@@ -137,8 +137,8 @@ $(document).ready(function() {
         toggleSearch(true);
     });
     document.getElementById('view-more-chips').addEventListener('click', function (evt) {
-        showMore = _("Show more tags");
-        showLess = ("Show fewer tags")
+        showMore = _('Show more tags');
+        showLess = _('Show fewer tags')
         toggleExpandable('morechips','flexchips');
         toggleText('view-more-chips', showMore, showLess);
     });
