@@ -138,8 +138,8 @@ $(document).ready(function() {
     });
     document.getElementById('view-more-chips').addEventListener('click', function (evt) {
         toggleExpandable('morechips','flexchips');
-        toggleText('view-more-chips','View More','View Less');
-		toggleText('view-more-chips','और दिखाएं','छिपाएं');
+        toggleText('view-more-chips','View More','View Fewer');
+		toggleText('view-more-chips','और दिखाएं','कम दिखाएं');
 		toggleText('view-more-chips','Ver más','Ver menos');
 		toggleText('view-more-chips','もっと見る','あまり見ない');
     });
