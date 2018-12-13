@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg19"
-   version="1.1"
+   width="192.5"
    height="80.5"
-   width="192.5">
+   version="1.1"
+   id="svg19">
   <metadata
      id="metadata25">
     <rdf:RDF>
@@ -24,63 +24,63 @@
   <defs
      id="defs23" />
   <rect
-     class=""
-     style="fill:none;stroke:none"
-     y="0.74999499"
-     x="0.75000501"
-     height="100%"
+     id="backgroundrect"
      width="100%"
-     id="backgroundrect" />
+     height="100%"
+     x="0.75000501"
+     y="0.74999499"
+     style="fill:none;stroke:none"
+     class="" />
   <g
-     transform="translate(0.750005,0.749995)"
+     class="currentLayer"
      id="g17"
-     class="currentLayer">
+     transform="translate(0.750005,0.749995)">
     <title
        id="title3">Layer 1</title>
     <g
-       id="g15"
-       class="">
+       class=""
+       id="g15">
       <g
-         class=""
-         id="svg_15">
+         id="svg_15"
+         class="">
         <g
-           id="svg_16"
-           transform="matrix(1.5,0,0,1.5,337,323)">
+           transform="matrix(1.5,0,0,1.5,337,323)"
+           id="svg_16">
           <path
-             id="svg_17"
+             d="m -216.66667,-215.33333 h 119.333332 v 20 H -216.66667 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -216.66667,-215.33333 h 119.333332 v 20 H -216.66667 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+             id="svg_17" />
           <text
-             x="-225.16667"
-             y="-215.83333"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_18"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-215.83333"
+             x="-225.16667">
             <tspan
-               id="svg_19"
+               x="-212.16667"
                y="-201.83333"
-               x="-212.16667">xざひょうち（カーソル）</tspan>
+               id="svg_19">xざひょうち （カーソル）</tspan>
           </text>
         </g>
       </g>
       <g
-         class=""
-         id="svg_20">
+         id="svg_20"
+         class="">
         <g
-           id="svg_21"
-           transform="matrix(1.5,0,0,1.5,337,372)">
+           transform="matrix(1.5,0,0,1.5,337,372)"
+           id="svg_21">
           <path
-             id="svg_22"
+             d="m -216.66667,-215.33333 h 119.333332 v 20 H -216.66667 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -216.66667,-215.33333 h 119.333332 v 20 H -216.66667 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+             id="svg_22" />
           <text
-             x="-225.16667"
-             y="-215.83333"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_23"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-215.83333"
+             x="-225.16667">
             <tspan
-               id="svg_24"
+               x="-212.16667"
                y="-201.83333"
-               x="-212.16667">yざひょうち（カーソル）</tspan>
+               id="svg_24">yざひょうち （カーソル）</tspan>
           </text>
         </g>
       </g>

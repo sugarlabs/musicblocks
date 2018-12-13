@@ -1066,7 +1066,7 @@ msgstr "おんりょうを 「0」に せってい しています。"
 #: js/musicutils.js:265
 #.TRANS: polytone synthesizer
 msgid "electronic synth"
-msgstr ""
+msgstr "シンセサイザー"
 
 #: js/logo.js:6854
 #: js/logo.js:6941

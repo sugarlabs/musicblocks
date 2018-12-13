@@ -1,45 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="63.367702mm"
-   height="9.1281252mm"
-   viewBox="0 0 63.367703 9.1281254"
-   version="1.1"
    id="svg1430"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="scalarstep.svg">
+   version="1.1"
+   viewBox="0 0 78.043252 9.1281254"
+   height="9.1281252mm"
+   width="78.043251mm">
   <defs
      id="defs1424" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-499.89285"
-     inkscape:cy="257.82082"
-     inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1" />
   <metadata
      id="metadata1427">
     <rdf:RDF>
@@ -53,57 +25,53 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-70.275221,-207.9203)">
+     transform="translate(-55.599667,-207.9203)"
+     id="layer1">
     <g
-       id="g100"
-       transform="matrix(0.26458333,0,0,0.26458333,70.275221,207.9203)">
+       transform="matrix(0.26458333,0,0,0.26458333,70.275221,207.9203)"
+       id="g100">
       <g
-         transform="scale(1.5)"
-         id="g98">
+         id="g98"
+         transform="scale(1.5,1.5)">
         <path
-           inkscape:connector-curvature="0"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 71.972656 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           id="path88"
            style="fill:#93e042;fill-opacity:1;stroke:#004000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path88" />
+           d="m -36.477781,8.5 0,-4 c 0,-2.209139 1.790861,-4 4,-4 l 4,0 0,2 10,0 0,-2 108.950437,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -108.950437,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.209139,0 -4,-1.790861 -4,-4 l 0,-4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text92">
+           id="text92"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="88"
+             id="tspan90"
              y="14"
-             id="tspan90">scalar step (+/–)</tspan>
+             x="88">音階内を上る／下りる (+/–)</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text96">
+           id="text96"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
           <tspan
-             x="88"
+             id="tspan94"
              y="12"
-             id="tspan94" />
+             x="88" />
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,106.25855,207.9203)"
-       id="g110">
+       id="g110"
+       transform="matrix(0.26458333,0,0,0.26458333,106.25855,207.9203)">
       <g
-         transform="scale(1.5)"
-         id="g108">
+         id="g108"
+         transform="scale(1.5,1.5)">
         <path
-           inkscape:connector-curvature="0"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           id="path102"
            style="fill:#ffb2bc;fill-opacity:1;stroke:#601136;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           id="path102" />
+           d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text106">
+           id="text106"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="13"
+             id="tspan104"
              y="14"
-             id="tspan104">1</tspan>
+             x="13">1</tspan>
         </text>
       </g>
     </g>
