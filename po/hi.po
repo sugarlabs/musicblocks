@@ -6875,7 +6875,7 @@ msgstr ""
 
 #: js/StringHelper.js:35
 msgid "View More"
-msgstr ""
+msgstr "और दिखाएं"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
