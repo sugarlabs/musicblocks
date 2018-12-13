@@ -17,10 +17,11 @@
 
 function debounce(func, wait, immediate) {
     var timeout;
-    return function() {
-        var context = this, args = arguments;
+    return function () {
+        var context = this,
+            args = arguments;
 
-        var later = function() {
+        var later = function () {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
@@ -68,7 +69,7 @@ function toggleSearch(on) {
 
 function toggleText(id, a, b) {
     var t = document.getElementById(id).innerHTML;
-    if (t.indexOf(a) !== -1){
+    if (t.indexOf(a) !== -1) {
         document.getElementById(id).innerHTML = t.replace(a, b);
     } else {
         document.getElementById(id).innerHTML = t.replace(b, a);
@@ -77,7 +78,7 @@ function toggleText(id, a, b) {
 
 function toggleExpandable(id, c) {
     var d = document.getElementById(id).className;
-    if (d === c + ' open'){
+    if (d === c + ' open') {
         document.getElementById(id).className = c;
     } else {
         document.getElementById(id).className = c + ' open';
@@ -86,10 +87,10 @@ function toggleExpandable(id, c) {
 
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
-    const outsideClickListener = function(event) {
+    const outsideClickListener = function (event) {
         var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
         var ok = false;
-        for (var i = 0; i < eles.length; i++){
+        for (var i = 0; i < eles.length; i++) {
             if (path.indexOf(eles[i]) !== -1) {
                 ok = true;
             }
@@ -101,7 +102,7 @@ function hideOnClickOutside(eles, other) {
         }
     };
 
-    const removeClickListener = function() {
+    const removeClickListener = function () {
         document.removeEventListener('click', outsideClickListener);
     };
 
@@ -112,19 +113,19 @@ function updateCheckboxes(id) {
     var elements = document.getElementById(id).querySelectorAll('input:checked');
     var urlel = document.getElementById(id).querySelectorAll('input[type=text]')[0];
     var url = urlel.getAttribute('data-originalurl');
-    for (var i = 0; i < elements.length; i++){
+    for (var i = 0; i < elements.length; i++) {
         url += '&' + elements[i].name + '=True';
     }
 
     urlel.value = url;
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('#publisher').modal();
     $('#deleter').modal();
     $('#projectviewer').modal();
     document.getElementById('global-search').addEventListener('input', function (evt) {
-        if(this.value !== ''){
+        if (this.value !== '') {
             document.getElementById('search-close').style.display = 'initial';
         } else {
             document.getElementById('search-close').style.display = 'none';
@@ -138,8 +139,8 @@ $(document).ready(function() {
     });
     document.getElementById('view-more-chips').addEventListener('click', function (evt) {
         showMore = _('Show more tags');
-        showLess = _('Show fewer tags')
-        toggleExpandable('morechips','flexchips');
+        showLess = _('Show fewer tags');
+        toggleExpandable('morechips', 'flexchips');
         toggleText('view-more-chips', showMore, showLess);
     });
 });
