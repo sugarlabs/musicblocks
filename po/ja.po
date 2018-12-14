@@ -3889,7 +3889,7 @@ msgstr "強拍に"
 
 #: js/basicblocks.js:1559
 msgid "on every note do"
-msgstr "全ての音符に～する"
+msgstr "全ての音符にアクション実行"
 
 #: js/basicblocks.js:1573
 #: js/basicblocks.js:1589
