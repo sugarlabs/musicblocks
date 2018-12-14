@@ -1438,7 +1438,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['bpmfactor'] = newblock;
     //.TRANS: number of beats played per minute
-    newblock.staticLabels.push(_('beats per minute'));
+    if (language === 'ja') {
+	newblock.staticLabels.push(_('beats per minute2'));
+    } else {
+	newblock.staticLabels.push(_('beats per minute'));
+    }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('bpmfactor')) {
