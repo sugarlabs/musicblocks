@@ -424,10 +424,9 @@ function GlobalPlanet(Planet) {
             
             document.body.onscroll = function () {
                 currentUserScrollPos = window.pageYOffset || document.documentElement.scrollTop;
-                maxScrollPos = Math.max( document.body.scrollHeight, document.body.offsetHeight, 
-                    document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+                maxScrollPos = Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
                 
-                if((currentUserScrollPos/maxScrollPos)*100 >= 75) {
+                if ((currentUserScrollPos/maxScrollPos) * 100 >= 75) {
                     if (that.loadButtonShown) {
                         that.loadMoreProjects();
                     }
