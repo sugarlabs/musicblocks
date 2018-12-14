@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg1870"
    version="1.1"
-   viewBox="0 0 46.831245 25.79687"
+   viewBox="0 0 56.794932 25.79687"
    height="25.796869mm"
-   width="46.831245mm">
+   width="56.794933mm">
   <defs
      id="defs1864" />
   <metadata
@@ -25,7 +25,7 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-25.118477,-151.66629)"
+     transform="translate(-15.154789,-151.66629)"
      id="layer1">
     <text
        y="192.21368"
@@ -58,7 +58,7 @@
            transform="scale(1.5)"
            id="g640">
           <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+             d="m -24.477778,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 9.9999998 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -54.9777782 -1 v 2 h -7.9999998 v -2 h -1 -4 c -2.209139,0 -4.740083,-1.918517 -4,-4 v -4 -21 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path626" />
           <text
@@ -67,7 +67,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan628">シェル</tspan>
+               id="tspan628">ネズミへんこう</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -83,7 +83,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan636">イメージ</tspan>
+               id="tspan636">がぞう そざい</tspan>
           </text>
         </g>
       </g>

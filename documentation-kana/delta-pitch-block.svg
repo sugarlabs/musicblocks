@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="78.688614mm"
+   height="41.128128mm"
+   viewBox="0 0 78.688611 41.128129"
+   version="1.1"
+   id="svg3045">
+  <defs
+     id="defs3039" />
+  <metadata
+     id="metadata3042">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path1196"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 35.917197,22.297328 h 42.572984 v 7.9375 H 35.917197 v -3.175001 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z" />
+  <text
+     y="22.09889"
+     x="32.543766"
+     id="text1200"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1198"
+       y="27.65514"
+       x="37.703136">おんていの ちがい</tspan>
+  </text>
+  <path
+     id="path1206"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 3.9026117,25.472327 v -1.5875 c 0,-0.876752 0.710748,-1.587499 1.5875,-1.587499 h 1.5875 v 0.793749 h 3.9687503 v -0.793749 h 21.171194 1.5875 c 0.876752,0 1.5875,0.710747 1.5875,1.587499 v 1.5875 h -1.5875 v -1.190624 h -1.5875 v 3.96875 h 1.5875 v -1.190626 h 1.5875 v 1.5875 c 0,0.876753 -0.710748,1.587501 -1.5875,1.587501 h -1.5875 -21.171194 -0.396875 v 0.793749 H 7.4744866 v -0.793749 h -0.3968749 -1.5875 c -0.876752,0 -1.5875,-0.710748 -1.5875,-1.587501 v -1.5875 z" />
+  <text
+     y="22.09889"
+     x="11.641672"
+     id="text1210"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1208"
+       y="27.65514"
+       x="31.485434">まえへ すすむ</tspan>
+  </text>
+  <text
+     y="22.09889"
+     x="3.704175"
+     id="text1214"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1212"
+       y="26.861389"
+       x="23.547926" />
+  </text>
+  <g
+     id="g1230"
+     transform="matrix(0.396875,0,0,0.396875,0,11.25097)">
+    <path
+       id="path1220"
+       style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 58 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -58 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+    <text
+       id="text1224"
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+      <tspan
+         id="tspan1222"
+         y="22"
+         x="20">アクション</tspan>
+    </text>
+    <text
+       id="text1228"
+       style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+      <tspan
+         id="tspan1226"
+         y="6"
+         x="83" />
+    </text>
+  </g>
+  <g
+     transform="matrix(0.13229166,0,0,0.13229166,0,14.425971)"
+     id="g1248"
+     style="isolation:isolate">
+    <g
+       data-name="レイヤー 2"
+       id="g1246">
+      <g
+         id="g1244">
+        <rect
+           id="rect1234"
+           style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+           ry="5"
+           rx="5"
+           height="42"
+           width="42"
+           x="0"
+           y="0" />
+        <path
+           id="path1236"
+           style="fill:#ffffff"
+           d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z" />
+        <path
+           id="path1238"
+           style="fill:#ffffff"
+           d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z" />
+        <path
+           id="path1240"
+           style="fill:#ffffff"
+           d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z" />
+        <path
+           id="path1242"
+           style="fill:#ffffff"
+           d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z" />
+      </g>
+    </g>
+  </g>
+  <path
+     id="path1254"
+     style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 37.504693,13.830658 h 35.718749 v 7.937499 H 37.504693 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.793751 v -3.175 h 0.793751 v 1.190625 h 2.38125 v -0.396875 z" />
+  <text
+     y="13.63222"
+     x="34.131256"
+     id="text1258"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1256"
+       y="19.188471"
+       x="39.29063">アクション</tspan>
+  </text>
+  <path
+     id="path1264"
+     style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984425,3.3734375 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 29.5660245 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -29.5660245 -0.396875 v 0.79375 h -3.175 v -0.79375 h -0.396875 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z" />
+  <text
+     y="1.9245434e-07"
+     x="4.9266237e-06"
+     id="text1268"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1266"
+       y="5.5562496"
+       x="36.115627">全ての音符に～する</tspan>
+  </text>
+  <text
+     y="1.9245434e-07"
+     x="4.9266237e-06"
+     id="text1272"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1270"
+       y="4.7624989"
+       x="36.115627" />
+  </text>
+  <path
+     id="path1278"
+     style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 40.415103,0.1984375 h 35.71875 v 7.9375 h -35.71875 v -3.175 -0.396875 h -2.381251 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.381251 v -0.396875 z" />
+  <text
+     y="1.9245434e-07"
+     x="37.041664"
+     id="text1282"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1280"
+       y="5.5562496"
+       x="42.201038">アクション</tspan>
+  </text>
+</svg>

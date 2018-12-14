@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6234"
+   version="1.1"
+   viewBox="0 0 76.113991 34.263546"
+   height="34.263546mm"
+   width="76.113991mm">
+  <defs
+     id="defs6228" />
+  <metadata
+     id="metadata6231">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g802"
+     transform="matrix(0.26458333,0,0,0.26458333,8.8657206,0)">
+    <g
+       transform="scale(1.5)"
+       id="g800">
+      <path
+         d="m -21.722222,8.5 v -4 c 0,-2.209139 1.790861,-4 3.999999,-4 h 4 v 2 h 10.0000003 v -2 h 52.8081597 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -52.8081597 -1 v 2 h -8.0000003 v -2 h -1 -4 c -2.209138,0 -4.368625,-2.397312 -3.999999,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path794" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text798">
+        <tspan
+           x="47"
+           y="14"
+           id="tspan796">ペンを あげる</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,3.2212767,25.135421)"
+     id="g812">
+    <g
+       transform="scale(1.5)"
+       id="g810">
+      <path
+         d="m -7.5000002,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 3.99999999 v 2 H 10.5 v -2 h 51.369141 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 10.5 9.4999998 v 2 h -8 v -2 H 0.49999979 -3.5000002 c -2.209139,0 -4.6985911,-1.904227 -4,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path804" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text808">
+        <tspan
+           x="60"
+           y="14"
+           id="tspan806">ペンを おろす</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,29.150449,8.466666)"
+     id="g830">
+    <g
+       transform="scale(1.5)"
+       id="g828">
+      <path
+         d="m -72.833334,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -103.333334 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4.243055,-2.146168 -4,-4 v -4 -21 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path814" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text818">
+        <tspan
+           x="46"
+           y="24"
+           id="tspan816">していざひょうに いどう</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text822">
+        <tspan
+           x="46"
+           y="12"
+           id="tspan820">xざひょう （ネズミ）</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text826">
+        <tspan
+           x="46"
+           y="33"
+           id="tspan824">yざひょう （ネズミ）</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,48.729616,8.466666)"
+     id="g840">
+    <g
+       transform="scale(1.5)"
+       id="g838">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path832" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text836">
+        <tspan
+           x="13"
+           y="14"
+           id="tspan834">0</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,48.729616,16.933333)"
+     id="g850">
+    <g
+       transform="scale(1.5)"
+       id="g848">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path842" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text846">
+        <tspan
+           x="13"
+           y="14"
+           id="tspan844">0</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

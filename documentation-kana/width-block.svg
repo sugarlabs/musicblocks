@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg1870"
    version="1.1"
-   viewBox="0 0 71.267356 55.003135"
+   viewBox="0 0 84.798957 55.003135"
    height="55.003136mm"
-   width="71.267357mm">
+   width="84.798958mm">
   <defs
      id="defs1864" />
   <metadata
@@ -37,7 +37,7 @@
            transform="scale(1.5)"
            id="g704">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 103.77777 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path698" />
           <text
@@ -46,7 +46,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan700">はば(よこ)</tspan>
+               id="tspan700">カンバスの よこはば</tspan>
           </text>
         </g>
       </g>
@@ -117,7 +117,7 @@
            transform="scale(1.5)"
            id="g784">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 104.66667 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path778" />
           <text
@@ -126,7 +126,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan780">ひだりに まがる</tspan>
+               id="tspan780">ざひょうち（ひだり）</tspan>
           </text>
         </g>
       </g>
@@ -137,7 +137,7 @@
            transform="scale(1.5)"
            id="g794">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 94 v 20 h -94 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path788" />
           <text
@@ -146,7 +146,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan790">みぎに まがる</tspan>
+               id="tspan790">ざひょうち（みぎ）</tspan>
           </text>
         </g>
       </g>
@@ -160,7 +160,7 @@
            transform="scale(1.5)"
            id="g694">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 103.77777 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path688" />
           <text
@@ -169,7 +169,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan690">たかさ(たて)</tspan>
+               id="tspan690">カンバスの たてはば</tspan>
           </text>
         </g>
       </g>
@@ -180,7 +180,7 @@
            transform="scale(1.5)"
            id="g714">
           <path
-             d="m 8.5,0.5 h 70.571289 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 95.90462 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path708" />
           <text
@@ -189,7 +189,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan710">かたん</tspan>
+               id="tspan710">ざひょうち（した）</tspan>
           </text>
         </g>
       </g>
@@ -260,7 +260,7 @@
            transform="scale(1.5)"
            id="g804">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             d="m 8.5,0.5 h 95.33334 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
              style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
              id="path798" />
           <text
@@ -269,7 +269,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan800">じょうたん</tspan>
+               id="tspan800">ざひょうち（うえ）</tspan>
           </text>
         </g>
       </g>

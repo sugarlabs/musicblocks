@@ -8,7 +8,7 @@
    id="svg1008"
    version="1.1"
    height="302.34308"
-   width="334.5">
+   width="366.5">
   <metadata
      id="metadata1014">
     <rdf:RDF>
@@ -201,7 +201,7 @@
           <tspan
              id="tspan56"
              y="12"
-             x="85">あたい</tspan>
+             x="85">ながさ</tspan>
         </text>
       </g>
     </g>
@@ -248,7 +248,7 @@
   </g>
   <g
      id="g100"
-     transform="translate(145.5,40.921537)">
+     transform="translate(145.5,40.921531)">
     <g
        id="g98"
        transform="scale(1.5)">
@@ -284,7 +284,7 @@
   </g>
   <g
      id="g110"
-     transform="translate(231,40.921537)">
+     transform="translate(231,40.921531)">
     <g
        id="g108"
        transform="scale(1.5)">
@@ -304,7 +304,7 @@
   </g>
   <g
      id="g120"
-     transform="translate(231,72.421537)">
+     transform="translate(231,72.421531)">
     <g
        id="g118"
        transform="scale(1.5)">
@@ -324,7 +324,7 @@
   </g>
   <g
      id="g130"
-     transform="translate(27,72.421537)">
+     transform="translate(27,72.421531)">
     <g
        id="g128"
        transform="scale(1.5)">
@@ -351,14 +351,14 @@
       <path
          id="path432"
          style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+         d="m 8.5,0.5 h 111.33334 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text436"
          style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
            id="tspan434"
            y="14"
-           x="13">「x」ざひょう</tspan>
+           x="13">xざひょうち（ネズミ）</tspan>
       </text>
     </g>
   </g>
@@ -371,14 +371,14 @@
       <path
          id="path442"
          style="fill:#728ff9;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+         d="m 8.5,0.5 h 111.33334 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text446"
          style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
            id="tspan444"
            y="14"
-           x="13">「y」ざひょう</tspan>
+           x="13">yざひょうち（ネズミ）</tspan>
       </text>
     </g>
   </g>
@@ -391,14 +391,14 @@
       <path
          id="path708"
          style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 8.5,0.5 h 70.571289 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+         d="m 8.5,0.5 h 94.57129 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text712"
          style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
            id="tspan710"
            y="14"
-           x="13">かたん</tspan>
+           x="13">ざひょうち（した）</tspan>
       </text>
     </g>
   </g>
@@ -411,14 +411,14 @@
       <path
          id="path778"
          style="fill:#ff5942;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+         d="m 8.5,0.5 h 104.66667 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text782"
          style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
            id="tspan780"
            y="14"
-           x="13">ひだりに まがる</tspan>
+           x="13">ざひょうち（ひだり）</tspan>
       </text>
     </g>
   </g>
