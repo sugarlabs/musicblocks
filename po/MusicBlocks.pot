@@ -6347,10 +6347,6 @@ msgstr ""
 #~msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
 #~msgstr ""
 
-#: js/StringHelper.js:35
-#~msgid "View More"
-#~msgstr ""
-
 #: js/StringHelper.js:51
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""

@@ -1138,6 +1138,49 @@
 #: js/rhythmruler.js:1173
 #: js/rhythmruler.js:1281
 #: js/rhythmruler.js:1283
+#: js/block.js:1162
+#: js/block.js:5410
+#: js/block.js:5419
+#: js/block.js:5430
+#: js/activity.js:2127
+#: js/palette.js:770
+#: js/palette.js:779
+#: js/palette.js:788
+#: js/palette.js:797
+#: js/palette.js:2098
+#: js/palette.js:2109
+#: js/palette.js:2120
+#: js/palette.js:2131
+#: js/palette.js:2141
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1527
+#: js/basicblocks.js:1547
+#: js/basicblocks.js:1561
+#: js/basicblocks.js:3967
+#: js/basicblocks.js:4007
+#: js/basicblocks.js:4017
+#: js/basicblocks.js:4065
+#: js/basicblocks.js:4078
+#: js/basicblocks.js:4126
+#: js/basicblocks.js:4181
+#: js/basicblocks.js:4186
+#: js/basicblocks.js:4191
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4598
+#: js/blocks.js:5455
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1171
+#: js/rhythmruler.js:1173
+#: js/rhythmruler.js:1281
+#: js/rhythmruler.js:1283
 #.TRANS: a stack of blocks to run (an action to take)
 #.TRANS: acción
 msgid "action"
@@ -7969,6 +8012,7 @@ msgstr ""
 
 #: js/StringHelper.js:35
 #: js/helper.js:141
+#.TRANS: 
 msgid "Show more tags"
 msgstr ""
 
@@ -8181,6 +8225,7 @@ msgid "Try Again"
 msgstr ""
 
 #: js/helper.js:142
+#.TRANS: 
 msgid "Show fewer tags"
 msgstr ""
 
@@ -8671,11 +8716,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Multiply</em> block is used to multiply."
 #~msgstr ""
 
-#: js/basicblocks.js:4883
-
-#~msgid "save svg"
-#~msgstr "eñongatu SVG icha"
-
 #: js/turtledefs.js:209
 
 #~msgid "The <em>Scalar transposition</em> block will shift the pitches contained inside <em>Note</em> blocks up (or down) the scale. In the example shown above, <em>sol</em> is shifted up to <em>la</em>."
@@ -8712,17 +8752,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "chine"
 #~msgstr "chino"
 
-#: js/timbre.js:743
-
-#: js/rhythmruler.js:1481
-
-#: js/modewidget.js:95
-
-#: js/pitchstaircase.js:534
-
-#~msgid "undo"
-#~msgstr "momba"
-
 #: js/basicblocks.js:2464
 
 #~msgid "chord' + ' ' + 'I"
@@ -8753,11 +8782,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #: js/turtledefs.js:378
 
 #~msgid "The <em>Waitfor</em> block will wait until the condition is true."
-#~msgstr ""
-
-#: js/turtledefs.js:226
-
-#~msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
 #~msgstr ""
 
 #: js/basicblocks.js:752
@@ -8905,6 +8929,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The Show heap block displays the contents of the heap at the top of the screen."
 #~msgstr ""
 
+#: js/turtledefs.js:260
+
+#~msgid "The <em>Number</em> block holds a number."
+#~msgstr ""
+
 #: js/turtledefs.js:381
 
 #~msgid "The <em>Case</em> block is used inside of a <em>Switch</em> to define matches."
@@ -8935,9 +8964,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "turtle note value"
 #~msgstr "karumbe nota repy"
 
-#: js/turtledefs.js:29
+#: js/turtledefs.js:380
 
-#~msgid "floor-tom"
+#~msgid "The <em>Switch</em> block will run the code in the matchin <em>Case</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:295
@@ -8960,10 +8989,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Click</em> block returns <em>True</em> if a mouse has been clicked."
 #~msgstr ""
 
-#: js/musicutils.js:237
+#: js/basicblocks.js:1501
 
-#~msgid "Spanish Gypsy"
-#~msgstr "Gitano español"
+#~msgid "on every beat do"
+#~msgstr ""
 
 #: js/turtledefs.js:220
 
@@ -9017,6 +9046,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "note volume"
 #~msgstr "volumen nota"
 
+#: js/activity.js:3541
+
+#~msgid "Save as .abc"
+#~msgstr ""
+
 #: js/turtledefs.js:144
 
 #: js/turtledefs.js:189
@@ -9024,10 +9058,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Open a panel for configuring Music Blocks."
 #~msgstr "Eipe’a ybyra pe moha’anga ha Vore Pupoty"
 
-#: js/turtledefs.js:121
+#: js/turtledefs.js:407
 
-#~msgid "Hide or show the block palettes."
-#~msgstr "Emongañy tera eichuka Yvyra pe vorekuera"
+#~msgid "The <em>And</em> block is the logical and operator."
+#~msgstr ""
 
 #: js/activity.js:3533
 
@@ -9231,7 +9265,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #: js/StringHelper.js:35
 
-#.TRANS: Ver más
 #~msgid "View More"
 #~msgstr ""
 
@@ -9270,6 +9303,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #: js/turtledefs.js:300
 
 #~msgid "The <em>Right</em> block returns the position of the right of the canvas."
+#~msgstr ""
+
+#: js/turtledefs.js:226
+
+#~msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
 #~msgstr ""
 
 #: js/turtledefs.js:224
@@ -9445,11 +9483,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
 #~msgstr ""
 
-#: js/turtledefs.js:296
-
-#~msgid "The <em>Width</em> block returns the width of the canvas."
-#~msgstr ""
-
 #: js/turtledefs.js:110
 
 #: js/turtledefs.js:148
@@ -9507,10 +9540,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Neighbor</em> block rapidly switches between neighboring pitches."
 #~msgstr ""
 
-#: js/turtledefs.js:469
+#: js/lilypond.js:21
 
-#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
-#~msgstr ""
+#~msgid "br"
+#~msgstr "br"
 
 #: js/block.js:1306
 
@@ -9616,10 +9649,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Drum name</em> block is used to select a drum."
 #~msgstr ""
 
-#: js/basicblocks.js:4872
+#: js/turtledefs.js:303
 
-#~msgid "save as lilypond"
-#~msgstr "eñongatu lilypond icha"
+#~msgid "The <em>Cursor X</em> block returns the horizontal position of the mouse."
+#~msgstr ""
 
 #: js/turtledefs.js:266
 
@@ -9811,11 +9844,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Beats per minute</em> block changes the beats per minute of any contained notes."
 #~msgstr ""
 
-#: js/turtledefs.js:243
+#: js/turtledefs.js:368
 
-#: js/turtledefs.js:244
-
-#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
+#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
 #~msgstr ""
 
 #: js/turtledefs.js:143
@@ -9891,6 +9922,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #: js/activity.js:2459
 
 #~msgid "untitled"
+#~msgstr ""
+
+#: js/activity.js:4426
+
+#~msgid "Run music step by step"
 #~msgstr ""
 
 #: js/samplesviewer.js:700
@@ -10173,11 +10209,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Invert</em> block rotates any contained notes around a target note."
 #~msgstr ""
 
-#: js/turtledefs.js:270
-
-#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
-#~msgstr ""
-
 #: js/lilypond.js:21
 
 #~msgid "m"
@@ -10256,10 +10287,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Dispatch</em> block is used to trigger an event."
 #~msgstr ""
 
-#: js/turtledefs.js:407
+#: js/turtledefs.js:121
 
-#~msgid "The <em>And</em> block is the logical and operator."
-#~msgstr ""
+#~msgid "Hide or show the block palettes."
+#~msgstr "Emongañy tera eichuka Yvyra pe vorekuera"
 
 #: js/activity.js:913
 
@@ -10394,9 +10425,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The Stopplayback block"
 #~msgstr ""
 
-#: js/turtledefs.js:368
+#: js/turtledefs.js:243
 
-#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
+#: js/turtledefs.js:244
+
+#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
 #~msgstr ""
 
 #: js/turtledefs.js:471
@@ -10444,9 +10477,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "More"
 #~msgstr ""
 
-#: js/turtledefs.js:461
+#: js/turtledefs.js:304
 
-#~msgid "The <em>Playback</em> block"
+#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
 #~msgstr ""
 
 #: js/turtledefs.js:260
@@ -10496,6 +10529,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #: js/turtledefs.js:164
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
+#~msgstr ""
+
+#: js/help.js:72
+
+#~msgid "next page"
 #~msgstr ""
 
 #: js/turtledefs.js:241
@@ -10644,10 +10682,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Backward</em> block runs code in reverse order (Musical retrograde)."
 #~msgstr ""
 
-#: js/basicblocks.js:1501
+#: js/musicutils.js:237
 
-#~msgid "on every beat do"
-#~msgstr ""
+#~msgid "Spanish Gypsy"
+#~msgstr "Gitano español"
 
 #: js/musicutils.js:226
 
@@ -10681,10 +10719,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
 #~msgstr ""
 
-#: js/musicutils.js:233
+#: js/turtledefs.js:207
 
-#~msgid "Hindu"
-#~msgstr "Hindú"
+#~msgid "e.g., 1, 2, 3, or 4."
+#~msgstr ""
 
 #: js/turtledefs.js:316
 
@@ -10753,10 +10791,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Distortion</em> block adds distortion to the pitch."
 #~msgstr ""
 
-#: js/lilypond.js:21
+#: js/turtledefs.js:469
 
-#~msgid "br"
-#~msgstr "br"
+#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
+#~msgstr ""
 
 #: js/turtledefs.js:235
 
@@ -10773,10 +10811,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Not</em> block is the logical not operator."
 #~msgstr ""
 
-#: js/turtledefs.js:303
+#: js/basicblocks.js:4872
 
-#~msgid "The <em>Cursor X</em> block returns the horizontal position of the mouse."
-#~msgstr ""
+#~msgid "save as lilypond"
+#~msgstr "eñongatu lilypond icha"
 
 #: js/activity.js:3444
 
@@ -10904,9 +10942,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Shell</em> block is used to change the appearance of the mouse."
 #~msgstr ""
 
-#: js/turtledefs.js:260
+#: js/turtledefs.js:270
 
-#~msgid "The <em>Number</em> block holds a number."
+#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
 #~msgstr ""
 
 #: js/savebox.js:105
@@ -10929,19 +10967,14 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Load plugin from file"
 #~msgstr "Ehupi plugin ñongatuha rire"
 
-#: js/turtledefs.js:304
+#: js/turtledefs.js:461
 
-#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
+#~msgid "The <em>Playback</em> block"
 #~msgstr ""
 
 #: js/basicblocks.js:3806
 
 #~msgid "found turtle"
-#~msgstr ""
-
-#: js/activity.js:3541
-
-#~msgid "Save as .abc"
 #~msgstr ""
 
 #: js/turtledefs.js:210
@@ -10995,10 +11028,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Plus</em> block is used to add."
 #~msgstr ""
 
-#: js/turtledefs.js:207
+#: js/musicutils.js:233
 
-#~msgid "e.g., 1, 2, 3, or 4."
-#~msgstr ""
+#~msgid "Hindu"
+#~msgstr "Hindú"
 
 #: js/turtledefs.js:416
 
@@ -11171,6 +11204,17 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Get blue</em> block returns the blue component of the pixel under the mouse."
 #~msgstr ""
 
+#: js/timbre.js:743
+
+#: js/rhythmruler.js:1481
+
+#: js/modewidget.js:95
+
+#: js/pitchstaircase.js:534
+
+#~msgid "undo"
+#~msgstr "momba"
+
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:320
@@ -11188,9 +11232,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Set relative volume</em> block changes the volume of the contained notes."
 #~msgstr ""
 
-#: js/turtledefs.js:380
+#: js/turtledefs.js:29
 
-#~msgid "The <em>Switch</em> block will run the code in the matchin <em>Case</em>."
+#~msgid "floor-tom"
 #~msgstr ""
 
 #: js/basicblocks.js:259
@@ -11325,9 +11369,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Click here to paste"
 #~msgstr ""
 
-#: js/activity.js:4426
+#: js/turtledefs.js:296
 
-#~msgid "Run music step by step"
+#~msgid "The <em>Width</em> block returns the width of the canvas."
 #~msgstr ""
 
 #: js/turtledefs.js:417
@@ -11409,10 +11453,10 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "Remove all content on the canvas, including the blocks."
 #~msgstr "Eipe’a opakatu canvas, vore kuéra avei"
 
-#: js/help.js:72
+#: js/basicblocks.js:4883
 
-#~msgid "next page"
-#~msgstr ""
+#~msgid "save svg"
+#~msgstr "eñongatu SVG icha"
 
 #: js/samplesviewer.js:699
 
@@ -11424,9 +11468,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>No background</em> block eliminates the background from the saved SVG output."
 #~msgstr ""
 
-#: js/activity.js:2527
+#: js/turtledefs.js:242
 
-#~msgid "My Music Blocks Creation"
+#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
 #~msgstr ""
 
 #: js/turtledefs.js:438
@@ -11494,11 +11538,6 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 
 #~msgid "export"
 #~msgstr "mondo"
-
-#: js/turtledefs.js:402
-
-#~msgid "The <em>Power</em> block calculates a power function."
-#~msgstr ""
 
 #: js/turtledefs.js:440
 
@@ -11592,9 +11631,9 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #~msgid "The <em>Notes played</em> block is the number of notes that have been played. (By default, it counts quarter notes.)"
 #~msgstr ""
 
-#: js/turtledefs.js:242
+#: js/activity.js:2527
 
-#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
+#~msgid "My Music Blocks Creation"
 #~msgstr ""
 
 #: js/turtledefs.js:248
@@ -11605,6 +11644,11 @@ msgstr "eiporavo vaerã peteĩ ñongatuha"
 #: js/turtledefs.js:352
 
 #~msgid "e.g. \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgstr ""
+
+#: js/turtledefs.js:402
+
+#~msgid "The <em>Power</em> block calculates a power function."
 #~msgstr ""
 
 #: js/basicblocks.js:83
