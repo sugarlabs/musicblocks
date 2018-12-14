@@ -5,35 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg11666"
    version="1.1"
    viewBox="0 0 88.503121 75.803125"
    height="75.803123mm"
-   width="88.50312mm"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="neighbor-block.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1278"
-     inkscape:window-height="773"
-     id="namedview105"
-     showgrid="false"
-     inkscape:zoom="0.8786504"
-     inkscape:cx="156.79687"
-     inkscape:cy="134.29687"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg11666" />
+   width="88.50312mm">
   <defs
      id="defs11660" />
   <metadata
@@ -44,7 +20,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,7 +46,7 @@
             <tspan
                x="5"
                y="22"
-               id="tspan2324">隣接音 (+/–)</tspan>
+               id="tspan2324">音を加える(+/–)</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -78,7 +54,7 @@
             <tspan
                x="93"
                y="12"
-               id="tspan2328">音階的音程</tspan>
+               id="tspan2328">音階の上下</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -86,7 +62,7 @@
             <tspan
                x="93"
                y="33"
-               id="tspan2332">音価</tspan>
+               id="tspan2332">音の長さ</tspan>
           </text>
         </g>
       </g>
@@ -233,7 +209,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan2606">値</tspan>
+                 id="tspan2606">長さ</tspan>
             </text>
           </g>
         </g>
@@ -390,7 +366,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan2684">音高</tspan>
+               id="tspan2684">音の高さ</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -406,7 +382,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan2692">オクターヴ</tspan>
+               id="tspan2692">オクターヴの高さ</tspan>
           </text>
         </g>
       </g>

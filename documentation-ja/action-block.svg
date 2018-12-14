@@ -56,7 +56,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan80">値</tspan>
+                 id="tspan80">長さ</tspan>
             </text>
           </g>
         </g>
@@ -213,7 +213,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan158">音高</tspan>
+               id="tspan158">音の高さ</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -229,7 +229,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan166">オクターヴ</tspan>
+               id="tspan166">オクターヴの高さ</tspan>
           </text>
         </g>
       </g>
@@ -299,7 +299,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan200">値</tspan>
+                 id="tspan200">長さ</tspan>
             </text>
           </g>
         </g>
@@ -456,7 +456,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan278">音高</tspan>
+               id="tspan278">音の高さ</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -472,7 +472,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan286">オクターヴ</tspan>
+               id="tspan286">オクターヴの高さ</tspan>
           </text>
         </g>
       </g>
@@ -542,7 +542,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan320">値</tspan>
+                 id="tspan320">長さ</tspan>
             </text>
           </g>
         </g>
@@ -699,7 +699,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan398">音高</tspan>
+               id="tspan398">音の高さ</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -715,7 +715,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan406">オクターヴ</tspan>
+               id="tspan406">オクターヴの高さ</tspan>
           </text>
         </g>
       </g>
