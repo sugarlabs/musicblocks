@@ -3802,7 +3802,7 @@ msgstr "強拍に"
 
 #: js/basicblocks.js:1560
 msgid "on every note do"
-msgstr "すべての おんぷに～する"
+msgstr "すべての おんぷに アクションじっこう"
 
 #: js/basicblocks.js:1574
 #: js/basicblocks.js:1590
