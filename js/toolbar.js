@@ -92,9 +92,9 @@ function Toolbar() {
                 var saveSVG = docById('save-svg');
                 var savePNG = docById('save-png');
                 var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
-                
+
                 // if there is no mouse artwork to save then grey out
-                if(svgData == '') {
+                if (svgData == '') {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = 'grey-text inactiveLink';
@@ -104,15 +104,15 @@ function Toolbar() {
                     savePNG.disabled = false;
                     saveSVG.className = '';
                     savePNG.className = '';
-                saveSVG.onclick = function () {
-                    svg_onclick();
-                };
+                    saveSVG.onclick = function () {
+                        svg_onclick();
+                    };
 
 
-                savePNG.onclick = function () {
-                    png_onclick();
-                };
-            }
+                    savePNG.onclick = function () {
+                        png_onclick();
+                    };
+                }
 
                 var saveWAV = docById('save-wav');
 
@@ -481,7 +481,7 @@ function Toolbar() {
         tooltipsDisabled = true;
     }
 
-    this.closeAuxToolbar = function(onclick) {
+    this.closeAuxToolbar = function (onclick) {
         if (auxToolbar.style.display === 'block') {
             onclick(false);
             var menuIcon = docById('menu');
