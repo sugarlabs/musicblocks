@@ -393,8 +393,8 @@ msgstr ""
 #: js/block.js:5558
 #: js/turtledefs.js:174
 #: js/turtledefs.js:216
-#: js/toolbar.js:359
-#: js/toolbar.js:407
+#: js/toolbar.js:371
+#: js/toolbar.js:419
 msgid "Help"
 msgstr ""
 
@@ -1175,8 +1175,8 @@ msgid "Let us start our tour!"
 msgstr ""
 
 #: js/turtledefs.js:146
-#: js/toolbar.js:350
-#: js/toolbar.js:398
+#: js/toolbar.js:362
+#: js/toolbar.js:410
 #: js/playback.js:203
 #: js/musickeyboard.js:185
 #: js/pitchdrummatrix.js:125
@@ -1212,8 +1212,8 @@ msgstr ""
 
 #: js/turtledefs.js:147
 #: js/turtledefs.js:183
-#: js/toolbar.js:351
-#: js/toolbar.js:399
+#: js/toolbar.js:363
+#: js/toolbar.js:411
 #: js/temperament.js:1417
 #: js/temperament.js:1417
 msgid "Stop"
@@ -1231,8 +1231,8 @@ msgstr ""
 
 #: js/turtledefs.js:148
 #: js/turtledefs.js:185
-#: js/toolbar.js:352
-#: js/toolbar.js:400
+#: js/toolbar.js:364
+#: js/toolbar.js:412
 #: js/StringHelper.js:19
 msgid "New project"
 msgstr ""
@@ -1244,8 +1244,8 @@ msgstr ""
 
 #: js/turtledefs.js:149
 #: js/turtledefs.js:186
-#: js/toolbar.js:353
-#: js/toolbar.js:401
+#: js/toolbar.js:365
+#: js/toolbar.js:413
 msgid "Load project from file"
 msgstr ""
 
@@ -1256,10 +1256,9 @@ msgstr ""
 
 #: js/turtledefs.js:150
 #: js/turtledefs.js:187
-#: js/toolbar.js:354
-#: js/toolbar.js:355
-#: js/toolbar.js:402
-#: js/toolbar.js:403
+#: js/toolbar.js:366
+#: js/toolbar.js:414
+#: js/toolbar.js:415
 msgid "Save project"
 msgstr ""
 
@@ -1269,8 +1268,8 @@ msgid "Save your project to a file."
 msgstr ""
 
 #: js/turtledefs.js:151
-#: js/toolbar.js:356
-#: js/toolbar.js:404
+#: js/toolbar.js:368
+#: js/toolbar.js:416
 msgid "Find and share projects"
 msgstr ""
 
@@ -1370,8 +1369,8 @@ msgstr ""
 
 #: js/turtledefs.js:167
 #: js/turtledefs.js:206
-#: js/toolbar.js:361
-#: js/toolbar.js:409
+#: js/toolbar.js:373
+#: js/toolbar.js:421
 msgid "Run step by step"
 msgstr ""
 
@@ -1382,8 +1381,8 @@ msgstr ""
 
 #: js/turtledefs.js:168
 #: js/turtledefs.js:212
-#: js/toolbar.js:368
-#: js/toolbar.js:416
+#: js/toolbar.js:380
+#: js/toolbar.js:428
 msgid "Restore"
 msgstr ""
 
@@ -1404,9 +1403,9 @@ msgstr ""
 
 #: js/turtledefs.js:170
 #: js/turtledefs.js:211
-#: js/toolbar.js:371
-#: js/toolbar.js:419
-#: js/toolbar.js:428
+#: js/toolbar.js:383
+#: js/toolbar.js:431
+#: js/toolbar.js:440
 msgid "Select language"
 msgstr ""
 
@@ -1490,9 +1489,9 @@ msgid "save"
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:373
-#: js/toolbar.js:421
-msgid "Save as SVG"
+#: js/toolbar.js:385
+#: js/toolbar.js:433
+msgid "Save mouse artwork as SVG"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1500,9 +1499,9 @@ msgid "Save graphics from your project to as SVG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:374
-#: js/toolbar.js:422
-msgid "Save as PNG"
+#: js/toolbar.js:386
+#: js/toolbar.js:434
+msgid "Save mouse artwork as PNG"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1510,9 +1509,9 @@ msgid "Save graphics from your project as PNG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:375
-#: js/toolbar.js:423
-msgid "Save as WAV"
+#: js/toolbar.js:387
+#: js/toolbar.js:435
+msgid "Save music as WAV"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1520,9 +1519,9 @@ msgid "Save audio from your project as WAV."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:376
-#: js/toolbar.js:424
-msgid "Save as ABC"
+#: js/toolbar.js:388
+#: js/toolbar.js:436
+msgid "Save sheet music as ABC"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1530,9 +1529,9 @@ msgid "Save your project to as an ABC file."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:377
-#: js/toolbar.js:425
-msgid "Save sheet music"
+#: js/toolbar.js:389
+#: js/toolbar.js:437
+msgid "Save sheet music as Lilypond"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1540,9 +1539,9 @@ msgid "Save your project to as a Lilypond file."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:378
-#: js/toolbar.js:426
-msgid "Save block artwork"
+#: js/toolbar.js:390
+#: js/toolbar.js:438
+msgid "Save block artwork as SVG"
 msgstr ""
 
 #: js/turtledefs.js:187
@@ -1574,8 +1573,8 @@ msgid "You can scroll the blocks on the canvas."
 msgstr ""
 
 #: js/turtledefs.js:209
-#: js/toolbar.js:362
-#: js/toolbar.js:410
+#: js/toolbar.js:374
+#: js/toolbar.js:422
 msgid "Display statistics"
 msgstr ""
 
@@ -1584,8 +1583,8 @@ msgid "Display statistics about your Music project."
 msgstr ""
 
 #: js/turtledefs.js:210
-#: js/toolbar.js:364
-#: js/toolbar.js:412
+#: js/toolbar.js:376
+#: js/toolbar.js:424
 msgid "Delete plugin"
 msgstr ""
 
@@ -2737,116 +2736,117 @@ msgstr ""
 msgid "The Stop mouse block stops the specified mouse."
 msgstr ""
 
-#: js/toolbar.js:349
-#: js/toolbar.js:397
+#: js/toolbar.js:361
+#: js/toolbar.js:409
 msgid "About Music Blocks"
 msgstr ""
 
-#: js/toolbar.js:357
-#: js/toolbar.js:405
-msgid "Offline. Sharing is unavailable"
-msgstr ""
-
-#: js/toolbar.js:358
-#: js/toolbar.js:406
-msgid "Auxilary menu"
-msgstr ""
-
-#: js/toolbar.js:360
-#: js/toolbar.js:408
-msgid "Run slowly"
-msgstr ""
-
-#: js/toolbar.js:363
-#: js/toolbar.js:411
-msgid "Load plugin"
-msgstr ""
-
-#: js/toolbar.js:365
-#: js/toolbar.js:413
-msgid "Enable horizontal scrolling"
-msgstr ""
-
-#: js/toolbar.js:366
-#: js/toolbar.js:414
-msgid "Disable horizontal scrolling"
-msgstr ""
-
 #: js/toolbar.js:367
-#: js/toolbar.js:415
-#: js/LocalCard.js:52
-msgid "Merge with current project"
+#: js/toolbar.js:384
+#: js/toolbar.js:432
+msgid "Save project as HTML"
 msgstr ""
 
 #: js/toolbar.js:369
 #: js/toolbar.js:417
-msgid "Switch to beginner mode"
+msgid "Offline. Sharing is unavailable"
 msgstr ""
 
 #: js/toolbar.js:370
 #: js/toolbar.js:418
-msgid "Switch to advanced mode"
+msgid "Auxilary menu"
 msgstr ""
 
 #: js/toolbar.js:372
 #: js/toolbar.js:420
-msgid "Save as HTML"
+msgid "Run slowly"
+msgstr ""
+
+#: js/toolbar.js:375
+#: js/toolbar.js:423
+msgid "Load plugin"
+msgstr ""
+
+#: js/toolbar.js:377
+#: js/toolbar.js:425
+msgid "Enable horizontal scrolling"
+msgstr ""
+
+#: js/toolbar.js:378
+#: js/toolbar.js:426
+msgid "Disable horizontal scrolling"
 msgstr ""
 
 #: js/toolbar.js:379
 #: js/toolbar.js:427
-msgid "Confirm"
-msgstr ""
-
-#: js/toolbar.js:380
-msgid "English (United States)"
+#: js/LocalCard.js:52
+msgid "Merge with current project"
 msgstr ""
 
 #: js/toolbar.js:381
-msgid "English (United Kingdom)"
+#: js/toolbar.js:429
+msgid "Switch to beginner mode"
 msgstr ""
 
 #: js/toolbar.js:382
-msgid "日本語"
-msgstr ""
-
-#: js/toolbar.js:383
-msgid "español"
-msgstr ""
-
-#: js/toolbar.js:384
-msgid "にほんご"
-msgstr ""
-
-#: js/toolbar.js:385
-msgid "中文"
-msgstr ""
-
-#: js/toolbar.js:386
-msgid "ภาษาไทย"
-msgstr ""
-
-#: js/toolbar.js:387
-msgid "aymara"
-msgstr ""
-
-#: js/toolbar.js:388
-msgid "guarani"
-msgstr ""
-
-#: js/toolbar.js:389
-msgid "हिंदी"
-msgstr ""
-
-#: js/toolbar.js:390
-msgid "igbo"
+#: js/toolbar.js:430
+msgid "Switch to advanced mode"
 msgstr ""
 
 #: js/toolbar.js:391
-msgid "عربى"
+#: js/toolbar.js:439
+msgid "Confirm"
 msgstr ""
 
 #: js/toolbar.js:392
+msgid "English (United States)"
+msgstr ""
+
+#: js/toolbar.js:393
+msgid "English (United Kingdom)"
+msgstr ""
+
+#: js/toolbar.js:394
+msgid "日本語"
+msgstr ""
+
+#: js/toolbar.js:395
+msgid "español"
+msgstr ""
+
+#: js/toolbar.js:396
+msgid "にほんご"
+msgstr ""
+
+#: js/toolbar.js:397
+msgid "中文"
+msgstr ""
+
+#: js/toolbar.js:398
+msgid "ภาษาไทย"
+msgstr ""
+
+#: js/toolbar.js:399
+msgid "aymara"
+msgstr ""
+
+#: js/toolbar.js:400
+msgid "guarani"
+msgstr ""
+
+#: js/toolbar.js:401
+msgid "हिंदी"
+msgstr ""
+
+#: js/toolbar.js:402
+msgid "igbo"
+msgstr ""
+
+#: js/toolbar.js:403
+msgid "عربى"
+msgstr ""
+
+#: js/toolbar.js:404
 msgid "עִברִית"
 msgstr ""
 
@@ -6373,8 +6373,49 @@ msgstr ""
 msgid "You need to select a file."
 msgstr ""
 
-#: js/turtledefs.js:369
+#: js/turtledefs.js:187
+#: js/toolbar.js:373
+#: js/toolbar.js:421
+#~msgid "Save as SVG"
+#~msgstr ""
+
+#: js/turtledefs.js:187
+#: js/toolbar.js:374
+#: js/toolbar.js:422
+#~msgid "Save as PNG"
+#~msgstr ""
+
+#: js/turtledefs.js:187
+#: js/toolbar.js:375
+#: js/toolbar.js:423
+#~msgid "Save as WAV"
+#~msgstr ""
+
+#: js/turtledefs.js:187
+#: js/toolbar.js:376
+#: js/toolbar.js:424
+#~msgid "Save as ABC"
+#~msgstr ""
+
+#: js/turtledefs.js:187
+#: js/toolbar.js:377
+#: js/toolbar.js:425
+#~msgid "Save sheet music"
+#~msgstr ""
+
+#: js/turtledefs.js:187
+#: js/toolbar.js:378
+#: js/toolbar.js:426
+#~msgid "Save block artwork"
+#~msgstr ""
+
+#: js/turtledefs.js:378
 #~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgstr ""
+
+#: js/toolbar.js:372
+#: js/toolbar.js:420
+#~msgid "Save as HTML"
 #~msgstr ""
 
 #: js/StringHelper.js:30

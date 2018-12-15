@@ -685,6 +685,49 @@
 #: js/rhythmruler.js:1173
 #: js/rhythmruler.js:1281
 #: js/rhythmruler.js:1283
+#: js/block.js:1162
+#: js/block.js:5410
+#: js/block.js:5419
+#: js/block.js:5430
+#: js/activity.js:2127
+#: js/palette.js:770
+#: js/palette.js:779
+#: js/palette.js:788
+#: js/palette.js:797
+#: js/palette.js:2098
+#: js/palette.js:2109
+#: js/palette.js:2120
+#: js/palette.js:2131
+#: js/palette.js:2141
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1531
+#: js/basicblocks.js:1551
+#: js/basicblocks.js:1565
+#: js/basicblocks.js:3971
+#: js/basicblocks.js:4011
+#: js/basicblocks.js:4021
+#: js/basicblocks.js:4069
+#: js/basicblocks.js:4082
+#: js/basicblocks.js:4130
+#: js/basicblocks.js:4185
+#: js/basicblocks.js:4190
+#: js/basicblocks.js:4195
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4598
+#: js/blocks.js:5455
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1171
+#: js/rhythmruler.js:1173
+#: js/rhythmruler.js:1281
+#: js/rhythmruler.js:1283
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "acción"
@@ -1018,8 +1061,8 @@ msgstr "Guardar pila"
 #: js/block.js:5558
 #: js/turtledefs.js:174
 #: js/turtledefs.js:216
-#: js/toolbar.js:359
-#: js/toolbar.js:407
+#: js/toolbar.js:371
+#: js/toolbar.js:419
 msgid "Help"
 msgstr "Ayuda"
 
@@ -1800,8 +1843,8 @@ msgid "Let us start our tour!"
 msgstr "Vamos a empezar nuestro recorrido!"
 
 #: js/turtledefs.js:146
-#: js/toolbar.js:350
-#: js/toolbar.js:398
+#: js/toolbar.js:362
+#: js/toolbar.js:410
 #: js/playback.js:203
 #: js/musickeyboard.js:185
 #: js/pitchdrummatrix.js:125
@@ -1837,8 +1880,8 @@ msgstr "Haga clic para ejecutar el proyecto en modo rápido."
 
 #: js/turtledefs.js:147
 #: js/turtledefs.js:183
-#: js/toolbar.js:351
-#: js/toolbar.js:399
+#: js/toolbar.js:363
+#: js/toolbar.js:411
 #: js/temperament.js:1417
 #: js/temperament.js:1417
 msgid "Stop"
@@ -1856,8 +1899,8 @@ msgstr "También puede escribir Alt-S para detenerse."
 
 #: js/turtledefs.js:148
 #: js/turtledefs.js:185
-#: js/toolbar.js:352
-#: js/toolbar.js:400
+#: js/toolbar.js:364
+#: js/toolbar.js:412
 #: js/StringHelper.js:19
 msgid "New project"
 msgstr "Nuevo proyecto"
@@ -1869,8 +1912,8 @@ msgstr "Inicializar un nuevo proyecto."
 
 #: js/turtledefs.js:149
 #: js/turtledefs.js:186
-#: js/toolbar.js:353
-#: js/toolbar.js:401
+#: js/toolbar.js:365
+#: js/toolbar.js:413
 msgid "Load project from file"
 msgstr "Cargar proyecto de archivo"
 
@@ -1881,10 +1924,9 @@ msgstr "También puede cargar proyectos desde el sistema de archivos."
 
 #: js/turtledefs.js:150
 #: js/turtledefs.js:187
-#: js/toolbar.js:354
-#: js/toolbar.js:355
-#: js/toolbar.js:402
-#: js/toolbar.js:403
+#: js/toolbar.js:366
+#: js/toolbar.js:414
+#: js/toolbar.js:415
 msgid "Save project"
 msgstr "Guardar proyecto"
 
@@ -1894,8 +1936,8 @@ msgid "Save your project to a file."
 msgstr "Guarde proyecto en archivo"
 
 #: js/turtledefs.js:151
-#: js/toolbar.js:356
-#: js/toolbar.js:404
+#: js/toolbar.js:368
+#: js/toolbar.js:416
 msgid "Find and share projects"
 msgstr "Encuentra y comparte proyectos"
 
@@ -1995,8 +2037,8 @@ msgstr "Haz click para ejecutar el proyecto en modo lento."
 
 #: js/turtledefs.js:167
 #: js/turtledefs.js:206
-#: js/toolbar.js:361
-#: js/toolbar.js:409
+#: js/toolbar.js:373
+#: js/toolbar.js:421
 msgid "Run step by step"
 msgstr "Ejecutar paso a paso"
 
@@ -2007,8 +2049,8 @@ msgstr "Haz click para ejecutar el proyecto en modo paso a paso."
 
 #: js/turtledefs.js:168
 #: js/turtledefs.js:212
-#: js/toolbar.js:368
-#: js/toolbar.js:416
+#: js/toolbar.js:380
+#: js/toolbar.js:428
 msgid "Restore"
 msgstr "Restaurar"
 
@@ -2029,9 +2071,9 @@ msgstr "Cambia entre los modos principiante y avanzado."
 
 #: js/turtledefs.js:170
 #: js/turtledefs.js:211
-#: js/toolbar.js:371
-#: js/toolbar.js:419
-#: js/toolbar.js:428
+#: js/toolbar.js:383
+#: js/toolbar.js:431
+#: js/toolbar.js:440
 msgid "Select language"
 msgstr "Seleccione el idioma"
 
@@ -2115,60 +2157,60 @@ msgid "save"
 msgstr "guardar"
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:373
-#: js/toolbar.js:421
-msgid "Save as SVG"
-msgstr "Guardar como SVG"
+#: js/toolbar.js:385
+#: js/toolbar.js:433
+msgid "Save mouse artwork as SVG"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save graphics from your project to as SVG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:374
-#: js/toolbar.js:422
-msgid "Save as PNG"
-msgstr "Guardar como PNG"
+#: js/toolbar.js:386
+#: js/toolbar.js:434
+msgid "Save mouse artwork as PNG"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save graphics from your project as PNG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:375
-#: js/toolbar.js:423
-msgid "Save as WAV"
-msgstr "Guardar como WAV"
+#: js/toolbar.js:387
+#: js/toolbar.js:435
+msgid "Save music as WAV"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save audio from your project as WAV."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:376
-#: js/toolbar.js:424
-msgid "Save as ABC"
-msgstr "Guardar como ABC"
+#: js/toolbar.js:388
+#: js/toolbar.js:436
+msgid "Save sheet music as ABC"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save your project to as an ABC file."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:377
-#: js/toolbar.js:425
-msgid "Save sheet music"
-msgstr "Ahorre partituras"
+#: js/toolbar.js:389
+#: js/toolbar.js:437
+msgid "Save sheet music as Lilypond"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save your project to as a Lilypond file."
 msgstr "Guarde el proyecto como un archivo de LilyPond."
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:378
-#: js/toolbar.js:426
-msgid "Save block artwork"
-msgstr "Guardar bloque svg"
+#: js/toolbar.js:390
+#: js/toolbar.js:438
+msgid "Save block artwork as SVG"
+msgstr ""
 
 #: js/turtledefs.js:187
 msgid "Save block artwork as an SVG file."
@@ -2199,8 +2241,8 @@ msgid "You can scroll the blocks on the canvas."
 msgstr "Puedes mover los bloques por el área de trabajo"
 
 #: js/turtledefs.js:209
-#: js/toolbar.js:362
-#: js/toolbar.js:410
+#: js/toolbar.js:374
+#: js/toolbar.js:422
 msgid "Display statistics"
 msgstr "Analizar"
 
@@ -2209,8 +2251,8 @@ msgid "Display statistics about your Music project."
 msgstr "Analizar los tipos de bloques usados."
 
 #: js/turtledefs.js:210
-#: js/toolbar.js:364
-#: js/toolbar.js:412
+#: js/toolbar.js:376
+#: js/toolbar.js:424
 msgid "Delete plugin"
 msgstr "Eliminar plugin"
 
@@ -3361,116 +3403,117 @@ msgstr ""
 msgid "The Stop mouse block stops the specified mouse."
 msgstr ""
 
-#: js/toolbar.js:349
-#: js/toolbar.js:397
+#: js/toolbar.js:361
+#: js/toolbar.js:409
 msgid "About Music Blocks"
 msgstr "Acerca de los bloques de música"
 
-#: js/toolbar.js:357
-#: js/toolbar.js:405
+#: js/toolbar.js:367
+#: js/toolbar.js:384
+#: js/toolbar.js:432
+msgid "Save project as HTML"
+msgstr ""
+
+#: js/toolbar.js:369
+#: js/toolbar.js:417
 msgid "Offline. Sharing is unavailable"
 msgstr "Desconectado. Compartir no está disponible."
 
-#: js/toolbar.js:358
-#: js/toolbar.js:406
+#: js/toolbar.js:370
+#: js/toolbar.js:418
 msgid "Auxilary menu"
 msgstr "Menú auxiliar"
 
-#: js/toolbar.js:360
-#: js/toolbar.js:408
+#: js/toolbar.js:372
+#: js/toolbar.js:420
 msgid "Run slowly"
 msgstr "Tocar lentamente"
 
-#: js/toolbar.js:363
-#: js/toolbar.js:411
+#: js/toolbar.js:375
+#: js/toolbar.js:423
 msgid "Load plugin"
 msgstr ""
 
-#: js/toolbar.js:365
-#: js/toolbar.js:413
+#: js/toolbar.js:377
+#: js/toolbar.js:425
 msgid "Enable horizontal scrolling"
 msgstr "Habilitar desplazamiento horizontal"
 
-#: js/toolbar.js:366
-#: js/toolbar.js:414
+#: js/toolbar.js:378
+#: js/toolbar.js:426
 msgid "Disable horizontal scrolling"
 msgstr "Deshabilitar desplazamiento horizontal"
 
-#: js/toolbar.js:367
-#: js/toolbar.js:415
+#: js/toolbar.js:379
+#: js/toolbar.js:427
 #: js/LocalCard.js:52
 msgid "Merge with current project"
 msgstr "Unir con el proyecto actual"
 
-#: js/toolbar.js:369
-#: js/toolbar.js:417
+#: js/toolbar.js:381
+#: js/toolbar.js:429
 msgid "Switch to beginner mode"
 msgstr "Cambiar al modo principiante"
 
-#: js/toolbar.js:370
-#: js/toolbar.js:418
+#: js/toolbar.js:382
+#: js/toolbar.js:430
 msgid "Switch to advanced mode"
 msgstr "Cambiar a modo avanzado"
 
-#: js/toolbar.js:372
-#: js/toolbar.js:420
-msgid "Save as HTML"
-msgstr "Guardar como HTML"
-
-#: js/toolbar.js:379
-#: js/toolbar.js:427
+#: js/toolbar.js:391
+#: js/toolbar.js:439
 msgid "Confirm"
 msgstr ""
 
-#: js/toolbar.js:380
+#: js/toolbar.js:392
 msgid "English (United States)"
 msgstr ""
 
-#: js/toolbar.js:381
+#: js/toolbar.js:393
 msgid "English (United Kingdom)"
 msgstr ""
 
-#: js/toolbar.js:382
+#: js/toolbar.js:394
 msgid "日本語"
 msgstr ""
 
-#: js/toolbar.js:383
+#: js/toolbar.js:395
 msgid "español"
 msgstr ""
 
-#: js/toolbar.js:384
+#: js/toolbar.js:396
 msgid "にほんご"
 msgstr ""
 
-#: js/toolbar.js:385
+#: js/toolbar.js:397
 msgid "中文"
 msgstr ""
 
-#: js/toolbar.js:386
+#: js/toolbar.js:398
 msgid "ภาษาไทย"
 msgstr ""
 
-#: js/toolbar.js:387
+#: js/toolbar.js:399
 msgid "aymara"
 msgstr ""
 
-#: js/toolbar.js:388
+#: js/toolbar.js:400
 msgid "guarani"
 msgstr ""
 
-#: js/toolbar.js:389
+#: js/toolbar.js:401
 msgid "हिंदी"
 msgstr ""
 
-#: js/toolbar.js:390
+#: js/toolbar.js:402
 msgid "igbo"
 msgstr ""
 
-#: js/toolbar.js:391
+#: js/toolbar.js:403
 msgid "عربى"
 msgstr ""
 
-#: js/toolbar.js:392
+#: js/toolbar.js:404
 msgid "עִברִית"
 msgstr ""
 
@@ -7047,6 +7090,17 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "chord' + ' ' + 'V"
 #~msgstr "acorde V"
 
+#: js/timbre.js:743
+
+#: js/rhythmruler.js:1481
+
+#: js/modewidget.js:95
+
+#: js/pitchstaircase.js:534
+
+#~msgid "undo"
+#~msgstr "anular"
+
 #: js/basicblocks.js:2464
 
 #~msgid "chord' + ' ' + 'I"
@@ -7077,6 +7131,11 @@ msgstr "Debe seleccionar un archivo."
 #: js/turtledefs.js:378
 
 #~msgid "The <em>Waitfor</em> block will wait until the condition is true."
+#~msgstr ""
+
+#: js/turtledefs.js:226
+
+#~msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
 #~msgstr ""
 
 #: js/basicblocks.js:3142
@@ -7162,6 +7221,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The Indexheap block returns a value in the heap at a specified location."
 #~msgstr ""
 
+#: js/turtledefs.js:187
+
+#: js/toolbar.js:378
+
+#: js/toolbar.js:426
+
+#~msgid "Save block artwork"
+#~msgstr "Guardar bloque svg"
+
 #: js/turtledefs.js:284
 
 #~msgid "The <em>Pen-up</em> block raises the pen so that it does not draw."
@@ -7215,11 +7283,6 @@ msgstr "Debe seleccionar un archivo."
 #: js/turtledefs.js:429
 
 #~msgid "The Show heap block displays the contents of the heap at the top of the screen."
-#~msgstr ""
-
-#: js/turtledefs.js:260
-
-#~msgid "The <em>Number</em> block holds a number."
 #~msgstr ""
 
 #: js/turtledefs.js:381
@@ -7324,11 +7387,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "note volume"
 #~msgstr "volumen nota"
 
-#: js/activity.js:3541
-
-#~msgid "Save as .abc"
-#~msgstr ""
-
 #: js/turtledefs.js:144
 
 #: js/turtledefs.js:189
@@ -7336,10 +7394,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Open a panel for configuring Music Blocks."
 #~msgstr "Abre el panel para configurar Bloques de Música."
 
-#: js/turtledefs.js:407
+#: js/turtledefs.js:87
 
-#~msgid "The <em>And</em> block is the logical and operator."
-#~msgstr ""
+#~msgid "Hide or show the block palettes."
+#~msgstr "Ocultar o mostrar las paletas de bloques."
 
 #: js/activity.js:3533
 
@@ -7569,11 +7627,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Right</em> block returns the position of the right of the canvas."
 #~msgstr ""
 
-#: js/turtledefs.js:226
-
-#~msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-#~msgstr ""
-
 #: js/turtledefs.js:224
 
 #~msgid "The <em>Crescendo</em> block will increase the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume."
@@ -7624,11 +7677,6 @@ msgstr "Debe seleccionar un archivo."
 #: js/turtledefs.js:313
 
 #~msgid "The <em>Multiply note value</em> block changes the duration of notes by changing their note values."
-#~msgstr ""
-
-#: js/turtledefs.js:208
-
-#~msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
 #~msgstr ""
 
 #: js/turtledefs.js:280
@@ -7697,11 +7745,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Pitch Block: Did you mean to use a Note block?"
 #~msgstr "Bloque de tono: Quizás quiso decir utilizar un bloque de nota?"
 
-#: js/turtledefs.js:430
-
-#~msgid "The Save heap to app block saves the heap to a web page."
-#~msgstr ""
-
 #: js/turtledefs.js:374
 
 #~msgid "The <em>Tuplet</em> block is used to generate a group of notes played in a condensed amount of time."
@@ -7715,6 +7758,11 @@ msgstr "Debe seleccionar un archivo."
 #: js/turtledefs.js:199
 
 #~msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
+#~msgstr ""
+
+#: js/turtledefs.js:296
+
+#~msgid "The <em>Width</em> block returns the width of the canvas."
 #~msgstr ""
 
 #: js/turtledefs.js:110
@@ -7779,10 +7827,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Neighbor</em> block rapidly switches between neighboring pitches."
 #~msgstr ""
 
-#: js/lilypond.js:21
+#: js/turtledefs.js:469
 
-#~msgid "br"
-#~msgstr "rm"
+#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
+#~msgstr ""
 
 #: js/block.js:1306
 
@@ -7904,6 +7952,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Expand/collapse toolbar"
 #~msgstr "Expandir o colapsar barra"
 
+#: js/turtledefs.js:187
+
+#: js/toolbar.js:373
+
+#: js/toolbar.js:421
+
+#~msgid "Save as SVG"
+#~msgstr "Guardar como SVG"
+
 #: js/turtledefs.js:424
 
 #~msgid "The Loadheap block loads the heap from a file."
@@ -7967,6 +8024,11 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "play forward"
 #~msgstr "jugar hacia adelante"
+
+#: js/turtledefs.js:208
+
+#~msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
+#~msgstr ""
 
 #: js/turtledefs.js:219
 
@@ -8059,9 +8121,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Avatar</em> block is used to change the appearance of the mouse."
 #~msgstr ""
 
-#: js/turtledefs.js:368
+#: js/turtledefs.js:243
 
-#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
+#: js/turtledefs.js:244
+
+#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
 #~msgstr ""
 
 #: js/turtledefs.js:143
@@ -8122,11 +8186,6 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "untitled"
 #~msgstr "intitulado"
 
-#: js/activity.js:4426
-
-#~msgid "Run music step by step"
-#~msgstr ""
-
 #: js/samplesviewer.js:700
 
 #~msgid "Worldwide"
@@ -8143,6 +8202,11 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "long press to run slowly"
 #~msgstr "largo presione para ejecutar lento"
+
+#: js/turtledefs.js:430
+
+#~msgid "The Save heap to app block saves the heap to a web page."
+#~msgstr ""
 
 #: js/turtledefs.js:476
 
@@ -8212,10 +8276,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Swing</em> block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
 #~msgstr ""
 
-#: js/basicblocks.js:703
+#: js/logo.js:3606
 
-#~msgid "set voice"
-#~msgstr "fijar voz"
+#~msgid "Distortion not in range"
+#~msgstr "Distorsión no en el rango"
 
 #: js/activity.js:3859
 
@@ -8379,6 +8443,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "field"
 #~msgstr "campo"
 
+#: js/turtledefs.js:270
+
+#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
+#~msgstr ""
+
 #: js/lilypond.js:21
 
 #~msgid "m"
@@ -8416,6 +8485,13 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Do</em> block is used to initiate an action. In the example, it is used with the <em>One of</em> block to choose a random phase."
 #~msgstr ""
 
+#: js/toolbar.js:372
+
+#: js/toolbar.js:420
+
+#~msgid "Save as HTML"
+#~msgstr "Guardar como HTML"
+
 #: js/basicblocks.js:1156
 
 #~msgid "on beat"
@@ -8444,10 +8520,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Dispatch</em> block is used to trigger an event."
 #~msgstr ""
 
-#: js/turtledefs.js:87
+#: js/turtledefs.js:407
 
-#~msgid "Hide or show the block palettes."
-#~msgstr "Ocultar o mostrar las paletas de bloques."
+#~msgid "The <em>And</em> block is the logical and operator."
+#~msgstr ""
 
 #: js/activity.js:2712
 
@@ -8551,11 +8627,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The Stopplayback block"
 #~msgstr ""
 
-#: js/turtledefs.js:243
+#: js/turtledefs.js:368
 
-#: js/turtledefs.js:244
-
-#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
+#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
 #~msgstr ""
 
 #: js/turtledefs.js:471
@@ -8575,6 +8649,15 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "osctime"
 #~msgstr "tiempo oscilador"
+
+#: js/turtledefs.js:187
+
+#: js/toolbar.js:374
+
+#: js/toolbar.js:422
+
+#~msgid "Save as PNG"
+#~msgstr "Guardar como PNG"
 
 #: js/turtledefs.js:425
 
@@ -8601,9 +8684,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "More"
 #~msgstr ""
 
-#: js/turtledefs.js:304
+#: js/turtledefs.js:461
 
-#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
+#~msgid "The <em>Playback</em> block"
 #~msgstr ""
 
 #~msgid "maths"
@@ -8693,6 +8776,15 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "The <em>Note value</em> block is the value of the duration of the note currently being played."
 #~msgstr ""
+
+#: js/turtledefs.js:187
+
+#: js/toolbar.js:375
+
+#: js/toolbar.js:423
+
+#~msgid "Save as WAV"
+#~msgstr "Guardar como WAV"
 
 #: js/turtledefs.js:354
 
@@ -8905,10 +8997,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Distortion</em> block adds distortion to the pitch."
 #~msgstr ""
 
-#: js/turtledefs.js:469
+#: js/lilypond.js:21
 
-#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
-#~msgstr ""
+#~msgid "br"
+#~msgstr "rm"
 
 #: js/turtledefs.js:235
 
@@ -8958,10 +9050,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "sort"
 #~msgstr "ordenar"
 
-#: js/logo.js:3606
+#: js/basicblocks.js:703
 
-#~msgid "Distortion not in range"
-#~msgstr "Distorsión no en el rango"
+#~msgid "set voice"
+#~msgstr "fijar voz"
 
 #: js/turtledefs.js:207
 
@@ -9049,9 +9141,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Shell</em> block is used to change the appearance of the mouse."
 #~msgstr ""
 
-#: js/turtledefs.js:270
+#: js/turtledefs.js:260
 
-#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
+#~msgid "The <em>Number</em> block holds a number."
 #~msgstr ""
 
 #: js/savebox.js:105
@@ -9074,9 +9166,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "Load plugin from file"
 #~msgstr "Cargar plugin desde archivo"
 
-#: js/turtledefs.js:461
+#: js/turtledefs.js:304
 
-#~msgid "The <em>Playback</em> block"
+#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
 #~msgstr ""
 
 #: js/basicblocks.js:3806
@@ -9088,6 +9180,11 @@ msgstr "Debe seleccionar un archivo."
 
 #~msgid "Mr. Mouse is our Music Blocks conductor."
 #~msgstr "Sr. Ratón es nuestro conductor de bloques de música."
+
+#: js/activity.js:3541
+
+#~msgid "Save as .abc"
+#~msgstr ""
 
 #: js/logo.js:10269
 
@@ -9323,16 +9420,14 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Get blue</em> block returns the blue component of the pixel under the mouse."
 #~msgstr ""
 
-#: js/timbre.js:743
+#: js/turtledefs.js:187
 
-#: js/rhythmruler.js:1481
+#: js/toolbar.js:377
 
-#: js/modewidget.js:95
+#: js/toolbar.js:425
 
-#: js/pitchstaircase.js:534
-
-#~msgid "undo"
-#~msgstr "anular"
+#~msgid "Save sheet music"
+#~msgstr "Ahorre partituras"
 
 #: js/block.js:1309
 
@@ -9477,9 +9572,9 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "This button opens and closes the primary toolbar."
 #~msgstr "Este botón abre y cierra la barra de herramientas principal."
 
-#: js/turtledefs.js:296
+#: js/activity.js:4426
 
-#~msgid "The <em>Width</em> block returns the width of the canvas."
+#~msgid "Run music step by step"
 #~msgstr ""
 
 #: js/turtledefs.js:417
@@ -9557,10 +9652,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>No background</em> block eliminates the background from the saved SVG output."
 #~msgstr ""
 
-#: js/turtledefs.js:242
+#: js/activity.js:2527
 
-#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-#~msgstr ""
+#~msgid "My Music Blocks Creation"
+#~msgstr "Mi creación de Bloques de Música"
 
 #: js/turtledefs.js:438
 
@@ -9621,6 +9716,11 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "export"
 #~msgstr "exportar"
 
+#: js/turtledefs.js:402
+
+#~msgid "The <em>Power</em> block calculates a power function."
+#~msgstr ""
+
 #: js/turtledefs.js:440
 
 #~msgid "The <em>Set heading</em> block sets the heading of the mouse."
@@ -9664,6 +9764,15 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Mouse color</em> block returns the pen color of the specified mouse."
 #~msgstr ""
 
+#: js/turtledefs.js:187
+
+#: js/toolbar.js:376
+
+#: js/toolbar.js:424
+
+#~msgid "Save as ABC"
+#~msgstr "Guardar como ABC"
+
 #: js/timbre.js:591
 
 #~msgid "synthesizer"
@@ -9699,10 +9808,10 @@ msgstr "Debe seleccionar un archivo."
 #~msgid "The <em>Notes played</em> block is the number of notes that have been played. (By default, it counts quarter notes.)"
 #~msgstr ""
 
-#: js/activity.js:2527
+#: js/turtledefs.js:242
 
-#~msgid "My Music Blocks Creation"
-#~msgstr "Mi creación de Bloques de Música"
+#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
+#~msgstr ""
 
 #: js/turtledefs.js:248
 
@@ -9712,11 +9821,6 @@ msgstr "Debe seleccionar un archivo."
 #: js/turtledefs.js:352
 
 #~msgid "e.g. \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr ""
-
-#: js/turtledefs.js:402
-
-#~msgid "The <em>Power</em> block calculates a power function."
 #~msgstr ""
 
 #: js/basicblocks.js:83

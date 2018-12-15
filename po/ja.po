@@ -524,6 +524,49 @@
 #: js/rhythmruler.js:1173
 #: js/rhythmruler.js:1281
 #: js/rhythmruler.js:1283
+#: js/block.js:1162
+#: js/block.js:5410
+#: js/block.js:5419
+#: js/block.js:5430
+#: js/activity.js:2127
+#: js/palette.js:770
+#: js/palette.js:779
+#: js/palette.js:788
+#: js/palette.js:797
+#: js/palette.js:2098
+#: js/palette.js:2109
+#: js/palette.js:2120
+#: js/palette.js:2131
+#: js/palette.js:2141
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1531
+#: js/basicblocks.js:1551
+#: js/basicblocks.js:1565
+#: js/basicblocks.js:3971
+#: js/basicblocks.js:4011
+#: js/basicblocks.js:4021
+#: js/basicblocks.js:4069
+#: js/basicblocks.js:4082
+#: js/basicblocks.js:4130
+#: js/basicblocks.js:4185
+#: js/basicblocks.js:4190
+#: js/basicblocks.js:4195
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4598
+#: js/blocks.js:5455
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1171
+#: js/rhythmruler.js:1173
+#: js/rhythmruler.js:1281
+#: js/rhythmruler.js:1283
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "アクション"
@@ -867,8 +910,8 @@ msgstr "スタックをほぞん"
 #: js/block.js:5558
 #: js/turtledefs.js:174
 #: js/turtledefs.js:216
-#: js/toolbar.js:359
-#: js/toolbar.js:407
+#: js/toolbar.js:371
+#: js/toolbar.js:419
 msgid "Help"
 msgstr "説明"
 
@@ -1671,8 +1714,8 @@ msgid "Let us start our tour!"
 msgstr "では、ツアーを始めよう。"
 
 #: js/turtledefs.js:146
-#: js/toolbar.js:350
-#: js/toolbar.js:398
+#: js/toolbar.js:362
+#: js/toolbar.js:410
 #: js/playback.js:203
 #: js/musickeyboard.js:185
 #: js/pitchdrummatrix.js:125
@@ -1708,8 +1751,8 @@ msgstr "クリックをすると、ふつうのスピードでプログラムを
 
 #: js/turtledefs.js:147
 #: js/turtledefs.js:183
-#: js/toolbar.js:351
-#: js/toolbar.js:399
+#: js/toolbar.js:363
+#: js/toolbar.js:411
 #: js/temperament.js:1417
 #: js/temperament.js:1417
 msgid "Stop"
@@ -1727,8 +1770,8 @@ msgstr "プログラムは、このボタンをおすかわりに、キーボー
 
 #: js/turtledefs.js:148
 #: js/turtledefs.js:185
-#: js/toolbar.js:352
-#: js/toolbar.js:400
+#: js/toolbar.js:364
+#: js/toolbar.js:412
 #: js/StringHelper.js:19
 msgid "New project"
 msgstr "新しいプロジェクト"
@@ -1740,8 +1783,8 @@ msgstr "新しいプロジェクトを作る。"
 
 #: js/turtledefs.js:149
 #: js/turtledefs.js:186
-#: js/toolbar.js:353
-#: js/toolbar.js:401
+#: js/toolbar.js:365
+#: js/toolbar.js:413
 msgid "Load project from file"
 msgstr "プロジェクトを読みこむ"
 
@@ -1752,10 +1795,9 @@ msgstr "コンピューターに保存してあるファイルから、ミュー
 
 #: js/turtledefs.js:150
 #: js/turtledefs.js:187
-#: js/toolbar.js:354
-#: js/toolbar.js:355
-#: js/toolbar.js:402
-#: js/toolbar.js:403
+#: js/toolbar.js:366
+#: js/toolbar.js:414
+#: js/toolbar.js:415
 msgid "Save project"
 msgstr "プロジェクトをほぞん"
 
@@ -1765,8 +1807,8 @@ msgid "Save your project to a file."
 msgstr "げんざい開いているプロジェクトをほぞんする。"
 
 #: js/turtledefs.js:151
-#: js/toolbar.js:356
-#: js/toolbar.js:404
+#: js/toolbar.js:368
+#: js/toolbar.js:416
 msgid "Find and share projects"
 msgstr "みんなの作品"
 
@@ -1867,8 +1909,8 @@ msgstr "クリックをすると、ゆっくりとしたスピードでプログ
 
 #: js/turtledefs.js:167
 #: js/turtledefs.js:206
-#: js/toolbar.js:361
-#: js/toolbar.js:409
+#: js/toolbar.js:373
+#: js/toolbar.js:421
 msgid "Run step by step"
 msgstr "ブロックを１つずつ実行する"
 
@@ -1879,8 +1921,8 @@ msgstr "クリックをすると、とてもゆっくり、ブロックを１つ
 
 #: js/turtledefs.js:168
 #: js/turtledefs.js:212
-#: js/toolbar.js:368
-#: js/toolbar.js:416
+#: js/toolbar.js:380
+#: js/toolbar.js:428
 msgid "Restore"
 msgstr "すてたブロックをもどす"
 
@@ -1901,9 +1943,9 @@ msgstr "ミュージック・ブロックスをかんたんモード／はって
 
 #: js/turtledefs.js:170
 #: js/turtledefs.js:211
-#: js/toolbar.js:371
-#: js/toolbar.js:419
-#: js/toolbar.js:428
+#: js/toolbar.js:383
+#: js/toolbar.js:431
+#: js/toolbar.js:440
 msgid "Select language"
 msgstr "言語を選ぶ"
 
@@ -1988,9 +2030,9 @@ msgid "save"
 msgstr "保存する"
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:373
-#: js/toolbar.js:421
-msgid "Save as SVG"
+#: js/toolbar.js:385
+#: js/toolbar.js:433
+msgid "Save mouse artwork as SVG"
 msgstr "SVGでほぞん"
 
 #: js/turtledefs.js:187
@@ -1998,9 +2040,9 @@ msgid "Save graphics from your project to as SVG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:374
-#: js/toolbar.js:422
-msgid "Save as PNG"
+#: js/toolbar.js:386
+#: js/toolbar.js:434
+msgid "Save mouse artwork as PNG"
 msgstr "PNGでほぞん"
 
 #: js/turtledefs.js:187
@@ -2008,9 +2050,9 @@ msgid "Save graphics from your project as PNG."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:375
-#: js/toolbar.js:423
-msgid "Save as WAV"
+#: js/toolbar.js:387
+#: js/toolbar.js:435
+msgid "Save music as WAV"
 msgstr "WAVでほぞん"
 
 #: js/turtledefs.js:187
@@ -2018,9 +2060,9 @@ msgid "Save audio from your project as WAV."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:376
-#: js/toolbar.js:424
-msgid "Save as ABC"
+#: js/toolbar.js:388
+#: js/toolbar.js:436
+msgid "Save sheet music as ABC"
 msgstr "ABCのフォーマットでほぞん"
 
 #: js/turtledefs.js:187
@@ -2028,9 +2070,9 @@ msgid "Save your project to as an ABC file."
 msgstr ""
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:377
-#: js/toolbar.js:425
-msgid "Save sheet music"
+#: js/toolbar.js:389
+#: js/toolbar.js:437
+msgid "Save sheet music as Lilypond"
 msgstr "がくふ(Lilypondのフォーマット)でほぞん"
 
 #: js/turtledefs.js:187
@@ -2038,9 +2080,9 @@ msgid "Save your project to as a Lilypond file."
 msgstr "作成した音楽を、コンピューター上でがくふをえがくファイル（Lilypondファイル）に変えてほぞんする。"
 
 #: js/turtledefs.js:187
-#: js/toolbar.js:378
-#: js/toolbar.js:426
-msgid "Save block artwork"
+#: js/toolbar.js:390
+#: js/toolbar.js:438
+msgid "Save block artwork as SVG"
 msgstr "ブロックのアートをほぞん"
 
 #: js/turtledefs.js:187
@@ -2072,8 +2114,8 @@ msgid "You can scroll the blocks on the canvas."
 msgstr "カンバス上をドラッグそうさしたときに、画面をスクロールさせることができる方向を上下だけと上下左右に変える。"
 
 #: js/turtledefs.js:209
-#: js/toolbar.js:362
-#: js/toolbar.js:410
+#: js/toolbar.js:374
+#: js/toolbar.js:422
 ## ひらがな＝とうけいじょうほう|Display is literal, but maybe not best word choice
 msgid "Display statistics"
 msgstr "とうけいを表示する"
@@ -2083,8 +2125,8 @@ msgid "Display statistics about your Music project."
 msgstr "プロジェクトに含まれているブロックの種類、わりあいなど、とうけいてきなじょうほうを表示する。"
 
 #: js/turtledefs.js:210
-#: js/toolbar.js:364
-#: js/toolbar.js:412
+#: js/toolbar.js:376
+#: js/toolbar.js:424
 msgid "Delete plugin"
 msgstr "プラグインを消す"
 
@@ -3235,116 +3277,117 @@ msgstr ""
 msgid "The Stop mouse block stops the specified mouse."
 msgstr ""
 
-#: js/toolbar.js:349
-#: js/toolbar.js:397
+#: js/toolbar.js:361
+#: js/toolbar.js:409
 msgid "About Music Blocks"
 msgstr "ミュージック・ブロックスについて"
 
-#: js/toolbar.js:357
-#: js/toolbar.js:405
+#: js/toolbar.js:367
+#: js/toolbar.js:384
+#: js/toolbar.js:432
+msgid "Save project as HTML"
+msgstr ""
+
+#: js/toolbar.js:369
+#: js/toolbar.js:417
 msgid "Offline. Sharing is unavailable"
 msgstr "オフライン。シェア機能が使えません"
 
-#: js/toolbar.js:358
-#: js/toolbar.js:406
+#: js/toolbar.js:370
+#: js/toolbar.js:418
 msgid "Auxilary menu"
 msgstr "サブメニュー"
 
-#: js/toolbar.js:360
-#: js/toolbar.js:408
+#: js/toolbar.js:372
+#: js/toolbar.js:420
 msgid "Run slowly"
 msgstr "ゆっくり実行する"
 
-#: js/toolbar.js:363
-#: js/toolbar.js:411
+#: js/toolbar.js:375
+#: js/toolbar.js:423
 msgid "Load plugin"
 msgstr "プラグインを読みこむ"
 
-#: js/toolbar.js:365
-#: js/toolbar.js:413
+#: js/toolbar.js:377
+#: js/toolbar.js:425
 msgid "Enable horizontal scrolling"
 msgstr "自由な方向にスクロール"
 
-#: js/toolbar.js:366
-#: js/toolbar.js:414
+#: js/toolbar.js:378
+#: js/toolbar.js:426
 msgid "Disable horizontal scrolling"
 msgstr "たて方向にスクロール"
 
-#: js/toolbar.js:367
-#: js/toolbar.js:415
+#: js/toolbar.js:379
+#: js/toolbar.js:427
 #: js/LocalCard.js:52
 msgid "Merge with current project"
 msgstr "プロジェクトを組みあわせる"
 
-#: js/toolbar.js:369
-#: js/toolbar.js:417
+#: js/toolbar.js:381
+#: js/toolbar.js:429
 msgid "Switch to beginner mode"
 msgstr "かんたんモードにする"
 
-#: js/toolbar.js:370
-#: js/toolbar.js:418
+#: js/toolbar.js:382
+#: js/toolbar.js:430
 msgid "Switch to advanced mode"
 msgstr "はってんモードにする"
 
-#: js/toolbar.js:372
-#: js/toolbar.js:420
-msgid "Save as HTML"
-msgstr "HTMLをほぞん"
-
-#: js/toolbar.js:379
-#: js/toolbar.js:427
+#: js/toolbar.js:391
+#: js/toolbar.js:439
 msgid "Confirm"
 msgstr "作成する"
 
-#: js/toolbar.js:380
+#: js/toolbar.js:392
 msgid "English (United States)"
 msgstr ""
 
-#: js/toolbar.js:381
+#: js/toolbar.js:393
 msgid "English (United Kingdom)"
 msgstr ""
 
-#: js/toolbar.js:382
+#: js/toolbar.js:394
 msgid "日本語"
 msgstr ""
 
-#: js/toolbar.js:383
+#: js/toolbar.js:395
 msgid "español"
 msgstr ""
 
-#: js/toolbar.js:384
+#: js/toolbar.js:396
 msgid "にほんご"
 msgstr ""
 
-#: js/toolbar.js:385
+#: js/toolbar.js:397
 msgid "中文"
 msgstr ""
 
-#: js/toolbar.js:386
+#: js/toolbar.js:398
 msgid "ภาษาไทย"
 msgstr ""
 
-#: js/toolbar.js:387
+#: js/toolbar.js:399
 msgid "aymara"
 msgstr ""
 
-#: js/toolbar.js:388
+#: js/toolbar.js:400
 msgid "guarani"
 msgstr ""
 
-#: js/toolbar.js:389
+#: js/toolbar.js:401
 msgid "हिंदी"
 msgstr ""
 
-#: js/toolbar.js:390
+#: js/toolbar.js:402
 msgid "igbo"
 msgstr ""
 
-#: js/toolbar.js:391
+#: js/toolbar.js:403
 msgid "عربى"
 msgstr ""
 
-#: js/toolbar.js:392
+#: js/toolbar.js:404
 msgid "עִברִית"
 msgstr ""
 
@@ -7031,6 +7074,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "7th"
 #~msgstr "７度"
 
+#~msgid "undo"
+#~msgstr "１つもどす"
+
 #~msgid "chord' + ' ' + 'I"
 #~msgstr "１度' + ' ' + 'の和音"
 
@@ -7217,6 +7263,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "relative interval"
 #~msgstr "相対的な音と音の間の間隔"
 
+#~msgid "Stop the music (and the turtles)."
+#~msgstr "音楽とネズミの動きを止めます。"
+
 #~msgid "on beat"
 #~msgstr "強拍にて"
 
@@ -7247,11 +7296,14 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "found turtle"
 #~msgstr "ネズミ見つかった"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
+#~msgid "free time"
+#~msgstr "クロックなし"
 
 #~msgid "Save your project to a server."
 #~msgstr "サーバーにプロジェクトをほぞん"
+
+#~msgid "multiply beat"
+#~msgstr "拍を倍に"
 
 #~msgid "4th"
 #~msgstr "４度"
@@ -7306,6 +7358,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Publish"
 #~msgstr "サーバにアップロードして発表する"
 
+#: js/activity.js:3327
+
+#~msgid "Turtle Blocks"
+#~msgstr "タートル・ブロックス"
+
 #~msgid "Worldwide"
 #~msgstr "世界中のプロジェクト"
 
@@ -7329,6 +7386,9 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "add pitches"
 #~msgstr "音高を足す"
+
+#~msgid "cb"
+#~msgstr "カ"
 
 #~msgid "reference pitch"
 #~msgstr "参考音高"
@@ -7357,16 +7417,18 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "field"
 #~msgstr "場"
 
-#: js/SaveInterface.js:24
-
-#~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~msgstr ""
-
 #~msgid "gs"
 #~msgstr "灰"
 
 #~msgid "graphical notation matrix"
 #~msgstr "簡単なビジュアル・マトリックス"
+
+#: js/toolbar.js:372
+
+#: js/toolbar.js:420
+
+#~msgid "Save as HTML"
+#~msgstr "HTMLをほぞん"
 
 #~msgid "Load project from files"
 #~msgstr "ファイルからロードする"
@@ -7424,6 +7486,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "More"
 #~msgstr "その他"
 
+#: js/SaveInterface.js:24
+
+#~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
+#~msgstr ""
+
 #~msgid "maths"
 #~msgstr "数学"
 
@@ -7475,9 +7542,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "step pitch"
 #~msgstr "ステップ音高"
 
-#~msgid "Stop the music (and the turtles)."
-#~msgstr "音楽とネズミの動きを止めます。"
-
 #~msgid "bk"
 #~msgstr "黒"
 
@@ -7490,18 +7554,10 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "br"
 #~msgstr "茶"
 
-#~msgid "multiply beat"
-#~msgstr "拍を倍に"
-
 #: js/activity.js:3444
 
 #~msgid "Save Project"
 #~msgstr "プロジェクトをほぞん"
-
-#: js/activity.js:3327
-
-#~msgid "Turtle Blocks"
-#~msgstr "タートル・ブロックス"
 
 #~msgid "rotate counter clockwise"
 #~msgstr "左回りにずれる"
@@ -7580,9 +7636,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Advanced options"
 #~msgstr "上級オプション"
 
-#~msgid "undo"
-#~msgstr "１つもどす"
-
 #~msgid "adjust transposition"
 #~msgstr "移調を変える"
 
@@ -7598,8 +7651,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Hard stop"
 #~msgstr "すぐストップ"
 
-#~msgid "free time"
-#~msgstr "クロックなし"
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
 #~msgid "You can also use Alt+C to copy a stack of blocks."
 #~msgstr "Alt+Cでブロックスをコピーすることもできます。"
@@ -7612,9 +7665,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "Run music step by step"
 #~msgstr "音楽を音符ずつ演奏する"
-
-#~msgid "cb"
-#~msgstr "カ"
 
 #~msgid "It appears after a long press on a stack."
 #~msgstr "スタックを長押しすると現れます。"
