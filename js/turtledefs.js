@@ -143,30 +143,35 @@ function createHelpContent() {
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
-            [_('Palette buttons'), _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Play'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
             [_('Stop'), _('Stop the music (and the mice).') + ' ' + _('You can also type Alt-S to stop.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))],
             [_('New project'), _('Initialize a new project.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(NEWBUTTON)))],
             [_('Load project from file'), _('You can also load projects from the file system.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOADBUTTON)))],
             [_('Save project'), _('Save your project to a file.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))],
             [_('Find and share projects'), _('This button opens a viewer for sharing projects and for finding example projects.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PLANETBUTTON)))],
-            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(MENUBUTTON)))],
-            [_('Help'), _('Show these messages.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HELPBUTTON)))],
-            [_('Run slow'), _('Click to run the project in slow mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))],
-            [_('Run step by step'), _('Click to run the project step by step.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STEPBUTTON)))],
+
+            [_('Palette buttons'), _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RHYTHMPALETTEICON)))],
+
+            [_('Cartesian/Polar'), _('Show or hide a coordinate grid.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)))],
+            [_('Clean'), _('Clear the screen and return the mice to their initial positions.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))],
+            [_('Collapse'), _('Collapse the graphics window.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))],
+
+            [_('Home'), _('Return all blocks to the center of the screen.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(GOHOMEBUTTON)))],
             [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HIDEBLOCKSBUTTON)))],
             [_('Expand/collapse collapsable blocks'), _('Expand or collapse start and action stacks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON)))],
-            [_('Home'), _('Return all blocks to the center of the screen.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(GOHOMEBUTTON)))],
-            [_('Cartesian/Polar'), _('Show or hide a coordinate grid.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)))],
+            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)))],
+            [_('Increase block size'), _('Increase the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)))],
+
+            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxillary toolbar.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(MENUBUTTON)))],
+            [_('Run slow'), _('Click to run the project in slow mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))],
+            [_('Run step by step'), _('Click to run the project step by step.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STEPBUTTON)))],
             [_('Restore'), _('Restore blocks from the trash.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RESTORETRASHBUTTON)))],
             [_('Switch mode'), _('Switch between beginner and advance modes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(ADVANCEDBUTTON)))],
             [_('Select language'), _('Select your language preference.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LANGUAGEBUTTON)))],
-            [_('Decrease block size'), _('Decrease the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)))],
-            [_('Increase block size'), _('Increase the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)))],
-            [_('Clean'), _('Clear the screen and return the mice to their initial positions.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))],
-            [_('Collapse'), _('Collapse the graphics window.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))],
+
             [_('Keyboard shortcuts'), _('You can type d to create a do block and r to create a re block etc.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), GUIDEURL, _('Music Blocks Guide')],
+            [_('Help'), _('Show these messages.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HELPBUTTON)))],
             [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts.') + ' ' + _('A full list of contributors can be found in the Music Blocks GitHub repository.') + ' ' + _('Music Blocks is licensed under the AGPL.') + ' ' + _('The current version is') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))]
         ];
@@ -174,37 +179,41 @@ function createHelpContent() {
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
-            //.TRANS: the buttons used to open various palettes of blocks
-            [_('Palette buttons'),
-             //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
-             _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
-            [_('Run slow'), _('Click to run the project in slow mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))],
-            [_('Run step by step'), _('Click to run the project step by step.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STEPBUTTON)))],
             [_('Stop'), _('Stop the music (and the mice).') + ' ' + _('You can also type Alt-S to stop.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))],
-            [_('Help'), _('Show these messages.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HELPBUTTON)))],
-            [_('Clean'), _('Clear the screen and return the mice to their initial positions.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))],
-            [_('Collapse'), _('Collapse the graphics window.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))],
-            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HIDEBLOCKSBUTTON)))],
-            [_('Expand/collapse collapsible blocks'), _('Expand or collapse start and action stacks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON)))],
-            [_('Home'), _('Return all blocks to the center of the screen.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(GOHOMEBUTTON)))],
-            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxiliary toolbar.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(MENUBUTTON)))],
+
             [_('New project'), _('Initialize a new project.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(NEWBUTTON)))],
             [_('Load project from file'), _('You can also load projects from the file system.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOADBUTTON)))],
-            [_('Save project'), _('Save your project to a file.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))],
+            [_('save'), _('Save project') + ': ' + _('Save your project to a file.') + '<br/><br/>' + _('Save as SVG') + ': '  + _('Save graphics from your project to as SVG.') + '<br/><br/>' + _('Save as PNG') + ': ' + _('Save graphics from your project as PNG.') + '<br/><br/>' + _('Save as WAV') + ': ' + _('Save audio from your project as WAV.') + '<br/><br/>' + _('Save as ABC') + ': ' + _('Save your project to as an ABC file.') + '<br/><br/>' + _('Save sheet music') + ': ' + _('Save your project to as a Lilypond file.') + '<br/><br/>' + _('Save block artwork') + ': ' + _('Save block artwork as an SVG file.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))],
             [_('Load samples from server'), _('This button opens a viewer for loading example projects.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PLANETBUTTON)))],
-            [_('Save sheet music'), _('Save your project to as a Lilypond file.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))],
+
+             //.TRANS: Please add commas to list: Rhythm, Pitch, Tone, Action, and more.
+            //.TRANS: the buttons used to open various palettes of blocks
+            [_('Palette buttons'), _('This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.') + ' ' + _('Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RHYTHMPALETTEICON)))],
+
             [_('Cartesian/Polar'), _('Show or hide a coordinate grid.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)))],
-            [_('Switch mode'), _('Switch between beginner and advance modes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(ADVANCEDBUTTON)))],
-            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SCROLLUNLOCKBUTTON)))],
+            [_('Clean'), _('Clear the screen and return the mice to their initial positions.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))],
+            [_('Collapse'), _('Collapse the graphics window.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))],
+
+            [_('Home'), _('Return all blocks to the center of the screen.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(GOHOMEBUTTON)))],
+            [_('Show/hide blocks'), _('Hide or show the blocks and the palettes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HIDEBLOCKSBUTTON)))],
+            [_('Expand/collapse collapsible blocks'), _('Expand or collapse start and action stacks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON)))],
             [_('Decrease block size'), _('Decrease the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)))],
             [_('Increase block size'), _('Increase the size of the blocks.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)))],
+
+            [_('Expand/collapse option toolbar'), _('Click this button to expand or collapse the auxiliary toolbar.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(MENUBUTTON)))],
+            [_('Run slow'), _('Click to run the project in slow mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))],
+            [_('Run step by step'), _('Click to run the project step by step.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STEPBUTTON)))],
+            [_('Switch mode'), _('Switch between beginner and advance modes.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(ADVANCEDBUTTON)))],
+            [_('Enable scrolling'), _('You can scroll the blocks on the canvas.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SCROLLUNLOCKBUTTON)))],
             [_('Display statistics'), _('Display statistics about your Music project.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STATSBUTTON)))],
             [_('Delete plugin'), _('Delete a selected plugin.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(PLUGINSDELETEBUTTON)))],
             [_('Select language'), _('Select your language preference.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LANGUAGEBUTTON)))],
             [_('Restore'), _('Restore blocks from the trash.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RESTORETRASHBUTTON)))],
+
             [_('Keyboard shortcuts'), _('You can type d to create a do block and r to create a re block etc.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))],
             [_('Guide'), _('A detailed guide to Music Blocks is available.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), GUIDEURL, _('Music Blocks Guide')],
+            [_('Help'), _('Show these messages.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(HELPBUTTON)))],
             [_('About'), _('Music Blocks is an open source collection of tools for exploring musical concepts.') + ' ' + _('A full list of contributors can be found in the Music Blocks GitHub repository.') + ' ' + _('Music Blocks is licensed under the AGPL.') + ' ' + _('The current version is') + ' ' + VERSION, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO))), 'https://github.com/sugarlabs/musicblocks', _('Music Blocks GitHub repository')],
             [_('Congratulations.'), _('You have finished the tour. Please enjoy Music Blocks!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))]
         ];
