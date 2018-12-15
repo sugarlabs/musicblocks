@@ -70,7 +70,7 @@ function Toolbar() {
         };
     };
 
-    this.renderSaveIcons = function (html_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
+    this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveButton = docById('saveButton');
         var saveButtonAdvanced = docById('saveButtonAdvanced');
         if (beginnerMode) {
@@ -89,18 +89,30 @@ function Toolbar() {
                 saveHTML.onclick = function () {
                     html_onclick();
                 };
-
                 var saveSVG = docById('save-svg');
-
-                saveSVG.onclick = function () {
-                    svg_onclick();
-                };
-
                 var savePNG = docById('save-png');
+                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
 
-                savePNG.onclick = function () {
-                    png_onclick();
-                };
+                // if there is no mouse artwork to save then grey out
+                if (svgData == '') {
+                    saveSVG.disabled = true;
+                    savePNG.disabled = true;
+                    saveSVG.className = 'grey-text inactiveLink';
+                    savePNG.className = 'grey-text inactiveLink';
+                } else {
+                    saveSVG.disabled = false;
+                    savePNG.disabled = false;
+                    saveSVG.className = '';
+                    savePNG.className = '';
+                    saveSVG.onclick = function () {
+                        svg_onclick();
+                    };
+
+
+                    savePNG.onclick = function () {
+                        png_onclick();
+                    };
+                }
 
                 var saveWAV = docById('save-wav');
 
@@ -352,7 +364,7 @@ function Toolbar() {
         ['newFile', _('New project')],
         ['load', _('Load project from file')],
         ['saveButton', _('Save project')],
-        ['saveButtonAdvanced', _('Save project')],
+        ['saveButtonAdvanced', _('Save project as HTML')],
         ['planetIcon', _('Find and share projects')],
         ['planetIconDisabled', _('Offline. Sharing is unavailable')],
         ['toggleAuxBtn', _('Auxilary menu')],
@@ -369,13 +381,13 @@ function Toolbar() {
         ['beginnerMode', _('Switch to beginner mode')],
         ['advancedMode', _('Switch to advanced mode')],
         ['languageSelectIcon', _('Select language')],
-        ['save-html', _('Save as HTML'), 'innerHTML'],
-        ['save-svg', _('Save as SVG'), 'innerHTML'],
-        ['save-png', _('Save as PNG'), 'innerHTML'],
-        ['save-wav', _('Save as WAV'), 'innerHTML'],
-        ['save-abc', _('Save as ABC'), 'innerHTML'],
-        ['save-ly', _('Save sheet music'), 'innerHTML'],
-        ['save-blockartwork-svg', _('Save block artwork'), 'innerHTML'],
+        ['save-html', _('Save project as HTML'), 'innerHTML'],
+        ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
+        ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
+        ['save-wav', _('Save music as WAV'), 'innerHTML'],
+        ['save-abc', _('Save sheet music as ABC'), 'innerHTML'],
+        ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
+        ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
         ['new-project', _('Confirm'), 'innerHTML'],
         ['enUS', _('English (United States)'), 'innerHTML'],
         ['enUK', _('English (United Kingdom)'), 'innerHTML'],
@@ -417,13 +429,13 @@ function Toolbar() {
         _('Switch to beginner mode'),
         _('Switch to advanced mode'),
         _('Select language'),
-        _('Save as HTML'),
-        _('Save as SVG'),
-        _('Save as PNG'),
-        _('Save as WAV'),
-        _('Save as ABC'),
-        _('Save sheet music'),
-        _('Save block artwork'),
+        _('Save project as HTML'),
+        _('Save mouse artwork as SVG'),
+        _('Save mouse artwork as PNG'),
+        _('Save music as WAV'),
+        _('Save sheet music as ABC'),
+        _('Save sheet music as Lilypond'),
+        _('Save block artwork as SVG'),
         _('Confirm'),
         _('Select language'),
     ];
@@ -469,7 +481,7 @@ function Toolbar() {
         tooltipsDisabled = true;
     }
 
-    this.closeAuxToolbar = function(onclick) {
+    this.closeAuxToolbar = function (onclick) {
         if (auxToolbar.style.display === 'block') {
             onclick(false);
             var menuIcon = docById('menu');
