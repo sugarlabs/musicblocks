@@ -83,8 +83,8 @@ function beginnerBlock(name) {
 function createDefaultStack() {
     var language = localStorage.languagePreference;
     if (language == 'ja') {
-	DATAOBJS =
-	    [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+        DATAOBJS =
+            [[0, 'start', screen.width / 3, 100, [null, 1, null]],
 
              [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
@@ -129,10 +129,10 @@ function createDefaultStack() {
              [37, ['solfege', {'value': 'do'}], 0, 0, [36]],
              [38, ['number', {'value': 5}], 0, 0, [36]],
              [39, 'hidden', 0, 0, [31, null]]
-	    ];
+            ];
     } else {
-	DATAOBJS =
-	    [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+        DATAOBJS =
+            [[0, 'start', screen.width / 3, 100, [null, 1, null]],
 
              [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
@@ -167,7 +167,7 @@ function createDefaultStack() {
              [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
              [29, ['number', {'value': 4}], 0, 0, [27]],
              [30, 'hidden', 0, 0, [22, null]]
-	    ];
+            ];
     }
 };
 
@@ -175,9 +175,9 @@ function createDefaultStack() {
 function createHelpContent() {
     var language = localStorage.languagePreference;
     if (language == 'ja') {
-	var LOGO = LOGOJA;
+        var LOGO = LOGOJA;
     } else {
-	var LOGO = LOGODEFAULT;
+        var LOGO = LOGODEFAULT;
     }
 
     if (beginnerMode) {
@@ -440,7 +440,7 @@ function createHelpContent() {
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
         'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'status.svg'],
-	'effectsname': [_('The Effects name block is used to select a sound effect.'), 'documentation', 'effects-block.svg'],
+        'effectsname': [_('The Effects name block is used to select a sound effect.'), 'documentation', 'effects-block.svg'],
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchslider': [_('The Pitch slider tool to is used to generate pitches at selected frequencies.'), 'documentation', 'pitch-slider-block.svg'],
@@ -562,12 +562,12 @@ function createHelpContent() {
 
     var language = localStorage.languagePreference;
     if (beginnerMode && language === 'ja') {
-	BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'];
-	BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
-	BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
-	BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
-	BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg'];
-	BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg'];
+        BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'];
+        BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
+        BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
+        BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
+        BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg'];
+        BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg'];
         BLOCKHELP['if'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg'];
         BLOCKHELP['ifthenelse'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'elif-conditional-block.svg'];
     }
