@@ -809,7 +809,7 @@ msgstr "regla"
 #: js/basicblocks.js:1230
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "timbre"
 
 #: js/block.js:1183
 msgid "stair"
@@ -819,7 +819,7 @@ msgstr "escalera"
 #: js/basicblocks.js:1258
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "tempo"
 
 #: js/block.js:1189
 #: js/basicblocks.js:2707
@@ -856,7 +856,7 @@ msgstr "tambor"
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
-msgstr "regla de ritmo"
+msgstr "hacer un ritmo"
 
 #: js/block.js:1204
 #: js/block.js:1761
@@ -900,14 +900,14 @@ msgstr "intervalo escalar"
 #: js/basicblocks.js:887
 #.TRANS: oscillator time (in milliseconds)
 msgid "milliseconds"
-msgstr ""
+msgstr "milisegundos"
 
 #: js/block.js:1213
 #: js/palette.js:840
 #: js/basicblocks.js:1216
 #: js/basicblocks.js:2010
 msgid "temperament"
-msgstr ""
+msgstr "temperamento"
 
 #: js/block.js:1759
 #: js/block.js:1798
@@ -1037,7 +1037,7 @@ msgstr "mayor"
 #: js/musicutils.js:173
 #.TRANS: modal scale for music
 msgid "ionian"
-msgstr ""
+msgstr "ionian"
 
 #: js/block.js:4958
 #: js/block.js:5034
@@ -1056,7 +1056,7 @@ msgstr "menor"
 #: js/musicutils.js:183
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr ""
+msgstr "aeolian"
 
 #: js/block.js:5347
 msgid "Not a number"
@@ -1296,7 +1296,7 @@ msgstr "El archivo seleccionado no contiene un pila válida."
 #: js/logo.js:3278
 #: plugins/heap.rtp:102
 msgid "The loadHeap block needs a loadFile block."
-msgstr "El bloque del pila de carga necesita un bloque de archivo de carga."
+msgstr "El bloque Pila de carga necesita un bloque de archivo de carga."
 
 #: js/logo.js:3299
 msgid "Error parsing JSON data:"
@@ -1424,15 +1424,15 @@ msgstr "escalar"
 
 #: js/logo.js:4246
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr "El bloque de Caso debe utilizarse dentro de un bloque de switch."
+msgstr "El bloque Caso debe utilizarse dentro de un bloque de switch."
 
 #: js/logo.js:4316
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "El bloque de paso escalar debe utilizarse dentro de un bloque de nota."
+msgstr "El bloque Paso escalar debe utilizarse dentro de un bloque de nota."
 
 #: js/logo.js:4335
 msgid "The Scalar Step Block must be preceded by a Pitch Block."
-msgstr "El bloque de paso escalar debe ir precedida de un bloque de tono."
+msgstr "El bloque Paso escalar debe ir precedida de un bloque de tono."
 
 #: js/logo.js:4446
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -1444,7 +1444,7 @@ msgstr "Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/logo.js:4591
 msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
-msgstr ""
+msgstr "Las transposiciones escalares son iguales a las transposiciones de semitono para el temperamento personalizado."
 
 #: js/logo.js:4998
 msgid "Pitch Block: Did you mean to use a Note block2?"
@@ -1495,7 +1495,7 @@ msgstr "El peso parcial debe estar entre 0 y 1."
 #: js/logo.js:5921
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
-msgstr "El bloque parcial debe usarse dentro de un bloque de parciales ponderados."
+msgstr "El bloque Parcial debe usarse dentro de un bloque de parciales ponderados."
 
 #: js/logo.js:6749
 #: js/logo.js:6796
@@ -1649,7 +1649,7 @@ msgstr "nombre de voz"
 #: js/basicblocks.js:524
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
-msgstr ""
+msgstr "accidental"
 
 #: js/palette.js:850
 msgid "interval name"
@@ -1700,7 +1700,7 @@ msgstr "ocultar"
 #: js/palette.js:1005
 #: js/palette.js:1006
 msgid "show2"
-msgstr ""
+msgstr "mostrar"
 
 #: js/palette.js:1008
 #: js/palette.js:1009
@@ -2306,11 +2306,11 @@ msgstr "Eliminar un plugin seleccionado."
 
 #: js/turtledefs.js:267
 msgid "The Note block is a container for one or more Pitch blocks."
-msgstr "El bloque de nota es un contenedor para uno o más bloques de tono."
+msgstr "El bloque Nota es un contenedor para uno o más bloques de tono."
 
 #: js/turtledefs.js:267
 msgid "The Note block specifies the duration (note value) of its contents."
-msgstr "El bloque de notas especifica la duración (valor de la nota) de su contenido."
+msgstr "El bloque Notas especifica la duración (valor de la nota) de su contenido."
 
 #: js/turtledefs.js:268
 msgid "You can use multiple Drum blocks within a Note block."
@@ -2322,7 +2322,7 @@ msgstr "Un resto de la duración del valor de nota especificado se puede constru
 
 #: js/turtledefs.js:270
 msgid "The Note value block is the value of the duration of the note currently being played."
-msgstr "El bloque de valor de la Nota es el valor de la duración de la nota que se está reproduciendo actualmente."
+msgstr "El bloque Valor de la Nota es el valor de la duración de la nota que se está reproduciendo actualmente."
 
 #: js/turtledefs.js:272
 msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
@@ -2334,16 +2334,16 @@ msgstr "El bloque Maestro de pulsaciones por minuto establece el número de 1/4 
 
 #: js/turtledefs.js:274
 msgid "The Beats per minute block sets the number of 1/4 notes per minute."
-msgstr "El bloque de pulsaciones por minuto establece el número de 1/4 notas por minuto."
+msgstr "El bloque Pulsaciones por minuto establece el número de 1/4 notas por minuto."
 
 #: js/turtledefs.js:275
 msgid "The On-every-note block let you specify actions to take on every note."
-msgstr "El bloque de cada nota le permite especificar acciones para tomar en cada nota."
+msgstr "El bloque Cada nota le permite especificar acciones para tomar en cada nota."
 
 #: js/turtledefs.js:276
 #: js/turtledefs.js:567
 msgid "The Beat count block is the number of the current beat,"
-msgstr "El bloque de conteo de tiempos es el número del tiempo actual,"
+msgstr "El bloque Conteo de tiempos es el número del tiempo actual,"
 
 #: js/turtledefs.js:276
 msgid "eg 1, 2, 3, or 4."
@@ -2356,7 +2356,7 @@ msgstr "En la figura, se utiliza para realizar una acción en el primer tiempo d
 
 #: js/turtledefs.js:277
 msgid "The Notes played block is the number of notes that have been played."
-msgstr "El bloque de notas ejecutadas es el número de notas que se han reproducido."
+msgstr "El bloque Notas ejecutadas es el número de notas que se han reproducido."
 
 #: js/turtledefs.js:277
 msgid "(By default, it counts quarter notes.)"
@@ -2376,11 +2376,11 @@ msgstr "El tono puede especificarse en términos de C D E F G A B."
 
 #: js/turtledefs.js:282
 msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
-msgstr "El bloque número de tono reproducirá un tono asociado por su número, por ejemplo, 0 para C y 7 para G."
+msgstr "El bloque Número de tono reproducirá un tono asociado por su número, por ejemplo, 0 para C y 7 para G."
 
 #: js/turtledefs.js:283
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
-msgstr "El bloque  de paso escalar (en combinación con un bloque numérico) reproducirá el siguiente tono en una escala,"
+msgstr "El bloque Paso escalar (en combinación con un bloque numérico) reproducirá el siguiente tono en una escala,"
 
 #: js/turtledefs.js:283
 msgid "eg if the last note played was sol, Scalar Step 1 will play la."
@@ -2392,7 +2392,7 @@ msgstr "El bloque Hertz (en combinación con un bloque numérico) reproducirá u
 
 #: js/turtledefs.js:285
 msgid "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
-msgstr "El bloque de transposición escalar desplazará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) de la escala."
+msgstr "El bloque Transposición escalar desplazará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) de la escala."
 
 #: js/turtledefs.js:285
 msgid "In the example shown above, sol is shifted up to la."
@@ -2400,16 +2400,16 @@ msgstr "En el ejemplo que se muestra arriba, el sol se desplaza hacia arriba a l
 
 #: js/turtledefs.js:286
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
-msgstr "El bloque tono in Hertz es el valor en hercios del tono de la nota que se está reproduciendo actualmente."
+msgstr "El bloque Tono en Hertz es el valor en hercios del tono de la nota que se está reproduciendo actualmente."
 
 #: js/turtledefs.js:287
 msgid "The Pitch number block is the value of the pitch of the note currently being played."
-msgstr "El bloque de número de tono es el valor del tono de la nota que se está reproduciendo actualmente."
+msgstr "El bloque Número de tono es el valor del tono de la nota que se está reproduciendo actualmente."
 
 #: js/turtledefs.js:289
 #: js/turtledefs.js:568
 msgid "The Set key block is used to set the key and mode,"
-msgstr "El bloque de teclas Set se usa para configurar la tecla y el modo,"
+msgstr "El bloque Fijar tecla se usa para configurar la tecla y el modo,"
 
 #: js/turtledefs.js:289
 msgid "eg C Major"
@@ -2417,7 +2417,7 @@ msgstr "por ejemplo, C Mayor"
 
 #: js/turtledefs.js:290
 msgid "The Mode length block is the number of notes in the current scale."
-msgstr "El bloque de longitud de modo es el número de notas en la escala actual."
+msgstr "El bloque Longitud de modo es el número de notas en la escala actual."
 
 #: js/turtledefs.js:290
 msgid "Most Western scales have 7 notes."
@@ -2425,7 +2425,7 @@ msgstr "La mayoría de las escalas occidentales tienen 7 notas."
 
 #: js/turtledefs.js:291
 msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-msgstr "El bloque de intervalo escalar calcula un intervalo relativo basado en el modo actual, omitiendo todas las notas fuera del modo."
+msgstr "El bloque Intervalo escalar calcula un intervalo relativo basado en el modo actual, omitiendo todas las notas fuera del modo."
 
 #: js/turtledefs.js:291
 msgid "In the figure, we add la to sol."
@@ -2433,13 +2433,13 @@ msgstr "En la figura, sumamos la a sol."
 
 #: js/turtledefs.js:292
 msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-msgstr "El bloque de fijar temperamento se usa para elegir el sistema de afinación usado por los bloques de música."
+msgstr "El bloque Fijar temperamento se usa para elegir el sistema de afinación usado por los bloques de música."
 
 #: js/turtledefs.js:294
 #: js/turtledefs.js:428
 #: js/turtledefs.js:569
 msgid "The Set timbre block selects a voice for the synthesizer,"
-msgstr "El bloque fijar timbre selecciona una voz para el sintetizador,"
+msgstr "El bloque Fijar timbre selecciona una voz para el sintetizador,"
 
 #: js/turtledefs.js:294
 #: js/turtledefs.js:428
@@ -2456,7 +2456,7 @@ msgstr "El bloque Slur alarga el sostenimiento de las notas mientras mantiene el
 
 #: js/turtledefs.js:297
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
-msgstr "El bloque de vibrato agrega una variación rápida y leve en el tono."
+msgstr "El bloque Vibrato agrega una variación rápida y leve en el tono."
 
 #: js/turtledefs.js:298
 msgid "The Neighbor block rapidly switches between neighboring pitches."
@@ -2480,7 +2480,7 @@ msgstr "Por ejemplo, si tiene 7 notas en secuencia contenidas en un bloque de De
 
 #: js/turtledefs.js:302
 msgid "The Set synth volume block will change the volume of a particular synth,"
-msgstr "El bloque de ajuste volumen del sintetizador cambiará el volumen de un sintetizador particular,"
+msgstr "El bloque Ajuste volumen del sintetizador cambiará el volumen de un sintetizador particular,"
 
 #: js/turtledefs.js:302
 msgid "eg guitar violin snare drum etc."
@@ -2496,364 +2496,364 @@ msgstr "El rango es de 0 para el silencio a 100 para el volumen completo."
 
 #: js/turtledefs.js:303
 msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "El bloque ajuste volumen maestro establece el volumen para todos los sintetizadores."
+msgstr "El bloque Ajuste volumen maestro establece el volumen para todos los sintetizadores."
 
 #: js/turtledefs.js:306
 #: js/turtledefs.js:572
 msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-msgstr ""
+msgstr "El bloque Fijar tambor de ajuste seleccionará un sonido de tambor para reemplazar el tono de cualquier nota contenida."
 
 #: js/turtledefs.js:306
 msgid "In the example above, a kick drum sound will be played instead of sol."
-msgstr ""
+msgstr "En el ejemplo anterior, se reproducirá un sonido de bombo en lugar de sol."
 
 #: js/turtledefs.js:308
 msgid "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
-msgstr ""
+msgstr "El bloque Estado abre una herramienta para inspeccionar el estado de Music Blocks mientras se ejecuta."
 
 #: js/turtledefs.js:309
 msgid "The Pitch-time Matrix block opens a tool to create musical phrases."
-msgstr ""
+msgstr "El bloque Matriz de tono y tiempo abre una herramienta para crear frases musicales."
 
 #: js/turtledefs.js:310
 msgid "The Rhythm Maker block opens a tool to create drum machines."
-msgstr ""
+msgstr "El bloque Hacer un ritmo abre una herramienta para crear cajas de ritmos."
 
 #: js/turtledefs.js:311
 msgid "The Pitch-slider block opens a tool to generate arbitray pitches."
-msgstr ""
+msgstr "El bloque Deslizante de tono abre una herramienta para generar tonos arbitrarios."
 
 #: js/turtledefs.js:312
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "El bloque Ritmo se utiliza para generar patrones de ritmo."
 
 #: js/turtledefs.js:313
 msgid "Tuplets are a collection of notes that get scaled to a specific duration."
-msgstr ""
+msgstr "Tuplets son una colección de notas que se escalan a una duración específica."
 
 #: js/turtledefs.js:313
 msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-msgstr ""
+msgstr "Usar tuplets facilita la creación de grupos de notas que no se basan en una potencia de 2."
 
 #: js/turtledefs.js:314
 msgid "The Music keyboard block opens a piano keyboard that can be used to create notes."
-msgstr ""
+msgstr "El bloque Teclado de música abre un teclado de piano que puede usarse para crear notas."
 
 #: js/turtledefs.js:315
 msgid "The Tempo block opens a metronome to visualize the beat."
-msgstr ""
+msgstr "El bloque Tempo abre un metrónomo para visualizar el ritmo."
 
 #: js/turtledefs.js:316
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-msgstr ""
+msgstr "El bloque Modo personalizado abre una herramienta para explorar el modo musical (el espaciado de las notas en una escala)."
 
 #: js/turtledefs.js:318
 msgid "The Repeat block will repeat the contained blocks."
-msgstr ""
+msgstr "El bloque Repetir repetirá los bloques contenidos."
 
 #: js/turtledefs.js:318
 msgid "In this example the note will be played 4 times."
-msgstr ""
+msgstr "En este ejemplo la nota se tocará 4 veces."
 
 #: js/turtledefs.js:319
 msgid "The Forever block will repeat the contained blocks forever."
-msgstr ""
+msgstr "El bloque Por siempre repetirá los bloques contenidos para siempre."
 
 #: js/turtledefs.js:319
 msgid "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
-msgstr ""
+msgstr "En este ejemplo de una caja de ritmos simple, un bombo ejecutará 1/4 de notas para siempre."
 
 #: js/turtledefs.js:320
 #: js/turtledefs.js:321
 #: js/turtledefs.js:573
 #: js/turtledefs.js:574
 msgid "Conditionals lets your program take different actions depending on the condition."
-msgstr ""
+msgstr "Los condicionales le permiten a su programa tomar diferentes acciones dependiendo de la condición."
 
 #: js/turtledefs.js:320
 #: js/turtledefs.js:321
 #: js/turtledefs.js:573
 #: js/turtledefs.js:574
 msgid "In this example if the mouse button is pressed a snare drum will play."
-msgstr ""
+msgstr "En este ejemplo, si se presiona el botón del mouse, se reproducirá una caja."
 
 #: js/turtledefs.js:321
 msgid "Else a kick drum will play."
-msgstr ""
+msgstr "Si no, tocará un bombo."
 
 #: js/turtledefs.js:322
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
-msgstr ""
+msgstr "El bloque Atrás ejecuta el código en orden inverso (retrógrado en la música)."
 
 #: js/turtledefs.js:324
 msgid "The Action block is used to group together blocks so that they can be used more than once."
-msgstr ""
+msgstr "El bloque Acción se utiliza para agrupar bloques de modo que puedan utilizarse más de una vez."
 
 #: js/turtledefs.js:324
 msgid "It is often used for storing a phrase of music that is repeated."
-msgstr ""
+msgstr "A menudo se utiliza para almacenar una frase de música que se repite."
 
 #: js/turtledefs.js:325
 msgid "Each Start block is a separate voice."
-msgstr ""
+msgstr "Cada bloque de inicio es una voz separada."
 
 #: js/turtledefs.js:325
 msgid "All of the Start blocks run at the same time when the Play button is pressed."
-msgstr ""
+msgstr "Todos los bloques de inicio se ejecutan al mismo tiempo cuando se presiona el botón Reproducir."
 
 #: js/turtledefs.js:326
 #: js/turtledefs.js:571
 msgid "The Listen block is used to listen for an event such as a mouse click."
-msgstr ""
+msgstr "El bloque de escucha se usa para escuchar un evento como un clic del ratón."
 
 #: js/turtledefs.js:326
 msgid "When the event happens, an action is taken."
-msgstr ""
+msgstr "Cuando ocurre el evento, se realiza una acción."
 
 #: js/turtledefs.js:327
 msgid "The Broadcast block is used to trigger an event."
-msgstr ""
+msgstr "El bloque Emitir se utiliza para desencadenar un evento."
 
 #: js/turtledefs.js:328
 #: js/turtledefs.js:467
 #: js/turtledefs.js:469
 msgid "The Do block is used to initiate an action."
-msgstr ""
+msgstr "El bloque Hacer se utiliza para iniciar una acción."
 
 #: js/turtledefs.js:328
 msgid "In the example, it is used with the One of block to choose a random phase."
-msgstr ""
+msgstr "En el ejemplo, se usa con el bloque Uno para elegir una fase aleatoria."
 
 #: js/turtledefs.js:330
 msgid "The Store in Box 1 block is used to store a value in Box 1."
-msgstr ""
+msgstr "El bloque Guardar en caja 1 se utiliza para almacenar un valor en la caja 1."
 
 #: js/turtledefs.js:331
 msgid "The Box 1 block returns the value stored in Box 1."
-msgstr ""
+msgstr "El bloque Caja 1 devuelve el valor almacenado en caja 1."
 
 #: js/turtledefs.js:332
 msgid "The Store in Box 2 block is used to store a value in Box 2."
-msgstr ""
+msgstr "El bloque Guardar en caja 2 se utiliza para almacenar un valor en la caja 2."
 
 #: js/turtledefs.js:333
 msgid "The Box 2 block returns the value stored in Box 2."
-msgstr ""
+msgstr "El bloque Caja 2 devuelve el valor almacenado en caja 2."
 
 #: js/turtledefs.js:334
 #: js/turtledefs.js:570
 msgid "The Add-to block is used to add to the value stored in a box."
-msgstr ""
+smsgstr "El bloque Sumar a se usa para agregar al valor almacenado en un cuadro."
 
 #: js/turtledefs.js:334
 msgid "It can also be used with other blocks, such as Color, Pen-size."
-msgstr ""
+msgstr "También se puede utilizar con otros bloques, como el color, el tamaño de la pluma."
 
 #: js/turtledefs.js:334
 msgid "etc."
-msgstr ""
+msgstr "etc."
 
 #: js/turtledefs.js:335
 msgid "The Add-1-to block adds one to the value stored in a box."
-msgstr ""
+msgstr "El bloque Sumar-1-a agrega uno al valor almacenado en un cuadro."
 
 #: js/turtledefs.js:337
 msgid "The Number block holds a number."
-msgstr ""
+msgstr "El bloque Numérico contiene un número."
 
 #: js/turtledefs.js:338
 msgid "The Random block returns a random number."
-msgstr ""
+msgstr "El bloque Aleatorio devuelve un número aleatorio."
 
 #: js/turtledefs.js:339
 msgid "The One-of block returns one of two choices."
-msgstr ""
+msgstr "El bloque Uno de estos devuelve una de dos opciones."
 
 #: js/turtledefs.js:340
 msgid "The Plus block is used to add."
-msgstr ""
+msgstr "El bloque Plus se utiliza para agregar."
 
 #: js/turtledefs.js:341
 msgid "The Minus block is used to subtract."
-msgstr ""
+msgstr "El bloque Minus se usa para restar."
 
 #: js/turtledefs.js:342
 msgid "The Multiply block is used to multiply."
-msgstr ""
+msgstr "El bloque Multiplicar se usa para multiplicar."
 
 #: js/turtledefs.js:343
 msgid "The Divide block is used to divide."
-msgstr ""
+msgstr "El bloque División se usa para dividir."
 
 #: js/turtledefs.js:345
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr ""
+msgstr "El bloque Mayor que devuelve verdadero si el número superior es mayor que el número inferior."
 
 #: js/turtledefs.js:346
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr ""
+msgstr "El bloque Menor que devuelve Verdadero si el número superior es menor que el número inferior."
 
 #: js/turtledefs.js:347
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr ""
+msgstr "El bloque Igual devuelve verdadero si los dos números son iguales."
 
 #: js/turtledefs.js:349
 msgid "The Forward block moves the mouse forward."
-msgstr ""
+msgstr "El bloque Adelante mueve el ratón hacia adelante."
 
 #: js/turtledefs.js:350
 msgid "The Back block moves the mouse backward."
-msgstr ""
+msgstr "El bloque Atrás mueve el ratón hacia atrás."
 
 #: js/turtledefs.js:351
 msgid "The Left block turns the mouse to the left."
-msgstr ""
+msgstr "El bloque Izquierdo gira el ratón hacia la izquierda."
 
 #: js/turtledefs.js:352
 msgid "The Right block turns the mouse to the right."
-msgstr ""
+msgstr "El bloque Derecha gira el ratón hacia la derecha."
 
 #: js/turtledefs.js:353
 msgid "The Arc block moves the mouse in a arc."
-msgstr ""
+msgstr "El bloque Arco mueve el ratón en un arco."
 
 #: js/turtledefs.js:354
 msgid "The Set XY block moves the mouse to a specific position on the screen."
-msgstr ""
+msgstr "El bloque Fijar XY mueve el ratón a una posición específica en la pantalla."
 
 #: js/turtledefs.js:355
 msgid "The Scroll XY block moves the canvas."
-msgstr ""
+msgstr "El bloque Desplazar XY mueve el lienzo."
 
 #: js/turtledefs.js:356
 msgid "The X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "El bloque X devuelve la posición horizontal del ratón."
 
 #: js/turtledefs.js:357
 msgid "The Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "El bloque Y devuelve la posición horizontal del ratón."
 
 #: js/turtledefs.js:358
 msgid "The Heading block returns the orientation of the mouse."
-msgstr ""
+msgid "El bloque Rumbo devuelve la orientación del mouse."
 
 #: js/turtledefs.js:360
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr ""
+msgstr "El bloque Fijar tamaño de la pluma de ajuste cambia el tamaño de la pluma."
 
 #: js/turtledefs.js:361
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "El bloque Subir pluma levanta la pluma para que no dibuje."
 
 #: js/turtledefs.js:362
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "El bloque de Haciar pluma abajo baja la pluma para que dibuje."
 
 #: js/turtledefs.js:363
 msgid "The Color block returns the current pen color."
-msgstr ""
+msgstr "El bloque Color devuelve el color actual de la pluma."
 
 #: js/turtledefs.js:364
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "El bloque Fijar color cambia el color de la pluma."
 
 #: js/turtledefs.js:365
 msgid "The Set-shade block changes the pen color from dark to light."
-msgstr ""
+msgstr "El bloque Fijar sombra cambia el color de la pluma de oscuro a claro."
 
 #: js/turtledefs.js:367
 msgid "The Print block displays text at the top of the screen."
-msgstr ""
+msgstr "El bloque Imprimir muestra texto en la parte superior de la pantalla."
 
 #: js/turtledefs.js:368
 msgid "The Text block holds a text string."
-msgstr ""
+msgstr "El bloque Texto contiene una cadena de texto."
 
 #: js/turtledefs.js:369
 msgid "The Media block is used to import an image."
-msgstr ""
+msgstr "El bloque Medios se utiliza para importar una imagen."
 
 #: js/turtledefs.js:370
 msgid "The Show block is used to display text or images on the canvas."
-msgstr ""
+msgstr "El bloque Mostrar se utiliza para mostrar texto o imágenes en el lienzo."
 
 #: js/turtledefs.js:371
 msgid "The Shell block is used to change the appearance of the mouse."
-msgstr ""
+msgstr "El bloque Avatar se usa para cambiar la apariencia del mouse."
 
 #: js/turtledefs.js:372
 msgid "The Speak block outputs to the text-to-speech synthesizer"
-msgstr ""
+msgstr "El bloque Habla emite al sintetizador de texto a voz."
 
 #: js/turtledefs.js:373
 msgid "The Height block returns the height of the canvas."
-msgstr ""
+msgstr "El bloque Altura devuelve la altura del lienzo."
 
 #: js/turtledefs.js:374
 msgid "The Width block returns the width of the canvas."
-msgstr ""
+msgstr "El bloque Ancho devuelve el ancho del lienzo."
 
 #: js/turtledefs.js:375
 msgid "The Top block returns the position of the top of the canvas."
-msgstr ""
+msgstr "El bloque superior devuelve la posición de la parte superior del lienzo."
 
 #: js/turtledefs.js:375
 #: js/turtledefs.js:376
 msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-msgstr ""
+msgstr "En este ejemplo, el ratón se mueve hacia arriba hasta que alcanza el borde superior del lienzo; luego reaparece en la parte inferior del lienzo."
 
 #: js/turtledefs.js:376
 msgid "The Bottom block returns the position of the bottom of the canvas."
-msgstr ""
+msgstr "El bloque Inferior devuelve la posición de la parte inferior del lienzo."
 
 #: js/turtledefs.js:377
 msgid "The Left block returns the position of the left of the canvas."
-msgstr ""
+msgstr "El bloque Izquierdo devuelve la posición de la izquierda del lienzo."
 
 #: js/turtledefs.js:377
 #: js/turtledefs.js:378
 msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-msgstr ""
+msgstr "En este ejemplo, el ratón se mueve hacia la derecha hasta que alcanza el borde derecho del lienzo; luego reaparece a la izquierda del lienzo."
 
 #: js/turtledefs.js:378
 msgid "The Right block returns the position of the right of the canvas."
-msgstr ""
+msgstr "El bloque Derecha devuelve la posición de la derecha del lienzo."
 
 #: js/turtledefs.js:380
 msgid "The Mouse-button block returns True if the mouse button is pressed."
-msgstr ""
+msgstr "El bloque Botón del ratón devuelve Verdadero si se presiona el botón del ratón."
 
 #: js/turtledefs.js:381
 msgid "The Cursor X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "El bloque Cursor X devuelve la posición horizontal del ratón."
 
 #: js/turtledefs.js:382
 msgid "The Cursor Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "El bloque Cursor Y devuelve la posición vertical del ratón."
 
 #: js/turtledefs.js:383
 msgid "The Click block returns True if a mouse has been clicked."
-msgstr ""
+msgstr "El bloque Clic devuelve Verdadero si se ha hecho clic en un ratón."
 
 #: js/turtledefs.js:385
 msgid "The Set-name block is used to name a mouse."
-msgstr ""
+msgstr "El bloque Fijar nombre se usa para nombrar un ratón."
 
 #: js/turtledefs.js:386
 msgid "The Mouse-name block returns the name of a mouse."
-msgstr ""
+msgstr "El bloque Nombre del ratón devuelve el nombre de un ratón."
 
 #: js/turtledefs.js:389
 msgid "The Dot block extends the duration of a note by 50%."
-msgstr ""
+msgstr "El bloque Punto extiende la duración de una nota en un 50%."
 
 #: js/turtledefs.js:389
 msgid "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-msgstr ""
+msgstr "Por ejemplo, una nota de un cuarto de puntos se reproducirá a 3/8 (1/4 + 1/8) de un tiempo."
 
 #: js/turtledefs.js:390
 msgid "The Tie block works on pairs of notes, combining them into one note."
-msgstr ""
+msgstr "El bloque Atar funciona en pares de notas, combinándolas en una sola nota."
 
 #: js/turtledefs.js:391
 msgid "The Multiply note value block changes the duration of notes by changing their note values."
