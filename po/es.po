@@ -3747,7 +3747,7 @@ msgstr "número de tono"
 #: js/basicblocks.js:184
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr ""
+msgstr "tono en hertz"
 
 #: js/basicblocks.js:206
 #.TRANS: MIDI is a technical standard for electronic music
@@ -3764,7 +3764,7 @@ msgstr "fijar offset del número de tono"
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr ""
+msgstr "nombre"
 
 #: js/basicblocks.js:210
 #: js/basicblocks.js:212
@@ -3898,7 +3898,7 @@ msgstr "transposición escalar"
 #: js/basicblocks.js:4532
 #.TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
-msgstr ""
+msgstr "hertz"
 
 #: js/basicblocks.js:590
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
@@ -3979,7 +3979,7 @@ msgstr "tuplet simple"
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: rhythm block
 msgid "rhythm1"
-msgstr ""
+msgstr "ritmo"
 
 #: js/basicblocks.js:902
 #: js/basicblocks.js:913
@@ -4157,7 +4157,7 @@ msgstr "matriz de tono en tiempo"
 #: js/basicblocks.js:1425
 #.TRANS: musical meter, e.g., 4:4
 msgid "current meter"
-msgstr ""
+msgstr "meter actuale"
 
 #: js/basicblocks.js:1436
 #.TRANS: number of beats per minute
