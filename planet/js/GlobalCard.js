@@ -73,7 +73,7 @@ function GlobalCard(Planet) {
         for (var i = 0; i < this.ProjectData.ProjectTags.length; i++){
             var chip = document.createElement('div');
             chip.classList.add('chipselect');
-            chip.textContent = Planet.TagsManifest[this.ProjectData.ProjectTags[i]].TagName;
+            chip.textContent = _(Planet.TagsManifest[this.ProjectData.ProjectTags[i]].TagName);
             tagcontainer.appendChild(chip);
         }
         

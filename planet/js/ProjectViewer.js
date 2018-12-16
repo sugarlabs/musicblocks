@@ -45,7 +45,7 @@ function ProjectViewer(Planet) {
         for (var i = 0; i < proj.ProjectTags.length; i++) {
             var chip = document.createElement('div');
             chip.classList.add('chipselect');
-            chip.textContent = Planet.TagsManifest[proj.ProjectTags[i]].TagName;
+            chip.textContent = _(Planet.TagsManifest[proj.ProjectTags[i]].TagName);
             tagcontainer.appendChild(chip);
         }
 
