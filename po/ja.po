@@ -6693,7 +6693,7 @@ msgstr "ゲーム"
 #: js/GlobalTag.js:33
 #.TRANS: planet tag name
 msgid "Media"
-msgstr メディア""
+msgstr "メディア"
 
 #: js/GlobalTag.js:35
 #.TRANS: planet tag name
