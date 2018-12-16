@@ -6055,11 +6055,11 @@ msgstr "Haga clic en el círculo para seleccionar notas para el modo."
 
 #: js/pitchstaircase.js:475
 msgid "Play chord"
-msgstr "Juegar un acorde"
+msgstr "Tocar un acorde"
 
 #: js/pitchstaircase.js:480
 msgid "Play scale"
-msgstr "Juegar una escala"
+msgstr "Tocar una escala"
 
 #: js/pitchstaircase.js:639
 msgid "Click on a note to create a new step."
