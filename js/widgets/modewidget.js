@@ -886,7 +886,7 @@ function ModeWidget() {
         console.log(newStack);
         var that = this;
         setTimeout(function() {
-            that._logo.blocks.palettes.hide();
+            // that._logo.blocks.palettes.hide();
             that._logo.blocks.loadNewBlocks(newStack);
         }, 2000);
     };
