@@ -2115,8 +2115,6 @@ function Block(protoblock, blocks, overrideName) {
 
                     return;
                 }
-
-                return;
             }
 
             if (that.blocks.getLongPressStatus()) {
