@@ -391,7 +391,7 @@ function GlobalPlanet(Planet) {
             if (Planet.IsMusicBlocks){
                 this.defaultMainTags = ["Music"];
                 this.specialTags = 
-                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': false}, 
+                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': true}, 
                  {'name': 'My Projects', 'func': this.searchMyProjects.bind(this), 'defaultTag': false}];
             } else {
                 this.defaultMainTags = [];
