@@ -2094,6 +2094,9 @@ function Block(protoblock, blocks, overrideName) {
             // We might be able to check which button was clicked.
             if ('nativeEvent' in event) {
                 if ('button' in event.nativeEvent && event.nativeEvent.button == 2) {
+                    that.blocks.stageClick = true;
+                    console.log('loading context menu');
+                    docById('wheelDiv').style.display = 'none';
                     that.piemenuBlockContext(thisBlock);
                     return;
                 } else if ('ctrlKey' in event.nativeEvent && event.nativeEvent.ctrlKey) {
@@ -2112,6 +2115,8 @@ function Block(protoblock, blocks, overrideName) {
 
                     return;
                 }
+
+                return;
             }
 
             if (that.blocks.getLongPressStatus()) {
