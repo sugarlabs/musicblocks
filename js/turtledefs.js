@@ -81,53 +81,94 @@ function beginnerBlock(name) {
 
 
 function createDefaultStack() {
-   DATAOBJS =
-       [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+    var language = localStorage.languagePreference;
+    if (language == 'ja') {
+	DATAOBJS =
+	    [[0, 'start', screen.width / 3, 100, [null, 1, null]],
 
-        [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
-        [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
-        [3, 'hidden', 0, 0, [1, null]],
+             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+             [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
+             [3, 'hidden', 0, 0, [1, null]],
 
-        [4, 'newnote', 0, 0, [1, 5, 8, 12]],
-        [5, 'divide', 0, 0, [4, 6, 7]],
-        [6, ['number', {'value': 1}], 0, 0, [5]],
-        [7, ['number', {'value': 2}], 0, 0, [5]],
-        [8, 'vspace', 0, 0, [4, 9]],
-        [9, 'pitch', 0, 0, [8, 10, 11, null]],
-        [10, ['solfege', {'value': 'do'}], 0, 0, [9]],
-        [11, ['number', {'value': 4}], 0, 0, [9]],
-        [12, 'hidden', 0, 0, [4, 13]],
+             [4, 'newnote', 0, 0, [1, 5, 8, 12]],
+             [5, 'divide', 0, 0, [4, 6, 7]],
+             [6, ['number', {'value': 1}], 0, 0, [5]],
+             [7, ['number', {'value': 2}], 0, 0, [5]],
+             [8, 'vspace', 0, 0, [4, 9]],
+             [9, 'pitch', 0, 0, [8, 10, 11, null]],
+             [10, ['solfege', {'value': 'do'}], 0, 0, [9]],
+             [11, ['number', {'value': 4}], 0, 0, [9]],
+             [12, 'hidden', 0, 0, [4, 13]],
 
-        [13, 'newnote', 0, 0, [12, 14, 17, 21]],
-        [14, 'divide', 0, 0, [13, 15, 16]],
-        [15, ['number', {'value': 1}], 0, 0, [14]],
-        [16, ['number', {'value': 4}], 0, 0, [14]],
-        [17, 'vspace', 0, 0, [13, 18]],
-        [18, 'pitch', 0, 0, [17, 19, 20, null]],
-        [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
-        [20, ['number', {'value': 4}], 0, 0, [18]],
-        [21, 'hidden', 0, 0, [13, 22]],
+             [13, 'newnote', 0, 0, [12, 14, 17, 21]],
+             [14, 'divide', 0, 0, [13, 15, 16]],
+             [15, ['number', {'value': 1}], 0, 0, [14]],
+             [16, ['number', {'value': 4}], 0, 0, [14]],
+             [17, 'vspace', 0, 0, [13, 18]],
+             [18, 'pitch', 0, 0, [17, 19, 20, null]],
+             [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
+             [20, ['number', {'value': 4}], 0, 0, [18]],
+             [21, 'hidden', 0, 0, [13, 22]],
 
-        [22, 'newnote', 0, 0, [21, 23, 26, 30]],
-        [23, 'divide', 0, 0, [22, 24, 25]],
-        [24, ['number', {'value': 1}], 0, 0, [23]],
-        [25, ['number', {'value': 4}], 0, 0, [23]],
-        [26, 'vspace', 0, 0, [22, 27]],
-        [27, 'pitch', 0, 0, [26, 28, 29, null]],
-        [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
-        [29, ['number', {'value': 4}], 0, 0, [27]],
-        [30, 'hidden', 0, 0, [22, 31]],
+             [22, 'newnote', 0, 0, [21, 23, 26, 30]],
+             [23, 'divide', 0, 0, [22, 24, 25]],
+             [24, ['number', {'value': 1}], 0, 0, [23]],
+             [25, ['number', {'value': 4}], 0, 0, [23]],
+             [26, 'vspace', 0, 0, [22, 27]],
+             [27, 'pitch', 0, 0, [26, 28, 29, null]],
+             [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
+             [29, ['number', {'value': 4}], 0, 0, [27]],
+             [30, 'hidden', 0, 0, [22, 31]],
 
-        [31, 'newnote', 0, 0, [30, 32, 35, 39]],
-        [32, 'divide', 0, 0, [31, 33, 34]],
-        [33, ['number', {'value': 1}], 0, 0, [32]],
-        [34, ['number', {'value': 1}], 0, 0, [32]],
-        [35, 'vspace', 0, 0, [31, 36]],
-        [36, 'pitch', 0, 0, [35, 37, 38, null]],
-        [37, ['solfege', {'value': 'do'}], 0, 0, [36]],
-        [38, ['number', {'value': 5}], 0, 0, [36]],
-        [39, 'hidden', 0, 0, [31, null]]
-       ];
+             [31, 'newnote', 0, 0, [30, 32, 35, 39]],
+             [32, 'divide', 0, 0, [31, 33, 34]],
+             [33, ['number', {'value': 1}], 0, 0, [32]],
+             [34, ['number', {'value': 1}], 0, 0, [32]],
+             [35, 'vspace', 0, 0, [31, 36]],
+             [36, 'pitch', 0, 0, [35, 37, 38, null]],
+             [37, ['solfege', {'value': 'do'}], 0, 0, [36]],
+             [38, ['number', {'value': 5}], 0, 0, [36]],
+             [39, 'hidden', 0, 0, [31, null]]
+	    ];
+    } else {
+	DATAOBJS =
+	    [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+
+             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+             [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
+             [3, 'hidden', 0, 0, [1, null]],
+
+             [4, 'newnote', 0, 0, [1, 5, 8, 12]],
+             [5, 'divide', 0, 0, [4, 6, 7]],
+             [6, ['number', {'value': 1}], 0, 0, [5]],
+             [7, ['number', {'value': 4}], 0, 0, [5]],
+             [8, 'vspace', 0, 0, [4, 9]],
+             [9, 'pitch', 0, 0, [8, 10, 11, null]],
+             [10, ['solfege', {'value': 'sol'}], 0, 0, [9]],
+             [11, ['number', {'value': 4}], 0, 0, [9]],
+             [12, 'hidden', 0, 0, [4, 13]],
+
+             [13, 'newnote', 0, 0, [12, 14, 17, 21]],
+             [14, 'divide', 0, 0, [13, 15, 16]],
+             [15, ['number', {'value': 1}], 0, 0, [14]],
+             [16, ['number', {'value': 4}], 0, 0, [14]],
+             [17, 'vspace', 0, 0, [13, 18]],
+             [18, 'pitch', 0, 0, [17, 19, 20, null]],
+             [19, ['solfege', {'value': 'mi'}], 0, 0, [18]],
+             [20, ['number', {'value': 4}], 0, 0, [18]],
+             [21, 'hidden', 0, 0, [13, 22]],
+
+             [22, 'newnote', 0, 0, [21, 23, 26, 30]],
+             [23, 'divide', 0, 0, [22, 24, 25]],
+             [24, ['number', {'value': 1}], 0, 0, [23]],
+             [25, ['number', {'value': 2}], 0, 0, [23]],
+             [26, 'vspace', 0, 0, [22, 27]],
+             [27, 'pitch', 0, 0, [26, 28, 29, null]],
+             [28, ['solfege', {'value': 'sol'}], 0, 0, [27]],
+             [29, ['number', {'value': 4}], 0, 0, [27]],
+             [30, 'hidden', 0, 0, [22, null]]
+	    ];
+    }
 };
 
 
