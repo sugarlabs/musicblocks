@@ -6604,7 +6604,7 @@ msgstr "ミュージック・ブロックスで ひらきます"
 
 #: js/GlobalCard.js:30
 msgid "More Details"
-msgstr "詳細"
+msgstr "しょうさい"
 
 #: js/GlobalCard.js:32
 msgid "Like project"
@@ -6622,7 +6622,7 @@ msgstr "シェア"
 
 #: js/GlobalCard.js:39
 msgid "Copy link to clipboard"
-msgstr ""
+msgstr "リンクを クリップボードに コピー する"
 
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:40
@@ -6652,52 +6652,52 @@ msgstr "じょうきゅう オプション"
 #: js/GlobalTag.js:15
 #.TRANS: planet tag name
 msgid "All Projects"
-msgstr ""
+msgstr "すべての プロジェクト"
 
 #: js/GlobalTag.js:19
 #.TRANS: planet tag name
 msgid "Examples"
-msgstr ""
+msgstr "れいの プロジェクト"
 
 #: js/GlobalTag.js:21
 #.TRANS: planet tag name
 msgid "Music"
-msgstr ""
+msgstr "おんがく"
 
 #: js/GlobalTag.js:23
 #.TRANS: planet tag name
 msgid "Art"
-msgstr ""
+msgstr "アート"
 
 #: js/GlobalTag.js:25
 #.TRANS: planet tag name
 msgid "Math"
-msgstr ""
+msgstr "さんすう"
 
 #: js/GlobalTag.js:27
 #.TRANS: planet tag name
 msgid "Interactive"
-msgstr ""
+msgstr "インタラクティブ"
 
 #: js/GlobalTag.js:29
 #.TRANS: planet tag name
 msgid "Design"
-msgstr ""
+msgstr "デザイン"
 
 #: js/GlobalTag.js:31
 #.TRANS: planet tag name
 msgid "Game"
-msgstr ""
+msgstr "ゲーム"
 
 #: js/GlobalTag.js:33
 #.TRANS: planet tag name
 msgid "Media"
-msgstr ""
+msgstr "メディア"
 
 #: js/GlobalTag.js:35
 #.TRANS: planet tag name
 msgid "Sensors"
-msgstr ""
+msgstr "センサー"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
