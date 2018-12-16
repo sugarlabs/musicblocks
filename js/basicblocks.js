@@ -645,299 +645,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // MATRIX PALETTE
-
-    var newblock = new ProtoBlock('oscillator');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['oscillator'] = newblock;
-    //.TRANS: there are different types (sine, triangle, square...) of oscillators.
-    newblock.staticLabels.push(_('oscillator'));
-    newblock.staticLabels.push(_('type'));
-    //.TRANS: Partials refers to the number of sine waves combined into the sound.
-    newblock.staticLabels.push(_('partials'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    //.TRANS: triangle wave
-    newblock.defaults.push(_('triangle'));
-    newblock.defaults.push(6);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('filtertype');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['filtertype'] = newblock;
-    newblock.valueBlock();
-    newblock.dockTypes[0] = 'textout';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('oscillatortype');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['oscillatortype'] = newblock;
-    newblock.valueBlock();
-    newblock.dockTypes[0] = 'textout';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('envelope');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['envelope'] = newblock;
-    //.TRANS: sound envelope (ADSR)
-    newblock.staticLabels.push(_('envelope'));
-    //.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
-    newblock.staticLabels.push(_('attack'));
-    //.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
-    newblock.staticLabels.push(_('decay'));
-    //.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
-    newblock.staticLabels.push(_('sustain'));
-    //.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
-    newblock.staticLabels.push(_('release'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(1);
-    newblock.defaults.push(50);
-    newblock.defaults.push(60);
-    newblock.defaults.push(1);
-    newblock.fourArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.dockTypes[3] = 'numberin';
-    newblock.dockTypes[4] = 'numberin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('filter');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['filter'] = newblock;
-    //.TRANS: a filter removes some unwanted components from a signal
-    newblock.staticLabels.push(_('filter'));
-    //.TRANS: type of filter, e.g., lowpass, highpass, etc.
-    newblock.staticLabels.push(_('type'));
-    //.TRANS: rolloff is the steepness of a change in frequency.
-    newblock.staticLabels.push(_('rolloff'));
-    newblock.staticLabels.push(_('frequency'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    //.TRANS: highpass filter
-    newblock.defaults.push(_('highpass'));
-    newblock.defaults.push(-12);
-    newblock.defaults.push(392);
-    newblock.threeArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.dockTypes[3] = 'numberin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('temperament');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['temperament'] = newblock;
-    newblock.staticLabels.push(_('temperament'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampOneArgBlock();
-    if (beginnerMode && !beginnerBlock('temperament')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('timbre');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['timbre'] = newblock;
-    //.TRANS: timbre is the character or quality of a musical sound
-    newblock.staticLabels.push(_('timbre'));
-    newblock.extraWidth = 50;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampOneArgBlock();
-    newblock.defaults.push(_('custom'));
-    if (beginnerMode && !beginnerBlock('timbre')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('modewidget');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['modewidget'] = newblock;
-    //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
-    newblock.staticLabels.push(_('custom mode'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('modewidget')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('tempo');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['tempo'] = newblock;
-    //.TRANS: the speed at music is should be played.
-    newblock.staticLabels.push(_('tempo'));
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('tempo')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('pitchdrummatrix');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['pitchdrummatrix'] = newblock;
-    //.TRANS: makes a mapping between pitches and drum sounds
-    newblock.staticLabels.push(_('pitch-drum mapper'));
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('pitchdrummatrix')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('pitchslider');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['pitchslider'] = newblock;
-    //.TRANS: widget to generate pitches using a slider
-    newblock.staticLabels.push(_('pitch slider'));
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('pitchslider')) {
-        newblock.hidden = true;
-    }
+    // RHYTHM PALETTE
 
     if (language === 'ja') {
-        // macro
-        var newblock = new ProtoBlock('musickeyboardja');
-        newblock.palette = palettes.dict['widgets'];
-        blocks.protoBlockDict['musickeyboardja'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
-        newblock.staticLabels.push(_('music keyboard'));
-        newblock.adjustWidthToLabel();
-        newblock.labelOffset = 15;
-        newblock.stackClampZeroArgBlock();
-        if (beginnerMode && !beginnerBlock('musickeyboard')) {
-            newblock.hidden = true;
-        }
+        var rhythmBlockPalette = 'rhythm';
     } else {
-        // macro
-        var newblock = new ProtoBlock('musickeyboard2');
-        newblock.palette = palettes.dict['widgets'];
-        blocks.protoBlockDict['musickeyboard2'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
-        newblock.staticLabels.push(_('music keyboard'));
-        newblock.adjustWidthToLabel();
-        newblock.labelOffset = 15;
-        newblock.stackClampZeroArgBlock();
-        if (beginnerMode && !beginnerBlock('musickeyboard')) {
-            newblock.hidden = true;
-        }
+        var rhythmBlockPalette = 'widgets';
     }
-
-    var newblock = new ProtoBlock('musickeyboard');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['musickeyboard'] = newblock;
-    //.TRANS: widget to generate pitches using a slider
-    newblock.staticLabels.push(_('music keyboard'));
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('pitchstaircase');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['pitchstaircase'] = newblock;
-    //.TRANS: generate a progressive sequence of pitches
-    newblock.staticLabels.push(_('pitch staircase'));
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('pitchstaircase')) {
-        newblock.hidden = true;
-    }
-
-    if (beginnerMode) {
-        // macro
-        var newblock = new ProtoBlock('rhythmruler3');
-        newblock.palette = palettes.dict['widgets'];
-        blocks.protoBlockDict['rhythmruler3'] = newblock;
-        //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-        newblock.staticLabels.push(_('rhythm maker'));
-        newblock.extraWidth = 20;
-        newblock.adjustWidthToLabel();
-        newblock.labelOffset = 15;
-        newblock.stackClampZeroArgBlock();
-    }
-
-    // macro
-    var newblock = new ProtoBlock('rhythmruler2');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['rhythmruler2'] = newblock;
-    //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-    newblock.staticLabels.push(_('rhythm maker'));
-    newblock.extraWidth = 20;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('matrixgmajor');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['matrixgmajor'] = newblock;
-    newblock.staticLabels.push(_('G major scale'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('matrixgmajor')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('matrixcmajor');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['matrixcmajor'] = newblock;
-    newblock.staticLabels.push(_('C major scale'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('matrixcmajor')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('matrix');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['matrix'] = newblock;
-    //.TRANS: assigns pitch to a sequence of beats to generate a melody
-    newblock.staticLabels.push(_('pitch-time matrix'));
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('matrix')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('status');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['status'] = newblock;
-    newblock.staticLabels.push(_('status'));
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.stackClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('status')) {
-        newblock.hidden = true;
-    }
-
-    // RHYTHM PALETTE
 
     // macro
     var newblock = new ProtoBlock('sixtyfourthNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['sixtyfourthNote'] = newblock;
     newblock.staticLabels.push(_('1/64 note') + ' 𝅘𝅥𝅱');
     newblock.adjustWidthToLabel();
@@ -948,7 +666,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('thirtysecondNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['thirtysecondNote'] = newblock;
     newblock.staticLabels.push(_('1/32 note') + ' 𝅘𝅥𝅰');
     newblock.adjustWidthToLabel();
@@ -959,7 +677,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('sixteenthNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['sixteenthNote'] = newblock;
     newblock.staticLabels.push(_('1/16 note') + ' 𝅘𝅥𝅯');
     newblock.adjustWidthToLabel();
@@ -970,7 +688,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('eighthNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['eighthNote'] = newblock;
     newblock.staticLabels.push(_('eighth note') + ' ♪');
     newblock.adjustWidthToLabel();
@@ -981,7 +699,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('quarterNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['quarterNote'] = newblock;
     newblock.staticLabels.push(_('quarter note') + ' ♩');
     newblock.adjustWidthToLabel();
@@ -992,7 +710,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('halfNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['halfNote'] = newblock;
     newblock.staticLabels.push(_('half note') + ' 𝅗𝅥');
     newblock.adjustWidthToLabel();
@@ -1003,7 +721,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('wholeNote');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['wholeNote'] = newblock;
     newblock.staticLabels.push(_('whole note') + ' 𝅝');
     newblock.adjustWidthToLabel();
@@ -1013,7 +731,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('tuplet2');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['tuplet2'] = newblock;
     //.TRANS: A tuplet is a note value divided into irregular time values.
     newblock.staticLabels.push(_('tuplet'));
@@ -1028,7 +746,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var tuplet3Block = new ProtoBlock('tuplet3');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['tuplet3'] = tuplet3Block;
     newblock.staticLabels.push(_('tuplet'));
     newblock.staticLabels.push(_('number of notes'), _('note value'));
@@ -1041,7 +759,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('tuplet4');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['tuplet4'] = newblock;
     newblock.staticLabels.push(_('tuplet'));
     newblock.staticLabels.push(_('note value'));
@@ -1054,7 +772,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('stuplet7');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['stuplet7'] = newblock;
     //.TRANS: A tuplet divided into 7 time values.
     newblock.staticLabels.push(_('septuplet'));
@@ -1065,7 +783,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('stuplet5');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['stuplet5'] = newblock;
     //.TRANS: A tuplet divided into 5 time values.
     newblock.staticLabels.push(_('quintuplet'));
@@ -1076,7 +794,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('stuplet3');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['stuplet3'] = newblock;
     //.TRANS: A tuplet divided into 3 time values.
     newblock.staticLabels.push(_('triplet'));
@@ -1087,7 +805,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('stuplet');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['stuplet'] = newblock;
     newblock.staticLabels.push(_('simple tuplet'));
     newblock.staticLabels.push(_('number of notes'), _('note value'));
@@ -1100,7 +818,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     var newblock = new ProtoBlock('rhythm');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['rhythm'] = newblock;
     //.TRANS: an arrangement of notes based on duration
     if (language === 'ja') {
@@ -1121,7 +839,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.deprecated = true;
 
     var newblock = new ProtoBlock('rhythm2');
-    newblock.palette = palettes.dict['rhythm'];
+    newblock.palette = palettes.dict[rhythmBlockPalette];
     blocks.protoBlockDict['rhythm2'] = newblock;
     //.TRANS: an arrangement of notes based on duration
     if (language === 'ja') {
@@ -1410,6 +1128,294 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     defineFrequencyBlock.flowClampOneArgBlock();
     defineFrequencyBlock.hidden = true;
 
+    // WIDGETS PALETTE
+
+    var newblock = new ProtoBlock('oscillator');
+    newblock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['oscillator'] = newblock;
+    //.TRANS: there are different types (sine, triangle, square...) of oscillators.
+    newblock.staticLabels.push(_('oscillator'));
+    newblock.staticLabels.push(_('type'));
+    //.TRANS: Partials refers to the number of sine waves combined into the sound.
+    newblock.staticLabels.push(_('partials'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    //.TRANS: triangle wave
+    newblock.defaults.push(_('triangle'));
+    newblock.defaults.push(6);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'numberin';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('filtertype');
+    newblock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['filtertype'] = newblock;
+    newblock.valueBlock();
+    newblock.dockTypes[0] = 'textout';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('oscillatortype');
+    newblock.palette = palettes.dict['tone'];
+    blocks.protoBlockDict['oscillatortype'] = newblock;
+    newblock.valueBlock();
+    newblock.dockTypes[0] = 'textout';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('envelope');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['envelope'] = newblock;
+    //.TRANS: sound envelope (ADSR)
+    newblock.staticLabels.push(_('envelope'));
+    //.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
+    newblock.staticLabels.push(_('attack'));
+    //.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
+    newblock.staticLabels.push(_('decay'));
+    //.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
+    newblock.staticLabels.push(_('sustain'));
+    //.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
+    newblock.staticLabels.push(_('release'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(1);
+    newblock.defaults.push(50);
+    newblock.defaults.push(60);
+    newblock.defaults.push(1);
+    newblock.fourArgBlock();
+    newblock.dockTypes[1] = 'numberin';
+    newblock.dockTypes[2] = 'numberin';
+    newblock.dockTypes[3] = 'numberin';
+    newblock.dockTypes[4] = 'numberin';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('filter');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['filter'] = newblock;
+    //.TRANS: a filter removes some unwanted components from a signal
+    newblock.staticLabels.push(_('filter'));
+    //.TRANS: type of filter, e.g., lowpass, highpass, etc.
+    newblock.staticLabels.push(_('type'));
+    //.TRANS: rolloff is the steepness of a change in frequency.
+    newblock.staticLabels.push(_('rolloff'));
+    newblock.staticLabels.push(_('frequency'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    //.TRANS: highpass filter
+    newblock.defaults.push(_('highpass'));
+    newblock.defaults.push(-12);
+    newblock.defaults.push(392);
+    newblock.threeArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'numberin';
+    newblock.dockTypes[3] = 'numberin';
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('temperament');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['temperament'] = newblock;
+    newblock.staticLabels.push(_('temperament'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampOneArgBlock();
+    if (beginnerMode && !beginnerBlock('temperament')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('timbre');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['timbre'] = newblock;
+    //.TRANS: timbre is the character or quality of a musical sound
+    newblock.staticLabels.push(_('timbre'));
+    newblock.extraWidth = 50;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampOneArgBlock();
+    newblock.defaults.push(_('custom'));
+    if (beginnerMode && !beginnerBlock('timbre')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('modewidget');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['modewidget'] = newblock;
+    //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
+    newblock.staticLabels.push(_('custom mode'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('modewidget')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('tempo');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['tempo'] = newblock;
+    //.TRANS: the speed at music is should be played.
+    newblock.staticLabels.push(_('tempo'));
+    newblock.extraWidth = 40;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('tempo')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('pitchdrummatrix');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['pitchdrummatrix'] = newblock;
+    //.TRANS: makes a mapping between pitches and drum sounds
+    newblock.staticLabels.push(_('pitch-drum mapper'));
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('pitchdrummatrix')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('pitchslider');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['pitchslider'] = newblock;
+    //.TRANS: widget to generate pitches using a slider
+    newblock.staticLabels.push(_('pitch slider'));
+    newblock.extraWidth = 40;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('pitchslider')) {
+        newblock.hidden = true;
+    }
+
+    if (language === 'ja') {
+        // macro
+        var newblock = new ProtoBlock('musickeyboardja');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboardja'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    } else {
+        // macro
+        var newblock = new ProtoBlock('musickeyboard2');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['musickeyboard2'] = newblock;
+        //.TRANS: widget to generate pitches using a slider
+        newblock.staticLabels.push(_('music keyboard'));
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+        if (beginnerMode && !beginnerBlock('musickeyboard')) {
+            newblock.hidden = true;
+        }
+    }
+
+    var newblock = new ProtoBlock('musickeyboard');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['musickeyboard'] = newblock;
+    //.TRANS: widget to generate pitches using a slider
+    newblock.staticLabels.push(_('music keyboard'));
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    newblock.hidden = true;
+
+    var newblock = new ProtoBlock('pitchstaircase');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['pitchstaircase'] = newblock;
+    //.TRANS: generate a progressive sequence of pitches
+    newblock.staticLabels.push(_('pitch staircase'));
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('pitchstaircase')) {
+        newblock.hidden = true;
+    }
+
+    if (beginnerMode) {
+        // macro
+        var newblock = new ProtoBlock('rhythmruler3');
+        newblock.palette = palettes.dict['widgets'];
+        blocks.protoBlockDict['rhythmruler3'] = newblock;
+        //.TRANS: widget for subdividing a measure into distinct rhythmic elements
+        newblock.staticLabels.push(_('rhythm maker'));
+        newblock.extraWidth = 20;
+        newblock.adjustWidthToLabel();
+        newblock.labelOffset = 15;
+        newblock.stackClampZeroArgBlock();
+    }
+
+    // macro
+    var newblock = new ProtoBlock('rhythmruler2');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['rhythmruler2'] = newblock;
+    //.TRANS: widget for subdividing a measure into distinct rhythmic elements
+    newblock.staticLabels.push(_('rhythm maker'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('matrixgmajor');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['matrixgmajor'] = newblock;
+    newblock.staticLabels.push(_('G major scale'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('matrixgmajor')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('matrixcmajor');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['matrixcmajor'] = newblock;
+    newblock.staticLabels.push(_('C major scale'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('matrixcmajor')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('matrix');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['matrix'] = newblock;
+    //.TRANS: assigns pitch to a sequence of beats to generate a melody
+    newblock.staticLabels.push(_('pitch-time matrix'));
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('matrix')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('status');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['status'] = newblock;
+    newblock.staticLabels.push(_('status'));
+    newblock.extraWidth = 40;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('status')) {
+        newblock.hidden = true;
+    }
+
     // METER PALETTE
 
     var newblock = new ProtoBlock('currentmeter');
@@ -1439,9 +1445,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['bpmfactor'] = newblock;
     //.TRANS: number of beats played per minute
     if (language === 'ja') {
-	newblock.staticLabels.push(_('beats per minute2'));
+        newblock.staticLabels.push(_('beats per minute2'));
     } else {
-	newblock.staticLabels.push(_('beats per minute'));
+        newblock.staticLabels.push(_('beats per minute'));
     }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
@@ -2641,7 +2647,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('moveable Do'));
     newblock.adjustWidthToLabel();
     newblock.oneBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('movable')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('movable')) {
         newblock.hidden = true;
     }
 
@@ -5040,7 +5046,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push('↓');
     newblock.extraWidth = -10;
     newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('vspace')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('vspace')) {
         newblock.hidden = true;
     }
 
@@ -5051,7 +5057,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgMathBlock();
     newblock.dockTypes[0] = 'anyout';
     newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('hspace')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('hspace')) {
         newblock.hidden = true;
     }
 
