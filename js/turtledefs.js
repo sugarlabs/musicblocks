@@ -25,7 +25,7 @@ if (GUIDEURL === 'guide url' || GUIDEURL === '') {
 
 const NUMBERBLOCKDEFAULT = 4;
 const DEFAULTPALETTE = 'rhythm';
-const TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
+var TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
 const VERSION = '2.6';
 
 // We don't include 'extras' since we want to be able to delete
@@ -180,7 +180,9 @@ function createHelpContent() {
         var LOGO = LOGODEFAULT;
     }
 
+    var TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
     if (beginnerMode) {
+	console.log(TITLESTRING);
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
