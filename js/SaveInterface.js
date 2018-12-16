@@ -98,7 +98,7 @@ function SaveInterface(PlanetInterface) {
             var image = '';  // FIXME
         }*/
 
-        image = '<svg class="image-div" xmlns="http://www.w3.org/2000/svg"><g><g transform="translate(20, 20)">'+decodeURIComponent(_printBlockSVG()).match('<g transform="s.*')[0];
+        image = '<svg class="image-div" xmlns="http://www.w3.org/2000/svg">'+decodeURIComponent(_printBlockSVG()).match('<g.*')[0];
 
         file = file.replace(new RegExp('{{ project_description }}', 'g'), description)
                    .replace(new RegExp('{{ project_name }}', 'g'), name)
