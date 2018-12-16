@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg2831"
-   version="1.1"
-   viewBox="0 0 64.061976 48.520837"
+   width="64.061974mm"
    height="48.520836mm"
-   width="64.061974mm">
+   viewBox="0 0 64.061976 48.520837"
+   version="1.1"
+   id="svg2831">
   <defs
      id="defs2825" />
   <metadata
@@ -25,216 +25,216 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(84.741874,-109.39791)"
-     id="layer1">
+     id="layer1"
+     transform="translate(84.741874,-109.39791)">
     <g
-       id="g2348"
-       transform="matrix(0.26458333,0,0,0.26458333,-358.05645,25.260408)">
+       transform="matrix(0.26458333,0,0,0.26458333,-358.05645,25.260408)"
+       id="g2348">
       <g
-         transform="translate(1106.5,318)"
-         id="g1020">
+         id="g1020"
+         transform="translate(1106.5,318)">
         <g
-           transform="scale(1.5)"
-           id="g1018">
+           id="g1018"
+           transform="scale(1.5)">
           <path
-             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             id="path1012"
              style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1012" />
+             d="m 8.5,0.5 h 70 v 20 h -70 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text1016">
+             id="text1016"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
             <tspan
-               x="13"
+               id="tspan1014"
                y="14"
-               id="tspan1014">クリック</tspan>
+               x="13">クリック</tspan>
           </text>
         </g>
       </g>
       <g
-         transform="translate(1033,318)"
-         id="g1038">
+         id="g1038"
+         transform="translate(1033,318)">
         <g
-           transform="scale(1.5)"
-           id="g1036">
+           id="g1036"
+           transform="scale(1.5)">
           <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+             id="path1022"
              style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1022" />
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1026">
+             id="text1026"
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan1024"
                y="24"
-               id="tspan1024">の時に</tspan>
+               x="46">のとき</tspan>
           </text>
           <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1030">
+             id="text1030"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan1028"
                y="12"
-               id="tspan1028">イベント</tspan>
+               x="46">イベント</tspan>
           </text>
           <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text1034">
+             id="text1034"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan1032"
                y="33"
-               id="tspan1032">～する</tspan>
+               x="46">アクション実行</tspan>
           </text>
         </g>
       </g>
       <g
-         transform="translate(1106.5,349.5)"
-         id="g1058">
+         id="g1058"
+         transform="translate(1106.5,349.5)">
         <g
-           transform="scale(1.5)"
-           id="g1056">
+           id="g1056"
+           transform="scale(1.5)">
           <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             id="path1050"
              style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path1050" />
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text1054">
+             id="text1054"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
             <tspan
-               x="13"
+               id="tspan1052"
                y="14"
-               id="tspan1052">アクション</tspan>
+               x="13">アクション</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       id="g2369"
-       transform="matrix(0.26458333,0,0,0.26458333,-362.28978,12.187495)">
+       transform="matrix(0.26458333,0,0,0.26458333,-362.28978,12.187495)"
+       id="g2369">
       <g
-         transform="translate(1049,443)"
-         id="g794">
+         id="g794"
+         transform="translate(1049,443)">
         <g
-           transform="scale(1.5)"
-           id="g792">
+           id="g792"
+           transform="scale(1.5)">
           <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+             id="path778"
              style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path778" />
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text782">
+             id="text782"
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan780"
                y="24"
-               id="tspan780">の時に</tspan>
+               x="46">のとき</tspan>
           </text>
           <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text786">
+             id="text786"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan784"
                y="12"
-               id="tspan784">イベント</tspan>
+               x="46">イベント</tspan>
           </text>
           <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text790">
+             id="text790"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="46"
+               id="tspan788"
                y="33"
-               id="tspan788">～する</tspan>
+               x="46">アクション実行</tspan>
           </text>
         </g>
       </g>
       <g
-         transform="translate(1122.5,443)"
-         id="g804">
+         id="g804"
+         transform="translate(1122.5,443)">
         <g
-           transform="scale(1.5)"
-           id="g802">
+           id="g802"
+           transform="scale(1.5)">
           <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             id="path796"
              style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path796" />
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text800">
+             id="text800"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
             <tspan
-               x="13"
+               id="tspan798"
                y="14"
-               id="tspan798">イベント</tspan>
+               x="13">イベント</tspan>
           </text>
         </g>
       </g>
       <g
-         transform="translate(1122.5,474.5)"
-         id="g814">
+         id="g814"
+         transform="translate(1122.5,474.5)">
         <g
-           transform="scale(1.5)"
-           id="g812">
+           id="g812"
+           transform="scale(1.5)">
           <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             id="path806"
              style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path806" />
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text810">
+             id="text810"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
             <tspan
-               x="13"
+               id="tspan808"
                y="14"
-               id="tspan808">アクション</tspan>
+               x="13">アクション</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       id="g2383"
-       transform="matrix(0.26458333,0,0,0.26458333,-362.55437,5.9156199)">
+       transform="matrix(0.26458333,0,0,0.26458333,-362.55437,5.9156199)"
+       id="g2383">
       <g
-         transform="translate(1050,540)"
-         id="g828">
+         id="g828"
+         transform="translate(1050,540)">
         <g
-           transform="scale(1.5)"
-           id="g826">
+           id="g826"
+           transform="scale(1.5)">
           <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 43.916016 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             id="path816"
              style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path816" />
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 43.916016 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text820">
+             id="text820"
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="60"
+               id="tspan818"
                y="14"
-               id="tspan818">送る</tspan>
+               x="60">イベント発生</tspan>
           </text>
           <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text824">
+             id="text824"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
             <tspan
-               x="60"
+               id="tspan822"
                y="12"
-               id="tspan822" />
+               x="60" />
           </text>
         </g>
       </g>
       <g
-         transform="translate(1144.374,540)"
-         id="g838">
+         id="g838"
+         transform="translate(1144.374,540)">
         <g
-           transform="scale(1.5)"
-           id="g836">
+           id="g836"
+           transform="scale(1.5)">
           <path
-             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             id="path830"
              style="fill:#ff5942;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path830" />
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
           <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text834">
+             id="text834"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
             <tspan
-               x="13"
+               id="tspan832"
                y="14"
-               id="tspan832">イベント</tspan>
+               x="13">イベント</tspan>
           </text>
         </g>
       </g>

@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="132.30717mm"
+   height="75.803123mm"
+   viewBox="0 0 132.30717 75.803124"
+   version="1.1"
+   id="svg3045">
+  <defs
+     id="defs3039" />
+  <metadata
+     id="metadata3042">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path832"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,3.3734375 v -1.5875 c 0,-0.87675204 0.71074796,-1.5875 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 3.5718755 39.81475 1.5875 c 0.876753,0 1.5875,0.71074796 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 c 0,0.876752 -0.710747,1.5875 -1.5875,1.5875 h -1.5875 -39.81475 -0.396876 v 0.79375 H 7.3421875 v -0.79375 h -0.396875 -1.5875 c -1.0959399,0 -1.9843747,0.8884346 -1.984375,1.9843745 v 1.5875 1.587501 50.006249 1.5875 c 0,1.09594 0.8884349,1.984375 1.984375,1.984375 h 1.5875 v 0.79375 h 3.9687505 v -0.79375 h 3.174999 v 2.381251 2.381249 1.587501 c -1e-6,0.876752 -0.710748,1.587499 -1.5875,1.587499 H 10.914063 7.3421875 6.9453125 v 0.79375 h -3.175 v -0.79375 h -0.396875 -1.5875 c -0.87675165,0 -1.58749945,-0.710747 -1.5875,-1.587499 v -1.587501 z" />
+  <text
+     id="text836"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan834"
+       y="5.953125"
+       x="1.984375">調を変える (+/–)</tspan>
+  </text>
+  <text
+     id="text840"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan838"
+       y="4.7624998"
+       x="44.450001" />
+  </text>
+  <path
+     id="path846"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 54.173441,3.3734375 v -1.5875 a 1.5875,1.5875 0 0 1 1.587499,-1.5875 h 1.5875 3.96875 11.90625 1.587501 a 1.5875,1.5875 0 0 1 1.587499,1.5875 v 1.5875 H 74.810941 V 2.1828125 H 73.22344 v 3.96875 h 1.587501 V 4.9609375 H 76.39844 V 11.707812 H 74.810941 V 10.517187 H 73.22344 v 3.96875 h 1.587501 v -1.190624 h 1.587499 v 1.5875 a 1.5875,1.5875 0 0 1 -1.587499,1.587499 H 73.22344 61.31719 57.34844 55.76094 a 1.5875,1.5875 0 0 1 -1.587499,-1.587499 v -1.5875 -8.3343755 -0.396875 H 51.79219 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.381251 z" />
+  <text
+     x="50.800003"
+     id="text850"
+     style="font-size:5.5562501px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan848"
+       y="9.5249996"
+       x="72.231255">+</tspan>
+  </text>
+  <text
+     x="45.508331"
+     id="text854"
+     style="font-size:3.70416665px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan852"
+       y="4.7624998"
+       x="66.939583" />
+  </text>
+  <text
+     x="45.508331"
+     id="text858"
+     style="font-size:3.70416665px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan856"
+       y="13.096875"
+       x="66.939583" />
+  </text>
+  <path
+     id="path864"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 76.927605,0.1984375 h 23.812505 v 7.9375 H 76.927605 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z" />
+  <text
+     x="73.554169"
+     id="text868"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan866"
+       y="5.5562501"
+       x="78.713547">4</tspan>
+  </text>
+  <path
+     id="path874"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 76.927605,11.840108 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875005 h 1.5875 3.96875 11.90625 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875005 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 6.746874 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -11.90625 -3.96875 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.587499 -8.334375 -0.396876 h -2.38125 v 1.190626 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 z" />
+  <text
+     y="8.46667"
+     x="73.554169"
+     id="text878"
+     style="font-size:5.5562501px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan876"
+       y="17.991671"
+       x="94.98542">×</tspan>
+  </text>
+  <text
+     y="8.46667"
+     x="68.262497"
+     id="text882"
+     style="font-size:3.70416665px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan880"
+       y="13.22917"
+       x="89.693748" />
+  </text>
+  <text
+     y="8.46667"
+     x="68.262497"
+     id="text886"
+     style="font-size:3.70416665px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan884"
+       y="21.563545"
+       x="89.693748" />
+  </text>
+  <path
+     id="path892"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="M 99.681773,8.6651075 H 123.49431 V 16.602607 H 99.681773 v -3.174999 -0.396876 h -2.381248 v 1.190626 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.381248 v -0.396875 z" />
+  <text
+     y="8.46667"
+     x="96.308342"
+     id="text896"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan894"
+       y="14.02292"
+       x="101.46772">0</tspan>
+  </text>
+  <path
+     id="path902"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 99.681773,17.131768 h 32.426987 v 7.9375 H 99.681773 v -3.175 -0.396876 h -2.381248 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.381248 v -0.396875 z" />
+  <text
+     y="16.933331"
+     x="96.308342"
+     id="text906"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan904"
+       y="22.48958"
+       x="101.46772">おんかいの おんすう</tspan>
+  </text>
+  <path
+     id="path912"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 3.9026045,11.840108 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875005 h 1.5875 v 0.79375 h 3.9687505 v -0.79375 h 7.937499 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875005 v 1.5875 1.5875 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -7.937499 -0.396875 v 0.79375 H 7.4744795 v -0.79375 h -0.396875 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.587499 z" />
+  <text
+     y="8.46667"
+     x="3.7041669"
+     id="text916"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan914"
+       y="14.02292"
+       x="17.991667">↓</tspan>
+  </text>
+  <path
+     id="path922"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 3.9026045,20.306767 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587499 h 1.5875 v 0.79375 h 3.9687505 v -0.79375 h 7.937499 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587499 v 1.5875 1.587501 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.587501 h -1.5875 -7.937499 -0.396875 v 0.79375 H 7.4744795 v -0.79375 h -0.396875 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587501 v -1.587499 z" />
+  <text
+     y="16.933331"
+     x="3.7041669"
+     id="text926"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan924"
+       y="22.48958"
+       x="17.991667">↓</tspan>
+  </text>
+  <g
+     id="g942"
+     transform="matrix(0.396875,0,0,0.396875,3.7041649,25.400007)">
+    <path
+       id="path932"
+       style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+    <text
+       id="text936"
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+      <tspan
+         id="tspan934"
+         y="15"
+         x="20">おんぷ</tspan>
+    </text>
+    <text
+       id="text940"
+       style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+      <tspan
+         id="tspan938"
+         y="12"
+         x="85">ながさ</tspan>
+    </text>
+  </g>
+  <g
+     transform="matrix(0.13229166,0,0,0.13229166,3.7041649,26.45834)"
+     id="g960"
+     style="isolation:isolate">
+    <g
+       data-name="レイヤー 2"
+       id="g958">
+      <g
+         id="g956">
+        <rect
+           id="rect946"
+           style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+           ry="5"
+           rx="5"
+           height="42"
+           width="42"
+           x="0"
+           y="0" />
+        <path
+           id="path948"
+           style="fill:#ffffff"
+           d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z" />
+        <path
+           id="path950"
+           style="fill:#ffffff"
+           d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z" />
+        <path
+           id="path952"
+           style="fill:#ffffff"
+           d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z" />
+        <path
+           id="path954"
+           style="fill:#ffffff"
+           d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z" />
+      </g>
+    </g>
+  </g>
+  <path
+     id="path966"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 42.002605,28.773437 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.587499 3.96875 11.90625 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 6.746875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -11.90625 -3.96875 -1.587499 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 -8.334375 -0.396875 h -2.38125 v 1.190625 h -0.793751 v -3.175 h 0.793751 v 1.190625 h 2.38125 z" />
+  <text
+     y="25.4"
+     x="38.629166"
+     id="text970"
+     style="font-size:3.5718751px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan968"
+       y="34.528126"
+       x="60.060417">➗</tspan>
+  </text>
+  <text
+     y="25.4"
+     x="38.629166"
+     id="text974"
+     style="font-size:2.3812499px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan972"
+       y="30.1625"
+       x="60.060417" />
+  </text>
+  <text
+     y="25.4"
+     x="38.629166"
+     id="text978"
+     style="font-size:2.3812499px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan976"
+       y="38.496876"
+       x="60.060417" />
+  </text>
+  <path
+     id="path984"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 64.756776,25.598437 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.793751 v -3.175 h 0.793751 v 1.190625 h 2.38125 v -0.396875 z" />
+  <text
+     y="25.4"
+     x="61.383339"
+     id="text988"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan986"
+       y="30.956249"
+       x="66.542709">1</tspan>
+  </text>
+  <path
+     id="path994"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 64.756776,34.065107 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190626 h -0.793751 v -3.175001 h 0.793751 v 1.190626 h 2.38125 v -0.396876 z" />
+  <text
+     y="33.866669"
+     x="61.383339"
+     id="text998"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan996"
+       y="39.42292"
+       x="66.542709">4</tspan>
+  </text>
+  <path
+     id="path1004"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 7.6067705,37.240107 v -1.587499 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875005 v 0.79375 h 3.96875 v -0.79375 h 7.937499 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.587499 1.5875 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -7.937499 -0.396876 v 0.79375 h -3.174999 v -0.79375 H 10.781771 9.1942705 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z" />
+  <text
+     y="33.866669"
+     x="7.4083328"
+     id="text1008"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1006"
+       y="39.42292"
+       x="21.695833">↓</tspan>
+  </text>
+  <path
+     id="path1014"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 7.6067702,45.706777 v -1.587499 c 0,-0.876752 0.7107476,-1.587501 1.5875,-1.587501 h 1.5875008 v 0.79375 h 3.968752 v -0.79375 h 21.431249 1.5875 c 0.876752,0 1.864753,0.755741 1.5875,1.587501 v 1.587499 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 6.746875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 h -1.5875 -21.431249 -0.396876 v 0.79375 h -3.175 v -0.79375 H 10.781771 9.1942702 c -0.876752,0 -1.8647533,-0.75574 -1.5875,-1.5875 v -1.5875 -8.334375 z" />
+  <text
+     y="42.33334"
+     x="16.933327"
+     id="text1018"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1016"
+       y="51.858341"
+       x="35.18959">おとの たかさ</tspan>
+  </text>
+  <text
+     y="42.33334"
+     x="16.933327"
+     id="text1022"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1020"
+       y="47.09584"
+       x="35.18959">なまえ</tspan>
+  </text>
+  <text
+     y="42.33334"
+     x="16.933327"
+     id="text1026"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1024"
+       y="55.430214"
+       x="35.18959">オクターヴの たかさ</tspan>
+  </text>
+  <path
+     id="path1032"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 39.885943,42.531777 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.793749 v -3.175 h 0.793749 v 1.190626 h 2.38125 v -0.396876 z" />
+  <text
+     y="42.33334"
+     x="36.512508"
+     id="text1036"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1034"
+       y="47.889591"
+       x="41.671883">ソ</tspan>
+  </text>
+  <path
+     id="path1042"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 39.885943,50.998447 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190626 h -0.793749 v -3.175001 h 0.793749 v 1.190626 h 2.38125 v -0.396875 z" />
+  <text
+     y="50.800011"
+     x="36.512508"
+     id="text1046"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan1044"
+       y="56.356258"
+       x="41.671883">4</tspan>
+  </text>
+</svg>

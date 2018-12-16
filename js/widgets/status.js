@@ -180,6 +180,8 @@ function StatusMatrix() {
             var cell = row.insertCell(i + 1);
             cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
 
+            console.log(this._logo.statusFields[i][1]);
+
             switch (this._logo.statusFields[i][1]) {
             case 'plus':
             case 'minus':
@@ -203,6 +205,7 @@ function StatusMatrix() {
                 } else {
                     var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
                 }
+                console.log(label);
                 break;
             default:
                 var label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock.staticLabels[0];
@@ -231,7 +234,7 @@ function StatusMatrix() {
 
             var row = header.insertRow();
             var cell = row.insertCell();
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
+            cell.style.backgroundColor = platformColor.labelColor;
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
@@ -247,7 +250,7 @@ function StatusMatrix() {
                 // + 1 is for the note column
                 for (var i = 0; i < this._logo.statusFields.length + 1; i++) {
                     var cell = row.insertCell();
-                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
                     cell.innerHTML = '';
                     cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -255,7 +258,7 @@ function StatusMatrix() {
             } else {
                 for (var i = 0; i < this._logo.statusFields.length; i++) {
                     var cell = row.insertCell();
-                    cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
                     cell.innerHTML = '';
                     cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';

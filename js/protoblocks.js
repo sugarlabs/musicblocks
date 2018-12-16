@@ -54,6 +54,8 @@ function ProtoBlock(name) {
     this.hidden = false;
     // Disabled: use inactive colors
     this.disabled = false;
+    // Deprecated
+    this.deprecated = false
     //Stores the width of the text component
     this.textWidth = 0;
     this.labelOffset = 0;

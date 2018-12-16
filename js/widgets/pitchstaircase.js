@@ -92,7 +92,7 @@ function PitchStaircase () {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = BUTTONSIZE + 'px';
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
 
             var cellWidth = Number(stepCell.style.width.replace(/px/, ''));
             var svgWidth = cellWidth.toString();
@@ -272,10 +272,10 @@ function PitchStaircase () {
         // The frequency is stored in the stepCell.
         stepCell.style.backgroundColor = platformColor.selectorBackground;
         var frequency = Number(stepCell.getAttribute('id'));
-        this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+        this._logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
         setTimeout(function () {
-            stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000)
     };
 
@@ -289,14 +289,14 @@ function PitchStaircase () {
             var pscTableCell = docById('stepTable' + i);
             var stepCell = pscTableCell.rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            this._logo.synth.trigger(0, pitchnotes, 1, 'default', null,null);
+            this._logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null,null);
         }
 
         setTimeout(function () {
             for (var i = 0; i < that.Stairs.length; i++) {
                 var pscTableCell = docById('stepTable' + i);
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
         }, 1000);
     };
@@ -310,7 +310,7 @@ function PitchStaircase () {
         var pscTableCell = docById('stepTable' + last);
         var stepCell = pscTableCell.rows[0].cells[1];
         stepCell.style.backgroundColor = platformColor.selectorBackground;
-        this._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
+        this._logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     };
 
@@ -325,7 +325,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
             return;
@@ -336,7 +336,7 @@ function PitchStaircase () {
                 for (var i = 0; i < that.Stairs.length; i++) {
                     var pscTableCell = docById('stepTable' + i);
                     var stepCell = pscTableCell.rows[0].cells[1];
-                    stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1000);
 
@@ -356,13 +356,13 @@ function PitchStaircase () {
         setTimeout(function () {
             if (pscTableCell != null) {
                 var stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
 
             var pscTableCell = docById('stepTable' + index);
             var stepCell = pscTableCell.rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            that._logo.synth.trigger(0, pitchnotes, 1, 'default', null, null);
+            that._logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
             if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
             }

@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg11666"
-   version="1.1"
-   viewBox="0 0 106.29389 25.003127"
+   width="106.29389mm"
    height="25.003124mm"
-   width="106.29389mm">
+   viewBox="0 0 106.29389 25.003127"
+   version="1.1"
+   id="svg11666">
   <defs
      id="defs11660" />
   <metadata
@@ -25,137 +25,137 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(424.7051,55.676149)"
-     id="layer1">
+     id="layer1"
+     transform="translate(424.7051,55.676149)">
     <g
-       id="g1036"
-       transform="matrix(0.26458333,0,0,0.26458333,-424.7051,-55.676149)">
+       transform="matrix(0.26458333,0,0,0.26458333,-424.7051,-55.676149)"
+       id="g1036">
       <g
-         id="g1034"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g1034">
         <path
-           id="path1020"
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 122.82715 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
            style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 122.82715 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
+           id="path1020" />
         <text
-           id="text1024"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1024">
           <tspan
-             id="tspan1022"
+             x="139"
              y="24"
-             x="139">マスターBPM(一分あたりの拍数)</tspan>
+             id="tspan1022">全体のスピードを決める</tspan>
         </text>
         <text
-           id="text1028"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1028">
           <tspan
-             id="tspan1026"
+             x="139"
              y="12"
-             x="139">BPM</tspan>
+             id="tspan1026">１分あたりの拍の数</tspan>
         </text>
         <text
-           id="text1032"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1032">
           <tspan
-             id="tspan1030"
+             x="139"
              y="33"
-             x="139">拍子の値</tspan>
+             id="tspan1030">１拍</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g1046"
-       transform="matrix(0.26458333,0,0,0.26458333,-368.41746,-55.676149)">
+       transform="matrix(0.26458333,0,0,0.26458333,-368.41746,-55.676149)"
+       id="g1046">
       <g
-         id="g1044"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g1044">
         <path
-           id="path1038"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path1038" />
         <text
-           id="text1042"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1042">
           <tspan
-             id="tspan1040"
+             x="13"
              y="14"
-             x="13">90</tspan>
+             id="tspan1040">90</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g1064"
-       transform="matrix(0.26458333,0,0,0.26458333,-368.41746,-47.341774)">
+       transform="matrix(0.26458333,0,0,0.26458333,-368.41746,-47.341774)"
+       id="g1064">
       <g
-         id="g1062"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g1062">
         <path
-           id="path1048"
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="path1048" />
         <text
-           id="text1052"
-           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1052">
           <tspan
-             id="tspan1050"
+             x="54"
              y="23"
-             x="54">➗</tspan>
+             id="tspan1050">➗</tspan>
         </text>
         <text
-           id="text1056"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1056">
           <tspan
-             id="tspan1054"
+             x="54"
              y="12"
-             x="54" />
+             id="tspan1054" />
         </text>
         <text
-           id="text1060"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text1060">
           <tspan
-             id="tspan1058"
+             x="54"
              y="33"
-             x="54" />
+             id="tspan1058" />
         </text>
       </g>
     </g>
     <g
-       id="g1074"
-       transform="matrix(0.26458333,0,0,0.26458333,-345.79558,-47.341774)">
+       transform="matrix(0.26458333,0,0,0.26458333,-345.79558,-47.341774)"
+       id="g1074">
       <g
-         id="g1072"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g1072">
         <path
-           id="path1066"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path1066" />
         <text
-           id="text1070"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1070">
           <tspan
-             id="tspan1068"
+             x="13"
              y="14"
-             x="13">1</tspan>
+             id="tspan1068">1</tspan>
         </text>
       </g>
     </g>
     <g
-       id="g1084"
-       transform="matrix(0.26458333,0,0,0.26458333,-345.79558,-39.007399)">
+       transform="matrix(0.26458333,0,0,0.26458333,-345.79558,-39.007399)"
+       id="g1084">
       <g
-         id="g1082"
-         transform="scale(1.5)">
+         transform="scale(1.5)"
+         id="g1082">
         <path
-           id="path1076"
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="path1076" />
         <text
-           id="text1080"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text1080">
           <tspan
-             id="tspan1078"
+             x="13"
              y="14"
-             x="13">4</tspan>
+             id="tspan1078">4</tspan>
         </text>
       </g>
     </g>

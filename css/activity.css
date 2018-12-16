@@ -1250,3 +1250,8 @@ input.timbreName {
         width: 290px;
     }
 }
+
+.inactiveLink {
+    pointer-events: none !important;
+    cursor: default !important;
+ }

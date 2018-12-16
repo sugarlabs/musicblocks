@@ -32,7 +32,7 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('acoustic guitar'), 'acousticguitar', 'images/voices.svg', 'string'],
+    [_('acoustic guitar'), 'acoustic guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('flute'), 'flute', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
@@ -50,17 +50,17 @@ var VOICENAMES = [
     //.TRANS: musical instrument
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
-    [_('electric guitar'), 'electricguitar', 'images/voices.svg', 'string'],
+    [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
-    [_('default'), 'default', 'images/synth.svg', 'electronic'],
+    [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'mono1', 'images/synth.svg', 'electronic'],
+    [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-2'), 'mono2', 'images/synth.svg', 'electronic'],
+    // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-3'), 'mono3', 'images/synth.svg', 'electronic'],
+    // [_('simple-3'), 'simple 3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-4'), 'mono4', 'images/synth.svg', 'electronic'],
+    // [_('simple-4'), 'simple 4', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
     [_('sine'), 'sine', 'images/synth.svg', 'electronic'],
     //.TRANS: square wave
@@ -152,7 +152,7 @@ const SAMPLECENTERNO = {
     'cello': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
-    'acousticguitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    'acoustic guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'flute': ['F#5', 57], // pitchToNumber('F#', 57, 'C Major')],
     'saxophone': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -161,7 +161,7 @@ const SAMPLECENTERNO = {
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
-    'electricguitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -213,10 +213,10 @@ function Synth() {
         'noise2': 1,
         'noise3': 1,
         'poly': 1,
-        'mono1': 1,
-        'mono2': 1,
-        'mono3': 1,
-        'mono4': 1,
+        'simple 1': 1,
+        'simple 2': 1,
+        'simple 3': 1,
+        'simple 4': 1,
         'custom': 1,
     };
 
@@ -435,12 +435,12 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-		{'name': 'acousticguitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+		{'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electricguitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -597,10 +597,10 @@ function Synth() {
                 }
             };
             break;
-        case 'mono1':
-        case 'mono2':
-        case 'mono3':
-        case 'mono4':
+        case 'simple 1':
+        case 'simple 2':
+        case 'simple 3':
+        case 'simple 4':
             var synthOptions = {
                 'oscillator': {
                     'type': 'sine'
@@ -698,8 +698,8 @@ function Synth() {
     this.createDefaultSynth = function (turtle) {
         console.log('create default poly/default/custom synth for turtle ' + turtle);
         var default_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth).toMaster();
-        instruments[turtle]['default'] = default_synth;
-        instrumentsSource['default'] = [0, 'default'];
+        instruments[turtle]['electronic synth'] = default_synth;
+        instrumentsSource['electronic synth'] = [0, 'electronic synth'];
         instruments[turtle]['custom'] = default_synth;
         instrumentsSource['custom'] = [0, 'custom'];
     };
@@ -735,10 +735,10 @@ function Synth() {
         }
 
         switch (sourceName) {
-        case 'mono1':
-        case 'mono2':
-        case 'mono3':
-        case 'mono4':
+        case 'simple 1':
+        case 'simple 2':
+        case 'simple 3':
+        case 'simple 4':
             instrumentsSource[instrumentName] = [3, sourceName];
             console.log(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
@@ -1061,7 +1061,7 @@ function Synth() {
         }
 
         var tempNotes = notes;
-        var tempSynth = instruments[turtle]['default'];
+        var tempSynth = instruments[turtle]['electronic synth'];
         var flag = 0;
         if (instrumentName in instruments[turtle]) {
             tempSynth = instruments[turtle][instrumentName];

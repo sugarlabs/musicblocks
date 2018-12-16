@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--Import Google Icon Font-->
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
         <!--Import materialize.css-->
@@ -42,7 +43,7 @@
     <body>
         <nav class="nav-extended light-green lighten-1" role="navigation">
             <div class="nav-wrapper container">
-                <a id="logo-container" href="#" class="brand-logo"><i class="material-icons" id="planeticon">public</i></a>
+                <a id="logo-container" class="brand-logo inactiveLink"><i class="material-icons" id="planeticon">public</i></a>
                 <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">close</i></a></li></ul>
                 <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">folder_open</i></a></li></ul>
                 <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">note_add</i></a></li></ul>
@@ -254,7 +255,8 @@
                 </div>
                 <div class="modal-footer">
                     <div class="report-project-div">
-                        <a class="btn-flat left modal-action waves-effect waves-red" id="projectviewer-report-project"></a>
+                        <a class="left tooltipped" id="projectviewer-report-project"><i class="material-icons red-text" id="report-icon" >error</i></a>
+                        <a class="left tooltipped" id="projectviewer-report-project-disabled"><i class="material-icons grey-text" id="report-icon" >error</i></a>
                         <div class="card report-card" id="projectviewer-report-card" style="display: none;">
                             <div id="projectviewer-report-content" style="display: none;">
                                 <div class="card-content">

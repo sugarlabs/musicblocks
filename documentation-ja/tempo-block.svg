@@ -48,7 +48,7 @@
               <tspan
                  x="20"
                  y="22"
-                 id="tspan4570">テンポ</tspan>
+                 id="tspan4570">メトロノーム</tspan>
             </text>
           </g>
         </g>
@@ -109,7 +109,7 @@
             <tspan
                x="139"
                y="24"
-               id="tspan4600">マスターBPM(一分あたりの拍数)</tspan>
+               id="tspan4600">全体のスピードを決める</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -117,7 +117,7 @@
             <tspan
                x="139"
                y="12"
-               id="tspan4604">BPM</tspan>
+               id="tspan4604">１分あたりの拍の数</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -125,7 +125,7 @@
             <tspan
                x="139"
                y="33"
-               id="tspan4608">拍子の値</tspan>
+               id="tspan4608">１泊</tspan>
           </text>
         </g>
       </g>

@@ -69,26 +69,26 @@ function RhythmRuler () {
     this._calculateZebraStripes = function(rulerno) {
         var ruler = docById('ruler' + rulerno);
         if (this._rulerSelected % 2 === 0) {
-            var evenColor = MATRIXNOTECELLCOLOR;
+            var evenColor = platformColor.selectorBackground;
         } else {
-            var evenColor = MATRIXNOTECELLCOLORHOVER;
+            var evenColor = platformColor.selectorSelected;
         }
 
         for (var i = 0; i < ruler.cells.length; i++) {
             var newCell = ruler.cells[i];
-            if (evenColor === MATRIXNOTECELLCOLOR) {
+            if (evenColor === platformColor.selectorBackground) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 }
             }
 
-            if (evenColor === MATRIXNOTECELLCOLORHOVER) {
+            if (evenColor === platformColor.selectorSelected) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 } else {
-                    newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }
         }
@@ -546,7 +546,7 @@ function RhythmRuler () {
                 this._logo.hideMsgs();
             } else {
                 console.log('Top max value exceeded');
-                this._logo.errorMsg(('Maximum value of 256 has been exceeded.'));
+                this._logo.errorMsg(_('Maximum value of 256 has been exceeded.'));
                 newNoteValue = inputNum;
             }
 
@@ -707,7 +707,7 @@ function RhythmRuler () {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.style.backgroundColor = platformColor.selectorBackground;
             newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1, this._cellScale);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
@@ -741,7 +741,7 @@ function RhythmRuler () {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            newCell.style.backgroundColor = platformColor.selectorBackground;
 
             var obj = rationalToFraction(newNoteValue);
             newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
@@ -812,6 +812,15 @@ function RhythmRuler () {
     };
 
     this._clear = function () {
+        this._logo.synth.stop();
+        this._logo.resetSynth(0);
+        this._playing = false;
+        this._playingAll = false;
+        this._playingOne = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
+        var iconSize = ICONSIZE;
+        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
@@ -1737,15 +1746,15 @@ function RhythmRuler () {
                 rulerSubCell.style.lineHeight = 60 + ' % ';
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     } else {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     }
                 } else {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     } else {
-                        rulerSubCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
 
@@ -1866,7 +1875,7 @@ function RhythmRuler () {
         this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
         this._wheel.wheelRadius = 200;
         this._wheel.maxPercent = 1.6;
-        this._wheel.colors = [MATRIXNOTECELLCOLOR, MATRIXNOTECELLCOLORHOVER];
+        this._wheel.colors = [platformColor.selectorBackground, platformColor.selectorSelected];
         this._wheel.navItemsContinuous = true;
         this._wheel.markerPathFunction = markerPath().PieLineMarker;
         this._wheel.clickModeRotate = false;

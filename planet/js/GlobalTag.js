@@ -10,6 +10,33 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function GlobalTag(Planet) {
+    var tagNames = [
+	//.TRANS: planet tag name
+	_('All Projects'),
+	//.TRANS: planet tag name
+	_('My Projects'),
+	//.TRANS: planet tag name
+	_('Examples'),
+	//.TRANS: planet tag name
+	_('Music'),
+	//.TRANS: planet tag name
+	_('Art'),
+	//.TRANS: planet tag name
+	_('Math'),
+	//.TRANS: planet tag name
+	_('Interactive'),
+	//.TRANS: planet tag name
+	_('Design'),
+	//.TRANS: planet tag name
+	_('Game'),
+	//.TRANS: planet tag name
+	_('Media'),
+	//.TRANS: planet tag name
+	_('Sensors'),
+	//.TRANS: planet tag name
+	_('Effects'),
+    ];
+
     this.id = null;
     this.name = null;
     this.func = null;
@@ -28,7 +55,7 @@ function GlobalTag(Planet) {
             tag.classList.add(this.selectedClass);
         }
 
-        tag.textContent = this.name;
+        tag.textContent = _(this.name);
 
         var that = this;
 
