@@ -6623,7 +6623,7 @@ msgstr "シェア"
 
 #: js/GlobalCard.js:39
 msgid "Copy link to clipboard"
-msgstr ""
+msgstr "リンクをクリップボードにコピーする"
 
 #: js/GlobalCard.js:41
 #: js/LocalCard.js:40
@@ -6653,52 +6653,52 @@ msgstr "上級オプション"
 #: js/GlobalTag.js:15
 #.TRANS: planet tag name
 msgid "All Projects"
-msgstr ""
+msgstr "全てのプロジェクト"
 
 #: js/GlobalTag.js:19
 #.TRANS: planet tag name
 msgid "Examples"
-msgstr ""
+msgstr "例のプロジェクト"
 
 #: js/GlobalTag.js:21
 #.TRANS: planet tag name
 msgid "Music"
-msgstr ""
+msgstr "音楽"
 
 #: js/GlobalTag.js:23
 #.TRANS: planet tag name
 msgid "Art"
-msgstr ""
+msgstr "アート"
 
 #: js/GlobalTag.js:25
 #.TRANS: planet tag name
 msgid "Math"
-msgstr ""
+msgstr "算数"
 
 #: js/GlobalTag.js:27
 #.TRANS: planet tag name
 msgid "Interactive"
-msgstr ""
+msgstr "インタラクティブ"
 
 #: js/GlobalTag.js:29
 #.TRANS: planet tag name
 msgid "Design"
-msgstr ""
+msgstr "デザイン"
 
 #: js/GlobalTag.js:31
 #.TRANS: planet tag name
 msgid "Game"
-msgstr ""
+msgstr "ゲーム"
 
 #: js/GlobalTag.js:33
 #.TRANS: planet tag name
 msgid "Media"
-msgstr ""
+msgstr メディア""
 
 #: js/GlobalTag.js:35
 #.TRANS: planet tag name
 msgid "Sensors"
-msgstr ""
+msgstr "センサー"
 
 #: js/ProjectStorage.js:221
 msgid "anonymous"
