@@ -232,22 +232,10 @@ function HelpWidget () {
 
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
+	    console.log(page + ' ' + link);
             // We need to add a case here whenever we add
             // a guide a new language.
             // e.g., guide-es
-            if (HELPCONTENT[page][0] !== _('About')) {
-                switch(localStorage.languagePreference) {
-                case 'ja':
-                    link = link + '-ja';
-                    break;
-                case 'es':
-                    link = link + '-es';
-                    break;
-                default:
-                    break;
-                }
-            }
-
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
 

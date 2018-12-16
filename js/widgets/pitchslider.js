@@ -49,7 +49,7 @@ function PitchSlider() {
     this._play = function (cell) {
         var cellIndex = cell.cellIndex;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
-        this._logo.synth.trigger(0, frequency, 1, 'default', null, null);
+        this._logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
         return;
     };
 
@@ -327,7 +327,7 @@ function PitchSlider() {
             sliderCell.style.minWidth = sliderCell.style.width;
             sliderCell.style.maxWidth = sliderCell.style.width;
             sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
-            sliderCell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+            sliderCell.style.backgroundColor = platformColor.selectorBackground;
             sliderCell.setAttribute('tabIndex', 1);
 
             // Add a div to hold the slider.

@@ -601,7 +601,11 @@ function Palettes () {
             // Add a background
             that.paletteHighlight = new createjs.Shape();
             that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
-            that.stage.addChildAt(that.paletteHighlight, 2);
+            if (name === 'search') {
+                that.stage.addChildAt(that.paletteHighlight, 1);
+            } else {
+                that.stage.addChildAt(that.paletteHighlight, 2);
+            }
         });
 
         this.buttons[name].on('pressup', function (event) {
@@ -989,10 +993,10 @@ function PopdownPalette(palettes) {
             html += '<div class="palette">';
             var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
             //.TRANS: popout: to detach as a separate window
-	    var language = localStorage.languagePreference;
-	    if (language === 'ja') {
-		//.TRANS: show2 is show as in make visible (the opposite of hide)
-		html += format('<h2 data-name="{n}"> \
+            var language = localStorage.languagePreference;
+            if (language === 'ja') {
+                //.TRANS: show2 is show as in make visible (the opposite of hide)
+                html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
                                      alt="{' + _('hide') + '}" \
@@ -1005,8 +1009,8 @@ function PopdownPalette(palettes) {
                                      title="{' + _('popout') + '}" /> \
                             </h2>',
                                {i: icon, n: toTitleCase(_(name))});
-	    } else {
-		html += format('<h2 data-name="{n}"> \
+            } else {
+                html += format('<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
                                      alt="{' + _('hide') + '}" \
@@ -1019,7 +1023,7 @@ function PopdownPalette(palettes) {
                                      title="{' + _('popout') + '}" /> \
                             </h2>',
                                {i: icon, n: toTitleCase(_(name))});
-	    }
+             }
             html += '<ul>';
             this.models[name].update();
 

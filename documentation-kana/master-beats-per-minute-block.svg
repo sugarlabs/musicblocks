@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg11666"
    version="1.1"
-   viewBox="0 0 106.29389 25.003127"
+   viewBox="0 0 108.45683 25.003127"
    height="25.003124mm"
-   width="106.29389mm">
+   width="108.45683mm">
   <defs
      id="defs11660" />
   <metadata
@@ -25,7 +25,7 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(424.7051,55.676149)"
+     transform="translate(426.86804,55.676149)"
      id="layer1">
     <g
        id="g1036"
@@ -36,14 +36,14 @@
         <path
            id="path1020"
            style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 122.82715 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
+           d="m -4.8333336,8.5 v -4 c 0,-2.209139 1.790861,-4 4.00000002,-4 H 3.1666664 v 2 h 9.9999996 v -2 h 128.160484 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -128.160484 -1 v 2 H 4.1666664 v -2 h -1 -3.99999998 c -2.20913902,0 -4.69859112,-1.904227 -4.00000002,-4 v -4 -21 z" />
         <text
            id="text1024"
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
           <tspan
              id="tspan1022"
              y="24"
-             x="139">マスターBPM(いっぷんあたりの はく すう)</tspan>
+             x="139">ぜんたいの スピードを きめる</tspan>
         </text>
         <text
            id="text1028"
@@ -51,7 +51,7 @@
           <tspan
              id="tspan1026"
              y="12"
-             x="139">BPM</tspan>
+             x="139">１ぷんあたりの はくのかず</tspan>
         </text>
         <text
            id="text1032"
@@ -59,7 +59,7 @@
           <tspan
              id="tspan1030"
              y="33"
-             x="139">びょうしの あたい</tspan>
+             x="139">１ぱく</tspan>
         </text>
       </g>
     </g>

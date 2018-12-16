@@ -17,7 +17,11 @@ function Toolbar() {
     var tooltipsDisabled = false;
 
     this.renderLogoIcon = function (onclick) {
-        var logoIcon = document.getElementById('mb-logo');
+        var logoIcon = docById('mb-logo');
+        if (language === 'ja') {
+            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+        }
+
         logoIcon.onmouseenter = function () {
             document.body.style.cursor = 'pointer';
         };
@@ -32,8 +36,8 @@ function Toolbar() {
     };
 
     this.renderPlayIcon = function (onclick) {
-        var playIcon = document.getElementById('play');
-        var stopIcon = document.getElementById('stop');
+        var playIcon = docById('play');
+        var stopIcon = docById('stop');
 
         playIcon.onclick = function () {
             onclick();
@@ -42,7 +46,7 @@ function Toolbar() {
     };
 
     this.renderStopIcon = function (onclick) {
-        var stopIcon = document.getElementById('stop');
+        var stopIcon = docById('stop');
 
         stopIcon.onclick = function () {
             onclick();
@@ -51,7 +55,7 @@ function Toolbar() {
     };
 
     this.renderNewProjectIcon = function (onclick) {
-        var newProjectIcon = document.getElementById('new-project');
+        var newProjectIcon = docById('new-project');
 
         newProjectIcon.onclick = function () {
             onclick();
@@ -59,16 +63,16 @@ function Toolbar() {
     };
 
     this.renderLoadIcon = function (onclick) {
-        var loadIcon = document.getElementById('load');
+        var loadIcon = docById('load');
 
         loadIcon.onclick = function () {
             onclick();
         };
     };
 
-    this.renderSaveIcons = function (html_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
-        var saveButton = document.getElementById('saveButton');
-        var saveButtonAdvanced = document.getElementById('saveButtonAdvanced');
+    this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
+        var saveButton = docById('saveButton');
+        var saveButtonAdvanced = docById('saveButtonAdvanced');
         if (beginnerMode) {
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.style.display = 'none';
@@ -80,43 +84,55 @@ function Toolbar() {
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
-                var saveHTML = document.getElementById('save-html');
+                var saveHTML = docById('save-html');
 
                 saveHTML.onclick = function () {
                     html_onclick();
                 };
+                var saveSVG = docById('save-svg');
+                var savePNG = docById('save-png');
+                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
 
-                var saveSVG = document.getElementById('save-svg');
+                // if there is no mouse artwork to save then grey out
+                if (svgData == '') {
+                    saveSVG.disabled = true;
+                    savePNG.disabled = true;
+                    saveSVG.className = 'grey-text inactiveLink';
+                    savePNG.className = 'grey-text inactiveLink';
+                } else {
+                    saveSVG.disabled = false;
+                    savePNG.disabled = false;
+                    saveSVG.className = '';
+                    savePNG.className = '';
+                    saveSVG.onclick = function () {
+                        svg_onclick();
+                    };
 
-                saveSVG.onclick = function () {
-                    svg_onclick();
-                };
 
-                var savePNG = document.getElementById('save-png');
+                    savePNG.onclick = function () {
+                        png_onclick();
+                    };
+                }
 
-                savePNG.onclick = function () {
-                    png_onclick();
-                };
-
-                var saveWAV = document.getElementById('save-wav');
+                var saveWAV = docById('save-wav');
 
                 saveWAV.onclick = function () {
                     wave_onclick();
                 };
 
-                var saveLY = document.getElementById('save-ly');
+                var saveLY = docById('save-ly');
 
                 saveLY.onclick = function () {
                     ly_onclick();
                 };
 
-                var saveABC = document.getElementById('save-abc');
+                var saveABC = docById('save-abc');
 
                 saveABC.onclick = function () {
                     abc_onclick();
                 };
 
-                var saveArtworkSVG = document.getElementById('save-blockartwork-svg');
+                var saveArtworkSVG = docById('save-blockartwork-svg');
 
                 saveArtworkSVG.onclick = function () {
                     blockartworksvg_onclick();
@@ -126,12 +142,12 @@ function Toolbar() {
     };
 
     this.renderPlanetIcon = function (planet, onclick) {
-        var planetIcon = document.getElementById('planetIcon');
-        var planetIconDisabled = document.getElementById('planetIconDisabled');
+        var planetIcon = docById('planetIcon');
+        var planetIconDisabled = docById('planetIconDisabled');
 
         if (planet) {
             planetIcon.onclick = function () {
-                document.getElementById('toolbars').style.display = 'none';
+                docById('toolbars').style.display = 'none';
                 onclick();
             };
         } else {
@@ -141,25 +157,25 @@ function Toolbar() {
     };
 
     this.renderMenuIcon = function (onclick) {
-        var menuIcon = document.getElementById('menu');
-        var auxToolbar = document.getElementById('aux-toolbar');
+        var menuIcon = docById('menu');
+        var auxToolbar = docById('aux-toolbar');
         menuIcon.onclick = function () {
             if (auxToolbar.style.display == '' || auxToolbar.style.display == 'none') {
                 onclick(false);
                 auxToolbar.style.display = 'block';
                 menuIcon.innerHTML = 'more_vert';
-                document.getElementById('toggleAuxBtn').className = 'blue darken-1';
+                docById('toggleAuxBtn').className = 'blue darken-1';
             } else {
                 onclick(true);
                 auxToolbar.style.display = 'none';
                 menuIcon.innerHTML = 'menu';
-                document.getElementById('toggleAuxBtn').className -= 'blue darken-1';
+                docById('toggleAuxBtn').className -= 'blue darken-1';
             }
         };
     };
 
     this.renderHelpIcon = function (onclick) {
-        var helpIcon = document.getElementById('helpIcon');
+        var helpIcon = docById('helpIcon');
 
         helpIcon.onclick = function () {
             onclick();
@@ -167,8 +183,8 @@ function Toolbar() {
     };
 
     this.renderModeSelectIcon = function (onclick) {
-        var begIcon = document.getElementById('beginnerMode');
-        var advIcon = document.getElementById('advancedMode');
+        var begIcon = docById('beginnerMode');
+        var advIcon = docById('advancedMode');
         if (begIcon.style.display === 'none') {
             advIcon.onclick = function () {
                 onclick();
@@ -181,7 +197,7 @@ function Toolbar() {
     };
 
     this.renderRunSlowlyIcon = function (onclick) {
-        var runSlowlyIcon = document.getElementById('runSlowlyIcon');
+        var runSlowlyIcon = docById('runSlowlyIcon');
         if (beginnerMode && language === 'ja') {
             runSlowlyIcon.style.display = 'none';
 
@@ -189,28 +205,28 @@ function Toolbar() {
 
         runSlowlyIcon.onclick = function () {
             onclick();
-            document.getElementById('stop').style.color = stopIconColorWhenPlaying;
+            docById('stop').style.color = stopIconColorWhenPlaying;
 
         };
     };
 
     this.renderRunStepIcon = function (onclick) {
-        var runStepByStepIcon = document.getElementById('runStepByStepIcon');
+        var runStepByStepIcon = docById('runStepByStepIcon');
         if (beginnerMode && language === 'ja') {
             runStepByStepIcon.style.display = 'none';
         }
 
         runStepByStepIcon.onclick = function () {
             onclick();
-            document.getElementById('stop').style.color = stopIconColorWhenPlaying;
+            docById('stop').style.color = stopIconColorWhenPlaying;
         };
     };
 
     this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
-        var displayStatsIcon = document.getElementById('displayStatsIcon');
-        var loadPluginIcon = document.getElementById('loadPluginIcon');
-        var delPluginIcon = document.getElementById('delPluginIcon');
-        var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+        var displayStatsIcon = docById('displayStatsIcon');
+        var loadPluginIcon = docById('loadPluginIcon');
+        var delPluginIcon = docById('delPluginIcon');
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
 
         if (!beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -234,7 +250,7 @@ function Toolbar() {
 
     // var scrollEnabled = false;
     // this.renderEnableHorizScrollIcon = function (setScroller, _setupBlocksContainerEvents) {
-    //     var enableHorizScrollIcon = document.getElementById('enableHorizScrollIcon');
+    //     var enableHorizScrollIcon = docById('enableHorizScrollIcon');
     //     enableHorizScrollIcon.onclick = function () {
     //         setScroller();
     //         _setupBlocksContainerEvents();
@@ -243,7 +259,7 @@ function Toolbar() {
     // }
 
     this.renderMergeIcon = function (onclick) {
-        var mergeWithCurrentIcon = document.getElementById('mergeWithCurrentIcon');
+        var mergeWithCurrentIcon = docById('mergeWithCurrentIcon');
 
         mergeWithCurrentIcon.onclick = function () {
             onclick();
@@ -251,7 +267,7 @@ function Toolbar() {
     };
 
     this.renderRestoreIcon = function (onclick) {
-        var restoreIcon = document.getElementById('restoreIcon');
+        var restoreIcon = docById('restoreIcon');
 
         restoreIcon.onclick = function () {
             onclick();
@@ -259,81 +275,81 @@ function Toolbar() {
     };
 
     this.renderLanguageSelectIcon = function (languageBox) {
-        var languageSelectIcon = document.getElementById('languageSelectIcon');
+        var languageSelectIcon = docById('languageSelectIcon');
         languageSelectIcon.onclick = function () {
-            var enUS = document.getElementById('enUS');
+            var enUS = docById('enUS');
 
             enUS.onclick = function () {
                 languageBox.enUS_onclick();
             };
 
-            var enUK = document.getElementById('enUK');
+            var enUK = docById('enUK');
 
             enUK.onclick = function () {
                 languageBox.enUK_onclick();
             };
 
-            var es = document.getElementById('es');
+            var es = docById('es');
 
             es.onclick = function () {
                 languageBox.es_onclick();
             };
 
-            var ja = document.getElementById('ja');
+            var ja = docById('ja');
 
             ja.onclick = function () {
                 languageBox.ja_onclick();
             };
 
-            var kana = document.getElementById('kana');
+            var kana = docById('kana');
 
             kana.onclick = function () {
                 languageBox.kana_onclick();
             };
 
-            var zhCN = document.getElementById('zhCN');
+            var zhCN = docById('zhCN');
 
             zhCN.onclick = function () {
                 languageBox.zhCN_onclick();
             };
 
-            var th = document.getElementById('th');
+            var th = docById('th');
 
             th.onclick = function () {
                 languageBox.th_onclick();
             };
 
-            var ayc = document.getElementById('ayc');
+            var ayc = docById('ayc');
 
             ayc.onclick = function () {
                 languageBox.ayc_onclick();
             };
 
-            var gug = document.getElementById('gug');
+            var gug = docById('gug');
 
             gug.onclick = function () {
                 languageBox.gug_onclick();
             };
 
-            var hi = document.getElementById('hi');
+            var hi = docById('hi');
 
             hi.onclick = function () {
                 languageBox.hi_onclick();
             };
 
-            var ibo = document.getElementById('ibo');
+            var ibo = docById('ibo');
 
             ibo.onclick = function () {
                 languageBox.ibo_onclick();
             };
 
-            var ar = document.getElementById('ar');
+            var ar = docById('ar');
 
             ar.onclick = function () {
                 languageBox.ar_onclick();
             };
 
-            var he = document.getElementById('he');
+            var he = docById('he');
 
             he.onclick = function () {
                 languageBox.he_onclick();
@@ -348,7 +364,7 @@ function Toolbar() {
         ['newFile', _('New project')],
         ['load', _('Load project from file')],
         ['saveButton', _('Save project')],
-        ['saveButtonAdvanced', _('Save project')],
+        ['saveButtonAdvanced', _('Save project as HTML')],
         ['planetIcon', _('Find and share projects')],
         ['planetIconDisabled', _('Offline. Sharing is unavailable')],
         ['toggleAuxBtn', _('Auxilary menu')],
@@ -365,13 +381,13 @@ function Toolbar() {
         ['beginnerMode', _('Switch to beginner mode')],
         ['advancedMode', _('Switch to advanced mode')],
         ['languageSelectIcon', _('Select language')],
-        ['save-html', _('Save as HTML'), 'innerHTML'],
-        ['save-svg', _('Save as SVG'), 'innerHTML'],
-        ['save-png', _('Save as PNG'), 'innerHTML'],
-        ['save-wav', _('Save as WAV'), 'innerHTML'],
-        ['save-abc', _('Save as ABC'), 'innerHTML'],
-        ['save-ly', _('Save sheet music'), 'innerHTML'],
-        ['save-blockartwork-svg', _('Save block artwork'), 'innerHTML'],
+        ['save-html', _('Save project as HTML'), 'innerHTML'],
+        ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
+        ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
+        ['save-wav', _('Save music as WAV'), 'innerHTML'],
+        ['save-abc', _('Save sheet music as ABC'), 'innerHTML'],
+        ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
+        ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
         ['new-project', _('Confirm'), 'innerHTML'],
         ['enUS', _('English (United States)'), 'innerHTML'],
         ['enUK', _('English (United Kingdom)'), 'innerHTML'],
@@ -413,20 +429,20 @@ function Toolbar() {
         _('Switch to beginner mode'),
         _('Switch to advanced mode'),
         _('Select language'),
-        _('Save as HTML'),
-        _('Save as SVG'),
-        _('Save as PNG'),
-        _('Save as WAV'),
-        _('Save as ABC'),
-        _('Save sheet music'),
-        _('Save block artwork'),
+        _('Save project as HTML'),
+        _('Save mouse artwork as SVG'),
+        _('Save mouse artwork as PNG'),
+        _('Save music as WAV'),
+        _('Save sheet music as ABC'),
+        _('Save sheet music as Lilypond'),
+        _('Save block artwork as SVG'),
         _('Confirm'),
         _('Select language'),
     ];
 
     this.init = function (mode) {
-        var beginnerMode = document.getElementById('beginnerMode');
-        var advancedMode = document.getElementById('advancedMode');
+        var beginnerMode = docById('beginnerMode');
+        var advancedMode = docById('advancedMode');
         if (mode || mode === 'null') {
             advancedMode.style.display = 'block';
             beginnerMode.style.display = 'none';
@@ -438,7 +454,7 @@ function Toolbar() {
         for (var i = 0; i < strings.length; i++) {
             var obj = strings[i];
             var trans = strings_[i];
-            var elem = document.getElementById(obj[0]);
+            var elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
@@ -463,5 +479,15 @@ function Toolbar() {
     this.disableTooltips = function (jquery) {
         jquery('.tooltipped').tooltip('remove');
         tooltipsDisabled = true;
+    }
+
+    this.closeAuxToolbar = function (onclick) {
+        if (auxToolbar.style.display === 'block') {
+            onclick(false);
+            var menuIcon = docById('menu');
+            auxToolbar.style.display = 'none';
+            menuIcon.innerHTML = 'menu';
+            docById('toggleAuxBtn').className -= 'blue darken-1';
+        }
     }
 };

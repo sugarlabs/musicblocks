@@ -73,6 +73,7 @@ function SaveInterface(PlanetInterface) {
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
     this.prepareHTML = function(){
         var file = this.htmlSaveTemplate;
+	console.log(GUIDEURL);
         if (this.PlanetInterface !== undefined) {
             var description = this.PlanetInterface.getCurrentProjectDescription();
         } else {
@@ -207,7 +208,8 @@ function SaveInterface(PlanetInterface) {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById('submitLilypond').textContent = _('Save as Lilypond');
         //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
-        docById('submitPDF').textContent = _('Save as PDF');
+       
+       // docById('submitPDF').textContent = _('Save as PDF');
 
         //TRANS: default file name when saving as Lilypond
         docById('fileName').value = filename;
@@ -228,12 +230,12 @@ function SaveInterface(PlanetInterface) {
         }
 
         docById('submitLilypond').onclick = function(){this.saveLYFile(false);}.bind(this);
-        if (this.planet){
-            docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
-            docById('submitPDF').disabled = false;
-        } else {
-            docById('submitPDF').disabled = true;
-        }
+        // if (this.planet){
+        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
+        //     docById('submitPDF').disabled = false;
+        // } else {
+        //     docById('submitPDF').disabled = true;
+        // }
         var t = this;
         docByClass('close')[0].onclick = function () {
             t.logo.runningLilypond = false;

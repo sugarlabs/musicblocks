@@ -195,9 +195,11 @@ function PitchTimeMatrix () {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
-        cell.onclick=function() {
-            that._export();
+        if (!localStorage.beginnerMode) {
+            var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
+            cell.onclick=function() {
+                that._export();
+            }
         }
 
         var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
@@ -212,7 +214,7 @@ function PitchTimeMatrix () {
                 that._rowMap[i] = i;
             }
 
-            that._logo.synth.stopSound(0, 'default');
+            that._logo.synth.stopSound(0, DEFAULTVOICE);
             that._logo.synth.stop();
             that._stopOrCloseClicked = true;
             ptmTableDiv.style.visibility = 'hidden';
@@ -350,7 +352,7 @@ function PitchTimeMatrix () {
 
             // A cell for the row label graphic
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
+            cell.style.backgroundColor = platformColor.labelColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -384,7 +386,7 @@ function PitchTimeMatrix () {
 
             // A cell for the row label
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = MATRIXLABELCOLOR;
+            cell.style.backgroundColor = platformColor.labelColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -449,7 +451,7 @@ function PitchTimeMatrix () {
         labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
         labelCell.style.minWidth = labelCell.style.width;
         labelCell.style.maxWidth = labelCell.style.width;
-        labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+        labelCell.style.backgroundColor = platformColor.labelColor;
 
         var ptmCell = ptmTableRow.insertCell();
         // Create tables to store individual note values.
@@ -636,7 +638,13 @@ function PitchTimeMatrix () {
 
     this._export = function() {
         var exportWindow = window.open('');
+        console.log(exportWindow);
         var exportDocument = exportWindow.document;
+        if (exportDocument === undefined) {
+            console.log('Could not create export window');
+            return;
+        }
+
         var title = exportDocument.createElement('title');
         title.innerHTML = 'Music Matrix';
         exportDocument.head.appendChild(title);
@@ -857,7 +865,7 @@ function PitchTimeMatrix () {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+            labelCell.style.backgroundColor = platformColor.labelColor;
 
             var labelCell = docById('ptmTupletValueLabel');
             labelCell.innerHTML = _('tuplet value');
@@ -866,7 +874,7 @@ function PitchTimeMatrix () {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = MATRIXLABELCOLOR;
+            labelCell.style.backgroundColor = platformColor.labelColor;
 
             // Fill in the columns in the tuplet note value row up to
             // where the tuplet begins.
@@ -874,14 +882,14 @@ function PitchTimeMatrix () {
             var valueRow = docById('ptmTupletValueRow');
             for (var i = 0; i < firstRow.cells.length; i++) {
                 var cell = noteRow.insertCell();
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
 
                 var cell = valueRow.insertCell();
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
@@ -900,7 +908,7 @@ function PitchTimeMatrix () {
             var cell = noteRow.insertCell(-1);
             var numerator = 32 / param[1][i];
             var thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
-            cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+            cell.style.backgroundColor = platformColor.tupletBackground;
             cell.style.width = this._noteWidth(thisNoteValue) + 'px';
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -928,15 +936,15 @@ function PitchTimeMatrix () {
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
             }
@@ -954,7 +962,7 @@ function PitchTimeMatrix () {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.textAlign = 'center';
         cell.innerHTML = tupletValue;
-        cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+        cell.style.backgroundColor = platformColor.tupletBackground;
 
         // And a span in the note value column too.
         var noteValueRow = docById('ptmNoteValueRow');
@@ -968,7 +976,7 @@ function PitchTimeMatrix () {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
         cell.style.textAlign = 'center';
         cell.innerHTML = noteValueToDisplay;
-        cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+        cell.style.backgroundColor = platformColor.rhythmcellcolor;
         this._matrixHasTuplets = true;
     };
 
@@ -996,17 +1004,17 @@ function PitchTimeMatrix () {
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                cell.style.backgroundColor = platformColor.selectorBackground;
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLORHOVER;
+                        this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
             }
@@ -1022,7 +1030,7 @@ function PitchTimeMatrix () {
             cell.style.lineHeight = 60 + '%';
             cell.style.textAlign = 'center';
             cell.innerHTML = noteValueToDisplay;
-            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
@@ -1034,7 +1042,7 @@ function PitchTimeMatrix () {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.backgroundColor = platformColor.tupletBackground;
 
                 var row = docById('ptmTupletValueRow');
                 var cell = row.insertCell();
@@ -1043,7 +1051,7 @@ function PitchTimeMatrix () {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.backgroundColor = platformColor.tupletBackground;
             }
         }
     };
@@ -1080,7 +1088,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     this._setNotes(j, i, false);
                 }
             }
@@ -1103,7 +1111,7 @@ function PitchTimeMatrix () {
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                        this.style.backgroundColor = platformColor.selectorBackground;
                         that._notesToPlay[j][0] = ['R'];
                         that._setNotes(j, i, false);
                     } else {
@@ -1118,7 +1126,7 @@ function PitchTimeMatrix () {
                     var j = Number(obj[1]);
                     if (isMouseDown) {
                         if (this.style.backgroundColor === 'black') {
-                            this.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                            this.style.backgroundColor = platformColor.selectorBackground;
                             that._notesToPlay[j][0] = ['R'];
                             that._setNotes(j, i, false);
                         } else {
@@ -1309,11 +1317,11 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
-                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
             }
 
             for (var i = 0; i < drumNotes.length; i++) {
@@ -1331,14 +1339,14 @@ function PitchTimeMatrix () {
         var row = docById('ptmNoteValueRow');
         for (var i = 0; i < row.cells.length; i++) {
             var cell = row.cells[i];
-            cell.style.backgroundColor = MATRIXRHYTHMCELLCOLOR;
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
         if (that._matrixHasTuplets) {
             var row = docById('ptmTupletNoteValueRow');
             for (var i = 0; i < row.cells.length; i++) {
                 var cell = row.cells[i];
-                cell.style.backgroundColor = MATRIXTUPLETCELLCOLOR;
+                cell.style.backgroundColor = platformColor.tupletBackground;
             }
         }
     };
@@ -1419,11 +1427,11 @@ function PitchTimeMatrix () {
                        }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, 'default', null, null);
+                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
@@ -1557,12 +1565,12 @@ function PitchTimeMatrix () {
                 if (drumName != null) {
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
-                    this._logo.synth.trigger(0, Number(note), noteValue, 'default', null, null);
+                    this._logo.synth.trigger(0, Number(note), noteValue, DEFAULTVOICE, null, null);
                 } else if (graphicsBlock !== true) {
                     if (typeof(note) === 'string') {
-                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, 'default', null, null);
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, DEFAULTVOICE, null, null);
                     } else {
-                        this._logo.synth.trigger(0, note, noteValue, 'default', null, null);
+                        this._logo.synth.trigger(0, note, noteValue, DEFAULTVOICE, null, null);
                     }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
@@ -1582,7 +1590,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = MATRIXNOTECELLCOLOR;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                     this._notesToPlay[j][0] = ['R'];
                     this._setNotes(j, i, false);
                 }
@@ -1601,7 +1609,7 @@ function PitchTimeMatrix () {
         this._logo.refreshCanvas();
 
 
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': 'chunk'}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
         for (var i = 0; i < this._notesToPlay.length; i++)

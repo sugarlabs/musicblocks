@@ -5,35 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   id="svg2831"
-   version="1.1"
-   viewBox="0 0 84.931252 50.8"
-   height="50.799999mm"
    width="84.931252mm"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="one-of-block.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1278"
-     inkscape:window-height="773"
-     id="namedview81"
-     showgrid="false"
-     inkscape:zoom="1.0400831"
-     inkscape:cx="150.46875"
-     inkscape:cy="89.999999"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg2831" />
+   height="50.799999mm"
+   viewBox="0 0 84.931252 50.8"
+   version="1.1"
+   id="svg2831">
   <defs
      id="defs2825" />
   <metadata
@@ -44,320 +20,305 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <path
-     sodipodi:nodetypes="csscccssccccccccccccccccsscccssccccccccccc"
-     d="m 26.392192,20.042189 0,-1.587501 c 0,-0.876752 0.710748,-1.5875 1.5875,-1.5875 l 1.5875,0 3.96875,0 23.19514,0 1.5875,0 c 0.876752,0 1.5875,0.710748 1.5875,1.5875 l 0,1.587501 -1.5875,0 0,-1.190626 -1.5875,0 0,3.96875 1.5875,0 0,-1.190625 1.5875,0 0,6.746875 -1.5875,0 0,-1.190625 -1.5875,0 0,3.96875 1.5875,0 0,-1.190624 1.5875,0 0,1.587499 c 0,0.876753 -0.710748,1.5875 -1.5875,1.5875 l -1.5875,0 -23.19514,0 -3.96875,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710747 -1.5875,-1.5875 l 0,-1.587499 0,-8.334376 0,-0.396875 -2.38125,0 0,1.190625 -0.79375,0 0,-3.175 0.79375,0 0,1.190625 2.38125,0 z"
-     style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
      id="path864"
-     inkscape:connector-curvature="0" />
+     style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 26.392192,20.042189 0,-1.587501 c 0,-0.876752 0.710748,-1.5875 1.5875,-1.5875 l 1.5875,0 3.96875,0 23.19514,0 1.5875,0 c 0.876752,0 1.5875,0.710748 1.5875,1.5875 l 0,1.587501 -1.5875,0 0,-1.190626 -1.5875,0 0,3.96875 1.5875,0 0,-1.190625 1.5875,0 0,6.746875 -1.5875,0 0,-1.190625 -1.5875,0 0,3.96875 1.5875,0 0,-1.190624 1.5875,0 0,1.587499 c 0,0.876753 -0.710748,1.5875 -1.5875,1.5875 l -1.5875,0 -23.19514,0 -3.96875,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710747 -1.5875,-1.5875 l 0,-1.587499 0,-8.334376 0,-0.396875 -2.38125,0 0,1.190625 -0.79375,0 0,-3.175 0.79375,0 0,1.190625 2.38125,0 z" />
   <text
-     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828"
+     y="16.668751"
+     x="34.307644"
      id="text868"
-     x="34.307644"
-     y="16.668751">
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828">
     <tspan
-       x="55.738892"
+       id="tspan866"
        y="25.796877"
-       id="tspan866">どちらかを選ぶ</tspan>
+       x="55.738892">どちらかランダム</tspan>
   </text>
   <text
-     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828"
+     y="16.668751"
+     x="34.307644"
      id="text872"
-     x="34.307644"
-     y="16.668751">
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828">
     <tspan
-       x="55.738892"
+       id="tspan870"
        y="21.431252"
-       id="tspan870">これか</tspan>
+       x="55.738892">これか</tspan>
   </text>
   <text
-     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828"
-     id="text876"
+     y="16.668751"
      x="34.307644"
-     y="16.668751">
+     id="text876"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828">
     <tspan
-       x="55.738892"
+       id="tspan874"
        y="29.765627"
-       id="tspan874">それか</tspan>
+       x="55.738892">それか</tspan>
   </text>
   <g
-     transform="matrix(0.26458333,0,0,0.26458333,56.929518,16.668751)"
-     id="g890">
+     id="g890"
+     transform="matrix(0.26458333,0,0,0.26458333,56.929518,16.668751)">
     <g
-       transform="scale(1.5,1.5)"
-       id="g888">
+       id="g888"
+       transform="scale(1.5,1.5)">
       <path
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
-         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path882"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text886">
-        <tspan
-           x="13"
-           y="14"
-           id="tspan884">ソ</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.26458333,0,0,0.26458333,56.929518,25.003126)"
-     id="g900">
-    <g
-       transform="scale(1.5,1.5)"
-       id="g898">
-      <path
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
          style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path892"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text896">
+         id="text886"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
-           x="13"
+           id="tspan884"
            y="14"
-           id="tspan894">ラ</tspan>
+           x="13">ソ</tspan>
       </text>
     </g>
   </g>
   <g
-     id="g934"
-     transform="matrix(0.26458333,0,0,0.26458333,-373.85624,-174.88958)">
+     id="g900"
+     transform="matrix(0.26458333,0,0,0.26458333,56.929518,25.003126)">
     <g
-       transform="translate(1413,661)"
-       id="g914">
+       id="g898"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path892"
+         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text896"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan894"
+           y="14"
+           x="13">ラ</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,-373.85624,-174.88958)"
+     id="g934">
+    <g
+       id="g914"
+       transform="translate(1413,661)">
       <g
-         transform="scale(1.5,1.5)"
-         id="g912">
+         id="g912"
+         transform="scale(1.5,1.5)">
         <path
-           d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 9,0 60,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -60,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 5,5 90 0 0 -5,5 l 0,4 0,4 0,63 0,4 a 5,5 90 0 0 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 a 4,4 90 0 1 -4,4 l -4,0 -9,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z"
-           style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path902"
-           inkscape:connector-curvature="0" />
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 9,0 60,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -60,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 5,5 90 0 0 -5,5 l 0,4 0,4 0,63 0,4 a 5,5 90 0 0 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 a 4,4 90 0 1 -4,4 l -4,0 -9,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-           id="text906">
+           id="text906"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
           <tspan
-             x="20"
+             id="tspan904"
              y="15"
-             id="tspan904">音符</tspan>
+             x="20">音符</tspan>
         </text>
         <text
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-           id="text910">
+           id="text910"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
           <tspan
-             x="85"
+             id="tspan908"
              y="12"
-             id="tspan908">値</tspan>
+             x="85">長さ</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="matrix(0.5,0,0,0.5,1413,665)"
-       id="g932">
+       id="g932"
+       transform="matrix(0.5,0,0,0.5,1413,665)">
       <g
-         style="isolation:isolate"
-         id="g930">
+         id="g930"
+         style="isolation:isolate">
         <g
-           id="g928"
-           data-name="レイヤー 2">
+           data-name="レイヤー 2"
+           id="g928">
           <g
              id="g926">
             <rect
-               width="42"
-               height="42"
-               rx="5"
-               ry="5"
-               style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
-               id="rect916"
+               y="0"
                x="0"
-               y="0" />
+               id="rect916"
+               style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+               ry="5"
+               rx="5"
+               height="42"
+               width="42" />
             <path
-               d="m 30.56,29.8 -4.17,-4.16 2.26,0 a 1.035,1.035 0 1 0 0,-2.07 l -4.71,0 a 1.08,1.08 0 0 0 -1.11,1 l 0,0 c 0,0 0,0 0,0.06 l 0,4.64 0,0 a 1.04,1.04 0 1 0 2.08,0 l 0,-2.19 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
-               style="fill:#ffffff"
                id="path918"
-               inkscape:connector-curvature="0" />
-            <path
-               d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 l -4.71,0 a 1.035,1.035 0 1 0 0,2.07 l 2.25,0 -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 0,2.26 a 1.04,1.04 0 1 0 2.08,0 l 0,-4.64 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
                style="fill:#ffffff"
+               d="m 30.56,29.8 -4.17,-4.16 2.26,0 a 1.035,1.035 0 1 0 0,-2.07 l -4.71,0 a 1.08,1.08 0 0 0 -1.11,1 l 0,0 c 0,0 0,0 0,0.06 l 0,4.64 0,0 a 1.04,1.04 0 1 0 2.08,0 l 0,-2.19 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z" />
+            <path
                id="path920"
-               inkscape:connector-curvature="0" />
-            <path
-               d="m 23.94,20.5 4.7,0 a 1.04,1.04 0 1 0 0,-2.08 l -2.25,0 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 l -4.19,4.21 0,-2.28 a 1.04,1.04 0 1 0 -2.08,0 l 0,4.64 a 0.43,0.43 0 0 0 0,0.05 l 0,0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
                style="fill:#ffffff"
+               d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 l -4.71,0 a 1.035,1.035 0 1 0 0,2.07 l 2.25,0 -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 0,2.26 a 1.04,1.04 0 1 0 2.08,0 l 0,-4.64 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z" />
+            <path
                id="path922"
-               inkscape:connector-curvature="0" />
-            <path
-               d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 l 0,2.29 -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 -2.29,0 a 1.04,1.04 0 1 0 0,2.08 l 4.71,0 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 l 0,-4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
                style="fill:#ffffff"
+               d="m 23.94,20.5 4.7,0 a 1.04,1.04 0 1 0 0,-2.08 l -2.25,0 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 l -4.19,4.21 0,-2.28 a 1.04,1.04 0 1 0 -2.08,0 l 0,4.64 a 0.43,0.43 0 0 0 0,0.05 l 0,0.05 a 1.09,1.09 0 0 0 1.11,1.04 z" />
+            <path
                id="path924"
-               inkscape:connector-curvature="0" />
+               style="fill:#ffffff"
+               d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 l 0,2.29 -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 -2.29,0 a 1.04,1.04 0 1 0 0,2.08 l 4.71,0 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 l 0,-4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z" />
           </g>
         </g>
       </g>
     </g>
   </g>
   <g
-     transform="matrix(0.26458333,0,0,0.26458333,34.925005,1.13e-6)"
-     id="g952">
+     id="g952"
+     transform="matrix(0.26458333,0,0,0.26458333,34.925005,1.13e-6)">
     <g
-       transform="scale(1.5,1.5)"
-       id="g950">
+       id="g950"
+       transform="scale(1.5,1.5)">
       <path
-         d="m 8.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 10,0 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -10,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 z"
-         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path936"
-         inkscape:connector-curvature="0" />
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 10,0 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -10,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 z" />
       <text
-         style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text940">
+         id="text940"
+         style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
         <tspan
-           x="54"
+           id="tspan938"
            y="23"
-           id="tspan938">➗</tspan>
+           x="54">➗</tspan>
       </text>
       <text
-         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text944">
+         id="text944"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
         <tspan
-           x="54"
+           id="tspan942"
            y="12"
-           id="tspan942" />
+           x="54" />
       </text>
       <text
-         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text948">
+         id="text948"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
         <tspan
-           x="54"
+           id="tspan946"
            y="33"
-           id="tspan946" />
+           x="54" />
       </text>
     </g>
   </g>
   <g
-     transform="matrix(0.26458333,0,0,0.26458333,57.54688,1.13e-6)"
-     id="g962">
+     id="g962"
+     transform="matrix(0.26458333,0,0,0.26458333,57.54688,1.13e-6)">
     <g
-       transform="scale(1.5,1.5)"
-       id="g960">
+       id="g960"
+       transform="scale(1.5,1.5)">
       <path
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
-         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path954"
-         inkscape:connector-curvature="0" />
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text958">
+         id="text958"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
-           x="13"
+           id="tspan956"
            y="14"
-           id="tspan956">1</tspan>
+           x="13">1</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="matrix(0.26458333,0,0,0.26458333,57.54688,8.334376)"
-     id="g972">
+     id="g972"
+     transform="matrix(0.26458333,0,0,0.26458333,57.54688,8.334376)">
     <g
-       transform="scale(1.5,1.5)"
-       id="g970">
+       id="g970"
+       transform="scale(1.5,1.5)">
       <path
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
-         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path964"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text968">
-        <tspan
-           x="13"
-           y="14"
-           id="tspan966">4</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.26458333,0,0,0.26458333,3.5718802,8.334376)"
-     id="g982">
-    <g
-       transform="scale(1.5,1.5)"
-       id="g980">
-      <path
-         d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 20,0 4,0 a 4,4 90 0 1 4,4 l 0,4 0,4 0,4 a 4,4 90 0 1 -4,4 l -4,0 -20,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z"
-         style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path974"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text978">
-        <tspan
-           x="36"
-           y="14"
-           id="tspan976">↓</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.26458333,0,0,0.26458333,3.5718802,16.668751)"
-     id="g1000">
-    <g
-       transform="scale(1.5,1.5)"
-       id="g998">
-      <path
-         d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,21 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-21 z"
-         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path984"
-         inkscape:connector-curvature="0" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text988">
-        <tspan
-           x="46"
-           y="35"
-           id="tspan986">音高</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text992">
-        <tspan
-           x="46"
-           y="12"
-           id="tspan990">名前</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-         id="text996">
-        <tspan
-           x="46"
-           y="54"
-           id="tspan994">オクターヴ</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.26458333,0,0,0.26458333,23.018755,33.337501)"
-     id="g1010">
-    <g
-       transform="scale(1.5,1.5)"
-       id="g1008">
-      <path
-         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z"
          style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path1002"
-         inkscape:connector-curvature="0" />
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
       <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text1006">
+         id="text968"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
         <tspan
-           x="13"
+           id="tspan966"
            y="14"
-           id="tspan1004">4</tspan>
+           x="13">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g982"
+     transform="matrix(0.26458333,0,0,0.26458333,3.5718802,8.334376)">
+    <g
+       id="g980"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path974"
+         style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 20,0 4,0 a 4,4 90 0 1 4,4 l 0,4 0,4 0,4 a 4,4 90 0 1 -4,4 l -4,0 -20,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z" />
+      <text
+         id="text978"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan976"
+           y="14"
+           x="36">↓</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g1000"
+     transform="matrix(0.26458333,0,0,0.26458333,3.5718802,16.668751)">
+    <g
+       id="g998"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path984"
+         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 0,2 10,0 0,-2 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,21 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-21 z" />
+      <text
+         id="text988"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan986"
+           y="35"
+           x="46">音の高さ</tspan>
+      </text>
+      <text
+         id="text992"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan990"
+           y="12"
+           x="46">名前</tspan>
+      </text>
+      <text
+         id="text996"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan994"
+           y="54"
+           x="46">オクターヴの高さ</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g1010"
+     transform="matrix(0.26458333,0,0,0.26458333,23.018755,33.337501)">
+    <g
+       id="g1008"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path1002"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text1006"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan1004"
+           y="14"
+           x="13">4</tspan>
       </text>
     </g>
   </g>

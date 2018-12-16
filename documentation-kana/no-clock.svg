@@ -1,45 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="27.259188mm"
-   height="25.796875mm"
-   viewBox="0 0 27.259189 25.796876"
-   version="1.1"
    id="svg1120"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="no-clock.svg">
+   version="1.1"
+   viewBox="0 0 26.7763 25.796876"
+   height="25.796875mm"
+   width="26.776299mm">
   <defs
      id="defs1114" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="3.2"
-     inkscape:cx="52.994066"
-     inkscape:cy="61.230128"
-     inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1" />
   <metadata
      id="metadata1117">
     <rdf:RDF>
@@ -53,29 +25,25 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-323.76141,-397.53222)">
+     transform="translate(-323.76141,-397.53222)"
+     id="layer1">
     <g
-       id="g258"
-       transform="matrix(0.26458333,0,0,0.26458333,323.76141,397.53222)">
+       transform="matrix(0.26458333,0,0,0.26458333,323.76141,397.53222)"
+       id="g258">
       <g
-         transform="scale(1.5)"
-         id="g256">
+         id="g256"
+         transform="scale(1.5)">
         <path
-           inkscape:connector-curvature="0"
-           d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 32.68457 4 c 2.209139,0 3.301409,1.9042267 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
-           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path250"
-           sodipodi:nodetypes="cssccccccssccsscccccccssccsscccccccsscccccccsscc" />
+           style="fill:#ff8b2d;fill-opacity:1;stroke:#520000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 31.351237 4 c 2.209139,0 4.698591,1.9042267 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text254">
+           id="text254"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
           <tspan
-             x="5"
+             id="tspan252"
              y="15"
-             id="tspan252">クロックなし</tspan>
+             x="5">クロックなし</tspan>
         </text>
       </g>
     </g>

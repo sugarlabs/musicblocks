@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg1621"
+   width="63.544094mm"
+   height="51.46146mm"
+   viewBox="0 0 63.544094 51.46146"
    version="1.1"
-   viewBox="0 0 52.255203 51.461456"
-   height="51.461456mm"
-   width="52.255203mm">
+   id="svg1621">
   <defs
      id="defs1615" />
   <metadata
@@ -24,254 +24,262 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <path
+     id="path540"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,11.840104 0,-1.5875 c 0,-0.8767515 0.710748,-1.5874995 1.5875,-1.5874995 l 1.5875,0 0,0.79375 3.96875,0 0,-0.79375 28.4990785,0 1.5875,0 c 0.876752,0 1.5875,0.710748 1.5875,1.5874995 l 0,1.5875 -1.5875,0 0,-1.190625 -1.5875,0 0,3.96875 1.5875,0 0,-1.190625 1.5875,0 0,1.587501 c -1e-6,0.876752 -0.710748,1.587499 -1.5875,1.587499 l -1.5875,0 -28.4990785,0 -0.39688,0 0,0.79375 -3.175,0 0,-0.79375 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710747 -1.5875,-1.587499 l 0,-1.587501 z" />
+  <text
+     y="8.4666691"
+     x="11.288879"
+     id="text544"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan542"
+       y="14.022921"
+       x="35.101379">色のこさをせってい</tspan>
+  </text>
+  <text
+     y="8.4666691"
+     x="11.288879"
+     id="text548"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan546"
+       y="13.229166"
+       x="35.101379" />
+  </text>
+  <path
+     id="path554"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 39.533156,8.6651045 23.8125,0 0,7.9374995 -23.8125,0 0,-3.175 0,-0.396874 -2.38125,0 0,1.190624 -0.79375,0 0,-3.174999 0.79375,0 0,1.190624 2.38125,0 0,-0.396875 z" />
+  <text
+     y="8.4666691"
+     x="36.159714"
+     id="text558"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan556"
+       y="14.022921"
+       x="41.319092">0</tspan>
+  </text>
+  <path
+     id="path564"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,28.773438 0,-1.5875 c 0,-0.876752 0.710748,-1.587501 1.5875,-1.587501 l 1.5875,0 0,0.793751 3.96875,0 0,-0.793751 28.4990785,0 1.5875,0 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 l 0,1.5875 -1.5875,0 0,-1.190626 -1.5875,0 0,3.96875 1.5875,0 0,-1.190624 1.5875,0 0,1.587499 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 l -1.5875,0 -28.4990785,0 -0.39688,0 0,0.793751 -3.175,0 0,-0.793751 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710748 -1.5875,-1.5875 l 0,-1.587499 z" />
+  <text
+     y="25.400003"
+     x="11.288879"
+     id="text568"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan566"
+       y="30.956251"
+       x="35.101379">色のこさをせってい</tspan>
+  </text>
+  <text
+     y="25.400003"
+     x="11.288879"
+     id="text572"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan570"
+       y="30.1625"
+       x="35.101379" />
+  </text>
+  <path
+     id="path578"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 39.533156,25.598437 23.8125,0 0,7.9375 -23.8125,0 0,-3.174999 0,-0.396876 -2.38125,0 0,1.190626 -0.79375,0 0,-3.175001 0.79375,0 0,1.190626 2.38125,0 0,-0.396875 z" />
+  <text
+     y="25.400003"
+     x="36.159714"
+     id="text582"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan580"
+       y="30.956251"
+       x="41.319092">50</tspan>
+  </text>
+  <path
+     id="path588"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,3.3734375 0,-1.5875 c 0,-0.87675204 0.710748,-1.5875 1.5875,-1.5875 l 1.5875,0 0,0.79375 3.96875,0 0,-0.79375 18.8781345,0 1.5875,0 c 0.876752,0 0.743493,1.3501232 1.5875,1.5875 l 0,1.5875 -1.5875,0 0,-1.190625 -1.5875,0 0,3.96875 1.5875,0 0,-1.190625 1.5875,0 0,1.587501 c 0,0.8767516 -2.464252,1.587499 -1.5875,1.587499 l -1.5875,0 -18.8781345,0 -0.39688,0 0,0.79375 -3.175,0 0,-0.79375 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.7107474 -1.5875,-1.587499 l 0,-1.587501 z" />
+  <text
+     y="1.6156721e-06"
+     x="-1.0063649e-05"
+     id="text592"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan590"
+       y="5.556253"
+       x="19.84374">前へ進む</tspan>
+  </text>
+  <text
+     y="1.6156721e-06"
+     x="11.288879"
+     id="text596"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan594"
+       y="4.7624984"
+       x="31.132629" />
+  </text>
   <g
-     transform="translate(199.2407,90.075967)"
-     id="layer1">
+     transform="translate(5.644442,4.9701977e-7)"
+     id="g3488">
     <path
-       id="path540"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-78.235863 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -17.21019 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.587501 z" />
-    <text
-       y="-81.609299"
-       x="-199.24071"
-       id="text544"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan542"
-         y="-76.053047"
-         x="-175.42821">色のこさをせってい</tspan>
-    </text>
-    <text
-       y="-81.609299"
-       x="-199.24071"
-       id="text548"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan546"
-         y="-76.846802"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path554"
+       d="m 24.27552,0.198437 23.8125,0 0,7.9375 -23.8125,0 0,-3.175 0,-0.396874 -2.38125,0 0,1.190624 -0.79375,0 0,-3.174999 0.79375,0 0,1.190624 2.38125,0 0,-0.396875 z"
        style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-81.410863 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
+       id="path602" />
     <text
-       y="-81.609299"
-       x="-174.36987"
-       id="text558"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan556"
-         y="-76.053047"
-         x="-169.21049">0</tspan>
-    </text>
-    <path
-       id="path564"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-61.302529 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -17.21019 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.587499 z" />
-    <text
-       y="-64.675964"
-       x="-199.24071"
-       id="text568"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan566"
-         y="-59.119717"
-         x="-175.42821">色のこさをせってい</tspan>
-    </text>
-    <text
-       y="-64.675964"
-       x="-199.24071"
-       id="text572"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan570"
-         y="-59.913467"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path578"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-64.47753 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396876 h -2.38125 v 1.190626 h -0.79375 v -3.175001 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
-    <text
-       y="-64.675964"
-       x="-174.36987"
-       id="text582"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan580"
-         y="-59.119717"
-         x="-169.21049">50</tspan>
-    </text>
-    <path
-       id="path588"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-86.70253 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.587501 z" />
-    <text
-       y="-90.075966"
-       x="-199.24071"
-       id="text592"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan590"
-         y="-84.519714"
-         x="-179.39696">前へ進む</tspan>
-    </text>
-    <text
-       y="-90.075966"
-       x="-199.24071"
-       id="text596"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan594"
-         y="-85.313469"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path602"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-89.87753 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
-    <text
-       y="-90.075966"
-       x="-178.33862"
+       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
        id="text606"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+       x="20.902077"
+       y="1.1186523e-06">
       <tspan
-         style="stroke-width:0.39687499"
+         x="26.061455"
+         y="5.5562525"
          id="tspan604"
-         y="-84.519714"
-         x="-173.17924">百</tspan>
-    </text>
-    <path
-       id="path612"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-69.769197 v -1.587499 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.587499 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.5875 z" />
-    <text
-       y="-73.142632"
-       x="-199.24071"
-       id="text616"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan614"
-         y="-67.586388"
-         x="-179.39696">前へ進む</tspan>
-    </text>
-    <text
-       y="-73.142632"
-       x="-199.24071"
-       id="text620"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan618"
-         y="-68.380135"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path626"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-72.944197 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396876 z" />
-    <text
-       y="-73.142632"
-       x="-178.33862"
-       id="text630"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan628"
-         y="-67.586388"
-         x="-173.17924">百</tspan>
-    </text>
-    <path
-       id="path636"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-52.835862 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.5875 z" />
-    <text
-       y="-56.209301"
-       x="-199.24071"
-       id="text640"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan638"
-         y="-50.653049"
-         x="-179.39696">前へ進む</tspan>
-    </text>
-    <text
-       y="-56.209301"
-       x="-199.24071"
-       id="text644"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan642"
-         y="-51.4468"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path650"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-56.010863 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z" />
-    <text
-       y="-56.209301"
-       x="-178.33862"
-       id="text654"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan652"
-         y="-50.653049"
-         x="-173.17924">百</tspan>
-    </text>
-    <path
-       id="path660"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-44.369196 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -17.21019 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z" />
-    <text
-       y="-47.742634"
-       x="-199.24071"
-       id="text664"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan662"
-         y="-42.186382"
-         x="-175.42821">色のこさをせってい</tspan>
-    </text>
-    <text
-       y="-47.742634"
-       x="-199.24071"
-       id="text668"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan666"
-         y="-42.980133"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path674"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-47.544197 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
-    <text
-       y="-47.742634"
-       x="-174.36987"
-       id="text678"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan676"
-         y="-42.186382"
-         x="-169.21049">百</tspan>
+         style="stroke-width:0.39687499">100</tspan>
     </text>
   </g>
+  <path
+     id="path612"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,20.30677 0,-1.587499 c 0,-0.876752 0.710748,-1.587501 1.5875,-1.587501 l 1.5875,0 0,0.793751 3.96875,0 0,-0.793751 18.8781345,0 1.5875,0 c 0.876752,0 0.743493,1.350124 1.5875,1.587501 l 0,1.587499 -1.5875,0 0,-1.190625 -1.5875,0 0,3.96875 1.5875,0 0,-1.190624 1.5875,0 0,1.5875 c 0,0.876752 -0.710748,1.587499 -1.5875,1.587499 l -1.5875,0 -18.8781345,0 -0.39688,0 0,0.793751 -3.175,0 0,-0.793751 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710747 -1.5875,-1.587499 l 0,-1.5875 z" />
+  <text
+     y="16.933336"
+     x="-1.0063649e-05"
+     id="text616"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan614"
+       y="22.48958"
+       x="19.84374">前へ進む</tspan>
+  </text>
+  <text
+     y="16.933336"
+     x="11.288879"
+     id="text620"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan618"
+       y="21.695833"
+       x="31.132629" />
+  </text>
+  <g
+     transform="translate(-2.5029802e-6,4.9701977e-7)"
+     id="g3502">
+    <path
+       d="m 29.919964,17.13177 23.8125,0 0,7.9375 -23.8125,0 0,-3.174999 0,-0.396875 -2.38125,0 0,1.190625 -0.79375,0 0,-3.175 0.79375,0 0,1.190625 2.38125,0 0,-0.396876 z"
+       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       id="path626" />
+    <text
+       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+       id="text630"
+       x="26.546522"
+       y="16.933336">
+      <tspan
+         x="31.7059"
+         y="22.48958"
+         id="tspan628"
+         style="stroke-width:0.39687499">100</tspan>
+    </text>
+  </g>
+  <path
+     id="path636"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,37.240105 0,-1.5875 c 0,-0.876752 0.710748,-1.587501 1.5875,-1.587501 l 1.5875,0 0,0.793751 3.96875,0 0,-0.793751 18.8781345,0 1.5875,0 c 0.876752,0 0.743493,1.350124 1.5875,1.587501 l 0,1.5875 -1.5875,0 0,-1.190626 -1.5875,0 0,3.96875 1.5875,0 0,-1.190624 1.5875,0 0,1.5875 c 0,0.876752 -2.464252,1.587499 -1.5875,1.587499 l -1.5875,0 -18.8781345,0 -0.39688,0 0,0.793751 -3.175,0 0,-0.793751 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710747 -1.5875,-1.587499 l 0,-1.5875 z" />
+  <text
+     y="33.866665"
+     x="-1.0063649e-05"
+     id="text640"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan638"
+       y="39.422916"
+       x="19.84374">前へ進む</tspan>
+  </text>
+  <text
+     y="33.866665"
+     x="11.288879"
+     id="text644"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan642"
+       y="38.629166"
+       x="31.132629" />
+  </text>
+  <g
+     transform="translate(5.644442,4.9701977e-7)"
+     id="g3478">
+    <path
+       d="m 24.27552,34.065104 23.8125,0 0,7.9375 -23.8125,0 0,-3.174999 0,-0.396875 -2.38125,0 0,1.190625 -0.79375,0 0,-3.175 0.79375,0 0,1.190625 2.38125,0 0,-0.396875 z"
+       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+       id="path650" />
+    <text
+       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+       id="text654"
+       x="20.902077"
+       y="33.866665">
+      <tspan
+         x="26.061455"
+         y="39.422916"
+         id="tspan652"
+         style="stroke-width:0.39687499">100</tspan>
+    </text>
+  </g>
+  <path
+     id="path660"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.1984375,45.706771 0,-1.5875 c 0,-0.876752 0.710748,-1.587501 1.5875,-1.587501 l 1.5875,0 0,0.79375 3.96875,0 0,-0.79375 28.4990785,0 1.5875,0 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 l 0,1.5875 -1.5875,0 0,-1.190626 -1.5875,0 0,3.96875 1.5875,0 0,-1.190625 1.5875,0 0,1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 l -1.5875,0 -28.4990785,0 -0.39688,0 0,0.79375 -3.175,0 0,-0.79375 -0.39687,0 -1.5875,0 c -0.876752,0 -1.5875,-0.710748 -1.5875,-1.5875 l 0,-1.5875 z" />
+  <text
+     y="42.333332"
+     x="11.288879"
+     id="text664"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan662"
+       y="47.889584"
+       x="35.101379">色のこさをせってい</tspan>
+  </text>
+  <text
+     y="42.333332"
+     x="11.288879"
+     id="text668"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan666"
+       y="47.095833"
+       x="35.101379" />
+  </text>
+  <path
+     id="path674"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 39.533156,42.53177 23.8125,0 0,7.9375 -23.8125,0 0,-3.175 0,-0.396875 -2.38125,0 0,1.190625 -0.79375,0 0,-3.175 0.79375,0 0,1.190626 2.38125,0 0,-0.396875 z" />
+  <text
+     y="42.333332"
+     x="36.159714"
+     id="text678"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan676"
+       y="47.889584"
+       x="41.319092">100</tspan>
+  </text>
 </svg>

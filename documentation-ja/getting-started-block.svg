@@ -7,8 +7,8 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg1513"
    version="1.1"
-   height="777.6666657924652"
-   width="365.666663646698">
+   height="774.84308"
+   width="349.50003">
   <metadata
      id="metadata1519">
     <rdf:RDF>
@@ -23,17 +23,8 @@
   </metadata>
   <defs
      id="defs1517" />
-  <rect
-     class=""
-     style=""
-     stroke="none"
-     fill="none"
-     y="0"
-     x="0"
-     height="100%"
-     width="100%"
-     id="backgroundrect" />
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_1">
     <g
@@ -183,6 +174,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_15">
     <g
@@ -212,7 +204,7 @@
           <tspan
              id="svg_22"
              y="-46.666668"
-             x="-119.44445">値</tspan>
+             x="-119.44445">長さ</tspan>
         </text>
       </g>
     </g>
@@ -258,6 +250,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_30">
     <g
@@ -290,6 +283,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_39">
     <g
@@ -312,6 +306,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_44">
     <g
@@ -334,6 +329,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_49">
     <g
@@ -358,42 +354,42 @@
   <path
      id="svg_56"
      style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
-     d="m 49.08334,151.75 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
+     d="m 42.750027,150.17154 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69.000003 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69.000003 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
   <text
-     x="72.333313"
-     y="139"
+     x="66"
+     y="137.42154"
      id="svg_57"
      style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_58"
-       y="175"
-       x="141.33331">音の高さ</tspan>
+       y="173.42154"
+       x="135">音の高さ</tspan>
   </text>
   <text
-     x="72.333313"
-     y="139"
+     x="66"
+     y="137.42154"
      id="svg_59"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_60"
-       y="157"
-       x="141.33331">名前</tspan>
+       y="155.42154"
+       x="135">名前</tspan>
   </text>
   <text
-     x="72.333313"
-     y="139"
+     x="66"
+     y="137.42154"
      id="svg_61"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_62"
-       y="188.5"
-       x="141.33331">オクターヴの高さ</tspan>
+       y="186.92154"
+       x="135">オクターヴの高さ</tspan>
   </text>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_63">
     <g
@@ -416,7 +412,7 @@
     </g>
   </g>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_68">
     <g
@@ -439,6 +435,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_73">
     <g
@@ -447,7 +444,7 @@
       <path
          id="svg_75"
          style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m -203.94444,-50.166668 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -36 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 399.000008 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+         d="m -203.94444,-50.166668 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 49.33333 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -49.33333 -1 v 2 h -8 v -2 h -1 -4 c -2.76142,0 -5,2.238576 -5,5 v 4 4 399.000008 4 c 0,2.76142 2.23858,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z" />
       <text
          x="-204.44446"
          y="-58.666668"
@@ -467,7 +464,8 @@
   </g>
   <g
      class=""
-     id="svg_80">
+     id="svg_80"
+     transform="translate(13.666687,-1.5784605)">
     <g
        id="svg_81"
        transform="matrix(1.5,0,0,1.5,423,131)">
@@ -488,6 +486,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_85">
     <g
@@ -517,7 +516,7 @@
           <tspan
              id="svg_92"
              y="-46.666668"
-             x="-119.44445">値</tspan>
+             x="-119.44445">長さ</tspan>
         </text>
       </g>
     </g>
@@ -563,6 +562,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_100">
     <g
@@ -595,6 +595,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_109">
     <g
@@ -617,6 +618,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_114">
     <g
@@ -639,6 +641,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_119">
     <g
@@ -663,42 +666,42 @@
   <path
      id="svg_126"
      style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
-     d="m 49.08334,309.75 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
+     d="m 42.750027,308.17154 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69.000003 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69.000003 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
   <text
-     x="72.333313"
-     y="297"
+     x="66"
+     y="295.42154"
      id="svg_127"
      style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_128"
-       y="333"
-       x="141.33331">音の高さ</tspan>
+       y="331.42154"
+       x="135">音の高さ</tspan>
   </text>
   <text
-     x="72.333313"
-     y="297"
+     x="66"
+     y="295.42154"
      id="svg_129"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_130"
-       y="315"
-       x="141.33331">名前</tspan>
+       y="313.42154"
+       x="135">名前</tspan>
   </text>
   <text
-     x="72.333313"
-     y="297"
+     x="66"
+     y="295.42154"
      id="svg_131"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_132"
-       y="346.5"
-       x="141.33331">オクターヴの高さ</tspan>
+       y="344.92154"
+       x="135">オクターヴの高さ</tspan>
   </text>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_133">
     <g
@@ -721,7 +724,7 @@
     </g>
   </g>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_138">
     <g
@@ -744,6 +747,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_143">
     <g
@@ -773,7 +777,7 @@
           <tspan
              id="svg_150"
              y="-46.666668"
-             x="-119.44445">値</tspan>
+             x="-119.44445">長さ</tspan>
         </text>
       </g>
     </g>
@@ -819,6 +823,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_158">
     <g
@@ -851,6 +856,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_167">
     <g
@@ -873,6 +879,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_172">
     <g
@@ -895,6 +902,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_177">
     <g
@@ -919,42 +927,42 @@
   <path
      id="svg_184"
      style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
-     d="m 49.08334,467.75 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
+     d="m 42.750027,466.17154 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69.000003 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69.000003 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
   <text
-     x="72.333313"
-     y="455"
+     x="66"
+     y="453.42154"
      id="svg_185"
      style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_186"
-       y="491"
-       x="141.33331">音の高さ</tspan>
+       y="489.42154"
+       x="135">音の高さ</tspan>
   </text>
   <text
-     x="72.333313"
-     y="455"
+     x="66"
+     y="453.42154"
      id="svg_187"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_188"
-       y="473"
-       x="141.33331">名前</tspan>
+       y="471.42154"
+       x="135">名前</tspan>
   </text>
   <text
-     x="72.333313"
-     y="455"
+     x="66"
+     y="453.42154"
      id="svg_189"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_190"
-       y="504.5"
-       x="141.33331">オクターヴの高さ</tspan>
+       y="502.92154"
+       x="135">オクターヴの高さ</tspan>
   </text>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_191">
     <g
@@ -977,7 +985,7 @@
     </g>
   </g>
   <g
-     transform="translate(24)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_196">
     <g
@@ -1000,6 +1008,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_201">
     <g
@@ -1029,7 +1038,7 @@
           <tspan
              id="svg_208"
              y="-46.666668"
-             x="-119.44445">値</tspan>
+             x="-119.44445">長さ</tspan>
         </text>
       </g>
     </g>
@@ -1075,6 +1084,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_216">
     <g
@@ -1107,6 +1117,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_225">
     <g
@@ -1129,6 +1140,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_230">
     <g
@@ -1151,6 +1163,7 @@
     </g>
   </g>
   <g
+     transform="translate(-6.333313,-1.5784605)"
      class=""
      id="svg_235">
     <g
@@ -1175,42 +1188,42 @@
   <path
      id="svg_242"
      style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
-     d="m 49.08334,625.75 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
+     d="m 42.750027,624.17154 v -6 c 0,-3.31371 2.68629,-6 6,-6 h 6 v 3 h 15 v -3 h 69.000003 6 c 3.31371,0 7.04789,2.85634 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69.000003 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 -31.5 z" />
   <text
-     x="70.333313"
-     y="613"
+     x="64"
+     y="611.42157"
      id="svg_243"
      style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_244"
-       y="649"
-       x="139.33331">音の高さ</tspan>
+       y="647.42157"
+       x="133">音の高さ</tspan>
   </text>
   <text
-     x="70.333313"
-     y="613"
+     x="64"
+     y="611.42157"
      id="svg_245"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_246"
-       y="631"
-       x="139.33331">名前</tspan>
+       y="629.42157"
+       x="133">名前</tspan>
   </text>
   <text
-     x="70.333313"
-     y="613"
+     x="64"
+     y="611.42157"
      id="svg_247"
      style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5">
     <tspan
        style="stroke-width:1.5"
        id="svg_248"
-       y="662.5"
-       x="139.33331">オクターヴの高さ</tspan>
+       y="660.92157"
+       x="133">オクターヴの高さ</tspan>
   </text>
   <g
-     transform="translate(22)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_249">
     <g
@@ -1233,7 +1246,7 @@
     </g>
   </g>
   <g
-     transform="translate(22)"
+     transform="translate(17.666687,-1.5784605)"
      class=""
      id="svg_254">
     <g

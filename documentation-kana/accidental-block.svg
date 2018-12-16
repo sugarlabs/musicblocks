@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3045"
+   version="1.1"
+   viewBox="0 0 88.7677 59.134373"
+   height="59.134373mm"
+   width="88.7677mm">
+  <defs
+     id="defs3039" />
+  <metadata
+     id="metadata3042">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     d="m 0.1984375,3.3734375 v -1.5875 c 0,-0.87675204 0.71074796,-1.5875 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 3.5718755 16.018919 1.5875 c 0.876752,0 1.5875,0.71074796 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 h -1.5875 -16.018919 -0.396876 v 0.79375 H 7.3421875 v -0.79375 h -0.396875 -1.5875 c -1.0959399,0 -1.9843747,0.8884346 -1.984375,1.9843745 v 1.5875 1.587501 33.337499 1.5875 c 0,1.09594 0.8884349,1.984375 1.984375,1.984375 h 1.5875 v 0.79375 h 3.9687505 v -0.79375 h 3.174999 v 2.38125 2.38125 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 H 10.914063 7.3421875 6.9453125 v 0.79375 h -3.175 v -0.79375 h -0.396875 -1.5875 c -0.87675204,0 -1.5875,-0.710748 -1.5875,-1.5875 v -1.5875 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1052" />
+  <text
+     x="2.3445716e-08"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1056">
+    <tspan
+       x="1.984375"
+       y="5.953125"
+       id="tspan1054"
+       style="stroke-width:0.39687499">へんかきごう</tspan>
+  </text>
+  <text
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1060">
+    <tspan
+       x="23.8125"
+       y="4.7624998"
+       id="tspan1058"
+       style="stroke-width:0.39687499" />
+  </text>
+  <g
+     transform="matrix(0.396875,0,0,0.396875,3.7041616,8.4666656)"
+     id="g1076">
+    <path
+       d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+       style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+       id="path1066" />
+    <text
+       style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+       id="text1070">
+      <tspan
+         x="20"
+         y="15"
+         id="tspan1068">おんぷ</tspan>
+    </text>
+    <text
+       style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
+       id="text1074">
+      <tspan
+         x="85"
+         y="12"
+         id="tspan1072">ながさ</tspan>
+    </text>
+  </g>
+  <g
+     style="isolation:isolate"
+     id="g1094"
+     transform="matrix(0.13229166,0,0,0.13229166,3.7041616,9.524999)">
+    <g
+       id="g1092"
+       data-name="レイヤー 2">
+      <g
+         id="g1090">
+        <rect
+           y="0"
+           x="0"
+           width="42"
+           height="42"
+           rx="5"
+           ry="5"
+           style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+           id="rect1080" />
+        <path
+           d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+           style="fill:#ffffff"
+           id="path1082" />
+        <path
+           d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+           style="fill:#ffffff"
+           id="path1084" />
+        <path
+           d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+           style="fill:#ffffff"
+           id="path1086" />
+        <path
+           d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+           style="fill:#ffffff"
+           id="path1088" />
+      </g>
+    </g>
+  </g>
+  <path
+     d="m 42.002608,11.840108 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875005 h 1.587499 3.96875 11.90625 1.5875 a 1.5875,1.5875 0 0 1 1.587501,1.5875005 v 1.5875 h -1.587501 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.587501 v 6.746874 h -1.587501 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.587501 v 1.587499 a 1.5875,1.5875 0 0 1 -1.587501,1.5875 h -1.5875 -11.90625 -3.96875 -1.587499 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.587499 -8.334375 -0.396876 h -2.38125 v 1.190626 h -0.793751 v -3.175 h 0.793751 v 1.190625 h 2.38125 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1100" />
+  <text
+     style="font-size:3.5718751px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1104"
+     x="38.629169"
+     y="8.46667">
+    <tspan
+       x="60.060421"
+       y="17.594795"
+       id="tspan1102"
+       style="stroke-width:0.39687499">➗</tspan>
+  </text>
+  <text
+     style="font-size:2.3812499px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1108"
+     x="38.629169"
+     y="8.46667">
+    <tspan
+       x="60.060421"
+       y="13.22917"
+       id="tspan1106"
+       style="stroke-width:0.39687499" />
+  </text>
+  <text
+     style="font-size:2.3812499px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1112"
+     x="38.629169"
+     y="8.46667">
+    <tspan
+       x="60.060421"
+       y="21.563545"
+       id="tspan1110"
+       style="stroke-width:0.39687499" />
+  </text>
+  <path
+     d="m 64.756765,8.6651075 h 23.8125 v 7.9374995 h -23.8125 v -3.174999 -0.396876 h -2.38125 v 1.190626 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1118" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1122"
+     x="61.383327"
+     y="8.46667">
+    <tspan
+       x="66.542702"
+       y="14.02292"
+       id="tspan1120"
+       style="stroke-width:0.39687499">1</tspan>
+  </text>
+  <path
+     d="m 64.756765,17.131768 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396876 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1128" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1132"
+     x="61.383327"
+     y="16.933331">
+    <tspan
+       x="66.542702"
+       y="22.48958"
+       id="tspan1130"
+       style="stroke-width:0.39687499">4</tspan>
+  </text>
+  <path
+     d="m 7.6067675,20.306767 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587499 h 1.5875005 v 0.79375 h 3.96875 v -0.79375 h 7.937499 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587499 v 1.5875 1.587501 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.587501 h -1.5875 -7.937499 -0.396876 v 0.79375 h -3.174999 v -0.79375 H 10.781768 9.1942675 a 1.5875,1.5875 0 0 1 -1.5875,-1.587501 v -1.587499 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1138" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1142"
+     x="7.40833"
+     y="16.933331">
+    <tspan
+       x="21.695829"
+       y="22.48958"
+       id="tspan1140"
+       style="stroke-width:0.39687499">↓</tspan>
+  </text>
+  <path
+     d="m 7.6067675,28.773437 v -1.5875 c 0,-0.876752 0.710748,-1.5875 1.5875,-1.5875 h 1.5875005 v 0.79375 h 3.96875 v -0.79375 H 37.2401 38.8276 c 0.876752,0 1.864754,0.75574 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 6.746875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 H 37.2401 14.750518 14.353642 v 0.79375 h -3.174999 v -0.79375 H 10.781768 9.1942675 c -0.876752,0 -1.5875,-0.710748 -1.5875,-1.5875 v -1.5875 -8.334375 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1148" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1152"
+     x="17.991659"
+     y="25.4">
+    <tspan
+       x="36.247921"
+       y="34.924999"
+       id="tspan1150"
+       style="stroke-width:0.39687499">おとの たかさ</tspan>
+  </text>
+  <text
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1156"
+     x="17.991659"
+     y="25.4">
+    <tspan
+       x="36.247921"
+       y="30.1625"
+       id="tspan1154"
+       style="stroke-width:0.39687499">なまえ</tspan>
+  </text>
+  <text
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499"
+     id="text1160"
+     x="17.991659"
+     y="25.4">
+    <tspan
+       x="36.247921"
+       y="38.496876"
+       id="tspan1158"
+       style="stroke-width:0.39687499">オクターヴの たかさ</tspan>
+  </text>
+  <path
+     d="m 40.944277,25.598437 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.793749 v -3.175 h 0.793749 v 1.190625 h 2.38125 v -0.396875 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1166" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1170"
+     x="37.570843"
+     y="25.4">
+    <tspan
+       x="42.730217"
+       y="30.956249"
+       id="tspan1168"
+       style="stroke-width:0.39687499">ソ</tspan>
+  </text>
+  <path
+     d="m 40.944277,34.065112 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190626 h -0.793749 v -3.175001 h 0.793749 v 1.190626 h 2.38125 v -0.396875 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1176" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1180"
+     x="37.570843"
+     y="33.866676">
+    <tspan
+       x="42.730217"
+       y="39.422924"
+       id="tspan1178"
+       style="stroke-width:0.39687499">4</tspan>
+  </text>
+  <path
+     d="m 30.625525,0.1984375 h 43.65625 v 7.9375 h -43.65625 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     id="path1186" />
+  <text
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499"
+     id="text1190"
+     x="27.252089">
+    <tspan
+       x="32.411461"
+       y="5.5562501"
+       id="tspan1188"
+       style="stroke-width:0.39687499">フラット（変）♭</tspan>
+  </text>
+</svg>

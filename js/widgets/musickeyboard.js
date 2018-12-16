@@ -366,7 +366,7 @@ function MusicKeyboard() {
 
     this._save = function(pitches) {
         console.log('generating keyboard pitches for: ' + pitches);
-        var newStack = [[0, ['action', {'collapsed':false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value':'chunk'}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed':false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         for (var i = 0; i < pitches.length; i++) {
             // Could be a note or a frequency.

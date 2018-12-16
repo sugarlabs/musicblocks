@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg11666"
+   width="86.432922mm"
+   height="88.329308mm"
+   viewBox="0 0 86.432923 88.329307"
    version="1.1"
-   viewBox="0 0 80.788483 88.329315"
-   height="88.329315mm"
-   width="80.788483mm">
+   id="svg11666">
   <defs
      id="defs11660" />
   <metadata
@@ -25,434 +25,427 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(385.14529,57.337502)"
-     id="layer1">
+     id="g3576"
+     transform="matrix(0.26458333,0,0,0.26458333,3.5718704,44.164656)">
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,-803.9807,-42.326098)"
-       id="g10902">
+       id="g3574"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3564"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 0,-4 c 0,-2.209139 1.790861,-4 4,-4 l 4,0 0,2 10,0 0,-2 9,0 57.345812,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -57.345812,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.761424,0 -5,2.238576 -5,5 l 0,4 0,4 0,21 0,4 c 0,2.761424 2.238576,5 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -9,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.209139,0 -4,-1.790861 -4,-4 l 0,-4 z" />
+      <text
+         id="text3568"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3566"
+           y="15"
+           x="5">ドラムをせってい</tspan>
+      </text>
+      <text
+         id="text3572"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3570"
+           y="12"
+           x="54" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3587"
+     transform="matrix(0.26458333,0,0,0.26458333,37.443502,44.164656)">
+    <g
+       id="g3584"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3578"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 110,0 0,20 -110,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3582"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3580"
+           y="14"
+           x="13">キックドラム</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3605"
+     transform="matrix(0.26458333,0,0,0.26458333,12.78819,52.499031)">
+    <g
+       id="g3603"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3589"
+         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -13.722222,8.5 0,-4 c 0,-2.209139 1.790861,-4 3.9999995,-4 l 4,0 0,2 10,0 0,-2 54.7837455,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -54.7837455,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.2091385,0 -3.9999995,-1.790861 -3.9999995,-4 l 0,-4 0,-21 z" />
+      <text
+         id="text3593"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3591"
+           y="24"
+           x="57">音符（かけ算）</tspan>
+      </text>
+      <text
+         id="text3597"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3595"
+           y="12"
+           x="57">音符の数</tspan>
+      </text>
+      <text
+         id="text3601"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3599"
+           y="33"
+           x="57">音の長さ</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3615"
+     transform="matrix(0.26458333,0,0,0.26458333,36.426674,52.499031)">
+    <g
+       id="g3613"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3607"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3611"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3609"
+           y="14"
+           x="13">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3633"
+     transform="matrix(0.26458333,0,0,0.26458333,36.426674,60.833406)">
+    <g
+       id="g3631"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3617"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 10,0 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -10,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 z" />
+      <text
+         id="text3621"
+         style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3619"
+           y="23"
+           x="54">➗</tspan>
+      </text>
+      <text
+         id="text3625"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3623"
+           y="12"
+           x="54" />
+      </text>
+      <text
+         id="text3629"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3627"
+           y="33"
+           x="54" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3643"
+     transform="matrix(0.26458333,0,0,0.26458333,59.048548,60.833406)">
+    <g
+       id="g3641"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3635"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3639"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3637"
+           y="14"
+           x="13">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3653"
+     transform="matrix(0.26458333,0,0,0.26458333,59.048548,69.16778)">
+    <g
+       id="g3651"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3645"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3649"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3647"
+           y="14"
+           x="13">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.26458333,0,0,0.26458333,-418.83541,15.011404)"
+     id="g3683">
+    <g
+       id="g3663"
+       transform="translate(1583,-56.314477)">
       <g
-         transform="translate(1596.5,110.18552)"
-         id="g3576">
-        <g
-           transform="scale(1.5)"
-           id="g3574">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 28.901367 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 21 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-             style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3564" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3568">
-            <tspan
-               x="5"
-               y="15"
-               id="tspan3566">ドラムを設定</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3572">
-            <tspan
-               x="54"
-               y="12"
-               id="tspan3570" />
-          </text>
-        </g>
+         id="g3661"
+         transform="scale(1.5,1.5)">
+        <path
+           id="path3655"
+           style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           d="m 0.5,14.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 5,-6 5,6 9,0 71.123047,0 4.000003,0 a 4,4 90 0 1 4,4 l 0,4 0,4 0,4 a 4,4 90 0 1 -4,4 l -4.000003,0 -71.123047,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 a 5,5 90 0 0 -5,5 l 0,4 0,4 0,147 0,4 a 5,5 90 0 0 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 a 4,4 90 0 1 -4,4 l -4,0 -9,0 -5,6 -5,-6 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 z" />
+        <text
+           id="text3659"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+          <tspan
+             id="tspan3657"
+             y="22"
+             x="20">リズムメーカー</tspan>
+        </text>
       </g>
+    </g>
+    <g
+       id="g3681"
+       transform="matrix(0.5,0,0,0.5,1583,-44.314477)">
       <g
-         transform="translate(1681.8521,110.18552)"
-         id="g3587">
+         id="g3679"
+         style="isolation:isolate">
         <g
-           transform="scale(1.5)"
-           id="g3584">
-          <path
-             d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3578" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3582">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3580">キックドラム</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1610,141.68552)"
-         id="g3605">
-        <g
-           transform="scale(1.5)"
-           id="g3603">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40.561523 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-             style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3589" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3593">
-            <tspan
-               x="57"
-               y="24"
-               id="tspan3591">リズム</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3597">
-            <tspan
-               x="57"
-               y="12"
-               id="tspan3595">音符の数</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3601">
-            <tspan
-               x="57"
-               y="33"
-               id="tspan3599">音価</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1699.3423,141.68552)"
-         id="g3615">
-        <g
-           transform="scale(1.5)"
-           id="g3613">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3607" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3611">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3609">1</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1699.3423,173.18552)"
-         id="g3633">
-        <g
-           transform="scale(1.5)"
-           id="g3631">
-          <path
-             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3617" />
-          <text
-             style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3621">
-            <tspan
-               x="54"
-               y="23"
-               id="tspan3619">➗</tspan>
-          </text>
-          <text
-             style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3625">
-            <tspan
-               x="54"
-               y="12"
-               id="tspan3623" />
-          </text>
-          <text
-             style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3629">
-            <tspan
-               x="54"
-               y="33"
-               id="tspan3627" />
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1784.8423,173.18552)"
-         id="g3643">
-        <g
-           transform="scale(1.5)"
-           id="g3641">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3635" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3639">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3637">1</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1784.8423,204.68552)"
-         id="g3653">
-        <g
-           transform="scale(1.5)"
-           id="g3651">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3645" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3649">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3647">1</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         id="g3683">
-        <g
-           transform="translate(1583,-56.314477)"
-           id="g3663">
+           data-name="レイヤー 2"
+           id="g3677">
           <g
-             transform="scale(1.5)"
-             id="g3661">
+             id="g3675">
+            <rect
+               id="rect3665"
+               style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+               ry="5"
+               rx="5"
+               height="42"
+               width="42"
+               x="0"
+               y="0" />
             <path
-               d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 71.123047 4.000003 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 H 98.623047 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 147 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
-               style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-               id="path3655" />
-            <text
-               style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-               id="text3659">
-              <tspan
-                 x="20"
-                 y="22"
-                 id="tspan3657">リズムルーラー</tspan>
-            </text>
-          </g>
-        </g>
-        <g
-           transform="matrix(0.5,0,0,0.5,1583,-44.314477)"
-           id="g3681">
-          <g
-             style="isolation:isolate"
-             id="g3679">
-            <g
-               id="g3677"
-               data-name="レイヤー 2">
-              <g
-                 id="g3675">
-                <rect
-                   y="0"
-                   x="0"
-                   width="42"
-                   height="42"
-                   rx="5"
-                   ry="5"
-                   style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
-                   id="rect3665" />
-                <path
-                   d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
-                   style="fill:#ffffff"
-                   id="path3667" />
-                <path
-                   d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
-                   style="fill:#ffffff"
-                   id="path3669" />
-                <path
-                   d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
-                   style="fill:#ffffff"
-                   id="path3671" />
-                <path
-                   d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
-                   style="fill:#ffffff"
-                   id="path3673" />
-              </g>
-            </g>
+               id="path3667"
+               style="fill:#ffffff"
+               d="m 30.56,29.8 -4.17,-4.16 2.26,0 a 1.035,1.035 0 1 0 0,-2.07 l -4.71,0 a 1.08,1.08 0 0 0 -1.11,1 l 0,0 c 0,0 0,0 0,0.06 l 0,4.64 0,0 a 1.04,1.04 0 1 0 2.08,0 l 0,-2.19 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z" />
+            <path
+               id="path3669"
+               style="fill:#ffffff"
+               d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 l -4.71,0 a 1.035,1.035 0 1 0 0,2.07 l 2.25,0 -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 0,2.26 a 1.04,1.04 0 1 0 2.08,0 l 0,-4.64 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z" />
+            <path
+               id="path3671"
+               style="fill:#ffffff"
+               d="m 23.94,20.5 4.7,0 a 1.04,1.04 0 1 0 0,-2.08 l -2.25,0 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 l -4.19,4.21 0,-2.28 a 1.04,1.04 0 1 0 -2.08,0 l 0,4.64 a 0.43,0.43 0 0 0 0,0.05 l 0,0.05 a 1.09,1.09 0 0 0 1.11,1.04 z" />
+            <path
+               id="path3673"
+               style="fill:#ffffff"
+               d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 l 0,2.29 -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 -2.29,0 a 1.04,1.04 0 1 0 0,2.08 l 4.71,0 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 l 0,-4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z" />
           </g>
         </g>
       </g>
-      <g
-         transform="translate(1596.5,-15.814477)"
-         id="g3697">
-        <g
-           transform="scale(1.5)"
-           id="g3695">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 28.901367 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 21 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-             style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3685" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3689">
-            <tspan
-               x="5"
-               y="15"
-               id="tspan3687">ドラムを設定</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3693">
-            <tspan
-               x="54"
-               y="12"
-               id="tspan3691" />
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1681.8521,-15.814477)"
-         id="g3707">
-        <g
-           transform="scale(1.5)"
-           id="g3705">
-          <path
-             d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3699" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3703">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3701">スネアドラム</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1610,15.685523)"
-         id="g3725">
-        <g
-           transform="scale(1.5)"
-           id="g3723">
-          <path
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40.561523 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
-             style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3709" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3713">
-            <tspan
-               x="57"
-               y="24"
-               id="tspan3711">リズム</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3717">
-            <tspan
-               x="57"
-               y="12"
-               id="tspan3715">音符の数</tspan>
-          </text>
-          <text
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3721">
-            <tspan
-               x="57"
-               y="33"
-               id="tspan3719">音価</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1699.3423,15.685523)"
-         id="g3735">
-        <g
-           transform="scale(1.5)"
-           id="g3733">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3727" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3731">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3729">1</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1699.3423,47.185523)"
-         id="g3753">
-        <g
-           transform="scale(1.5)"
-           id="g3751">
-          <path
-             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3737" />
-          <text
-             style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3741">
-            <tspan
-               x="54"
-               y="23"
-               id="tspan3739">➗</tspan>
-          </text>
-          <text
-             style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3745">
-            <tspan
-               x="54"
-               y="12"
-               id="tspan3743" />
-          </text>
-          <text
-             style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
-             id="text3749">
-            <tspan
-               x="54"
-               y="33"
-               id="tspan3747" />
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1784.8423,47.185523)"
-         id="g3763">
-        <g
-           transform="scale(1.5)"
-           id="g3761">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3755" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3759">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3757">1</tspan>
-          </text>
-        </g>
-      </g>
-      <g
-         transform="translate(1784.8423,78.685523)"
-         id="g3773">
-        <g
-           transform="scale(1.5)"
-           id="g3771">
-          <path
-             d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-             style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             id="path3765" />
-          <text
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-             id="text3769">
-            <tspan
-               x="13"
-               y="14"
-               id="tspan3767">1</tspan>
-          </text>
-        </g>
-      </g>
+    </g>
+  </g>
+  <g
+     id="g3697"
+     transform="matrix(0.26458333,0,0,0.26458333,3.5718704,10.827157)">
+    <g
+       id="g3695"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3685"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 0,-4 c 0,-2.209139 1.790861,-4 4,-4 l 4,0 0,2 10,0 0,-2 9,0 57.345812,0 4,0 c 2.209139,0 6.12663,3.4018854 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -57.345812,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.761424,0 -5,2.238576 -5,5 l 0,4 0,4 0,21 0,4 c 0,2.761424 2.238576,5 5,5 l 4,0 0,2 10,0 0,-2 8,0 0,6 0,6 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -9,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.209139,0 -4,-1.790861 -4,-4 l 0,-4 z" />
+      <text
+         id="text3689"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3687"
+           y="15"
+           x="5">ドラムをせってい</tspan>
+      </text>
+      <text
+         id="text3693"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3691"
+           y="12"
+           x="54" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3707"
+     transform="matrix(0.26458333,0,0,0.26458333,37.443502,10.827157)">
+    <g
+       id="g3705"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3699"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 110,0 0,20 -110,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3703"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3701"
+           y="14"
+           x="13">スネアドラム</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3725"
+     transform="matrix(0.26458333,0,0,0.26458333,12.78819,19.161532)">
+    <g
+       id="g3723"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3709"
+         style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -13.722222,8.5 0,-4 c 0,-2.209139 1.790861,-4 3.9999995,-4 l 4,0 0,2 10,0 0,-2 54.7837455,0 4,0 c 2.209139,0 4,1.790861 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 c 0,2.209139 -1.790861,4 -4,4 l -4,0 -54.7837455,0 -1,0 0,2 -8,0 0,-2 -1,0 -4,0 c -2.2091385,0 -6.1266295,-3.401885 -3.9999995,-4 l 0,-4 0,-21 z" />
+      <text
+         id="text3713"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3711"
+           y="24"
+           x="57">音符（かけ算）</tspan>
+      </text>
+      <text
+         id="text3717"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3715"
+           y="12"
+           x="57">音符の数</tspan>
+      </text>
+      <text
+         id="text3721"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3719"
+           y="33"
+           x="57">音の長さ</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3735"
+     transform="matrix(0.26458333,0,0,0.26458333,36.426674,19.161532)">
+    <g
+       id="g3733"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3727"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3731"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3729"
+           y="14"
+           x="13">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3753"
+     transform="matrix(0.26458333,0,0,0.26458333,36.426674,27.495907)">
+    <g
+       id="g3751"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3737"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 0,-4 a 4,4 90 0 1 4,-4 l 4,0 10,0 30,0 4,0 a 4,4 90 0 1 4,4 l 0,4 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,4 a 4,4 90 0 1 -4,4 l -4,0 -30,0 -10,0 -4,0 a 4,4 90 0 1 -4,-4 l 0,-4 0,-21 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 z" />
+      <text
+         id="text3741"
+         style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3739"
+           y="23"
+           x="54">➗</tspan>
+      </text>
+      <text
+         id="text3745"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3743"
+           y="12"
+           x="54" />
+      </text>
+      <text
+         id="text3749"
+         style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan3747"
+           y="33"
+           x="54" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3763"
+     transform="matrix(0.26458333,0,0,0.26458333,59.048548,27.495907)">
+    <g
+       id="g3761"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3755"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3759"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3757"
+           y="14"
+           x="13">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g3773"
+     transform="matrix(0.26458333,0,0,0.26458333,59.048548,35.830282)">
+    <g
+       id="g3771"
+       transform="scale(1.5,1.5)">
+      <path
+         id="path3765"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 60,0 0,20 -60,0 0,-8 0,-1 -6,0 0,3 -2,0 0,-8 2,0 0,3 6,0 0,-1 z" />
+      <text
+         id="text3769"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan3767"
+           y="14"
+           x="13">1</tspan>
+      </text>
     </g>
   </g>
 </svg>

@@ -5,35 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg11666"
    version="1.1"
    viewBox="0 0 132.16984 67.468758"
    height="67.46875mm"
-   width="132.16985mm"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="scalar-transpose-block.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1278"
-     inkscape:window-height="773"
-     id="namedview112"
-     showgrid="false"
-     inkscape:zoom="1.417839"
-     inkscape:cx="234.15918"
-     inkscape:cy="119.53125"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg11666" />
+   width="132.16985mm">
   <defs
      id="defs11660" />
   <metadata
@@ -44,7 +20,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -80,7 +56,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan320">値</tspan>
+                 id="tspan320">長さ</tspan>
             </text>
           </g>
         </g>
@@ -237,7 +213,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan398">音高</tspan>
+               id="tspan398">音の高さ</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -253,7 +229,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan406">オクターヴ</tspan>
+               id="tspan406">オクターヴの高さ</tspan>
           </text>
         </g>
       </g>
@@ -313,7 +289,7 @@
             <tspan
                x="5"
                y="15"
-               id="tspan1560">音階内の移調 (+/–)</tspan>
+               id="tspan1560">調を変える(+/–)</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
