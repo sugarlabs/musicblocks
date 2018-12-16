@@ -2198,11 +2198,11 @@ msgstr "<h2>音の高さブロック</h2><br>音の高さをせっていする�
 
 #: js/turtledefs.js:237
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
-msgstr ""
+msgstr "<h2>音の高さブロック</h2><br>音の高さを、ド、レ、ミ、ファ、ソ、ラ、シの７つのソルフェージュでせっていする。"
 
 #: js/turtledefs.js:238
 msgid "Pitch can be specified in terms of C D E F G A B."
-msgstr ""
+msgstr "<h2>音の高さブロック</h2><br>音の高さを、CDEFGABの７つのアルファベットでせっていする。たとえば、ドならばＣ、レならばＤであらわされる。"
 
 #: js/turtledefs.js:239
 msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
@@ -2873,11 +2873,11 @@ msgstr ""
 
 #: js/turtledefs.js:401
 msgid "The Drum name block is used to select a drum."
-msgstr ""
+msgstr "<h2>ドラムブロック</h2><br>ドラムの種類を変えるときに使う。クリックで、いろいろなドラムの音を選ぶことができる。"
 
 #: js/turtledefs.js:402
 msgid "The Effects name block is used to select a sound effect."
-msgstr ""
+msgstr "<h2>こうかあんブロック</h2><br>こうかあんの種類を変えるときに使う。クリックで、いろいろなおもしろい音を選ぶことができる。"
 
 #: js/turtledefs.js:403
 msgid "The Noise name block is used to select a noise synthesizer."
@@ -2901,7 +2901,7 @@ msgstr ""
 
 #: js/turtledefs.js:409
 msgid "The Temperament name block is used to select a tuning method."
-msgstr ""
+msgstr "<h2>音律（おんりつ）ブロック</h2><br>調律（ちょうりつ）のしかたをせっていする。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。"
 
 #: js/turtledefs.js:410
 msgid "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
@@ -3075,7 +3075,7 @@ msgstr ""
 #: js/turtledefs.js:463
 #: js/turtledefs.js:464
 msgid "The Space block is used to add space between blocks."
-msgstr ""
+msgstr "<h2>スペースブロック</h2><br>ブロックとブロックの間にスペースを入れたいときに使う。"
 
 #: js/turtledefs.js:465
 msgid "The Open project block is used to open a project from a web page."
@@ -6481,7 +6481,7 @@ msgstr "プロジェクトを探す"
 #: js/StringHelper.js:35
 #: js/helper.js:141
 msgid "Show more tags"
-msgstr ""
+msgstr "タッグをもっと見る"
 
 #: js/StringHelper.js:36
 msgid "Most recent"
@@ -6654,7 +6654,7 @@ msgstr "もう一度使い直してください。"
 
 #: js/helper.js:142
 msgid "Show fewer tags"
-msgstr ""
+msgstr "タッグを非表示"
 
 #: js/LocalCard.js:21
 msgid "View published project"
