@@ -43,7 +43,7 @@
           <tspan
              id="tspan796"
              y="14"
-             x="47">pen up</tspan>
+             x="47">subir pluma</tspan>
         </text>
       </g>
     </g>
@@ -63,7 +63,7 @@
           <tspan
              id="tspan806"
              y="14"
-             x="60">pen down</tspan>
+             x="60">bajar pluma</tspan>
         </text>
       </g>
     </g>
@@ -83,7 +83,7 @@
           <tspan
              id="tspan816"
              y="24"
-             x="46">set xy</tspan>
+             x="46">fijar xy</tspan>
         </text>
         <text
            id="text822"

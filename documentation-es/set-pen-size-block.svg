@@ -48,7 +48,7 @@
               <tspan
                  x="20"
                  y="22"
-                 id="tspan4">start</tspan>
+                 id="tspan4">iniciar</tspan>
             </text>
           </g>
         </g>
@@ -196,7 +196,7 @@
             <tspan
                x="70"
                y="14"
-               id="tspan52">set pen size</tspan>
+               id="tspan52">fijar pluma</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -244,7 +244,7 @@
             <tspan
                x="60"
                y="14"
-               id="tspan100">pen down</tspan>
+               id="tspan100">bajar pluma</tspan>
           </text>
         </g>
       </g>
@@ -264,7 +264,7 @@
             <tspan
                x="50"
                y="14"
-               id="tspan110">forward</tspan>
+               id="tspan110">adelante</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -312,7 +312,7 @@
             <tspan
                x="5"
                y="19"
-               id="tspan134">if</tspan>
+               id="tspan134">si</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -320,7 +320,7 @@
             <tspan
                x="46"
                y="38"
-               id="tspan138">then</tspan>
+               id="tspan138">entonces</tspan>
           </text>
         </g>
       </g>
@@ -340,7 +340,7 @@
             <tspan
                x="90"
                y="14"
-               id="tspan148">mouse button</tspan>
+               id="tspan148">botón del ratón</tspan>
           </text>
         </g>
       </g>

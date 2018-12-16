@@ -43,7 +43,7 @@
           <tspan
              id="tspan1674"
              y="19"
-             x="5">if</tspan>
+             x="5">si</tspan>
         </text>
         <text
            id="text1680"
@@ -51,7 +51,7 @@
           <tspan
              id="tspan1678"
              y="38"
-             x="46">then</tspan>
+             x="46">entonces</tspan>
         </text>
         <text
            id="text1684"
@@ -59,7 +59,7 @@
           <tspan
              id="tspan1682"
              y="143"
-             x="46">else</tspan>
+             x="46">sino</tspan>
         </text>
       </g>
     </g>
@@ -79,7 +79,7 @@
           <tspan
              id="tspan1706"
              y="14"
-             x="90">mouse button</tspan>
+             x="90">botón del ratón</tspan>
         </text>
       </g>
     </g>
@@ -99,7 +99,7 @@
           <tspan
              id="tspan1726"
              y="15"
-             x="5">forever</tspan>
+             x="5">por siempre</tspan>
         </text>
       </g>
     </g>
@@ -122,7 +122,7 @@
             <tspan
                id="tspan1746"
                y="15"
-               x="20">note</tspan>
+               x="20">nota</tspan>
           </text>
           <text
              id="text1752"
@@ -130,7 +130,7 @@
             <tspan
                id="tspan1750"
                y="12"
-               x="85">value</tspan>
+               x="85">valor</tspan>
           </text>
         </g>
       </g>
@@ -287,7 +287,7 @@
           <tspan
              id="tspan1828"
              y="14"
-             x="46">drum</tspan>
+             x="46">tambor</tspan>
         </text>
         <text
            id="text1834"
@@ -315,7 +315,7 @@
           <tspan
              id="tspan1842"
              y="14"
-             x="13">snare drum</tspan>
+             x="13">tambor militar pequeño</tspan>
         </text>
       </g>
     </g>
@@ -338,7 +338,7 @@
             <tspan
                id="tspan1852"
                y="15"
-               x="20">note</tspan>
+               x="20">nota</tspan>
           </text>
           <text
              id="text1858"
@@ -346,7 +346,7 @@
             <tspan
                id="tspan1856"
                y="12"
-               x="85">value</tspan>
+               x="85">valor</tspan>
           </text>
         </g>
       </g>
@@ -503,7 +503,7 @@
           <tspan
              id="tspan1934"
              y="14"
-             x="46">drum</tspan>
+             x="46">tambor</tspan>
         </text>
         <text
            id="text1940"
@@ -531,7 +531,7 @@
           <tspan
              id="tspan1948"
              y="14"
-             x="13">kick drum</tspan>
+             x="13">tambor de patada</tspan>
         </text>
       </g>
     </g>

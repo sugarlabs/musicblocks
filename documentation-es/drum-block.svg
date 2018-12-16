@@ -48,7 +48,7 @@
               <tspan
                  x="20"
                  y="15"
-                 id="tspan748">note</tspan>
+                 id="tspan748">nota</tspan>
             </text>
             <text
                style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -56,7 +56,7 @@
               <tspan
                  x="85"
                  y="12"
-                 id="tspan752">value</tspan>
+                 id="tspan752">valor</tspan>
             </text>
           </g>
         </g>
@@ -213,7 +213,7 @@
             <tspan
                x="46"
                y="14"
-               id="tspan830">drum</tspan>
+               id="tspan830">tambor</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -241,7 +241,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan844">kick drum</tspan>
+               id="tspan844">tambor de patada</tspan>
           </text>
         </g>
       </g>

@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="42.068748mm"
-   height="25.796875mm"
-   viewBox="0 0 42.06875 25.796875"
+   id="svg2831"
    version="1.1"
-   id="svg2831">
+   viewBox="0 0 42.06875 25.796875"
+   height="25.796875mm"
+   width="42.068748mm">
   <defs
      id="defs2825" />
   <metadata
@@ -25,48 +25,48 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     transform="translate(89.471298,-103.31249)">
+     transform="translate(89.471298,-103.31249)"
+     id="layer1">
     <g
-       transform="matrix(0.26458333,0,0,0.26458333,-202.44838,45.633327)"
-       id="g2614">
+       id="g2614"
+       transform="matrix(0.26458333,0,0,0.26458333,-202.44838,45.633327)">
       <g
-         id="g466"
-         transform="translate(427,218)">
+         transform="translate(427,218)"
+         id="g466">
         <g
-           id="g464"
-           transform="scale(1.5)">
+           transform="scale(1.5)"
+           id="g464">
           <path
-             id="path458"
-             style="fill:#d68136;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 35.123047 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z" />
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 11.123047 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path458" />
           <text
-             id="text462"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text462">
             <tspan
-               id="tspan460"
+               x="5"
                y="15"
-               x="5">por siempre</tspan>
+               id="tspan460">por siempre</tspan>
           </text>
         </g>
       </g>
       <g
-         id="g572"
-         transform="translate(440.5,249.5)">
+         transform="translate(440.5,249.5)"
+         id="g572">
         <g
-           id="g570"
-           transform="scale(1.5)">
+           transform="scale(1.5)"
+           id="g570">
           <path
-             id="path564"
-             style="fill:#daa926;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 70 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -70 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 70 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -70 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path564" />
           <text
-             id="text568"
-             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text568">
             <tspan
-               id="tspan566"
+               x="86"
                y="14"
-               x="86">acción</tspan>
+               id="tspan566">acción</tspan>
           </text>
         </g>
       </g>

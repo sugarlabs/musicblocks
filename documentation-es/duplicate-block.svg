@@ -46,7 +46,7 @@
             <tspan
                id="tspan1222"
                y="15"
-               x="20">note</tspan>
+               x="20">nota</tspan>
           </text>
           <text
              id="text1228"
@@ -54,7 +54,7 @@
             <tspan
                id="tspan1226"
                y="12"
-               x="85">value</tspan>
+               x="85">valor</tspan>
           </text>
         </g>
       </g>
@@ -211,7 +211,7 @@
           <tspan
              id="tspan1304"
              y="24"
-             x="46">pitch</tspan>
+             x="46">tono</tspan>
         </text>
         <text
            id="text1310"
@@ -219,7 +219,7 @@
           <tspan
              id="tspan1308"
              y="12"
-             x="46">name</tspan>
+             x="46">nombre</tspan>
         </text>
         <text
            id="text1314"
@@ -227,7 +227,7 @@
           <tspan
              id="tspan1312"
              y="33"
-             x="46">octave</tspan>
+             x="46">octava</tspan>
         </text>
       </g>
     </g>
@@ -290,7 +290,7 @@
             <tspan
                id="tspan1342"
                y="15"
-               x="20">note</tspan>
+               x="20">nota</tspan>
           </text>
           <text
              id="text1348"
@@ -298,7 +298,7 @@
             <tspan
                id="tspan1346"
                y="12"
-               x="85">value</tspan>
+               x="85">valor</tspan>
           </text>
         </g>
       </g>
@@ -455,7 +455,7 @@
           <tspan
              id="tspan1424"
              y="24"
-             x="46">pitch</tspan>
+             x="46">tono</tspan>
         </text>
         <text
            id="text1430"
@@ -463,7 +463,7 @@
           <tspan
              id="tspan1428"
              y="12"
-             x="46">name</tspan>
+             x="46">nombre</tspan>
         </text>
         <text
            id="text1434"
@@ -471,7 +471,7 @@
           <tspan
              id="tspan1432"
              y="33"
-             x="46">octave</tspan>
+             x="46">octava</tspan>
         </text>
       </g>
     </g>
@@ -534,7 +534,7 @@
             <tspan
                id="tspan1462"
                y="15"
-               x="20">note</tspan>
+               x="20">nota</tspan>
           </text>
           <text
              id="text1468"
@@ -542,7 +542,7 @@
             <tspan
                id="tspan1466"
                y="12"
-               x="85">value</tspan>
+               x="85">valor</tspan>
           </text>
         </g>
       </g>
@@ -699,7 +699,7 @@
           <tspan
              id="tspan1544"
              y="24"
-             x="46">pitch</tspan>
+             x="46">tono</tspan>
         </text>
         <text
            id="text1550"
@@ -707,7 +707,7 @@
           <tspan
              id="tspan1548"
              y="12"
-             x="46">name</tspan>
+             x="46">nombre</tspan>
         </text>
         <text
            id="text1554"
@@ -715,7 +715,7 @@
           <tspan
              id="tspan1552"
              y="33"
-             x="46">octave</tspan>
+             x="46">octava</tspan>
         </text>
       </g>
     </g>
@@ -735,7 +735,7 @@
           <tspan
              id="tspan1562"
              y="14"
-             x="13">ti</tspan>
+             x="13">si</tspan>
         </text>
       </g>
     </g>
@@ -775,7 +775,7 @@
           <tspan
              id="tspan1582"
              y="15"
-             x="5">duplicate</tspan>
+             x="5">duplicar</tspan>
         </text>
         <text
            id="text1588"
@@ -826,7 +826,7 @@
             <tspan
                id="tspan1606"
                y="22"
-               x="20">start</tspan>
+               x="20">iniciar</tspan>
           </text>
         </g>
       </g>

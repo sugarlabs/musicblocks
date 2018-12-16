@@ -44,7 +44,7 @@
             <tspan
                x="20"
                y="22"
-               id="tspan4">start</tspan>
+               id="tspan4">iniciar</tspan>
           </text>
         </g>
       </g>
@@ -192,7 +192,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan52">harmonic</tspan>
+             id="tspan52">armónico</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -242,7 +242,7 @@
             <tspan
                x="20"
                y="15"
-               id="tspan76">note</tspan>
+               id="tspan76">nota</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -250,7 +250,7 @@
             <tspan
                x="85"
                y="12"
-               id="tspan80">value</tspan>
+               id="tspan80">valor</tspan>
           </text>
         </g>
       </g>
@@ -407,7 +407,7 @@
           <tspan
              x="46"
              y="24"
-             id="tspan158">pitch</tspan>
+             id="tspan158">tono</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -415,7 +415,7 @@
           <tspan
              x="46"
              y="12"
-             id="tspan162">name</tspan>
+             id="tspan162">nombre</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -423,7 +423,7 @@
           <tspan
              x="46"
              y="33"
-             id="tspan166">octave</tspan>
+             id="tspan166">octava</tspan>
         </text>
       </g>
     </g>

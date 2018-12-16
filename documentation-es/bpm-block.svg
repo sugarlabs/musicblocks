@@ -44,7 +44,7 @@
             <tspan
                x="20"
                y="22"
-               id="tspan4">start</tspan>
+               id="tspan4">iniciar</tspan>
           </text>
         </g>
       </g>
@@ -192,7 +192,7 @@
           <tspan
              x="91"
              y="24"
-             id="tspan52">beats per minute</tspan>
+             id="tspan52">pulsaciones por minuto</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -208,7 +208,7 @@
           <tspan
              x="91"
              y="33"
-             id="tspan60">beat value</tspan>
+             id="tspan60">valor de latidos</tspan>
         </text>
       </g>
     </g>
@@ -346,7 +346,7 @@
             <tspan
                x="20"
                y="15"
-               id="tspan128">note</tspan>
+               id="tspan128">nota</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -354,7 +354,7 @@
             <tspan
                x="85"
                y="12"
-               id="tspan132">value</tspan>
+               id="tspan132">valor</tspan>
           </text>
         </g>
       </g>
@@ -511,7 +511,7 @@
           <tspan
              x="46"
              y="24"
-             id="tspan210">pitch</tspan>
+             id="tspan210">tono</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -519,7 +519,7 @@
           <tspan
              x="46"
              y="12"
-             id="tspan214">name</tspan>
+             id="tspan214">nombre</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -527,7 +527,7 @@
           <tspan
              x="46"
              y="33"
-             id="tspan218">octave</tspan>
+             id="tspan218">octava</tspan>
         </text>
       </g>
     </g>

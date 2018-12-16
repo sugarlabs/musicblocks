@@ -48,7 +48,7 @@
               <tspan
                  x="20"
                  y="22"
-                 id="tspan4295">music keyboard</tspan>
+                 id="tspan4295">teclado musical</tspan>
             </text>
           </g>
         </g>
@@ -109,7 +109,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan4325">pitch</tspan>
+               id="tspan4325">tono</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -117,7 +117,7 @@
             <tspan
                x="46"
                y="12"
-               id="tspan4329">name</tspan>
+               id="tspan4329">nombre</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -125,7 +125,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan4333">octave</tspan>
+               id="tspan4333">octava</tspan>
           </text>
         </g>
       </g>
@@ -145,7 +145,7 @@
             <tspan
                x="13"
                y="14"
-               id="tspan4343">do</tspan>
+               id="tspan4343">hacer</tspan>
           </text>
         </g>
       </g>
@@ -185,7 +185,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan4363">pitch</tspan>
+               id="tspan4363">tono</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -193,7 +193,7 @@
             <tspan
                x="46"
                y="12"
-               id="tspan4367">name</tspan>
+               id="tspan4367">nombre</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -201,7 +201,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan4371">octave</tspan>
+               id="tspan4371">octava</tspan>
           </text>
         </g>
       </g>
@@ -261,7 +261,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan4401">pitch</tspan>
+               id="tspan4401">tono</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -269,7 +269,7 @@
             <tspan
                x="46"
                y="12"
-               id="tspan4405">name</tspan>
+               id="tspan4405">nombre</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -277,7 +277,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan4409">octave</tspan>
+               id="tspan4409">octava</tspan>
           </text>
         </g>
       </g>
@@ -337,7 +337,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan4439">pitch</tspan>
+               id="tspan4439">tono</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -345,7 +345,7 @@
             <tspan
                x="46"
                y="12"
-               id="tspan4443">name</tspan>
+               id="tspan4443">nombre</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -353,7 +353,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan4447">octave</tspan>
+               id="tspan4447">octava</tspan>
           </text>
         </g>
       </g>
@@ -413,7 +413,7 @@
             <tspan
                x="46"
                y="24"
-               id="tspan4477">pitch</tspan>
+               id="tspan4477">tono</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -421,7 +421,7 @@
             <tspan
                x="46"
                y="12"
-               id="tspan4481">name</tspan>
+               id="tspan4481">nombre</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -429,7 +429,7 @@
             <tspan
                x="46"
                y="33"
-               id="tspan4485">octave</tspan>
+               id="tspan4485">octava</tspan>
           </text>
         </g>
       </g>

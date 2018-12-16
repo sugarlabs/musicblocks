@@ -48,7 +48,7 @@
               <tspan
                  x="20"
                  y="22"
-                 id="tspan4">start</tspan>
+                 id="tspan4">iniciar</tspan>
             </text>
           </g>
         </g>
@@ -196,7 +196,7 @@
             <tspan
                x="5"
                y="15"
-               id="tspan52">repeat</tspan>
+               id="tspan52">repetir</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -244,7 +244,7 @@
             <tspan
                x="50"
                y="14"
-               id="tspan76">forward</tspan>
+               id="tspan76">adelante</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -292,7 +292,7 @@
             <tspan
                x="46"
                y="14"
-               id="tspan100">left</tspan>
+               id="tspan100">izquierda</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -340,7 +340,7 @@
             <tspan
                x="46"
                y="14"
-               id="tspan124">wait</tspan>
+               id="tspan124">esperar</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"

@@ -44,7 +44,7 @@
             <tspan
                x="20"
                y="22"
-               id="tspan4">start</tspan>
+               id="tspan4">iniciar</tspan>
           </text>
         </g>
       </g>
@@ -194,7 +194,7 @@
             <tspan
                x="20"
                y="15"
-               id="tspan52">note</tspan>
+               id="tspan52">nota</tspan>
           </text>
           <text
              style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -202,7 +202,7 @@
             <tspan
                x="85"
                y="12"
-               id="tspan56">value</tspan>
+               id="tspan56">valor</tspan>
           </text>
         </g>
       </g>
@@ -359,7 +359,7 @@
           <tspan
              x="46"
              y="24"
-             id="tspan134">pitch</tspan>
+             id="tspan134">tono</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -367,7 +367,7 @@
           <tspan
              x="46"
              y="12"
-             id="tspan138">name</tspan>
+             id="tspan138">nombre</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -375,7 +375,7 @@
           <tspan
              x="46"
              y="33"
-             id="tspan142">octave</tspan>
+             id="tspan142">octava</tspan>
         </text>
       </g>
     </g>
@@ -435,7 +435,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan172">skip notes</tspan>
+             id="tspan172">saltar notas</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -483,7 +483,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan196">repeat</tspan>
+             id="tspan196">repetir</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
