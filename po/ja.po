@@ -2921,7 +2921,7 @@ msgstr "<h2>ドラムブロック</h2><br>ドラムの種類を変えるとき�
 
 #: js/turtledefs.js:445
 msgid "The Effects name block is used to select a sound effect."
-msgstr "<h2>こうかあんブロック</h2><br>こうかあんの種類を変えるときに使う。クリックで、いろいろなおもしろい音を選ぶことができる。"
+msgstr "<h2>こうかおんブロック</h2><br>こうかおんの種類を変えるときに使う。クリックで、いろいろなおもしろい音を選ぶことができる。"
 
 #: js/turtledefs.js:446
 msgid "The Noise name block is used to select a noise synthesizer."
@@ -6484,7 +6484,7 @@ msgstr "プロジェクト検索"
 #: js/GlobalTag.js:17
 #.TRANS: planet tag name
 msgid "My Projects"
-msgstr "私のプロジェクト"
+msgstr "自分のプロジェクト"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:125
@@ -6658,7 +6658,7 @@ msgstr "全てのプロジェクト"
 #: js/GlobalTag.js:19
 #.TRANS: planet tag name
 msgid "Examples"
-msgstr "例のプロジェクト"
+msgstr "プロジェクトの見本"
 
 #: js/GlobalTag.js:21
 #.TRANS: planet tag name
