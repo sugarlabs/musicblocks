@@ -2920,7 +2920,7 @@ msgstr "<h2>ドラムブロック</h2><br>ドラムの しゅるいを かえる
 
 #: js/turtledefs.js:445
 msgid "The Effects name block is used to select a sound effect."
-msgstr "<h2>こうかあんブロック</h2><br>こうかあんの しゅるいを かえるときに つかう。 クリックで、 いろいろな おもしろい おとを えらぶことが できる。"
+msgstr "<h2>こうかおんブロック</h2><br>こうかおんの しゅるいを かえるときに つかう。 クリックで、 いろいろな おもしろい おとを えらぶことが できる。"
 
 #: js/turtledefs.js:446
 msgid "The Noise name block is used to select a noise synthesizer."
@@ -6483,7 +6483,7 @@ msgstr "プロジェクト けんさく"
 #: js/GlobalTag.js:17
 #.TRANS: planet tag name
 msgid "My Projects"
-msgstr "わたしの プロジェクト"
+msgstr "じぶんの プロジェクト"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:125
@@ -6657,7 +6657,7 @@ msgstr "すべての プロジェクト"
 #: js/GlobalTag.js:19
 #.TRANS: planet tag name
 msgid "Examples"
-msgstr "れいの プロジェクト"
+msgstr "プロジェクトの みほん"
 
 #: js/GlobalTag.js:21
 #.TRANS: planet tag name
