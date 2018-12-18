@@ -141,9 +141,9 @@ function HelpWidget () {
         canvas.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
+                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE/2;
                 helpDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
+                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE/2;
                 helpDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
@@ -156,9 +156,9 @@ function HelpWidget () {
         helpDiv.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - that._dx;
+                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE/2;
                 helpDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
+                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE/2;
                 helpDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
