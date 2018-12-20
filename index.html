@@ -119,17 +119,26 @@
   <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
 
 <script>
-  var loadIt = function() {
-      console.log(document.webL10n.getLanguage());
-      console.log(localStorage.languagePreference);
-      if (localStorage.languagePreference === 'ja' || document.webL10n.getLanguage() == 'ja') {
+  var loadL10nSplashScreen = function() {
+
+      console.log("The browser is set to " + navigator.language);
+      if (localStorage.languagePreference) {
+	  console.log("Music Blocks is set to " + localStorage.languagePreference);
+	  var lang = localStorage.languagePreference;
+      } else {
+	  var lang = navigator.language;
+      }
+
+      console.log("Using " + lang);
+
+      if (lang === 'ja') {
 	  document.getElementById('loading-image-container').innerHTML = '<img src="loading-animation-ja.svg" style="width: 100%; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />'
       } else {
 	  document.getElementById('loading-image-container').innerHTML = '<img src="loading-animation.gif" style="max-width:90%; width: 1024px; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />'
       }
   };
 
-  loadIt();
+  loadL10nSplashScreen();
 </script>
 
   </div>
