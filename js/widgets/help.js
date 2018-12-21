@@ -114,9 +114,15 @@ function HelpWidget () {
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
+        cells = row.getElementsByTagName("td");
+        //to position the dragged box such that the 
+        //cursor is in the middle of the dragcell
+        //after dropping.
+        this._dx = 0;
+        for(var i = 0; i < 3;i++) this._dx += parseInt(cells[i].style.width.slice(0,2));
+        this._dx +=  parseInt(cells[3].style.width.slice(0,2))/2; 
+        this._dy = parseInt(cells[3].style.height.slice(0,2))/2;
 
-        this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
         this._dragCellHTML = dragCell.innerHTML;
