@@ -2361,6 +2361,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
+	console.log('DO LOAD ' + merge);
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -2406,6 +2407,7 @@ function Activity() {
      * Loads MB project from Planet
      */
     this.loadProject = function (projectID, flags, env) {
+	console.log('LOAD PROJECT');
         //set default value of run
         flags = typeof flags !== 'undefined' ? flags : {
             run: false,
@@ -2512,6 +2514,8 @@ function Activity() {
     };
 
     this._loadStart = function () {
+        console.log('LOAD START');
+
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
@@ -3470,7 +3474,8 @@ function Activity() {
      *
      * @param dy how much of a change in y
      *
-     * Handles changes in y coordinates of elements when e.g aux toolbar is opened
+     * Handles changes in y coordinates of elements when
+     * aux toolbar is opened.
      * Repositions elements on screen by a certain amount (dy)
      */
     deltaY = function (dy) {
@@ -3992,15 +3997,17 @@ function Activity() {
             };
 
             this.loadProjectFromFile = function () {
-                console.log('OPEN');
                 document.querySelector('#myOpenFile').focus();
                 document.querySelector('#myOpenFile').click();
                 window.scroll(0, 0);
             };
 
             this.newProject = function () {
+                console.log('NEW');
                 this.closePlanet();
                 this.initialiseNewProject();
+                that._loadStart();
+                this.saveLocally();
             };
 
             this.initialiseNewProject = function (name) {
@@ -4008,8 +4015,6 @@ function Activity() {
                 sendAllToTrash();
                 refreshCanvas();
                 blocks.trashStacks = [];
-                that._loadStart();
-                this.saveLocally();
             };
 
             this.saveLocally = function () {
