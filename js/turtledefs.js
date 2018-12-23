@@ -185,7 +185,7 @@ function createHelpContent() {
 	console.log(TITLESTRING);
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
-            [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
+            [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))],
             [_('Play'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
             [_('Stop'), _('Stop the music (and the mice).') + ' ' + _('You can also type Alt-S to stop.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))],
             [_('New project'), _('Initialize a new project.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(NEWBUTTON)))],
@@ -221,7 +221,7 @@ function createHelpContent() {
     } else {
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
-            [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
+            [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))],
             [_('Run fast'), _('Click the run button to run the project in fast mode.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(RUNBUTTON)))],
             [_('Stop'), _('Stop the music (and the mice).') + ' ' + _('You can also type Alt-S to stop.'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))],
 
