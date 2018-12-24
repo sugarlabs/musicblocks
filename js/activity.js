@@ -666,11 +666,6 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        stage.on('stagemousemove', function (event) {
-            stageX = event.stageX;
-            stageY = event.stageY;
-        });
-
         var currentDelay = logo.turtleDelay;
         var playingWidget = false;
         logo.setTurtleDelay(0);
@@ -753,11 +748,6 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        stage.on('stagemousemove', function (event) {
-            stageX = event.stageX;
-            stageY = event.stageY;
-        });
-
         logo.setTurtleDelay(DEFAULTDELAY);
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
@@ -778,11 +768,6 @@ function Activity() {
     _doStepButton = function () {
         blocks.activeBlock = null;
         hideDOMLabel();
-
-        stage.on('stagemousemove', function (event) {
-            stageX = event.stageX;
-            stageY = event.stageY;
-        });
 
         var turtleCount = Object.keys(logo.stepQueue).length;
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -1179,6 +1164,11 @@ function Activity() {
             }
 
         };
+
+        stage.on('stagemousemove', function (event) {
+            stageX = event.stageX;
+            stageY = event.stageY;
+        });
 
         stage.on('stagemousedown', function (event) {
             stageMouseDown = true;
