@@ -148,6 +148,7 @@ function Toolbar() {
         if (planet) {
             planetIcon.onclick = function () {
                 docById('toolbars').style.display = 'none';
+                docById('wheelDiv').style.display = 'none';
                 onclick();
             };
         } else {
