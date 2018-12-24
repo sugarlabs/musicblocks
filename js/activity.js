@@ -110,7 +110,8 @@ function Activity() {
 
     try {
         console.log(localStorage.languagePreference);
-
+        console.log(navigator.language);
+    
         if (localStorage.languagePreference) {
             try {
                 lang = localStorage.languagePreference;
@@ -119,7 +120,8 @@ function Activity() {
                 console.log(e);
             }
         } else {
-            lang = document.webL10n.getLanguage();
+            // document.webL10n.getLanguage();
+            lang = navigator.language;
             if (lang.indexOf('-') !== -1) {
                 lang = lang.slice(0, lang.indexOf('-'));
                 document.webL10n.setLanguage(lang);
@@ -2361,7 +2363,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-	console.log('DO LOAD ' + merge);
+        console.log('DO LOAD ' + merge);
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -2407,7 +2409,7 @@ function Activity() {
      * Loads MB project from Planet
      */
     this.loadProject = function (projectID, flags, env) {
-	console.log('LOAD PROJECT');
+        console.log('LOAD PROJECT');
         //set default value of run
         flags = typeof flags !== 'undefined' ? flags : {
             run: false,
