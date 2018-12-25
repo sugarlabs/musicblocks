@@ -56,6 +56,11 @@ var NAMEDICT = {
 function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.palettes = palettes;
     var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
+    console.log('language setting is ' + language);
 
     // PITCH PALETTE
 

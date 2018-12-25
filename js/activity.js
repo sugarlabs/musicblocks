@@ -109,10 +109,10 @@ function Activity() {
     }
 
     try {
-        console.log(localStorage.languagePreference);
-        console.log(navigator.language);
+        console.log('stored preference: ' + localStorage.languagePreference);
+        console.log('browser preference: ' + navigator.language);
     
-        if (localStorage.languagePreference) {
+        if (localStorage.languagePreference !== undefined) {
             try {
                 lang = localStorage.languagePreference;
                 document.webL10n.setLanguage(lang);
