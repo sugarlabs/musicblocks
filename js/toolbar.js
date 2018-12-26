@@ -149,6 +149,7 @@ function Toolbar() {
             planetIcon.onclick = function () {
                 docById('toolbars').style.display = 'none';
                 docById('wheelDiv').style.display = 'none';
+                docById('helpDiv').style.display = 'none';
                 onclick();
             };
         } else {
