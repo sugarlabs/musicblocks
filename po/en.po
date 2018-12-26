@@ -2389,7 +2389,7 @@ msgstr ""
 #: js/palette.js:1005
 #: js/palette.js:1006
 msgid "show2"
-msgstr ""
+msgstr "show"
 
 #: js/palette.js:1008
 #: js/palette.js:1009
@@ -4453,7 +4453,7 @@ msgstr ""
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr ""
+msgstr "name"
 
 #: js/basicblocks.js:210
 #: js/basicblocks.js:212
@@ -4668,7 +4668,7 @@ msgstr ""
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: rhythm block
 msgid "rhythm1"
-msgstr ""
+msgstr "rhythm"
 
 #: js/basicblocks.js:902
 #: js/basicblocks.js:913
@@ -4717,7 +4717,7 @@ msgstr ""
 #: js/basicblocks.js:1109
 #.TRANS: value2 is note value of note (JAPANESE ONLY)
 msgid "value2"
-msgstr ""
+msgstr "value"
 
 #: js/basicblocks.js:1111
 #: js/basicblocks.js:3838
@@ -4857,7 +4857,7 @@ msgstr ""
 #: js/status.js:204
 #.TRANS: number of beats played per minute
 msgid "beats per minute2"
-msgstr ""
+msgstr "beats per minute"
 
 #: js/basicblocks.js:1450
 #: js/basicblocks.js:1610
@@ -4922,7 +4922,7 @@ msgstr ""
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 msgid "do1"
-msgstr ""
+msgstr "do"
 
 #: js/basicblocks.js:1534
 #: js/basicblocks.js:1553
@@ -5233,7 +5233,7 @@ msgstr ""
 #: js/basicblocks.js:2496
 #.TRANS: a chord is a group fo three or more notes.
 msgid "chord1"
-msgstr ""
+msgstr "chord"
 
 #: js/basicblocks.js:2634
 #.TRANS: define a custom mode
@@ -5500,11 +5500,11 @@ msgstr ""
 
 #: js/basicblocks.js:3099
 msgid "x2"
-msgstr ""
+msgstr "x"
 
 #: js/basicblocks.js:3099
 msgid "y2"
-msgstr ""
+msgstr "y"
 
 #: js/basicblocks.js:3116
 #.TRANS: erase the screen and return the mice to the center position
@@ -5521,14 +5521,14 @@ msgstr ""
 #: js/basicblocks.js:3169
 #: js/basicblocks.js:3216
 msgid "x1"
-msgstr ""
+msgstr "x"
 
 #: js/basicblocks.js:3129
 #: js/basicblocks.js:3149
 #: js/basicblocks.js:3169
 #: js/basicblocks.js:3216
 msgid "y1"
-msgstr ""
+msgstr "y"
 
 #: js/basicblocks.js:3147
 #.TRANS: control point in a Bezier curve
@@ -5566,7 +5566,7 @@ msgstr ""
 #: js/basicblocks.js:3234
 #.TRANS: right1 is right when turning right (clickwise)
 msgid "right1"
-msgstr ""
+msgstr "right"
 
 #: js/basicblocks.js:3237
 #: js/basicblocks.js:4390
@@ -5581,7 +5581,7 @@ msgstr ""
 #: js/basicblocks.js:3251
 #.TRANS: left1 is left when turning left (counter-clockwise)
 msgid "left1"
-msgstr ""
+msgstr "left"
 
 #: js/basicblocks.js:3254
 #: js/basicblocks.js:4406
@@ -5799,14 +5799,14 @@ msgstr ""
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "value1"
-msgstr ""
+msgstr "value"
 
 #: js/basicblocks.js:3896
 #: js/basicblocks.js:5299
 #.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
 #.TRANS: name1 is name as in name of mouse (JAPANESE ONLY)
 msgid "name1"
-msgstr ""
+msgstr "name"
 
 #: js/basicblocks.js:3914
 msgid "box 2"
@@ -5937,12 +5937,12 @@ msgstr ""
 #: js/basicblocks.js:4387
 #.TRANS: right2 is right as in right side of the screen
 msgid "right2"
-msgstr ""
+msgstr "right"
 
 #: js/basicblocks.js:4403
 #.TRANS: left2 is left as in left side of the screen
 msgid "left2"
-msgstr ""
+msgstr "left"
 
 #: js/basicblocks.js:4417
 msgid "top"
@@ -6007,7 +6007,7 @@ msgstr ""
 #.TRANS: a media object
 #.TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
-msgstr ""
+msgstr "show"
 
 #: js/basicblocks.js:4586
 #: js/basicblocks.js:4588
@@ -6074,7 +6074,7 @@ msgstr ""
 #.TRANS: do2 is do something until some condition is met (JAPANESE ONLY)
 #.TRANS: do2 is do something while some condition is true (JAPANESE ONLY)
 msgid "do2"
-msgstr ""
+msgstr "do"
 
 #: js/basicblocks.js:4763
 #: js/basicblocks.js:4767
