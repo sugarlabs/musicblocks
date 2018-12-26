@@ -245,7 +245,7 @@ const TACAT = {
     'random': 'random',
     'number': 'ignore',
 
-    // box palette    
+    // box palette
 
     'incrementOne': 'box',
     'increment': 'box',
@@ -309,6 +309,7 @@ const TACAT = {
     'show': 'media',
     'media': 'ignore',
     'text': 'ignore',
+    'dectofrac': 'ignaore',
 
     // flow palette
 

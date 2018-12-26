@@ -4626,6 +4626,16 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('dectofrac');
+    newblock.palette = palettes.dict['media'];
+    blocks.protoBlockDict['dectofrac'] = newblock;
+    newblock.staticLabels.push(_('decimal to fraction'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgMathBlock();
+    if (beginnerMode && !beginnerBlock('dectofrac')) {
+        newblock.hidden = true;
+    }
+
     // FLOW PALETTE
 
     var newblock = new ProtoBlock('duplicatefactor');
