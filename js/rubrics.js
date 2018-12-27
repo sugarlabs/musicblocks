@@ -309,7 +309,7 @@ const TACAT = {
     'show': 'media',
     'media': 'ignore',
     'text': 'ignore',
-    'dectofrac': 'ignaore',
+    'dectofrac': 'ignore',
 
     // flow palette
 

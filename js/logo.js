@@ -10518,7 +10518,12 @@ function Logo () {
                     } else {
                         var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
                         if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = mixedNumber(a);
+                            if (a < 0) {
+                                a = a * -1;
+                                that.blocks.blockList[blk].value = '-' + mixedNumber(a);
+                            } else {
+                                that.blocks.blockList[blk].value = mixedNumber(a);
+                            }
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
