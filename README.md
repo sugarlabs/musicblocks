@@ -61,9 +61,10 @@ pitch-tracking widget.
 
 Many students contributed to the project as part of Google Code-in
 (2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018). Sam Parkinson
-built the Planet during GCI 2016&ndash;17. Euan Ong redesigned the
-Planet code as a series of GCI tasks in 2017&ndash;18; Austin George
-refactored the toolbars as a series of GCI tasks in 2018.
+built the Planet during GCI 2016&ndash;17. Emily Ong designed our
+mouse icon and Euan Ong redesigned the Planet code as a series of GCI
+tasks in 2017&ndash;18; Austin George refactored the toolbars as a
+series of GCI tasks in 2018.
 
 A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
