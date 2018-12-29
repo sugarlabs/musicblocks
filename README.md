@@ -21,9 +21,9 @@ Chrome, and Opera work best).
 
 If you want to run Music Blocks offline,
 [download](https://github.com/sugarlabs/musicblocks/archive/master.zip]
-(or git [clone](https://github.com/sugarlabs/musicblocks.git)) this
-repo and point your browser to the index.html file found in the
-musicblocks directory on your local file system.
+or [git clone](https://github.com/sugarlabs/musicblocks.git) this repo
+and point your browser to the index.html file found in the musicblocks
+directory on your local file system.
 
 You can also run Music Blocks by setting up a local server.
 
