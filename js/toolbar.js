@@ -70,6 +70,14 @@ function Toolbar() {
         };
     };
 
+    this.renderLoadCodeIcon = function (onclick) {
+        var loadCodeIcon = docById('loadCode');
+
+        loadCodeIcon.onclick = function () {
+            onclick();
+        };
+    };
+
     this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveButton = docById('saveButton');
         var saveButtonAdvanced = docById('saveButtonAdvanced');
@@ -363,6 +371,7 @@ function Toolbar() {
         ['stop', _('Stop')],
         ['newFile', _('New project')],
         ['load', _('Load project from file')],
+        ['loadCode', _('Load project from MB Code')],
         ['saveButton', _('Save project')],
         ['saveButtonAdvanced', _('Save project as HTML')],
         ['planetIcon', _('Find and share projects')],
@@ -411,6 +420,7 @@ function Toolbar() {
         _('Stop'),
         _('New project'),
         _('Load project from file'),
+        _('Load project from MB Code'),
         _('Save project'),
         _('Save project'),
         _('Find and share projects'),

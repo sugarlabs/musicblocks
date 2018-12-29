@@ -2382,6 +2382,18 @@ function Activity() {
         _allClear();
     };
 
+    doLoadFromCode = function (merge) {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
+        musicBlocksCode = prompt('MB Code:', "");
+        window.scroll(0, 0);
+        that.doHardStopButton();
+        _allClear();
+        if(musicBlocksCode != null) {
+            console.log('Loading .tb data from user input.');
+            planet.loadProjectFromData(String(musicBlocksCode),merge);
+        }
+    }
+
     window.prepareExport = prepareExport;
 
     /*
@@ -4111,6 +4123,7 @@ function Activity() {
         toolbar.renderStopIcon(that.doHardStopButton);
         toolbar.renderNewProjectIcon(_afterDelete);
         toolbar.renderLoadIcon(doLoad);
+        toolbar.renderLoadCodeIcon(doLoadFromCode);
         toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
         toolbar.renderPlanetIcon(planet, _doOpenSamples);
         toolbar.renderMenuIcon(_showHideAuxMenu);
