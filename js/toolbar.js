@@ -114,23 +114,25 @@ function Toolbar() {
                     };
                 }
 
-                var saveWAV = docById('save-wav');
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    var saveWAV = docById('save-wav');
 
-                saveWAV.onclick = function () {
-                    wave_onclick();
-                };
+                    saveWAV.onclick = function () {
+                        wave_onclick();
+                    };
 
-                var saveLY = docById('save-ly');
+                    var saveLY = docById('save-ly');
 
-                saveLY.onclick = function () {
-                    ly_onclick();
-                };
+                    saveLY.onclick = function () {
+                        ly_onclick();
+                    };
 
-                var saveABC = docById('save-abc');
+                    var saveABC = docById('save-abc');
 
-                saveABC.onclick = function () {
-                    abc_onclick();
-                };
+                    saveABC.onclick = function () {
+                        abc_onclick();
+                    };
+                }
 
                 var saveArtworkSVG = docById('save-blockartwork-svg');
 
@@ -185,22 +187,24 @@ function Toolbar() {
     };
 
     this.renderModeSelectIcon = function (onclick) {
-        var begIcon = docById('beginnerMode');
-        var advIcon = docById('advancedMode');
-        if (begIcon.style.display === 'none') {
-            advIcon.onclick = function () {
-                onclick();
-            };
-        } else {
-            begIcon.onclick = function () {
-                onclick();
-            };
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            var begIcon = docById('beginnerMode');
+            var advIcon = docById('advancedMode');
+            if (begIcon.style.display === 'none') {
+                advIcon.onclick = function () {
+                    onclick();
+                };
+            } else {
+                begIcon.onclick = function () {
+                    onclick();
+                };
+            }
         }
     };
 
     this.renderRunSlowlyIcon = function (onclick) {
         var runSlowlyIcon = docById('runSlowlyIcon');
-        if (beginnerMode && language === 'ja') {
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === 'ja') {
             runSlowlyIcon.style.display = 'none';
 
         }
@@ -214,7 +218,7 @@ function Toolbar() {
 
     this.renderRunStepIcon = function (onclick) {
         var runStepByStepIcon = docById('runStepByStepIcon');
-        if (beginnerMode && language === 'ja') {
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === 'ja') {
             runStepByStepIcon.style.display = 'none';
         }
 
@@ -230,7 +234,7 @@ function Toolbar() {
         var delPluginIcon = docById('delPluginIcon');
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
 
-        if (!beginnerMode) {
+        if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
             displayStatsIcon.onclick = function () {
                 analytics_onclick();
             };
@@ -359,98 +363,175 @@ function Toolbar() {
         }
     };
 
-    var strings = [
-        ['mb-logo', _('About Music Blocks')],
-        ['play', _('Play')],
-        ['stop', _('Stop')],
-        ['newFile', _('New project')],
-        ['load', _('Load project from file')],
-        ['saveButton', _('Save project')],
-        ['saveButtonAdvanced', _('Save project as HTML')],
-        ['planetIcon', _('Find and share projects')],
-        ['planetIconDisabled', _('Offline. Sharing is unavailable')],
-        ['toggleAuxBtn', _('Auxilary menu')],
-        ['helpIcon', _('Help')],
-        ['runSlowlyIcon', _('Run slowly')],
-        ['runStepByStepIcon', _('Run step by step')],
-        ['displayStatsIcon', _('Display statistics')],
-        ['loadPluginIcon', _('Load plugin')],
-        ['delPluginIcon', _('Delete plugin')],
-        ['enableHorizScrollIcon', _('Enable horizontal scrolling')],
-        ['disableHorizScrollIcon', _('Disable horizontal scrolling')],
-        ['mergeWithCurrentIcon', _('Merge with current project')],
-        ['restoreIcon', _('Restore')],
-        ['beginnerMode', _('Switch to beginner mode')],
-        ['advancedMode', _('Switch to advanced mode')],
-        ['languageSelectIcon', _('Select language')],
-        ['save-html', _('Save project as HTML'), 'innerHTML'],
-        ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
-        ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
-        ['save-wav', _('Save music as WAV'), 'innerHTML'],
-        ['save-abc', _('Save sheet music as ABC'), 'innerHTML'],
-        ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
-        ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
-        ['new-project', _('Confirm'), 'innerHTML'],
-        ['enUS', _('English (United States)'), 'innerHTML'],
-        ['enUK', _('English (United Kingdom)'), 'innerHTML'],
-        ['ja', _('日本語'), 'innerHTML'],
-        ['es', _('español'), 'innerHTML'],
-        ['kana', _('にほんご'), 'innerHTML'],
-        ['zhCN', _('中文'), 'innerHTML'],
-        ['th', _('ภาษาไทย'), 'innerHTML'],
-        ['ayc', _('aymara'), 'innerHTML'],
-        ['gug', _('guarani'), 'innerHTML'],
-        ['hi', _('हिंदी'), 'innerHTML'],
-        ['ibo', _('igbo'), 'innerHTML'],
-        ['ar', _('عربى'), 'innerHTML'],
-        ['he', _('עִברִית'), 'innerHTML'],
-    ];
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        var strings = [
+            ['mb-logo', _('About Music Blocks')],
+            ['play', _('Play')],
+            ['stop', _('Stop')],
+            ['newFile', _('New project')],
+            ['load', _('Load project from file')],
+            ['saveButton', _('Save project')],
+            ['saveButtonAdvanced', _('Save project as HTML')],
+            ['planetIcon', _('Find and share projects')],
+            ['planetIconDisabled', _('Offline. Sharing is unavailable')],
+            ['toggleAuxBtn', _('Auxilary menu')],
+            ['helpIcon', _('Help')],
+            ['runSlowlyIcon', _('Run slowly')],
+            ['runStepByStepIcon', _('Run step by step')],
+            ['displayStatsIcon', _('Display statistics')],
+            ['loadPluginIcon', _('Load plugin')],
+            ['delPluginIcon', _('Delete plugin')],
+            ['enableHorizScrollIcon', _('Enable horizontal scrolling')],
+            ['disableHorizScrollIcon', _('Disable horizontal scrolling')],
+            ['mergeWithCurrentIcon', _('Merge with current project')],
+            ['restoreIcon', _('Restore')],
+            ['beginnerMode', _('Switch to beginner mode')],
+            ['advancedMode', _('Switch to advanced mode')],
+            ['languageSelectIcon', _('Select language')],
+            ['save-html', _('Save project as HTML'), 'innerHTML'],
+            ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
+            ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
+            ['save-wav', _('Save music as WAV'), 'innerHTML'],
+            ['save-abc', _('Save sheet music as ABC'), 'innerHTML'],
+            ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
+            ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
+            ['new-project', _('Confirm'), 'innerHTML'],
+            ['enUS', _('English (United States)'), 'innerHTML'],
+            ['enUK', _('English (United Kingdom)'), 'innerHTML'],
+            ['ja', _('日本語'), 'innerHTML'],
+            ['es', _('español'), 'innerHTML'],
+            ['kana', _('にほんご'), 'innerHTML'],
+            ['zhCN', _('中文'), 'innerHTML'],
+            ['th', _('ภาษาไทย'), 'innerHTML'],
+            ['ayc', _('aymara'), 'innerHTML'],
+            ['gug', _('guarani'), 'innerHTML'],
+            ['hi', _('हिंदी'), 'innerHTML'],
+            ['ibo', _('igbo'), 'innerHTML'],
+            ['ar', _('عربى'), 'innerHTML'],
+            ['he', _('עִברִית'), 'innerHTML'],
+        ];
 
-    // Workaround for FF
-    var strings_ = [
-        _('About Music Blocks'),
-        _('Play'),
-        _('Stop'),
-        _('New project'),
-        _('Load project from file'),
-        _('Save project'),
-        _('Save project'),
-        _('Find and share projects'),
-        _('Offline. Sharing is unavailable'),
-        _('Auxilary menu'),
-        _('Help'),
-        _('Run slowly'),
-        _('Run step by step'),
-        _('Display statistics'),
-        _('Load plugin'),
-        _('Delete plugin'),
-        _('Enable horizontal scrolling'),
-        _('Disable horizontal scrolling'),
-        _('Merge with current project'),
-        _('Restore'),
-        _('Switch to beginner mode'),
-        _('Switch to advanced mode'),
-        _('Select language'),
-        _('Save project as HTML'),
-        _('Save mouse artwork as SVG'),
-        _('Save mouse artwork as PNG'),
-        _('Save music as WAV'),
-        _('Save sheet music as ABC'),
-        _('Save sheet music as Lilypond'),
-        _('Save block artwork as SVG'),
-        _('Confirm'),
-        _('Select language'),
-    ];
+        // Workaround for FF
+        var strings_ = [
+            _('About Music Blocks'),
+            _('Play'),
+            _('Stop'),
+            _('New project'),
+            _('Load project from file'),
+            _('Save project'),
+            _('Save project'),
+            _('Find and share projects'),
+            _('Offline. Sharing is unavailable'),
+            _('Auxilary menu'),
+            _('Help'),
+            _('Run slowly'),
+            _('Run step by step'),
+            _('Display statistics'),
+            _('Load plugin'),
+            _('Delete plugin'),
+            _('Enable horizontal scrolling'),
+            _('Disable horizontal scrolling'),
+            _('Merge with current project'),
+            _('Restore'),
+            _('Switch to beginner mode'),
+            _('Switch to advanced mode'),
+            _('Select language'),
+            _('Save project as HTML'),
+            _('Save mouse artwork as SVG'),
+            _('Save mouse artwork as PNG'),
+            _('Save music as WAV'),
+            _('Save sheet music as ABC'),
+            _('Save sheet music as Lilypond'),
+            _('Save block artwork as SVG'),
+            _('Confirm'),
+            _('Select language'),
+        ];
+    } else {
+        var strings = [
+            ['mb-logo', _('About Turtle Blocks')],
+            ['play', _('Play')],
+            ['stop', _('Stop')],
+            ['newFile', _('New project')],
+            ['load', _('Load project from file')],
+            ['saveButton', _('Save project')],
+            ['saveButtonAdvanced', _('Save project as HTML')],
+            ['planetIcon', _('Find and share projects')],
+            ['planetIconDisabled', _('Offline. Sharing is unavailable')],
+            ['toggleAuxBtn', _('Auxilary menu')],
+            ['helpIcon', _('Help')],
+            ['runSlowlyIcon', _('Run slowly')],
+            ['runStepByStepIcon', _('Run step by step')],
+            ['displayStatsIcon', _('Display statistics')],
+            ['loadPluginIcon', _('Load plugin')],
+            ['delPluginIcon', _('Delete plugin')],
+            ['enableHorizScrollIcon', _('Enable horizontal scrolling')],
+            ['disableHorizScrollIcon', _('Disable horizontal scrolling')],
+            ['mergeWithCurrentIcon', _('Merge with current project')],
+            ['restoreIcon', _('Restore')],
+            ['languageSelectIcon', _('Select language')],
+            ['save-html', _('Save project as HTML'), 'innerHTML'],
+            ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
+            ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
+            ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
+            ['new-project', _('Confirm'), 'innerHTML'],
+            ['enUS', _('English (United States)'), 'innerHTML'],
+            ['enUK', _('English (United Kingdom)'), 'innerHTML'],
+            ['ja', _('日本語'), 'innerHTML'],
+            ['es', _('español'), 'innerHTML'],
+            ['kana', _('にほんご'), 'innerHTML'],
+            ['zhCN', _('中文'), 'innerHTML'],
+            ['th', _('ภาษาไทย'), 'innerHTML'],
+            ['ayc', _('aymara'), 'innerHTML'],
+            ['gug', _('guarani'), 'innerHTML'],
+            ['hi', _('हिंदी'), 'innerHTML'],
+            ['ibo', _('igbo'), 'innerHTML'],
+            ['ar', _('عربى'), 'innerHTML'],
+            ['he', _('עִברִית'), 'innerHTML'],
+        ];
+
+        // Workaround for FF
+        var strings_ = [
+            _('About Turtle Blocks'),
+            _('Play'),
+            _('Stop'),
+            _('New project'),
+            _('Load project from file'),
+            _('Save project'),
+            _('Save project'),
+            _('Find and share projects'),
+            _('Offline. Sharing is unavailable'),
+            _('Auxilary menu'),
+            _('Help'),
+            _('Run slowly'),
+            _('Run step by step'),
+            _('Display statistics'),
+            _('Load plugin'),
+            _('Delete plugin'),
+            _('Enable horizontal scrolling'),
+            _('Disable horizontal scrolling'),
+            _('Merge with current project'),
+            _('Restore'),
+            _('Select language'),
+            _('Save project as HTML'),
+            _('Save turtle artwork as SVG'),
+            _('Save turtle artwork as PNG'),
+            _('Save block artwork as SVG'),
+            _('Confirm'),
+            _('Select language'),
+        ];
+    }
 
     this.init = function (mode) {
-        var beginnerMode = docById('beginnerMode');
-        var advancedMode = docById('advancedMode');
-        if (mode || mode === 'null') {
-            advancedMode.style.display = 'block';
-            beginnerMode.style.display = 'none';
-        } else {
-            advancedMode.style.display = 'none';
-            beginnerMode.style.display = 'display';
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            var beginnerMode = docById('beginnerMode');
+            var advancedMode = docById('advancedMode');
+            if (mode || mode === 'null') {
+                advancedMode.style.display = 'block';
+                beginnerMode.style.display = 'none';
+            } else {
+                advancedMode.style.display = 'none';
+                beginnerMode.style.display = 'display';
+            }
         }
 
         for (var i = 0; i < strings.length; i++) {

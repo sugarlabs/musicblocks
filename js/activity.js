@@ -74,9 +74,9 @@ function Activity() {
         } catch (e) {};
     }
 
+    firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
         beginnerMode = true;
-        firstTimeUser = false;
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;

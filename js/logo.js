@@ -1371,7 +1371,9 @@ function Logo () {
         this._masterBPM = TARGETBPM;
         this.defaultBPMFactor = TONEBPM / this._masterBPM;
         this.masterVolume = [DEFAULTVOLUME];
-        this.synth.changeInTemperament = false;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.changeInTemperament = false;
+        }
 
         this.checkingCompletionState = false;
 
