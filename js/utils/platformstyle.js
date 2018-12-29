@@ -42,6 +42,7 @@ window.platformColor = {
         'volume': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
         'drum': ['#3EDCDD', '#1DBCBD', '#25C3C0', '#A1EEEF'],
         'graphics': ['#92A9FF', '#5370DC', '#728FF9', '#CDD8FF'],
+        'turtle': ['#92A9FF', '#5370DC', '#728FF9', '#CDD8FF'],
         'pen': ['#92A9FF', '#5370DC', '#728FF9', '#CDD8FF'],
         'boxes': ['#FFBF00', '#DAAF30', '#DAA926', '#FFE391'],
         'action': ['#FFBF00', '#DAAF30', '#DAA926', '#FFE391'],
