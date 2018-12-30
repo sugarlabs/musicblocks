@@ -25,12 +25,14 @@ function SaveInterface(PlanetInterface) {
     
     this.download = function(extension, dataurl, defaultfilename){
         var filename = null;
-        if (defaultfilename === undefined){
+        if (defaultfilename === undefined || defaultfilename === null){
             if (this.PlanetInterface === undefined) {
                 defaultfilename = _('My Project');
             } else {
                 defaultfilename = this.PlanetInterface.getCurrentProjectName();
             }
+
+            console.log(defaultfilename);
 
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += '.' + extension;
@@ -46,6 +48,12 @@ function SaveInterface(PlanetInterface) {
                 defaultfilename += '.' + extension;
             }
             filename = defaultfilename;
+        }
+
+        console.log(filename);
+        if (filename === null) {
+            console.log('save cancelled');
+            return;
         }
 
         if (fileExt(filename) != extension) {
@@ -73,7 +81,6 @@ function SaveInterface(PlanetInterface) {
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
     this.prepareHTML = function(){
         var file = this.htmlSaveTemplate;
-	console.log(GUIDEURL);
         if (this.PlanetInterface !== undefined) {
             var description = this.PlanetInterface.getCurrentProjectDescription();
         } else {
@@ -107,6 +114,7 @@ function SaveInterface(PlanetInterface) {
 
     this.saveHTML = function(filename){
         var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
+        console.log(filename);
         this.download('html', html, filename);
     }
 
@@ -143,12 +151,12 @@ function SaveInterface(PlanetInterface) {
         this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
-	console.log('DURING SAVE WAV');
+        console.log('DURING SAVE WAV');
         this.logo.runLogoCommands();
     }
 
     this.afterSaveWAV = function(blob){
-	console.log('AFTER SAVE WAV');
+        console.log('AFTER SAVE WAV');
         //don't reset cursor
         this.download('wav',URL.createObjectURL(blob));
     }
