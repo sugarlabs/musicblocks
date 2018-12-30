@@ -82,6 +82,11 @@ function beginnerBlock(name) {
 
 function createDefaultStack() {
     var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
+    console.log('language setting is ' + language);
     if (language == 'ja') {
         DATAOBJS =
             [[0, 'start', screen.width / 3, 100, [null, 1, null]],
