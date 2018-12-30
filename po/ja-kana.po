@@ -1004,7 +1004,7 @@ msgstr "ブロックが みつかりません。"
 #: js/ProjectStorage.js:13
 #: js/GlobalPlanet.js:370
 msgid "My Project"
-msgstr "わたしの プロジェクト"
+msgstr "じぶんの プロジェクト"
 
 #: js/activity.js:2508
 ## check verb
@@ -4917,7 +4917,7 @@ msgstr "（ちゅうくうの）せん"
 #: js/basicblocks.js:3473
 #.TRANS: fill in as a solid color
 msgid "fill"
-msgstr "きにゅうする"
+msgstr "ぬりつぶす"
 
 #: js/basicblocks.js:3484
 #.TRANS: riase up the pen so that it does not draw when it is moved

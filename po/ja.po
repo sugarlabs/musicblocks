@@ -1004,7 +1004,7 @@ msgstr "ブロックが見つかりません。"
 #: js/ProjectStorage.js:13
 #: js/GlobalPlanet.js:370
 msgid "My Project"
-msgstr "私のプロジェクト"
+msgstr "自分のプロジェクト"
 
 #: js/activity.js:2508
 ## check verb
@@ -4918,7 +4918,7 @@ msgstr "（中空の）線"
 #: js/basicblocks.js:3473
 #.TRANS: fill in as a solid color
 msgid "fill"
-msgstr "記入する"
+msgstr "ぬりつぶす"
 
 #: js/basicblocks.js:3484
 #.TRANS: riase up the pen so that it does not draw when it is moved
