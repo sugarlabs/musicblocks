@@ -87,7 +87,7 @@ function createDefaultStack() {
     }
 
     console.log('language setting is ' + language);
-    if (language == 'ja') {
+    if (language === 'ja') {
         DATAOBJS =
             [[0, 'start', screen.width / 3, 100, [null, 1, null]],
 
@@ -179,6 +179,10 @@ function createDefaultStack() {
 
 function createHelpContent() {
     var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
     if (language == 'ja') {
         var LOGO = LOGOJA;
     } else {
@@ -568,6 +572,10 @@ function createHelpContent() {
     }
 
     var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
     if (beginnerMode && language === 'ja') {
         BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'];
         BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
