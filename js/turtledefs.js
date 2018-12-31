@@ -183,7 +183,7 @@ function createHelpContent() {
         language = navigator.language;
     }
 
-    if (language == 'ja') {
+    if (language === 'ja') {
         var LOGO = LOGOJA;
     } else {
         var LOGO = LOGODEFAULT;

@@ -194,9 +194,14 @@ function HelpWidget () {
                     if (BLOCKHELP[name].length > 1) {
                         var path = BLOCKHELP[name][1];
                         // We need to add a case here whenever we add
-                        // help artwor support for a new language.
+                        // help artwort support for a new language.
                         // e.g., documentation-es
-                        switch(localStorage.languagePreference) {
+			var language = localStorage.languagePreference;
+			if (language === undefined) {
+			    language = navigator.language;
+			}
+
+                        switch(language) {
                         case 'ja':
                             if (localStorage.kanaPreference == 'kana') {
                                 path = path + '-kana';
@@ -233,9 +238,6 @@ function HelpWidget () {
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
 	    console.log(page + ' ' + link);
-            // We need to add a case here whenever we add
-            // a guide a new language.
-            // e.g., guide-es
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
 

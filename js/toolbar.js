@@ -14,6 +14,10 @@ function Toolbar() {
     var $j = jQuery.noConflict();
     var stopIconColorWhenPlaying = '#ea174c';
     var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
     var tooltipsDisabled = false;
 
     this.renderLogoIcon = function (onclick) {
