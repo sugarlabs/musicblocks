@@ -156,6 +156,7 @@ function Toolbar() {
                 docById('toolbars').style.display = 'none';
                 docById('wheelDiv').style.display = 'none';
                 docById('helpDiv').style.display = 'none';
+                docById('contextWheelDiv').style.display = 'none';
                 onclick();
             };
         } else {
