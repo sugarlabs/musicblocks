@@ -1799,6 +1799,9 @@ function Turtles () {
                         } else {
                             that._collapseLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._collapseButton.x+28, that._collapseButton.y+28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1806,6 +1809,7 @@ function Turtles () {
 
                 that._collapseButton.removeAllEventListeners('mouseout');
                 that._collapseButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._collapseLabel !== null) {
                         that._collapseLabel.visible = false;
                         that._collapseLabelBG.visible = false;
@@ -1869,6 +1873,9 @@ function Turtles () {
                         } else {
                             that._clearLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._clearButton.x+28, that._clearButton.y+28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1876,6 +1883,7 @@ function Turtles () {
 
                 that._clearButton.removeAllEventListeners('mouseout');
                 that._clearButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._clearLabel !== null) {
                         that._clearLabel.visible = false;
                     }
@@ -1950,6 +1958,9 @@ function Turtles () {
                         } else {
                             that._gridLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._gridButton.x+28, that._gridButton.y+28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1957,6 +1968,7 @@ function Turtles () {
 
                 that._gridButton.removeAllEventListeners('mouseout');
                 that._gridButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._gridLabel !== null) {
                         that._gridLabel.visible = false;
                         that._gridLabelBG.visible = false;
