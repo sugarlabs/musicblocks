@@ -143,7 +143,7 @@ function Turtle (name, turtles, drum) {
      * @param  cp1x - the x-coordinate of the first bezier control point
      * @param  cp1y - the y-coordinate of the first bezier control point
      * @param  cp2x - the x-coordinate of the second bezier control point
-     * @param  cp2y - the y-coordinate of the second bezier control point	
+     * @param  cp2y - the y-coordinate of the second bezier control point
      * @param  x2 - the x-coordinate of the ending point
      * @param  y2 - the y-coordinate of the ending point
      * 
@@ -1563,6 +1563,7 @@ function Turtles () {
         }
 
         var that = this;
+        var circles = null;
 
         /**
          * Makes boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
@@ -1801,7 +1802,7 @@ function Turtles () {
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._collapseButton.x+28, that._collapseButton.y+28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(that._collapseButton.x + 28, that._collapseButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1875,7 +1876,7 @@ function Turtles () {
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._clearButton.x+28, that._clearButton.y+28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(that._clearButton.x + 28, that._clearButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1960,7 +1961,7 @@ function Turtles () {
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._gridButton.x+28, that._gridButton.y+28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(that._gridButton.x + 28, that._gridButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
