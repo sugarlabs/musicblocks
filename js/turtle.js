@@ -143,7 +143,7 @@ function Turtle (name, turtles, drum) {
      * @param  cp1x - the x-coordinate of the first bezier control point
      * @param  cp1y - the y-coordinate of the first bezier control point
      * @param  cp2x - the x-coordinate of the second bezier control point
-     * @param  cp2y - the y-coordinate of the second bezier control point	
+     * @param  cp2y - the y-coordinate of the second bezier control point
      * @param  x2 - the x-coordinate of the ending point
      * @param  y2 - the y-coordinate of the ending point
      * 
@@ -1563,6 +1563,7 @@ function Turtles () {
         }
 
         var that = this;
+        var circles = null;
 
         /**
          * Makes boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
@@ -1799,6 +1800,9 @@ function Turtles () {
                         } else {
                             that._collapseLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._collapseButton.x + 28, that._collapseButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1806,6 +1810,7 @@ function Turtles () {
 
                 that._collapseButton.removeAllEventListeners('mouseout');
                 that._collapseButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._collapseLabel !== null) {
                         that._collapseLabel.visible = false;
                         that._collapseLabelBG.visible = false;
@@ -1869,6 +1874,9 @@ function Turtles () {
                         } else {
                             that._clearLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._clearButton.x + 28, that._clearButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1876,6 +1884,7 @@ function Turtles () {
 
                 that._clearButton.removeAllEventListeners('mouseout');
                 that._clearButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._clearLabel !== null) {
                         that._clearLabel.visible = false;
                     }
@@ -1950,6 +1959,9 @@ function Turtles () {
                         } else {
                             that._gridLabelBG.visible = true;
                         }
+
+                        var r = 55 / 2;
+                        circles = showButtonHighlight(that._gridButton.x + 28, that._gridButton.y + 28, r, event, palettes.scale, that.stage);
                     }
 
                     that.refreshCanvas();
@@ -1957,6 +1969,7 @@ function Turtles () {
 
                 that._gridButton.removeAllEventListeners('mouseout');
                 that._gridButton.on('mouseout', function (event) {
+                    hideButtonHighlight(circles, that.stage);
                     if (that._gridLabel !== null) {
                         that._gridLabel.visible = false;
                         that._gridLabelBG.visible = false;
