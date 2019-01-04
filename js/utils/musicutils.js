@@ -2210,6 +2210,64 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 }
             }
 
+            if (movable) {
+                switch(mode) {
+                case 'dorian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 6;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'phrygian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 5;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'lydian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 4;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'mixolydian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 3;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'minor':
+                case 'aeolian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 2;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'locrian':
+                    var i = SOLFEGENAMES.indexOf(solfegePart);
+                    i += 1;
+                    if (i > 6) {
+                        i -= 7;
+                    }
+                    solfegePart = SOLFEGENAMES[i];
+                    break;
+                case 'major':
+                case 'ionian':
+                default:
+                    break;
+                }
+            }
+
             if (halfSteps.indexOf(solfegePart) !== -1) {
                 var index = halfSteps.indexOf(solfegePart) + offset;
                 if (index > 11) {
