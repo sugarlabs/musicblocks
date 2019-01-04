@@ -20,6 +20,12 @@ Richard Hermann, Professor of Theory and Composition at the University
 of New Mexico, shared ideas and his publications with our team that
 inspired new features and improvements.
 
+Gakken Plus, a Japanese education company, contributed designs, the new
+color scheme, input for the "new beginner mode", new Japanese
+translations, and the new logo for the Japanese version. Their team
+worked very hard to help us improve the software. Special thanks to
+the educators and kids in Japan for their input.
+
 Related Websites
 ----------------
 http://www.larryscripp.net/
@@ -31,6 +37,8 @@ http://music-in-education.org/
 http://www.richardhermann.net/
 
 http://www.devinulibarri.com/
+
+http://gakken-plus.co.jp/
 
 Some of the graphics were contributed by Chie Yasuda (the Mouse theme
 originates with her). She also has been very patient with Devin as he
