@@ -45,10 +45,10 @@ education ideas, representations and practices (e.g. aspects of
 matrix, musical cups) developed and published by [Larry
 Scripp](http://www.larryscripp.net/) with whom Devin studied at New
 England Conservatory and for whom he worked at Affron Scripp &
-Associates, LLC. [Center for Music and the Arts in Education
-(CMAIE)](http://centerformie.org/) [Music in
-Education](http://music-in-education.org/) Some of the graphics were
-contributed by Chie Yasuda.
+Associates, LLC, [Center for Music and the Arts in Education
+(CMAIE)](http://centerformie.org/), and [Music in
+Education](http://music-in-education.org/) Some of the initial graphics
+were contributed by [Chie Yasuda](http://www.chieyasuda.com).
 
 Much of the initial coding specific to Music Blocks was done by
 Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
