@@ -1189,6 +1189,9 @@ function Activity() {
 
             stage.removeAllEventListeners('stagemousemove');
             stage.on('stagemousemove', function (event) {
+		stageX = event.stageX;
+		stageY = event.stageY;
+
                 if (!moving) {
                     return;
                 }
