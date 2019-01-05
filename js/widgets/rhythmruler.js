@@ -676,6 +676,11 @@ function RhythmRuler () {
         // FIXME: Add undo for REST
         this._logo.synth.stop();
         this._startingTime = null;
+        this._playing = false;
+        this._playingAll = false;
+        this._playingOne = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
 
         if (this._undoList.length === 0) {
             return;
