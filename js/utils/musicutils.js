@@ -35,11 +35,11 @@ const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
 
 const NSYMBOLS = {1: '𝅝',
-		  2: '𝅗𝅥',
-		  4: '♩',
-		  8: '♪',
-		  16: '𝅘𝅥𝅯'
-		 };
+                  2: '𝅗𝅥',
+                  4: '♩',
+                  8: '♪',
+                  16: '𝅘𝅥𝅯'
+                 };
 
 const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
 const STOSHARP = {'E#': 'E' + SHARP, 'G#': 'G' + SHARP, 'A#': 'A' + SHARP, 'B#': 'B' + SHARP, 'D#': 'D' + SHARP, 'C#': 'C' + SHARP, 'F#': 'F' + SHARP, 'e#': 'E' + SHARP, 'g#': 'G' + SHARP, 'a#': 'A' + SHARP, 'b#': 'B' + SHARP, 'd#': 'D' + SHARP, 'c#': 'C' + SHARP, 'f#': 'F' + SHARP};
@@ -2214,47 +2214,78 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 switch(mode) {
                 case 'dorian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 0) {
+                        transposition += 12;
+                    }
+
+                    transposition -= 12;
+
                     i += 6;
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'phrygian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 1) {
+                        transposition += 12;
+                    }
+
                     i += 5;
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'lydian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 2) {
+                        transposition += 12;
+                    }
+
                     i += 4;
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'mixolydian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 3) {
+                        transposition += 12;
+                    }
+
                     i += 3;
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'minor':
                 case 'aeolian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 4) {
+                        transposition += 12;
+                    }
+
                     i += 2;
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'locrian':
                     var i = SOLFEGENAMES.indexOf(solfegePart);
+                    if (i > 5) {
+                        transposition += 12;
+                    }
+
                     i += 1;
                     if (i > 6) {
                         i -= 7;
