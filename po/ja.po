@@ -2386,7 +2386,7 @@ msgid "The Status block opens a tool for inspecting the status of Music Blocks a
 msgstr "<h2>実行じょうきょうブロック</h2><br>ブロックの実行じょうきょうをけんさくするテーブルを表示する。<br>"
 
 #: js/turtledefs.js:309
-msgid "The Pitch-time Matrix block opens a tool to create musical phrases."
+msgid "The Phrase Maker block opens a tool to create musical phrases."
 msgstr "<h2>フレーズメーカーブロック</h2><br>フレーズを作るためのテーブルを表示する。作ったフレーズをデータ化することができる。<br><br>★フレーズとは<br>ひとまとまりの音楽。<br><br>"
 
 #: js/turtledefs.js:310
@@ -4039,7 +4039,7 @@ msgstr "Cメジャー"
 
 #: js/basicblocks.js:1398
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
-msgid "pitch-time matrix"
+msgid "phrase maker"
 msgstr "フレーズメーカー"
 
 #: js/basicblocks.js:1425

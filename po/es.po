@@ -2512,7 +2512,7 @@ msgid "The Status block opens a tool for inspecting the status of Music Blocks a
 msgstr "El bloque Estado abre una herramienta para inspeccionar el estado de Music Blocks mientras se ejecuta."
 
 #: js/turtledefs.js:309
-msgid "The Pitch-time Matrix block opens a tool to create musical phrases."
+msgid "The Phrase Maker block opens a tool to create musical phrases."
 msgstr "El bloque Matriz de tono y tiempo abre una herramienta para crear frases musicales."
 
 #: js/turtledefs.js:310
@@ -4151,7 +4151,7 @@ msgstr "escala mayor C"
 
 #: js/basicblocks.js:1398
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
-msgid "pitch-time matrix"
+msgid "phrase maker"
 msgstr "matriz de tono en tiempo"
 
 #: js/basicblocks.js:1425

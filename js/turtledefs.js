@@ -315,7 +315,7 @@ function createHelpContent() {
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
         // Widgets palette
         'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status-block.svg'],
-        'matrix': [_('The Pitch-time Matrix block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg'],
+        'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg'],
         'rhythmruler2': [_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', 'rhythm-ruler-block.svg'],
         'pitchslider': [_('The Pitch-slider block opens a tool to generate arbitray pitches.'), 'documentation', 'pitch-slider-block.svg'],
         'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg'],

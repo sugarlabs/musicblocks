@@ -1400,7 +1400,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['matrix'] = newblock;
     //.TRANS: assigns pitch to a sequence of beats to generate a melody
-    newblock.staticLabels.push(_('pitch-time matrix'));
+    newblock.staticLabels.push(_('phrase maker'));
     newblock.adjustWidthToLabel();
     newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
