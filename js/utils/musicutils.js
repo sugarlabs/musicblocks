@@ -33,12 +33,17 @@ const FLAT = '♭';
 const NATURAL = '♮';
 const DOUBLESHARP = '𝄪';
 const DOUBLEFLAT = '𝄫';
-
+// note symbols
 const NSYMBOLS = {1: '𝅝',
                   2: '𝅗𝅥',
                   4: '♩',
                   8: '♪',
                   16: '𝅘𝅥𝅯'
+                 };
+// rest symbols
+const RSYMBOLS = {1: '𝄻',
+                  2: '𝄼',
+                  4: '𝄽',
                  };
 
 const BTOFLAT = {'Eb': 'E' + FLAT, 'Gb': 'G' + FLAT, 'Ab': 'A' + FLAT, 'Bb': 'B' + FLAT, 'Db': 'D' + FLAT, 'Cb': 'C' + FLAT, 'Fb': 'F' + FLAT, 'eb': 'E' + FLAT, 'gb': 'G' + FLAT, 'ab': 'A' + FLAT, 'bb': 'B' + FLAT, 'db': 'D' + FLAT, 'cb': 'C' + FLAT, 'fb': 'F' + FLAT};
