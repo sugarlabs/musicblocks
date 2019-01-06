@@ -136,7 +136,7 @@ function Blocks (activity) {
     this.clearLongPress = function () {
         this.inLongPress = false;
     };
-	
+
    /*
     * Set the Set Playback status variable
     * DEPRECATED
@@ -148,7 +148,7 @@ function Blocks (activity) {
         this.setPlaybackStatus = setPlaybackStatus;
         return this;
     };
-	
+
    /*
     * We need access to the canvas.
     * @param - canvas
@@ -159,7 +159,7 @@ function Blocks (activity) {
         this.canvas = canvas;
         return this;
     };
-	
+
    /*
     * We need access to the stage.
     * @param - stage - staging area
@@ -170,7 +170,7 @@ function Blocks (activity) {
         this.stage = stage;
         return this;
     };
-	
+
    /*
     * We need to be able to refreshe the canvas.
     * @param - refreshCanvas - new variable
@@ -181,7 +181,7 @@ function Blocks (activity) {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
-	
+
    /*
     * We need to access the trashcan.
     * @param - trashcan - new variable
@@ -192,7 +192,7 @@ function Blocks (activity) {
         this.trashcan = trashcan;
         return this;
     };
-	
+
    /*
     * We need to be able to update the stage.
     * @param - updateStage - new variable
@@ -203,7 +203,7 @@ function Blocks (activity) {
         this.updateStage = updateStage;
         return this;
     };
-	
+
    /*
     * We need to access the stage scale.
     * @param - getStageScale - new variable
@@ -402,7 +402,7 @@ function Blocks (activity) {
             this.blockMoved(blk);
         }
     };
-	
+
    /*
     * Find the y position of the bottom-most block
     * @public
@@ -485,7 +485,7 @@ function Blocks (activity) {
         this.boundary = boundary;
         return this;
     };
-	
+
    /*
     * Is this an action block?
     * @param - name - block name
@@ -495,7 +495,7 @@ function Blocks (activity) {
     this._actionBlock = function (name) {
         return ['do', 'doArg', 'calc', 'calcArg'].indexOf(name) !== -1;
     };
-	
+
    /*
     * Is this a named action block?
     * @param - name - block name
@@ -684,7 +684,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Add or remove the vspace blocks
     * @param - blk - block number
@@ -1172,7 +1172,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Deletes the next default element: either a Pitch block or a Silent block.
     * @param - thisBlock
@@ -1360,7 +1360,7 @@ function Blocks (activity) {
         // Is the added block above or below?
         var insertAfterDefault = true;
 
-	console.log('moving ' + this.blockList[thisBlock].name);
+        console.log('moving ' + this.blockList[thisBlock].name);
 
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
@@ -1374,13 +1374,13 @@ function Blocks (activity) {
             }
 
             if (COLLAPSIBLES.indexOf(this.blockList[b].name) !== -1) {
-		if (INLINECOLLAPSIBLES.indexOf(this.blockList[b].name) === -1) {
-		    if (this.blockList[b].collapsed) {
-			continue;
-		    }
-		}
-	    }
-		
+                if (INLINECOLLAPSIBLES.indexOf(this.blockList[b].name) === -1) {
+                    if (this.blockList[b].collapsed) {
+                        continue;
+                    }
+                }
+            }
+
             // Don't connect to a block in the trash.
             if (this.blockList[b].trash) {
                 continue;
@@ -1870,7 +1870,7 @@ function Blocks (activity) {
 
         this.refreshCanvas();
     };
-	
+
    /*
     * Checks the bounds to ensure blocks are "home".
     * @public
@@ -1894,7 +1894,7 @@ function Blocks (activity) {
             this.boundary.hide();
         }
     };
-	
+
    /*
     * Move a block to a specified position and check the docks afterward.
     * @public
@@ -1948,7 +1948,7 @@ function Blocks (activity) {
             console.log('No container yet for block ' + myBlock.name);
         }
     };
-	
+
    /*
     * Moves the blocks in a stack to a new position.
     * @param blk - block
@@ -2291,7 +2291,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Search for argument flow blocks.
     * @private
@@ -2396,7 +2396,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Unhighlight all blocks.
     * @public
@@ -2407,7 +2407,7 @@ function Blocks (activity) {
             this.unhighlight(blk);
         }
     };
-	
+
    /*
     * Unhighlight a block
     * @public
@@ -2432,7 +2432,7 @@ function Blocks (activity) {
             this.highlightedBlock = null;
         }
     };
-	
+
    /*
     * Highlight a block
     * @param - blk - block
@@ -2452,7 +2452,7 @@ function Blocks (activity) {
             this.highlightedBlock = blk;
         }
     };
-	
+
    /*
     * Hide all of the blocks.
     * @public
@@ -2464,7 +2464,7 @@ function Blocks (activity) {
         }
         this.visible = false;
     };
-	
+
    /*
     * Show all the blocks.
     * @public
@@ -2903,7 +2903,7 @@ function Blocks (activity) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].value = value;
-                    var label = value.toString();
+                    var label = i18nSolfege(value.toString());
                     that.blockList[thisBlock].text.text = label;
                 };
 
@@ -3084,7 +3084,7 @@ function Blocks (activity) {
         }
         return value;
     };
-	
+
    /*
     * Finds a unique custom name for custom mode block.
     * @param - name - new variable
@@ -3109,7 +3109,7 @@ function Blocks (activity) {
         }
         return value;
     }
-	
+
    /*
     * Finds a unique custom name for temperament block.
     * @param - name - new variable
@@ -3154,7 +3154,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Rename the block boxes.
     * @param - oldName - old name of boxes
@@ -3328,7 +3328,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
    /*
     * Renames Named do blocks.
     * @param oldName
@@ -3377,7 +3377,7 @@ function Blocks (activity) {
             // this.palettes.show();
         }
     };
-	
+
     /*
     * Make a new Storein block.
     * @param - name - new variable
@@ -3581,7 +3581,7 @@ function Blocks (activity) {
 
         return false;
     };
-	
+
    /*
     * Make a new Named Calc block.
     * @param - name -new variable
@@ -4225,7 +4225,7 @@ function Blocks (activity) {
         this._pasteDX = 0;
         this._pasteDY = 0;
     };
-	
+
    /*
     * Triggers the long press of keys and clears timeout.
     * @public
@@ -4308,7 +4308,7 @@ function Blocks (activity) {
             }
         }
     };
-	
+
   /*
    * Copies the Block to objects.
    * @public
@@ -5506,7 +5506,7 @@ function Blocks (activity) {
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
     };
-	
+
     /*
     * Cleanup the stacks after load.
     * @private
@@ -5600,7 +5600,7 @@ function Blocks (activity) {
 
         this.refreshCanvas;
     };
-	
+
    /*
     * Deletes an Action block
     * @param - myblock - new variable
@@ -5696,7 +5696,7 @@ function Blocks (activity) {
      * @return {void}
      */
     this.sendStackToTrash = function (myBlock) {
-	// First, hide the palettes as they will need updating.
+        // First, hide the palettes as they will need updating.
         for (var name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
         }
