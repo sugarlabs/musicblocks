@@ -4305,7 +4305,7 @@ function Blocks (activity) {
                 });
             } else {
                 this.addToMyPalette(name, blockObjs);
-                // this.palettes.updatePalettes('myblocks');
+                this.palettes.updatePalettes('myblocks');
             }
         }
     };

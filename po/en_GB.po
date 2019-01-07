@@ -10,6 +10,9 @@
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: ini-to-pot script\n"
 
+msgid "myblocks"
+msgstr "my blocks"
+
 #: js/activity.js:443
 #: js/activity.js:443
 #: js/activity.js:445

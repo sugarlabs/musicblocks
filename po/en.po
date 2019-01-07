@@ -1846,6 +1846,9 @@ msgstr ""
 msgid "My Project"
 msgstr ""
 
+msgid "myblocks"
+msgstr "my blocks"
+
 #: js/activity.js:2508
 msgid "Please set browser zoom level to 100%"
 msgstr ""

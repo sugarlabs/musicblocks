@@ -2037,7 +2037,7 @@ function Palette(palettes, name) {
     };
 
     this.promptMacrosDelete = function () {
-        var msg = 'Do you want to remove all the stacks from your custom palette?';
+        var msg = _('Do you want to remove all the stacks from your "My blocks" palette?');
         if (!confirm(msg)) {
             return;
         }
