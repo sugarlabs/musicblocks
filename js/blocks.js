@@ -4274,6 +4274,7 @@ function Blocks (activity) {
      * @return {void}
      */
     this.saveStack = function () {
+	console.log(this.selectedStack);
         if (this.selectedStack == null) {
             return;
         }
@@ -4373,6 +4374,7 @@ function Blocks (activity) {
         var myBlock = new ProtoBlock('macro_' + name);
         var blkName = 'macro_' + name;
         this.protoBlockDict[blkName] = myBlock;
+	console.log('Adding ' + name + ' to myblocks palette');
         if (!('myblocks' in this.palettes.dict)) {
             this.palettes.add('myblocks');
         }

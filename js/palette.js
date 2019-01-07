@@ -147,7 +147,7 @@ function Palettes () {
             that.stage.addChild(bitmap);
             that.selectorButtonsOff.push(bitmap);
             that.selectorButtonsOff[i].on('click', function (event) {
-                console.log('SHOWING ' + i + ' via mouse click');
+                // console.log('SHOWING ' + i + ' via mouse click');
                 that.showSelection(i);
             });
 
@@ -197,8 +197,19 @@ function Palettes () {
                 this.buttons[name].visible = false;
                 this.labels[name].visible = false;
             } else {
-                this.buttons[name].visible = true;
-                this.labels[name].visible = true;
+                if (name === 'myblocks') {
+                    var n = palettes.countProtoBlocks('myblocks');
+                    if (n === 0) {
+                        this.buttons[name].visible = false;
+                        this.labels[name].visible = false;
+                    } else {
+                        this.buttons[name].visible = true;
+                        this.labels[name].visible = true;
+                    }
+                } else {
+                    this.buttons[name].visible = true;
+                    this.labels[name].visible = true;
+                }
             }
         }
 
@@ -280,6 +291,18 @@ function Palettes () {
         }
 
         return (obj);
+    };
+
+    this.countProtoBlocks = function (name) {
+	// How many protoblocks are in palette name?
+        var n = 0;
+        for (var b in this.blocks.protoBlockDict) {
+            if (this.blocks.protoBlockDict[b].palette !== null && this.blocks.protoBlockDict[b].palette.name === name) {
+                n += 1;
+            }
+        }
+
+        return n;
     };
 
     this._updateButtonMasks = function () {
@@ -1957,7 +1980,7 @@ function Palette(palettes, name) {
     };
 
     this._promptPaletteDelete = function () {
-        var msg = 'Do you want to remove all "%s" blocks from your project?'.replace('%s', this.name)
+        var msg = _('Do you want to remove all "%s" blocks from your project?').replace('%s', this.name)
         if (!confirm(msg)) {
             return;
         }
@@ -2013,7 +2036,7 @@ function Palette(palettes, name) {
         this._hideMenuItems();
     };
 
-    this._promptMacrosDelete = function () {
+    this.promptMacrosDelete = function () {
         var msg = 'Do you want to remove all the stacks from your custom palette?';
         if (!confirm(msg)) {
             return;

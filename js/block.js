@@ -1736,6 +1736,7 @@ function Block(protoblock, blocks, overrideName) {
         // block.
         var v = '';
         var c = this.connections[1];
+        var vi = null;
         if (c !== null) {
             // Only look for standard form: / 1 4
             if (this.blocks.blockList[c].name === 'divide') {
@@ -1744,8 +1745,9 @@ function Block(protoblock, blocks, overrideName) {
                 if (this.blocks.blockList[c1].name === 'number' && this.blocks.blockList[c2].name === 'number') {
                     v = this.blocks.blockList[c1].value + '/' + this.blocks.blockList[c2].value;
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        if (this.blocks.blockList[c2].value in NSYMBOLS) {
-                            v += NSYMBOLS[this.blocks.blockList[c2].value];
+                        vi = this.blocks.blockList[c2].value;
+                        if (vi in NSYMBOLS) {
+                            v += NSYMBOLS[vi];
                         }
                     }
                 }
@@ -1756,11 +1758,26 @@ function Block(protoblock, blocks, overrideName) {
         c = this.blocks.findFirstPitchBlock(c);
         var p = this._getPitch(c);
         if (c === null) {
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (vi !== null) {
+                    if (vi in NSYMBOLS) {
+                        v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
+                    }
+                }
+            }
             this.collapseText.text = _('silence') + ' | ' + v;
         } else if (p === '' && v === '') {
             this.collapseText.text = _('note value');
         } else {
-            // Are there more pitch blocks in this note?
+            if (_THIS_IS_MUSIC_BLOCKS_ && p === _('silence')) {
+                if (vi !== null) {
+                    if (vi in NSYMBOLS) {
+                        v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
+                    }
+                }
+            }
+
+            // are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
             if (c === null) {
@@ -5594,7 +5611,9 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.name === 'action') {
             wheel.navItems[5].navigateFunction = function () {
+		console.log('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
+		that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
             };
         }

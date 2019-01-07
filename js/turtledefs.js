@@ -30,12 +30,12 @@ const VERSION = '2.71';
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
-const BUILTINPALETTES = ['search', 'rhythm', 'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'graphics', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'ensemble', 'extras'];
+const BUILTINPALETTES = ['search', 'rhythm', 'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'flow', 'action', 'boxes', 'widgets', 'graphics', 'pen', 'number', 'boolean', 'media', 'sensors', 'heap', 'ensemble', 'extras', 'myblocks'];
 
-const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('ornament'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('graphics'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('ensemble'), _('extras')];
+const BUILTINPALETTESFORL23N = [_('search'), _('rhythm'), _('meter'), _('pitch'), _('intervals'), _('tone'), _('ornament'), _('volume'), _('drum'), _('flow'), _('action'), _('boxes'), _('widgets'), _('graphics'), _('pen'), _('number'), _('boolean'), _('media'), _('sensors'), _('heap'), _('ensemble'), _('extras'), _('my blocks')];
 
 // We put the palette buttons into groups.
-const MULTIPALETTES = [['rhythm', 'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras'], ['graphics', 'pen', 'media', 'sensors', 'ensemble']];
+const MULTIPALETTES = [['rhythm', 'meter', 'pitch', 'intervals', 'tone', 'ornament', 'volume', 'drum', 'widgets'], ['flow', 'action', 'boxes', 'number', 'boolean', 'heap', 'extras', 'myblocks'], ['graphics', 'pen', 'media', 'sensors', 'ensemble']];
 
 // Skip these palettes in beginner mode.
 const SKIPPALETTES = ['heap', 'extras'];
@@ -43,6 +43,7 @@ const SKIPPALETTES = ['heap', 'extras'];
 // Icons used to select between multipalettes.
 const MULTIPALETTEICONS = ['music', 'logic', 'artwork'];
 const MULTIPALETTENAMES = [_('music'), _('logic'), _('artwork')];
+
 
 function getMainToolbarButtonNames(name) {
     return (['popdown-palette', 'run', 'step', 'step-music', 'stop-turtle', 'hard-stop-turtle', 'palette', 'help', 'sugarizer-stop', 'beginner', 'advanced', 'planet', 'planet-disabled', 'open', 'save', 'new'].indexOf(name) > -1);
