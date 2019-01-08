@@ -1006,6 +1006,7 @@ function Activity() {
      * Removes loaded plugin
      */
     deletePlugin = function () {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
         if (palettes.paletteObject !== null) {
             palettes.paletteObject.promptPaletteDelete();
@@ -2949,6 +2950,7 @@ function Activity() {
      * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
      */
     doOpenPlugin = function () {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
         pluginChooser.focus();
         pluginChooser.click();
     };
