@@ -49,6 +49,7 @@ Subdirectories with additional utilities
 	* `synthutils.js`: related to defining synths in tone.js
 	* `utils.js`: general utility functions
 * widgets -- widget code
+	* `help.js`: show help for individual blocks and the tour of Music Blocks
 	* `modewidget.js`: explore musical modes
 	* `pitchdrummatrix.js`: map pitches to drum sounds
 	* `pitchslider.js`: generate pitch blocks based on frequency (in Hertz)
