@@ -750,9 +750,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.hidden = true;
 
     // macro
-    var tuplet3Block = new ProtoBlock('tuplet3');
+    var newblock = new ProtoBlock('tuplet3');
     newblock.palette = palettes.dict[rhythmBlockPalette];
-    blocks.protoBlockDict['tuplet3'] = tuplet3Block;
+    blocks.protoBlockDict['tuplet3'] = newblock;
     newblock.staticLabels.push(_('tuplet'));
     newblock.staticLabels.push(_('number of notes'), _('note value'));
     newblock.extraWidth = 20;

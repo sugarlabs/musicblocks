@@ -4219,7 +4219,7 @@ function Blocks (activity) {
 
         // Copy the selectedStack.
         this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj()));
-        console.log(this.selectedBlocksObj);
+        // console.log(this.selectedBlocksObj);
 
         // Reset paste offset.
         this._pasteDX = 0;

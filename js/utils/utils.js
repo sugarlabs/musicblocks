@@ -237,9 +237,9 @@ function _ (text) {
 
     if (localStorage.kanaPreference === 'kana') {
         var lang = document.webL10n.getLanguage();
-	if (lang === 'ja') {
-	    replaced = 'kana-' + replaced;
-	}
+        if (lang === 'ja') {
+            replaced = 'kana-' + replaced;
+        }
     }
 
     try {
@@ -347,6 +347,8 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
             HIGHLIGHTSTROKECOLORS[name] = strokeHighlightColor;
 
+            platformColor.paletteColors[name] = [fillColor, strokeColor, highlightColor, strokeHighlightColor];
+
             if (name in palettes.buttons) {
                 console.log('palette ' + name + ' already exists');
             } else {
@@ -359,6 +361,7 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
     if (newPalette) {
         try {
+            console.log('CALLING makePalettes');
             palettes.makePalettes();
         } catch (e) {
             console.log('makePalettes: ' + e);
@@ -458,20 +461,23 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
         }
     }
 
-    try {
-	// Push the protoblocks onto their palettes.
-	for (var protoblock in blocks.protoBlockDict) {
+    for (var protoblock in blocks.protoBlockDict) {
+        try {
+        // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
-		console.log('Cannot find palette for protoblock ' + protoblock);
+                console.log('Cannot find palette for protoblock ' + protoblock);
+            } else if (blocks.protoBlockDict[protoblock].palette === null) {
+                console.log('Cannot find palette for protoblock ' + protoblock);
             } else {
-		blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+                blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
             }
-	}
-    } catch (e) {
-	console.log(e);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    palettes.updatePalettes();
+    console.log('updating palette ' + name);
+    palettes.updatePalettes(name);
 
     // Return the object in case we need to save it to local storage.
     return obj;
@@ -708,9 +714,9 @@ function displayMsg (blocks, text) {
 function safeSVG (label) {
     if (typeof(label) === 'string') {
         return label
-	    .replace(/&/, '&amp;')
-	    .replace(/</, '&lt;')
-	    .replace(/>/, '&gt;');
+            .replace(/&/, '&amp;')
+            .replace(/</, '&lt;')
+            .replace(/>/, '&gt;');
     } else {
         return label;
     }
@@ -1081,9 +1087,9 @@ function rgbToHex(r, g, b) {
 function hexToRGB(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
-	r: parseInt(result[1], 16),
-	g: parseInt(result[2], 16),
-	b: parseInt(result[3], 16)
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
     } : null;
 };
 

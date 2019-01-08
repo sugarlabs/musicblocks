@@ -1008,7 +1008,15 @@ function Activity() {
     deletePlugin = function () {
         blocks.activeBlock = null;
         if (palettes.paletteObject !== null) {
-            palettes.paletteObject._promptPaletteDelete();
+            palettes.paletteObject.promptPaletteDelete();
+        } else {
+            // look to see if My Blocks palette is visible
+            if (palettes.buttons['myblocks'].visible) {
+                console.log(palettes.dict['myblocks'].visible);
+                if (palettes.dict['myblocks'].visible) {
+                    palettes.dict['myblocks'].promptMacrosDelete();
+                }
+            }
         }
     };
 

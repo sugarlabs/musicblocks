@@ -97,6 +97,7 @@ function Palettes () {
     this.selectorButtonsOn = [];  // Select between palettes in their on state
     this.buttons = {};  // The toolbar button for each palette.
     this.labels = {};  // The label for each button.
+    this.pluginPalettes = [];  // List of palettes not in multipalette list
 
     this.init = function () {
         this.halfCellSize = Math.floor(this.cellSize / 2);
@@ -196,6 +197,13 @@ function Palettes () {
             } else if (MULTIPALETTES[i].indexOf(name) === -1) {
                 this.buttons[name].visible = false;
                 this.labels[name].visible = false;
+                if (i === MULTIPALETTES.length - 1) { // last selector
+                    if (this.pluginPalettes.indexOf(name) > -1) {
+                        console.log('Showing ' + name);
+                        this.buttons[name].visible = true;
+                        this.labels[name].visible = true;
+                    }
+                }
             } else {
                 if (name === 'myblocks') {
                     var n = palettes.countProtoBlocks('myblocks');
@@ -294,7 +302,7 @@ function Palettes () {
     };
 
     this.countProtoBlocks = function (name) {
-	// How many protoblocks are in palette name?
+        // How many protoblocks are in palette name?
         var n = 0;
         for (var b in this.blocks.protoBlockDict) {
             if (this.blocks.protoBlockDict[b].palette !== null && this.blocks.protoBlockDict[b].palette.name === name) {
@@ -404,10 +412,15 @@ function Palettes () {
                     }
 
                     if (i === MULTIPALETTES.length) {
-                        // We didn't find a match...
-                        this.buttons[name].x = this.x[1];
-                        this.buttons[name].y = this.y[1] + this.scrollDiff;
-                        this.y[1] += this.cellSize;
+			// Put plugins in last multipalette selector
+			i = MULTIPALETTES.length - 1; 
+                        console.log("We didn't find a multipalette for " + name);
+                        this.buttons[name].x = this.x[i];
+                        this.buttons[name].y = this.y[i] + this.scrollDiff;
+                        this.y[i] += this.cellSize;
+                        if (this.pluginPalettes.indexOf(name) === -1) {
+                            this.pluginPalettes.push(name);
+                        }
                     }
                 }
 
@@ -566,8 +579,12 @@ function Palettes () {
             return;
         }
 
+        console.log(this.labels[name]);
+        this.labels[name].visible = false;
+        this.stage.removeChild(this.labels[name]);
+        this.buttons[name].visible = false;
         this.buttons[name].removeAllChildren();
-        this.labels[name].removeAllChildren();
+        this.stage.removeChild(this.buttons[name]);
         var btnKeys = Object.keys(this.dict);
         for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
             this.buttons[btnKeys[btnKey]].y -= this.cellSize;
@@ -1571,6 +1588,7 @@ function Palette(palettes, name) {
             this.palettes.paletteObject = this;
         } else {
             this.palettes.pluginsDeleteStatus = false;
+            this.palettes.paletteObject = null;
         }
     };
 
@@ -1979,8 +1997,10 @@ function Palette(palettes, name) {
         this._resetLayout();
     };
 
-    this._promptPaletteDelete = function () {
-        var msg = _('Do you want to remove all "%s" blocks from your project?').replace('%s', this.name)
+    this.promptPaletteDelete = function () {
+        console.log(this.name);
+        // .TRANS: "%s" will be replaced by the palette name.
+        var msg = _('Do you want to remove all the stacks from your "%s" palette?').replace('%s', _(this.name));
         if (!confirm(msg)) {
             return;
         }
@@ -2037,13 +2057,14 @@ function Palette(palettes, name) {
     };
 
     this.promptMacrosDelete = function () {
-        var msg = _('Do you want to remove all the stacks from your "My blocks" palette?');
+        var msg = _('Do you want to remove all the stacks from your "%s" palette?').replace('%s', _('myblocks'));
         if (!confirm(msg)) {
             return;
         }
 
         for (var i = 0; i < this.protoList.length; i++) {
             var name = this.protoList[i].name;
+            this.protoContainers[name].visible = false;
             delete this.protoContainers[name];
             this.protoList.splice(i, 1);
         }
