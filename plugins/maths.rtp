@@ -83,8 +83,6 @@ block.value = Math.pow(base, exp);
 
 //* palette-icon:maths *//
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -105,13 +103,13 @@ block.value = Math.pow(base, exp);
      style="fill:#000000;display:block"><path
        d="m 11.852704,38.123539 31.294591,0 -31.294591,-26.247077 z"
        id="path5"
-       style="fill:none;stroke:#ffffff;stroke-width:3.53326035" /><path
+       style="fill:none;stroke:#FF6EA1;stroke-width:3.53326035" /><path
        d="m 11.852704,30.047514 8.076024,0 0,8.076025"
        id="path7"
-       style="fill:none;stroke:#ffffff;stroke-width:1.51425433" /></g></svg>
+       style="fill:none;stroke:#FF6EA1;stroke-width:1.51425433" /></g></svg>
 
-//* palette-fill:maths *// #ff0066
-//* palette-stroke:maths *// #ef003e
-//* palette-highlight:maths *// #ffb1b3
-//* palette-stroke-highlight:maths *// #000000
+//* palette-fill:maths *// #FF6EA1
+//* palette-stroke:maths *// #FF2C76
+//* palette-highlight:maths *// #FF5293
+//* palette-stroke-highlight:maths *// #FFCDDF
 

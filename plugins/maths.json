@@ -1,6 +1,6 @@
 {
     "HIGHLIGHTSTROKECOLORS": {
-        "maths": "#000000"
+        "maths": "#FFCDDF"
     }, 
     "ARGPLUGINS": {
         "asin": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.asin(logo.parseArg(logo, turtle, conns[1]));", 
@@ -19,10 +19,10 @@ ons;block.value = Math.PI;",
         "tan": "var block = logo.blocks.blockList[blk];var conns = block.connections;block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));"
     }, 
     "PALETTEHIGHLIGHTCOLORS": {
-        "maths": "#ffb1b3"
+        "maths": "#FF5293"
     }, 
     "PALETTEPLUGINS": {
-        "maths": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!-- Created with Inkscape (http://www.inkscape.org/) --><svg   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"   xmlns:cc=\"http://creativecommons.org/ns#\"   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"   xmlns:svg=\"http://www.w3.org/2000/svg\"   xmlns=\"http://www.w3.org/2000/svg\"   version=\"1.1\"   width=\"55\"   height=\"55\"   viewBox=\"0 0 55 55\"   id=\"svg2\"   xml:space=\"preserve\"><metadata     id=\"metadata13\"><rdf:RDF><cc:Work         rdf:about=\"\"><dc:format>image/svg+xml</dc:format><dc:type           rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs     id=\"defs11\" /><g     id=\"toolbar-trigonometry\"     style=\"fill:#000000;display:block\"><path       d=\"m 11.852704,38.123539 31.294591,0 -31.294591,-26.247077 z\"       id=\"path5\"       style=\"fill:none;stroke:#ffffff;stroke-width:3.53326035\" /><path       d=\"m 11.852704,30.047514 8.076024,0 0,8.076025\"       id=\"path7\"       style=\"fill:none;stroke:#ffffff;stroke-width:1.51425433\" /></g></svg>"
+        "maths": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!-- Created with Inkscape (http://www.inkscape.org/) --><svg   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"   xmlns:cc=\"http://creativecommons.org/ns#\"   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"   xmlns:svg=\"http://www.w3.org/2000/svg\"   xmlns=\"http://www.w3.org/2000/svg\"   version=\"1.1\"   width=\"55\"   height=\"55\"   viewBox=\"0 0 55 55\"   id=\"svg2\"   xml:space=\"preserve\"><metadata     id=\"metadata13\"><rdf:RDF><cc:Work         rdf:about=\"\"><dc:format>image/svg+xml</dc:format><dc:type           rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs     id=\"defs11\" /><g     id=\"toolbar-trigonometry\"     style=\"fill:#000000;display:block\"><path       d=\"m 11.852704,38.123539 31.294591,0 -31.294591,-26.247077 z\"       id=\"path5\"       style=\"fill:none;stroke:#FF6EA1;stroke-width:3.53326035\" /><path       d=\"m 11.852704,30.047514 8.076024,0 0,8.076025\"       id=\"path7\"       style=\"fill:none;stroke:#FF6EA1;stroke-width:1.51425433\" /></g></svg>"
     }, 
     "BLOCKPLUGINS": {
         "asin": "var simpleOneArgBlock = function (name, label) {    if (label === undefined) { var label = name; }    var block = new ProtoBlock(name);    block.palette = palettes.dict['maths'];    blocks.protoBlockDict[name] = block;    block.staticLabels.push(label);    block.adjustWidthToLabel();    block.oneArgMathBlock();    block.defaults.push(1);};var staticBlock = function (name, label) {    var block = new ProtoBlock(name);    block.palette = palettes.dict['maths'];    blocks.protoBlockDict[name] = block;    block.staticLabels.push(label);    block.adjustWidthToLabel();    block.parameterBlock();};simpleOneArgBlock('asin');", 
@@ -40,9 +40,9 @@ ons;block.value = Math.PI;",
         "radians": "var simpleOneArgBlock = function (name, label) {    if (label === undefined) { var label = name; }    var block = new ProtoBlock(name);    block.palette = palettes.dict['maths'];    blocks.protoBlockDict[name] = block;    block.staticLabels.push(label);    block.adjustWidthToLabel();    block.oneArgMathBlock();    block.defaults.push(1);};var staticBlock = function (name, label) {    var block = new ProtoBlock(name);    block.palette = palettes.dict['maths'];    blocks.protoBlockDict[name] = block;    block.staticLabels.push(label);    block.adjustWidthToLabel();    block.parameterBlock();};simpleOneArgBlock(_('radians'), _('to radians'));"
     }, 
     "PALETTEFILLCOLORS": {
-        "maths": "#ff0066"
+        "maths": "#FF6EA1"
     }, 
     "PALETTESTROKECOLORS": {
-        "maths": "#ef003e"
+        "maths": "#FF2C76"
     }
 }
