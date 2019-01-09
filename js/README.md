@@ -91,7 +91,7 @@ is where the code associated with running each block is defined.
 
 1. Define the type of block
 
-`var uniquenameBlock = new protoBlock('uniquename');`
+`var uniquenameBlock = new ProtoBlock('uniquename');`
 
 e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');`
 
