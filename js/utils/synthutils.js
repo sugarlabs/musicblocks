@@ -51,6 +51,10 @@ var VOICENAMES = [
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('bassoon'), 'bassoon', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('celeste'), 'celeste', 'images/voices.svg', 'string'],
     //.TRANS: polytone synthesizer
     [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -141,7 +145,8 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
+    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar",
+    "samples/bassoon", "samples/celeste"
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -162,6 +167,8 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'bassoon': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
+    'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
 
@@ -441,6 +448,8 @@ function Synth() {
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
 		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
+		{'name': 'celeste', 'data': CELESTE_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
