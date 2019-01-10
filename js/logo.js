@@ -4997,7 +4997,7 @@ function Logo () {
 
                     that._processNote(noteBeatValue, blk, turtle, __callback);
                 } else {
-                    that.errorMsg(_('Pitch Block: Did you mean to use a Note block2?'), blk);
+                    that.errorMsg(_('Pitch Block: Did you mean to use a Note block?'), blk);
                 }
             }
             break;

@@ -739,7 +739,7 @@ msgid "Scalar transpositions are equal to Semitone transpositions for custom tem
 msgstr ""
 
 #: js/logo.js:5000
-msgid "Pitch Block: Did you mean to use a Note block2?"
+msgid "Pitch Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/logo.js:5040

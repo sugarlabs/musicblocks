@@ -1509,6 +1509,49 @@
 #: js/rhythmruler.js:1178
 #: js/rhythmruler.js:1286
 #: js/rhythmruler.js:1288
+#: js/block.js:1162
+#: js/block.js:5430
+#: js/block.js:5439
+#: js/block.js:5450
+#: js/activity.js:2134
+#: js/palette.js:810
+#: js/palette.js:819
+#: js/palette.js:828
+#: js/palette.js:837
+#: js/palette.js:2142
+#: js/palette.js:2153
+#: js/palette.js:2164
+#: js/palette.js:2175
+#: js/palette.js:2185
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1542
+#: js/basicblocks.js:1562
+#: js/basicblocks.js:1576
+#: js/basicblocks.js:3982
+#: js/basicblocks.js:4022
+#: js/basicblocks.js:4032
+#: js/basicblocks.js:4080
+#: js/basicblocks.js:4093
+#: js/basicblocks.js:4141
+#: js/basicblocks.js:4196
+#: js/basicblocks.js:4201
+#: js/basicblocks.js:4206
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4600
+#: js/blocks.js:5457
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1176
+#: js/rhythmruler.js:1178
+#: js/rhythmruler.js:1286
+#: js/rhythmruler.js:1288
 #.TRANS: a stack of blocks to run (an action to take)
 #.TRANS: acción
 msgid "action"
@@ -2296,9 +2339,8 @@ msgid "Scalar transpositions are equal to Semitone transpositions for custom tem
 msgstr ""
 
 #: js/logo.js:5000
-#.TRANS: Bloque de tone: Quizás quiso decir utilizar un bloque de nota?
-msgid "Pitch Block: Did you mean to use a Note block2?"
-msgstr ""
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr "Pitch larama wakichata: Maya siqi warurt'a chimpcha?"
 
 #: js/logo.js:5040
 #.TRANS: ritmo polifónico
@@ -2612,10 +2654,12 @@ msgstr "Jañurt’äwi"
 
 #: js/palette.js:2003
 #: js/palette.js:2060
+#.TRANS: 
 msgid "Do you want to remove all the stacks from your \"%s\" palette?"
 msgstr ""
 
 #: js/palette.js:2060
+#.TRANS: 
 msgid "myblocks"
 msgstr ""
 
@@ -2779,6 +2823,7 @@ msgid "extras"
 msgstr "yaqhanaka"
 
 #: js/turtledefs.js:35
+#.TRANS: 
 msgid "my blocks"
 msgstr ""
 
@@ -3767,6 +3812,7 @@ msgstr ""
 
 #: js/turtledefs.js:344
 #: js/turtledefs.js:584
+#.TRANS: 
 msgid "The Add-to block is used to add to the value stored in a box."
 msgstr ""
 
@@ -3881,6 +3927,7 @@ msgid "The Y block returns the vertical position of the mouse."
 msgstr ""
 
 #: js/turtledefs.js:368
+#.TRANS: 
 msgid "The Heading block returns the orientation of the mouse."
 msgstr ""
 
@@ -4942,14 +4989,17 @@ msgstr ""
 
 #: js/toolbar.js:456
 #: js/toolbar.js:499
+#.TRANS: 
 msgid "About Turtle Blocks"
 msgstr ""
 
 #: js/toolbar.js:521
+#.TRANS: 
 msgid "Save turtle artwork as SVG"
 msgstr ""
 
 #: js/toolbar.js:522
+#.TRANS: 
 msgid "Save turtle artwork as PNG"
 msgstr ""
 
@@ -9279,17 +9329,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "chord' + ' ' + 'V"
 #~msgstr ""
 
-#: js/timbre.js:743
-
-#: js/rhythmruler.js:1481
-
-#: js/modewidget.js:95
-
-#: js/pitchstaircase.js:534
-
-#~msgid "undo"
-#~msgstr "kutt'aña"
-
 #: js/basicblocks.js:2464
 
 #~msgid "chord' + ' ' + 'I"
@@ -9413,6 +9452,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Do</em> block is used to initiate an action."
 #~msgstr ""
 
+#: js/turtledefs.js:200
+
+#~msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
+#~msgstr ""
+
 #: js/turtledefs.js:422
 
 #~msgid "The Indexheap block returns a value in the heap at a specified location."
@@ -9490,20 +9534,13 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The Show heap block displays the contents of the heap at the top of the screen."
 #~msgstr ""
 
-#: js/turtledefs.js:260
-
-#~msgid "The <em>Number</em> block holds a number."
-#~msgstr ""
-
 #: js/turtledefs.js:381
 
 #~msgid "The <em>Case</em> block is used inside of a <em>Switch</em> to define matches."
 #~msgstr ""
 
-#: js/turtledefs.js:251
-
-#~msgid "The <em>Do</em> block is used to initiate an action. In the example, it is used with the <em>One of</em> block to choose a random phase."
-#~msgstr ""
+#~msgid "graphical notation matrix"
+#~msgstr "rixita qhananchaña wakichata"
 
 #: js/turtledefs.js:458
 
@@ -9530,9 +9567,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "turtle note value"
 #~msgstr ""
 
-#: js/turtledefs.js:29
+#: js/turtledefs.js:380
 
-#~msgid "floor-tom"
+#~msgid "The <em>Switch</em> block will run the code in the matchin <em>Case</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:295
@@ -9555,10 +9592,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The On-every-beat block let you specify actions to take on every beat."
 #~msgstr ""
 
-#: js/musicutils.js:237
+#: js/basicblocks.js:1501
 
-#~msgid "Spanish Gypsy"
-#~msgstr "Gitana española wakichata"
+#~msgid "on every beat do"
+#~msgstr ""
 
 #: js/basicblocks.js:893
 
@@ -9612,14 +9649,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Save as abc"
 #~msgstr ""
 
-#: js/basicblocks.js:3078
+#: js/turtledefs.js:456
 
-#~msgid "note volume"
-#~msgstr "warurt'äwi jach'ata qhantayaña"
-
-#: js/activity.js:3541
-
-#~msgid "Save as .abc"
+#~msgid "The <em>To frequency</em> block converts a pitch name and octave to Hertz."
 #~msgstr ""
 
 #: js/turtledefs.js:144
@@ -9629,10 +9661,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Open a panel for configuring Music Blocks."
 #~msgstr "Tortuga wakichata siqinaka wakichañataki wakisiri wakichaña qhantayma"
 
-#: js/turtledefs.js:407
+#: js/turtledefs.js:87
 
-#~msgid "The <em>And</em> block is the logical and operator."
-#~msgstr ""
+#~msgid "Hide or show the block palettes."
+#~msgstr "siqinaka wakichaña imantaña unstayaña"
 
 #: js/activity.js:3533
 
@@ -9773,13 +9805,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Run"
 #~msgstr ""
 
-#: js/turtledefs.js:29
-
-#: js/musicutils.js:287
-
-#~msgid "natural-minor"
-#~msgstr ""
-
 #: js/turtledefs.js:169
 
 #~msgid "You can load new blocks from the file system."
@@ -9886,11 +9911,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Set translucency</em> block changes the opacity of the pen."
 #~msgstr ""
 
-#: js/turtledefs.js:200
-
-#~msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
-#~msgstr ""
-
 #: js/turtledefs.js:218
 
 #~msgid "The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes."
@@ -9911,10 +9931,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Crescendo</em> block will increase the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume."
 #~msgstr ""
 
-#: js/turtledefs.js:456
+#: js/basicblocks.js:3078
 
-#~msgid "The <em>To frequency</em> block converts a pitch name and octave to Hertz."
-#~msgstr ""
+#~msgid "note volume"
+#~msgstr "warurt'äwi jach'ata qhantayaña"
 
 #: js/synthutils.js:92
 
@@ -10040,11 +10060,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Run fast / long press to run slow / extra-long press to run music slow"
 #~msgstr ""
 
-#: js/logo.js:4547
-
-#~msgid "Pitch Block: Did you mean to use a Note block?"
-#~msgstr "Pitch larama wakichata: Maya siqi warurt'a chimpcha?"
-
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
@@ -10068,11 +10083,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #: js/turtledefs.js:199
 
 #~msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
-#~msgstr ""
-
-#: js/turtledefs.js:296
-
-#~msgid "The <em>Width</em> block returns the width of the canvas."
 #~msgstr ""
 
 #: js/turtledefs.js:110
@@ -10142,25 +10152,15 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Neighbor</em> block rapidly switches between neighboring pitches."
 #~msgstr ""
 
-#: js/logo.js:2175
+#: js/turtledefs.js:353
 
-#: js/logo.js:7714
-
-#: js/logo.js:7849
-
-#: js/logo.js:7909
-
-#: js/logo.js:8029
-
-#: js/logo.js:8057
-
-#~msgid "Could not find mouse"
+#~msgid "The <em>Distortion</em> block adds distortion to the pitch."
 #~msgstr ""
 
-#: js/lilypond.js:21
+#: js/turtledefs.js:469
 
-#~msgid "br"
-#~msgstr "lsa"
+#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
+#~msgstr ""
 
 #: js/block.js:1306
 
@@ -10303,10 +10303,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr ""
 
-#: js/basicblocks.js:4872
+#: js/turtledefs.js:303
 
-#~msgid "save as lilypond"
-#~msgstr "Ukawa warurt'awi chimpu..."
+#~msgid "The <em>Cursor X</em> block returns the horizontal position of the mouse."
+#~msgstr ""
 
 #: js/turtledefs.js:266
 
@@ -10520,9 +10520,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Beats per minute</em> block changes the beats per minute of any contained notes."
 #~msgstr ""
 
-#: js/turtledefs.js:368
+#: js/turtledefs.js:243
 
-#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
+#: js/turtledefs.js:244
+
+#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
 #~msgstr ""
 
 #: js/turtledefs.js:143
@@ -10598,6 +10600,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #: js/activity.js:2459
 
 #~msgid "untitled"
+#~msgstr ""
+
+#: js/activity.js:4426
+
+#~msgid "Run music step by step"
 #~msgstr ""
 
 #: js/samplesviewer.js:700
@@ -10692,10 +10699,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Swing</em> block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
 #~msgstr ""
 
-#: js/basicblocks.js:703
+#: js/logo.js:3606
 
-#~msgid "set voice"
-#~msgstr "aru chimpuña"
+#~msgid "Distortion not in range"
+#~msgstr ""
 
 #: js/toolbar.js:340
 
@@ -10839,6 +10846,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The Reverseheap block reverses the order of the heap."
 #~msgstr ""
 
+#: js/basicblocks.js:4883
+
+#~msgid "save svg"
+#~msgstr " SVG Sutini imaña"
+
 #: js/turtledefs.js:262
 
 #~msgid "The <em>One-of</em> block returns one of two choices."
@@ -10903,6 +10915,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "field"
 #~msgstr "apanaqäwi"
 
+#: js/turtledefs.js:270
+
+#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
+#~msgstr ""
+
 #: js/lilypond.js:21
 
 #~msgid "m"
@@ -10965,8 +10982,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Jazz Minor"
 #~msgstr "Sullka Jazz wakichata"
 
-#~msgid "graphical notation matrix"
-#~msgstr "rixita qhananchaña wakichata"
+#: js/turtledefs.js:251
+
+#~msgid "The <em>Do</em> block is used to initiate an action. In the example, it is used with the <em>One of</em> block to choose a random phase."
+#~msgstr ""
 
 #: js/toolbar.js:372
 
@@ -11003,10 +11022,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Dispatch</em> block is used to trigger an event."
 #~msgstr ""
 
-#: js/turtledefs.js:87
+#: js/turtledefs.js:407
 
-#~msgid "Hide or show the block palettes."
-#~msgstr "siqinaka wakichaña imantaña unstayaña"
+#~msgid "The <em>And</em> block is the logical and operator."
+#~msgstr ""
 
 #: js/activity.js:2712
 
@@ -11159,11 +11178,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The Stopplayback block"
 #~msgstr ""
 
-#: js/turtledefs.js:243
+#: js/turtledefs.js:368
 
-#: js/turtledefs.js:244
-
-#~msgid "Conditionals lets your program take different actions depending on the <em>condition</em>. In this example, <em>if</em> the mouse button is pressed, a snare drum will play. Otherwise (<em>else</em>) a kick drum will play."
+#~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
 #~msgstr ""
 
 #: js/turtledefs.js:471
@@ -11218,9 +11235,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "More"
 #~msgstr ""
 
-#: js/turtledefs.js:304
+#: js/turtledefs.js:461
 
-#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
+#~msgid "The <em>Playback</em> block"
 #~msgstr ""
 
 #~msgid "maths"
@@ -11278,11 +11295,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #: js/turtledefs.js:164
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Action and more."
-#~msgstr ""
-
-#: js/help.js:72
-
-#~msgid "next page"
 #~msgstr ""
 
 #: js/turtledefs.js:241
@@ -11482,10 +11494,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "deprecated note value"
 #~msgstr "jaqunukata qillqata arsuyaña chani"
 
-#: js/basicblocks.js:1501
+#: js/musicutils.js:237
 
-#~msgid "on every beat do"
-#~msgstr ""
+#~msgid "Spanish Gypsy"
+#~msgstr "Gitana española wakichata"
 
 #: js/musicutils.js:226
 
@@ -11519,10 +11531,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
 #~msgstr ""
 
-#: js/musicutils.js:233
+#: js/turtledefs.js:207
 
-#~msgid "Hindu"
-#~msgstr "Hindú wakichata"
+#~msgid "e.g., 1, 2, 3, or 4."
+#~msgstr ""
 
 #: js/turtledefs.js:316
 
@@ -11586,15 +11598,25 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "bt"
 #~msgstr "ch"
 
-#: js/turtledefs.js:353
+#: js/logo.js:2175
 
-#~msgid "The <em>Distortion</em> block adds distortion to the pitch."
+#: js/logo.js:7714
+
+#: js/logo.js:7849
+
+#: js/logo.js:7909
+
+#: js/logo.js:8029
+
+#: js/logo.js:8057
+
+#~msgid "Could not find mouse"
 #~msgstr ""
 
-#: js/turtledefs.js:469
+#: js/lilypond.js:21
 
-#~msgid "The <em>Get green</em> block returns the green component of the pixel under the mouse."
-#~msgstr ""
+#~msgid "br"
+#~msgstr "lsa"
 
 #: js/turtledefs.js:235
 
@@ -11606,10 +11628,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "???"
 #~msgstr ""
 
-#: js/turtledefs.js:303
+#: js/basicblocks.js:4872
 
-#~msgid "The <em>Cursor X</em> block returns the horizontal position of the mouse."
-#~msgstr ""
+#~msgid "save as lilypond"
+#~msgstr "Ukawa warurt'awi chimpu..."
 
 #: js/activity.js:3444
 
@@ -11641,10 +11663,16 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "sort"
 #~msgstr "wakichaña"
 
-#: js/logo.js:3606
+#: js/logo.js:5000
 
-#~msgid "Distortion not in range"
+#.TRANS: Bloque de tone: Quizás quiso decir utilizar un bloque de nota?
+#~msgid "Pitch Block: Did you mean to use a Note block2?"
 #~msgstr ""
+
+#: js/basicblocks.js:703
+
+#~msgid "set voice"
+#~msgstr "aru chimpuña"
 
 #: js/turtledefs.js:453
 
@@ -11732,9 +11760,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Shell</em> block is used to change the appearance of the mouse."
 #~msgstr ""
 
-#: js/turtledefs.js:270
+#: js/turtledefs.js:260
 
-#~msgid "The <em>Equal</em> block returns <em>True</em> if the two numbers are equal."
+#~msgid "The <em>Number</em> block holds a number."
 #~msgstr ""
 
 #: js/savebox.js:105
@@ -11757,9 +11785,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Load plugin from file"
 #~msgstr "plugin wakichata qhantayaña"
 
-#: js/turtledefs.js:461
+#: js/turtledefs.js:304
 
-#~msgid "The <em>Playback</em> block"
+#~msgid "The <em>Cursor Y</em> block returns the vertical position of the mouse."
 #~msgstr ""
 
 #: js/basicblocks.js:3806
@@ -11771,6 +11799,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "Mr. Mouse is our Music Blocks conductor."
 #~msgstr "Achaku tatawa siqi warurt'äwinaka qhanayirixa."
+
+#: js/activity.js:3541
+
+#~msgid "Save as .abc"
+#~msgstr ""
 
 #: js/turtledefs.js:210
 
@@ -11828,10 +11861,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Plus</em> block is used to add."
 #~msgstr ""
 
-#: js/turtledefs.js:207
+#: js/musicutils.js:233
 
-#~msgid "e.g., 1, 2, 3, or 4."
-#~msgstr ""
+#~msgid "Hindu"
+#~msgstr "Hindú wakichata"
 
 #: js/turtledefs.js:416
 
@@ -12045,6 +12078,17 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Get blue</em> block returns the blue component of the pixel under the mouse."
 #~msgstr ""
 
+#: js/timbre.js:743
+
+#: js/rhythmruler.js:1481
+
+#: js/modewidget.js:95
+
+#: js/pitchstaircase.js:534
+
+#~msgid "undo"
+#~msgstr "kutt'aña"
+
 #: js/turtledefs.js:187
 
 #: js/toolbar.js:377
@@ -12071,9 +12115,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Set relative volume</em> block changes the volume of the contained notes."
 #~msgstr ""
 
-#: js/turtledefs.js:380
+#: js/turtledefs.js:29
 
-#~msgid "The <em>Switch</em> block will run the code in the matchin <em>Case</em>."
+#~msgid "floor-tom"
 #~msgstr ""
 
 #: js/basicblocks.js:282
@@ -12206,6 +12250,13 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "You can also use Alt+C to copy a stack of blocks."
 #~msgstr ""
 
+#: js/turtledefs.js:29
+
+#: js/musicutils.js:287
+
+#~msgid "natural-minor"
+#~msgstr ""
+
 #: js/activity.js:4437
 
 #: js/activity.js:4472
@@ -12216,9 +12267,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "This button opens and closes the primary toolbar."
 #~msgstr "Aka limt’añaxa wakichatanaka wakisiri apanaqañanaka qhantayi jiwayi"
 
-#: js/activity.js:4426
+#: js/turtledefs.js:296
 
-#~msgid "Run music step by step"
+#~msgid "The <em>Width</em> block returns the width of the canvas."
 #~msgstr ""
 
 #: js/turtledefs.js:417
@@ -12313,10 +12364,10 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "Remove all content on the canvas, including the blocks."
 #~msgstr "carnavas taypina wakichatanakapa qawayata apsuña, siqinakamppacha"
 
-#: js/basicblocks.js:4883
+#: js/help.js:72
 
-#~msgid "save svg"
-#~msgstr " SVG Sutini imaña"
+#~msgid "next page"
+#~msgstr ""
 
 #: js/samplesviewer.js:699
 
@@ -12328,9 +12379,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>No background</em> block eliminates the background from the saved SVG output."
 #~msgstr ""
 
-#: js/activity.js:2527
+#: js/turtledefs.js:242
 
-#~msgid "My Music Blocks Creation"
+#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
 #~msgstr ""
 
 #: js/turtledefs.js:438
@@ -12398,6 +12449,11 @@ msgstr "Maya wakichata imata chhijllañamawa"
 
 #~msgid "export"
 #~msgstr "apsuña"
+
+#: js/turtledefs.js:402
+
+#~msgid "The <em>Power</em> block calculates a power function."
+#~msgstr ""
 
 #: js/turtledefs.js:440
 
@@ -12500,9 +12556,9 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #~msgid "The <em>Notes played</em> block is the number of notes that have been played. (By default, it counts quarter notes.)"
 #~msgstr ""
 
-#: js/turtledefs.js:242
+#: js/activity.js:2527
 
-#~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
+#~msgid "My Music Blocks Creation"
 #~msgstr ""
 
 #: js/turtledefs.js:248
@@ -12513,11 +12569,6 @@ msgstr "Maya wakichata imata chhijllañamawa"
 #: js/turtledefs.js:352
 
 #~msgid "e.g. \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr ""
-
-#: js/turtledefs.js:402
-
-#~msgid "The <em>Power</em> block calculates a power function."
 #~msgstr ""
 
 #: js/basicblocks.js:83

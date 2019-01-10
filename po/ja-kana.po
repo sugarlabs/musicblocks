@@ -653,6 +653,49 @@
 #: js/rhythmruler.js:1178
 #: js/rhythmruler.js:1286
 #: js/rhythmruler.js:1288
+#: js/block.js:1162
+#: js/block.js:5430
+#: js/block.js:5439
+#: js/block.js:5450
+#: js/activity.js:2134
+#: js/palette.js:810
+#: js/palette.js:819
+#: js/palette.js:828
+#: js/palette.js:837
+#: js/palette.js:2142
+#: js/palette.js:2153
+#: js/palette.js:2164
+#: js/palette.js:2175
+#: js/palette.js:2185
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1542
+#: js/basicblocks.js:1562
+#: js/basicblocks.js:1576
+#: js/basicblocks.js:3982
+#: js/basicblocks.js:4022
+#: js/basicblocks.js:4032
+#: js/basicblocks.js:4080
+#: js/basicblocks.js:4093
+#: js/basicblocks.js:4141
+#: js/basicblocks.js:4196
+#: js/basicblocks.js:4201
+#: js/basicblocks.js:4206
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4600
+#: js/blocks.js:5457
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1176
+#: js/rhythmruler.js:1178
+#: js/rhythmruler.js:1286
+#: js/rhythmruler.js:1288
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "アクション"
@@ -1349,8 +1392,8 @@ msgid "Scalar transpositions are equal to Semitone transpositions for custom tem
 msgstr ""
 
 #: js/logo.js:5000
-msgid "Pitch Block: Did you mean to use a Note block2?"
-msgstr "ピッチ・ブロック：音符ブロックと一緒に使いますか？"
+msgid "Pitch Block: Did you mean to use a Note block?"
+msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
 
 #: js/logo.js:5040
 msgid "polyphonic rhythm"
@@ -7299,9 +7342,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "japanese"
 #~msgstr "日本おんかい"
 
-#~msgid "undo"
-#~msgstr "もとに もどす"
-
 #~msgid "set volume"
 #~msgstr "音量をせってい"
 
@@ -7475,9 +7515,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "untitled"
 #~msgstr "無題"
 
-#~msgid "Pitch Block: Did you mean to use a Note block?"
-#~msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
-
 #~msgid "Click here to paste."
 #~msgstr "はりつけるにはここをクリック"
 
@@ -7488,6 +7525,9 @@ msgstr "ファイルをえらぶひつようがあります"
 
 #~msgid "relative interval"
 #~msgstr "相対的な音とおとの間の間隔"
+
+#~msgid "Stop the music (and the turtles)."
+#~msgstr "音楽とネズミの動きを止めます。"
 
 #~msgid "on beat"
 #~msgstr "強拍にて"
@@ -7519,17 +7559,23 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "found turtle"
 #~msgstr "ネズミ見つかった"
 
-#~msgid "free time"
-#~msgstr "クロックなし"
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~msgstr "ミスター・マウスはわたしたちのミュージック・ブロックスのしきしゃです。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまなたんきゅうに力を貸してくれます。さぁ、わたしたちのミュージックブロックスツアーをはじめましょう！ "
 
 #~msgid "Save your project to a server."
 #~msgstr "サーバーにプロジェクトをほぞん"
+
+#~msgid "multiply beat"
+#~msgstr "はくをばいに"
 
 #~msgid "Click to run just the music in slow mode."
 #~msgstr "おんがくをゆっくりさいせいしたい時は、ここをクリック。"
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "はやいスピードでさいせいします／ながおしでスローさいせい／よりながおしでさらにスローさいせい"
+
+#~msgid "Expand/collapse toolbar"
+#~msgstr "ツールバーを開く/隠す"
 
 #~msgid "Alternatively, you can hit the ENTER or RETURN key."
 #~msgstr "もしくは、エンターキー、リターンキーの どちらかを おしてください。"
@@ -7569,11 +7615,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "Publish"
 #~msgstr "サーバにアップロードして発表する"
 
-#: js/activity.js:3327
-
-#~msgid "Turtle Blocks"
-#~msgstr "タートル・ブロックス"
-
 #~msgid "Worldwide"
 #~msgstr "世界中のプロジェクト"
 
@@ -7598,9 +7639,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "add pitches"
 #~msgstr "音高を足す"
 
-#~msgid "cb"
-#~msgstr "カ"
-
 #~msgid "Click to run the music note by note."
 #~msgstr "おんぷを ひとつずつ さいせいするには ここを クリック。"
 
@@ -7613,20 +7651,19 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "Show or hide a Cartesian-coordinate grid."
 #~msgstr "直交座標をひょうじする/隠す"
 
-#~msgid "Long press on blocks to copy."
-#~msgstr "ブロック ながおしで コピー"
-
 #~msgid "Save as .svg"
 #~msgstr "SVGでほぞん"
 
 #~msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
 #~msgstr "「d」を うつと「ド」の ブロックが つくられ、「r」を うつと「レ」の ブロックが つくられます"
 
-#~msgid "next page"
-#~msgstr "つぎの ページ"
-
 #~msgid "field"
 #~msgstr "場"
+
+#: js/SaveInterface.js:24
+
+#~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
+#~msgstr ""
 
 #~msgid "gs"
 #~msgstr "灰"
@@ -7691,11 +7728,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "More"
 #~msgstr "その他"
 
-#: js/SaveInterface.js:24
-
-#~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~msgstr ""
-
 #~msgid "maths"
 #~msgstr "数学"
 
@@ -7716,9 +7748,6 @@ msgstr "ファイルをえらぶひつようがあります"
 
 #~msgid "Click this button to expand or collapse the auxilary toolbar."
 #~msgstr "ここをクリックして、オプションツールバーをひょうじ"
-
-#~msgid "Expand/collapse toolbar"
-#~msgstr "ツールバーを開く/隠す"
 
 #~msgid "Long press the run button to run the project in slow mode."
 #~msgstr "ながおしで スローさいせい になります。"
@@ -7744,9 +7773,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "step pitch"
 #~msgstr "ステップ音高"
 
-#~msgid "Stop the music (and the turtles)."
-#~msgstr "音楽とネズミの動きを止めます。"
-
 #~msgid "bk"
 #~msgstr "黒"
 
@@ -7759,9 +7785,6 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "br"
 #~msgstr "茶"
 
-#~msgid "multiply beat"
-#~msgstr "はくをばいに"
-
 #~msgid "save as lilypond"
 #~msgstr "Lilypondの ファイルフォーマットで ほぞん"
 
@@ -7770,11 +7793,21 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "Save Project"
 #~msgstr "プロジェクトを ほぞん"
 
+#: js/activity.js:3327
+
+#~msgid "Turtle Blocks"
+#~msgstr "タートル・ブロックス"
+
 #~msgid "rotate counter clockwise"
 #~msgstr "はんとけい まわり"
 
 #~msgid "sort"
 #~msgstr "せいり する"
+
+#: js/logo.js:5000
+
+#~msgid "Pitch Block: Did you mean to use a Note block2?"
+#~msgstr "ピッチ・ブロック：音符ブロックと一緒に使いますか？"
 
 #: js/turtledefs.js:143
 
@@ -7850,6 +7883,9 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "Advanced options"
 #~msgstr "上級オプション"
 
+#~msgid "undo"
+#~msgstr "もとに もどす"
+
 #~msgid "adjust transposition"
 #~msgstr "移調を変える"
 
@@ -7859,14 +7895,17 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgid "Run note by note"
 #~msgstr "おんぷを ひとつずつ さいせい"
 
+#~msgid "Long press on blocks to copy."
+#~msgstr "ブロック ながおしで コピー"
+
 #~msgid "on offbeat do"
 #~msgstr "じゃくはくにて～する"
 
 #~msgid "Hard stop"
 #~msgstr "すぐストップ"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ミスター・マウスはわたしたちのミュージック・ブロックスのしきしゃです。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまなたんきゅうに力を貸してくれます。さぁ、わたしたちのミュージックブロックスツアーをはじめましょう！ "
+#~msgid "free time"
+#~msgstr "クロックなし"
 
 #~msgid "You can also use Alt+C to copy a stack of blocks."
 #~msgstr "Alt+Cでブロックスを コピーすることも できます。"
@@ -7879,6 +7918,9 @@ msgstr "ファイルをえらぶひつようがあります"
 
 #~msgid "Run music step by step"
 #~msgstr "音楽を音符ずつ演奏する"
+
+#~msgid "cb"
+#~msgstr "カ"
 
 #~msgid "It appears after a long press on a stack."
 #~msgstr "スタックを長押しすると現れます。"
@@ -7900,6 +7942,9 @@ msgstr "ファイルをえらぶひつようがあります"
 
 #~msgid "Remove all content on the canvas, including the blocks."
 #~msgstr "画面上にひょうじされているもの（ブロックスを含む）を全て消します。"
+
+#~msgid "next page"
+#~msgstr "つぎの ページ"
 
 #~msgid "On my device"
 #~msgstr "自分のPCにあるファイル"
