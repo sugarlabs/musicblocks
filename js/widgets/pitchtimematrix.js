@@ -561,9 +561,11 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-100, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+		var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
+                sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-100, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+		var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+                sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
