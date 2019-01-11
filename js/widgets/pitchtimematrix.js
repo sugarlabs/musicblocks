@@ -542,8 +542,8 @@ function PitchTimeMatrix () {
             }
 
             // We want to sort based on frequency, so we convert all notes to frequency.
-            // Deprecated
             if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
+                // Deprecated
                 sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else {
                 sortableList.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
@@ -554,15 +554,16 @@ function PitchTimeMatrix () {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                var drumIndex = getDrumIndex(this.rowLabels[i]);
+                sortableList.push([-drumIndex, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                sortableList.push([-100, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                sortableList.push([-100, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
@@ -594,6 +595,7 @@ function PitchTimeMatrix () {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                console.log('skipping ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
                 // skip duplicates
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
@@ -603,6 +605,7 @@ function PitchTimeMatrix () {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
+                console.log('pushing ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
             }
 

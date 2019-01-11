@@ -704,6 +704,27 @@ function getModeNumbers(name) {
 };
 
 
+function getDrumIndex(name) {
+    if (name === '') {
+        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
+        name = DEFAULTDRUM;
+    } else if (name.slice(0, 4) === 'http') {
+        name = DEFAULTDRUM;
+    }
+
+    for (var drum = 0; drum < DRUMNAMES.length; drum++) {
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return drum;
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return drum;
+        }
+    }
+
+    // console.log(name + ' not found in DRUMNAMES');
+    return -1;
+};
+
+
 function getDrumName(name) {
     if (name === '') {
         console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
