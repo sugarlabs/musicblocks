@@ -375,7 +375,7 @@ function PitchStaircase () {
         }
 
         this._logo.refreshCanvas();
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 

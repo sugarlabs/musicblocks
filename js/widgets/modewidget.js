@@ -817,7 +817,7 @@ function ModeWidget() {
         }
 
         // Save a stack of pitches to be used with the matrix.
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': modeName}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': modeName}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
