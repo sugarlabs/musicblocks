@@ -1024,7 +1024,7 @@ function RhythmRuler () {
                 var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
             }
             var delta = selectedRuler * 42;
-            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
+            var newStack = [[0, ['action', {'collapsed': true}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
@@ -1080,7 +1080,7 @@ function RhythmRuler () {
                 var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
             }
             var delta = selectedRuler * 42;
-            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
+            var newStack = [[0, ['action', {'collapsed': true}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
             var previousBlock = 0;
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
@@ -1178,7 +1178,7 @@ function RhythmRuler () {
                 var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('action');
             }
 
-            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            var newStack = [[0, ['action', {'collapsed': true}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
             var previousBlock = 0; // 1
             var sameNoteValue = 1;
             for (var i = 0; i < ruler.cells.length; i++) {
@@ -1288,7 +1288,7 @@ function RhythmRuler () {
                 var action_name = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + '_' + _('action');
             }
 
-            var newStack = [[0, ['action', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
+            var newStack = [[0, ['action', {'collapsed': true}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': action_name}], 0, 0, [0]]];
             newStack.push([2, 'settimbre', 0, 0, [0, 3, 5, 4]]);
             newStack.push([3, ['voicename', {'value': voice}], 0, 0, [2]]);
             newStack.push([4, 'hidden', 0, 0, [2, null]]);
