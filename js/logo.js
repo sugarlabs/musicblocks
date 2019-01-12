@@ -3985,6 +3985,8 @@ function Logo () {
                 that.pitchTimeMatrix = new PitchTimeMatrix();
             }
 
+            that.pitchTimeMatrix._instrumentName = DEFAULTVOICE;
+
             that.pitchTimeMatrix.rowLabels = [];
             that.pitchTimeMatrix.rowArgs = [];
             that.pitchTimeMatrix.graphicsBlocks = [];
@@ -5498,6 +5500,10 @@ function Logo () {
                         synth = args[0];
                         break;
                     }
+                }
+
+                if (that.inMatrix) {
+                    that.pitchTimeMatrix._instrumentName = synth;
                 }
 
                 if (that.instrumentNames[turtle].indexOf(synth) === -1) {

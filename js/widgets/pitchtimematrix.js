@@ -23,6 +23,7 @@ function PitchTimeMatrix () {
     const ICONSIZE = 32;
 
     this._stopOrCloseClicked = false;
+    this._instrumentName = DEFAULTVOICE;
 
     this.paramsEffects = {
         "doVibrato": false,
@@ -214,7 +215,7 @@ function PitchTimeMatrix () {
                 that._rowMap[i] = i;
             }
 
-            that._logo.synth.stopSound(0, DEFAULTVOICE);
+            that._logo.synth.stopSound(0, that._instrumentName);
             that._logo.synth.stop();
             that._stopOrCloseClicked = true;
             ptmTableDiv.style.visibility = 'hidden';
@@ -561,10 +562,10 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-		var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
+                var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
                 sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-		var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+                var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
                 sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
@@ -1322,11 +1323,11 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
-                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < drumNotes.length; i++) {
@@ -1432,11 +1433,11 @@ function PitchTimeMatrix () {
                        }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
@@ -1570,12 +1571,12 @@ function PitchTimeMatrix () {
                 if (drumName != null) {
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
-                    this._logo.synth.trigger(0, Number(note), noteValue, DEFAULTVOICE, null, null);
+                    this._logo.synth.trigger(0, Number(note), noteValue, this._instrumentName, null, null);
                 } else if (graphicsBlock !== true) {
                     if (typeof(note) === 'string') {
-                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, DEFAULTVOICE, null, null);
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, this._instrumentName, null, null);
                     } else {
-                        this._logo.synth.trigger(0, note, noteValue, DEFAULTVOICE, null, null);
+                        this._logo.synth.trigger(0, note, noteValue, this._instrumentName, null, null);
                     }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
