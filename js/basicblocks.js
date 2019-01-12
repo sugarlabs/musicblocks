@@ -163,11 +163,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('deltapitch');
     newblock.palette = palettes.dict['pitch'];
     blocks.protoBlockDict['deltapitch'] = newblock;
-    //.TRANS: the change meaused in half-steps between the current pitch and the previous pitch
+    //.TRANS: the change measured in half-steps between the current pitch and the previous pitch
     newblock.staticLabels.push(_('change in pitch'));
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('deltapitch')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('deltapitch2');
+    newblock.palette = palettes.dict['pitch'];
+    blocks.protoBlockDict['deltapitch2'] = newblock;
+    //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
+    newblock.staticLabels.push(_('scalar change in pitch'));
+    newblock.parameterBlock();
+    newblock.adjustWidthToLabel();
+    if (beginnerMode && !beginnerBlock('deltapitch2')) {
         newblock.hidden = true;
     }
 
@@ -4655,7 +4666,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.hiddenBlockFlow();
     newblock.hidden = true;
 
-    // macro
     var newblock = new ProtoBlock('backward');
     newblock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['backward'] = newblock;
@@ -4667,7 +4677,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    // macro
     var newblock = new ProtoBlock('duplicatenotes');
     newblock.palette = palettes.dict['flow'];
     blocks.protoBlockDict['duplicatenotes'] = newblock;

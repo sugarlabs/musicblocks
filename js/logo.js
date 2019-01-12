@@ -1051,6 +1051,7 @@ function Logo () {
                 value = last(this.masterVolume);
                 break;
             case 'deltapitch':
+                // half steps
                 if (this.lastNotePlayed[turtle] !== null && this.previousNotePlayed[turtle] !== null) {
                     var len = this.previousNotePlayed[turtle][0].length;
                     var pitch = this.previousNotePlayed[turtle][0].slice(0, len - 1);
@@ -1068,6 +1069,57 @@ function Logo () {
 
                 value = value.toString();
                 break;
+            case 'deltapitch2':
+                // scalar steps
+                if (this.lastNotePlayed[turtle] !== null && this.previousNotePlayed[turtle] !== null) {
+                    var len = this.previousNotePlayed[turtle][0].length;
+                    var pitch = this.previousNotePlayed[turtle][0].slice(0, len - 1);
+                    var octave = parseInt(this.previousNotePlayed[turtle][0].slice(len - 1));
+                    var obj = [pitch, octave];
+                    var previousValue = pitchToNumber(obj[0], obj[1], this.keySignature[turtle]);
+                    len = this.lastNotePlayed[turtle][0].length;
+                    pitch = this.lastNotePlayed[turtle][0].slice(0, len - 1);
+                    octave = parseInt(this.lastNotePlayed[turtle][0].slice(len - 1));
+                    obj = [pitch, octave];
+                    var delta = pitchToNumber(obj[0], obj[1], this.keySignature[turtle]) - previousValue;
+                    // convert to scalar steps
+                    var scalarDelta = 0;
+                    var i = 0;
+                    if (delta > 0) {
+                        while(delta > 0) {
+                            i += 1;
+                            var nhalf = getStepSizeUp(this.keySignature[turtle], pitch, 0, 'equal');
+                            delta -= nhalf;
+                            scalarDelta += 1;
+                            obj = getNote(pitch, octave, nhalf, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
+                            pitch = obj[0];
+                            octave = obj[1];
+                            if (i > 100) {
+                                break;
+                            }
+                        }
+
+                        value = scalarDelta;
+                    } else {
+                        while(delta < 0) {
+                            i += 1;
+                            var nhalf = getStepSizeDown(this.keySignature[turtle], pitch, 0, 'equal');
+                            delta -= nhalf;
+                            scalarDelta -= 1;
+                            obj = getNote(pitch, octave, nhalf, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
+                            pitch = obj[0];
+                            octave = obj[1];
+                            if (i > 100) {
+                                break;
+                            }
+                        }
+                        value = scalarDelta;
+                    }
+                } else {
+                    value = 0;
+                }
+
+                value = value.toString();
             case 'mypitch':
                 if (this.lastNotePlayed[turtle] !== null) {
                     var len = this.lastNotePlayed[turtle][0].length;
@@ -10828,6 +10880,7 @@ function Logo () {
                 }
                 break;
             case 'deltapitch':
+            case 'deltapitch2':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'mypitch']);
                 } else if (that.previousNotePlayed[turtle] == null) {
@@ -10842,7 +10895,45 @@ function Logo () {
                     pitch = that.lastNotePlayed[turtle][0].slice(0, len - 1);
                     octave = parseInt(that.lastNotePlayed[turtle][0].slice(len - 1));
                     obj = [pitch, octave];
-                    that.blocks.blockList[blk].value = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - previousValue;
+                    var delta = pitchToNumber(obj[0], obj[1], that.keySignature[turtle]) - previousValue;
+                    if (that.blocks.blockList[blk].name === 'deltapitch') {
+                        // half-step difference
+                        that.blocks.blockList[blk].value = delta;
+                    } else {
+                        // convert to scalar steps
+                        var scalarDelta = 0;
+                        var i = 0;
+                        if (delta > 0) {
+                            while(delta > 0) {
+                                i += 1;
+                                var nhalf = getStepSizeUp(that.keySignature[turtle], pitch, 0, 'equal');
+                                delta -= nhalf;
+                                scalarDelta += 1;
+                                obj = getNote(pitch, octave, nhalf, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
+                                pitch = obj[0];
+                                octave = obj[1];
+                                if (i > 100) {
+                                    break;
+                                }
+                            }
+
+                            that.blocks.blockList[blk].value = scalarDelta;
+                        } else {
+                            while(delta < 0) {
+                                i += 1;
+                                var nhalf = getStepSizeDown(that.keySignature[turtle], pitch, 0, 'equal');
+                                delta -= nhalf;
+                                scalarDelta -= 1;
+                                obj = getNote(pitch, octave, nhalf, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
+                                pitch = obj[0];
+                                octave = obj[1];
+                                if (i > 100) {
+                                    break;
+                                }
+                            }
+                            that.blocks.blockList[blk].value = scalarDelta;
+                        }
+                    }
                 }
                 break;
             case 'mypitch':
