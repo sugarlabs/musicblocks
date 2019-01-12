@@ -1504,20 +1504,20 @@ function calcNoteValueToDisplay(a, b, scale) {
         var cellScale = scale;
     }
 
-    if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
-        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) + '>';
+    if (noteValue in NSYMBOLS) {
+        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + NSYMBOLS[noteValue];
     } else {
         noteValueToDisplay = reducedFraction(b, a);
     }
 
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
-        if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> .';
+        if (noteValueToDisplay in NSYMBOLS) {
+            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
-            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> ..';
+            if (noteValueToDisplay in NSYMBOLS) {
+                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.,';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
@@ -2021,8 +2021,8 @@ function reducedFraction(a, b) {
     }
 
     var gcm = greatestCommonMultiple(a, b);
-    if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
+    if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br>' + NSYMBOLS[b / gcm];
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }
