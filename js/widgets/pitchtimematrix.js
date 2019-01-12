@@ -1613,8 +1613,7 @@ function PitchTimeMatrix () {
         }
         this._logo.refreshCanvas();
 
-
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
         for (var i = 0; i < this._notesToPlay.length; i++)
