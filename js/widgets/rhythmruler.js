@@ -983,7 +983,7 @@ function RhythmRuler () {
             }
 
             // And highlight its cell.
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = platformColor.rulerHighlight; // selectorBackground;
 
             // Calculate any offset in playback.
             var d = new Date();
