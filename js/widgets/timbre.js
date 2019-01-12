@@ -808,6 +808,10 @@ function TimbreWidget () {
             that._dragging = true;
             that._target = e.target;
         };
+        
+        timbreDiv.onmouseup = function (e) {
+            that._dragging = false;
+        };
 
         timbreDiv.ondragstart = function (e) {
             if (dragCell.contains(that._target)) {
