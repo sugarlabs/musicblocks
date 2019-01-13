@@ -775,6 +775,7 @@ function TimbreWidget () {
         };
 
         canvas.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -790,6 +791,7 @@ function TimbreWidget () {
         };
 
         timbreDiv.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -805,7 +807,6 @@ function TimbreWidget () {
         };
 
         timbreDiv.onmousedown = function (e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
