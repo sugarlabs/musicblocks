@@ -107,6 +107,7 @@ function PlaybackWidget() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -122,6 +123,7 @@ function PlaybackWidget() {
         };
 
         playbackDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -137,7 +139,6 @@ function PlaybackWidget() {
         };
 
         playbackDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

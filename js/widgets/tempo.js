@@ -284,6 +284,7 @@ function Tempo () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -299,6 +300,7 @@ function Tempo () {
         };
 
         tempoDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -314,7 +316,6 @@ function Tempo () {
         };
 
         tempoDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

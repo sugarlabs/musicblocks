@@ -135,6 +135,7 @@ function HelpWidget () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -150,6 +151,7 @@ function HelpWidget () {
         };
 
         helpDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -165,7 +167,6 @@ function HelpWidget () {
         };
 
         helpDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
