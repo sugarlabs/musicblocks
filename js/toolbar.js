@@ -306,6 +306,12 @@ function Toolbar() {
                 languageBox.es_onclick();
             };
 
+            var pt = docById('pt');
+
+            pt.onclick = function () {
+                languageBox.pt_onclick();
+            };
+
             var ja = docById('ja');
 
             ja.onclick = function () {
@@ -405,6 +411,7 @@ function Toolbar() {
             ['enUK', _('English (United Kingdom)'), 'innerHTML'],
             ['ja', _('日本語'), 'innerHTML'],
             ['es', _('español'), 'innerHTML'],
+            ['pt', _('português'), 'innerHTML'],
             ['kana', _('にほんご'), 'innerHTML'],
             ['zhCN', _('中文'), 'innerHTML'],
             ['th', _('ภาษาไทย'), 'innerHTML'],
@@ -483,6 +490,7 @@ function Toolbar() {
             ['enUK', _('English (United Kingdom)'), 'innerHTML'],
             ['ja', _('日本語'), 'innerHTML'],
             ['es', _('español'), 'innerHTML'],
+            ['pt', _('português'), 'innerHTML'],
             ['kana', _('にほんご'), 'innerHTML'],
             ['zhCN', _('中文'), 'innerHTML'],
             ['th', _('ภาษาไทย'), 'innerHTML'],

@@ -696,6 +696,49 @@
 #: js/rhythmruler.js:1178
 #: js/rhythmruler.js:1286
 #: js/rhythmruler.js:1288
+#: js/block.js:1162
+#: js/block.js:5430
+#: js/block.js:5439
+#: js/block.js:5450
+#: js/activity.js:2134
+#: js/palette.js:810
+#: js/palette.js:819
+#: js/palette.js:828
+#: js/palette.js:837
+#: js/palette.js:2142
+#: js/palette.js:2153
+#: js/palette.js:2164
+#: js/palette.js:2175
+#: js/palette.js:2185
+#: js/turtledefs.js:35
+#: js/basicblocks.js:1542
+#: js/basicblocks.js:1562
+#: js/basicblocks.js:1576
+#: js/basicblocks.js:3982
+#: js/basicblocks.js:4022
+#: js/basicblocks.js:4032
+#: js/basicblocks.js:4080
+#: js/basicblocks.js:4093
+#: js/basicblocks.js:4141
+#: js/basicblocks.js:4196
+#: js/basicblocks.js:4201
+#: js/basicblocks.js:4206
+#: js/rubrics.js:478
+#: js/macros.js:45
+#: js/blocks.js:1023
+#: js/blocks.js:2849
+#: js/blocks.js:2850
+#: js/blocks.js:3064
+#: js/blocks.js:3366
+#: js/blocks.js:3559
+#: js/blocks.js:4600
+#: js/blocks.js:5457
+#: js/musickeyboard.js:369
+#: js/pitchtimematrix.js:1612
+#: js/rhythmruler.js:1176
+#: js/rhythmruler.js:1178
+#: js/rhythmruler.js:1286
+#: js/rhythmruler.js:1288
 #.TRANS: a stack of blocks to run (an action to take)
 msgid "action"
 msgstr "アクション"
@@ -7347,6 +7390,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "7th"
 #~msgstr "７度"
 
+#~msgid "undo"
+#~msgstr "１つもどす"
+
 #~msgid "chord' + ' ' + 'I"
 #~msgstr "１度' + ' ' + 'の和音"
 
@@ -7535,6 +7581,9 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "relative interval"
 #~msgstr "相対的な音と音の間の間隔"
 
+#~msgid "Stop the music (and the turtles)."
+#~msgstr "音楽とネズミの動きを止めます。"
+
 #~msgid "on beat"
 #~msgstr "強拍にて"
 
@@ -7565,11 +7614,14 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "found turtle"
 #~msgstr "ネズミ見つかった"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
+#~msgid "free time"
+#~msgstr "クロックなし"
 
 #~msgid "Save your project to a server."
 #~msgstr "サーバーにプロジェクトをほぞん"
+
+#~msgid "multiply beat"
+#~msgstr "拍を倍に"
 
 #~msgid "4th"
 #~msgstr "４度"
@@ -7582,6 +7634,9 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
 #~msgstr "速いスピードで再生します／長押しでスロー再生／より長押しでさらにスロー再生"
+
+#~msgid "Expand/collapse toolbar"
+#~msgstr "ツールバーを開く/隠す"
 
 #~msgid "Alternatively, you can hit the ENTER or RETURN key."
 #~msgstr "ENTERまたRETURNでも可能です"
@@ -7621,6 +7676,11 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Publish"
 #~msgstr "サーバにアップロードして発表する"
 
+#: js/activity.js:3327
+
+#~msgid "Turtle Blocks"
+#~msgstr "タートル・ブロックス"
+
 #~msgid "Worldwide"
 #~msgstr "世界中のプロジェクト"
 
@@ -7644,9 +7704,6 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "add pitches"
 #~msgstr "音高を足す"
-
-#~msgid "cb"
-#~msgstr "カ"
 
 #~msgid "reference pitch"
 #~msgstr "参考音高"
@@ -7770,9 +7827,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Click this button to expand or collapse the auxilary toolbar."
 #~msgstr "ここをクリックして、オプションツールバーを表示"
 
-#~msgid "Expand/collapse toolbar"
-#~msgstr "ツールバーを開く/隠す"
-
 #~msgid "Long press the run button to run the project in slow mode."
 #~msgstr "長押しでスロー再生になります。"
 
@@ -7797,9 +7851,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "step pitch"
 #~msgstr "ステップ音高"
 
-#~msgid "Stop the music (and the turtles)."
-#~msgstr "音楽とネズミの動きを止めます。"
-
 #~msgid "bk"
 #~msgstr "黒"
 
@@ -7812,18 +7863,10 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "br"
 #~msgstr "茶"
 
-#~msgid "multiply beat"
-#~msgstr "拍を倍に"
-
 #: js/activity.js:3444
 
 #~msgid "Save Project"
 #~msgstr "プロジェクトをほぞん"
-
-#: js/activity.js:3327
-
-#~msgid "Turtle Blocks"
-#~msgstr "タートル・ブロックス"
 
 #~msgid "rotate counter clockwise"
 #~msgstr "左回りにずれる"
@@ -7912,9 +7955,6 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Advanced options"
 #~msgstr "上級オプション"
 
-#~msgid "undo"
-#~msgstr "１つもどす"
-
 #~msgid "adjust transposition"
 #~msgstr "移調を変える"
 
@@ -7933,8 +7973,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Hard stop"
 #~msgstr "すぐストップ"
 
-#~msgid "free time"
-#~msgstr "クロックなし"
+#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
 #~msgid "You can also use Alt+C to copy a stack of blocks."
 #~msgstr "Alt+Cでブロックスをコピーすることもできます。"
@@ -7947,6 +7987,9 @@ msgstr "ファイルを選ぶ必要があります"
 
 #~msgid "Run music step by step"
 #~msgstr "音楽を音符ずつ演奏する"
+
+#~msgid "cb"
+#~msgstr "カ"
 
 #~msgid "It appears after a long press on a stack."
 #~msgstr "スタックを長押しすると現れます。"

@@ -46,6 +46,11 @@ function LanguageBox() {
         this.hide();
     };
 
+    this.pt_onclick = function() {
+        language = 'pt';
+        this.hide();
+    };
+
     this.zhCN_onclick = function() {
         language = 'zhCN';
         this.hide();
@@ -95,6 +100,7 @@ function LanguageBox() {
             'ja': '言語を変更するにはブラウザを再起動する必要があります。',
             'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようが あります。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
+	    'pt': 'Atualize seu navegador para alterar sua preferência de idioma.',
             'zhCN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
             'hi': 'अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें',
