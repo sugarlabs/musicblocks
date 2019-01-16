@@ -3118,7 +3118,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
     newblock.adjustWidthToLabel();
     newblock.twoArgBlock();
-    newblock.defaults.push(0);
+    newblock.defaults.push(100);
     newblock.defaults.push(0);
     newblock.dockTypes[1] = 'numberin';
     if (beginnerMode && !beginnerBlock('scrollxy')) {
