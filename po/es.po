@@ -5468,17 +5468,29 @@ msgstr "apilar"
 msgid "right2"
 msgstr "dereche"
 
+msgid "right2 (screen)"
+msgstr "dereche"
+
 #: js/basicblocks.js:4408
 #.TRANS: left2 is left as in left side of the screen
 msgid "left2"
+msgstr "izquierda"
+
+msgid "left2 (screen)"
 msgstr "izquierda"
 
 #: js/basicblocks.js:4422
 msgid "top"
 msgstr "superior"
 
+msgid "top (screen)"
+msgstr "superior"
+
 #: js/basicblocks.js:4432
 msgid "bottom"
+msgstr "inferior"
+
+msgid "bottom (screen)"
 msgstr "inferior"
 
 #: js/basicblocks.js:4442

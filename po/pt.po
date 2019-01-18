@@ -4627,17 +4627,29 @@ msgstr "empurrar"
 msgid "right2"
 msgstr ""
 
+msgid "right (screen)"
+msgstr "direita"
+
 #: js/basicblocks.js:4408
 #.TRANS: left2 is left as in left side of the screen
 msgid "left2"
 msgstr ""
 
+msgid "left (screen)"
+msgstr "esquerda"
+
 #: js/basicblocks.js:4422
 msgid "top"
 msgstr ""
 
+msgid "top (screen)"
+msgstr ""
+
 #: js/basicblocks.js:4432
 msgid "bottom"
+msgstr ""
+
+msgid "bottom (screen)"
 msgstr ""
 
 #: js/basicblocks.js:4442

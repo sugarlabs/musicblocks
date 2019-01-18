@@ -5416,17 +5416,29 @@ msgstr "プッシュ"
 msgid "right2"
 msgstr "ざひょうち（右）"
 
+msgid "right (screen)"
+msgstr "ざひょうち（右）"
+
 #: js/basicblocks.js:4408
 #.TRANS: left2 is left as in left side of the screen
 msgid "left2"
+msgstr "ざひょうち（左）"
+
+msgid "left (screen)"
 msgstr "ざひょうち（左）"
 
 #: js/basicblocks.js:4422
 msgid "top"
 msgstr "ざひょうち（上）"
 
+msgid "top (screen)"
+msgstr "ざひょうち（上）"
+
 #: js/basicblocks.js:4432
 msgid "bottom"
+msgstr "ざひょうち（下）"
+
+msgid "bottom (screen)"
 msgstr "ざひょうち（下）"
 
 #: js/basicblocks.js:4442
