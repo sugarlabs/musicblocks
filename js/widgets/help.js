@@ -13,7 +13,8 @@
 
 function HelpWidget () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const BUTTONSIZE = 53;
+    // const BUTTONSIZE = 53;
+    const BUTTONSIZE = 112.5;
     const ICONSIZE = 32;
     const HELPWIDTH = 400;
     const HELPHEIGHT = 600;
@@ -62,11 +63,13 @@ function HelpWidget () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorSelected;
+                // this.style.backgroundColor = platformColor.selectorSelected;
+                this.style.backgroundColor = '#2196F3';
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
+                // this.style.backgroundColor = platformColor.selectorBackground;
+                this.style.backgroundColor = '#2196F3';
             };
 
             var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
@@ -81,11 +84,13 @@ function HelpWidget () {
             };
 
             cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorSelected;
+                // this.style.backgroundColor = platformColor.selectorSelected;
+                this.style.backgroundColor = '#2196F3';
             };
 
             cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
+                // this.style.backgroundColor = platformColor.selectorBackground;
+                this.style.backgroundColor = '#2196F3';
             };
         } else {
             if (blocks.activeBlock.name === null) {
@@ -104,11 +109,13 @@ function HelpWidget () {
         };
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorSelected;
+            // this.style.backgroundColor = platformColor.selectorSelected;
+            this.style.backgroundColor = '#2196F3';
         };
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
+            // this.style.backgroundColor = platformColor.selectorBackground;
+            this.style.backgroundColor = '#2196F3';
         };
 
         // We use this cell as a handle for dragging.
@@ -264,11 +271,13 @@ function HelpWidget () {
         cell.style.backgroundColor = platformColor.selectorBackground;
 
         cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorSelected;
+            // this.style.backgroundColor = platformColor.selectorSelected;
+            this.style.backgroundColor = '#2196F3';
         }
 
         cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
+            // this.style.backgroundColor = platformColor.selectorBackground;
+            this.style.backgroundColor = '#2196F3';
         }
 
         return cell;
@@ -280,7 +289,8 @@ function HelpWidget () {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        // cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = '#2196F3';
 
         return cell;
     };
