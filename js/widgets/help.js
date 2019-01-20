@@ -14,7 +14,7 @@
 function HelpWidget () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
     // const BUTTONSIZE = 53;
-    const BUTTONSIZE = 112.5;
+    const BUTTONSIZE = 82;
     const ICONSIZE = 32;
     const HELPWIDTH = 400;
     const HELPHEIGHT = 600;
@@ -261,14 +261,16 @@ function HelpWidget () {
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
+        cell.style.height = '55px';
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        // cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = '#2196F3';
+        cell.style.paddingLeft = '30.5px';
 
         cell.onmouseover=function() {
             // this.style.backgroundColor = platformColor.selectorSelected;
