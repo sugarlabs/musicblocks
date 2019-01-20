@@ -682,13 +682,29 @@ table {
     position: absolute;
     top: 20%;
     left: 20%;
-    width: 350px;
-    height: 400px;
-    background: rgba(196, 196, 196, 1.0) !important;
+    width: 455px;
+    height: 335px;
+    /* background: rgba(196, 196, 196, 1.0) !important; */
+    background: #fff !important;
     overflow-y: auto;
     -webkit-user-select: none;
+    border-radius: 10px;
+    box-shadow: -3px 3px 10px grey;
 }
-
+#helpDiv h1 {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 1.5em;
+}
+#helpDiv p:first-child {
+    padding-left: -10px;
+}
+#helpDiv p:not(:first-child) {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 0.9em;
+    line-height: 20px;
+}
 #helpButtonsDiv {
     position: relative;
     left: 0px;
