@@ -1141,7 +1141,7 @@ msgstr "じぶんの プロジェクト"
 #: js/activity.js:2517
 ## check verb
 msgid "Please set browser zoom level to 100%"
-msgstr "ブラウザ ひょうじを 100%に せってい して ください。"
+msgstr "ブラウザの ひょうじを 100パーセントに して ください。"
 
 #: js/activity.js:3031
 #: js/activity.js:3031
@@ -1199,7 +1199,7 @@ msgstr ""
 #: js/activity.js:4322
 #: js/activity.js:4368
 msgid "Cannot load project from the file. Please check the file type."
-msgstr "プロジェクトを よみこめません。 ファイルの しゅるいを かくにんしてください。"
+msgstr "プロジェクトを よみこめません。 ファイルの しゅるいを かくにん してください。"
 
 #: js/activity.js:4525
 msgid "Invalid parameters"
@@ -1269,7 +1269,7 @@ msgstr "ただしい URL をいれてください。"
 #: js/logo.js:3267
 #: js/logo.js:9794
 msgid "You must select a file."
-msgstr "ファイルを えらぶ ひつようが あります。"
+msgstr "ファイルを えらんで ください。"
 
 #: js/logo.js:3276
 #: plugins/heap.rtp:96
@@ -1287,7 +1287,7 @@ msgstr "JSON データの こうぶん エラー です。"
 
 #: js/logo.js:3306
 msgid "404: Page not found"
-msgstr "404: このページが みつかりません"
+msgstr "４０４エラー：ページが見つかりません。"
 
 #: js/logo.js:3335
 ## To be verified
@@ -1302,7 +1302,7 @@ msgstr "インデクス ばんごうは 0 より おおきい ひつようが �
 #: js/logo.js:3360
 #: js/logo.js:11216
 msgid "Maximum heap size is 1000."
-msgstr "ヒープの さいだいちは 1000です。"
+msgstr "ヒープの おおきさは、 さいだい 1000です。"
 
 #: js/logo.js:3383
 #: js/logo.js:3414
@@ -1331,7 +1331,7 @@ msgstr "ちょうふく している ピッチすうちは むし します"
 
 #: js/logo.js:3709
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "フレーズメーカー には、 おとのたかさブロック と ドラムブロック を くみあわせてください。"
+msgstr "フレーズメーカーブロックには、 おとの たかさブロックと ドラムブロックを さいてい 1つずつ いれて ください。"
 
 #: js/logo.js:3833
 #: js/logo.js:3855
@@ -1339,7 +1339,7 @@ msgstr "フレーズメーカー には、 おとのたかさブロック と �
 #: js/logo.js:3906
 #: js/logo.js:3929
 msgid "Beats per minute must be > 30."
-msgstr "１ぷんあたりの はくのかずには ３０より おおきいあたいを せっていしてください。"
+msgstr "１ぷん あたりの はくの かずは ３０より おおきい あたいを せってい して ください。"
 
 #: js/logo.js:3836
 #: js/logo.js:3858
@@ -1347,7 +1347,7 @@ msgstr "１ぷんあたりの はくのかずには ３０より おおきいあ
 #: js/logo.js:3909
 #: js/logo.js:3932
 msgid "Maximum beats per minute is 1000."
-msgstr "１ぷんあたりの はくすうは さいだい１０００です。"
+msgstr "１ぷん あたりの はくの かずは さいだい １０００です。"
 
 #: js/logo.js:4002
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -1416,11 +1416,11 @@ msgstr "ケースブロックは スイッチ ブロックの なかに ある �
 
 #: js/logo.js:4318
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "おんかい ステップ ブロックは おんぷ ブロックの なかに ある ひつようが あります。"
+msgstr "おんかいうちを あがる／おりるブロックは、 おんぷブロックの なかに いれて つかって ください。"
 
 #: js/logo.js:4337
 msgid "The Scalar Step Block must be preceded by a Pitch Block."
-msgstr ""
+msgstr "おんかいうちを あがる／おりるブロックは、 おとの たかさ ブロックの あとに つかってください。"
 
 #: js/logo.js:4448
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -1436,7 +1436,7 @@ msgstr ""
 
 #: js/logo.js:5000
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
+msgstr "おとの たかさブロック： おんぷブロックを つかいますか?"
 
 #: js/logo.js:5040
 msgid "polyphonic rhythm"
@@ -1445,7 +1445,7 @@ msgstr "ポリリズム"
 #: js/logo.js:5372
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr "音価のすうちは０よりおおきいひつようがあります"
+msgstr "おとの ながさは、 0より おおきい あたいを せってい して ください。"
 
 #: js/logo.js:5448
 msgid "An argument of -1 results in a note value of 0."
@@ -1453,15 +1453,15 @@ msgstr "ー１は ０の おんかに します"
 
 #: js/logo.js:5692
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr "ビブラートの「きょうど」は ０と 100の あいだ である ひつようが あります。"
+msgstr "ビブラートの おおきさは、 1から 100までの はんいで せってい して ください。"
 
 #: js/logo.js:5697
 msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートの 「レート」 すうじは ０より おおきい ひつようが あります。"
+msgstr "ビブラートの はやさは、 0より おおきい あたいを せってい して ください。"
 
 #: js/logo.js:5729
 msgid "Distortion must be from 0 to 100."
-msgstr "ディストーションの すうじは ０と 100の あいだ である ひつようが あります。"
+msgstr "ディストーションは、 0から 100までの はんいで せってい して ください。"
 
 #: js/logo.js:5759
 #: js/logo.js:5827
@@ -1491,7 +1491,7 @@ msgstr "ばいおん ブロック が「ばいおん ウェート ブロック�
 #: js/logo.js:6848
 #: js/logo.js:6935
 msgid "Setting volume to 0."
-msgstr "おんりょうを 「0」に せってい しています。"
+msgstr "おんりょうを 「0」に せってい します。"
 
 #: js/logo.js:6854
 #: js/logo.js:6941
@@ -1538,7 +1538,7 @@ msgstr "「ばいおん ウェート」ブロックの なかに ひとつ い�
 
 #: js/logo.js:8152
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-msgstr "同じたかさの音だけタイで繋げることが可能です。"
+msgstr "タイブロックは、 おなじ たかさの おと しか つなげません。 スラーブロックを つかいますか？"
 
 #: js/logo.js:8623
 msgid "synth cannot play chords."
@@ -2490,7 +2490,7 @@ msgstr "<h2>ねいろをせってい ブロック</h2>なかに はいってい�
 #: js/turtledefs.js:304
 #: js/turtledefs.js:438
 msgid "eg guitar piano violin or cello."
-msgstr ""
+msgstr " ねいろは、 ギター や ピアノ などの なかから えらぶことが できる。"
 
 #: js/turtledefs.js:305
 msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
@@ -2534,11 +2534,11 @@ msgstr "<br><br>デフォルトは おんりょう ５０。 "
 
 #: js/turtledefs.js:312
 msgid "The default volume is 50."
-msgstr " ０から １００までの すうちを せってい できる。"
+msgstr "<br>"
 
 #: js/turtledefs.js:312
 msgid "The range is 0 for silence to 100 for full volume."
-msgstr "０から１００までのすうちをせっていできる。<br><br> "
+msgstr "０から １００までの すうちを せってい できる。 "
 
 #: js/turtledefs.js:313
 msgid "The Set master volume block sets the volume for all synthesizers."
@@ -3101,7 +3101,7 @@ msgstr ""
 
 #: js/turtledefs.js:458
 msgid "The Pitch slider tool to is used to generate pitches at selected frequencies."
-msgstr ""
+msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを じょうげに うごかすことで、 ちがう しゅうはすう（ヘルツのすうち） の おとを きくことが できる。 つくった おとを データに することが できる。また、 ヘルツの しょきせっていち は じゆうに かえられる。<br>★ヘルツとは<br>おとの たかさを あらわす しゅうはすう。<br>★しゅうはすうとは<br>おとが １びょうかん に なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。"
 
 #: js/turtledefs.js:459
 msgid "The Pitch staircase tool to is used to generate pitches from a given ratio."
@@ -6001,7 +6001,7 @@ msgstr "ブロックが えらばれて いません。"
 
 #: js/blocks.js:5744
 msgid "You must always have at least one start block."
-msgstr "スタートブロックは、 １ついじょう  のこしておいてください。"
+msgstr "スタート ブロックは、 １つ いじょう  のこして おいて ください。"
 
 #: js/playbackbox.js:83
 #: js/playbackbox.js:91
@@ -6168,7 +6168,7 @@ msgstr "モジュレーションインデックス"
 #: js/timbre.js:1193
 ## http://jisho.org/word/%E3%83%93%E3%83%96%E3%83%A9%E3%83%BC%E3%83%88 
 msgid "vibrato amount"
-msgstr "ビブラートの量"
+msgstr "ビブラートの はやさ"
 
 #: js/timbre.js:1752
 ## https://effector-hakase.com/delay/
@@ -6177,12 +6177,12 @@ msgstr "ディレイ・エフェクター（ms）"
 
 #: js/timbre.js:1896
 msgid "distortion amount"
-msgstr "ディストーションの量"
+msgstr "ディストーションの おおきさ"
 
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr "BPM(いっぷん あたりの はく すう)は 30から 1000である ひつようが あります"
+msgstr "1ぷん あたりの はくの かずは、 30から 1000までの はんいで せってい して ください。"
 
 #: js/tempo.js:339
 msgid "speed up"
@@ -6207,7 +6207,7 @@ msgstr "リズムを タップ する"
 
 #: js/rhythmruler.js:549
 msgid "Maximum value of 256 has been exceeded."
-msgstr ""
+msgstr "リズムメーカーの おとの ながさは、さいだい ２５６ です。"
 
 #: js/rhythmruler.js:1286
 #: js/synthutils.js:33

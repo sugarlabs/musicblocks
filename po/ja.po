@@ -1859,7 +1859,7 @@ msgstr "その他"
 
 #: js/turtledefs.js:35
 msgid "my blocks"
-msgstr ""
+msgstr "自分のブロック"
 
 #: js/turtledefs.js:45
 msgid "music"
@@ -6169,7 +6169,7 @@ msgstr "モジュレーションインデックス"
 #: js/timbre.js:1193
 ## http://jisho.org/word/%E3%83%93%E3%83%96%E3%83%A9%E3%83%BC%E3%83%88 
 msgid "vibrato amount"
-msgstr "ビブラートの量"
+msgstr "ビブラートの速さ"
 
 #: js/timbre.js:1752
 ## https://effector-hakase.com/delay/
@@ -6178,7 +6178,7 @@ msgstr "ディレイ・エフェクター（ms）"
 
 #: js/timbre.js:1896
 msgid "distortion amount"
-msgstr "ディストーションの量"
+msgstr "ディストーションの大きさ"
 
 #: js/tempo.js:75
 #: js/tempo.js:78
@@ -6187,11 +6187,11 @@ msgstr "1分あたりの拍の数は、30から1000までのはんいでせっ�
 
 #: js/tempo.js:339
 msgid "speed up"
-msgstr "はやくする"
+msgstr "速くする"
 
 #: js/tempo.js:355
 msgid "slow down"
-msgstr "おそくする"
+msgstr "遅くする"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
