@@ -1252,11 +1252,11 @@ msgstr "タートルが見つかりません。"
 
 #: js/logo.js:2778
 msgid "Mouse is already running."
-msgstr "ネズミは既に動いています。"
+msgstr "ネズミはすでに動いています。"
 
 #: js/logo.js:2780
 msgid "Turtle is already running."
-msgstr "タートルは既に動いています。"
+msgstr "タートルはすでに動いています。"
 
 #: js/logo.js:2800
 msgid "Cannot find start block"
@@ -1269,7 +1269,7 @@ msgstr "正しい URL をいれて下さい。"
 #: js/logo.js:3267
 #: js/logo.js:9794
 msgid "You must select a file."
-msgstr "ファイルを選ぶ必要があります。"
+msgstr "ファイルをえらんでください。"
 
 #: js/logo.js:3276
 #: plugins/heap.rtp:96
@@ -1287,7 +1287,7 @@ msgstr "JSON データの構文エラーです。"
 
 #: js/logo.js:3306
 msgid "404: Page not found"
-msgstr "404: このページが見つかりません"
+msgstr "４０４エラー：ページが見つかりません。"
 
 #: js/logo.js:3335
 ## To be verified
@@ -1302,7 +1302,7 @@ msgstr "インデクス番号は 0 より大きい必要があります。"
 #: js/logo.js:3360
 #: js/logo.js:11216
 msgid "Maximum heap size is 1000."
-msgstr "ヒープの最大値は1000です。"
+msgstr "ヒープの大きさは、最大1000です。"
 
 #: js/logo.js:3383
 #: js/logo.js:3414
@@ -1331,7 +1331,7 @@ msgstr "重複しているピッチ数値は無視します"
 
 #: js/logo.js:3709
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr "フレーズメーカーには、音の高さブロックとドラムブロックを組み合わせてください。"
+msgstr "フレーズメーカーブロックには、音の高さブロックとドラムブロックを最低1つずつ入れてください。"
 
 #: js/logo.js:3833
 #: js/logo.js:3855
@@ -1347,7 +1347,7 @@ msgstr "１分あたりの拍の数には、３０より大きいあたいをせ
 #: js/logo.js:3909
 #: js/logo.js:3932
 msgid "Maximum beats per minute is 1000."
-msgstr "１分あたりの拍数は最大１０００です。"
+msgstr "1分あたりの拍の数は、最大1000です。"
 
 #: js/logo.js:4002
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -1416,19 +1416,19 @@ msgstr "ケースブロックはスイッチブロックの中にある必要が
 
 #: js/logo.js:4318
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "音階ステップブロックは音符ブロックの中にある必要があります。"
+msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
 
 #: js/logo.js:4337
 msgid "The Scalar Step Block must be preceded by a Pitch Block."
-msgstr ""
+msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
 
 #: js/logo.js:4448
 msgid "Noise Block: Did you mean to use a Note block?"
-msgstr "ノイズ・ブロック：音符ブロックと一緒に使いますか？"
+msgstr "音符ブロックを使いますか？"
 
 #: js/logo.js:4528
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr "ドラムブロック：音符ブロックと一緒に使いますか？"
+msgstr "ドラムブロック：音符ブロックを使いますか？"
 
 #: js/logo.js:4593
 msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
@@ -1445,7 +1445,7 @@ msgstr "ポリリズム"
 #: js/logo.js:5372
 #.TRANS: Note value is the note duration.
 msgid "Note value must be greater than 0."
-msgstr "音価の数値は０より大きい必要があります"
+msgstr "音の長さは、0より大きいあたいをせっていしてください。"
 
 #: js/logo.js:5448
 msgid "An argument of -1 results in a note value of 0."
@@ -1453,15 +1453,15 @@ msgstr "ー１は０の音価にします"
 
 #: js/logo.js:5692
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr "ビブラートの「強度」は０と100の間である必要があります。"
+msgstr "ビブラートの大きさは、1から100までのはんいでせっていしてください。"
 
 #: js/logo.js:5697
 msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートの「レート」数字は０より大きい必要があります。"
+msgstr "ビブラートのはやさは、0より大きいあたいをせっていしてください。"
 
 #: js/logo.js:5729
 msgid "Distortion must be from 0 to 100."
-msgstr "ディストーションの数字は０と100の間である必要があります。"
+msgstr "ディストーションは、0から100までのはんいでせっていしてください。"
 
 #: js/logo.js:5759
 #: js/logo.js:5827
@@ -1491,7 +1491,7 @@ msgstr "倍音ブロックが「倍音ウェートブロック」の中にある
 #: js/logo.js:6848
 #: js/logo.js:6935
 msgid "Setting volume to 0."
-msgstr "音量を「0」に設定しています。"
+msgstr "音量を「0」にせっていします。"
 
 #: js/logo.js:6854
 #: js/logo.js:6941
@@ -1525,7 +1525,7 @@ msgstr ""
 
 #: js/logo.js:7139
 msgid "Hertz Block: Did you mean to use a Note block?"
-msgstr "ヘルツ・ブロック：音符ブロックを使いますか？"
+msgstr "ヘルツブロック：音符ブロックを使いますか？"
 
 #: js/logo.js:7740
 msgid "Playback is ready."
@@ -1538,7 +1538,7 @@ msgstr "「倍音ウェート」ブロックの中に一つ以上の倍音ブロ
 
 #: js/logo.js:8152
 msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-msgstr "同じ高さの音だけタイで繋げることが可能です。"
+msgstr "タイブロックは、同じ高さの音しかつなげません。スラーブロックを使いますか？"
 
 #: js/logo.js:8623
 msgid "synth cannot play chords."
@@ -1712,11 +1712,11 @@ msgstr "表示する"
 #: js/palette.js:2003
 #: js/palette.js:2060
 msgid "Do you want to remove all the stacks from your \"%s\" palette?"
-msgstr ""
+msgstr "自分のブロックスを全て消しますか？"
 
 #: js/palette.js:2060
 msgid "myblocks"
-msgstr ""
+msgstr "自分のブロック"
 
 #: js/turtle.js:486
 #: js/turtle.js:664
@@ -1859,7 +1859,7 @@ msgstr "その他"
 
 #: js/turtledefs.js:35
 msgid "my blocks"
-msgstr ""
+msgstr "自分のブロック"
 
 #: js/turtledefs.js:45
 msgid "music"
@@ -2156,12 +2156,12 @@ msgstr "ミュージック・ブロックスをかんたんモード／はって
 #: js/toolbar.js:519
 #: js/toolbar.js:525
 msgid "Select language"
-msgstr "言語を選ぶ"
+msgstr "言語をえらぶ"
 
 #: js/turtledefs.js:223
 #: js/turtledefs.js:264
 msgid "Select your language preference."
-msgstr "ブロックの名前などに表示される言語を選ぶ。"
+msgstr "ブロックの名前などに表示される言語をえらぶ。"
 
 #: js/turtledefs.js:225
 #: js/turtledefs.js:267
@@ -2456,7 +2456,7 @@ msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数�
 #: js/turtledefs.js:299
 #: js/turtledefs.js:582
 msgid "The Set key block is used to set the key and mode,"
-msgstr "<h2>音階ブロック</h2><br>調の部分に音の高さ、音階の部分に音階の種類を選び、調をせっていする。<br><br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。<br>★音階とは<br>順番に並んだ音のまとまり。"
+msgstr "<h2>調をせっていブロック</h2><br>調の部分に音の高さ、音階の部分に音階の種類を選び、調をせっていする。<br><br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。<br>★音階とは<br>順番に並んだ音のまとまり。"
 
 #: js/turtledefs.js:299
 msgid "eg C Major"
@@ -2531,7 +2531,7 @@ msgstr "<h2>楽器の音量をせっていブロック</h2><br>ギター、ヴ�
 
 #: js/turtledefs.js:312
 msgid "eg guitar violin snare drum etc."
-msgstr "<br><br>例えば、ギター、バイオリン、スネアドラムなど。"
+msgstr "<br>"
 
 #: js/turtledefs.js:312
 msgid "The default volume is 50."
@@ -2588,7 +2588,7 @@ msgstr "<h2>キーボードブロック</h2><br>ピアノのキーボードを�
 
 #: js/turtledefs.js:325
 msgid "The Tempo block opens a metronome to visualize the beat."
-msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示する。ボタンをおすと、メトロノームのはやさを変えられる。テーブル（表）には、１分あたりの拍（はく）の数が表示される。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
+msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示する。ボタンをおすと、メトロノームのはやさを変えられる。テーブルには、１分あたりの拍（はく）の数が表示される。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/turtledefs.js:326
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
@@ -2600,7 +2600,7 @@ msgstr "<h2>実行ブロック（くり返し）</h2><br>はさまれている�
 
 #: js/turtledefs.js:328
 msgid "In this example the note will be played 4 times."
-msgstr "<br><br>図の例では、「ソ」の音が４回えんそうされる"
+msgstr "<br><br>図の例では、「ソ」の音が４回えんそうされる。"
 
 #: js/turtledefs.js:329
 msgid "The Forever block will repeat the contained blocks forever."
@@ -2622,7 +2622,7 @@ msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを�
 #: js/turtledefs.js:587
 #: js/turtledefs.js:588
 msgid "In this example if the mouse button is pressed a snare drum will play."
-msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「スネアドラム」ブロックをえんそうする。"
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。"
 
 #: js/turtledefs.js:331
 msgid "Else a kick drum will play."
@@ -2798,7 +2798,7 @@ msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線を�
 
 #: js/turtledefs.js:373
 msgid "The Color block returns the current pen color."
-msgstr "げんざいのペンの色を、すうちでひょうじする。"
+msgstr "<h2>ペンブロック</h2><br>げんざいのペンの色を、すうちでひょうじする。"
 
 #: js/turtledefs.js:374
 msgid "The Set-color block changes the pen color."
@@ -3102,7 +3102,7 @@ msgstr ""
 
 #: js/turtledefs.js:458
 msgid "The Pitch slider tool to is used to generate pitches at selected frequencies."
-msgstr ""
+msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。また、ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは音の高さを表す周波数。<br>★周波数とは音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。"
 
 #: js/turtledefs.js:459
 msgid "The Pitch staircase tool to is used to generate pitches from a given ratio."
@@ -5249,7 +5249,7 @@ msgstr "さいだいち"
 #: js/basicblocks.js:3828
 ## JA just refers to box right now
 msgid "add 1 to"
-msgstr "箱に１をたす"
+msgstr "箱に１を足す"
 
 #: js/basicblocks.js:3839
 #: js/basicblocks.js:3843
@@ -5994,7 +5994,7 @@ msgstr "箱２"
 
 #: js/blocks.js:1442
 msgid "Consider breaking this stack into parts."
-msgstr "この長いスタックを別々のスタックにしたほうがいい"
+msgstr "アクションブロックを使ってプログラムをまとめませんか"
 
 #: js/blocks.js:4212
 msgid "There is no block selected."
@@ -6169,7 +6169,7 @@ msgstr "モジュレーションインデックス"
 #: js/timbre.js:1193
 ## http://jisho.org/word/%E3%83%93%E3%83%96%E3%83%A9%E3%83%BC%E3%83%88 
 msgid "vibrato amount"
-msgstr "ビブラートの量"
+msgstr "ビブラートの速さ"
 
 #: js/timbre.js:1752
 ## https://effector-hakase.com/delay/
@@ -6178,20 +6178,20 @@ msgstr "ディレイ・エフェクター（ms）"
 
 #: js/timbre.js:1896
 msgid "distortion amount"
-msgstr "ディストーションの量"
+msgstr "ディストーションの大きさ"
 
 #: js/tempo.js:75
 #: js/tempo.js:78
 msgid "The beats per minute must be between 30 and 1000."
-msgstr "BPM（一分あたりの拍数）は30から1000である必要があります"
+msgstr "1分あたりの拍の数は、30から1000までのはんいでせっていしてください。"
 
 #: js/tempo.js:339
 msgid "speed up"
-msgstr "はやくする"
+msgstr "速くする"
 
 #: js/tempo.js:355
 msgid "slow down"
-msgstr "おそくする"
+msgstr "遅くする"
 
 #: js/tempo.js:431
 msgid "Adjust the tempo with the buttons."
@@ -6208,7 +6208,7 @@ msgstr "リズムをタップする"
 
 #: js/rhythmruler.js:549
 msgid "Maximum value of 256 has been exceeded."
-msgstr ""
+msgstr "リズムメーカーの音の長さは、最大２５６です。"
 
 #: js/rhythmruler.js:1286
 #: js/synthutils.js:33

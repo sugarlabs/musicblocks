@@ -1549,7 +1549,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         // #TRANS: 'on' musical 'beat' 'do' some action
         newblock.staticLabels.push(_('on weak beat'), _('beat'), _('do'));
     }
-    newblock.oneArgBlock();
+    newblock.twoArgBlock();
     newblock.defaults.push(_('action'));
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
