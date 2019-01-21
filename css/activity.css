@@ -689,7 +689,7 @@ table {
     overflow-y: auto;
     -webkit-user-select: none;
     border-radius: 10px;
-    box-shadow: -3px 3px 10px grey;
+    box-shadow: 0 1px 10px #8080808f;
 }
 #helpDiv h1 {
     text-align: left;
