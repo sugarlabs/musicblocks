@@ -2625,8 +2625,8 @@ msgid "In this example if the mouse button is pressed a snare drum will play."
 msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。"
 
 #: js/turtledefs.js:331
-msgid "Else a kick drum will play."
-msgstr "長おししていなければ（そうでなければ）「キックドラム」ブロックをえんそうする。"
+msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
+msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。長おししていなければ（そうでなければ）「キックドラム」ブロックをえんそうする。"
 
 #: js/turtledefs.js:332
 msgid "The Backward block runs code in reverse order (Musical retrograde)."

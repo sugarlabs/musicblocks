@@ -1910,7 +1910,7 @@ msgid "In this example if the mouse button is pressed a snare drum will play."
 msgstr ""
 
 #: js/turtledefs.js:331
-msgid "Else a kick drum will play."
+msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
 msgstr ""
 
 #: js/turtledefs.js:332
