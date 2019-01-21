@@ -2483,7 +2483,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2506,7 +2506,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['setsynthvolume', 'tremolo', 'chorus', 'phaser', 'duosynth'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+        if (['setsynthvolume', 'tremolo', 'chorus', 'phaser', 'duosynth', 'arc'].indexOf(this.blocks.blockList[cblk].name) === -1) {
             return false;
         }
 
@@ -2988,6 +2988,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'phaser':
                     this._piemenuNumber([1, 2, 3], this.value);
                     break;
+		case 'arc':
+                    this._piemenuNumber([25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300], this.value);
+                    break;
                 }
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
@@ -3027,6 +3030,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'phaser':
                 case 'tremolo':
                     this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
+                    break;
+		case 'arc':
+                    this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 295, 300, 315, 330, 345, 360], this.value);
                     break;
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
@@ -4104,6 +4110,14 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
+        if (this._numberWheel.navItems.length > 20) {
+            console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
+            for (var i = 0; i < this._numberWheel.navItems.length; i++) {
+                this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+            }
+        }
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -4185,6 +4199,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.navigateWheel(i);
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+
         this.label.style.display = '';
         this.label.focus();
 
@@ -5611,9 +5626,9 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.name === 'action') {
             wheel.navItems[5].navigateFunction = function () {
-		console.log('CALLING saveStack');
+                console.log('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
-		that.blocks.prepareStackForCopy();
+                that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
             };
         }
