@@ -1580,6 +1580,7 @@ function RhythmRuler () {
         };
 
         canvas.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1597,6 +1598,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1614,7 +1616,6 @@ function RhythmRuler () {
         };
 
         rulerDiv.onmousedown = function (e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

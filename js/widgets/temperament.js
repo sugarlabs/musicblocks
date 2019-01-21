@@ -1744,6 +1744,7 @@ function TemperamentWidget () {
         };
 
         canvas.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1759,6 +1760,7 @@ function TemperamentWidget () {
         };
 
         temperamentDiv.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1774,7 +1776,6 @@ function TemperamentWidget () {
         };
 
         temperamentDiv.onmousedown = function (e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

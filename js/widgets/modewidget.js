@@ -131,6 +131,7 @@ function ModeWidget() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -146,6 +147,7 @@ function ModeWidget() {
         };
 
         modeDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -161,7 +163,6 @@ function ModeWidget() {
         };
 
         modeDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

@@ -252,6 +252,7 @@ function PitchSlider() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -267,6 +268,7 @@ function PitchSlider() {
         };
 
         sliderDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -282,7 +284,6 @@ function PitchSlider() {
         };
 
         sliderDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

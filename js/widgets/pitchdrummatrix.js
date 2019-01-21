@@ -174,6 +174,7 @@ function PitchDrumMatrix() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -189,6 +190,7 @@ function PitchDrumMatrix() {
         };
 
         pdmDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -204,7 +206,6 @@ function PitchDrumMatrix() {
         };
 
         pdmDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

@@ -248,6 +248,7 @@ function PitchTimeMatrix () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -263,6 +264,7 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -278,7 +280,6 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
