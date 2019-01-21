@@ -3032,7 +3032,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
                     break;
 		case 'arc':
-                    this._piemenuNumber([30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360], this.value);
+                    this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 295, 300, 315, 330, 345, 360], this.value);
                     break;
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
@@ -4110,6 +4110,14 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
+        if (this._numberWheel.navItems.length > 20) {
+            console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
+            for (var i = 0; i < this._numberWheel.navItems.length; i++) {
+                this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+            }
+        }
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -4191,6 +4199,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.navigateWheel(i);
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+
         this.label.style.display = '';
         this.label.focus();
 
@@ -5617,9 +5626,9 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.name === 'action') {
             wheel.navItems[5].navigateFunction = function () {
-		console.log('CALLING saveStack');
+                console.log('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
-		that.blocks.prepareStackForCopy();
+                that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
             };
         }
