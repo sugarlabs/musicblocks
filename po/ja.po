@@ -2693,7 +2693,7 @@ msgid "The Add-to block is used to add to the value stored in a box."
 msgstr "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、好きなすうちを足す。マイナスのすうちを使うと引き算になる。"
 
 #: js/turtledefs.js:344
-msgid "It can also be used with other blocks, such as Color, Pen-size."
+msgid "It can also be used with other blocks such as Color and Pen size."
 msgstr "<br><br>マイナスの数値を使うと引き算になる。"
 
 #: js/turtledefs.js:344

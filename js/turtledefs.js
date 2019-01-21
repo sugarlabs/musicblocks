@@ -341,7 +341,7 @@ function createHelpContent() {
         'box1': [_('The Box 1 block returns the value stored in Box 1.'), 'documentation', 'box-1-block.svg'],
         'storebox2': [_('The Store in Box 2 block is used to store a value in Box 2.'), 'documentation', 'box-2-block.svg'],
         'box2': [_('The Box 2 block returns the value stored in Box 2.'), 'documentation', 'box-2-block.svg'],
-        'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks, such as Color, Pen-size.') + ' ' + _('etc.'), 'documentation', 'box-2-block.svg'],
+        'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks such as Color and Pen size.'), 'documentation', 'box-2-block.svg'],
         'incrementOne': [_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', 'box-1-block.svg'],
         // Number palette
         'number': [_('The Number block holds a number.'), 'documentation', 'repeat-block.svg'],

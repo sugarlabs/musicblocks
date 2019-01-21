@@ -2819,7 +2819,7 @@ msgid "The Add-to block is used to add to the value stored in a box."
 msgstr ""
 
 #: js/turtledefs.js:344
-msgid "It can also be used with other blocks, such as Color, Pen-size."
+msgid "It can also be used with other blocks such as Color and Pen size."
 msgstr "También se puede utilizar con otros bloques, como el color, el tamaño de la pluma."
 
 #: js/turtledefs.js:344
