@@ -374,6 +374,9 @@ function Activity() {
      */
     this._findBlocks = function () {
         // _showHideAuxMenu(false);
+        if (!blocks.visible)  {
+            _changeBlockVisibility();
+        }
         var leftpos = Math.floor(canvas.width / 4);
         var toppos;
         blocks.activeBlock = null;
@@ -2252,12 +2255,15 @@ function Activity() {
         if (blocks.visible) {
             logo.hideBlocks();
             palettes.hide();
+            hideBlocksContainer[1].visible = true;
+            hideBlocksContainer[0].visible = false;
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-
+            hideBlocksContainer[1].visible = false;
+            hideBlocksContainer[0].visible = true;
             logo.showBlocks();
             palettes.show();
             palettes.bringToTop();
@@ -3041,8 +3047,16 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer = [];
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[0], x, y, _changeBlockVisibility, null, null, null, null);
+        
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSFADEDBUTTON, _('Show/hide block'), x, y - btnSize, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[1], x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer[1].visible = false;
+
+        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
+        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
