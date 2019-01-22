@@ -683,13 +683,52 @@ table {
     top: 20%;
     left: 20%;
     width: 455px;
-    height: 335px;
+    height: 336px;
     /* background: rgba(196, 196, 196, 1.0) !important; */
     background: #fff !important;
     overflow-y: auto;
     -webkit-user-select: none;
     border-radius: 10px;
     box-shadow: 0 1px 10px #8080808f;
+}
+#right-arrow, #left-arrow {
+    position: absolute;
+    top: 184px;
+    background-size: 40px 40px;
+    height: 40px;
+    width: 40px;
+}
+#right-arrow {
+    left: 410px;
+    background: url('../header-icons/right-arrow.png');
+}
+#right-arrow:hover {
+    cursor: pointer;
+}
+#left-arrow {
+    left: 5px;
+    background: url('../header-icons/left-arrow.png');
+}
+#left-arrow:hover {
+    cursor: pointer;
+}
+#top-wrapper {
+    width: 100%;
+    background: #2196F3;
+    /* position: absolute; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.9em;
+    text-align: center;
+    height: 55px;
+}
+#skip_div {
+    position: absolute;
+    color: #fff;
+    font-size: 1em;
+    left: 400px;
 }
 #helpDiv h1 {
     text-align: left;
@@ -714,10 +753,11 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 0px;
+    left: 45px;
     top: 0px;
     border: 0 !important;
     overflow-x: auto;
+    width: 330px
 }
 
 #pscDiv {
