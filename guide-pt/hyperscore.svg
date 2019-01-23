@@ -174,7 +174,7 @@
           <tspan
              id="tspan158"
              y="13.833333"
-             x="13.333333">top</tspan>
+             x="13.333333">topo</tspan>
         </text>
       </g>
     </g>
@@ -874,7 +874,7 @@
           <tspan
              id="tspan1158"
              y="13.833333"
-             x="13.333333">height</tspan>
+             x="13.333333">altura</tspan>
         </text>
       </g>
     </g>
@@ -2470,7 +2470,7 @@
           <tspan
              id="tspan1674"
              y="13.833333"
-             x="13.333333">width</tspan>
+             x="13.333333">largura</tspan>
         </text>
       </g>
     </g>
@@ -2658,7 +2658,7 @@
           <tspan
              id="tspan1768"
              y="13.833333"
-             x="13.333333">width</tspan>
+             x="13.333333">largura</tspan>
         </text>
       </g>
     </g>
@@ -2770,7 +2770,7 @@
           <tspan
              id="tspan1824"
              y="13.833333"
-             x="13.333333">width</tspan>
+             x="13.333333">largura</tspan>
         </text>
       </g>
     </g>
@@ -3142,7 +3142,7 @@
           <tspan
              id="tspan536"
              y="13.833333"
-             x="13.333333">width</tspan>
+             x="13.333333">largura</tspan>
         </text>
       </g>
     </g>
@@ -3162,7 +3162,7 @@
           <tspan
              id="tspan546"
              y="13.833333"
-             x="13.333333">height</tspan>
+             x="13.333333">altura</tspan>
         </text>
       </g>
     </g>
@@ -4350,7 +4350,7 @@
           <tspan
              id="tspan1984"
              y="13.833333"
-             x="13.333333">top</tspan>
+             x="13.333333">topo</tspan>
         </text>
       </g>
     </g>
@@ -5498,7 +5498,7 @@
           <tspan
              id="tspan2654"
              y="15.25"
-             x="12">make block</tspan>
+             x="12">fazer bloco</tspan>
         </text>
       </g>
     </g>
@@ -5810,7 +5810,7 @@
           <tspan
              id="tspan2810"
              y="13.5"
-             x="69.702477">delete block</tspan>
+             x="69.702477">excluir bloco</tspan>
         </text>
         <text
            id="text2816"
@@ -5858,7 +5858,7 @@
           <tspan
              id="tspan2834"
              y="13.5"
-             x="69.702477">delete block</tspan>
+             x="69.702477">excluir bloco</tspan>
         </text>
         <text
            id="text2840"
@@ -5982,7 +5982,7 @@
           <tspan
              id="tspan2896"
              y="13.5"
-             x="69.702477">delete block</tspan>
+             x="69.702477">excluir bloco</tspan>
         </text>
         <text
            id="text2902"
@@ -6382,7 +6382,7 @@
           <tspan
              id="tspan3096"
              y="21.166666"
-             x="82.480797">connect blocks</tspan>
+             x="82.480797">conectar blocos</tspan>
         </text>
         <text
            id="text3102"
@@ -6390,7 +6390,7 @@
           <tspan
              id="tspan3100"
              y="11.25"
-             x="82.480797">target block</tspan>
+             x="82.480797">Blco alvo</tspan>
         </text>
         <text
            id="text3106"
@@ -6398,7 +6398,7 @@
           <tspan
              id="tspan3104"
              y="32.25"
-             x="82.480797">connection number</tspan>
+             x="82.480797">Número da conexão</tspan>
         </text>
         <text
            id="text3110"
@@ -6406,7 +6406,7 @@
           <tspan
              id="tspan3108"
              y="53.25"
-             x="82.480797">block number</tspan>
+             x="82.480797">número do bloco</tspan>
         </text>
       </g>
     </g>
@@ -6794,7 +6794,7 @@
           <tspan
              id="tspan3302"
              y="15.25"
-             x="12">make block</tspan>
+             x="12">fazer bloco</tspan>
         </text>
       </g>
     </g>
@@ -6950,7 +6950,7 @@
           <tspan
              id="tspan3380"
              y="21.166666"
-             x="82.480797">connect blocks</tspan>
+             x="82.480797">conectar blocos</tspan>
         </text>
         <text
            id="text3386"
@@ -6958,7 +6958,7 @@
           <tspan
              id="tspan3384"
              y="11.25"
-             x="82.480797">target block</tspan>
+             x="82.480797">Blco alvo</tspan>
         </text>
         <text
            id="text3390"
@@ -6966,7 +6966,7 @@
           <tspan
              id="tspan3388"
              y="32.25"
-             x="82.480797">connection number</tspan>
+             x="82.480797">Número da conexão</tspan>
         </text>
         <text
            id="text3394"
@@ -6974,7 +6974,7 @@
           <tspan
              id="tspan3392"
              y="53.25"
-             x="82.480797">block number</tspan>
+             x="82.480797">número do bloco</tspan>
         </text>
       </g>
     </g>
@@ -7054,7 +7054,7 @@
           <tspan
              id="tspan3432"
              y="21.166666"
-             x="82.480797">connect blocks</tspan>
+             x="82.480797">conectar blocos</tspan>
         </text>
         <text
            id="text3438"
@@ -7062,7 +7062,7 @@
           <tspan
              id="tspan3436"
              y="11.25"
-             x="82.480797">target block</tspan>
+             x="82.480797">Blco alvo</tspan>
         </text>
         <text
            id="text3442"
@@ -7070,7 +7070,7 @@
           <tspan
              id="tspan3440"
              y="32.25"
-             x="82.480797">connection number</tspan>
+             x="82.480797">Número da conexão</tspan>
         </text>
         <text
            id="text3446"
@@ -7078,7 +7078,7 @@
           <tspan
              id="tspan3444"
              y="53.25"
-             x="82.480797">block number</tspan>
+             x="82.480797">número do bloco</tspan>
         </text>
       </g>
     </g>
@@ -7206,7 +7206,7 @@
           <tspan
              id="tspan3508"
              y="15.25"
-             x="12">make block</tspan>
+             x="12">fazer bloco</tspan>
         </text>
       </g>
     </g>

@@ -995,7 +995,7 @@
         <tspan
            x="45"
            y="33"
-           id="tspan414">delay (MS)</tspan>
+           id="tspan414">atraso (MS)</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
@@ -1715,7 +1715,7 @@
         <tspan
            x="93"
            y="12"
-           id="tspan754">scalar interval</tspan>
+           id="tspan754">intervalo escalar</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"

@@ -715,7 +715,7 @@
           <tspan
              x="-260.8333435058594"
              y="-12.833333969116211"
-             id="svg_188">semi-tone transpose</tspan>
+             id="svg_188">transposição de semi-tom</tspan>
         </text>
         <text
            style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
@@ -1051,7 +1051,7 @@
           <tspan
              x="-252.83334350585938"
              y="-13.833333969116211"
-             id="svg_273">mode length</tspan>
+             id="svg_273">duração do modo</tspan>
         </text>
       </g>
     </g>
