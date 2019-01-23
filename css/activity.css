@@ -683,7 +683,7 @@ table {
     top: 20%;
     left: 20%;
     width: 455px;
-    height: 336px;
+    height: 349px;
     /* background: rgba(196, 196, 196, 1.0) !important; */
     background: #fff !important;
     overflow-y: auto;
@@ -732,9 +732,6 @@ table {
     background-size: 22px;
     left: 22px;
 }
-#move-div {
-    background-repeat: no-repeat;
-}
 #skip_div {
     position: absolute;
     color: #fff;
@@ -765,10 +762,10 @@ table {
 #helpBodyDiv {
     position: relative;
     left: 45px;
-    top: 0px;
+    top: 25px;
     border: 0 !important;
     overflow-x: auto;
-    width: 330px
+    width: 345px;
 }
 
 #pscDiv {
