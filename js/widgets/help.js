@@ -51,7 +51,8 @@ function HelpWidget () {
         var that = this;
 
         if (blocks === null) {
-            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('Previous page'));
+            // var cell = this._addButton(row, 'up.svg', ICONSIZE, _('Previous page'));
+            var cell = docById("left-arrow");
 
             cell.onclick=function() {
                 page = page - 1;
@@ -72,8 +73,9 @@ function HelpWidget () {
                 this.style.backgroundColor = '#2196F3';
             };
 
-            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
-
+            // var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
+            var cell = docById("left-arrow");
+            
             cell.onclick=function() {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {

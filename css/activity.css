@@ -691,23 +691,23 @@ table {
     border-radius: 10px;
     box-shadow: 0 1px 10px #8080808f;
 }
-#right-arrow, #left-arrow {
-    position: absolute;
-    top: 184px;
-    background-size: 40px 40px;
-    height: 40px;
-    width: 40px;
-}
 #right-arrow {
     left: 410px;
     background: url('../header-icons/right-arrow.png');
 }
-#right-arrow:hover {
-    cursor: pointer;
-}
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
+}
+#right-arrow, #left-arrow {
+    position: absolute;
+    top: 195px;
+    background-size: 40px;
+    height: 40px;
+    width: 40px;
+}
+#right-arrow:hover {
+    cursor: pointer;
 }
 #left-arrow:hover {
     cursor: pointer;
@@ -723,6 +723,17 @@ table {
     font-size: 0.9em;
     text-align: center;
     height: 55px;
+}
+#move-div {
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: url('../header-icons/move.png');
+    background-size: 22px;
+    left: 22px;
+}
+#move-div {
+    background-repeat: no-repeat;
 }
 #skip_div {
     position: absolute;
