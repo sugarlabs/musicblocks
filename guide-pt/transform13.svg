@@ -252,7 +252,7 @@
         <tspan
            x="54"
            y="54"
-           id="tspan64">even/odd/scalar</tspan>
+           id="tspan64">par/impar/escalar</tspan>
       </text>
     </g>
   </g>
@@ -1140,7 +1140,7 @@
         <tspan
            x="54"
            y="54"
-           id="tspan496">even/odd/scalar</tspan>
+           id="tspan496">par/impar/escalar</tspan>
       </text>
     </g>
   </g>
@@ -1512,7 +1512,7 @@
         <tspan
            x="54"
            y="54"
-           id="tspan678">even/odd/scalar</tspan>
+           id="tspan678">par/impar/escalar</tspan>
       </text>
     </g>
   </g>
