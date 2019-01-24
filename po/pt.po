@@ -3831,7 +3831,7 @@ msgstr "definir timbre"
 
 #: js/basicblocks.js:2014
 msgid "set temperament"
-msgstr "Definir temperamento"
+msgstr "definir temperamento"
 
 #: js/basicblocks.js:2026
 msgid "octave space"
