@@ -5,11 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg1621"
-   version="1.1"
-   viewBox="0 0 52.255203 51.461456"
+   width="58.122318mm"
    height="51.461456mm"
-   width="52.255203mm">
+   viewBox="0 0 58.122318 51.461456"
+   version="1.1"
+   id="svg1621">
   <defs
      id="defs1615" />
   <metadata
@@ -24,254 +24,250 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     transform="translate(199.2407,90.075967)"
-     id="layer1">
-    <path
-       id="path540"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-78.235863 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -17.21019 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.587501 z" />
-    <text
-       y="-81.609299"
-       x="-199.24071"
-       id="text544"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan542"
-         y="-76.053047"
-         x="-175.42821">definir sombra</tspan>
-    </text>
-    <text
-       y="-81.609299"
-       x="-199.24071"
-       id="text548"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan546"
-         y="-76.846802"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path554"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-81.410863 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
-    <text
-       y="-81.609299"
-       x="-174.36987"
-       id="text558"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan556"
-         y="-76.053047"
-         x="-169.21049">0</tspan>
-    </text>
-    <path
-       id="path564"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-61.302529 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.587499 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -17.21019 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.587499 z" />
-    <text
-       y="-64.675964"
-       x="-199.24071"
-       id="text568"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan566"
-         y="-59.119717"
-         x="-175.42821">definir sombra</tspan>
-    </text>
-    <text
-       y="-64.675964"
-       x="-199.24071"
-       id="text572"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan570"
-         y="-59.913467"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path578"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-64.47753 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396876 h -2.38125 v 1.190626 h -0.79375 v -3.175001 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
-    <text
-       y="-64.675964"
-       x="-174.36987"
-       id="text582"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan580"
-         y="-59.119717"
-         x="-169.21049">50</tspan>
-    </text>
-    <path
-       id="path588"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-86.70253 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.5875 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.587501 z" />
-    <text
-       y="-90.075966"
-       x="-199.24071"
-       id="text592"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan590"
-         y="-84.519714"
-         x="-179.39696">para frente</tspan>
-    </text>
-    <text
-       y="-90.075966"
-       x="-199.24071"
-       id="text596"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan594"
-         y="-85.313469"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path602"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-89.87753 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
-    <text
-       y="-90.075966"
-       x="-178.33862"
-       id="text606"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan604"
-         y="-84.519714"
-         x="-173.17924">100</tspan>
-    </text>
-    <path
-       id="path612"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-69.769197 v -1.587499 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.587499 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.5875 z" />
-    <text
-       y="-73.142632"
-       x="-199.24071"
-       id="text616"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan614"
-         y="-67.586388"
-         x="-179.39696">para frente</tspan>
-    </text>
-    <text
-       y="-73.142632"
-       x="-199.24071"
-       id="text620"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan618"
-         y="-68.380135"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path626"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-72.944197 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396876 z" />
-    <text
-       y="-73.142632"
-       x="-178.33862"
-       id="text630"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan628"
-         y="-67.586388"
-         x="-173.17924">100</tspan>
-    </text>
-    <path
-       id="path636"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-52.835862 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.793751 h 3.96875 v -0.793751 h 13.23369 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.587499 h -1.5875 -13.23369 -0.39688 v 0.793751 h -3.175 v -0.793751 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.587499 v -1.5875 z" />
-    <text
-       y="-56.209301"
-       x="-199.24071"
-       id="text640"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan638"
-         y="-50.653049"
-         x="-179.39696">para frente</tspan>
-    </text>
-    <text
-       y="-56.209301"
-       x="-199.24071"
-       id="text644"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan642"
-         y="-51.4468"
-         x="-179.39696" />
-    </text>
-    <path
-       id="path650"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -174.96518,-56.010863 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z" />
-    <text
-       y="-56.209301"
-       x="-178.33862"
-       id="text654"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan652"
-         y="-50.653049"
-         x="-173.17924">100</tspan>
-    </text>
-    <path
-       id="path660"
-       style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -199.04226,-44.369196 v -1.5875 a 1.5875,1.5875 0 0 1 1.5875,-1.587501 h 1.5875 v 0.79375 h 3.96875 v -0.79375 h 17.21019 1.5875 a 1.5875,1.5875 0 0 1 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.5875 a 1.5875,1.5875 0 0 1 -1.5875,1.5875 h -1.5875 -17.21019 -0.39688 v 0.79375 h -3.175 v -0.79375 h -0.39687 -1.5875 a 1.5875,1.5875 0 0 1 -1.5875,-1.5875 v -1.5875 z" />
-    <text
-       y="-47.742634"
-       x="-199.24071"
-       id="text664"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan662"
-         y="-42.186382"
-         x="-175.42821">definir sombra</tspan>
-    </text>
-    <text
-       y="-47.742634"
-       x="-199.24071"
-       id="text668"
-       style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan666"
-         y="-42.980133"
-         x="-175.42821" />
-    </text>
-    <path
-       id="path674"
-       style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
-       d="m -170.99643,-47.544197 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
-    <text
-       y="-47.742634"
-       x="-174.36987"
-       id="text678"
-       style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
-      <tspan
-         style="stroke-width:0.39687499"
-         id="tspan676"
-         y="-42.186382"
-         x="-169.21049">100</tspan>
-    </text>
-  </g>
+  <path
+     id="path540"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471424,11.840104 v -1.5875 c 0,-0.8767516 0.71074802,-1.5874995 1.58750006,-1.5874995 h 1.5875 v 0.79375 h 3.9687513 v -0.79375 h 23.0310254 1.5875 c 0.876752,0 1.5875,0.710748 1.5875,1.5874995 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 c -10e-7,0.876752 -0.710748,1.587499 -1.5875,1.587499 h -1.5875 -23.0310254 -0.39688 v 0.79375 H 3.8165839 v -0.79375 h -0.3968696 -1.5875 c -0.87675165,0 -1.86475313,-0.755739 -1.58750006,-1.587499 v -1.587501 z" />
+  <text
+     y="8.4666691"
+     x="5.8671002"
+     id="text544"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan542"
+       y="14.022921"
+       x="29.679605">definir sombra</tspan>
+  </text>
+  <text
+     y="8.4666691"
+     x="0.046266608"
+     id="text548"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan546"
+       y="13.229166"
+       x="23.858767" />
+  </text>
+  <path
+     id="path554"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 34.111381,8.6651045 h 23.8125 v 7.9374995 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
+  <text
+     y="8.4666691"
+     x="30.73794"
+     id="text558"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan556"
+       y="14.022921"
+       x="35.897316">0</tspan>
+  </text>
+  <path
+     id="path564"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471424,28.773438 v -1.5875 c 0,-0.876752 0.71074763,-1.587501 1.58750006,-1.587501 h 1.5875 v 0.793751 h 3.9687513 v -0.793751 h 23.0310254 1.5875 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.587499 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 h -1.5875 -23.0310254 -0.39688 v 0.793751 H 3.8165843 v -0.793751 h -0.39687 -1.5875 c -0.87675204,0 -1.58750006,-0.710748 -1.58750006,-1.5875 v -1.587499 z" />
+  <text
+     y="25.400003"
+     x="5.8671002"
+     id="text568"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan566"
+       y="30.956251"
+       x="29.679605">definir sombra</tspan>
+  </text>
+  <text
+     y="25.400003"
+     x="0.046266608"
+     id="text572"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan570"
+       y="30.1625"
+       x="23.858767" />
+  </text>
+  <path
+     id="path578"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 34.111381,25.598437 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396876 h -2.38125 v 1.190626 h -0.79375 v -3.175001 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
+  <text
+     y="25.400003"
+     x="30.73794"
+     id="text582"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan580"
+       y="30.956251"
+       x="35.897316">50</tspan>
+  </text>
+  <path
+     id="path588"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471409,3.3734375 v -1.5875 c 0,-0.87675208 0.71074802,-1.5875 1.58750011,-1.5875 h 1.5875 v 0.79375 H 7.388464 v -0.79375 h 16.408692 1.5875 c 0.876752,0 1.5875,0.71074796 1.5875,1.5875 v 1.5875 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190625 h 1.5875 v 1.587501 c -10e-7,0.8767516 -0.710748,1.587499 -1.5875,1.587499 h -1.5875 -16.408692 -0.39688 v 0.79375 H 3.8165842 v -0.79375 h -0.39687 -1.5875 c -0.8767517,0 -1.86475318,-0.7557393 -1.58750011,-1.587499 v -1.587501 z" />
+  <text
+     y="1.6156721e-06"
+     x="3.2212665"
+     id="text592"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan590"
+       y="5.556253"
+       x="23.06502">para frente</tspan>
+  </text>
+  <text
+     y="1.6156721e-06"
+     x="0.046266608"
+     id="text596"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan594"
+       y="4.7624984"
+       x="19.890017" />
+  </text>
+  <path
+     id="path602"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 27.496796,0.1984375 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396874 h -2.38125 v 1.190624 h -0.79375 v -3.174999 h 0.79375 v 1.190624 h 2.38125 v -0.396875 z" />
+  <text
+     y="1.6156721e-06"
+     x="24.123354"
+     id="text606"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan604"
+       y="5.556253"
+       x="29.282732">100</tspan>
+  </text>
+  <path
+     id="path612"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471409,20.30677 v -1.587499 c 0,-0.876752 0.71074763,-1.587501 1.58750011,-1.587501 h 1.5875 v 0.793751 H 7.388464 V 17.13177 h 16.408692 1.5875 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 v 1.587499 h -1.5875 v -1.190625 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 c -10e-7,0.876752 -0.710748,1.587499 -1.5875,1.587499 h -1.5875 -16.408692 -0.39688 v 0.793751 H 3.8165842 V 25.06927 h -0.39687 -1.5875 c -0.8767517,0 -1.58750011,-0.710747 -1.58750011,-1.587499 v -1.5875 z" />
+  <text
+     y="16.933336"
+     x="3.2212665"
+     id="text616"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan614"
+       y="22.48958"
+       x="23.06502">para frente</tspan>
+  </text>
+  <text
+     y="16.933336"
+     x="0.046266608"
+     id="text620"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan618"
+       y="21.695833"
+       x="19.890017" />
+  </text>
+  <path
+     id="path626"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 27.496796,17.13177 h 23.8125 v 7.9375 h -23.8125 v -3.174999 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 V 20.30677 Z" />
+  <text
+     y="16.933336"
+     x="24.123354"
+     id="text630"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan628"
+       y="22.48958"
+       x="29.282732">100</tspan>
+  </text>
+  <path
+     id="path636"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471409,37.240105 v -1.5875 c 0,-0.876752 0.71074763,-1.587501 1.58750011,-1.587501 h 1.5875 v 0.793751 H 7.388464 v -0.793751 h 16.408692 1.5875 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 v -1.190624 h 1.5875 v 1.5875 c -10e-7,0.876752 -0.710748,1.587499 -1.5875,1.587499 h -1.5875 -16.408692 -0.39688 v 0.793751 H 3.8165842 v -0.793751 h -0.39687 -1.5875 c -0.8767517,0 -1.86475334,-0.755739 -1.58750011,-1.587499 v -1.5875 z" />
+  <text
+     y="33.866665"
+     x="3.2212665"
+     id="text640"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan638"
+       y="39.422916"
+       x="23.06502">para frente</tspan>
+  </text>
+  <text
+     y="33.866665"
+     x="0.046266608"
+     id="text644"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan642"
+       y="38.629166"
+       x="19.890017" />
+  </text>
+  <path
+     id="path650"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 27.496796,34.065104 h 23.8125 v 7.9375 h -23.8125 V 38.827605 38.43073 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190625 h 2.38125 v -0.396875 z" />
+  <text
+     y="33.866665"
+     x="24.123354"
+     id="text654"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan652"
+       y="39.422916"
+       x="29.282732">100</tspan>
+  </text>
+  <path
+     id="path660"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.24471424,45.706771 v -1.5875 c 0,-0.876752 0.71074763,-1.587501 1.58750006,-1.587501 h 1.5875 v 0.79375 h 3.9687513 v -0.79375 h 23.0310254 1.5875 c 0.876752,0 1.587501,0.710749 1.5875,1.587501 v 1.5875 h -1.5875 v -1.190626 h -1.5875 v 3.96875 h 1.5875 V 47.29427 h 1.5875 v 1.5875 c 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 h -1.5875 -23.0310254 -0.39688 v 0.79375 H 3.8165843 v -0.79375 h -0.39687 -1.5875 c -0.87675204,0 -1.86475341,-0.75574 -1.58750006,-1.5875 v -1.5875 z" />
+  <text
+     y="42.333332"
+     x="5.8671002"
+     id="text664"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan662"
+       y="47.889584"
+       x="29.679605">definir sombra</tspan>
+  </text>
+  <text
+     y="42.333332"
+     x="0.046266608"
+     id="text668"
+     style="font-size:2.64583325px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan666"
+       y="47.095833"
+       x="23.858767" />
+  </text>
+  <path
+     id="path674"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:0.39687499;stroke-linecap:round;stroke-opacity:1"
+     d="m 34.111381,42.53177 h 23.8125 v 7.9375 h -23.8125 v -3.175 -0.396875 h -2.38125 v 1.190625 h -0.79375 v -3.175 h 0.79375 v 1.190626 h 2.38125 v -0.396875 z" />
+  <text
+     y="42.333332"
+     x="30.73794"
+     id="text678"
+     style="font-size:3.96875px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:0.39687499">
+    <tspan
+       style="stroke-width:0.39687499"
+       id="tspan676"
+       y="47.889584"
+       x="35.897316">100</tspan>
+  </text>
 </svg>
