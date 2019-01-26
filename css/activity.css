@@ -42,6 +42,7 @@
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
     font-size: 24px;
+    color: black;
 }
 
 #search:focus {
