@@ -213,6 +213,9 @@ function HelpWidget () {
                         case 'es':
                             path = path + '-es';
                             break;
+                        case 'pt':
+                            path = path + '-pt';
+                            break;
                         default:
                             break;
                         }
