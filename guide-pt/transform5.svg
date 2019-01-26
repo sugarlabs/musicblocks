@@ -935,7 +935,7 @@
          transform="translate(468,15) scale(1.5) ">
         <path
            id="svg_249"
-           style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            d="m -312,-2 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 103.48893 4 c 2.20914,0 4.69859,1.9042267 4,4 v 4 h -4 v -3 h -4 V 5 h 4 V 2 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H -285 h -1 v 2 h -8 v -2 h -1 -4 c -2.76142,0 -5,2.238576 -5,5 v 4 4 105 4 c 0,2.76142 2.23858,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z" />
         <text
            x="-312.5"
@@ -1063,7 +1063,7 @@
          transform="translate(468,315) scale(1.5) ">
         <path
            id="svg_280"
-           style="fill:#ff8b2d;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            d="m -312,-2 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 103.48893 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 V 5 h 4 V 2 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H -285 h -1 v 2 h -8 v -2 h -1 -4 c -2.76142,0 -5,2.238576 -5,5 v 4 4 105 4 c 0,2.76142 2.23858,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z" />
         <text
            x="-312.5"
