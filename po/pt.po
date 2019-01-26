@@ -5034,7 +5034,7 @@ msgstr "volume mestre"
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: set the loudness level
 msgid "set synth volume"
-msgstr "Definir volume do sintetizador"
+msgstr "definir volume do sintetizador"
 
 #: js/basicblocks.js:5585
 #: js/basicblocks.js:5613
@@ -5044,14 +5044,14 @@ msgstr "sintetizador"
 #: js/basicblocks.js:5598
 #.TRANS: set the loudness level
 msgid "set drum volume"
-msgstr "Definir volume da bateria"
+msgstr "definir volume da bateria"
 
 #: js/basicblocks.js:5627
 #: js/basicblocks.js:5639
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
-msgstr "Definir volume mestre"
+msgstr "definir volume mestre"
 
 #: js/basicblocks.js:5651
 #.TRANS: set an articulation (change in volume)
