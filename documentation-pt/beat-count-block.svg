@@ -5,11 +5,39 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg1710"
    version="1.1"
-   viewBox="0 0 88.782562 17.594791"
-   height="17.594791mm"
-   width="88.782562mm">
+   viewBox="0 0 97.778404 17.594793"
+   height="17.594793mm"
+   width="97.778404mm"
+   sodipodi:docname="beat-count-block.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     id="namedview3380"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.5"
+     inkscape:cx="61.551718"
+     inkscape:cy="33.250004"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1710" />
   <defs
      id="defs1704" />
   <metadata
@@ -36,7 +64,9 @@
         <path
            id="path738"
            style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 86.704102 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           d="m 8.5,0.5 h 109.37077 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="ccccccccccccccc" />
         <text
            id="text742"
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
@@ -56,7 +86,8 @@
         <path
            id="path748"
            style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 51.708984 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 51.708984 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           inkscape:connector-curvature="0" />
         <text
            id="text752"
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
@@ -84,7 +115,8 @@
         <path
            id="path762"
            style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+           inkscape:connector-curvature="0" />
         <text
            id="text766"
            style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828">
@@ -120,7 +152,8 @@
         <path
            id="path780"
            style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           inkscape:connector-curvature="0" />
         <text
            id="text784"
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
@@ -140,7 +173,8 @@
         <path
            id="path790"
            style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           inkscape:connector-curvature="0" />
         <text
            id="text794"
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
