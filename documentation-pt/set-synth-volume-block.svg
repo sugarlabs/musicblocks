@@ -1,1 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="325.66666650772095" height="71.33333349227905"><rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none" style="" class=""/><g class="currentLayer" style=""><title>Layer 1</title><g class=""><g id="svg_85" class=""><g transform="translate(423, 447) scale(1.5)" id="svg_86"><path d="m-280.3888888955116,-287.5 L-280.3888888955116,-291.5 A4,4 90 0 1 -276.3888888955116,-295.5 L-272.3888888955116,-295.5 L-272.3888888955116,-293.5 L-262.3888888955116,-293.5 L-262.3888888955116,-295.5 L-184.38888889551163,-295.5 L-180.38888889551163,-295.5 A4,4 90 0 1 -176.38888889551163,-291.5 L-176.38888889551163,-287.5 L-180.38888889551163,-287.5 L-180.38888889551163,-290.5 L-184.38888889551163,-290.5 L-184.38888889551163,-280.5 L-180.38888889551163,-280.5 L-180.38888889551163,-283.5 L-176.38888889551163,-283.5 L-176.38888889551163,-266.5 L-180.38888889551163,-266.5 L-180.38888889551163,-269.5 L-184.38888889551163,-269.5 L-184.38888889551163,-259.5 L-180.38888889551163,-259.5 L-180.38888889551163,-262.5 L-176.38888889551163,-262.5 L-176.38888889551163,-258.5 A4,4 90 0 1 -180.38888889551163,-254.5 L-184.38888889551163,-254.5 L-262.3888888955116,-254.5 L-263.3888888955116,-254.5 L-263.3888888955116,-252.5 L-271.3888888955116,-252.5 L-271.3888888955116,-254.5 L-272.3888888955116,-254.5 L-276.3888888955116,-254.5 A4,4 90 0 1 -280.3888888955116,-258.5 L-280.3888888955116,-262.5 L-280.3888888955116,-283.5 L-280.3888888955116,-287.5 z" style="fill:#25C3C0;fill-opacity:1;stroke:#1DBCBD;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" id="svg_87"/><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end" id="svg_88" y="-296.00001698732376" x="-280.8888990879059"><tspan x="-186.88889908790588" y="-272.00001698732376" id="svg_89">definir volume do sintetizador</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end" id="svg_90" y="-296.00001698732376" x="-280.8888990879059"><tspan x="-186.88889908790588" y="-284.00001698732376" id="svg_91">synth
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg28"
+   version="1.1"
+   height="66"
+   width="412.5">
+  <metadata
+     id="metadata34">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs32" />
+  <g
+     transform="translate(86.33334,-3)"
+     class=""
+     id="svg_85">
+    <g
+       id="svg_86"
+       transform="matrix(1.5,0,0,1.5,423,447)">
+      <path
+         id="svg_87"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -339.05556,-287.5 v -4 c 0,-2.20914 1.79087,-4 4,-4 h 4 v 2 h 10 v -2 h 136.66667 4 c 2.20914,0 4,1.79086 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -136.66667 -1 v 2 h -8 v -2 h -1 -4 c -2.20913,0 -4,-1.79086 -4,-4 v -4 -21 z" />
+      <text
+         x="-280.88889"
+         y="-296.00003"
+         id="svg_88"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="svg_89"
+           y="-272.00003"
+           x="-186.8889">definir volume do sintetizador</tspan>
+      </text>
+      <text
+         x="-280.88889"
+         y="-296.00003"
+         id="svg_90"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="svg_91"
+           y="-284.00003"
+           x="-186.8889">sintetizador</tspan>
+      </text>
+      <text
+         x="-280.88889"
+         y="-296.00003"
+         id="svg_92"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="svg_93"
+           y="-263.00003"
+           x="-186.8889">volume</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(86.33334,-3)"
+     class=""
+     id="svg_94">
+    <g
+       id="svg_95"
+       transform="matrix(1.5,0,0,1.5,569,447)">
+      <path
+         id="svg_96"
+         style="fill:#25c3c0;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -272.38889,-295.5 h 110 v 20 h -110 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         x="-280.88889"
+         y="-296.00003"
+         id="svg_97"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="svg_98"
+           y="-282.00003"
+           x="-267.88889">guitarra</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(86.33334,-3)"
+     class=""
+     id="svg_99">
+    <g
+       id="svg_100"
+       transform="matrix(1.5,0,0,1.5,569,479)">
+      <path
+         id="svg_101"
+         style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -272.38889,-295.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         x="-280.88889"
+         y="-296.00003"
+         id="svg_102"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="svg_103"
+           y="-282.00003"
+           x="-267.88889">50</tspan>
+      </text>
+    </g>
+  </g>
+</svg>
