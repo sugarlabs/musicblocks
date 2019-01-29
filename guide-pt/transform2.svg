@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg6945"
+   width="1069.0586"
+   height="413.25"
    version="1.1"
-   height="412.5"
-   width="1023.0586">
+   id="svg6945">
   <metadata
      id="metadata6951">
     <rdf:RDF>
@@ -24,1284 +24,1284 @@
   <defs
      id="defs6949" />
   <rect
-     style="fill:none;stroke:none"
-     class=""
-     y="0.75000101"
-     x="0.75001001"
-     height="100%"
+     id="backgroundrect"
      width="100%"
-     id="backgroundrect" />
+     height="100%"
+     x="0.75001001"
+     y="0.75000101"
+     class=""
+     style="fill:none;stroke:none" />
   <g
-     transform="translate(0.75001,0.750001)"
+     class="currentLayer"
      id="g6943"
-     class="currentLayer">
+     transform="translate(0.75001,0.750001)">
     <title
        id="title6623">Layer 1</title>
     <g
-       transform="translate(16)"
+       id="svg_15"
        class=""
-       id="svg_15">
+       transform="translate(16)">
       <g
          id="svg_16">
         <g
-           id="svg_17"
-           transform="matrix(1.5,0,0,1.5,883,105)">
+           transform="matrix(1.5,0,0,1.5,883,105)"
+           id="svg_17">
           <path
-             id="svg_18"
+             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
              style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+             id="svg_18" />
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_19"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_20"
+               x="-245.83334"
                y="-12.833334"
-               x="-245.83334">nota</tspan>
+               id="svg_20">nota</tspan>
           </text>
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_21"
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_22"
+               x="-180.83334"
                y="-15.833334"
-               x="-180.83334">valor</tspan>
+               id="svg_22">valor</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_30"
        class=""
-       id="svg_30">
+       transform="translate(16)">
       <g
-         id="svg_31"
-         transform="matrix(1.5,0,0,1.5,1015,105)">
+         transform="matrix(1.5,0,0,1.5,1015,105)"
+         id="svg_31">
         <path
-           id="svg_32"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_32" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_33"
-           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_34"
+             x="-211.83334"
              y="-4.833334"
-             x="-211.83334">➗</tspan>
+             id="svg_34">➗</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_35"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_37"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_39"
        class=""
-       id="svg_39">
+       transform="translate(16)">
       <g
-         id="svg_40"
-         transform="matrix(1.5,0,0,1.5,1101,105)">
+         transform="matrix(1.5,0,0,1.5,1101,105)"
+         id="svg_40">
         <path
-           id="svg_41"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_41" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_42"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_43"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_43">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_44"
        class=""
-       id="svg_44">
+       transform="translate(16)">
       <g
-         id="svg_45"
-         transform="matrix(1.5,0,0,1.5,1101,137)">
+         transform="matrix(1.5,0,0,1.5,1101,137)"
+         id="svg_45">
         <path
-           id="svg_46"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_46" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_47"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_48"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">4</tspan>
+             id="svg_48">4</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_49"
        class=""
-       id="svg_49">
+       transform="translate(16)">
       <g
-         id="svg_50"
-         transform="matrix(1.5,0,0,1.5,897,137)">
+         transform="matrix(1.5,0,0,1.5,897,137)"
+         id="svg_50">
         <path
-           id="svg_51"
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
            style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="svg_51" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_52"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_53"
+             x="-229.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_53">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(82)"
+       id="svg_54"
        class=""
-       id="svg_54">
+       transform="translate(82)">
       <g
-         id="svg_55"
-         transform="matrix(1.5,0,0,1.5,897,169)">
+         transform="matrix(1.5,0,0,1.5,897,169)"
+         id="svg_55">
         <path
-           id="svg_56"
+           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.790861 -4,-4 v -4 -21 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.790861 -4,-4 v -4 -21 z" />
+           id="svg_56" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_57"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_58"
+             x="-219.83334"
              y="-3.833334"
-             x="-219.83334">determinar o tom</tspan>
+             id="svg_58">determinar o tom</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_59"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_60"
+             x="-219.83334"
              y="-15.833334"
-             x="-219.83334">nome</tspan>
+             id="svg_60">nome</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_61"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_62"
+             x="-219.83334"
              y="5.166666"
-             x="-219.83334">oitava</tspan>
+             id="svg_62">oitava</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(82)"
+       id="svg_63"
        class=""
-       id="svg_63">
+       transform="translate(82)">
       <g
-         id="svg_64"
-         transform="matrix(1.5,0,0,1.5,971,169)">
+         transform="matrix(1.5,0,0,1.5,971,169)"
+         id="svg_64">
         <path
-           id="svg_65"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_65" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_66"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
-          <tspan
-             id="svg_67"
-             y="-13.833334"
-             x="-252.83334">re</tspan>
-        </text>
-      </g>
-    </g>
-    <g
-       transform="translate(82)"
-       class=""
-       id="svg_68">
-      <g
-         id="svg_69"
-         transform="matrix(1.5,0,0,1.5,971,201)">
-        <path
-           id="svg_70"
-           style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
-        <text
-           x="-265.83334"
            y="-27.833334"
-           id="svg_71"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           x="-265.83334">
           <tspan
-             id="svg_72"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">5</tspan>
+             id="svg_67">re</tspan>
         </text>
       </g>
     </g>
     <g
+       id="svg_68"
        class=""
-       id="svg_73">
+       transform="translate(82)">
+      <g
+         transform="matrix(1.5,0,0,1.5,971,201)"
+         id="svg_69">
+        <path
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="svg_70" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="svg_71"
+           y="-27.833334"
+           x="-265.83334">
+          <tspan
+             x="-252.83334"
+             y="-13.833334"
+             id="svg_72">5</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_73"
+       class="">
       <g
          id="svg_74">
         <g
-           id="svg_75"
-           transform="matrix(1.5,0,0,1.5,412,263)">
+           transform="matrix(1.5,0,0,1.5,412,263)"
+           id="svg_75">
           <path
-             id="svg_76"
+             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
              style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+             id="svg_76" />
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_77"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_78"
+               x="-245.83334"
                y="-12.833334"
-               x="-245.83334">nota</tspan>
+               id="svg_78">nota</tspan>
           </text>
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_79"
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_80"
+               x="-180.83334"
                y="-15.833334"
-               x="-180.83334">valor</tspan>
+               id="svg_80">valor</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       class=""
-       id="svg_88">
+       id="svg_88"
+       class="">
       <g
-         id="svg_89"
-         transform="matrix(1.5,0,0,1.5,544,263)">
+         transform="matrix(1.5,0,0,1.5,544,263)"
+         id="svg_89">
         <path
-           id="svg_90"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_90" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_91"
-           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_92"
+             x="-211.83334"
              y="-4.833334"
-             x="-211.83334">➗</tspan>
+             id="svg_92">➗</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_93"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_95"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       class=""
-       id="svg_97">
+       id="svg_97"
+       class="">
       <g
-         id="svg_98"
-         transform="matrix(1.5,0,0,1.5,630,263)">
+         transform="matrix(1.5,0,0,1.5,630,263)"
+         id="svg_98">
         <path
-           id="svg_99"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_99" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_100"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_101"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_101">1</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_102">
+       id="svg_102"
+       class="">
       <g
-         id="svg_103"
-         transform="matrix(1.5,0,0,1.5,630,295)">
+         transform="matrix(1.5,0,0,1.5,630,295)"
+         id="svg_103">
         <path
-           id="svg_104"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_104" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_105"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_106"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">8</tspan>
+             id="svg_106">8</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_107">
+       id="svg_107"
+       class="">
       <g
-         id="svg_108"
-         transform="matrix(1.5,0,0,1.5,426,295)">
+         transform="matrix(1.5,0,0,1.5,426,295)"
+         id="svg_108">
         <path
-           id="svg_109"
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
            style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="svg_109" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_110"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_111"
+             x="-229.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_111">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(66)"
+       id="svg_112"
        class=""
-       id="svg_112">
+       transform="translate(66)">
       <g
-         id="svg_113"
-         transform="matrix(1.5,0,0,1.5,426,327)">
+         transform="matrix(1.5,0,0,1.5,426,327)"
+         id="svg_113">
         <path
-           id="svg_114"
+           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4.69859,-1.904227 -4,-4 v -4 -21 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4.69859,-1.904227 -4,-4 v -4 -21 z" />
+           id="svg_114" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_115"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_116"
+             x="-219.83334"
              y="-3.833334"
-             x="-219.83334">determinar o tom</tspan>
+             id="svg_116">determinar o tom</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_117"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_118"
+             x="-219.83334"
              y="-15.833334"
-             x="-219.83334">nome</tspan>
+             id="svg_118">nome</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_119"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_120"
+             x="-219.83334"
              y="5.166666"
-             x="-219.83334">oitava</tspan>
+             id="svg_120">oitava</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(66)"
+       id="svg_121"
        class=""
-       id="svg_121">
+       transform="translate(66)">
       <g
-         id="svg_122"
-         transform="matrix(1.5,0,0,1.5,500,327)">
+         transform="matrix(1.5,0,0,1.5,500,327)"
+         id="svg_122">
         <path
-           id="svg_123"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_123" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_124"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
-          <tspan
-             id="svg_125"
-             y="-13.833334"
-             x="-252.83334">mi</tspan>
-        </text>
-      </g>
-    </g>
-    <g
-       transform="translate(66)"
-       class=""
-       id="svg_126">
-      <g
-         id="svg_127"
-         transform="matrix(1.5,0,0,1.5,500,359)">
-        <path
-           id="svg_128"
-           style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
-        <text
-           x="-265.83334"
            y="-27.833334"
-           id="svg_129"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           x="-265.83334">
           <tspan
-             id="svg_130"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">5</tspan>
+             id="svg_125">mi</tspan>
         </text>
       </g>
     </g>
     <g
+       id="svg_126"
        class=""
-       id="svg_131">
+       transform="translate(66)">
+      <g
+         transform="matrix(1.5,0,0,1.5,500,359)"
+         id="svg_127">
+        <path
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="svg_128" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="svg_129"
+           y="-27.833334"
+           x="-265.83334">
+          <tspan
+             x="-252.83334"
+             y="-13.833334"
+             id="svg_130">5</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_131"
+       class="">
       <g
          id="svg_132">
         <g
-           id="svg_133"
-           transform="matrix(1.5,0,0,1.5,412,105)">
+           transform="matrix(1.5,0,0,1.5,412,105)"
+           id="svg_133">
           <path
-             id="svg_134"
+             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
              style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+             id="svg_134" />
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_135"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_136"
+               x="-245.83334"
                y="-12.833334"
-               x="-245.83334">nota</tspan>
+               id="svg_136">nota</tspan>
           </text>
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_137"
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_138"
+               x="-180.83334"
                y="-15.833334"
-               x="-180.83334">valor</tspan>
+               id="svg_138">valor</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       class=""
-       id="svg_146">
+       id="svg_146"
+       class="">
       <g
-         id="svg_147"
-         transform="matrix(1.5,0,0,1.5,544,105)">
+         transform="matrix(1.5,0,0,1.5,544,105)"
+         id="svg_147">
         <path
-           id="svg_148"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_148" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_149"
-           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_150"
+             x="-211.83334"
              y="-4.833334"
-             x="-211.83334">➗</tspan>
+             id="svg_150">➗</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_151"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_153"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       class=""
-       id="svg_155">
+       id="svg_155"
+       class="">
       <g
-         id="svg_156"
-         transform="matrix(1.5,0,0,1.5,630,105)">
+         transform="matrix(1.5,0,0,1.5,630,105)"
+         id="svg_156">
         <path
-           id="svg_157"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_157" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_158"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_159"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_159">1</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_160">
+       id="svg_160"
+       class="">
       <g
-         id="svg_161"
-         transform="matrix(1.5,0,0,1.5,426,137)">
+         transform="matrix(1.5,0,0,1.5,426,137)"
+         id="svg_161">
         <path
-           id="svg_162"
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
            style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="svg_162" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_163"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_164"
+             x="-229.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_164">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(66)"
+       id="svg_165"
        class=""
-       id="svg_165">
+       transform="translate(66)">
       <g
-         id="svg_166"
-         transform="matrix(1.5,0,0,1.5,426,169)">
+         transform="matrix(1.5,0,0,1.5,426,169)"
+         id="svg_166">
         <path
-           id="svg_167"
+           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4.69859,-1.904227 -4,-4 v -4 -21 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4.69859,-1.904227 -4,-4 v -4 -21 z" />
+           id="svg_167" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_168"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_169"
+             x="-219.83334"
              y="-3.833334"
-             x="-219.83334">determinar o tom</tspan>
+             id="svg_169">determinar o tom</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_170"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_171"
+             x="-219.83334"
              y="-15.833334"
-             x="-219.83334">nome</tspan>
+             id="svg_171">nome</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_172"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_173"
+             x="-219.83334"
              y="5.166666"
-             x="-219.83334">oitava</tspan>
+             id="svg_173">oitava</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(66)"
+       id="svg_174"
        class=""
-       id="svg_174">
+       transform="translate(66)">
       <g
-         id="svg_175"
-         transform="matrix(1.5,0,0,1.5,500,169)">
+         transform="matrix(1.5,0,0,1.5,500,169)"
+         id="svg_175">
         <path
-           id="svg_176"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_176" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_177"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_178"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">re</tspan>
+             id="svg_178">re</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(66)"
+       id="svg_179"
        class=""
-       id="svg_179">
+       transform="translate(66)">
       <g
-         id="svg_180"
-         transform="matrix(1.5,0,0,1.5,500,201)">
+         transform="matrix(1.5,0,0,1.5,500,201)"
+         id="svg_180">
         <path
-           id="svg_181"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_181" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_182"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_183"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">5</tspan>
+             id="svg_183">5</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_184">
+       id="svg_184"
+       class="">
       <g
-         id="svg_185"
-         transform="matrix(1.5,0,0,1.5,398,41)">
+         transform="matrix(1.5,0,0,1.5,398,41)"
+         id="svg_185">
         <path
-           id="svg_186"
+           d="m -265.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 109.93392 4 c 2.20913,0 4.69859,1.904227 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79087,4 -4,4 h -4 -109.93392 -1 v 2 h -8 v -2 h -1 -4 c -2.76143,0 -5,2.2385763 -5,5 v 4 4 210.000004 4 c 0,2.76142 2.23857,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 109.93392 4 c 2.20913,0 4.69859,1.904227 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79087,4 -4,4 h -4 -109.93392 -1 v 2 h -8 v -2 h -1 -4 c -2.76143,0 -5,2.2385763 -5,5 v 4 4 210.000004 4 c 0,2.76142 2.23857,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z" />
+           id="svg_186" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_187"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_188"
+             x="-260.83334"
              y="-12.833334"
-             x="-260.83334">transposição de semi-tom</tspan>
+             id="svg_188">transposição de semi-tom</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_189"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(44)"
+       id="svg_191"
        class=""
-       id="svg_191">
+       transform="translate(44)">
       <g
-         id="svg_192"
-         transform="matrix(1.5,0,0,1.5,561,41)">
+         transform="matrix(1.5,0,0,1.5,561,41)"
+         id="svg_192">
         <path
-           id="svg_193"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_193" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_194"
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_195"
+             x="-211.83334"
              y="-3.833334"
-             x="-211.83334">+</tspan>
+             id="svg_195">+</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_196"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_198"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(44)"
+       id="svg_200"
        class=""
-       id="svg_200">
+       transform="translate(44)">
       <g
-         id="svg_201"
-         transform="matrix(1.5,0,0,1.5,647,41)">
+         transform="matrix(1.5,0,0,1.5,647,41)"
+         id="svg_201">
         <path
-           id="svg_202"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_202" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_203"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_204"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_204">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(44)"
+       id="svg_205"
        class=""
-       id="svg_205">
+       transform="translate(44)">
       <g
-         id="svg_206"
-         transform="matrix(1.5,0,0,1.5,647,73)">
+         transform="matrix(1.5,0,0,1.5,647,73)"
+         id="svg_206">
         <path
-           id="svg_207"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_207" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_208"
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_209"
+             x="-211.83334"
              y="-3.833334"
-             x="-211.83334">×</tspan>
+             id="svg_209">×</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_210"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_212"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(44)"
+       id="svg_214"
        class=""
-       id="svg_214">
+       transform="translate(44)">
       <g
-         id="svg_215"
-         transform="matrix(1.5,0,0,1.5,733,73)">
+         transform="matrix(1.5,0,0,1.5,733,73)"
+         id="svg_215">
         <path
-           id="svg_216"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_216" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_217"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_218"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_218">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(44)"
+       id="svg_219"
        class=""
-       id="svg_219">
+       transform="translate(44)">
       <g
-         id="svg_220"
-         transform="matrix(1.5,0,0,1.5,733,105)">
+         transform="matrix(1.5,0,0,1.5,733,105)"
+         id="svg_220">
         <path
-           id="svg_221"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_221" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_222"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_223"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">12</tspan>
+             id="svg_223">12</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_224">
+       id="svg_224"
+       class="">
       <g
-         id="svg_225"
-         transform="matrix(1.5,0,0,1.5,412,73)">
+         transform="matrix(1.5,0,0,1.5,412,73)"
+         id="svg_225">
         <path
-           id="svg_226"
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
            style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="svg_226" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_227"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_228"
+             x="-229.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_228">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       class=""
-       id="svg_229">
+       id="svg_229"
+       class="">
       <g
-         id="svg_230"
-         transform="matrix(1.5,0,0,1.5,630,137)">
+         transform="matrix(1.5,0,0,1.5,630,137)"
+         id="svg_230">
         <path
-           id="svg_231"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_231" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_232"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_233"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">8</tspan>
+             id="svg_233">8</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_234"
        class=""
-       id="svg_234">
+       transform="translate(16)">
       <g
-         id="svg_235"
-         transform="matrix(1.5,0,0,1.5,869,41)">
+         transform="matrix(1.5,0,0,1.5,869,41)"
+         id="svg_235">
         <path
-           id="svg_236"
+           d="m -265.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 110.9873 4 c 2.20914,0 4.69859,1.904227 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -110.9873 -1 v 2 h -8 v -2 h -1 -4 c -2.76142,0 -5,2.2385763 -5,5 v 4 4 210.000004 4 c 0,2.76142 2.23858,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 9 110.9873 4 c 2.20914,0 4.69859,1.904227 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -110.9873 -1 v 2 h -8 v -2 h -1 -4 c -2.76142,0 -5,2.2385763 -5,5 v 4 4 210.000004 4 c 0,2.76142 2.23858,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.79086,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.79086 -4,-4 v -4 z" />
+           id="svg_236" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_237"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_238"
+             x="-260.83334"
              y="-12.833334"
-             x="-260.83334">transposição escalar (+/–)</tspan>
+             id="svg_238">transposição escalar (+/–)</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_239"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(52)"
+       id="svg_241"
        class=""
-       id="svg_241">
+       transform="translate(52)">
       <g
-         id="svg_242"
-         transform="matrix(1.5,0,0,1.5,1041,41)">
+         transform="matrix(1.5,0,0,1.5,1041,41)"
+         id="svg_242">
         <path
-           id="svg_243"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_243" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_244"
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_245"
+             x="-211.83334"
              y="-3.833334"
-             x="-211.83334">+</tspan>
+             id="svg_245">+</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_246"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_248"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(52)"
+       id="svg_250"
        class=""
-       id="svg_250">
+       transform="translate(52)">
       <g
-         id="svg_251"
-         transform="matrix(1.5,0,0,1.5,1127,41)">
+         transform="matrix(1.5,0,0,1.5,1127,41)"
+         id="svg_251">
         <path
-           id="svg_252"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_252" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_253"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_254"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">4</tspan>
+             id="svg_254">4</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(52)"
+       id="svg_255"
        class=""
-       id="svg_255">
+       transform="translate(52)">
       <g
-         id="svg_256"
-         transform="matrix(1.5,0,0,1.5,1127,73)">
+         transform="matrix(1.5,0,0,1.5,1127,73)"
+         id="svg_256">
         <path
-           id="svg_257"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_257" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_258"
-           style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_259"
+             x="-211.83334"
              y="-3.833334"
-             x="-211.83334">×</tspan>
+             id="svg_259">×</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_260"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_262"
-           style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(52)"
+       id="svg_264"
        class=""
-       id="svg_264">
+       transform="translate(52)">
       <g
-         id="svg_265"
-         transform="matrix(1.5,0,0,1.5,1213,73)">
+         transform="matrix(1.5,0,0,1.5,1213,73)"
+         id="svg_265">
         <path
-           id="svg_266"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_266" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_267"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_268"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">0</tspan>
+             id="svg_268">0</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(52)"
+       id="svg_269"
        class=""
-       id="svg_269">
+       transform="translate(52)">
       <g
-         id="svg_270"
-         transform="matrix(1.5,0,0,1.5,1213,105)">
+         transform="matrix(1.5,0,0,1.5,1213,105)"
+         id="svg_270">
         <path
-           id="svg_271"
+           d="m -257.33334,-27.333334 h 125.70573 v 20 h -125.70573 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 95.03906 v 20 h -95.03906 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_271" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_272"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
-          <tspan
-             id="svg_273"
-             y="-13.833334"
-             x="-252.83334">duração do modo</tspan>
-        </text>
-      </g>
-    </g>
-    <g
-       transform="translate(16)"
-       class=""
-       id="svg_274">
-      <g
-         id="svg_275"
-         transform="matrix(1.5,0,0,1.5,883,73)">
-        <path
-           id="svg_276"
-           style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
-        <text
-           x="-265.83334"
            y="-27.833334"
-           id="svg_277"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           x="-265.83334">
           <tspan
-             id="svg_278"
+             x="-252.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_273">modo número de notas</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_274"
        class=""
-       id="svg_279">
+       transform="translate(16)">
+      <g
+         transform="matrix(1.5,0,0,1.5,883,73)"
+         id="svg_275">
+        <path
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="svg_276" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="svg_277"
+           y="-27.833334"
+           x="-265.83334">
+          <tspan
+             x="-229.83334"
+             y="-13.833334"
+             id="svg_278">↓</tspan>
+        </text>
+      </g>
+    </g>
+    <g
+       id="svg_279"
+       class=""
+       transform="translate(16)">
       <g
          id="svg_280">
         <g
-           id="svg_281"
-           transform="matrix(1.5,0,0,1.5,883,263)">
+           transform="matrix(1.5,0,0,1.5,883,263)"
+           id="svg_281">
           <path
-             id="svg_282"
+             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
              style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-             d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 60 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -60 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+             id="svg_282" />
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_283"
-             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_284"
+               x="-245.83334"
                y="-12.833334"
-               x="-245.83334">nota</tspan>
+               id="svg_284">nota</tspan>
           </text>
           <text
-             x="-265.83334"
-             y="-27.833334"
+             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_285"
-             style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+             y="-27.833334"
+             x="-265.83334">
             <tspan
-               id="svg_286"
+               x="-180.83334"
                y="-15.833334"
-               x="-180.83334">valor</tspan>
+               id="svg_286">valor</tspan>
           </text>
         </g>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_294"
        class=""
-       id="svg_294">
+       transform="translate(16)">
       <g
-         id="svg_295"
-         transform="matrix(1.5,0,0,1.5,1015,263)">
+         transform="matrix(1.5,0,0,1.5,1015,263)"
+         id="svg_295">
         <path
-           id="svg_296"
+           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+           id="svg_296" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_297"
-           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_298"
+             x="-211.83334"
              y="-4.833334"
-             x="-211.83334">➗</tspan>
+             id="svg_298">➗</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_299"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
-        <text
-           x="-265.83334"
            y="-27.833334"
+           x="-265.83334" />
+        <text
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_301"
-           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828" />
+           y="-27.833334"
+           x="-265.83334" />
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_303"
        class=""
-       id="svg_303">
+       transform="translate(16)">
       <g
-         id="svg_304"
-         transform="matrix(1.5,0,0,1.5,1101,263)">
+         transform="matrix(1.5,0,0,1.5,1101,263)"
+         id="svg_304">
         <path
-           id="svg_305"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_305" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_306"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_307"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">1</tspan>
+             id="svg_307">1</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_308"
        class=""
-       id="svg_308">
+       transform="translate(16)">
       <g
-         id="svg_309"
-         transform="matrix(1.5,0,0,1.5,1101,295)">
+         transform="matrix(1.5,0,0,1.5,1101,295)"
+         id="svg_309">
         <path
-           id="svg_310"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_310" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_311"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_312"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">4</tspan>
+             id="svg_312">4</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(16)"
+       id="svg_313"
        class=""
-       id="svg_313">
+       transform="translate(16)">
       <g
-         id="svg_314"
-         transform="matrix(1.5,0,0,1.5,897,295)">
+         transform="matrix(1.5,0,0,1.5,897,295)"
+         id="svg_314">
         <path
-           id="svg_315"
+           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
            style="fill:#b0b0b0;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -265.33334,-19.333334 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+           id="svg_315" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_316"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_317"
+             x="-229.83334"
              y="-13.833334"
-             x="-229.83334">↓</tspan>
+             id="svg_317">↓</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(82)"
+       id="svg_318"
        class=""
-       id="svg_318">
+       transform="translate(82)">
       <g
-         id="svg_319"
-         transform="matrix(1.5,0,0,1.5,897,327)">
+         transform="matrix(1.5,0,0,1.5,897,327)"
+         id="svg_319">
         <path
-           id="svg_320"
+           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.790861 -4,-4 v -4 -21 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -309.33334,-19.333334 v -4 c 0,-2.209139 1.79086,-4 4,-4 h 4 v 2 h 10 v -2 h 74 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -74 -1 v 2 h -8 v -2 h -1 -4 c -2.20914,0 -4,-1.790861 -4,-4 v -4 -21 z" />
+           id="svg_320" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_321"
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_322"
+             x="-219.83334"
              y="-3.833334"
-             x="-219.83334">determinar o tom</tspan>
+             id="svg_322">determinar o tom</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_323"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_324"
+             x="-219.83334"
              y="-15.833334"
-             x="-219.83334">nome</tspan>
+             id="svg_324">nome</tspan>
         </text>
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_325"
-           style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_326"
+             x="-219.83334"
              y="5.166666"
-             x="-219.83334">oitava</tspan>
+             id="svg_326">oitava</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(82)"
+       id="svg_327"
        class=""
-       id="svg_327">
+       transform="translate(82)">
       <g
-         id="svg_328"
-         transform="matrix(1.5,0,0,1.5,971,327)">
+         transform="matrix(1.5,0,0,1.5,971,327)"
+         id="svg_328">
         <path
-           id="svg_329"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#77c428;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_329" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_330"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_331"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">mi</tspan>
+             id="svg_331">mi</tspan>
         </text>
       </g>
     </g>
     <g
-       transform="translate(82)"
+       id="svg_332"
        class=""
-       id="svg_332">
+       transform="translate(82)">
       <g
-         id="svg_333"
-         transform="matrix(1.5,0,0,1.5,971,359)">
+         transform="matrix(1.5,0,0,1.5,971,359)"
+         id="svg_333">
         <path
-           id="svg_334"
+           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
            style="fill:#ff5293;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-           d="m -257.33334,-27.333334 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+           id="svg_334" />
         <text
-           x="-265.83334"
-           y="-27.833334"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_335"
-           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+           y="-27.833334"
+           x="-265.83334">
           <tspan
-             id="svg_336"
+             x="-252.83334"
              y="-13.833334"
-             x="-252.83334">5</tspan>
+             id="svg_336">5</tspan>
         </text>
       </g>
     </g>
