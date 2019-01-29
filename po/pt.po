@@ -520,11 +520,11 @@ msgstr "Não é um nome de nota válido"
 
 #: js/logo.js:381
 msgid "Turning off mouse blink; setting FPS to 10."
-msgstr "Desligando o piscar do mouse; definição de FPS para 10."
+msgstr "Desligando o piscar do ratinho; definição de FPS para 10."
 
 #: js/logo.js:386
 msgid "Turning on mouse blink; setting FPS to 30."
-msgstr "Desligando o piscar do mouse; definição de FPS para 30."
+msgstr "Desligando o piscar do ratinho; definição de FPS para 30."
 
 #: js/logo.js:1756
 msgid "Block does not support incrementing."
@@ -542,7 +542,7 @@ msgstr "O bloco não suporta incrementações."
 #: js/logo.js:10952
 #: js/logo.js:10980
 msgid "Cannot find mouse"
-msgstr "Não foi possível encontrar o mouse"
+msgstr "Não foi possível encontrar o ratinho"
 
 #: js/logo.js:2163
 #: js/logo.js:2748
@@ -560,7 +560,7 @@ msgstr "Não foi possível encontrar a tartaruga"
 
 #: js/logo.js:2778
 msgid "Mouse is already running."
-msgstr "O mouse está sendo executado."
+msgstr "O ratinho está sendo executado."
 
 #: js/logo.js:2780
 msgid "Turtle is already running."
@@ -1173,17 +1173,17 @@ msgstr "Bem vindo ao Music Blocks"
 #: js/turtledefs.js:198
 #: js/turtledefs.js:234
 msgid "Meet Mr. Mouse!"
-msgstr "Conheça o Sr. Mouse"
+msgstr "Conheça o Sr. Ratinho!"
 
 #: js/turtledefs.js:198
 #: js/turtledefs.js:234
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "Sr Mouse é o nosso guia do Music Blocks."
+msgstr "Sr Ratinho é o nosso guia do Music Blocks."
 
 #: js/turtledefs.js:198
 #: js/turtledefs.js:234
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr "Sr Mouse incentiva a explorar o Music Blocks."
+msgstr "Sr Ratinho incentiva a explorar o Music Blocks."
 
 #: js/turtledefs.js:198
 #: js/turtledefs.js:234
@@ -1529,7 +1529,7 @@ msgstr "salvar"
 #: js/toolbar.js:445
 #: js/toolbar.js:478
 msgid "Save mouse artwork as SVG"
-msgstr "Salvar as ilustrações do mouse como SVG"
+msgstr "Salvar as ilustrações do ratinho como SVG"
 
 #: js/turtledefs.js:240
 msgid "Save graphics from your project to as SVG."
@@ -1540,7 +1540,7 @@ msgstr "Salvar os grficos do seu projeto como SVG."
 #: js/toolbar.js:446
 #: js/toolbar.js:479
 msgid "Save mouse artwork as PNG"
-msgstr "Salvar as ilustrações do mouse como PNG"
+msgstr "Salvar as ilustrações do ratinho como PNG"
 
 #: js/turtledefs.js:240
 msgid "Save graphics from your project as PNG."
@@ -1749,7 +1749,7 @@ msgstr "Por exemplo, C Maior"
 
 #: js/turtledefs.js:300
 msgid "The Mode length block is the number of notes in the current scale."
-msgstr "O bloco Modo de comprimento é o número de notas na escala atual."
+msgstr "O bloco Modo número de notas é o número de notas na escala atual."
 
 #: js/turtledefs.js:300
 msgid "Most Western scales have 7 notes."
@@ -1780,7 +1780,7 @@ msgstr "por exemplo guitarra piano violino ou violoncelo."
 
 #: js/turtledefs.js:305
 msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
-msgstr "O bloco Staccato encurta o comprimento da nota real enquanto mantém o valor rítmico especificado das notas."
+msgstr "O bloco Staccato encurta a duração da nota real enquanto mantém o valor rítmico especificado das notas."
 
 #: js/turtledefs.js:306
 msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
@@ -2031,27 +2031,27 @@ msgstr "O bloco Igual retorna Verdadeiro se os dois números forem iguais."
 
 #: js/turtledefs.js:359
 msgid "The Forward block moves the mouse forward."
-msgstr "O bloco Avançar move o mouse para frente."
+msgstr "O bloco Avançar move o ratinho para frente."
 
 #: js/turtledefs.js:360
 msgid "The Back block moves the mouse backward."
-msgstr "O bloco Retornar move o mouse para trás."
+msgstr "O bloco Retornar move o ratinho para trás."
 
 #: js/turtledefs.js:361
 msgid "The Left block turns the mouse to the left."
-msgstr "O bloco Esquerda gira o mouse para a esquerda."
+msgstr "O bloco Esquerda gira o ratinho para a esquerda."
 
 #: js/turtledefs.js:362
 msgid "The Right block turns the mouse to the right."
-msgstr "O bloco Direita gira o mouse para a direita."
+msgstr "O bloco Direita gira o ratinho para a direita."
 
 #: js/turtledefs.js:363
 msgid "The Arc block moves the mouse in a arc."
-msgstr "O bloco Arco move o mouse em arco."
+msgstr "O bloco Arco move o ratinho em arco."
 
 #: js/turtledefs.js:364
 msgid "The Set XY block moves the mouse to a specific position on the screen."
-msgstr "O bloco Estabeleça XY move o mouse para uma posição específica na tela."
+msgstr "O bloco Estabeleça XY move o ratinho para uma posição específica na tela."
 
 #: js/turtledefs.js:365
 msgid "The Scroll XY block moves the canvas."
@@ -2063,11 +2063,11 @@ msgstr "O bloco X retorna a posição horizontal do mouse."
 
 #: js/turtledefs.js:367
 msgid "The Y block returns the vertical position of the mouse."
-msgstr "O bloco Y retorna a posição vertical do mouse."
+msgstr "O bloco Y retorna a posição vertical do ratinho."
 
 #: js/turtledefs.js:368
 msgid "The Heading block returns the orientation of the mouse."
-msgstr "O bloco Rumo retorna a orientação do mouse."
+msgstr "O bloco Rumo retorna a orientação do ratinho."
 
 #: js/turtledefs.js:370
 msgid "The Set-pen-size block changes the size of the pen."
@@ -2111,7 +2111,7 @@ msgstr "O bloco Mostrar é usado para exibir texto ou imagens na tela."
 
 #: js/turtledefs.js:381
 msgid "The Shell block is used to change the appearance of the mouse."
-msgstr "O bloco Casco é usado para alterar a aparência do mouse."
+msgstr "O bloco Casco é usado para alterar a aparência do ratinho."
 
 #: js/turtledefs.js:382
 msgid "The Speak block outputs to the text-to-speech synthesizer"
@@ -2132,7 +2132,7 @@ msgstr "O bloco Topo retorna a posição do topo da tela."
 #: js/turtledefs.js:385
 #: js/turtledefs.js:386
 msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-msgstr "Neste exemplo, o mouse se move para cima até alcançar a borda superior da tela; então reaparece na parte de baixo da tela."
+msgstr "Neste exemplo, o ratinho se move para cima até alcançar a borda superior da tela; então reaparece na parte de baixo da tela."
 
 #: js/turtledefs.js:386
 msgid "The Bottom block returns the position of the bottom of the canvas."
@@ -2145,7 +2145,7 @@ msgstr "O bloco Esquerda retorna a posição da esquerda da tela."
 #: js/turtledefs.js:387
 #: js/turtledefs.js:388
 msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-msgstr "Neste exemplo, o mouse se move para a direita até alcançar a borda direita da tela; então reaparece à esquerda da tela."
+msgstr "Neste exemplo, o ratinho se move para a direita até alcançar a borda direita da tela; então reaparece à esquerda da tela."
 
 #: js/turtledefs.js:388
 msgid "The Right block returns the position of the right of the canvas."
@@ -2153,27 +2153,27 @@ msgstr "O bloco Direita retorna a posição da direita da tela."
 
 #: js/turtledefs.js:390
 msgid "The Mouse-button block returns True if the mouse button is pressed."
-msgstr "O bloco Botão-do-mouse retorna Verdadeiro se o botão do mouse for pressionado."
+msgstr "O bloco Botão-do-ratinho retorna Verdadeiro se o botão do ratinho for pressionado."
 
 #: js/turtledefs.js:391
 msgid "The Cursor X block returns the horizontal position of the mouse."
-msgstr "O bloco Cursor X retorna a posição horizontal do mouse."
+msgstr "O bloco Cursor X retorna a posição horizontal do ratinho."
 
 #: js/turtledefs.js:392
 msgid "The Cursor Y block returns the vertical position of the mouse."
-msgstr "O bloco Cursor Y retorna a posição vertical do mouse."
+msgstr "O bloco Cursor Y retorna a posição vertical do ratinho."
 
 #: js/turtledefs.js:393
 msgid "The Click block returns True if a mouse has been clicked."
-msgstr "O bloco Click retorna Verdadeiro se um mouse tiver sido clicado."
+msgstr "O bloco Click retorna Verdadeiro se um ratinho tiver sido clicado."
 
 #: js/turtledefs.js:395
 msgid "The Set-name block is used to name a mouse."
-msgstr "O bloco Definir-nome é usado para nomear um mouse."
+msgstr "O bloco Definir-nome é usado para nomear um ratinho."
 
 #: js/turtledefs.js:396
 msgid "The Mouse-name block returns the name of a mouse."
-msgstr "O bloco Nome-do-mouse retorna o nome de um mouse."
+msgstr "O bloco Nome-do-ratinho retorna o nome de um ratinho."
 
 #: js/turtledefs.js:399
 msgid "The Dot block extends the duration of a note by 50%."
@@ -2197,7 +2197,7 @@ msgstr "O bloco Ignorar notas fará com que as notas sejam ignoradas."
 
 #: js/turtledefs.js:403
 msgid "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
-msgstr "O bloco Balanço trabalha em pares de notas (especificadas pelo valor da nota), adicionando alguma duração (especificada pelo valor de balanço) à primeira nota e retirando a mesma quantidade da segunda nota."
+msgstr "O bloco Swing trabalha em pares de notas (especificadas pelo valor da nota), adicionando alguma duração (especificada pelo valor do swing) à primeira nota e retirando a mesma quantidade da segunda nota."
 
 #: js/turtledefs.js:404
 msgid "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
@@ -2621,7 +2621,7 @@ msgstr "O bloco Abrir paleta abre uma paleta."
 
 #: js/turtledefs.js:529
 msgid "The Set heading block sets the heading of the mouse."
-msgstr "O bloco Definir rumo define o rumo do mouse."
+msgstr "O bloco Definir rumo define o rumo do ratinho."
 
 #: js/turtledefs.js:530
 msgid "The Bezier block draws a Bezier curve."
@@ -2709,19 +2709,19 @@ msgstr "O bloco Tempo retorna o número de segundos que o programa está executa
 
 #: js/turtledefs.js:554
 msgid "The Get pixel block returns the color of the pixel under the mouse."
-msgstr "O bloco Obtenha pixel retorna a cor do pixel sob o mouse."
+msgstr "O bloco Obtenha pixel retorna a cor do pixel sob o ratinho."
 
 #: js/turtledefs.js:555
 msgid "The Get red block returns the red component of the pixel under the mouse."
-msgstr "O bloco Obtenha vermelho retorna o componente vermelho do pixel sob o mouse."
+msgstr "O bloco Obtenha vermelho retorna o componente vermelho do pixel sob o ratinho."
 
 #: js/turtledefs.js:556
 msgid "The Get green block returns the green component of the pixel under the mouse."
-msgstr "O bloco Obtenha verde retorna o componente verde do pixel sob o mouse."
+msgstr "O bloco Obtenha verde retorna o componente verde do pixel sob o ratinho."
 
 #: js/turtledefs.js:557
 msgid "The Get blue block returns the blue component of the pixel under the mouse."
-msgstr "O bloco Obtenha azul retorna o componente azul do pixel sob o mouse."
+msgstr "O bloco Obtenha azul retorna o componente azul do pixel sob o ratinho."
 
 #: js/turtledefs.js:558
 msgid "The Loudness block returns the volume detected by the microphone."
@@ -2729,55 +2729,55 @@ msgstr "O bloco Sonoridade retorna o volume detectado pelo microfone."
 
 #: js/turtledefs.js:560
 msgid "The New mouse block will create a new mouse."
-msgstr "O bloco Novo mouse criará um novo mouse."
+msgstr "O bloco Novo mouse criará um novo ratinho."
 
 #: js/turtledefs.js:561
 msgid "The Found mouse block will return true if the specified mouse can be found."
-msgstr "O bloco Encontrar do mouse retornará verdadeiro se o mouse especificado for encontrado."
+msgstr "O bloco Encontrar do mouse retornará verdadeiro se o ratinho especificado for encontrado."
 
 #: js/turtledefs.js:562
 msgid "The Mouse sync block aligns the beat count between mice."
-msgstr "O bloco de sincronização do Mouse alinha a contagem de batimentos entre os ratos."
+msgstr "O bloco de sincronização do Ratinho alinha a contagem de batimentos entre os ratinho."
 
 #: js/turtledefs.js:563
 msgid "The Mouse note block returns the current note value being played by the specified mouse."
-msgstr "O bloco nota do Mouse retorna o atual valor da nota sendo executada pelo mouse especificado."
+msgstr "O bloco nota do Ratinho retorna o atual valor da nota sendo executada pelo ratinho especificado."
 
 #: js/turtledefs.js:564
 msgid "The Mouse pitch block returns the current pitch number being played by the specified mouse."
-msgstr "O bloco tom do Mouse retorna o tom atual sendo executado pelo mouse especificado."
+msgstr "O bloco tom do Ratinho retorna o tom atual sendo executado pelo ratinho especificado."
 
 #: js/turtledefs.js:565
 msgid "The Mouse elapse notes block returns the number of notes played by the specified mouse."
-msgstr "O bloco de notas de passagem do Mouse retorna o número de notas executadas pelo mouse especificado."
+msgstr "O bloco de notas de passagem do Ratinho retorna o número de notas executadas pelo ratinho especificado."
 
 #: js/turtledefs.js:566
 msgid "The X mouse block returns the X position of the specified mouse."
-msgstr "O bloco mouse X retorna a posição X do mouse especificado"
+msgstr "O bloco ratinho X retorna a posição X do ratinho especificado"
 
 #: js/turtledefs.js:567
 msgid "The Y mouse block returns the Y position of the specified mouse."
-msgstr "O bloco mouse Y retorna a posição Y do mouse especificado."
+msgstr "O bloco ratinho Y retorna a posição Y do ratinho especificado."
 
 #: js/turtledefs.js:568
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
-msgstr "O bloco Define mouse envia uma pilha de blocos para ser executada pelo mous especificado."
+msgstr "O bloco Define ratinho envia uma pilha de blocos para ser executada pelo ratinho especificado."
 
 #: js/turtledefs.js:569
 msgid "The Mouse heading block returns the heading of the specified mouse."
-msgstr "O bloco rumo do Mouse retorna a orientação do mouse especificado."
+msgstr "O bloco rumo do Ratinho retorna a orientação do ratinho especificado."
 
 #: js/turtledefs.js:570
 msgid "The Mouse color block returns the pen color of the specified mouse."
-msgstr "O bloco cor do Mouse retorna a cor da caneta do mouse especificado."
+msgstr "O bloco cor do Ratinho retorna a cor da caneta do ratinho especificado."
 
 #: js/turtledefs.js:571
 msgid "The Start mouse block starts the specified mouse."
-msgstr "O bloco Iniciar mouse inicia o mouse especificado."
+msgstr "O bloco Iniciar ratinho inicia o ratinho especificado."
 
 #: js/turtledefs.js:572
 msgid "The Stop mouse block stops the specified mouse."
-msgstr "O bloco Parar mouse para o mouse especificado."
+msgstr "O bloco Parar ratinho para o ratinho especificado."
 
 #: js/toolbar.js:373
 #: js/toolbar.js:421
@@ -3046,7 +3046,7 @@ msgstr "Salvar como PDF"
 #: js/basicblocks.js:5476
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr "Sr. Mouse"
+msgstr "Sr. Ratinho"
 
 #: js/SaveInterface.js:354
 msgid "Do you want to save your project?"
@@ -3364,12 +3364,12 @@ msgstr "ritmo1"
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
-msgstr "balançar"
+msgstr "swing"
 
 #: js/basicblocks.js:930
 #.TRANS: the amount to shift to the offbeat note
 msgid "swing value"
-msgstr "valor da oscilação"
+msgstr "valor do swing"
 
 #: js/basicblocks.js:946
 #.TRANS: substitute rests on notes being skipped
@@ -3935,7 +3935,7 @@ msgstr "Do móvel"
 #: js/basicblocks.js:2663
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
-msgstr "duração do modo"
+msgstr "modo número de notas"
 
 #: js/basicblocks.js:2674
 #.TRANS: the mode in music is 'major', 'minor', etc.
@@ -4935,7 +4935,7 @@ msgstr "cursor x"
 
 #: js/basicblocks.js:5218
 msgid "mouse button"
-msgstr "botão do mouse"
+msgstr "botão do ratinho"
 
 #: js/basicblocks.js:5228
 msgid "to ASCII"
@@ -4943,69 +4943,69 @@ msgstr "ir para ASCII"
 
 #: js/basicblocks.js:5250
 msgid "stop mouse"
-msgstr "parar mouse"
+msgstr "parar ratinho"
 
 #: js/basicblocks.js:5262
 msgid "start mouse"
-msgstr "iniciar mouse"
+msgstr "iniciar ratinho"
 
 #: js/basicblocks.js:5275
 #.TRANS: pen color for this mouse
 msgid "mouse color"
-msgstr "cor do mouse"
+msgstr "cor do ratinho"
 
 #: js/basicblocks.js:5288
 #.TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
-msgstr "rumo do mouse"
+msgstr "rumo do ratinho"
 
 #: js/basicblocks.js:5302
 #: js/basicblocks.js:5307
 #: js/basicblocks.js:5320
 #.TRANS: set xy position for this mouse
 msgid "set mouse"
-msgstr "Definir mouse"
+msgstr "Definir ratinho"
 
 #: js/basicblocks.js:5333
 #.TRANS: y position for this mouse
 msgid "mouse y"
-msgstr "mouse y"
+msgstr "ratinho y"
 
 #: js/basicblocks.js:5346
 #.TRANS: x position for this mouse
 msgid "mouse x"
-msgstr "mouse x"
+msgstr "ratinho x"
 
 #: js/basicblocks.js:5359
 #.TRANS: notes played by this mouse
 msgid "mouse notes played"
-msgstr "notas de mouse tocadas"
+msgstr "notas de ratinho tocadas"
 
 #: js/basicblocks.js:5372
 #.TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
-msgstr "número de tom do mouse"
+msgstr "número de tom do ratinho"
 
 #: js/basicblocks.js:5384
 #: js/basicblocks.js:5395
 msgid "mouse note value"
-msgstr "valor da nota do mouse"
+msgstr "valor da nota do ratinho"
 
 #: js/basicblocks.js:5407
 msgid "mouse sync"
-msgstr "sincronizar mouse"
+msgstr "sincronizar ratinho"
 
 #: js/basicblocks.js:5419
 msgid "found mouse"
-msgstr "encontrar mouse"
+msgstr "encontrar ratinho"
 
 #: js/basicblocks.js:5432
 msgid "new mouse"
-msgstr "novo mouse"
+msgstr "novo ratinho"
 
 #: js/basicblocks.js:5444
 msgid "mouse name"
-msgstr "nome do mouse"
+msgstr "nome do ratinho"
 
 #: js/basicblocks.js:5455
 #: js/basicblocks.js:5472
@@ -5115,7 +5115,7 @@ msgstr "Arrastar"
 #: js/lilypond.js:734
 #: js/lilypond.js:772
 msgid "mouse"
-msgstr "mouse"
+msgstr "ratinho"
 
 #: js/rubrics.js:478
 msgid "mice"
@@ -5123,7 +5123,7 @@ msgstr "rato"
 
 #: js/lilypond.js:18
 msgid "brown rat"
-msgstr "rato"
+msgstr "rato marron"
 
 #: js/lilypond.js:18
 msgid "mole"
