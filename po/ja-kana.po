@@ -2384,7 +2384,7 @@ msgstr "<h2>スピードを きめるブロック</h2><br>１ぷんあたりの 
 
 #: js/turtledefs.js:285
 msgid "The On-every-note block let you specify actions to take on every note."
-msgstr "<h2>ぜんぶの おんぷに ～するブロック</h2><br>すべてのおんぷに せっていするときに つかう。"
+msgstr "<h2>ぜんぶの おんぷに アクション じっこう</h2><br>すべてのおんぷに せっていするときに つかう。"
 
 #: js/turtledefs.js:286
 #: js/turtledefs.js:581
