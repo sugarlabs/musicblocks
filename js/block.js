@@ -2413,7 +2413,7 @@ function Block(protoblock, blocks, overrideName) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
-                    this._labelChanged(true);
+                    this._labelChanged(true, true);
                     hideDOMLabel();
                 }
 
@@ -3101,6 +3101,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 }
             } else {
+		console.log('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -3119,7 +3120,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                that._labelChanged(true, true);
+                that._labelChanged(false, true);
 
                 event.preventDefault();
 
@@ -3136,7 +3137,7 @@ function Block(protoblock, blocks, overrideName) {
 
 
             var __input = function (event) {
-                that._labelChanged(false);
+                that._labelChanged(false, true);
             };
 
             if (this.name === 'text' || this.name === 'number') {
@@ -3153,7 +3154,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener('keypress', __keypress);
 
             this.label.addEventListener('change', function () {
-                that._labelChanged(true, true);
+                that._labelChanged(false, true);
             });
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
@@ -3972,7 +3973,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
@@ -4161,7 +4162,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
@@ -4320,7 +4321,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
