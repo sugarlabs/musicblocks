@@ -4154,9 +4154,10 @@ msgstr "tambor de taça"
 
 #: js/basicblocks.js:2989
 #: js/synthutils.js:86
+#: js/musicutils.js:282
 #.TRANS: musical instrument
-msgid "floor tom tom"
-msgstr "tom tom de chão"
+msgid "floor tom"
+msgstr "tom baixo"
 
 #: js/basicblocks.js:3000
 #: js/synthutils.js:84
@@ -5851,10 +5852,6 @@ msgstr "simples 3"
 #: js/musicutils.js:274
 msgid "simple 4"
 msgstr "simples 4"
-
-#: js/musicutils.js:282
-msgid "floor tom"
-msgstr "tom baixo"
 
 #: js/musicutils.js:308
 #: js/musicutils.js:479

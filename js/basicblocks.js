@@ -2986,7 +2986,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('floortom');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['floortom'] = newblock;
-    newblock.staticLabels.push(_('floor tom tom'));
+    newblock.staticLabels.push(_('floor tom'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('floortom')) {

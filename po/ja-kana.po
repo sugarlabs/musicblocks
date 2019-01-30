@@ -4910,9 +4910,10 @@ msgstr "カップドラム"
 
 #: js/basicblocks.js:2989
 #: js/synthutils.js:86
+#: js/musicutils.js:282
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
-msgid "floor tom tom"
+msgid "floor tom"
 msgstr "フロアタム"
 
 #: js/basicblocks.js:3000
@@ -6683,10 +6684,6 @@ msgstr "シンプル３"
 #: js/musicutils.js:274
 msgid "simple 4"
 msgstr "シンプル４"
-
-#: js/musicutils.js:282
-msgid "floor tom"
-msgstr "フロアタム"
 
 #: js/musicutils.js:308
 #: js/musicutils.js:479

@@ -83,7 +83,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('tom tom'), 'tom tom', 'images/tom.svg', 'tomml', 'drum'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
+    [_('floor tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
     //.TRANS: a drum made from an inverted cup
     [_('cup drum'), 'cup drum', 'images/cup.svg', 'hh', 'drum'],
     //.TRANS: musical instrument

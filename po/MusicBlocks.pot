@@ -4113,8 +4113,9 @@ msgstr ""
 
 #: js/basicblocks.js:2989
 #: js/synthutils.js:86
+#: js/musicutils.js:282
 #.TRANS: musical instrument
-msgid "floor tom tom"
+msgid "floor tom"
 msgstr ""
 
 #: js/basicblocks.js:3000
@@ -5809,10 +5810,6 @@ msgstr ""
 
 #: js/musicutils.js:274
 msgid "simple 4"
-msgstr ""
-
-#: js/musicutils.js:282
-msgid "floor tom"
 msgstr ""
 
 #: js/musicutils.js:308
