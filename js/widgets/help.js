@@ -13,7 +13,8 @@
 
 function HelpWidget () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    const BUTTONSIZE = 53;
+    // const BUTTONSIZE = 53;
+    const BUTTONSIZE = 82;
     const ICONSIZE = 32;
     const HELPWIDTH = 400;
     const HELPHEIGHT = 600;
@@ -35,58 +36,38 @@ function HelpWidget () {
         helpDiv.style.left = '200px';
         helpDiv.style.top = '150px';
 
-        // The widget buttons
-        var widgetButtonsDiv = docById('helpButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="helpButtonTable"></table>';
-
-        var buttonTable = docById('helpButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
-
         // For the button callbacks
         var that = this;
 
         if (blocks === null) {
-            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('Previous page'));
+            var cell = docById("left-arrow");
 
             cell.onclick=function() {
                 page = page - 1;
                 if (page < 0) {
                     page = HELPCONTENT.length - 1;
                 }
+                if (page === (HELPCONTENT.length - 2)) {
+                    docById("helpBodyDiv").style.top = "0";
+                } else docById("helpBodyDiv").style.top = "25px";
 
                 that._showPage(page);
             };
 
-            cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorSelected;
-            };
-
-            cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
+            var cell = docById("right-arrow");
 
             cell.onclick=function() {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
+                if (page === (HELPCONTENT.length - 2)) {
+                    docById("helpBodyDiv").style.top = "0";
+                } else docById("helpBodyDiv").style.top = "25px";
 
                 that._showPage(page);
             };
 
-            cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorSelected;
-            };
-
-            cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
-            };
         } else {
             if (blocks.activeBlock.name === null) {
                 helpDiv.style.display = 'none';
@@ -97,23 +78,28 @@ function HelpWidget () {
             var cell = this._addLabel(row, ICONSIZE, label);
 	}
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        var cell = document.createElement('div');
+        cell.style.position = "absolute";
+        cell.style.color = "#fff";
+        cell.style.fontSize = "1em";
+        cell.style.left = "400px";
+        cell.innerHTML = "Skip";
+        cell.style.cursor = "pointer";
+        document.getElementById("top-wrapper").appendChild(cell);
 
         cell.onclick=function() {
             helpDiv.style.display = 'none';
         };
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorSelected;
-        };
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
+        var dragCell = document.createElement("div");
+        dragCell.style.position = "absolute";
+        dragCell.style.left = "20px";
+        dragCell.style.background = "url(" + "'../../header-icons/move.png'" + ")";
+        dragCell.style.backgroundSize = "22px";
+        dragCell.style.height = "22px";
+        dragCell.style.width = "22px";
         dragCell.style.cursor = 'move';
+        document.getElementById("top-wrapper").appendChild(dragCell);
 
         this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
         this._dy = dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top;
@@ -142,9 +128,9 @@ function HelpWidget () {
         canvas.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE/2;
+                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE / 2;
                 helpDiv.style.left = x + 'px';
-                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE/2;
+                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE / 2;
                 helpDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
@@ -256,35 +242,14 @@ function HelpWidget () {
         }
 };
 
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorSelected;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        }
-
-        return cell;
-    };
-
     this._addLabel = function(row, iconSize, label) {
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        // cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = '#2196F3';
 
         return cell;
     };

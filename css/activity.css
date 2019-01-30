@@ -683,13 +683,76 @@ table {
     position: absolute;
     top: 20%;
     left: 20%;
-    width: 350px;
-    height: 400px;
-    background: rgba(196, 196, 196, 1.0) !important;
+    width: 455px;
+    height: 349px;
+    /* background: rgba(196, 196, 196, 1.0) !important; */
+    background: #fff !important;
     overflow-y: auto;
     -webkit-user-select: none;
+    border-radius: 10px;
+    box-shadow: 0 1px 10px #8080808f;
 }
-
+#right-arrow {
+    left: 410px;
+    background: url('../header-icons/right-arrow.png');
+}
+#left-arrow {
+    left: 5px;
+    background: url('../header-icons/left-arrow.png');
+}
+#right-arrow, #left-arrow {
+    position: absolute;
+    top: 195px;
+    background-size: 40px;
+    height: 40px;
+    width: 40px;
+}
+#right-arrow:hover {
+    cursor: pointer;
+}
+#left-arrow:hover {
+    cursor: pointer;
+}
+#top-wrapper {
+    width: 100%;
+    background: #2196F3;
+    /* position: absolute; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.9em;
+    text-align: center;
+    height: 55px;
+}
+#move-div {
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    background: url('../header-icons/move.png');
+    background-size: 22px;
+    left: 22px;
+}
+#skip_div {
+    position: absolute;
+    color: #fff;
+    font-size: 1em;
+    left: 400px;
+}
+#helpDiv h1 {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 1.5em;
+}
+#helpDiv p:first-child {
+    padding-left: -10px;
+}
+#helpDiv p:not(:first-child) {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 0.9em;
+    line-height: 20px;
+}
 #helpButtonsDiv {
     position: relative;
     left: 0px;
@@ -699,10 +762,11 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 0px;
-    top: 0px;
+    left: 45px;
+    top: 25px;
     border: 0 !important;
     overflow-x: auto;
+    width: 345px;
 }
 
 #pscDiv {
