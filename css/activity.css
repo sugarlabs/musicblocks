@@ -724,20 +724,7 @@ table {
     text-align: center;
     height: 55px;
 }
-#move-div {
-    position: absolute;
-    height: 22px;
-    width: 22px;
-    background: url('../header-icons/move.png');
-    background-size: 22px;
-    left: 22px;
-}
-#skip_div {
-    position: absolute;
-    color: #fff;
-    font-size: 1em;
-    left: 400px;
-}
+
 #helpDiv h1 {
     text-align: left;
     padding-left: 30px;

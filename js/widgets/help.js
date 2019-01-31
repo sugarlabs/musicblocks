@@ -82,8 +82,11 @@ function HelpWidget () {
         cell.style.position = "absolute";
         cell.style.color = "#fff";
         cell.style.fontSize = "1em";
-        cell.style.left = "400px";
-        cell.innerHTML = "Skip";
+        cell.style.left = "410px";
+        cell.style.width = "18px";
+        cell.style.height = "18px";
+        cell.style.background = "url(" + '../musicblocks/header-icons/close.png' + ")"
+        cell.style.backgroundSize = "18px";
         cell.style.cursor = "pointer";
         document.getElementById("top-wrapper").appendChild(cell);
 
@@ -94,7 +97,7 @@ function HelpWidget () {
         var dragCell = document.createElement("div");
         dragCell.style.position = "absolute";
         dragCell.style.left = "20px";
-        dragCell.style.background = "url(" + "'../../header-icons/move.png'" + ")";
+        dragCell.style.background = "url(" + '../musicblocks/header-icons/move.png' + ")";
         dragCell.style.backgroundSize = "22px";
         dragCell.style.height = "22px";
         dragCell.style.width = "22px";
