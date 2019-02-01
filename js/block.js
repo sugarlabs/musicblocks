@@ -3307,6 +3307,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental, custom) {
+        var prevPitch = null;
+
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
             console.log('stageClick: aborting piemenu display');
@@ -3316,11 +3318,12 @@ function Block(protoblock, blocks, overrideName) {
         if (custom === undefined) {
             custom = false;
         }
+
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
         var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
 
-        // If we are attached to a sset key block, we want to order
+        // If we are attached to a set key block, we want to order
         // pitch by fifths.
         if (this.connections[0] !== null && ['setkey', 'setkey2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1) {
             noteLabels = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
@@ -3429,6 +3432,8 @@ function Block(protoblock, blocks, overrideName) {
             i = 4;
         }
 
+        prevPitch = i;
+
         this._pitchWheel.navigateWheel(i);
         if (!custom) {
             // Navigate to a the current accidental value.
@@ -3464,6 +3469,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // Navigate to current octave
             this._octavesWheel.navigateWheel(8 - pitchOctave);
+            prevOctave = 8 - pitchOctave;
         }
 
         // Set up event handlers
@@ -3503,6 +3509,31 @@ function Block(protoblock, blocks, overrideName) {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
+
+            // Are we wrapping across C? We need to compare with the
+            // previous pitch.
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+            var deltaPitch = i - prevPitch;
+            if (deltaPitch > 3) {
+                var delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                var delta = deltaPitch + 7;
+            } else {
+                var delta = deltaPitch;
+            }
+
+            // If we wrapped across C, we need to adjust the octave.
+            var deltaOctave = 0;
+            if ((prevPitch + delta) > 6) {
+                deltaOctave = -1;
+            } else if ((prevPitch + delta) < 0) {
+                deltaOctave = 1;
+            }
+
+            prevPitch = i;
             var note = noteValues[i];
             if (!custom) {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
@@ -3520,12 +3551,25 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 4;
             }
 
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
+
+            if (hasOctaveWheel && deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
             var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
             }
+
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -3547,11 +3591,13 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < noteValues.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
         }
+
         if (!custom) {
             for (var i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
             }
         }
+
         if (hasOctaveWheel) {
             for (var i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
