@@ -328,7 +328,7 @@ function createHelpContent() {
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
         'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg'],
-        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.') + ' ' + _('Else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
+        'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
         'backward': [_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
         'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg'],
@@ -341,7 +341,7 @@ function createHelpContent() {
         'box1': [_('The Box 1 block returns the value stored in Box 1.'), 'documentation', 'box-1-block.svg'],
         'storebox2': [_('The Store in Box 2 block is used to store a value in Box 2.'), 'documentation', 'box-2-block.svg'],
         'box2': [_('The Box 2 block returns the value stored in Box 2.'), 'documentation', 'box-2-block.svg'],
-        'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks, such as Color, Pen-size.') + ' ' + _('etc.'), 'documentation', 'box-2-block.svg'],
+        'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks such as Color and Pen size.'), 'documentation', 'box-2-block.svg'],
         'incrementOne': [_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', 'box-1-block.svg'],
         // Number palette
         'number': [_('The Number block holds a number.'), 'documentation', 'repeat-block.svg'],

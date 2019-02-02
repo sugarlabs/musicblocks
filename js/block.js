@@ -2413,7 +2413,7 @@ function Block(protoblock, blocks, overrideName) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
-                    this._labelChanged(true);
+                    this._labelChanged(true, true);
                     hideDOMLabel();
                 }
 
@@ -2483,7 +2483,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2506,7 +2506,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['setsynthvolume', 'tremolo', 'chorus', 'phaser', 'duosynth'].indexOf(this.blocks.blockList[cblk].name) === -1) {
+        if (['setsynthvolume', 'tremolo', 'chorus', 'phaser', 'duosynth', 'arc'].indexOf(this.blocks.blockList[cblk].name) === -1) {
             return false;
         }
 
@@ -2988,6 +2988,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'phaser':
                     this._piemenuNumber([1, 2, 3], this.value);
                     break;
+		case 'arc':
+                    this._piemenuNumber([25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300], this.value);
+                    break;
                 }
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
@@ -3027,6 +3030,9 @@ function Block(protoblock, blocks, overrideName) {
                 case 'phaser':
                 case 'tremolo':
                     this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
+                    break;
+		case 'arc':
+                    this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 295, 300, 315, 330, 345, 360], this.value);
                     break;
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
@@ -3095,6 +3101,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 }
             } else {
+		console.log('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -3113,7 +3120,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                that._labelChanged(true, true);
+                that._labelChanged(false, true);
 
                 event.preventDefault();
 
@@ -3130,7 +3137,7 @@ function Block(protoblock, blocks, overrideName) {
 
 
             var __input = function (event) {
-                that._labelChanged(false);
+                that._labelChanged(false, true);
             };
 
             if (this.name === 'text' || this.name === 'number') {
@@ -3147,7 +3154,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener('keypress', __keypress);
 
             this.label.addEventListener('change', function () {
-                that._labelChanged(true, true);
+                that._labelChanged(false, true);
             });
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
@@ -3300,6 +3307,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuPitches = function (noteLabels, noteValues, accidentals, note, accidental, custom) {
+        var prevPitch = null;
+
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
             console.log('stageClick: aborting piemenu display');
@@ -3309,11 +3318,12 @@ function Block(protoblock, blocks, overrideName) {
         if (custom === undefined) {
             custom = false;
         }
+
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
         var hasOctaveWheel = (this.connections[0] !== null && ['pitch', 'setpitchnumberoffset', 'invert1', 'tofrequency'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1);
 
-        // If we are attached to a sset key block, we want to order
+        // If we are attached to a set key block, we want to order
         // pitch by fifths.
         if (this.connections[0] !== null && ['setkey', 'setkey2'].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1) {
             noteLabels = ['C', 'G', 'D', 'A', 'E', 'B', 'F'];
@@ -3422,6 +3432,8 @@ function Block(protoblock, blocks, overrideName) {
             i = 4;
         }
 
+        prevPitch = i;
+
         this._pitchWheel.navigateWheel(i);
         if (!custom) {
             // Navigate to a the current accidental value.
@@ -3457,6 +3469,7 @@ function Block(protoblock, blocks, overrideName) {
 
             // Navigate to current octave
             this._octavesWheel.navigateWheel(8 - pitchOctave);
+            prevOctave = 8 - pitchOctave;
         }
 
         // Set up event handlers
@@ -3496,6 +3509,31 @@ function Block(protoblock, blocks, overrideName) {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
+
+            // Are we wrapping across C? We need to compare with the
+            // previous pitch.
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+            var deltaPitch = i - prevPitch;
+            if (deltaPitch > 3) {
+                var delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                var delta = deltaPitch + 7;
+            } else {
+                var delta = deltaPitch;
+            }
+
+            // If we wrapped across C, we need to adjust the octave.
+            var deltaOctave = 0;
+            if ((prevPitch + delta) > 6) {
+                deltaOctave = -1;
+            } else if ((prevPitch + delta) < 0) {
+                deltaOctave = 1;
+            }
+
+            prevPitch = i;
             var note = noteValues[i];
             if (!custom) {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
@@ -3513,12 +3551,25 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 4;
             }
 
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
+
+            if (hasOctaveWheel && deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
             // FIX ME: get key signature if available
             // FIX ME: get moveable if available
             var obj = getNote(note, octave, 0, 'C major', false, null, that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
             }
+
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -3540,11 +3591,13 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < noteValues.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
         }
+
         if (!custom) {
             for (var i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
             }
         }
+
         if (hasOctaveWheel) {
             for (var i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
@@ -3966,7 +4019,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
@@ -4104,6 +4157,14 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
+        if (this._numberWheel.navItems.length > 20) {
+            console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
+            for (var i = 0; i < this._numberWheel.navItems.length; i++) {
+                this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+            }
+        }
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -4147,7 +4208,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
@@ -4185,6 +4246,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.navigateWheel(i);
 
         this.label.style.fontSize = Math.round(20 * this.blocks.blockScale * this.protoblock.scale / 2) + 'px';
+
         this.label.style.display = '';
         this.label.focus();
 
@@ -4305,7 +4367,7 @@ function Block(protoblock, blocks, overrideName) {
         // this.label.addEventListener('keypress', __keypress);
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true);
+            that._labelChanged(true, false);
         });
 
         // Position the widget over the note block.
@@ -5611,9 +5673,9 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.name === 'action') {
             wheel.navItems[5].navigateFunction = function () {
-		console.log('CALLING saveStack');
+                console.log('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
-		that.blocks.prepareStackForCopy();
+                that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
             };
         }
