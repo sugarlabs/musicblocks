@@ -36,7 +36,7 @@ Other utilities
 * `background.js` -- extenstion utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
-* sugarizer-`compatibility.js` -- datastore utilities used by sugarizer
+* sugarizer-`compatibility.js` -- data store utilities used by sugarizer
 * `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
@@ -45,7 +45,7 @@ Subdirectories with additional utilities
 	* `detectIE.js`: check if Music Blocks is being run in Internet Explorer
 	* `munsell.js`: Munsell color system used for mice and widgets
 	* `musicutils.js`: related to musical notations
-	* `platformstyle.js`: checking platform that Music Blocks is run in
+	* `platformstyle.js`: checking platform that Mus id="report-icon"ic Blocks is run in
 	* `synthutils.js`: related to defining synths in tone.js
 	* `utils.js`: general utility functions
 * widgets -- widget code
