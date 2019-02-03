@@ -688,7 +688,7 @@ table {
     background: #fff !important;
     overflow-y: auto;
     -webkit-user-select: none;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 0 1px 10px #8080808f;
 }
 #right-arrow {
@@ -715,12 +715,13 @@ table {
 #top-wrapper {
     width: 100%;
     background: #2196F3;
+    font-family: "Roboto";
     /* position: absolute; */
     display: flex;
     flex-direction: column;
     justify-content: center;
     color: #fff;
-    font-size: 0.9em;
+    font-size: 1.1em;
     text-align: center;
     height: 55px;
 }

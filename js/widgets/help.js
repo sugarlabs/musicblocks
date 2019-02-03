@@ -223,13 +223,14 @@ function HelpWidget () {
         body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
-
+        
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
-	    console.log(page + ' ' + link);
+            console.log(page + ' ' + link);
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
-
+        
+    helpBody.style.color = "#505050";
     helpBody.innerHTML = body;
     };
 
