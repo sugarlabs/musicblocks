@@ -251,7 +251,7 @@ nav ul {
 nav ul li {
     display: inline;
     padding-right: 12px;
-    float: right;
+ /*   float: right; */
 }
 
 .nav-spacer {
@@ -433,7 +433,6 @@ input.BPMInput {
 }
 
 table {
-    cellpadding: 0px !important;
     border-collapse: separate;
     border-spacing: 1px 1px;
 }
@@ -1073,7 +1072,7 @@ input.timbreName {
 .rangeslidervalue {
   display: inline-block;
   position: relative;
-  / * width: $range-label-width; */
+  /* width: $range-label-width; */
   color: blue;
   background-color: #c8C8C8;
   line-height: 20px;
@@ -1082,8 +1081,8 @@ input.timbreName {
   border-color:green;
   padding: 5px 10px;
   margin-left: 8px;
-
-  ::after {
+}
+.rangeslidervalue:after {
     position: absolute;
     top: 8px;
     left: -7px;
@@ -1093,7 +1092,7 @@ input.timbreName {
     border-bottom: 7px solid transparent;
     content: '';
   }
-}
+
 
 .filterselector {
   margin-top: -50px;
