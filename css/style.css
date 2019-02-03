@@ -11,7 +11,7 @@ input[type=range]::-webkit-slider-runnable-track {
   width: 10px;
   height: 11px;
   cursor: pointer;
-  animate: 0.2s;
+  animation: 0.2s;
   box-shadow: 1px 1px 1px #000000;
   background: #90c100;
   border-radius: 1px;
