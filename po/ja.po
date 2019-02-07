@@ -3403,7 +3403,7 @@ msgstr ""
 
 #: js/turtledefs.js:537
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミがえがいた図形の内がわをぬりつぶす。"
 
 #: js/turtledefs.js:538
 msgid "The Hollow line block creates a line with a hollow center."

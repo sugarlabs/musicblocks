@@ -3402,7 +3402,7 @@ msgstr ""
 
 #: js/turtledefs.js:537
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミが えがいた ずけいの うちがわを ぬりつぶす。"
 
 #: js/turtledefs.js:538
 msgid "The Hollow line block creates a line with a hollow center."
@@ -6072,7 +6072,7 @@ msgstr "プレイバックようの おんがくを じゅんび（コンパイ�
 
 #: js/languagebox.js:97
 msgid "Refresh your browser to change your language preference."
-msgstr "げんごを かえるには、 ブラウザを こうしんしてください。"
+msgstr "げんごを かえるには、ブラウザを こうしんしてください。"
 
 #: js/help.js:53
 msgid "Previous page"
