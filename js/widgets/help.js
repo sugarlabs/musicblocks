@@ -82,8 +82,11 @@ function HelpWidget () {
         cell.style.position = "absolute";
         cell.style.color = "#fff";
         cell.style.fontSize = "1em";
-        cell.style.left = "400px";
-        cell.innerHTML = "Skip";
+        cell.style.left = "410px";
+        cell.style.width = "18px";
+        cell.style.height = "18px";
+        cell.style.background = "url(" + '../musicblocks/header-icons/close.png' + ")"
+        cell.style.backgroundSize = "18px";
         cell.style.cursor = "pointer";
         document.getElementById("top-wrapper").appendChild(cell);
 
@@ -94,7 +97,7 @@ function HelpWidget () {
         var dragCell = document.createElement("div");
         dragCell.style.position = "absolute";
         dragCell.style.left = "20px";
-        dragCell.style.background = "url(" + "'../../header-icons/move.png'" + ")";
+        dragCell.style.background = "url(" + '../musicblocks/header-icons/move.png' + ")";
         dragCell.style.backgroundSize = "22px";
         dragCell.style.height = "22px";
         dragCell.style.width = "22px";
@@ -224,13 +227,14 @@ function HelpWidget () {
         body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
-
+        
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
-	    console.log(page + ' ' + link);
+            console.log(page + ' ' + link);
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
-
+        
+    helpBody.style.color = "#505050";
     helpBody.innerHTML = body;
     };
 
