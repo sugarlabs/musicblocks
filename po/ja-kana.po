@@ -3544,7 +3544,7 @@ msgstr "ミュージック・ブロックスに ついて"
 #: js/toolbar.js:484
 #: js/toolbar.js:528
 msgid "Save project as HTML"
-msgstr ""
+msgstr "HTMLをほぞん"
 
 #: js/toolbar.js:387
 #: js/toolbar.js:436
