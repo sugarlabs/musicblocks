@@ -1253,7 +1253,7 @@
            y="36"
            x="16.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Play</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Play</text>
       </g>
       <g
          transform="translate(1.3515189,-77.282008)"
@@ -1267,7 +1267,7 @@
            y="26"
            x="65.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Pitch</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Pitch</text>
       </g>
       <g
          transform="matrix(0.95211227,0,0,1,3.9961936,-77.282008)"
@@ -1281,7 +1281,7 @@
            y="46"
            x="55"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Number</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Number</text>
       </g>
       <g
          transform="translate(1.3515189,-77.282008)"
@@ -1295,7 +1295,7 @@
            y="36"
            x="124.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Ratio</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Ratio</text>
       </g>
       <g
          transform="translate(1.3515189,-77.282008)"
@@ -1309,7 +1309,7 @@
            y="36"
            x="210.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Interval</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Interval</text>
       </g>
       <g
          transform="translate(1.3515189,-77.282008)"
@@ -1323,7 +1323,7 @@
            y="36"
            x="309.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Note</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Note</text>
       </g>
       <g
          transform="translate(1.3515189,-77.282008)"
@@ -1337,7 +1337,7 @@
            y="36"
            x="378.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">C major</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">C major</text>
       </g>
       <g
          transform="translate(-8.109114,-77.282008)"
@@ -1351,7 +1351,7 @@
            y="36"
            x="471.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:700;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Frequency</text>
+           style="font-style:normal;font-weight:700;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Frequency</text>
       </g>
       <g
          id="g1327"
@@ -1364,7 +1364,7 @@
            y="80"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1335"
@@ -1377,7 +1377,7 @@
            y="80"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1391,7 +1391,7 @@
            y="77"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">0</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">0</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1405,7 +1405,7 @@
            y="77"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.00</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.00</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1419,7 +1419,7 @@
            y="77"
            x="219"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">perfect 1</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">perfect 1</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1433,7 +1433,7 @@
            y="77"
            x="323.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">C,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">C,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1447,7 +1447,7 @@
            y="77"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">0</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">0</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1461,7 +1461,7 @@
            y="77"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">261.63</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">261.63</text>
       </g>
       <g
          id="g1363"
@@ -1474,7 +1474,7 @@
            y="109"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:''sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1371"
@@ -1487,7 +1487,7 @@
            y="109"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1501,7 +1501,7 @@
            y="106"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1515,7 +1515,7 @@
            y="106"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.07</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.07</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1529,7 +1529,7 @@
            y="106"
            x="223"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">minor 2</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">minor 2</text>
       </g>
       <g
          id="g1387"
@@ -1542,7 +1542,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1391"
@@ -1568,7 +1568,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1582,7 +1582,7 @@
            y="106"
            x="379.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1596,7 +1596,7 @@
            y="106"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">279.07</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">279.07</text>
       </g>
       <g
          id="g1407"
@@ -1609,7 +1609,7 @@
            y="138"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1415"
@@ -1622,7 +1622,7 @@
            y="138"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1636,7 +1636,7 @@
            y="135"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">2</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">2</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1650,7 +1650,7 @@
            y="135"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.13</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.13</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1664,7 +1664,7 @@
            y="135"
            x="222.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">major 2</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">major 2</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1678,7 +1678,7 @@
            y="135"
            x="323.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">D,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">D,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1692,7 +1692,7 @@
            y="135"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1706,7 +1706,7 @@
            y="135"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">294.33</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">294.33</text>
       </g>
       <g
          id="g1443"
@@ -1719,7 +1719,7 @@
            y="167"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1451"
@@ -1732,7 +1732,7 @@
            y="167"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1746,7 +1746,7 @@
            y="164"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">3</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">3</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1760,7 +1760,7 @@
            y="164"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.20</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.20</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1774,7 +1774,7 @@
            y="164"
            x="223"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">minor 3</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">minor 3</text>
       </g>
       <g
          id="g1467"
@@ -1787,7 +1787,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1471"
@@ -1800,7 +1800,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'MS UI Gothic';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1475"
@@ -1813,7 +1813,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1827,7 +1827,7 @@
            y="164"
            x="379.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1841,7 +1841,7 @@
            y="164"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">313.95</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">313.95</text>
       </g>
       <g
          id="g1487"
@@ -1854,7 +1854,7 @@
            y="196"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1495"
@@ -1867,7 +1867,7 @@
            y="196"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1881,7 +1881,7 @@
            y="193"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1895,7 +1895,7 @@
            y="193"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.25</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.25</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1909,7 +1909,7 @@
            y="193"
            x="222.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">major 3</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">major 3</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1923,7 +1923,7 @@
            y="193"
            x="324.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">E,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">E,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1937,7 +1937,7 @@
            y="193"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">2</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">2</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1951,7 +1951,7 @@
            y="193"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">327.03</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">327.03</text>
       </g>
       <g
          id="g1523"
@@ -1964,7 +1964,7 @@
            y="225"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1531"
@@ -1977,7 +1977,7 @@
            y="225"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -1991,7 +1991,7 @@
            y="222"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">5</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">5</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2005,7 +2005,7 @@
            y="222"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.33</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.33</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2019,7 +2019,7 @@
            y="222"
            x="219"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">perfect 4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">perfect 4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2033,7 +2033,7 @@
            y="222"
            x="325.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">F,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">F,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2047,7 +2047,7 @@
            y="222"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">3</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">3</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2061,7 +2061,7 @@
            y="222"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">348.83</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">348.83</text>
       </g>
       <g
          id="g1559"
@@ -2074,7 +2074,7 @@
            y="254"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1567"
@@ -2087,7 +2087,7 @@
            y="254"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2101,7 +2101,7 @@
            y="251"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">6</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">6</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2115,7 +2115,7 @@
            y="251"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.40</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.40</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2129,7 +2129,7 @@
            y="251"
            x="208.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">diminished 5</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">diminished 5</text>
       </g>
       <g
          id="g1583"
@@ -2142,7 +2142,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1587"
@@ -2155,7 +2155,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'MS UI Gothic';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1591"
@@ -2168,7 +2168,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2182,7 +2182,7 @@
            y="251"
            x="379.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2196,7 +2196,7 @@
            y="251"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">366.28</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">366.28</text>
       </g>
       <g
          id="g1603"
@@ -2209,7 +2209,7 @@
            y="283"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1611"
@@ -2222,7 +2222,7 @@
            y="283"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2236,7 +2236,7 @@
            y="280"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">7</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">7</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2250,7 +2250,7 @@
            y="280"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.50</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.50</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2264,7 +2264,7 @@
            y="280"
            x="219"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">perfect 5</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">perfect 5</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2278,7 +2278,7 @@
            y="280"
            x="323.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">G,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">G,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2292,7 +2292,7 @@
            y="280"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2306,7 +2306,7 @@
            y="280"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">392.44</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">392.44</text>
       </g>
       <g
          id="g1639"
@@ -2319,7 +2319,7 @@
            y="312"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1647"
@@ -2332,7 +2332,7 @@
            y="312"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2346,7 +2346,7 @@
            y="309"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">8</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">8</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2360,7 +2360,7 @@
            y="309"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.60</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.60</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2374,7 +2374,7 @@
            y="309"
            x="223"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">minor 6</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">minor 6</text>
       </g>
       <g
          id="g1663"
@@ -2387,7 +2387,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1667"
@@ -2400,7 +2400,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'MS UI Gothic';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1671"
@@ -2413,7 +2413,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2427,7 +2427,7 @@
            y="309"
            x="379.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2441,7 +2441,7 @@
            y="309"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">418.60</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">418.60</text>
       </g>
       <g
          id="g1683"
@@ -2454,7 +2454,7 @@
            y="341"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1691"
@@ -2467,7 +2467,7 @@
            y="341"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2481,7 +2481,7 @@
            y="338"
            x="84"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">9</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">9</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2495,7 +2495,7 @@
            y="338"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.67</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.67</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2509,7 +2509,7 @@
            y="338"
            x="222.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">major 6</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">major 6</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2523,7 +2523,7 @@
            y="338"
            x="323.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">A,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">A,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2537,7 +2537,7 @@
            y="338"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">5</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">5</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2551,7 +2551,7 @@
            y="338"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">436.04</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">436.04</text>
       </g>
       <g
          id="g1719"
@@ -2564,7 +2564,7 @@
            y="370"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1727"
@@ -2577,7 +2577,7 @@
            y="370"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2591,7 +2591,7 @@
            y="367"
            x="80"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">10</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">10</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2605,7 +2605,7 @@
            y="367"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.78</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.78</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2619,7 +2619,7 @@
            y="367"
            x="223"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">minor 7</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">minor 7</text>
       </g>
       <g
          id="g1743"
@@ -2632,7 +2632,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1747"
@@ -2645,7 +2645,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'MS UI Gothic';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1751"
@@ -2658,7 +2658,7 @@
            y="0"
            x="0"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2672,7 +2672,7 @@
            y="367"
            x="379.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Non Scalar</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2686,7 +2686,7 @@
            y="367"
            x="486.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">465.11</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">465.11</text>
       </g>
       <g
          id="g1763"
@@ -2699,7 +2699,7 @@
            y="399"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1771"
@@ -2712,7 +2712,7 @@
            y="399"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2726,7 +2726,7 @@
            y="396"
            x="80.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">11</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">11</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2740,7 +2740,7 @@
            y="396"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">1.88</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">1.88</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2754,7 +2754,7 @@
            y="396"
            x="222.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">major 7</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">major 7</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2768,7 +2768,7 @@
            y="396"
            x="324"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">B,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">B,4</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2782,7 +2782,7 @@
            y="396"
            x="410"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">6</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">6</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2796,7 +2796,7 @@
            y="396"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">490.55</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">490.55</text>
       </g>
       <g
          id="g1799"
@@ -2809,7 +2809,7 @@
            y="428"
            x="16"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          id="g1807"
@@ -2822,7 +2822,7 @@
            y="428"
            x="44"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none" />
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none" />
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2836,7 +2836,7 @@
            y="425"
            x="80"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">12</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">12</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2850,7 +2850,7 @@
            y="425"
            x="138"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">2.00</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">2.00</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2864,7 +2864,7 @@
            y="425"
            x="219"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">perfect 8</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">perfect 8</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2878,7 +2878,7 @@
            y="425"
            x="323.5"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">C,5</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">C,5</text>
       </g>
       <g
          transform="matrix(0.98739255,0,0,1,-1.322774,-82.475357)"
@@ -2892,7 +2892,7 @@
            y="425"
            x="486"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">523.25</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">523.25</text>
       </g>
       <g
          id="g1833"
@@ -2911,7 +2911,7 @@
          id="text4590"
          y="431.77637"
          x="377.7319"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.09832191px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.45245802"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.09832191px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.45245802"
          xml:space="preserve"><tspan
            style="stroke-width:0.45245802"
            y="448.07852"
@@ -2925,7 +2925,7 @@
          y="339.60837"
          x="405.38025"
          xml:space="preserve"
-         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'sans-serif';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
          transform="scale(0.99367625,1.006364)">7</text>
       <path
          d="m 42.635426,135.34947 a 9.93367,9.088369 0 1 1 -19.86734,0 9.93367,9.088369 0 1 1 19.86734,0 z"
@@ -3137,7 +3137,7 @@
            y="15.174394"
            x="848.42548"
            xml:space="preserve"
-           style="font-style:normal;font-weight:400;font-size:16px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;stroke:none">Cb,4</text>
+           style="font-style:normal;font-weight:400;font-size:16px;font-family:'sans-serif';fill:#000000;fill-opacity:1;stroke:none">Cb,4</text>
       </g>
       <text
          id="text1349-3-1"
@@ -3147,7 +3147,7 @@
          y="80.99131"
          x="316.74072"
          xml:space="preserve"
-         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'sans-serif';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
          transform="scale(0.99367625,1.006364)">Db,4</text>
       <text
          id="text1349-3-6"
@@ -3157,7 +3157,7 @@
          y="166.9998"
          x="316.87671"
          xml:space="preserve"
-         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'sans-serif';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
          transform="scale(0.99367625,1.006364)">Gb,4</text>
       <text
          id="text1349-3-4"
@@ -3167,7 +3167,7 @@
          y="224.99411"
          x="318.23682"
          xml:space="preserve"
-         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'sans-serif';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
          transform="scale(0.99367625,1.006364)">Ab,4</text>
       <text
          id="text1349-3-8"
@@ -3177,7 +3177,7 @@
          y="282.25116"
          x="316.19666"
          xml:space="preserve"
-         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'Times New Roman';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+         style="font-style:normal;font-weight:400;font-size:15.89882088px;font-family:'sans-serif';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.9936763;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
          transform="scale(0.99367625,1.006364)">Bb,4</text>
     </g>
     <path

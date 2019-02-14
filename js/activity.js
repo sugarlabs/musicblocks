@@ -2348,6 +2348,8 @@ function Activity() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (beginnerMode) {
             save.saveHTML(_('My Project'));
+        }else{
+            
         }
     };
 
