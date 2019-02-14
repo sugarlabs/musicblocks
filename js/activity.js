@@ -2348,8 +2348,6 @@ function Activity() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (beginnerMode) {
             save.saveHTML(_('My Project'));
-        }else{
-            
         }
     };
 
@@ -2778,7 +2776,7 @@ function Activity() {
     /*
      * Shows polar grid
      */
-    _showPolar = function () {
+    _showPolar = function () {Plan
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
@@ -2957,7 +2955,7 @@ function Activity() {
         pluginChooser.click();
     };
 
-    _hideStopButton = function () {
+    _hideStopButton = function () {Plan
         /*
         if (stopTurtleContainer === null) {
             return;
