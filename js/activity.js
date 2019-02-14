@@ -2776,7 +2776,7 @@ function Activity() {
     /*
      * Shows polar grid
      */
-    _showPolar = function () {Plan
+    _showPolar = function () {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
@@ -2955,7 +2955,7 @@ function Activity() {
         pluginChooser.click();
     };
 
-    _hideStopButton = function () {Plan
+    _hideStopButton = function () {
         /*
         if (stopTurtleContainer === null) {
             return;
