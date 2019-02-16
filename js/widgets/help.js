@@ -36,10 +36,27 @@ function HelpWidget () {
         helpDiv.style.left = '200px';
         helpDiv.style.top = '150px';
 
+        var topDiv = document.createElement('div');
+        topDiv.style.display = "flex";
+        topDiv.style.justifyContent = "center";
+        topDiv.style.fontFamily = "Roboto";
+        topDiv.style.background = "#2196F3";
+        topDiv.style.flexDirection = "column";
+        topDiv.style.width = "100%";
+        topDiv.style.height= "55px";
+        topDiv.style.fontSize = "1.1em";
+        topDiv.style.textAlign = "center";
+        topDiv.style.position = "absolute";
+        topDiv.style.top = "0";
+        topDiv.style.color = "#fff";
+
+        helpDiv.appendChild(topDiv);
+
         // For the button callbacks
         var that = this;
 
         if (blocks === null) {
+            topDiv.innerHTML = "Take a Tour";
             var cell = docById("left-arrow");
 
             cell.onclick=function() {
@@ -47,9 +64,6 @@ function HelpWidget () {
                 if (page < 0) {
                     page = HELPCONTENT.length - 1;
                 }
-                if (page === (HELPCONTENT.length - 2)) {
-                    docById("helpBodyDiv").style.top = "0";
-                } else docById("helpBodyDiv").style.top = "25px";
 
                 that._showPage(page);
             };
@@ -61,9 +75,6 @@ function HelpWidget () {
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
-                if (page === (HELPCONTENT.length - 2)) {
-                    docById("helpBodyDiv").style.top = "0";
-                } else docById("helpBodyDiv").style.top = "25px";
 
                 that._showPage(page);
             };
@@ -75,7 +86,8 @@ function HelpWidget () {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
 	    }
 
-            var cell = this._addLabel(row, ICONSIZE, label);
+            // var cell = this._addLabel(row, ICONSIZE, label);
+            topDiv.innerHTML = label;
 	}
         // var arrowRight = document.createElement('div');
         // arrowRight.style.left = "410px";
@@ -83,8 +95,8 @@ function HelpWidget () {
         // document.getElementById("top-wrapper").appendChild(arrowRight);
 
         var cell = document.createElement('div');
+        cell.setAttribute("id", "close-button");
         cell.style.position = "absolute";
-        cell.style.color = "#fff";
         cell.style.fontSize = "1em";
         cell.style.left = "410px";
         cell.style.width = "18px";
@@ -92,7 +104,8 @@ function HelpWidget () {
         cell.style.background = "url(" + '../musicblocks/header-icons/close.png' + ")"
         cell.style.backgroundSize = "18px";
         cell.style.cursor = "pointer";
-        document.getElementById("top-wrapper").appendChild(cell);
+        // document.getElementById("top-wrapper").appendChild(cell);
+        topDiv.appendChild(cell);
 
         cell.onclick=function() {
             helpDiv.style.display = 'none';
@@ -106,7 +119,8 @@ function HelpWidget () {
         dragCell.style.height = "22px";
         dragCell.style.width = "22px";
         dragCell.style.cursor = 'move';
-        document.getElementById("top-wrapper").appendChild(dragCell);
+        // document.getElementById("top-wrapper").appendChild(dragCell);
+        topDiv.appendChild(dragCell);
 
         this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
         this._dy = dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top;
