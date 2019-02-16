@@ -88,11 +88,14 @@ function HelpWidget () {
 
             // var cell = this._addLabel(row, ICONSIZE, label);
             topDiv.innerHTML = label;
+            var rightArrow = document.getElementById("right-arrow");
+            rightArrow.style.opacity = "0";
+            rightArrow.classList.remove('hover');
+
+            var leftArrow = document.getElementById("left-arrow");
+            leftArrow.style.opacity = "0";
+            leftArrow.classList.remove('hover');
 	}
-        // var arrowRight = document.createElement('div');
-        // arrowRight.style.left = "410px";
-        // arrowRight.style.background = "url(" + '../../header-icons/right-arrow.png' + ")";
-        // document.getElementById("top-wrapper").appendChild(arrowRight);
 
         var cell = document.createElement('div');
         cell.setAttribute("id", "close-button");

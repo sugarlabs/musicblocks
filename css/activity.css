@@ -706,12 +706,10 @@ table {
     height: 40px;
     width: 40px;
 }
-#right-arrow:hover {
+.hover:hover {
     cursor: pointer;
 }
-#left-arrow:hover {
-    cursor: pointer;
-}
+
 #top-wrapper {
     width: 100%;
     background: #2196F3;
