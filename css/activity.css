@@ -707,12 +707,10 @@ table {
     height: 40px;
     width: 40px;
 }
-#right-arrow:hover {
+.hover:hover {
     cursor: pointer;
 }
-#left-arrow:hover {
-    cursor: pointer;
-}
+
 #top-wrapper {
     width: 100%;
     background: #2196F3;
@@ -751,7 +749,7 @@ table {
 #helpBodyDiv {
     position: relative;
     left: 45px;
-    top: 25px;
+    top: 75px;
     border: 0 !important;
     overflow-x: auto;
     width: 345px;
