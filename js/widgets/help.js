@@ -56,7 +56,7 @@ function HelpWidget () {
 
             var cell = docById("right-arrow");
 
-            cell.onclick=function() {
+            cell.onclick = function() {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {
                     page = 0;
@@ -77,6 +77,10 @@ function HelpWidget () {
 
             var cell = this._addLabel(row, ICONSIZE, label);
 	}
+        // var arrowRight = document.createElement('div');
+        // arrowRight.style.left = "410px";
+        // arrowRight.style.background = "url(" + '../../header-icons/right-arrow.png' + ")";
+        // document.getElementById("top-wrapper").appendChild(arrowRight);
 
         var cell = document.createElement('div');
         cell.style.position = "absolute";
@@ -185,10 +189,10 @@ function HelpWidget () {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-			var language = localStorage.languagePreference;
-			if (language === undefined) {
-			    language = navigator.language;
-			}
+			            var language = localStorage.languagePreference;
+			            if (language === undefined) {
+			                language = navigator.language;
+			            }
 
                         switch(language) {
                         case 'ja':
