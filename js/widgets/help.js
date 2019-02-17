@@ -37,18 +37,9 @@ function HelpWidget () {
         helpDiv.style.top = '150px';
 
         var topDiv = document.createElement('div');
-        topDiv.style.display = "flex";
-        topDiv.style.justifyContent = "center";
-        topDiv.style.fontFamily = "Roboto";
-        topDiv.style.background = "#2196F3";
-        topDiv.style.flexDirection = "column";
-        topDiv.style.width = "100%";
-        topDiv.style.height= "55px";
-        topDiv.style.fontSize = "1.1em";
-        topDiv.style.textAlign = "center";
-        topDiv.style.position = "absolute";
-        topDiv.style.top = "0";
-        topDiv.style.color = "#fff";
+        // topDiv.style.position = "absolute";
+        // topDiv.style.top = "0";
+        topDiv.classList.add('top-wrapper');
 
         helpDiv.appendChild(topDiv);
 
@@ -57,6 +48,14 @@ function HelpWidget () {
 
         if (blocks === null) {
             topDiv.innerHTML = "Take a Tour";
+            var rightArrow = document.getElementById("right-arrow");
+            rightArrow.style.display = "block";
+            rightArrow.classList.add('hover');
+
+            var leftArrow = document.getElementById("left-arrow");
+            leftArrow.style.display = "block";
+            leftArrow.classList.add('hover');
+
             var cell = docById("left-arrow");
 
             cell.onclick=function() {
@@ -89,25 +88,18 @@ function HelpWidget () {
             // var cell = this._addLabel(row, ICONSIZE, label);
             topDiv.innerHTML = label;
             var rightArrow = document.getElementById("right-arrow");
-            rightArrow.style.opacity = "0";
+            // rightArrow.style.opacity = "0";
+            rightArrow.style.display = "none";
             rightArrow.classList.remove('hover');
 
             var leftArrow = document.getElementById("left-arrow");
-            leftArrow.style.opacity = "0";
+            // leftArrow.style.opacity = "0";
+            leftArrow.style.display = "none";
             leftArrow.classList.remove('hover');
 	}
 
         var cell = document.createElement('div');
-        cell.setAttribute("id", "close-button");
-        cell.style.position = "absolute";
-        cell.style.fontSize = "1em";
-        cell.style.left = "410px";
-        cell.style.width = "18px";
-        cell.style.height = "18px";
-        cell.style.background = "url(" + '../musicblocks/header-icons/close.png' + ")"
-        cell.style.backgroundSize = "18px";
-        cell.style.cursor = "pointer";
-        // document.getElementById("top-wrapper").appendChild(cell);
+        cell.classList.add('close-button');
         topDiv.appendChild(cell);
 
         cell.onclick=function() {
@@ -115,14 +107,7 @@ function HelpWidget () {
         };
 
         var dragCell = document.createElement("div");
-        dragCell.style.position = "absolute";
-        dragCell.style.left = "20px";
-        dragCell.style.background = "url(" + '../musicblocks/header-icons/move.png' + ")";
-        dragCell.style.backgroundSize = "22px";
-        dragCell.style.height = "22px";
-        dragCell.style.width = "22px";
-        dragCell.style.cursor = 'move';
-        // document.getElementById("top-wrapper").appendChild(dragCell);
+        dragCell.classList.add('drag-button');
         topDiv.appendChild(dragCell);
 
         this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
@@ -263,17 +248,17 @@ function HelpWidget () {
         }
 };
 
-    this._addLabel = function(row, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        // cell.style.backgroundColor = platformColor.selectorBackground;
-        cell.style.backgroundColor = '#2196F3';
+    // this._addLabel = function(row, iconSize, label) {
+    //     var cell = row.insertCell(-1);
+    //     cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
+    //     cell.style.height = cell.style.width;
+    //     cell.style.minHeight = cell.style.height;
+    //     cell.style.maxHeight = cell.style.height;
+    //     // cell.style.backgroundColor = platformColor.selectorBackground;
+    //     cell.style.backgroundColor = '#2196F3';
 
-        return cell;
-    };
+    //     return cell;
+    // };
 
     this.hide = function () {
         docById('helpDiv').style.visibility = 'hidden';
