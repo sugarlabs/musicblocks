@@ -216,7 +216,7 @@ var urlsToCache = [
     'lib/require.js',
     'lib/reqwest.js',
     'lib/text.js',
-    'lib/Tone.min.js',
+    'lib/Tone.js',
     'lib/tweenjs.min.js',
     'lib/voices/en/en.json',
     'lib/webL10n.js',
