@@ -173,7 +173,7 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
-            'Tone.min',
+            'Tone',
             'widgets/modewidget',
             'widgets/pitchtimematrix',
             'widgets/pitchdrummatrix',
