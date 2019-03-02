@@ -863,6 +863,7 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
+        scrollPaletteContainer = !scrollPaletteContainer;
     };
 
     /*
