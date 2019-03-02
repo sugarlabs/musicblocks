@@ -251,6 +251,7 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
+        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -1127,6 +1128,40 @@ function Activity() {
             delta: 0
         };
 
+        var __paletteWheelHandler = function (event) {
+            // vertical scroll
+            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+                if (palettes.paletteVisible) {
+                    if (event.clientX > cellSize + MENUWIDTH) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                } else {
+                    if (event.clientX > cellSize) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                }
+            }
+
+            // horizontal scroll
+            if (scrollPaletteContainer) {
+                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    } else {
+                        if (event.clientX > cellSize) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    }
+                }
+            } else {
+                event.preventDefault();
+            }
+
+            refreshCanvas();
+        };
+
         var __wheelHandler = function (event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
@@ -1162,6 +1197,7 @@ function Activity() {
         };
 
         docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
+        docById('myCanvas').addEventListener('wheel', __paletteWheelHandler, false);
 
         var __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
