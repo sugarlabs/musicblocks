@@ -1188,9 +1188,9 @@ function Activity() {
           }
 
       }
-     
+      
 
-
+    
       function actualReszieHandler () {
 
         //handle the resize event
@@ -2010,8 +2010,8 @@ function Activity() {
         // If the clientWidth hasn't changed, don't resize (except
         // on init).
         if (!force && this._clientWidth === document.body.clientWidth) {
-            console.log('NO WIDTH CHANGE');
-            return;
+          //  console.log('NO WIDTH CHANGE');
+           // return;
         }
 
         this._clientWidth = document.body.clientWidth;
