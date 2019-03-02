@@ -1163,6 +1163,51 @@ function Activity() {
             refreshCanvas();
         };
 
+
+      var myCanvas = docById('myCanvas')
+
+      var __heightBasedScroll = function (event) {
+
+          actualReszieHandler(); //check size during init 
+          
+          window.addEventListener("resize",resizeThrottler,false);
+
+          var resizeTimeout;
+
+          function resizeThrottler() {
+            //ignore resize events as long as an actualResizeHandler execution is in queue
+              if(!resizeTimeout) {
+                  resizeTimeout = setTimeout(function () {
+                      resizeTimeout = null;
+                      actualReszieHandler();
+
+                      // The actualResizeHandler will execute at the rate of 15fps
+                  }, 66);
+              }
+            
+          }
+
+      }
+     
+
+
+      function actualReszieHandler () {
+
+        //handle the resize event
+
+         var h = window.innerHeight;
+
+         if (h < 500) { //activate on mobile
+             myCanvas.addEventListener('wheel', __paletteWheelHandler,false)
+         }else {
+             //cleanup event listeners
+            myCanvas.removeEventListener('wheel', __paletteWheelHandler)
+         }
+          
+      }
+      __heightBasedScroll()
+
+
         var __wheelHandler = function (event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
@@ -1198,7 +1243,7 @@ function Activity() {
         };
 
         docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
-        docById('myCanvas').addEventListener('wheel', __paletteWheelHandler, false);
+    
 
         var __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
