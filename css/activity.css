@@ -682,13 +682,83 @@ table {
     position: absolute;
     top: 20%;
     left: 20%;
-    width: 350px;
-    height: 400px;
-    background: rgba(196, 196, 196, 1.0) !important;
-    overflow-y: auto;
+    width: 455px;
+    height: 349px;
+    /* background: rgba(196, 196, 196, 1.0) !important; */
+    background: #fff !important;
+    /* overflow-y: auto; */
+    overflow-x: hidden;
     -webkit-user-select: none;
+    border-radius: 5px;
+    box-shadow: 0 1px 10px #8080808f;
+}
+#right-arrow {
+    left: 410px;
+    background: url('../header-icons/right-arrow.png');
+}
+#left-arrow {
+    left: 5px;
+    background: url('../header-icons/left-arrow.png');
+}
+#right-arrow, #left-arrow {
+    position: absolute;
+    top: 195px;
+    background-size: 40px;
+    height: 40px;
+    width: 40px;
+}
+.hover:hover {
+    cursor: pointer;
 }
 
+.top-wrapper {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    background: #2196F3;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1em;
+    text-align: center;
+    height: 55px;
+}
+.close-button {
+    position: absolute;
+    font-size: 1em;
+    left: 410px;
+    width:18px;
+    height: 18px;
+    background: url('../header-icons/close.png');
+    background-size: 18px;
+    cursor: pointer;
+}
+.drag-button {
+    position: absolute;
+    left: 20px;
+    background: url('../header-icons/move.png');
+    background-size: 22px;
+    height: 22px;
+    width: 22px;
+    cursor: move;
+}
+
+#helpDiv h1 {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 1.5em;
+}
+#helpDiv p:first-child {
+    padding-left: -10px;
+}
+#helpDiv p:not(:first-child) {
+    text-align: left;
+    padding-left: 30px;
+    font-size: 0.9em;
+    line-height: 20px;
+}
 #helpButtonsDiv {
     position: relative;
     left: 0px;
@@ -698,10 +768,12 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 0px;
-    top: 0px;
+    left: 45px;
+    top: 75px;
     border: 0 !important;
-    overflow-x: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 345px;
 }
 
 #pscDiv {
