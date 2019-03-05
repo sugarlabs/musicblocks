@@ -111,7 +111,7 @@ var urlsToCache = [
     'header-icons/slow-button.svg',
     'header-icons/slow-music-button.svg',
     'header-icons/smaller-button.svg',
-    'header-icons/smaller-disabled-button.svg',
+    'header-icons/smaller-disable-button.svg',
     'header-icons/sort.svg',
     'header-icons/stats-button.svg',
     'header-icons/step-button.svg',
