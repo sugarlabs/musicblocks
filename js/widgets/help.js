@@ -47,7 +47,7 @@ function HelpWidget () {
         var that = this;
 
         if (blocks === null) {
-            topDiv.innerHTML = "Take a Tour";
+            topDiv.innerHTML = _('Take a tour');
             var rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add('hover');
