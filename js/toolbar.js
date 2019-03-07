@@ -233,11 +233,12 @@ function Toolbar() {
         };
     };
 
-    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
+    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick,setScroller,_setupBlocksContainerEvents) {
         var displayStatsIcon = docById('displayStatsIcon');
         var loadPluginIcon = docById('loadPluginIcon');
         var delPluginIcon = docById('delPluginIcon');
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -251,6 +252,14 @@ function Toolbar() {
             delPluginIcon.onclick = function () {
                 delPlugin_onclick();
             };
+            enableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
+            disableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
         } else {
             displayStatsIcon.style.display = 'none';
             loadPluginIcon.style.display = 'none';
