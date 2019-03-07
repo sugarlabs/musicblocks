@@ -59,6 +59,7 @@ function ModeWidget() {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
+            that._logo.resetSynth(0);
             that._playAll();
         }
 
