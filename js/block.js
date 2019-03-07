@@ -4165,7 +4165,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.colors = platformColor.exitWheelcolors2;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -4173,7 +4173,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(['x', ' ']);
+        this._exitWheel.createWheel(['x', '-', '+']);
 
         var that = this;
 
@@ -4261,6 +4261,30 @@ function Block(protoblock, blocks, overrideName) {
         // Or use the exit wheel...
         this._exitWheel.navItems[0].navigateFunction = function () {
             __exitMenu();
+        };
+
+        this._exitWheel.navItems[1].navigateFunction = function () {
+            that.value -= 1;
+            that.text.text = that.value.toString();
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+	    that.label.value = that.value;
+        };
+
+        this._exitWheel.navItems[2].navigateFunction = function () {
+            that.value += 1;
+            that.text.text = that.value.toString();
+
+            // Make sure text is on top.
+            var z = that.container.children.length - 1;
+            that.container.setChildIndex(that.text, z);
+            that.updateCache();
+
+	    that.label.value = that.value;
         };
     };
 
