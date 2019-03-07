@@ -144,6 +144,33 @@ var SOUNDSAMPLESDEFINES = [
     "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
 ]
 
+
+// Some samples have a default volume other than 50 (See #1697)
+const DEFAULTSYNTHVOLUME = {
+    'flute': 90,
+    'electronic synth': 90,
+    'piano': 100,
+    'banjo': 90,
+    'koto': 70,
+    'kick drum': 100,
+    'tom tom': 100,
+    'floor tom': 100,
+    'cup drum': 100,
+    'darbuka drum': 100,
+    'hi hat': 100,
+    'ride bell': 100,
+    'cow bell': 100,
+    'triangle bell': 60,
+    'finger cymbals': 70,
+    'chime': 90,
+    'gong': 70,
+    'clang': 70,
+    'crash': 90,
+    'clap': 90,
+    'slap': 60,
+}
+
+
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
 const SAMPLECENTERNO = {
@@ -435,12 +462,12 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-		{'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+                {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE},
-		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
+                {'name': 'banjo', 'data': BANJO_SAMPLE},
+                {'name': 'koto', 'data': KOTO_SAMPLE},
+                {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+                {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -710,9 +737,9 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
-	    var noteDict = {};
-	    noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
-	    var tempSynth = new Tone.Sampler(noteDict);
+            var noteDict = {};
+            noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
@@ -1032,7 +1059,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-	// console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+        // console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
@@ -1123,15 +1150,30 @@ function Synth() {
     };
 
     this.setVolume = function (turtle, instrumentName, volume) {
-        // volume in decibals
-        var db = Tone.gainToDb(volume / 100);
+        // We pass in volume as a number from 0 to 100.
+        // As per #1697, we adjust the volume of some instruments.
+        if (instrumentName in DEFAULTSYNTHVOLUME) {
+            var sv = DEFAULTSYNTHVOLUME[instrumentName];
+            if (volume > 50) {
+                var d = 100 - sv;
+                var nv = ((volume - 50) / 50) * d + sv;
+            } else {
+                var nv = (volume / 50) * sv;
+            }
+        } else {
+            var nv = volume;
+        }
+
+        // Convert volume to decibals
+        var db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
     };
 
+    """
+    // Unused and it is not clear that the return value is correct.
     this.getVolume = function (turtle, instrumentName) {
-        // volume in decibals
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {
@@ -1139,6 +1181,7 @@ function Synth() {
             return 50;
         }
     };
+    """
 
     this.setMasterVolume = function (volume) {
         var db = Tone.gainToDb(volume / 100);
