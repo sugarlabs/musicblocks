@@ -867,6 +867,15 @@ function Activity() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         scrollPaletteContainer = !scrollPaletteContainer;
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
+        if (scrollBlockContainer && !beginnerMode){
+          enableHorizScrollIcon.style.display = 'none';
+          disableHorizScrollIcon.style.display = 'block';
+        }else{
+          enableHorizScrollIcon.style.display = 'block';
+          disableHorizScrollIcon.style.display = 'none';
+        }
     };
 
     /*
@@ -4228,7 +4237,7 @@ function Activity() {
         toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin,setScroller, that._setupBlocksContainerEvents);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
         toolbar.renderMergeIcon(_doMergeLoad);
