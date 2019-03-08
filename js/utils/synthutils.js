@@ -1171,7 +1171,6 @@ function Synth() {
         }
     };
 
-    """
     // Unused and it is not clear that the return value is correct.
     this.getVolume = function (turtle, instrumentName) {
         if (instrumentName in instruments[turtle]) {
@@ -1181,7 +1180,6 @@ function Synth() {
             return 50;
         }
     };
-    """
 
     this.setMasterVolume = function (volume) {
         var db = Tone.gainToDb(volume / 100);
