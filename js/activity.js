@@ -263,6 +263,7 @@ function Activity() {
         largerContainer = null;
         smallerOffContainer = null;
         largerOffContainer = null;
+        resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
 
@@ -971,12 +972,18 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale < BLOCKSCALES.length - 1) {
-            blockscale += 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale < BLOCKSCALES.length - 1) {
+                resizeDebounce = true;
+                blockscale += 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
-        setSmallerLargerStatus();
+            setSmallerLargerStatus();
+        }
     };
 
     /*
@@ -986,10 +993,16 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale > 0) {
-            blockscale -= 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale > 0) {
+                resizeDebounce = true;
+                blockscale -= 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+            }
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
         setSmallerLargerStatus();
     };
