@@ -4103,6 +4103,18 @@ msgstr "カウベル"
 msgid "ride bell"
 msgstr "ライドベル"
 
+msgid "japanese bell"
+msgstr "しょう"
+
+msgid "japanese drum"
+msgstr "たいこ"
+
+msgid "xylophone"
+msgstr "もっきん"
+
+msgid "vibraphone"
+msgstr "てっきん"
+
 #: js/basicblocks.js:2934
 #: js/synthutils.js:100
 #: js/musicutils.js:289

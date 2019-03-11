@@ -51,6 +51,8 @@ var VOICENAMES = [
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
+    //.TRANS: xylophone musical instrument
+    [_('xylophone'), 'xylophone', 'images/8_bellset_key_6.svg', 'precussion'],
     //.TRANS: polytone synthesizer
     [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -71,6 +73,8 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+    //.TRANS: vibraphone musical instrument
+    [_('vibraphone'), 'vibraphone', 'images/synth.svg', 'electronic'],
 ];
 
 // drum symbols are from
@@ -89,6 +93,8 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
+    [_('japanese drum'), 'japanese drum', 'images/tom.svg', 'hh', 'drum'],
+    //.TRANS: musical instrument
     [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh', 'bell'],
     //.TRANS: a small metal bell
     [_('ride bell'), 'ride bell', 'images/ridebell.svg', 'rb', 'bell'],
@@ -98,6 +104,8 @@ var DRUMNAMES = [
     [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg', 'tri', 'bell'],
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
+    //.TRANS: musical instrument
+    [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
     //.TRANS: a musical instrument
@@ -141,7 +149,9 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
+    "samples/koto", "samples/gong", "samples/dulcimer",
+    "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
+    "samples/japanese_drum", "samples/japanese_bell",
 ]
 
 
@@ -189,6 +199,8 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'vibraphone': ['C5', 51],
+    'xylophone': ['C5', 51],
 };
 
 
@@ -467,6 +479,8 @@ function Synth() {
                 {'name': 'banjo', 'data': BANJO_SAMPLE},
                 {'name': 'koto', 'data': KOTO_SAMPLE},
                 {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
+		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
                 {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
@@ -490,6 +504,8 @@ function Synth() {
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
+                {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
+		{'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
