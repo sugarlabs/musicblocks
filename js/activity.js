@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
