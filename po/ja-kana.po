@@ -4109,6 +4109,9 @@ msgstr "しょう"
 msgid "japanese drum"
 msgstr "たいこ"
 
+msgid "taiko"
+msgstr "たいこ"
+
 msgid "xylophone"
 msgstr "もっきん"
 

@@ -93,7 +93,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
-    [_('japanese drum'), 'japanese drum', 'images/tom.svg', 'hh', 'drum'],
+    [_('taiko'), 'japanese drum', 'images/tom.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
     [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh', 'bell'],
     //.TRANS: a small metal bell

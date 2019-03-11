@@ -4110,6 +4110,9 @@ msgstr "鉦"
 msgid "japanese drum"
 msgstr "太鼓"
 
+msgid "taiko"
+msgstr "太鼓"
+
 msgid "xylophone"
 msgstr "木琴"
 
