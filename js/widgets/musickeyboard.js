@@ -1,6 +1,6 @@
 // Copyright (c) 2015 Jefferson Lee
 // Copyright (c) 2018 Ritwik Abhishek
-// Copyright (c) 2018 Walter Bender
+// Copyright (c) 2018,19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public

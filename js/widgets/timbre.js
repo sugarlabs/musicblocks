@@ -1,4 +1,4 @@
-// Copyright (c) 2017,18 Walter Bender
+// Copyright (c) 2017-19 Walter Bender
 // Copyright (c) 2017 Tayba Wasim
 // Copyright (c) 2017 Prachi Agrawal
 //
