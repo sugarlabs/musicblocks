@@ -3,6 +3,8 @@ How to add a new sample sound
 
 * Find a sample under a free/libre open-source (FOSS) license.
 
+* The sample has to have only one note (pitch) through out the audio and the volume has to be 50 . The longer the sample, the better it is.
+
 * `base64` encode the sample data
 
   ```
@@ -52,7 +54,7 @@ Note: To deterine the center pitch of your sample, you may find the
 useful.
 
 
-* Add you new sample name to the list of string that need translation
+* Add your new sample name to the list of string that need translation
 in `js/utils/musicutils.js`
 
    ```
