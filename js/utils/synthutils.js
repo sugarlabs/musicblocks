@@ -178,6 +178,9 @@ const DEFAULTSYNTHVOLUME = {
     'crash': 90,
     'clap': 90,
     'slap': 60,
+    'vibraphone': 80,
+    'xylophone': 100,
+    'japanese bell': 80,
 }
 
 
