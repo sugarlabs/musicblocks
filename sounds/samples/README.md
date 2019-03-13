@@ -7,7 +7,7 @@ How to add a new sample sound
 
 * [ ] Only one pitch (no melodic movement)
 
-* [ ] After tuning the synth, use your ear and ask yourself "does this pitch sound the similar" (Audacity can be used to some extent for fundamental pitch) [Audacity](https://manual.audacityteam.org/man/change_pitch.html).
+* [ ] After tuning the synth, use your ear and ask yourself "does this pitch sound have a constant frequency throughout the sample?" (Audacity can be used to some extent for fundamental pitch) [Audacity](https://manual.audacityteam.org/man/change_pitch.html).
 
 * [ ] Steady pitch
 
