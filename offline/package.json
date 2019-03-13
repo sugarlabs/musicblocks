@@ -1,7 +1,7 @@
 {
   "name": "musicblocks",
   "productName": "MusicBlocks",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Visual Programming Language for Exploring Math, Music, and Programming",
   "main": "main.js",
   "scripts": {
@@ -11,11 +11,8 @@
   },
   "repository": "https://github.com/ukkari/mb-electron-test",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "Music",
+    "Programming"
   ],
   "author": "MusicBlocks",
   "license": "CC0-1.0",

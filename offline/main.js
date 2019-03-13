@@ -8,39 +8,6 @@ const { app, globalShortcut, Menu, ipcMain} = require("electron");
 var file = new nodeStatic.Server(__dirname + '../../');
 var port = 0;
 
-const template = [
-  {
-    label: '表示',
-    submenu: [
-      {role: 'reload', label:"リロード"},
-      {role: 'forcereload', label:"強制リロード"},
-      {role: 'toggledevtools', label:"開発者ツールを表示"},
-      {type: 'separator'},
-      {role: 'resetzoom', label:"等倍にする"},
-      {role: 'zoomin', label:"拡大する"},
-      {role: 'zoomout', label:"縮小する"},
-      {type: 'separator'},
-      {role: 'togglefullscreen', label:"フルスクリーンの有効化/無効化"}
-    ]
-  },
-  {
-    role: 'window', label:"ウィンドウ",
-    submenu: [
-      {role: 'minimize', label:"最小化"},
-      {role: 'close', label:"閉じる"}
-    ]
-  },
-  {
-    role: 'help', label:"ヘルプ",
-    submenu: [
-      {
-        label: 'ホームページを開く',
-        click () { require('electron').shell.openExternal('https://musicblocks.net/') }
-      }
-    ]
-  }
-]
-
 var server = require('http').createServer(function (request, response) {
   request.addListener('end', function () {
     file.serve(request, response);
@@ -57,8 +24,13 @@ app.on('window-all-closed', function () {
 });
 
 app.on('ready', function () {
+
+  var lang = app.getLocale();
+  if(!localizedMenu[lang]){
+    lang = "en"
+  }
   mainWindow = new BrowserWindow({
-    title: "ミュージックブロックス オフラインバージョン",
+    title: localizedMenu[lang]['Title'],
     show: false,
     webPreferences: {
       nodeIntegration: false,
@@ -67,7 +39,40 @@ app.on('ready', function () {
   });
   mainWindow.setMenu(null)
   mainWindow.loadURL('http://localhost:' + server.address().port + '/index.html');
-  //mainWindow.webContents.openDevTools()
+  
+  var template = [
+    {
+      label: localizedMenu[lang]["Edit"],
+      submenu: [
+        {role: 'reload', label: localizedMenu[lang]["Reload"]},
+        {role: 'forcereload', label: localizedMenu[lang]["ForceReload"]},
+        {role: 'toggledevtools', label: localizedMenu[lang]["ToggleDevTools"]},
+        {type: 'separator'},
+        {role: 'resetzoom', label: localizedMenu[lang]["ResetZoom"]},
+        {role: 'zoomin', label: localizedMenu[lang]["ZoomIn"]},
+        {role: 'zoomout', label: localizedMenu[lang]["ZoomOut"]},
+        {type: 'separator'},
+        {role: 'togglefullscreen', label: localizedMenu[lang]["ToggleFullScreen"]}
+      ]
+    },
+    {
+      role: 'window', label: localizedMenu[lang]["Window"],
+      submenu: [
+        {role: 'minimize', label: localizedMenu[lang]["Minimize"]},
+        {role: 'close', label:localizedMenu[lang]["Close"]}
+      ]
+    },
+    {
+      role: 'help', label: localizedMenu[lang]["Help"],
+      submenu: [
+        {
+          label: localizedMenu[lang]["OpenHomepage"],
+          click () { require('electron').shell.openExternal('https://musicblocks.net/') }
+        }
+      ]
+    }
+  ]
+
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
   mainWindow.maximize()
@@ -82,10 +87,40 @@ app.on('ready', function () {
   mainWindow.on('page-title-updated', (evt) => {
     evt.preventDefault();
   });
-
-    // Register a 'CommandOrControl+Y' shortcut listener.
-  globalShortcut.register('CommandOrControl+Y', () => {
-    // Do stuff when Y and either Command/Control is pressed.
-    console.log("pressed!")
-  });
 });
+
+const localizedMenu = {
+  "en": {
+    "Title": "MusicBlocks Offline Version",
+    "Edit": "Edit",
+    "Reload": "Reload",
+    "ForceReload": "Force Reload",
+    "ToggleDevTools": "Toggle Developer Tools",
+    "ResetZoom": "Reset Zoom",
+    "ZoomIn": "Zoom In",
+    "ZoomOut": "Zoom Out",
+    "ToggleFullScreen": "Toggle Fullscreen",
+    "Window": "Window",
+    "Minimize": "Minimize",
+    "Close": "Close",
+    "Help": "Help",
+    "OpenHomepage": "Open Homepage"
+   },
+  "ja": {
+    "Title": "ミュージックブロックス オフラインバージョン",
+    "Edit": "編集",
+    "Reload": "リロード",
+    "ForceReload": "強制リロード",
+    "ToggleDevTools": "開発者ツールを表示",
+    "ResetZoom": "等倍にする",
+    "ZoomIn": "拡大する",
+    "ZoomOut": "縮小する",
+    "ToggleFullScreen": "フルスクリーンの有効化/無効化",
+    "Window": "ウィンドウ",
+    "Minimize": "最小化",
+    "Close": "閉じる",
+    "Help": "ヘルプ",
+    "OpenHomepage": "ホームページを開く"
+  }
+}
+
