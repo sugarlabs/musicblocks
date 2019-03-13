@@ -4587,7 +4587,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(55);
     newblock.defaults.push(null);
     newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'mediain';
+    newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('turtleshell')) {
         newblock.hidden = true;
     }
