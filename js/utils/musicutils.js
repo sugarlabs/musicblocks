@@ -288,7 +288,7 @@ const SELECTORSTRINGS = [
     _('ride bell'),
     _('cow bell'),
     _('japanese drum'),
-    _('japanese bell'),
+    // _('japanese bell'),
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),

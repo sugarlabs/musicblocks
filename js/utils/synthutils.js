@@ -105,7 +105,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: musical instrument
-    [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
+    // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
     //.TRANS: a musical instrument
@@ -178,9 +178,9 @@ const DEFAULTSYNTHVOLUME = {
     'crash': 90,
     'clap': 90,
     'slap': 60,
-    'vibraphone': 80,
-    'xylophone': 100,
-    'japanese bell': 80,
+    'vibraphone': 50,
+    'xylophone': 50,
+    // 'japanese bell': 80,
 }
 
 
