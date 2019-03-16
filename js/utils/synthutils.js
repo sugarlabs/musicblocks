@@ -151,7 +151,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", "samples/japanese_bell",
+    "samples/japanese_drum", // "samples/japanese_bell",
 ]
 
 
@@ -203,7 +203,7 @@ const SAMPLECENTERNO = {
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
-    'xylophone': ['C5', 51],
+    'xylophone': ['C4', 39],
 };
 
 
@@ -508,7 +508,7 @@ function Synth() {
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
                 {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
-		{'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
+		// {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
