@@ -1,15 +1,17 @@
 How to add a new sample sound
 =============================
 
+### Checklist for sound sample:
+
+[ ] Sample should contain only one pitch (i.e., no melodic movement)
+
+[ ] After tuning the synth, use your ear and ask yourself "does this sound have a constant frequency throughout the sample?" ([Audacity](https://manual.audacityteam.org/man/change_pitch.html) can be used to help determine the fundamental pitch)
+
+[ ] Is it a steady pitch?
+
+### Steps for adding the sample:
+
 * Find a sample under a free/libre open-source (FOSS) license.
-
-### Checklist for Sample
-
-* [ ] Only one pitch (no melodic movement)
-
-* [ ] After tuning the synth, use your ear and ask yourself "does this sound have a constant frequency throughout the sample?" (Audacity can be used to some extent for fundamental pitch) [Audacity](https://manual.audacityteam.org/man/change_pitch.html).
-
-* [ ] Steady pitch
 
 * `base64` encode the sample data
 
