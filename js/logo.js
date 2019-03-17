@@ -3732,6 +3732,8 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {   
+                that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
+                that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
                 that.musicKeyboard.init(that);
             };
 
