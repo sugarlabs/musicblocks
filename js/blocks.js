@@ -2033,7 +2033,11 @@ function Blocks (activity) {
             var label = _(TEMPERAMENTS[0][1]);  // equal by default
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
                 if (TEMPERAMENTS[i][1] === myBlock.value) {
-                    label = TEMPERAMENTS[i][0];
+                    if (TEMPERAMENTS[i][0].length === 0) {
+                        label = TEMPERAMENTS[i][2];
+                    } else {
+                        label = TEMPERAMENTS[i][0];
+                    }
                     break;
                 }
             }
