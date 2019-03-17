@@ -480,12 +480,12 @@ var OSCTYPES = [
 ];
 
 var TEMPERAMENTS = [
-    [_('equal'), 'equal'],
-    [_('just intonation'), 'just intonation'],
-    [_('Pythagorean'), 'Pythagorean'],
-    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
-    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
-    [_('custom'), 'custom'],
+  [_('equal'), 'equal', 'equal'],
+  [_('just intonation'), 'just intonation', 'just intonation'],
+  [_('Pythagorean'), 'Pythagorean', 'Pythagorean'],
+  [_('meantone') +  ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+  [_('meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
+  [_('custom'), 'custom', 'custom'],
 
 ];
 

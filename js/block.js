@@ -2898,8 +2898,13 @@ function Block(protoblock, blocks, overrideName) {
                 if (beginnerMode && TEMPERAMENTS[i][1] === 'custom') {
                     continue;
                 }
+                
+                if (TEMPERAMENTS[i][0].length === 0) {
+                    temperamentLabels.push(TEMPERAMENTS[i][2]);
+                } else {
+                    temperamentLabels.push(TEMPERAMENTS[i][0]);
+                }
 
-                temperamentLabels.push(TEMPERAMENTS[i][0]);
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
