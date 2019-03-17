@@ -3,6 +3,14 @@ How to add a new sample sound
 
 * Find a sample under a free/libre open-source (FOSS) license.
 
+### Checklist for Sample
+
+* [ ] Only one pitch (no melodic movement)
+
+* [ ] After tuning the synth, use your ear and ask yourself "does this sound have a constant frequency throughout the sample?" (Audacity can be used to some extent for fundamental pitch) [Audacity](https://manual.audacityteam.org/man/change_pitch.html).
+
+* [ ] Steady pitch
+
 * `base64` encode the sample data
 
   ```
@@ -46,13 +54,10 @@ on one line.
                {'name': 'piano', 'data': PIANO_SAMPLE},
    ```
 
-Note: To deterine the center pitch of your sample, you may find the
-"change pitch" feature of
-[Audacity](https://manual.audacityteam.org/man/change_pitch.html)
-useful.
 
 
-* Add you new sample name to the list of string that need translation
+
+* Add your new sample name to the list of string that need translation
 in `js/utils/musicutils.js`
 
    ```
