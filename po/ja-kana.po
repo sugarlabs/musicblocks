@@ -4164,6 +4164,9 @@ msgstr "カップドラム"
 msgid "floor tom"
 msgstr "フロアタム"
 
+msgid "floor tom tom"
+msgstr "フロアタムタム"
+
 #: js/basicblocks.js:3000
 #: js/synthutils.js:84
 #: js/musicutils.js:281
