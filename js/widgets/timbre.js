@@ -1470,10 +1470,10 @@ function TimbreWidget () {
                 instrumentsFilters[0][that.instrumentName][m]['filterType'] = elem.value;
                 that._update(m, elem.value, 0);
                 var error = instrumentsFilters[0][that.instrumentName].filter(function(el) {
-                  return el.filterType === elem.value;
+                    return el.filterType === elem.value;
                 });
-                if (error.length >1){
-                  that._logo.errorMsg(_('Filter already present'));
+                if (error.length > 1){
+                    that._logo.errorMsg(_('Filter already present.'));
                 }
                 that._playNote('G4', 1 / 8);
             });
@@ -1548,20 +1548,21 @@ function TimbreWidget () {
         var n = this._logo.blocks.blockList.length - 4;
         var selectedFilters = instrumentsFilters[0][this.instrumentName].slice();
         var filterType = FILTERTYPES.slice().filter(function (filter) {
-          for (var i in selectedFilters){
-            if (selectedFilters[i].filterType === filter[1]){
-              return false
+            for (var i in selectedFilters) {
+                if (selectedFilters[i].filterType === filter[1]) {
+                    return false;
+                }
             }
-          }
-          return true
-        })        
+            return true;
+        });
+
         this.fil.push(n);
         if (filterType.length<=0){
-          this.filterParams.push(DEFAULTFILTERTYPE);
+            this.filterParams.push(DEFAULTFILTERTYPE);
+        } else {
+            this.filterParams.push(filterType[0][1]);
         }
-        else{
-          this.filterParams.push(filterType[0][1]);
-        }
+
         this.filterParams.push(-12);
         this.filterParams.push(392);
 
