@@ -1426,16 +1426,19 @@ function TimbreWidget () {
 
         var myDiv = docById(selectorID);
         var selectOpt = '<select class="sel" id="' + selID + '">';
+        var selectedFilter = null;
         for (var i = 0; i < FILTERTYPES.length; i++) {
             // work around some weird i18n bug
             if (FILTERTYPES[i][0].length === 0) {
                 if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
                     selectOpt += '<option value="' + FILTERTYPES[i][1] + '" selected>' + FILTERTYPES[i][1] + '</option>';
+                    selectedFilter = FILTERTYPES[i][1];
                 } else {
                     selectOpt += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
                 }
             } else if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
                 selectOpt += '<option value="' + FILTERTYPES[i][0] + '" selected>' + FILTERTYPES[i][0] + '</option>';
+                selectedFilter = FILTERTYPES[i][0];
             } else {
                 selectOpt += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
             }
@@ -1450,7 +1453,7 @@ function TimbreWidget () {
         }
 
         if (instrumentsFilters[0][this.instrumentName].length - 1 < f) {
-            instrumentsFilters[0][this.instrumentName].push({'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392});
+            instrumentsFilters[0][this.instrumentName].push({'filterType': selectedFilter, 'filterRolloff': -12, 'filterFrequency': 392});
         }
     };
 
@@ -1466,6 +1469,12 @@ function TimbreWidget () {
                 var m = elem.id.slice(-1);
                 instrumentsFilters[0][that.instrumentName][m]['filterType'] = elem.value;
                 that._update(m, elem.value, 0);
+                var error = instrumentsFilters[0][that.instrumentName].filter(function(el) {
+                    return el.filterType === elem.value;
+                });
+                if (error.length > 1){
+                    that._logo.errorMsg(_('Filter already present.'));
+                }
                 that._playNote('G4', 1 / 8);
             });
 
@@ -1537,8 +1546,23 @@ function TimbreWidget () {
         this._logo.blocks.loadNewBlocks(FILTEROBJ);
 
         var n = this._logo.blocks.blockList.length - 4;
+        var selectedFilters = instrumentsFilters[0][this.instrumentName].slice();
+        var filterType = FILTERTYPES.slice().filter(function (filter) {
+            for (var i in selectedFilters) {
+                if (selectedFilters[i].filterType === filter[1]) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
         this.fil.push(n);
-        this.filterParams.push(DEFAULTFILTERTYPE);
+        if (filterType.length<=0){
+            this.filterParams.push(DEFAULTFILTERTYPE);
+        } else {
+            this.filterParams.push(filterType[0][1]);
+        }
+
         this.filterParams.push(-12);
         this.filterParams.push(392);
 
