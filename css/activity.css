@@ -728,7 +728,7 @@ table {
 .close-button {
     position: absolute;
     font-size: 1em;
-    left: 410px;
+    right: 410px;
     width:18px;
     height: 18px;
     background: url('../header-icons/close.png');
@@ -737,7 +737,7 @@ table {
 }
 .drag-button {
     position: absolute;
-    left: 20px;
+    right: 20px;
     background: url('../header-icons/move.png');
     background-size: 22px;
     height: 22px;
