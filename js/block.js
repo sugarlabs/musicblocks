@@ -4029,7 +4029,7 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        this.label.addEventListener('keypress', this._exitKeyPressed());
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(thisgi));
 
         this.label.addEventListener('change', function () {
             that._labelChanged(false, false);
@@ -5368,6 +5368,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.labelattr != null) {
                 this.labelattr.style.display = 'none';
             }
+            docById('wheelDiv').style.display = 'none';
         }
 
         // The pie menu may be visible too, so hide it.
@@ -5510,6 +5511,7 @@ function Block(protoblock, blocks, overrideName) {
         if (closeInput) {
             // and hide the DOM textview...
             this.label.style.display = 'none';
+            docById('wheelDiv').style.display = 'none';
         }
 
         // Make sure text is on top.
