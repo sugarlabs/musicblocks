@@ -3177,6 +3177,19 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
+    /**
+     * Keypress handler. Handles exit key (Tab and Enter) press.
+     * @param{Event} KeyPress event object
+     * @returns{void}
+     * @private
+     */
+     this._exitKeyPressed = function(event) {
+        if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+            this._labelChanged(true, false);
+            event.preventDefault();
+            this.label.removeEventListener('keypress', this._exitKeyPressed);
+        }
+    }
     /*
      * Check if pie menu is ok to launch
      * @return{void}
@@ -4016,10 +4029,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed());
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
@@ -4205,10 +4218,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
@@ -4388,10 +4401,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
