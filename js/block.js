@@ -4034,7 +4034,7 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        this.label.addEventListener('keypress', this._exitKeyPressed.bind(thisgi));
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
             that._labelChanged(false, false);
