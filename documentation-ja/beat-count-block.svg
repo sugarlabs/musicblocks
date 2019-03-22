@@ -43,7 +43,7 @@
           <tspan
              id="tspan740"
              y="14"
-             x="13">beat count</tspan>
+             x="13">拍の位置</tspan>
         </text>
       </g>
     </g>
@@ -63,7 +63,7 @@
           <tspan
              id="tspan750"
              y="14"
-             x="68">set heading</tspan>
+             x="68">向きを変える</tspan>
         </text>
         <text
            id="text756"
