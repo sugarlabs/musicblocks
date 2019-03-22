@@ -1026,7 +1026,7 @@ msgstr "ネズミと ペンを もどす"
 #: js/turtledefs.js:20
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
 msgid "guide url"
-msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/README.md"
+msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
 
 #: js/turtledefs.js:28
 #: js/turtledefs.js:193
