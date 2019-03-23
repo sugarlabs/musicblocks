@@ -999,17 +999,17 @@ function TimbreWidget () {
                             that.AMSynthesizer.push(n);
                             that.AMSynthParams.push(1);
 
-                            setTimeout(function () {
-                                if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            if (that.FMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer)), 500);
+                                setTimeout(that.FMSynthesizer.pop(), 600);
+                                  
+                            } else if (that.duoSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer)), 500);
+                                setTimeout(that.duoSynthesizer.pop(), 600);
+                                  
+                            } else {
+                                setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                            }
 
                             console.log('CREATING AM SYNTH!!!');
                             that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
@@ -1056,17 +1056,17 @@ function TimbreWidget () {
                             that.FMSynthesizer.push(n);
                             that.FMSynthParams.push(10);
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.FMSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.FMSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            if (that.AMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.FMSynthesizer)), 500);
+                                setTimeout(that.AMSynthesizer.pop(), 600);
+                                  
+                            } else if (that.duoSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.FMSynthesizer)), 500);
+                                setTimeout(that.duoSynthesizer.pop(), 600);
+                                  
+                            } else {
+                                setTimeout(that.blockConnection(2, bottomOfClamp), 500);
+                            }
 
                             console.log('CREATING FM SYNTH!!!');
                             that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
@@ -1113,20 +1113,21 @@ function TimbreWidget () {
                             that.NoiseSynthesizer.push(n);
                             that.NoiseSynthParams.push("white");
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.NoiseSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            if (that.AMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer)), 500);
+                                setTimeout(that.AMSynthesizer.pop(), 600);
+                                  
+                            } else if (that.FMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer)), 500);
+                                setTimeout(that.FMSynthesizer.pop(), 600);
+                                  
+                            } else if (that.duoSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.NoiseSynthesizer)), 500);
+                                setTimeout(that.FMSynthesizer.pop(), 600);
+                                  
+                            } else {
+                                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                            }
 
                             console.log('CREATING NOISE SYNTH!!!');
                             that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
@@ -1172,17 +1173,17 @@ function TimbreWidget () {
                             that.duoSynthParams.push(10);
                             that.duoSynthParams.push(6);
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.duoSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(3, bottomOfClamp);
-                                }
-                            }, 500);
+                            if (that.AMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.duoSynthesizer)), 500);
+                                setTimeout(that.AMSynthesizer.pop(), 600);
+                                  
+                            } else if (that.FMSynthesizer.length !== 0) {
+                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer)), 500);
+                                setTimeout(that.FMSynthesizer.pop(), 600);
+                                  
+                            } else {
+                                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                            }
 
                             console.log('CREATING DUO SYNTH!!!');
                             that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
