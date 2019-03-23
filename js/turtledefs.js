@@ -451,7 +451,7 @@ function createHelpContent() {
         'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', 'status.svg'],
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
-        'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'status.svg'],
+        'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', 'drum-block.svg'],
         'effectsname': [_('The Effects name block is used to select a sound effect.'), 'documentation', 'effects-block.svg'],
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
