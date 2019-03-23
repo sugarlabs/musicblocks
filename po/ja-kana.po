@@ -2642,8 +2642,8 @@ msgid "The Hollow line block creates a line with a hollow center."
 msgstr ""
 
 #: js/turtledefs.js:539
-msgid "The Background block sets the background color."
-msgstr ""
+msgid "The Background block sets the window background color."
+msgstr "はいけいブロック は、 カンバスの いろを せっていする。"
 
 #: js/turtledefs.js:540
 msgid "The Grey block returns the current pen grey value."
