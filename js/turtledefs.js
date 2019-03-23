@@ -536,7 +536,7 @@ function createHelpContent() {
         'settranslucency': [_('The Set translucency block changes the opacity of the pen.'), 'documentation', 'status.svg'],
         'fill': [_('The Fill block fills in a shape with a color.'), 'documentation', 'fill-block.svg'],
         'hollowline': [_('The Hollow line block creates a line with a hollow center.'), 'documentation', 'status.svg'],
-        'fillscreen': [_('The Background block sets the background color.'), 'documentation', 'status.svg'],
+        'background': [_('The Background block sets the background color.'), 'documentation', 'background.svg'],
         'grey': [_('The Grey block returns the current pen grey value.'), 'documentation', 'status.svg'],
         'shade': [_('The Shade block returns the current pen shade value.'), 'documentation', 'status.svg'],
         'pensize': [_('The Pen size block returns the current pen size value.'), 'documentation', 'status.svg'],
