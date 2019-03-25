@@ -855,6 +855,27 @@ function TimbreWidget () {
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
 
+    this._changeBlock = function (newblk, synthChosen, bottomOfClamp) {
+        var lastBlk = 0;
+        if (this.AMSynthesizer.length !== 0 && synthChosen !== 'AMSynth') {
+            lastBlk = this.AMSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (this.FMSynthesizer.length !== 0 && synthChosen !== 'FMSynth') {
+            lastBlk = this.FMSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (this.duoSynthesizer.length !== 0 && synthChosen !== 'DuoSynth') {
+            lastBlk = this.duoSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (synthChosen === 'FMSynth' || synthChosen === 'AMSynth') {
+            setTimeout(this.blockConnection(2, bottomOfClamp), 500);
+        } else {
+            setTimeout(this.blockConnection(3, bottomOfClamp), 500);
+        }
+    }
+
     this._blockReplace = function (oldblk, newblk) {
         // Find the connections from the old block
         var c0 = this._logo.blocks.blockList[oldblk].connections[0];
@@ -999,17 +1020,7 @@ function TimbreWidget () {
                             that.AMSynthesizer.push(n);
                             that.AMSynthParams.push(1);
 
-                            if (that.FMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer)), 500);
-                                setTimeout(that.FMSynthesizer.pop(), 600);
-                                  
-                            } else if (that.duoSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer)), 500);
-                                setTimeout(that.duoSynthesizer.pop(), 600);
-                                  
-                            } else {
-                                setTimeout(that.blockConnection(2, bottomOfClamp), 500);
-                            }
+                            that._changeBlock(last(that.AMSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING AM SYNTH!!!');
                             that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
@@ -1056,17 +1067,7 @@ function TimbreWidget () {
                             that.FMSynthesizer.push(n);
                             that.FMSynthParams.push(10);
 
-                            if (that.AMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.FMSynthesizer)), 500);
-                                setTimeout(that.AMSynthesizer.pop(), 600);
-                                  
-                            } else if (that.duoSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.FMSynthesizer)), 500);
-                                setTimeout(that.duoSynthesizer.pop(), 600);
-                                  
-                            } else {
-                                setTimeout(that.blockConnection(2, bottomOfClamp), 500);
-                            }
+                            that._changeBlock(last(that.FMSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING FM SYNTH!!!');
                             that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
@@ -1113,21 +1114,7 @@ function TimbreWidget () {
                             that.NoiseSynthesizer.push(n);
                             that.NoiseSynthParams.push("white");
 
-                            if (that.AMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer)), 500);
-                                setTimeout(that.AMSynthesizer.pop(), 600);
-                                  
-                            } else if (that.FMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer)), 500);
-                                setTimeout(that.FMSynthesizer.pop(), 600);
-                                  
-                            } else if (that.duoSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.duoSynthesizer), last(that.NoiseSynthesizer)), 500);
-                                setTimeout(that.FMSynthesizer.pop(), 600);
-                                  
-                            } else {
-                                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
-                            }
+                            that._changeBlock(last(that.NoiseSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING NOISE SYNTH!!!');
                             that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
@@ -1173,17 +1160,7 @@ function TimbreWidget () {
                             that.duoSynthParams.push(10);
                             that.duoSynthParams.push(6);
 
-                            if (that.AMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.AMSynthesizer), last(that.duoSynthesizer)), 500);
-                                setTimeout(that.AMSynthesizer.pop(), 600);
-                                  
-                            } else if (that.FMSynthesizer.length !== 0) {
-                                setTimeout(that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer)), 500);
-                                setTimeout(that.FMSynthesizer.pop(), 600);
-                                  
-                            } else {
-                                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
-                            }
+                            that._changeBlock(last(that.duoSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING DUO SYNTH!!!');
                             that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
