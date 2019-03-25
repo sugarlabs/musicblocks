@@ -1517,11 +1517,13 @@ function calcNoteValueToDisplay(a, b, scale) {
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
         if (noteValueToDisplay in NSYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
+            var value = b/a*noteValueToDisplay;
+            noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
             if (noteValueToDisplay in NSYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.,';
+                var value = b/a*noteValueToDisplay;
+                noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.,';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
