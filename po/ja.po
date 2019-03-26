@@ -5377,7 +5377,7 @@ msgid "Move down"
 msgstr "下げる"
 
 #: js/pitchslider.js:402
-msgid "Use the slider to change the pitch."
+msgid "Click on the slider to create a note block."
 msgstr "スライダーで音の高さを変えます。"
 
 #: js/pitchtimematrix.js:200
