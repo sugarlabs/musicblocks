@@ -2957,7 +2957,8 @@ function Activity() {
                                 'color': turtle.color,
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
-                                'grey': turtle.chroma
+                                'grey': turtle.chroma,
+                                'name': turtle.name
                             };
                         }
                         break;
