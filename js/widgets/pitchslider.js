@@ -399,6 +399,6 @@ function PitchSlider() {
             };
         }
 
-        this._logo.textMsg(_('Use the slider to change the pitch.'));
+        this._logo.textMsg(_('Use the slider to change the pitch. Click the slider to generate a note in hertz from the sounding pitch.'));
     };
 };
