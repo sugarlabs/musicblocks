@@ -416,15 +416,15 @@ function createHelpContent() {
         // pitch palette
         'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental-block.svg'],
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'set-scalar-transposition-block.svg'],
-        'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'status.svg'],
+        'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'register-block.svg'],
         'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'invert.svg'],
         'deltapitch': [_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'delta-pitch-block.svg'],
         '// customNote': ['', 'documentation', 'status.svg'],
         //.TRANS: 'ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa' are East Indian note names.
-        'eastindiansolfege': [_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', 'status.svg'],
+        'eastindiansolfege': [_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', 'eastindian-block.svg'],
         'accidentalname': [_('The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat.'), 'documentation', 'accidental-block.svg'],
         'number2octave': [_('The Number to octave block will convert a pitch number to an octave.'), 'documentation', 'status.svg'],
-        'setpitchnumberoffset': [_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', 'status.svg'],
+        'setpitchnumberoffset': [_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', 'setpitchnumberoffset-block.svg'],
         'consonantstepsizeup': [_('The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode.'), 'documentation', 'status.svg'],
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
         // Intervals palette
@@ -433,7 +433,7 @@ function createHelpContent() {
         'semitoneinterval': [_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', 'semitoneinterval.svg'],
         'measureintervalscalar': [_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', 'status.svg'],
         'measureintervalsemitones': [_('The Semi-tone interval block measures the distance between two notes in semi-tones.'), 'documentation', 'status.svg'],
-        'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'status.svg'],
+        'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'doubly-block.svg'],
         // Tone palette
         'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'set-timbre-block.svg'],
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg'],
@@ -443,9 +443,9 @@ function createHelpContent() {
         'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic-block.svg'],
         'harmonic': [_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', 'status.svg'],
         'partial': [_('The Partial block is used to specify a weight for a specific partical harmonic.'), 'documentation', 'status.svg'],
-        'fmsynth': [_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', 'status.svg'],
-        'amsynth': [_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', 'status.svg'],
-        'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', 'status.svg'],
+        'fmsynth': [_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', 'fmsynth-block.svg'],
+        'amsynth': [_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', 'amsynth-block.svg'],
+        'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', 'duosynth-block.svg'],
         // Volume palette
         'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'status.svg'],
         'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', 'status.svg'],
