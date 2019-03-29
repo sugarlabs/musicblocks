@@ -1367,7 +1367,7 @@ function Activity() {
     };
 
     function getStageY() {
-        return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
     };
 
     function getStageMouseDown() {
