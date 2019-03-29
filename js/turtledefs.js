@@ -396,7 +396,7 @@ function createHelpContent() {
         'turtlename': [_('The Mouse-name block returns the name of a mouse.'), 'documentation', 'click-block.svg'],
         // Advanced blocks
         // Rhythm palette
-        'rhythmic2dot': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot.svg'],
+        'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg'],
         'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg'],
