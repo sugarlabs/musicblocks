@@ -447,7 +447,7 @@ function createHelpContent() {
         'amsynth': [_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', 'amsynth-block.svg'],
         'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', 'duosynth-block.svg'],
         // Volume palette
-        'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'status.svg'],
+        'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'articulation-block.svg'],
         'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', 'status.svg'],
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],
@@ -456,11 +456,11 @@ function createHelpContent() {
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchslider': [_('The Pitch slider tool to is used to generate pitches at selected frequencies.'), 'documentation', 'pitch-slider-block.svg'],
-        'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'status.svg'],
-        'pitchdrummatrix': [_('The Pitch drum matrix is used to map pitches to drum sounds.'), 'documentation', 'status.svg'],
+        'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'pitchstaircase-block.svg'],
+        'pitchdrummatrix': [_('The Pitch drum matrix is used to map pitches to drum sounds.'), 'documentation', 'pitchdrum-block.svg'],
         'temperament': [_('The Temperament tool is used to define custom tuning.'), 'documentation', 'status.svg'],
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'set-temperament-block.svg'],
-        'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'status.svg'],
+        'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'tuplet4-block.svg'],
         // Flow palette
         'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'status.svg'],
         'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'status.svg'],
