@@ -469,7 +469,7 @@ function createHelpContent() {
         'switch': [_('The Switch block will run the code in the matching Case.'), 'documentation', 'switch-block.svg'],
         'case': [_('The Case block is used inside of a Switch to define matches.'), 'documentation', 'switch-block.svg'],
         'default': [_('The Default block is used inside of a Switch to define a default action.'), 'documentation', 'switch-block.svg'],
-        'duplicatenotes': [_('The Duplicate block will run each block multiple times.') + ' ' + _('The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.'), 'documentation', 'status.svg'],
+        'duplicatenotes': [_('The Duplicate block will run each block multiple times.') + ' ' + _('The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.'), 'documentation', 'duplicate-block.svg'],
         // Action palette
         'arg': [_('The Arg block contains the value of an argument passed to an action.'), 'documentation', 'status.svg'],
         'namedarg': [_('The Arg block contains the value of an argument passed to an action.'), 'documentation', 'status.svg'],
