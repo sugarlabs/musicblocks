@@ -2288,7 +2288,7 @@ function Turtles () {
                     newTurtle.rename(infoDict['name'])
                 }
             }
-        }, 3000);
+        }, 6000);
 
         this.refreshCanvas();
     };
