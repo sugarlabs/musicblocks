@@ -5146,6 +5146,10 @@ function Blocks (activity) {
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
+                    if (['simple 1', 'simple 2', 'simple 3', 'simple 4'].indexOf(value) !== -1) {
+                        value = 'sine';
+                    }
+
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
                 };
