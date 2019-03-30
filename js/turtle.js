@@ -2117,7 +2117,7 @@ function Turtles () {
         if (blkInfoAvailable && 'name' in infoDict) {
             turtleName = infoDict['name'];
         } else {
-            var turtleName = i.toString();
+            var turtleName = _('start'); // i.toString();
         }
 
         var newTurtle = new Turtle(turtleName, this, this._drum);
