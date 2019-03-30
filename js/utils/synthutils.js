@@ -56,7 +56,7 @@ var VOICENAMES = [
     //.TRANS: polytone synthesizer
     [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
+    // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
