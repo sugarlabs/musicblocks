@@ -6270,6 +6270,14 @@ function Logo () {
                     that.embeddedGraphics[turtle][saveBlk] = [];
 
                     that._processNote(noteValue, saveBlk, turtle);
+                    if (that.bpm[turtle].length > 0) {
+                        var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                    } else {
+                        var bpmFactor = TONEBPM / that._masterBPM;
+                    }
+
+		    // Wait until this note is played before continuing.
+                    that._doWait(turtle, bpmFactor / noteValue);
 
                     that.inNoteBlock[turtle].pop();
 
