@@ -3731,7 +3731,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['divide'] = newblock;
     newblock.fontsize = 9;
-    newblock.staticLabels.push('➗');
+    if (language === 'ja') {
+        newblock.staticLabels.push('➗');
+    } else {
+        newblock.staticLabels.push('/');
+    }
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {
