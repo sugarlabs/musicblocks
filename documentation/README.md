@@ -79,7 +79,7 @@ projects* button.
 screen. There you will find the *Home* button, buttons for show/hide
 blocks, expand/collapse blocks and decrease/increase block size.
 
-(3) The *Auxilary* toolbar above the *main* toolbar. It appears when 
+(3) The *Auxilary* toolbar below the *main* toolbar. It appears when 
 *auxilary menu* button is clicked. There you will find the buttons *Run 
 slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*, 
 etc. and also the button for selecting language.  
