@@ -146,7 +146,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
     "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar",
-    "samples/bassoon", "samples/celeste"
+    "samples/bassoon", "samples/celeste",
 ]
 
 // The sample has a pitch which is subsequently transposed.
@@ -167,7 +167,7 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
-    'bassoon': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
+    'bassoon': ['D4', 41],  // pitchToNumber('C', 5, 'C Major')],
     'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
 };
 
@@ -447,9 +447,9 @@ function Synth() {
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
 		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
-		{'name': 'celeste', 'data': CELESTE_SAMPLE}
+		{'name': 'celeste', 'data': CELESTE_SAMPLE},
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
