@@ -30,7 +30,7 @@ block is defined.
 
 1. Define the type of block.
   
-   `var newblock = new protoBlock('uniquename');`
+   `var newblock = new ProtoBlock('uniquename');`
   
    This creates a new instance of the class protoBlock which is used
    to create a new block. Unique name cannot match the name of any
@@ -204,7 +204,7 @@ Valid blocks styles in turtleblocksjs:
 * `booleanZeroArgBlock`: E.g., mouse button.
 * `booleanOneBooleanArgBlock`: E.g., not
 * `booleanTwoBooleanArgBlock`: E.g., and
-* `booleanOneArgBlock`: E.g.,
+* `booleanOneArgBlock`: E.g., found mouse
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
 

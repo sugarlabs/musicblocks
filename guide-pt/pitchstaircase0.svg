@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg4602"
+   viewBox="0 0 242.59373 135.79038"
+   height="135.79037"
+   width="242.59373">
+  <defs
+     id="defs4604" />
+  <metadata
+     id="metadata4607">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="matrix(0.93749999,0,0,0.93749999,0,0.39519136)"
+     id="g876">
+    <g
+       transform="scale(1.5)"
+       id="g874">
+      <path
+         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 78.09379 4 c 2.20914,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 21 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path868" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text872">
+        <tspan
+           x="5.3333335"
+           y="21.5"
+           id="tspan870">medir tom da escala</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93749999,0,0,0.93749999,76.65625,38.36394)"
+     id="g894">
+    <g
+       transform="scale(1.5)"
+       id="g892">
+      <path
+         d="m -45.011112,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -75.511112 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4.740083,-1.918517 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path878" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text882">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan880">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text886">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan884">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text890">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan888">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93749999,0,0,0.93749999,145.56249,38.36394)"
+     id="g904">
+    <g
+       transform="scale(1.5)"
+       id="g902">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path896" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text900">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan898">la</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93749999,0,0,0.93749999,145.56249,67.895192)"
+     id="g914">
+    <g
+       transform="scale(1.5)"
+       id="g912">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path906" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text910">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan908">3</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

@@ -48,7 +48,7 @@ Subdirectories with additional utilities
 	* `platformstyle.js`: checking platform that Music Blocks is run in
 	* `synthutils.js`: related to defining synths in tone.js
 	* `utils.js`: general utility functions
-* widgets -- widget code
+  * ` widgets` : widget code
 	* `help.js`: show help for individual blocks and the tour of Music Blocks
 	* `modewidget.js`: explore musical modes
 	* `pitchdrummatrix.js`: map pitches to drum sounds
@@ -91,7 +91,7 @@ is where the code associated with running each block is defined.
 
 1. Define the type of block
 
-`var uniquenameBlock = new protoBlock('uniquename');`
+`var uniquenameBlock = new ProtoBlock('uniquename');`
 
 e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');`
 
@@ -177,7 +177,7 @@ Check
 
 ## Macro expansions
 
-In some cases, you may want a block on the palette expand into a stack
+In some cases, you may want a block on the palette to expand into a stack
 of blocks.
 
 To add a macro:
@@ -345,7 +345,7 @@ creating interactive music in the browser. It provides advanced
 scheduling capabilities, synths and effects, and intuitive musical
 abstractions built on top of the Web Audio API."
 
-Music Blocks uses the Tone.js API for many of the synth effectss, such
+Music Blocks uses the Tone.js API for many of the synth effects, such
 as chorus, vibrato and tremolo.
 
 In order to set up a new synth effect:
@@ -391,7 +391,7 @@ In order to set up a new synth effect:
 * `booleanZeroArgBlock`: E.g., mouse button.
 * `booleanOneBooleanArgBlock`: E.g., not
 * `booleanTwoBooleanArgBlock`: E.g., and
-* `booleanOneArgBlock`: E.g.,
+* `booleanOneArgBlock`: E.g., found mouse
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
 

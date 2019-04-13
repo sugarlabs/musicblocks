@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Walter Bender
+// Copyright (c) 2018,19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -43,6 +43,11 @@ function LanguageBox() {
 
     this.es_onclick = function() {
         language = 'es';
+        this.hide();
+    };
+
+    this.pt_onclick = function() {
+        language = 'pt';
         this.hide();
     };
 
@@ -92,9 +97,10 @@ function LanguageBox() {
             'default': _('Refresh your browser to change your language preference.'),
             'enUS': 'Refresh your browser to change your language preference.',
             'enUK': 'Refresh your browser to change your language preference.',
-            'ja': '言語を変更するにはブラウザを再起動する必要があります。',
-            'kana': 'げんごを へんこうするには ブラウザを さいきどうする ひつようが あります。',
+            'ja': '言語を変えるには、ブラウザをこうしんしてください。',
+            'kana': 'げんごを かえるには、ブラウザを こうしんしてください。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
+	    'pt': 'Atualize seu navegador para alterar sua preferência de idioma.',
             'zhCN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
             'hi': 'अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें',

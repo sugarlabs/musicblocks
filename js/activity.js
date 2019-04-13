@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -173,7 +173,7 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
-            'Tone.min',
+            'Tone',
             'widgets/modewidget',
             'widgets/pitchtimematrix',
             'widgets/pitchdrummatrix',
@@ -251,6 +251,7 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
+        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -262,6 +263,7 @@ function Activity() {
         largerContainer = null;
         smallerOffContainer = null;
         largerOffContainer = null;
+        resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
 
@@ -374,6 +376,9 @@ function Activity() {
      */
     this._findBlocks = function () {
         // _showHideAuxMenu(false);
+        if (!blocks.visible)  {
+            _changeBlockVisibility();
+        }
         var leftpos = Math.floor(canvas.width / 4);
         var toppos;
         blocks.activeBlock = null;
@@ -862,6 +867,16 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
+        scrollPaletteContainer = !scrollPaletteContainer;
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
+        if (scrollBlockContainer && !beginnerMode){
+          enableHorizScrollIcon.style.display = 'none';
+          disableHorizScrollIcon.style.display = 'block';
+        }else{
+          enableHorizScrollIcon.style.display = 'block';
+          disableHorizScrollIcon.style.display = 'none';
+        }
     };
 
     /*
@@ -957,12 +972,18 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale < BLOCKSCALES.length - 1) {
-            blockscale += 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale < BLOCKSCALES.length - 1) {
+                resizeDebounce = true;
+                blockscale += 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
-        setSmallerLargerStatus();
+            setSmallerLargerStatus();
+        }
     };
 
     /*
@@ -972,10 +993,16 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale > 0) {
-            blockscale -= 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale > 0) {
+                resizeDebounce = true;
+                blockscale -= 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+            }
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
         setSmallerLargerStatus();
     };
@@ -1127,6 +1154,85 @@ function Activity() {
             delta: 0
         };
 
+        var __paletteWheelHandler = function (event) {
+            // vertical scroll
+            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+                if (palettes.paletteVisible) {
+                    if (event.clientX > cellSize + MENUWIDTH) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                } else {
+                    if (event.clientX > cellSize) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                }
+            }
+
+            // horizontal scroll
+            if (scrollPaletteContainer) {
+                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    } else {
+                        if (event.clientX > cellSize) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    }
+                }
+            } else {
+                event.preventDefault();
+            }
+
+            refreshCanvas();
+        };
+
+
+      var myCanvas = docById('myCanvas')
+
+      var __heightBasedScroll = function (event) {
+
+          actualReszieHandler(); //check size during init 
+          
+          window.addEventListener("resize",resizeThrottler,false);
+
+          var resizeTimeout;
+
+          function resizeThrottler() {
+            //ignore resize events as long as an actualResizeHandler execution is in queue
+              if(!resizeTimeout) {
+                  resizeTimeout = setTimeout(function () {
+                      resizeTimeout = null;
+                      actualReszieHandler();
+
+                      // The actualResizeHandler will execute at the rate of 15fps
+                  }, 66);
+              }
+            
+          }
+
+      }
+      
+
+    
+      function actualReszieHandler () {
+
+        //handle the resize event
+
+         var h = window.innerHeight;
+
+         if (h < 500) { //activate on mobile
+             myCanvas.addEventListener('wheel', __paletteWheelHandler,false)
+         }else {
+             //cleanup event listeners
+            myCanvas.removeEventListener('wheel', __paletteWheelHandler)
+         }
+          
+      }
+      __heightBasedScroll()
+
+
         var __wheelHandler = function (event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
@@ -1162,6 +1268,7 @@ function Activity() {
         };
 
         docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
+    
 
         var __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
@@ -1260,7 +1367,7 @@ function Activity() {
     };
 
     function getStageY() {
-        return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
     };
 
     function getStageMouseDown() {
@@ -1928,8 +2035,8 @@ function Activity() {
         // If the clientWidth hasn't changed, don't resize (except
         // on init).
         if (!force && this._clientWidth === document.body.clientWidth) {
-            console.log('NO WIDTH CHANGE');
-            return;
+            // console.log('NO WIDTH CHANGE');
+            // return;
         }
 
         this._clientWidth = document.body.clientWidth;
@@ -2252,12 +2359,15 @@ function Activity() {
         if (blocks.visible) {
             logo.hideBlocks();
             palettes.hide();
+            hideBlocksContainer[1].visible = true;
+            hideBlocksContainer[0].visible = false;
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-
+            hideBlocksContainer[1].visible = false;
+            hideBlocksContainer[0].visible = true;
             logo.showBlocks();
             palettes.show();
             palettes.bringToTop();
@@ -2847,7 +2957,8 @@ function Activity() {
                                 'color': turtle.color,
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
-                                'grey': turtle.chroma
+                                'grey': turtle.chroma,
+                                'name': turtle.name
                             };
                         }
                         break;
@@ -3010,7 +3121,8 @@ function Activity() {
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
             stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer);
+            stage.removeChild(hideBlocksContainer[0]);
+            stage.removeChild(hideBlocksContainer[1]);
             stage.removeChild(collapseBlocksContainer);
             stage.removeChild(smallerContainer);
             stage.removeChild(smallerOffContainer);
@@ -3041,8 +3153,16 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer = [];
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[0], x, y, _changeBlockVisibility, null, null, null, null);
+        
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSFADEDBUTTON, _('Show/hide block'), x, y - btnSize, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[1], x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer[1].visible = false;
+
+        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
+        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
@@ -4131,7 +4251,7 @@ function Activity() {
         toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin,setScroller, that._setupBlocksContainerEvents);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
         toolbar.renderMergeIcon(_doMergeLoad);

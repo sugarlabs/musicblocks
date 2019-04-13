@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="208.95583"
+   height="135.79039"
+   viewBox="0 0 208.95583 135.79039"
+   id="svg5587"
+   version="1.1">
+  <defs
+     id="defs5589" />
+  <metadata
+     id="metadata5592">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095"
+     x="-19.669565"
+     y="534.75867">
+    <tspan
+       id="tspan3097"
+       y="557.25867"
+       x="90.330452" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3107"
+     x="-19.669565"
+     y="324.75864">
+    <tspan
+       id="tspan3109"
+       y="347.25864"
+       x="74.330452" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3033"
+     x="-19.669565"
+     y="282.75861">
+    <tspan
+       id="tspan3035"
+       y="305.25861"
+       x="82.330452" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3317"
+     x="-37.669563"
+     y="114.75862">
+    <tspan
+       id="tspan3319"
+       y="137.25862"
+       x="104.33045" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095-2"
+     x="-19.669565"
+     y="492.75864">
+    <tspan
+       id="tspan3097-4"
+       y="515.25867"
+       x="90.330452" />
+  </text>
+  <g
+     transform="matrix(0.93750006,0,0,0.93750006,0,0.39519139)"
+     id="g857">
+    <g
+       transform="scale(1.5)"
+       id="g855">
+      <path
+         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 77.04663 4 c 2.20914,0 4.74009,1.9185168 4,4 v 4 4 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 21 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path849" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text853">
+        <tspan
+           x="5.3333335"
+           y="21.5"
+           id="tspan851">modo personalizado</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750006,0,0,0.93750006,40.65626,38.363941)"
+     id="g875">
+    <g
+       transform="scale(1.5)"
+       id="g873">
+      <path
+         d="m -19.41111,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10.0000002 v -2 h 51.5907968 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -51.5907968 -1 v 2 H -10.41111 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 -21 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path859" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text863">
+        <tspan
+           x="48.01302"
+           y="24"
+           id="tspan861">definir chave</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text867">
+        <tspan
+           x="48.01302"
+           y="11.25"
+           id="tspan865">chave</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text871">
+        <tspan
+           x="48.01302"
+           y="32.25"
+           id="tspan869">modo</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750006,0,0,0.93750006,111.92457,38.363941)"
+     id="g885">
+    <g
+       transform="scale(1.5)"
+       id="g883">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path877" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text881">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan879">C</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750006,0,0,0.93750006,111.92457,67.895191)"
+     id="g895">
+    <g
+       transform="scale(1.5)"
+       id="g893">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path887" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text891">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan889">maior</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

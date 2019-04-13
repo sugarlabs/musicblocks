@@ -1,5 +1,5 @@
 // Copyright (c) 2015 Yash Khandelwal
-// Copyright (c) 2015-18 Walter Bender
+// Copyright (c) 2015-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -23,6 +23,7 @@ function PitchTimeMatrix () {
     const ICONSIZE = 32;
 
     this._stopOrCloseClicked = false;
+    this._instrumentName = DEFAULTVOICE;
 
     this.paramsEffects = {
         "doVibrato": false,
@@ -214,7 +215,7 @@ function PitchTimeMatrix () {
                 that._rowMap[i] = i;
             }
 
-            that._logo.synth.stopSound(0, DEFAULTVOICE);
+            that._logo.synth.stopSound(0, that._instrumentName);
             that._logo.synth.stop();
             that._stopOrCloseClicked = true;
             ptmTableDiv.style.visibility = 'hidden';
@@ -247,6 +248,7 @@ function PitchTimeMatrix () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -262,6 +264,7 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -277,7 +280,6 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
@@ -542,8 +544,8 @@ function PitchTimeMatrix () {
             }
 
             // We want to sort based on frequency, so we convert all notes to frequency.
-            // Deprecated
             if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
+                // Deprecated
                 sortableList.push([this.rowArgs[i], this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else {
                 sortableList.push([noteToFrequency(this.rowLabels[i] + this.rowArgs[i], this._logo.keySignature[0]), this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
@@ -554,15 +556,18 @@ function PitchTimeMatrix () {
         for (var i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                sortableList.push([-2, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                var drumIndex = getDrumIndex(this.rowLabels[i]);
+                sortableList.push([-drumIndex, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
         for (var i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
+                sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                sortableList.push([-1, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
+                var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+                sortableList.push([-gi, this.rowLabels[i], this.rowArgs[i], i, this._noteStored[i]]);
             }
         }
 
@@ -594,6 +599,7 @@ function PitchTimeMatrix () {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+                console.log('skipping ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
                 // skip duplicates
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
@@ -603,6 +609,7 @@ function PitchTimeMatrix () {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
+                console.log('pushing ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
             }
 
@@ -1255,7 +1262,6 @@ function PitchTimeMatrix () {
 
             // We have an array of pitches and note values.
             var note = this._notesToPlay[this._notesCounter][0];
-            console.log(this._noteStored);
             var pitchNotes = [];
             var synthNotes = [];
             var drumNotes = [];
@@ -1317,11 +1323,12 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                this._playChord(pitchNotes, this._logo.defaultBPMFactor / noteValue);
+                // this._logo.synth.trigger(0, pitchNotes[0], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
-                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                this._logo.synth.trigger(0, [Number(synthNotes[i])], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < drumNotes.length; i++) {
@@ -1424,14 +1431,15 @@ function PitchTimeMatrix () {
                             }
                         }
                     }
-                       }
+                }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                    that._playChord(pitchNotes, that._logo.defaultBPMFactor / noteValue);
+                    // that._logo.synth.trigger(0, pitchNotes[0], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, DEFAULTVOICE, null, null);
+                    that._logo.synth.trigger(0, [Number(synthNotes[i])], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
@@ -1463,6 +1471,31 @@ function PitchTimeMatrix () {
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+    };
+
+    this._playChord = function (notes, noteValue) {
+        var that = this;
+        setTimeout(function() {
+            that._logo.synth.trigger(0, notes[0], noteValue, that._instrumentName, null, null);
+        }, 1);
+
+        if (notes.length > 1) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[1], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
+
+        if (notes.length > 2) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[2], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
+
+        if (notes.length > 3) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[3], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
     };
 
     this._processGraphics = function (obj) {
@@ -1565,21 +1598,19 @@ function PitchTimeMatrix () {
                 if (drumName != null) {
                     this._logo.synth.trigger(0, 'C2', noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === 'hertz') {
-                    this._logo.synth.trigger(0, Number(note), noteValue, DEFAULTVOICE, null, null);
+                    this._logo.synth.trigger(0, Number(note), noteValue, this._instrumentName, null, null);
                 } else if (graphicsBlock !== true) {
                     if (typeof(note) === 'string') {
-                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, DEFAULTVOICE, null, null);
+                        this._logo.synth.trigger(0, note.replace(/♭/g, 'b').replace(/♯/g, '#'), noteValue, this._instrumentName, null, null);
                     } else {
-                        this._logo.synth.trigger(0, note, noteValue, DEFAULTVOICE, null, null);
+                        this._logo.synth.trigger(0, note, noteValue, this._instrumentName, null, null);
                     }
                 } else {
                     console.log('Cannot parse note object: ' + obj);
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
-
             this._logo.synth.trigger(0, [Number(obj[1])], noteValue, obj[0], null, null);
-
         }
     };
 
@@ -1608,8 +1639,7 @@ function PitchTimeMatrix () {
         }
         this._logo.refreshCanvas();
 
-
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
         for (var i = 0; i < this._notesToPlay.length; i++)

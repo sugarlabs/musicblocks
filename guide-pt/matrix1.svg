@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="275.60214"
+   height="312.97787"
+   id="svg3641"
+   viewBox="0 0 275.60214 312.97787">
+  <metadata
+     id="metadata3670">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3668" />
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,0,0.39519136)"
+     id="g1181">
+    <g
+       transform="scale(1.5)"
+       id="g1179">
+      <path
+         d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 63.344727 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 147 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1173" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1177">
+        <tspan
+           x="5.3333335"
+           y="21.5"
+           id="tspan1175">criador de frase</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,72.65625,38.363941)"
+     id="g1199">
+    <g
+       transform="scale(1.5)"
+       id="g1197">
+      <path
+         d="m -42.166666,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -72.666666 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1183" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1187">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan1185">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1191">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1189">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1195">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan1193">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,38.363941)"
+     id="g1209">
+    <g
+       transform="scale(1.5)"
+       id="g1207">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1201" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1205">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1203">sol</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,67.895192)"
+     id="g1219">
+    <g
+       transform="scale(1.5)"
+       id="g1217">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1211" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1215">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1213">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,72.65625,97.426442)"
+     id="g1237">
+    <g
+       transform="scale(1.5)"
+       id="g1235">
+      <path
+         d="m -42.166666,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -72.666666 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4.740083,-1.918517 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1221" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1225">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan1223">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1229">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1227">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1233">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan1231">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,97.426442)"
+     id="g1247">
+    <g
+       transform="scale(1.5)"
+       id="g1245">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1239" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1243">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1241">mi</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,126.95769)"
+     id="g1257">
+    <g
+       transform="scale(1.5)"
+       id="g1255">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1249" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1253">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1251">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,72.65625,156.48894)"
+     id="g1275">
+    <g
+       transform="scale(1.5)"
+       id="g1273">
+      <path
+         d="m -42.166666,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -72.666666 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1259" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1263">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan1261">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1267">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1265">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1271">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan1269">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,156.48894)"
+     id="g1285">
+    <g
+       transform="scale(1.5)"
+       id="g1283">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1277" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1281">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1279">re</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,141.5625,186.02019)"
+     id="g1295">
+    <g
+       transform="scale(1.5)"
+       id="g1293">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1287" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1291">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1289">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,14.65625,215.55145)"
+     id="g1313">
+    <g
+       transform="scale(1.5)"
+       id="g1311">
+      <path
+         d="m -0.92222221,8.5 v -4 c 0,-2.209139 1.790861,-4 4.00000001,-4 h 4 v 2 H 17.077778 v -2 h 41.983745 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -41.983745 -1 v 2 H 8.0777778 v -2 h -1 -4 c -2.20913901,0 -4.00000001,-1.790861 -4.00000001,-4 v -4 -21 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1297" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1301">
+        <tspan
+           x="56.894855"
+           y="24"
+           id="tspan1299">Ritmo</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1305">
+        <tspan
+           x="56.894855"
+           y="11.25"
+           id="tspan1303">número de notas</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1309">
+        <tspan
+           x="56.894855"
+           y="32.25"
+           id="tspan1307">valor de nota</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,98.414647,215.55145)"
+     id="g1323">
+    <g
+       transform="scale(1.5)"
+       id="g1321">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1315" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1319">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1317">3</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,98.414647,245.0827)"
+     id="g1341">
+    <g
+       transform="scale(1.5)"
+       id="g1339">
+      <path
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1325" />
+      <text
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1329">
+        <tspan
+           x="54.333332"
+           y="23.799999"
+           id="tspan1327">/</tspan>
+      </text>
+      <text
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1333">
+        <tspan
+           x="54.333332"
+           y="10.75"
+           id="tspan1331" />
+      </text>
+      <text
+         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1337">
+        <tspan
+           x="54.333332"
+           y="31.75"
+           id="tspan1335" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,178.5709,245.0827)"
+     id="g1351">
+    <g
+       transform="scale(1.5)"
+       id="g1349">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1343" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1347">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1345">1</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="matrix(0.93750001,0,0,0.93750001,178.5709,274.61395)"
+     id="g1361">
+    <g
+       transform="scale(1.5)"
+       id="g1359">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1353" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1357">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1355">4</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

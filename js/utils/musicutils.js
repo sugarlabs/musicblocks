@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -258,6 +258,8 @@ const SELECTORSTRINGS = [
     _('scalar'),
     _('piano'),
     _('violin'),
+    _('xylophone'),
+    _('vibraphone'),
     _('cello'),
     _('bass'),
     _('guitar'),
@@ -285,6 +287,8 @@ const SELECTORSTRINGS = [
     _('hi hat'),
     _('ride bell'),
     _('cow bell'),
+    _('japanese drum'),
+    // _('japanese bell'),
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),
@@ -478,12 +482,12 @@ var OSCTYPES = [
 ];
 
 var TEMPERAMENTS = [
-    [_('equal'), 'equal'],
-    [_('just intonation'), 'just intonation'],
-    [_('Pythagorean'), 'Pythagorean'],
-    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
-    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
-    [_('custom'), 'custom'],
+  [_('equal'), 'equal', 'equal'],
+  [_('just intonation'), 'just intonation', 'just intonation'],
+  [_('Pythagorean'), 'Pythagorean', 'Pythagorean'],
+  [_('meantone') +  ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+  [_('meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
+  [_('custom'), 'custom', 'custom'],
 
 ];
 
@@ -703,6 +707,27 @@ function getModeNumbers(name) {
 
     console.log(name + ' not found in MUSICALMODES');
     return '';
+};
+
+
+function getDrumIndex(name) {
+    if (name === '') {
+        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
+        name = DEFAULTDRUM;
+    } else if (name.slice(0, 4) === 'http') {
+        name = DEFAULTDRUM;
+    }
+
+    for (var drum = 0; drum < DRUMNAMES.length; drum++) {
+        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+            return drum;
+        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
+            return drum;
+        }
+    }
+
+    // console.log(name + ' not found in DRUMNAMES');
+    return -1;
 };
 
 
@@ -1485,20 +1510,22 @@ function calcNoteValueToDisplay(a, b, scale) {
         var cellScale = scale;
     }
 
-    if (NOTESYMBOLS != undefined && noteValue in NOTESYMBOLS) {
-        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValue] + '" height=' + (MATRIXBUTTONHEIGHT / 2) + '>';
+    if (noteValue in NSYMBOLS) {
+        noteValueToDisplay = '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + NSYMBOLS[noteValue];
     } else {
         noteValueToDisplay = reducedFraction(b, a);
     }
 
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
-        if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> .';
+        if (noteValueToDisplay in NSYMBOLS) {
+            var value =  b / a * noteValueToDisplay;
+            noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
-            if (NOTESYMBOLS != undefined && noteValueToDisplay in NOTESYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + '<img src="' + NOTESYMBOLS[noteValueToDisplay] + '" height=' + (MATRIXBUTTONHEIGHT / 2) * cellScale + '> ..';
+            if (noteValueToDisplay in NSYMBOLS) {
+                var value = b / a * noteValueToDisplay;
+                noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '..';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
@@ -2002,8 +2029,8 @@ function reducedFraction(a, b) {
     }
 
     var gcm = greatestCommonMultiple(a, b);
-    if (NOTESYMBOLS != undefined && [1, 2, 4, 8, 16, 32, 64].indexOf(b/gcm) !== -1) {
-        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><img src=' + NOTESYMBOLS[b / gcm] + '>';
+    if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
+        return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br>' + NSYMBOLS[b / gcm];
     } else {
         return (a / gcm) + '<br>&mdash;<br>' + (b / gcm) + '<br><br>';
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -86,6 +86,7 @@ function StatusMatrix() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -101,6 +102,7 @@ function StatusMatrix() {
         };
 
         statusDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -116,7 +118,6 @@ function StatusMatrix() {
         };
 
         statusDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

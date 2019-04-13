@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018 Walter Bender
+// Copyright (c) 2016-2019 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -375,7 +375,7 @@ function PitchStaircase () {
         }
 
         this._logo.refreshCanvas();
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': 'stair'}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
@@ -584,6 +584,7 @@ function PitchStaircase () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -599,6 +600,7 @@ function PitchStaircase () {
         };
 
         pscDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -614,7 +616,6 @@ function PitchStaircase () {
         };
 
         pscDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

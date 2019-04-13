@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 Walter Bender
+// Copyright (c) 2014-2019 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -2108,18 +2108,28 @@ function Turtles () {
         var blkInfoAvailable = false;
 
         if (typeof (infoDict) === 'object') {
-            if (Object.keys(infoDict).length === 8) {
+            if (Object.keys(infoDict).length > 0) {
                 blkInfoAvailable = true;
             }
         }
 
         var i = this.turtleList.length;
-        var turtleName = i.toString();
+        if (blkInfoAvailable && 'name' in infoDict) {
+            turtleName = infoDict['name'];
+        } else {
+            var turtleName = _('start'); // i.toString();
+        }
+
         var newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
-            newTurtle.x = infoDict['xcor'];
-            newTurtle.y = infoDict['ycor'];
+            if ('xcor' in infoDict) {
+                newTurtle.x = infoDict['xcor'];
+            }
+
+            if ('ycor' in infoDict) {
+                newTurtle.y = infoDict['ycor'];
+            }
         }
 
         this.turtleList.push(newTurtle);
@@ -2254,13 +2264,31 @@ function Turtles () {
 
         setTimeout(function () {
             if (blkInfoAvailable) {
-                newTurtle.doSetHeading(infoDict['heading']);
-                newTurtle.doSetPensize(infoDict['pensize']);
-                newTurtle.doSetChroma(infoDict['grey']);
-                newTurtle.doSetValue(infoDict['shade']);
-                newTurtle.doSetColor(infoDict['color']);
+                if ('heading' in infoDict) {
+                    newTurtle.doSetHeading(infoDict['heading']);
+                }
+
+                if ('pensize' in infoDict) {
+                    newTurtle.doSetPensize(infoDict['pensize']);
+                }
+
+                if ('grey' in infoDict) {
+                    newTurtle.doSetChroma(infoDict['grey']);
+                }
+
+                if ('shade' in infoDict) {
+                    newTurtle.doSetValue(infoDict['shade']);
+                }
+
+                if ('color' in infoDict) {
+                    newTurtle.doSetColor(infoDict['color']);
+                }
+
+                if ('name' in infoDict) {
+                    newTurtle.rename(infoDict['name'])
+                }
             }
-        }, 1000);
+        }, 6000);
 
         this.refreshCanvas();
     };

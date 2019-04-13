@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3641"
+   height="396.84308"
+   width="258.5"
+   version="1.1">
+  <metadata
+     id="metadata3670">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3668" />
+  <text
+     y="-424.2294"
+     x="1311.9385"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3057">
+    <tspan
+       id="tspan3059"
+       y="-401.72937"
+       x="1405.9385" />
+  </text>
+  <g
+     transform="translate(0,0.42153745)"
+     id="g930">
+    <g
+       transform="scale(1.5)"
+       id="g928">
+      <path
+         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 95.25423 4 c 2.20914,0 4.69859,1.9042267 4,4 v 4 4 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 189 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path922" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text926">
+        <tspan
+           x="5.3333335"
+           y="21.5"
+           id="tspan924">mapa do tom de bateria</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(81.5,40.921537)"
+     id="g948">
+    <g
+       transform="scale(1.5)"
+       id="g946">
+      <path
+         d="m -44.833333,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -75.333333 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path932" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text936">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan934">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text940">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan938">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text944">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan942">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,40.921537)"
+     id="g958">
+    <g
+       transform="scale(1.5)"
+       id="g956">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path950" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text954">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan952">sol</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,72.421537)"
+     id="g968">
+    <g
+       transform="scale(1.5)"
+       id="g966">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path960" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text964">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan962">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(81.5,103.92154)"
+     id="g986">
+    <g
+       transform="scale(1.5)"
+       id="g984">
+      <path
+         d="m -44.833333,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -75.333333 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4.698591,-1.904227 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path970" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text974">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan972">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text978">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan976">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text982">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan980">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,103.92154)"
+     id="g996">
+    <g
+       transform="scale(1.5)"
+       id="g994">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path988" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text992">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan990">mi</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,135.42154)"
+     id="g1006">
+    <g
+       transform="scale(1.5)"
+       id="g1004">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path998" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1002">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1000">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(81.5,166.92154)"
+     id="g1024">
+    <g
+       transform="scale(1.5)"
+       id="g1022">
+      <path
+         d="m -44.833333,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -75.333333 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4.698591,-1.904227 -4,-4 v -4 -21 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1008" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1012">
+        <tspan
+           x="46.333332"
+           y="24"
+           id="tspan1010">determinar o tom</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1016">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1014">nome</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1020">
+        <tspan
+           x="46.333332"
+           y="32.25"
+           id="tspan1018">oitava</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,166.92154)"
+     id="g1034">
+    <g
+       transform="scale(1.5)"
+       id="g1032">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1026" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1030">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1028">re</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(155,198.42154)"
+     id="g1044">
+    <g
+       transform="scale(1.5)"
+       id="g1042">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1036" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1040">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1038">4</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(13.5,229.92154)"
+     id="g1058">
+    <g
+       transform="scale(1.5)"
+       id="g1056">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1046" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1050">
+        <tspan
+           x="46.333332"
+           y="13.5"
+           id="tspan1048">bateria</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1054">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1052" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(87,229.92154)"
+     id="g1068">
+    <g
+       transform="scale(1.5)"
+       id="g1066">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1060" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1064">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1062">bumbo</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(13.5,261.42154)"
+     id="g1082">
+    <g
+       transform="scale(1.5)"
+       id="g1080">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1070" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1074">
+        <tspan
+           x="46.333332"
+           y="13.5"
+           id="tspan1072">bateria</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1078">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1076" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(87,261.42154)"
+     id="g1092">
+    <g
+       transform="scale(1.5)"
+       id="g1090">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1084" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1088">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1086">tom tom</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(13.5,324.42154)"
+     id="g1106">
+    <g
+       transform="scale(1.5)"
+       id="g1104">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1094" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1098">
+        <tspan
+           x="46.333332"
+           y="13.5"
+           id="tspan1096">bateria</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1102">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1100" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(87,324.42154)"
+     id="g1116">
+    <g
+       transform="scale(1.5)"
+       id="g1114">
+      <path
+         d="m 8.5,0.5 h 84 v 20 h -84 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1108" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1112">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1110">sino triângular</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(13.5,292.92154)"
+     id="g1192">
+    <g
+       transform="scale(1.5)"
+       id="g1190">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1180" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1184">
+        <tspan
+           x="46.333332"
+           y="13.5"
+           id="tspan1182">bateria</tspan>
+      </text>
+      <text
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
+         id="text1188">
+        <tspan
+           x="46.333332"
+           y="11.25"
+           id="tspan1186" />
+      </text>
+    </g>
+  </g>
+  <g
+     transform="translate(87,292.92154)"
+     id="g1202">
+    <g
+       transform="scale(1.5)"
+       id="g1200">
+      <path
+         d="m 8.5,0.5 h 77.333333 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1194" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
+         id="text1198">
+        <tspan
+           x="13.333333"
+           y="13.833333"
+           id="tspan1196">pequeno sino</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

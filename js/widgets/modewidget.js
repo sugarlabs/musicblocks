@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -59,6 +59,7 @@ function ModeWidget() {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
+            that._logo.resetSynth(0);
             that._playAll();
         }
 
@@ -131,6 +132,7 @@ function ModeWidget() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -146,6 +148,7 @@ function ModeWidget() {
         };
 
         modeDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -161,7 +164,6 @@ function ModeWidget() {
         };
 
         modeDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
@@ -817,7 +819,7 @@ function ModeWidget() {
         }
 
         // Save a stack of pitches to be used with the matrix.
-        var newStack = [[0, ['action', {'collapsed': false}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': modeName}], 0, 0, [0]]];
+        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': modeName}], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 

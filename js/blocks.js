@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -2033,7 +2033,11 @@ function Blocks (activity) {
             var label = _(TEMPERAMENTS[0][1]);  // equal by default
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
                 if (TEMPERAMENTS[i][1] === myBlock.value) {
-                    label = TEMPERAMENTS[i][0];
+                    if (TEMPERAMENTS[i][0].length === 0) {
+                        label = TEMPERAMENTS[i][2];
+                    } else {
+                        label = TEMPERAMENTS[i][0];
+                    }
                     break;
                 }
             }
@@ -5142,6 +5146,10 @@ function Blocks (activity) {
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
+                    if (['simple 1', 'simple 2', 'simple 3', 'simple 4'].indexOf(value) !== -1) {
+                        value = 'sine';
+                    }
+
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
                 };
