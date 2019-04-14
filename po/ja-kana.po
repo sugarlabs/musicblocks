@@ -12,6 +12,12 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "bassoon"
+msgstr "バスーン"
+
+msgid "celeste"
+msgstr "セレスタ"
+
 msgid "Take a tour"
 msgstr "ツアーを はじめよう"
 
