@@ -51,6 +51,10 @@ var VOICENAMES = [
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('bassoon'), 'bassoon', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('celeste'), 'celeste', 'images/voices.svg', 'string'],
     //.TRANS: xylophone musical instrument
     [_('xylophone'), 'xylophone', 'images/8_bellset_key_6.svg', 'precussion'],
     //.TRANS: polytone synthesizer
@@ -149,6 +153,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
+    "samples/bassoon", "samples/celeste",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
     "samples/japanese_drum", // "samples/japanese_bell",
@@ -202,6 +207,8 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'bassoon': ['D4', 41],  // pitchToNumber('C', 5, 'C Major')],
+    'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
 };
@@ -479,12 +486,14 @@ function Synth() {
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-                {'name': 'banjo', 'data': BANJO_SAMPLE},
-                {'name': 'koto', 'data': KOTO_SAMPLE},
-                {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'banjo', 'data': BANJO_SAMPLE},
+		{'name': 'koto', 'data': KOTO_SAMPLE},
+		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
+		{'name': 'celeste', 'data': CELESTE_SAMPLE},
 		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
 		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
-                {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
