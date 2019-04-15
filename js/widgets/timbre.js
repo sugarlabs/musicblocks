@@ -552,6 +552,17 @@ function TimbreWidget () {
             effectsButtonCell.style.backgroundColor = platformColor.selectorBackground;
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
+         
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick = function () {
+            docById('timbreDiv').style.visibility = 'hidden';
+            docById('timbreButtonsDiv').style.visibility = 'hidden';
+            docById('timbreTableDiv').style.visibility = 'hidden';
+            docById('timbreName').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
+        }
+
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
@@ -564,15 +575,7 @@ function TimbreWidget () {
             that._save();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-
-        cell.onclick = function () {
-            docById('timbreDiv').style.visibility = 'hidden';
-            docById('timbreButtonsDiv').style.visibility = 'hidden';
-            docById('timbreTableDiv').style.visibility = 'hidden';
-            docById('timbreName').classList.remove('hasKeyboard');
-            that._logo.hideMsgs();
-        }
+       
 
         var cell = row.insertCell();
         cell.innerHTML = '<input id="timbreName" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="timbreName" type="text" value="' + this.instrumentName + '" />';

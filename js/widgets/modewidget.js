@@ -56,6 +56,16 @@ function ModeWidget() {
         // For the button callbacks
         var that = this;
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
@@ -70,15 +80,7 @@ function ModeWidget() {
 
 
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-
-        cell.onclick=function() {
-            docById('modeDiv').style.visibility = 'hidden';
-            docById('modeButtonsDiv').style.visibility = 'hidden';
-            docById('modeTableDiv').style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
-
+       
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {

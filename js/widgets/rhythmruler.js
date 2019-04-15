@@ -1436,23 +1436,6 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
-        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
-
-        this._playAllCell.onclick = function () {
-            if (that._playing) {
-                that.__pause();
-            }
-            else if (!that._playingAll) {
-                that.__resume();
-            }
-        };
-
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
-        cell.onclick = function () {
-            // that._save(0);
-            that._saveTuplets(0);
-        };
-
 
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
@@ -1499,6 +1482,26 @@ function RhythmRuler () {
             that._playingAll = false;
             that._logo.hideMsgs();
         };
+
+
+
+        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
+
+        this._playAllCell.onclick = function () {
+            if (that._playing) {
+                that.__pause();
+            }
+            else if (!that._playingAll) {
+                that.__resume();
+            }
+        };
+
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
+        cell.onclick = function () {
+            // that._save(0);
+            that._saveTuplets(0);
+        };
+
 
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
