@@ -502,6 +502,17 @@ function PitchStaircase () {
         cell.onclick=function() {
             that._save(0);
         };
+      
+        
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick=function() {
+            docById('pscDiv').style.visibility = 'hidden';
+            docById('pscButtonsDiv').style.visibility = 'hidden';
+            docById('pscTableDiv').style.visibility = 'hidden';
+            docById('musicratio1').classList.remove('hasKeyboard');
+            docById('musicratio2').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
+        };
 
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
@@ -542,15 +553,15 @@ function PitchStaircase () {
 	    }
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            docById('pscDiv').style.visibility = 'hidden';
-            docById('pscButtonsDiv').style.visibility = 'hidden';
-            docById('pscTableDiv').style.visibility = 'hidden';
-            docById('musicratio1').classList.remove('hasKeyboard');
-            docById('musicratio2').classList.remove('hasKeyboard');
-            that._logo.hideMsgs();
-        };
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick=function() {
+        //     docById('pscDiv').style.visibility = 'hidden';
+        //     docById('pscButtonsDiv').style.visibility = 'hidden';
+        //     docById('pscTableDiv').style.visibility = 'hidden';
+        //     docById('musicratio1').classList.remove('hasKeyboard');
+        //     docById('musicratio2').classList.remove('hasKeyboard');
+        //     that._logo.hideMsgs();
+        // };
 
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;

@@ -69,6 +69,17 @@ function ModeWidget() {
             that._save();
         }
 
+
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
@@ -99,14 +110,14 @@ function ModeWidget() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
-            docById('modeDiv').style.visibility = 'hidden';
-            docById('modeButtonsDiv').style.visibility = 'hidden';
-            docById('modeTableDiv').style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        // cell.onclick=function() {
+        //     docById('modeDiv').style.visibility = 'hidden';
+        //     docById('modeButtonsDiv').style.visibility = 'hidden';
+        //     docById('modeTableDiv').style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
