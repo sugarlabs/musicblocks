@@ -178,6 +178,22 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick=function() {
+            that._rowOffset = [];
+            for (var i = 0; i < that._rowMap.length; i++) {
+                that._rowMap[i] = i;
+            }
+
+            that._logo.synth.stopSound(0, that._instrumentName);
+            that._logo.synth.stop();
+            that._stopOrCloseClicked = true;
+            ptmTableDiv.style.visibility = 'hidden';
+            ptmButtonsDiv.style.visibility = 'hidden';
+            ptmDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
@@ -190,6 +206,7 @@ function PitchTimeMatrix () {
         cell.onclick=function() {
             that._save();
         }
+        
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {
@@ -208,21 +225,21 @@ function PitchTimeMatrix () {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            that._rowOffset = [];
-            for (var i = 0; i < that._rowMap.length; i++) {
-                that._rowMap[i] = i;
-            }
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick=function() {
+        //     that._rowOffset = [];
+        //     for (var i = 0; i < that._rowMap.length; i++) {
+        //         that._rowMap[i] = i;
+        //     }
 
-            that._logo.synth.stopSound(0, that._instrumentName);
-            that._logo.synth.stop();
-            that._stopOrCloseClicked = true;
-            ptmTableDiv.style.visibility = 'hidden';
-            ptmButtonsDiv.style.visibility = 'hidden';
-            ptmDiv.style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        //     that._logo.synth.stopSound(0, that._instrumentName);
+        //     that._logo.synth.stop();
+        //     that._stopOrCloseClicked = true;
+        //     ptmTableDiv.style.visibility = 'hidden';
+        //     ptmButtonsDiv.style.visibility = 'hidden';
+        //     ptmDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));

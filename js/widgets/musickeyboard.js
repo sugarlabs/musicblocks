@@ -182,6 +182,23 @@ function MusicKeyboard() {
             }
         // }
 
+
+        var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+
+        cell.onclick = function() {
+            mkbDiv.style.visibility = 'hidden';
+            mkbButtonsDiv.style.visibility = 'hidden';
+            document.getElementById('keyboardHolder').style.display = 'none';
+            document.getElementById('keyboardHolder2').style.display = 'none';
+            var myNode = document.getElementById('myrow');
+            myNode.innerHTML = '';
+            var myNode = document.getElementById('myrow2');
+            myNode.innerHTML = '';
+            selected = [];
+            selected1 = [];
+        };
+
+
         var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick = function() {
@@ -215,6 +232,8 @@ function MusicKeyboard() {
             }
         };
 
+
+    
         var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
@@ -222,20 +241,6 @@ function MusicKeyboard() {
             selected1 = [];
         };
 
-        var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
-
-        cell.onclick = function() {
-            mkbDiv.style.visibility = 'hidden';
-            mkbButtonsDiv.style.visibility = 'hidden';
-            document.getElementById('keyboardHolder').style.display = 'none';
-            document.getElementById('keyboardHolder2').style.display = 'none';
-            var myNode = document.getElementById('myrow');
-            myNode.innerHTML = '';
-            var myNode = document.getElementById('myrow2');
-            myNode.innerHTML = '';
-            selected = [];
-            selected1 = [];
-        };
 
         var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';

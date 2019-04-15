@@ -1436,6 +1436,55 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+
+        cell.onclick = function () {
+            // If the piemenu was open, close it.
+            // docById('wheelDiv').style.display = 'none';
+            // docById('contextWheelDiv').style.display = 'none';
+
+            // Save the new dissect history.
+            var dissectHistory = [];
+            var drums = [];
+            for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
+                var history = [];
+                for (var j = 0; j < that.Rulers[i][1].length; j++) {
+                    history.push(that.Rulers[i][1][j]);
+                }
+
+                docById('dissectNumber').classList.add('hasKeyboard');
+                dissectHistory.push([history, that.Drums[i]]);
+                drums.push(that.Drums[i]);
+            }
+
+            // Look for any old entries that we may have missed.
+            for (var i = 0; i < that._dissectHistory.length; i++) {
+                var drum = that._dissectHistory[i][1];
+                if (drums.indexOf(drum) === -1) {
+                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+                    dissectHistory.push([history, drum]);
+                }
+            }
+
+            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
+            rulerTableDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            rulerDiv.style.visibility = 'hidden';
+
+            that._playing = false;
+            that._playingOne = false;
+            that._playingAll = false;
+            that._logo.hideMsgs();
+        };
+
+
+
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
 
         this._playAllCell.onclick = function () {
@@ -1452,6 +1501,8 @@ function RhythmRuler () {
             // that._save(0);
             that._saveTuplets(0);
         };
+
+
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
@@ -1509,51 +1560,51 @@ function RhythmRuler () {
             that._clear();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+        // var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
-        cell.onclick = function () {
-            // If the piemenu was open, close it.
-            // docById('wheelDiv').style.display = 'none';
-            // docById('contextWheelDiv').style.display = 'none';
+        // cell.onclick = function () {
+        //     // If the piemenu was open, close it.
+        //     // docById('wheelDiv').style.display = 'none';
+        //     // docById('contextWheelDiv').style.display = 'none';
 
-            // Save the new dissect history.
-            var dissectHistory = [];
-            var drums = [];
-            for (var i = 0; i < that.Rulers.length; i++) {
-                if (that.Drums[i] === null) {
-                    continue;
-                }
+        //     // Save the new dissect history.
+        //     var dissectHistory = [];
+        //     var drums = [];
+        //     for (var i = 0; i < that.Rulers.length; i++) {
+        //         if (that.Drums[i] === null) {
+        //             continue;
+        //         }
 
-                var history = [];
-                for (var j = 0; j < that.Rulers[i][1].length; j++) {
-                    history.push(that.Rulers[i][1][j]);
-                }
+        //         var history = [];
+        //         for (var j = 0; j < that.Rulers[i][1].length; j++) {
+        //             history.push(that.Rulers[i][1][j]);
+        //         }
 
-                docById('dissectNumber').classList.add('hasKeyboard');
-                dissectHistory.push([history, that.Drums[i]]);
-                drums.push(that.Drums[i]);
-            }
+        //         docById('dissectNumber').classList.add('hasKeyboard');
+        //         dissectHistory.push([history, that.Drums[i]]);
+        //         drums.push(that.Drums[i]);
+        //     }
 
-            // Look for any old entries that we may have missed.
-            for (var i = 0; i < that._dissectHistory.length; i++) {
-                var drum = that._dissectHistory[i][1];
-                if (drums.indexOf(drum) === -1) {
-                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
-                    dissectHistory.push([history, drum]);
-                }
-            }
+        //     // Look for any old entries that we may have missed.
+        //     for (var i = 0; i < that._dissectHistory.length; i++) {
+        //         var drum = that._dissectHistory[i][1];
+        //         if (drums.indexOf(drum) === -1) {
+        //             var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+        //             dissectHistory.push([history, drum]);
+        //         }
+        //     }
 
-            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+        //     that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
 
-            rulerTableDiv.style.visibility = 'hidden';
-            widgetButtonsDiv.style.visibility = 'hidden';
-            rulerDiv.style.visibility = 'hidden';
+        //     rulerTableDiv.style.visibility = 'hidden';
+        //     widgetButtonsDiv.style.visibility = 'hidden';
+        //     rulerDiv.style.visibility = 'hidden';
 
-            that._playing = false;
-            that._playingOne = false;
-            that._playingAll = false;
-            that._logo.hideMsgs();
-        };
+        //     that._playing = false;
+        //     that._playingOne = false;
+        //     that._playingAll = false;
+        //     that._logo.hideMsgs();
+        // };
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');

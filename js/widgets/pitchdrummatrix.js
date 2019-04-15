@@ -122,6 +122,17 @@ function PitchDrumMatrix() {
         // For the button callbacks
         var that = this;
 
+
+        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            pdmDiv.style.visibility = 'hidden';
+            pdmButtonsDiv.style.visibility = 'hidden';
+            pdmTableDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick=function() {
@@ -135,20 +146,21 @@ function PitchDrumMatrix() {
             that._save();
         }
 
+
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._clear();
         }
 
-        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
-            pdmDiv.style.visibility = 'hidden';
-            pdmButtonsDiv.style.visibility = 'hidden';
-            pdmTableDiv.style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        // cell.onclick=function() {
+        //     pdmDiv.style.visibility = 'hidden';
+        //     pdmButtonsDiv.style.visibility = 'hidden';
+        //     pdmTableDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
