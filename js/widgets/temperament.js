@@ -1593,19 +1593,6 @@ function TemperamentWidget () {
         row.id = 'buttonsRow';
 
         var that = this;
-        this._playing = false;
-
-        temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
-        temperamentCell.style.width = (2 * BUTTONSIZE) + 'px';
-        temperamentCell.style.minWidth = temperamentCell.style.width;
-        temperamentCell.style.maxWidth = temperamentCell.style.width;
-        temperamentCell.style.height = BUTTONSIZE + 'px';
-        temperamentCell.style.minHeight = temperamentCell.style.height;
-        temperamentCell.style.maxHeight = temperamentCell.style.height;
-        temperamentCell.style.textAlign = 'center';
-        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
-
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick = function () {
             that._logo.synth.setMasterVolume(0);
@@ -1626,6 +1613,21 @@ function TemperamentWidget () {
                 that.wheel1.removeWheel();  
             }
         };
+
+        this._playing = false;
+
+        temperamentCell = row.insertCell();
+        temperamentCell.innerHTML = this.inTemperament;
+        temperamentCell.style.width = (2 * BUTTONSIZE) + 'px';
+        temperamentCell.style.minWidth = temperamentCell.style.width;
+        temperamentCell.style.maxWidth = temperamentCell.style.width;
+        temperamentCell.style.height = BUTTONSIZE + 'px';
+        temperamentCell.style.minHeight = temperamentCell.style.height;
+        temperamentCell.style.maxHeight = temperamentCell.style.height;
+        temperamentCell.style.textAlign = 'center';
+        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+
+       
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
