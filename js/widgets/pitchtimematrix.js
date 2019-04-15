@@ -178,19 +178,6 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-        cell.onclick=function() {
-            that._logo.setTurtleDelay(0);
-
-            that._logo.resetSynth(0);
-            that.playAll(row);
-        }
-
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-        cell.onclick=function() {
-            that._save();
-        }
-         
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
         cell.onclick=function() {
             that._rowOffset = [];
@@ -207,6 +194,19 @@ function PitchTimeMatrix () {
             that._logo.hideMsgs();
         }
 
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
+        cell.onclick=function() {
+            that._logo.setTurtleDelay(0);
+
+            that._logo.resetSynth(0);
+            that.playAll(row);
+        }
+
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
+        cell.onclick=function() {
+            that._save();
+        }
+        
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {

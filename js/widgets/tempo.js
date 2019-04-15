@@ -223,6 +223,14 @@ function Tempo () {
         // For the button callbacks
         var that = this;
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            that.hide();
+            that._logo.hideMsgs();
+        };
+
+
         var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('Pause'));
 
         cell.onclick=function() {
@@ -245,12 +253,12 @@ function Tempo () {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
-            that.hide();
-            that._logo.hideMsgs();
-        };
+        // cell.onclick=function() {
+        //     that.hide();
+        //     that._logo.hideMsgs();
+        // };
 
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;

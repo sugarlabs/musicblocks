@@ -1593,6 +1593,27 @@ function TemperamentWidget () {
         row.id = 'buttonsRow';
 
         var that = this;
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick = function () {
+            that._logo.synth.setMasterVolume(0);
+            that._logo.synth.stop();
+            docById('temperamentDiv').style.visibility = 'hidden';
+            docById('temperamentButtonsDiv').style.visibility = 'hidden';
+            docById('temperamentTableDiv').style.visibility = 'hidden';
+            if (docById('wheelDiv2') != null) {
+                docById('wheelDiv2').style.display = 'none';
+                that.notesCircle.removeWheel();
+            }
+            if (docById('wheelDiv3') != null) {
+                docById('wheelDiv3').style.display = 'none';
+                that.wheel.removeWheel();  
+            }
+            if (docById('wheelDiv4') != null) {
+                docById('wheelDiv4').style.display = 'none';
+                that.wheel1.removeWheel();  
+            }
+        };
+
         this._playing = false;
 
         temperamentCell = row.insertCell();
@@ -1606,6 +1627,8 @@ function TemperamentWidget () {
         temperamentCell.style.textAlign = 'center';
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
+       
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick = function(event) {
@@ -1617,6 +1640,7 @@ function TemperamentWidget () {
         cell.onclick = function() {
             that._save();
         };
+     
 
         var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Table'));
 
@@ -1703,26 +1727,26 @@ function TemperamentWidget () {
             that.edit();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick = function () {
-            that._logo.synth.setMasterVolume(0);
-            that._logo.synth.stop();
-            docById('temperamentDiv').style.visibility = 'hidden';
-            docById('temperamentButtonsDiv').style.visibility = 'hidden';
-            docById('temperamentTableDiv').style.visibility = 'hidden';
-            if (docById('wheelDiv2') != null) {
-                docById('wheelDiv2').style.display = 'none';
-                that.notesCircle.removeWheel();
-            }
-            if (docById('wheelDiv3') != null) {
-                docById('wheelDiv3').style.display = 'none';
-                that.wheel.removeWheel();  
-            }
-            if (docById('wheelDiv4') != null) {
-                docById('wheelDiv4').style.display = 'none';
-                that.wheel1.removeWheel();  
-            }
-        };
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick = function () {
+        //     that._logo.synth.setMasterVolume(0);
+        //     that._logo.synth.stop();
+        //     docById('temperamentDiv').style.visibility = 'hidden';
+        //     docById('temperamentButtonsDiv').style.visibility = 'hidden';
+        //     docById('temperamentTableDiv').style.visibility = 'hidden';
+        //     if (docById('wheelDiv2') != null) {
+        //         docById('wheelDiv2').style.display = 'none';
+        //         that.notesCircle.removeWheel();
+        //     }
+        //     if (docById('wheelDiv3') != null) {
+        //         docById('wheelDiv3').style.display = 'none';
+        //         that.wheel.removeWheel();  
+        //     }
+        //     if (docById('wheelDiv4') != null) {
+        //         docById('wheelDiv4').style.display = 'none';
+        //         that.wheel1.removeWheel();  
+        //     }
+        // };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
