@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1452,62 +1452,7 @@ function RhythmRuler () {
             // that._save(0);
             that._saveTuplets(0);
         };
-
-        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
-        cell.onclick = function () {
-            that._saveMachine(0);
-        };
-
-        // An input for setting the dissect number
-        var cell = row.insertCell();
-        cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dissectNumber" value="' + 2 + '" />';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        var numberInput = docById('dissectNumber');
-
-        numberInput.onfocus = function (event) {
-            // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
-        };
-
-        numberInput.onkeydown = function (event) {
-            if (event.keyCode === DEL) {
-                numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
-            }   
-        };
-
-        numberInput.oninput = function (event) {
-            // Put a limit on the size (2 <--> 128).
-            numberInput.onmouseout = function(){
-                if (numberInput.value < 2) {
-                    numberInput.value = 2;
-                } 
-            };
-
-            if (numberInput.value > 128) {
-                numberInput.value = 128;
-            }
-        };
-
-        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
-        cell.onclick = function () {
-            that._undo();
-        };
-
-        //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('Tap a rhythm'), '');
-        this._tapButton.onclick = function () {
-            that._tap();
-        };
-
-        //.TRANS: clear all subdivisions from the ruler.
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('Clear'), '');
-        cell.onclick = function () {
-            that._clear();
-        };
+    
 
         var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
@@ -1555,6 +1500,111 @@ function RhythmRuler () {
             that._logo.hideMsgs();
         };
 
+
+
+        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
+        cell.onclick = function () {
+            that._saveMachine(0);
+        };
+
+        // An input for setting the dissect number
+        var cell = row.insertCell();
+        cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dissectNumber" value="' + 2 + '" />';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
+        cell.style.backgroundColor = platformColor.selectorBackground;
+
+        var numberInput = docById('dissectNumber');
+
+        numberInput.onfocus = function (event) {
+            // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
+        };
+
+        numberInput.onkeydown = function (event) {
+            if (event.keyCode === DEL) {
+                numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
+            }   
+        };
+
+        numberInput.oninput = function (event) {
+            // Put a limit on the size (2 <--> 128).
+            numberInput.onmouseout = function(){
+                if (numberInput.value < 2) {
+                    numberInput.value = 2;
+                } 
+            };
+
+            if (numberInput.value > 128) {
+                numberInput.value = 128;
+            }
+        };
+
+
+        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
+        cell.onclick = function () {
+            that._undo();
+        };
+
+        //.TRANS: user can tap out a rhythm by clicking on a ruler.
+        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('Tap a rhythm'), '');
+        this._tapButton.onclick = function () {
+            that._tap();
+        };
+
+        //.TRANS: clear all subdivisions from the ruler.
+        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('Clear'), '');
+        cell.onclick = function () {
+            that._clear();
+        };
+
+        // var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+
+        // cell.onclick = function () {
+        //     // If the piemenu was open, close it.
+        //     // docById('wheelDiv').style.display = 'none';
+        //     // docById('contextWheelDiv').style.display = 'none';
+
+        //     // Save the new dissect history.
+        //     var dissectHistory = [];
+        //     var drums = [];
+        //     for (var i = 0; i < that.Rulers.length; i++) {
+        //         if (that.Drums[i] === null) {
+        //             continue;
+        //         }
+
+        //         var history = [];
+        //         for (var j = 0; j < that.Rulers[i][1].length; j++) {
+        //             history.push(that.Rulers[i][1][j]);
+        //         }
+
+        //         docById('dissectNumber').classList.add('hasKeyboard');
+        //         dissectHistory.push([history, that.Drums[i]]);
+        //         drums.push(that.Drums[i]);
+        //     }
+
+        //     // Look for any old entries that we may have missed.
+        //     for (var i = 0; i < that._dissectHistory.length; i++) {
+        //         var drum = that._dissectHistory[i][1];
+        //         if (drums.indexOf(drum) === -1) {
+        //             var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+        //             dissectHistory.push([history, drum]);
+        //         }
+        //     }
+
+        //     that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
+        //     rulerTableDiv.style.visibility = 'hidden';
+        //     widgetButtonsDiv.style.visibility = 'hidden';
+        //     rulerDiv.style.visibility = 'hidden';
+
+        //     that._playing = false;
+        //     that._playingOne = false;
+        //     that._playingAll = false;
+        //     that._logo.hideMsgs();
+        // };
+
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');
 
@@ -1580,7 +1630,6 @@ function RhythmRuler () {
         };
 
         canvas.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1598,7 +1647,6 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1616,6 +1664,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.onmousedown = function (e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

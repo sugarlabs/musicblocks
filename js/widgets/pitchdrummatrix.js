@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -135,11 +135,6 @@ function PitchDrumMatrix() {
             that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-
-        cell.onclick=function() {
-            that._clear();
-        }
 
         var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
@@ -149,6 +144,22 @@ function PitchDrumMatrix() {
             pdmTableDiv.style.visibility = 'hidden';
             that._logo.hideMsgs();
         }
+
+
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
+
+        cell.onclick=function() {
+            that._clear();
+        }
+
+        // var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
+
+        // cell.onclick=function() {
+        //     pdmDiv.style.visibility = 'hidden';
+        //     pdmButtonsDiv.style.visibility = 'hidden';
+        //     pdmTableDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -174,7 +185,6 @@ function PitchDrumMatrix() {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -190,7 +200,6 @@ function PitchDrumMatrix() {
         };
 
         pdmDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -206,6 +215,7 @@ function PitchDrumMatrix() {
         };
 
         pdmDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

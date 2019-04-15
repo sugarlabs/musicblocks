@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -59,7 +59,6 @@ function ModeWidget() {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
 
         cell.onclick=function() {
-            that._logo.resetSynth(0);
             that._playAll();
         }
 
@@ -67,6 +66,15 @@ function ModeWidget() {
 
         cell.onclick=function() {
             that._save();
+        }
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
@@ -99,14 +107,14 @@ function ModeWidget() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
-            docById('modeDiv').style.visibility = 'hidden';
-            docById('modeButtonsDiv').style.visibility = 'hidden';
-            docById('modeTableDiv').style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        // cell.onclick=function() {
+        //     docById('modeDiv').style.visibility = 'hidden';
+        //     docById('modeButtonsDiv').style.visibility = 'hidden';
+        //     docById('modeTableDiv').style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -132,7 +140,6 @@ function ModeWidget() {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -148,7 +155,6 @@ function ModeWidget() {
         };
 
         modeDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -164,6 +170,7 @@ function ModeWidget() {
         };
 
         modeDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

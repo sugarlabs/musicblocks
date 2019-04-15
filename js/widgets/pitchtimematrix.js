@@ -1,5 +1,5 @@
 // Copyright (c) 2015 Yash Khandelwal
-// Copyright (c) 2015-19 Walter Bender
+// Copyright (c) 2015-18 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -191,6 +191,23 @@ function PitchTimeMatrix () {
             that._save();
         }
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick=function() {
+            that._rowOffset = [];
+            for (var i = 0; i < that._rowMap.length; i++) {
+                that._rowMap[i] = i;
+            }
+
+            that._logo.synth.stopSound(0, that._instrumentName);
+            that._logo.synth.stop();
+            that._stopOrCloseClicked = true;
+            ptmTableDiv.style.visibility = 'hidden';
+            ptmButtonsDiv.style.visibility = 'hidden';
+            ptmDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
+
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {
             that._clear();
@@ -208,21 +225,21 @@ function PitchTimeMatrix () {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            that._rowOffset = [];
-            for (var i = 0; i < that._rowMap.length; i++) {
-                that._rowMap[i] = i;
-            }
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick=function() {
+        //     that._rowOffset = [];
+        //     for (var i = 0; i < that._rowMap.length; i++) {
+        //         that._rowMap[i] = i;
+        //     }
 
-            that._logo.synth.stopSound(0, that._instrumentName);
-            that._logo.synth.stop();
-            that._stopOrCloseClicked = true;
-            ptmTableDiv.style.visibility = 'hidden';
-            ptmButtonsDiv.style.visibility = 'hidden';
-            ptmDiv.style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        //     that._logo.synth.stopSound(0, that._instrumentName);
+        //     that._logo.synth.stop();
+        //     that._stopOrCloseClicked = true;
+        //     ptmTableDiv.style.visibility = 'hidden';
+        //     ptmButtonsDiv.style.visibility = 'hidden';
+        //     ptmDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -248,7 +265,6 @@ function PitchTimeMatrix () {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -264,7 +280,6 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -280,6 +295,7 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 
@@ -1262,6 +1278,7 @@ function PitchTimeMatrix () {
 
             // We have an array of pitches and note values.
             var note = this._notesToPlay[this._notesCounter][0];
+            console.log(this._noteStored);
             var pitchNotes = [];
             var synthNotes = [];
             var drumNotes = [];
@@ -1323,8 +1340,7 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._playChord(pitchNotes, this._logo.defaultBPMFactor / noteValue);
-                // this._logo.synth.trigger(0, pitchNotes[0], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
+                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
@@ -1431,11 +1447,10 @@ function PitchTimeMatrix () {
                             }
                         }
                     }
-                }
+                       }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._playChord(pitchNotes, that._logo.defaultBPMFactor / noteValue);
-                    // that._logo.synth.trigger(0, pitchNotes[0], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
+                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
@@ -1471,31 +1486,6 @@ function PitchTimeMatrix () {
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
-    };
-
-    this._playChord = function (notes, noteValue) {
-        var that = this;
-        setTimeout(function() {
-            that._logo.synth.trigger(0, notes[0], noteValue, that._instrumentName, null, null);
-        }, 1);
-
-        if (notes.length > 1) {
-            setTimeout(function() {
-                that._logo.synth.trigger(0, notes[1], noteValue, that._instrumentName, null, null);
-            }, 1);
-        }
-
-        if (notes.length > 2) {
-            setTimeout(function() {
-                that._logo.synth.trigger(0, notes[2], noteValue, that._instrumentName, null, null);
-            }, 1);
-        }
-
-        if (notes.length > 3) {
-            setTimeout(function() {
-                that._logo.synth.trigger(0, notes[3], noteValue, that._instrumentName, null, null);
-            }, 1);
-        }
     };
 
     this._processGraphics = function (obj) {
@@ -1610,7 +1600,9 @@ function PitchTimeMatrix () {
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
+
             this._logo.synth.trigger(0, [Number(obj[1])], noteValue, obj[0], null, null);
+
         }
     };
 
