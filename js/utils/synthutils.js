@@ -51,12 +51,16 @@ var VOICENAMES = [
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('bassoon'), 'bassoon', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('celeste'), 'celeste', 'images/voices.svg', 'string'],
     //.TRANS: xylophone musical instrument
     [_('xylophone'), 'xylophone', 'images/8_bellset_key_6.svg', 'precussion'],
     //.TRANS: polytone synthesizer
     [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
+    // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -105,7 +109,7 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
     //.TRANS: musical instrument
-    [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
+    // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
     //.TRANS: a musical instrument
@@ -149,9 +153,10 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
+    "samples/bassoon", "samples/celeste",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", "samples/japanese_bell",
+    "samples/japanese_drum", // "samples/japanese_bell",
 ]
 
 
@@ -178,9 +183,9 @@ const DEFAULTSYNTHVOLUME = {
     'crash': 90,
     'clap': 90,
     'slap': 60,
-    'vibraphone': 80,
+    'vibraphone': 100,
     'xylophone': 100,
-    'japanese bell': 80,
+    'japanese drum': 90,
 }
 
 
@@ -202,8 +207,10 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'bassoon': ['D4', 41],  // pitchToNumber('C', 5, 'C Major')],
+    'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
-    'xylophone': ['C5', 51],
+    'xylophone': ['C4', 39],
 };
 
 
@@ -479,12 +486,14 @@ function Synth() {
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-                {'name': 'banjo', 'data': BANJO_SAMPLE},
-                {'name': 'koto', 'data': KOTO_SAMPLE},
-                {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'banjo', 'data': BANJO_SAMPLE},
+		{'name': 'koto', 'data': KOTO_SAMPLE},
+		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
+		{'name': 'celeste', 'data': CELESTE_SAMPLE},
 		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
 		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
-                {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -508,7 +517,7 @@ function Synth() {
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
                 {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
-		{'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
+		// {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},

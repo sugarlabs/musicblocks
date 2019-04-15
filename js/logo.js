@@ -3732,6 +3732,8 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {   
+                that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
+                that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
                 that.musicKeyboard.init(that);
             };
 
@@ -4067,7 +4069,7 @@ function Logo () {
                         switch (that.tupletRhythms[i][0]) {
                         case 'notes':
                         case 'simple':
-                            var tupletParam = [that.tupletParams[that.tupletRhythms[i][1]]];
+                            var tupletParam = [that.tupletParams[i]];
                             tupletParam.push([]);
                             for (var j = 2; j < that.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(that.tupletRhythms[i][j]);
@@ -6268,6 +6270,14 @@ function Logo () {
                     that.embeddedGraphics[turtle][saveBlk] = [];
 
                     that._processNote(noteValue, saveBlk, turtle);
+                    if (that.bpm[turtle].length > 0) {
+                        var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                    } else {
+                        var bpmFactor = TONEBPM / that._masterBPM;
+                    }
+
+		    // Wait until this note is played before continuing.
+                    that._doWait(turtle, bpmFactor / noteValue);
 
                     that.inNoteBlock[turtle].pop();
 

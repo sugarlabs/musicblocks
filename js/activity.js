@@ -1367,7 +1367,7 @@ function Activity() {
     };
 
     function getStageY() {
-        return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
     };
 
     function getStageMouseDown() {
@@ -2957,7 +2957,8 @@ function Activity() {
                                 'color': turtle.color,
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
-                                'grey': turtle.chroma
+                                'grey': turtle.chroma,
+                                'name': turtle.name
                             };
                         }
                         break;

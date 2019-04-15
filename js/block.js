@@ -2898,8 +2898,13 @@ function Block(protoblock, blocks, overrideName) {
                 if (beginnerMode && TEMPERAMENTS[i][1] === 'custom') {
                     continue;
                 }
+                
+                if (TEMPERAMENTS[i][0].length === 0) {
+                    temperamentLabels.push(TEMPERAMENTS[i][2]);
+                } else {
+                    temperamentLabels.push(TEMPERAMENTS[i][0]);
+                }
 
-                temperamentLabels.push(TEMPERAMENTS[i][0]);
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
@@ -3177,6 +3182,19 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
+    /**
+     * Keypress handler. Handles exit key (Tab and Enter) press.
+     * @param{Event} KeyPress event object
+     * @returns{void}
+     * @private
+     */
+     this._exitKeyPressed = function(event) {
+        if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+            this._labelChanged(true, false);
+            event.preventDefault();
+            this.label.removeEventListener('keypress', this._exitKeyPressed);
+        }
+    }
     /*
      * Check if pie menu is ok to launch
      * @return{void}
@@ -4016,10 +4034,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
@@ -4205,10 +4223,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
@@ -4388,10 +4406,10 @@ function Block(protoblock, blocks, overrideName) {
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
-        // this.label.addEventListener('keypress', __keypress);
+        this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            that._labelChanged(true, false);
+            that._labelChanged(false, false);
         });
 
         // Position the widget over the note block.
@@ -5355,6 +5373,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.labelattr != null) {
                 this.labelattr.style.display = 'none';
             }
+            docById('wheelDiv').style.display = 'none';
         }
 
         // The pie menu may be visible too, so hide it.
@@ -5497,6 +5516,7 @@ function Block(protoblock, blocks, overrideName) {
         if (closeInput) {
             // and hide the DOM textview...
             this.label.style.display = 'none';
+            docById('wheelDiv').style.display = 'none';
         }
 
         // Make sure text is on top.

@@ -5272,7 +5272,7 @@ msgid "Move down"
 msgstr ""
 
 #: js/pitchslider.js:402
-msgid "Use the slider to change the pitch."
+msgid "Click on the slider to create a note block."
 msgstr ""
 
 #: js/pitchtimematrix.js:200

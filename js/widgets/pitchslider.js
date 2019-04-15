@@ -398,6 +398,6 @@ function PitchSlider() {
             };
         }
 
-        this._logo.textMsg(_('Use the slider to change the pitch.'));
+        this._logo.textMsg(_('Click on the slider to create a note block.'));
     };
 };

@@ -288,7 +288,7 @@ const SELECTORSTRINGS = [
     _('ride bell'),
     _('cow bell'),
     _('japanese drum'),
-    _('japanese bell'),
+    // _('japanese bell'),
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),
@@ -308,6 +308,8 @@ const SELECTORSTRINGS = [
     _('koto'),
     _('dulcimer'),
     _('electric guitar'),
+    _('bassoon'),
+    _('celeste'),
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
@@ -480,12 +482,12 @@ var OSCTYPES = [
 ];
 
 var TEMPERAMENTS = [
-    [_('equal'), 'equal'],
-    [_('just intonation'), 'just intonation'],
-    [_('Pythagorean'), 'Pythagorean'],
-    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
-    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
-    [_('custom'), 'custom'],
+  [_('equal'), 'equal', 'equal'],
+  [_('just intonation'), 'just intonation', 'just intonation'],
+  [_('Pythagorean'), 'Pythagorean', 'Pythagorean'],
+  [_('meantone') +  ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+  [_('meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
+  [_('custom'), 'custom', 'custom'],
 
 ];
 
@@ -1517,11 +1519,13 @@ function calcNoteValueToDisplay(a, b, scale) {
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
         if (noteValueToDisplay in NSYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
+            var value =  b / a * noteValueToDisplay;
+            noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
             if (noteValueToDisplay in NSYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.,';
+                var value = b / a * noteValueToDisplay;
+                noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '..';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }

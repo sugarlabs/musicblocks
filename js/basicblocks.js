@@ -1541,18 +1541,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = newblock;
     // #TRANS: on musical 'offbeat' do some action
-    if (language === 'ja') {
-        newblock.staticLabels.push(_('on weak beat'), _('beat'));
-        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do1'));
-    } else {
-        // #TRANS: 'on' musical 'beat' 'do' some action
-        newblock.staticLabels.push(_('on weak beat'), _('beat'), _('do'));
-    }
-    newblock.twoArgBlock();
+    newblock.staticLabels.push(_('on weak beat do'));
+    newblock.oneArgBlock();
     newblock.defaults.push(_('action'));
-    newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
+    newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('offbeatdo')) {
         newblock.hidden = true;
     }
@@ -3738,7 +3731,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['divide'] = newblock;
     newblock.fontsize = 9;
-    newblock.staticLabels.push('➗');
+    if (language === 'ja') {
+        newblock.staticLabels.push('➗');
+    } else {
+        newblock.staticLabels.push('/');
+    }
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {

@@ -12,6 +12,12 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "bassoon"
+msgstr "バスーン"
+
+msgid "celeste"
+msgstr "セレスタ"
+
 msgid "Take a tour"
 msgstr "ツアーを はじめよう"
 
@@ -1026,7 +1032,7 @@ msgstr "ネズミと ペンを もどす"
 #: js/turtledefs.js:20
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
 msgid "guide url"
-msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/README.md"
+msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
 
 #: js/turtledefs.js:28
 #: js/turtledefs.js:193
@@ -2642,8 +2648,8 @@ msgid "The Hollow line block creates a line with a hollow center."
 msgstr ""
 
 #: js/turtledefs.js:539
-msgid "The Background block sets the background color."
-msgstr ""
+msgid "The Background block sets the window background color."
+msgstr "はいけいブロック は、 カンバスの いろを せっていする。"
 
 #: js/turtledefs.js:540
 msgid "The Grey block returns the current pen grey value."
@@ -4164,6 +4170,9 @@ msgstr "カップドラム"
 msgid "floor tom"
 msgstr "フロアタム"
 
+msgid "floor tom tom"
+msgstr "フロアタムタム"
+
 #: js/basicblocks.js:3000
 #: js/synthutils.js:84
 #: js/musicutils.js:281
@@ -5373,7 +5382,7 @@ msgid "Move down"
 msgstr "したに うごかす"
 
 #: js/pitchslider.js:402
-msgid "Use the slider to change the pitch."
+msgid "Click on the slider to create a note block."
 msgstr "スライダーでおとのたかさを変えます。"
 
 #: js/pitchtimematrix.js:200
