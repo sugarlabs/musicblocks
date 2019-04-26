@@ -1608,8 +1608,11 @@ function Blocks (activity) {
                                             delete that.protoBlockDict['myDo_' + that.blockList[connection].value];
                                             that.palettes.hide();
                                             that.palettes.updatePalettes('action');
-                                            // that.palettes.show();
-                                        }, 50); // 500
+					    // Fixes #1779
+					    setTimeout(function () {
+						that.palettes.show();
+					    }, 500);
+                                        }, 50);
 
                                         break;
                                     }
