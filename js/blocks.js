@@ -845,9 +845,9 @@ function Blocks (activity) {
         }
 
         // If the note value block is collapsed, spoof size.
-	if (this.blocksToCollapse.indexOf(blk) != -1) {
+        if (this.blocksToCollapse.indexOf(blk) != -1) {
             size = 1;
-	} else if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
+        } else if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
             size = 1;
         }
 
@@ -1610,10 +1610,10 @@ function Blocks (activity) {
                                             delete that.protoBlockDict['myDo_' + that.blockList[connection].value];
                                             that.palettes.hide();
                                             that.palettes.updatePalettes('action');
-					    // Fixes #1779
-					    setTimeout(function () {
-						that.palettes.show();
-					    }, 500);
+                                            // Fixes #1779
+                                            setTimeout(function () {
+                                                that.palettes.show();
+                                            }, 500);
                                         }, 50);
 
                                         break;
@@ -2853,6 +2853,8 @@ function Blocks (activity) {
         for (var i = 0; i < myBlock.protoblock.defaults.length; i++) {
             var value = myBlock.protoblock.defaults[i];
 
+            console.log('==============');
+            console.log(value);
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
@@ -4283,7 +4285,7 @@ function Blocks (activity) {
      * @return {void}
      */
     this.saveStack = function () {
-	console.log(this.selectedStack);
+        console.log(this.selectedStack);
         if (this.selectedStack == null) {
             return;
         }
@@ -4383,7 +4385,7 @@ function Blocks (activity) {
         var myBlock = new ProtoBlock('macro_' + name);
         var blkName = 'macro_' + name;
         this.protoBlockDict[blkName] = myBlock;
-	console.log('Adding ' + name + ' to myblocks palette');
+        console.log('Adding ' + name + ' to myblocks palette');
         if (!('myblocks' in this.palettes.dict)) {
             this.palettes.add('myblocks');
         }
@@ -4472,6 +4474,7 @@ function Blocks (activity) {
                 }
             } else if (this.blockList[b].name === 'storein') {
                 if (this.blockList[b].connections[1] != null) {
+                    console.log('found storein name: ' + this.blockList[this.blockList[b].connections[1]].value);
                     currentStoreinNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
             }
@@ -4609,6 +4612,7 @@ function Blocks (activity) {
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
+
             var oldName = name;
             var i = 1;
             while (currentActionNames.indexOf(name) !== -1) {
@@ -4620,6 +4624,9 @@ function Blocks (activity) {
                     break;
                 }
             }
+
+            // Add this name to the list so we don't repeat it.
+            currentActionNames.push(name);
 
             if (oldName !== name) {
                 // Change the name of the action...
