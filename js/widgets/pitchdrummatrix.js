@@ -89,6 +89,10 @@ function PitchDrumMatrix() {
         }
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function(logo) {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
@@ -141,11 +145,18 @@ function PitchDrumMatrix() {
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
+        this._save_lock = false;
 
-        cell.onclick=function() {
-            that._save();
-        }
-
+        cell.onclick = function () {
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._save();
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
+        };
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 

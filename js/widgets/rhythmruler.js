@@ -1380,6 +1380,10 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function (logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
@@ -1483,8 +1487,6 @@ function RhythmRuler () {
             that._logo.hideMsgs();
         };
 
-
-
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
 
         this._playAllCell.onclick = function () {
@@ -1497,16 +1499,31 @@ function RhythmRuler () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
+
+        this._save_lock = false;
+
         cell.onclick = function () {
             // that._save(0);
-            that._saveTuplets(0);
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._saveTuplets(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
         };
-
-
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
-            that._saveMachine(0);
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._saveMachine(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
         };
 
         // An input for setting the dissect number

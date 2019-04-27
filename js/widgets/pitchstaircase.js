@@ -435,6 +435,10 @@ function PitchStaircase () {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function (logo) {
         this._logo = logo;
         for (var i = 0; i < this.Stairs.length; i++) {
@@ -511,10 +515,18 @@ function PitchStaircase () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
+        this._save_lock = false;
+
         cell.onclick=function() {
-            that._save(0);
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._save(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
         };
-      
        
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
