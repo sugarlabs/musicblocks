@@ -964,15 +964,25 @@ function PitchTimeMatrix () {
 
             // Add the notes to the matrix a la addNote.
             for (var j = 0; j < this.rowLabels.length; j++) {
+		// Depending on the row, we choose a different background color.
+		if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+		    cellColor = platformColor.graphicsBackground;
+		} else {
+		    cellColor = platformColor.selectorBackground;
+		}
+
                 var ptmRow = docById('ptm' + j);
                 var cell = ptmRow.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / tupletNoteValue);
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = cellColor;
 
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
@@ -982,7 +992,7 @@ function PitchTimeMatrix () {
 
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
@@ -1035,14 +1045,24 @@ function PitchTimeMatrix () {
 
         for (var j = 0; j < numBeats; j++) {
             for (var i = 0; i < rowCount; i++) {
+		// Depending on the row, we choose a different background color.
+		if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
+		    cellColor = platformColor.graphicsBackground;
+		} else {
+		    cellColor = platformColor.selectorBackground;
+		}
+
                 // the buttons get add to the embedded table
                 var row = docById('ptm' + i);
                 var cell = row.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = cellColor;
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
 
@@ -1054,7 +1074,8 @@ function PitchTimeMatrix () {
 
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+			console.log(this.getAttribute('cellColor'));
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
@@ -1128,7 +1149,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._setNotes(j, i, false);
                 }
             }
@@ -1151,7 +1172,7 @@ function PitchTimeMatrix () {
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                         that._notesToPlay[j][0] = ['R'];
                         that._setNotes(j, i, false);
                     } else {
@@ -1166,7 +1187,7 @@ function PitchTimeMatrix () {
                     var j = Number(obj[1]);
                     if (isMouseDown) {
                         if (this.style.backgroundColor === 'black') {
-                            this.style.backgroundColor = platformColor.selectorBackground;
+                            this.style.backgroundColor = this.getAttribute('cellColor');
                             that._notesToPlay[j][0] = ['R'];
                             that._setNotes(j, i, false);
                         } else {
@@ -1654,7 +1675,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._notesToPlay[j][0] = ['R'];
                     this._setNotes(j, i, false);
                 }
