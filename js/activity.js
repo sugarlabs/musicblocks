@@ -1514,13 +1514,9 @@ function Activity() {
     };
 
     /*
-     * @param  searchWidget      {searchWidget element}
-     * @param  blocks            {all blocks}
-     * @param  searchSuggestions {suggestions from user input}
-     * @param  doSearch          {search function callback}
+      Prepare a list of blocks for the search bar autocompletion.
      */
-    this.prepSearchWidget = function (searchWidget, blocks, searchSuggestions, doSearch) {
-        var that = this;
+    prepSearchWidget = function () {
         searchWidget.style.visibility = 'hidden';
         searchBlockPosition = [100, 100];
 
@@ -4670,6 +4666,8 @@ function Activity() {
                 that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
         }
+
+	prepSearchWidget();
 
         document.addEventListener('mousewheel', scrollEvent, false);
         document.addEventListener('DOMMouseScroll', scrollEvent, false);
