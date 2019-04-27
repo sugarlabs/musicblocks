@@ -845,8 +845,10 @@ function Blocks (activity) {
         }
 
         // If the note value block is collapsed, spoof size.
-        if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
-            size = 1
+	if (this.blocksToCollapse.indexOf(blk) != -1) {
+            size = 1;
+	} else if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
+            size = 1;
         }
 
         // check on any connected block
