@@ -381,9 +381,22 @@ function PitchTimeMatrix () {
 
             var ptmTableRow = ptmTable.insertRow();
 
+            var drumName = getDrumName(this.rowLabels[i]);
+
+            // Depending on the row, we choose a different background color.
+            if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
+                cellColor = platformColor.graphicsLabelBackground;
+            } else {
+                if (drumName === null) {
+                    cellColor = platformColor.pitchLabelBackground;
+                } else {
+                    cellColor = platformColor.drumLabelBackground;
+                }
+            }
+
             // A cell for the row label graphic
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -391,8 +404,6 @@ function PitchTimeMatrix () {
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
             cell.innerHTML = '';
-
-            var drumName = getDrumName(this.rowLabels[i]);
 
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -417,7 +428,7 @@ function PitchTimeMatrix () {
 
             // A cell for the row label
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -972,7 +983,7 @@ function PitchTimeMatrix () {
                     if (drumName === null) {
                         cellColor = platformColor.pitchBackground;
                     } else {
-                        cellColor = platformColor.selectorBackground;
+                        cellColor = platformColor.drumBackground;
                     }
                 }
 
@@ -1058,7 +1069,7 @@ function PitchTimeMatrix () {
                     if (drumName === null) {
                         cellColor = platformColor.pitchBackground;
                     } else {
-                        cellColor = platformColor.selectorBackground;
+                        cellColor = platformColor.drumBackground;
                     }
                 }
 
