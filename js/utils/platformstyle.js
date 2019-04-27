@@ -76,6 +76,7 @@ window.platformColor = {
     selectorSelected: '#1A8CFF',
     labelColor: '#90c100',
     tupletBackground: '#57e751',
+    pitchBackground: '#7CD622',
     graphicsBackground: '#92A9FF',
     rhythmcellcolor: '#c8c8c8',
     hitAreaGraphicsBeginFill: '#FFF',

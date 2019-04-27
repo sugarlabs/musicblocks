@@ -133,7 +133,7 @@ function PitchTimeMatrix () {
     };
 
     this._get_save_lock = function() {
-	return this._save_lock;
+        return this._save_lock;
     };
 
     this.init = function(logo) {
@@ -210,14 +210,14 @@ function PitchTimeMatrix () {
         this._save_lock = false;
 
         cell.onclick = function () {
-	    // Debounce button
-	    if (!that._get_save_lock()) {
-		that._save_lock = true;
-		that._save();
-		setTimeout(function () {
-		    that._save_lock = false;
-		}, 1000);
-	    }
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._save();
+                setTimeout(function () {
+                    that._save_lock = false;
+                }, 1000);
+            }
         };
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
@@ -964,12 +964,17 @@ function PitchTimeMatrix () {
 
             // Add the notes to the matrix a la addNote.
             for (var j = 0; j < this.rowLabels.length; j++) {
-		// Depending on the row, we choose a different background color.
-		if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
-		    cellColor = platformColor.graphicsBackground;
-		} else {
-		    cellColor = platformColor.selectorBackground;
-		}
+                // Depending on the row, we choose a different background color.
+                if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[j]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.selectorBackground;
+                    }
+                }
 
                 var ptmRow = docById('ptm' + j);
                 var cell = ptmRow.insertCell();
@@ -1045,12 +1050,17 @@ function PitchTimeMatrix () {
 
         for (var j = 0; j < numBeats; j++) {
             for (var i = 0; i < rowCount; i++) {
-		// Depending on the row, we choose a different background color.
-		if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
-		    cellColor = platformColor.graphicsBackground;
-		} else {
-		    cellColor = platformColor.selectorBackground;
-		}
+                // Depending on the row, we choose a different background color.
+                if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[i]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.selectorBackground;
+                    }
+                }
 
                 // the buttons get add to the embedded table
                 var row = docById('ptm' + i);
@@ -1074,7 +1084,6 @@ function PitchTimeMatrix () {
 
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-			console.log(this.getAttribute('cellColor'));
                         this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
