@@ -488,7 +488,7 @@ function PitchTimeMatrix () {
         // Create tables to store individual note values.
         ptmCell.innerHTML = '<table  class="ptmTable" cellpadding="0px"><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
 
-        // Sort the if there are note blocks.
+        // Sort them if there are note blocks.
         this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function () {
@@ -973,11 +973,13 @@ function PitchTimeMatrix () {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = platformColor.selectorBackground;
+
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
+
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorBackground;
@@ -1043,11 +1045,13 @@ function PitchTimeMatrix () {
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
+
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
+
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorBackground;
@@ -1272,7 +1276,7 @@ function PitchTimeMatrix () {
         // Play all of the notes in the matrix.
         this.playingNow = !this.playingNow;
 
-        var playButtonCell = row.cells[0];
+        var playButtonCell = row.cells[1];
 
         if (this.playingNow) {
             playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
