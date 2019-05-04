@@ -562,7 +562,10 @@ function Synth() {
         }
     });
 
-    this.recorder = new Recorder(Tone.Master);
+    // Until we fix #1744, disable recorder on FF
+    if (!platform.FF) {
+        this.recorder = new Recorder(Tone.Master);
+    }
 
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
