@@ -1247,6 +1247,9 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
 };
 
 
+// Approximate mapping of mode to solfege (Used by modes where the length !== 7).
+const SOLFMAPPER = ['do', 'do', 're', 're', 'mi', 'fa', 'fa', 'sol', 'sol', 'la', 'la', 'ti'];
+
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     var obj = keySignatureToMode(keySignature);
@@ -1258,10 +1261,43 @@ function getScaleAndHalfSteps(keySignature) {
     }
 
     var solfege = [];
-    for (var i = 0; i < halfSteps.length; i++) {
-        solfege.push(SOLFEGENAMES[i]);
-        for (var j = 1; j < halfSteps[i]; j++) {
-            solfege.push('');
+
+    if (halfSteps.length === 7) {
+        for (var i = 0; i < halfSteps.length; i++) {
+            solfege.push(SOLFEGENAMES[i]);
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
+        }
+    } else if (halfSteps.length > 7) {
+        // If there are more than 7 notes, we need to add accidentals.
+        for (var i = 0; i < halfSteps.length; i++) {
+            if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
+                solfege.push(SOLFMAPPER[i]);
+            } else {
+                solfege.push(SOLFMAPPER[i] + SHARP);
+            }
+
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
+        }
+    } else {
+        // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
+        for (var i = 0; i < halfSteps.length; i++) {
+            var n = 0;
+            var solf = SOLFMAPPER[solfege.length];
+            // Ensure there are no duplicates.
+            while (solfege.indexOf(solf) !== -1) {
+                n += 1;
+                solf = SOLFMAPPER[solfege.length + n];
+            }
+
+            solfege.push(solf);
+
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
         }
     }
 
@@ -2324,6 +2360,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'major':
