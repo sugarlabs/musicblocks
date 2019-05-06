@@ -27,6 +27,8 @@ function ModeWidget() {
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
         this._undoStack = [];
+        this._playing = false;
+        this._cellColors = [];
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -69,7 +71,22 @@ function ModeWidget() {
 
         cell.onclick=function() {
             that._logo.resetSynth(0);
-            that._playAll();
+            if (that._playingStatus()) {
+                that._playing = false;
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else {
+                that._playing = true;
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+
+                var table = docById('modeTable');
+                for (var i = 0; i < 12; i++) {
+                    that._cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
+                }
+
+                that._playAll(this);
+            }
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
@@ -78,9 +95,6 @@ function ModeWidget() {
             that._save();
         }
 
-
-
-       
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
@@ -212,6 +226,10 @@ function ModeWidget() {
         this._makeClickable();
         //.TRANS: A circle of notes represents the musical mode.
         this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
+    };
+
+    this._playingStatus = function() {
+        return this._playing;
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -525,6 +543,13 @@ function ModeWidget() {
 
     };
 
+    this._resetColors = function() {
+        var table = docById('modeTable');
+        for (var i = 0; i < 12; i++) {
+            table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor = this._cellColors[i];
+        }
+    };
+
     this._rotateRight = function() {
         if (this._locked) {
             return;
@@ -543,6 +568,7 @@ function ModeWidget() {
         for (var i = 0; i < 12; i++) {
             cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
         }
+
         this.__rotateRightOneCell(1, cellColors);
 
     };
@@ -633,7 +659,7 @@ function ModeWidget() {
         }
     };
 
-    this._playAll = function() {
+    this._playAll = function(buttonCell) {
         // Play all of the notes in the widget.
         var table = docById('modeTable');
         if (table == null) {
@@ -666,10 +692,15 @@ function ModeWidget() {
         }
 
         this._lastNotePlayed = null;
-        this.__playNextNote(0, 0);
+        if (this._playing) {
+            this.__playNextNote(0, 0, buttonCell);
+        } else {
+            this._resetColors();
+            this._locked = false;
+        }
     };
 
-    this.__playNextNote = function(time, noteCounter) {
+    this.__playNextNote = function(time, noteCounter, buttonCell) {
         var that = this;
         time = this._noteValue + 0.125;
 
@@ -678,6 +709,8 @@ function ModeWidget() {
             setTimeout(function() {
                 that._lastNotePlayed.style.backgroundColor = 'black';
             }, 1000 * time);
+
+            buttonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
 
             this._locked = false;
             return;
@@ -698,12 +731,19 @@ function ModeWidget() {
             if (that._lastNotePlayed != null && that._lastNotePlayed !== cell) {
                 that._lastNotePlayed.style.backgroundColor = 'black';
             }
+
             that._lastNotePlayed = cell;
 
             var ks = that._logo.keySignature[0];
             var noteToPlay = getNote(that._pitch, 4, that.cells[i], ks, false, null, that._logo.errorMsg);
             that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
-            that.__playNextNote(time, noteCounter + 1);
+            if (that._playing) {
+                that.__playNextNote(time, noteCounter + 1, buttonCell);
+            } else {
+                that._locked = false;
+                setTimeout(that._resetColors(), 500);
+                return;
+            }
         }, 1000 * time);
     };
 
