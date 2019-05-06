@@ -26,7 +26,6 @@ function ModeWidget() {
         this._locked = false;
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
-
         this._undoStack = [];
 
         var w = window.innerWidth;
@@ -561,7 +560,7 @@ function ModeWidget() {
         if (i === 11) {
             setTimeout(function() {
                 var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
-		cell.style.backgroundColor = cellColors[0];
+                cell.style.backgroundColor = cellColors[0];
                 that._locked = false;
 
                 // Keep rotating until first cell is set.
@@ -569,7 +568,7 @@ function ModeWidget() {
                 if (cell.style.backgroundColor !== 'black') {
                     that._rotateRight();
                     // We don't want to 'undo' to a broken mode.
-		    that._undoStack.pop();
+                    that._undoStack.pop();
                 }
 
                 that._setModeName()
@@ -607,7 +606,7 @@ function ModeWidget() {
 
         var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
         var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-	prev.style.backgroundColor = cellColors[i - 1];
+        prev.style.backgroundColor = cellColors[i - 1];
         cell.style.backgroundColor = ORANGE;
 
         var that = this;
@@ -622,7 +621,7 @@ function ModeWidget() {
                 if (cell.style.backgroundColor !== 'black') {
                     that._rotateLeft();
                     // We don't want to 'undo' to a broken mode.
-		    that._undoStack.pop();
+                    that._undoStack.pop();
                 }
 
                 that._setModeName()
@@ -701,7 +700,8 @@ function ModeWidget() {
             }
             that._lastNotePlayed = cell;
 
-            var noteToPlay = getNote(that._pitch, 4, that.cells[i], '', false, null, that._logo.errorMsg);
+            var ks = that._logo.keySignature[0];
+            var noteToPlay = getNote(that._pitch, 4, that.cells[i], ks, false, null, that._logo.errorMsg);
             that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
             that.__playNextNote(time, noteCounter + 1);
         }, 1000 * time);
@@ -713,9 +713,11 @@ function ModeWidget() {
             return;
         }
 
+        var ks = this._logo.keySignature[0];
+
         var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
         if (cell.style.backgroundColor === 'black') {
-            var noteToPlay = getNote(this._pitch, 4, idx, '', false, null, this._logo.errorMsg);
+            var noteToPlay = getNote(this._pitch, 4, idx, ks, false, null, this._logo.errorMsg);
             this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, DEFAULTVOICE, null, null);
         }
     };
@@ -790,7 +792,7 @@ function ModeWidget() {
 
     this._setModeName = function() {
         var table = docById('modeTable');
-	var n = table.rows.length - 1;
+        var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
         var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
 

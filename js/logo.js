@@ -158,6 +158,7 @@ function Logo () {
     this.inMusicKeyboard = false;
     this._currentDrumlock = null;
     this.inTimbre = false;
+    this.insideModeWidget = false;
     this.insideTemperament = false;
     this.inSetTimbre = {};
 
@@ -1449,6 +1450,8 @@ function Logo () {
         this.inMusicKeyboard = false;
         this.inTimbre = false;
         this.inRhythmRuler = false;
+        this.insideModeWidget = false;
+        this.insideTemperament = false;
         this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
         this.inStatusMatrix = false;
@@ -3559,6 +3562,13 @@ function Logo () {
                     that.keySignature[turtle] = args[0] + ' ' + modename;
                     that.notationKey(turtle, args[0], modename);
                 }
+
+                if (that.insideModeWidget) {
+                    // Ensure that the mode for Turtle 0 is set, since it
+                    // is used by the mode widget.
+                    that.keySignature[0] = args[0] + ' ' + modename;
+                    that.notationKey(0, args[0], modename);
+                }
             }
             break;
         case 'definemode':
@@ -3840,11 +3850,14 @@ function Logo () {
                 that.modeWidget = new ModeWidget();
             }
 
+            that.insideModeWidget = true;
+
             var listenerName = '_modewidget_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
                 that.modeWidget.init(that, that._modeBlock);
+                that.insideModeWidget = false;
             }
 
             that._setListener(turtle, listenerName, __listener);
@@ -6277,7 +6290,7 @@ function Logo () {
                         var bpmFactor = TONEBPM / that._masterBPM;
                     }
 
-		    // Wait until this note is played before continuing.
+                    // Wait until this note is played before continuing.
                     that._doWait(turtle, bpmFactor / noteValue);
 
                     that.inNoteBlock[turtle].pop();

@@ -2993,7 +2993,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'phaser':
                     this._piemenuNumber([1, 2, 3], this.value);
                     break;
-		case 'arc':
+                case 'arc':
                     this._piemenuNumber([25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300], this.value);
                     break;
                 }
@@ -3036,7 +3036,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'tremolo':
                     this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
                     break;
-		case 'arc':
+                case 'arc':
                     this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 295, 300, 315, 330, 345, 360], this.value);
                     break;
                 case 'rhythmicdot2':
@@ -3106,7 +3106,7 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 }
             } else {
-		console.log('NUMBER LABEL');
+                console.log('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -3516,6 +3516,18 @@ function Block(protoblock, blocks, overrideName) {
                 // Set the octave of the pitch block if available
                 var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
                 that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
+            if (that.connections[0] !== null && ['setkey', 'setkey2'].indexOf(this.blocks.blockList[that.connections[0]].name) !== -1) {
+                // We may need to update the mode widget.
+                var modeBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.logo._modeBlock = modeBlock;
+                var modeDiv = docById('modeDiv');
+                if (modeDiv.style.visibility === 'visible') {
+                    parts = that.blocks.logo.keySignature[0].split(' ');
+                    that.blocks.logo.keySignature[0] = label + ' ' + parts[1];
+                    that.blocks.logo.modeWidget.init(that.blocks.logo, modeBlock);
+                }
             }
         };
 
@@ -4290,7 +4302,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
 
-	    that.label.value = that.value;
+            that.label.value = that.value;
         };
 
         this._exitWheel.navItems[2].navigateFunction = function () {
@@ -4302,7 +4314,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, z);
             that.updateCache();
 
-	    that.label.value = that.value;
+            that.label.value = that.value;
         };
     };
 
@@ -5094,6 +5106,18 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.setChildIndex(that.text, z);
                 that.updateCache();
             }
+
+            var modeDiv = docById('modeDiv');
+            if (modeDiv.style.visibility === 'visible') {
+                var modeBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.logo._modeBlock = modeBlock;
+                var modeDiv = docById('modeDiv');
+                if (modeDiv.style.visibility === 'visible') {
+                    parts = that.blocks.logo.keySignature[0].split(' ');
+                    that.blocks.logo.keySignature[0] = parts[0] + ' ' + that.value;
+                    that.blocks.logo.modeWidget.init(that.blocks.logo, modeBlock);
+                }
+            }
         };
 
         // Add function to each main menu for show/hide sub menus
@@ -5361,6 +5385,8 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
+        console.log('LABEL CHANGED ' + this.name);
+
         if (this === null || this.label === null) {
             this._labelLock = false;
             return;
