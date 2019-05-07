@@ -78,7 +78,7 @@ function ModeWidget() {
             } else {
                 that._playing = true;
 
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
 
                 var table = docById('modeTable');
                 for (var i = 0; i < 12; i++) {
