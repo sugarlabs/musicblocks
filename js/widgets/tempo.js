@@ -177,6 +177,33 @@ function Tempo () {
         }
     };
 
+    this.__save = function (i) {
+        var that = this;
+        setTimeout(function () {
+            console.log('saving a BPM block for ' + that.BPMs[i]);
+            var delta = i * 42;
+            var newStack = [[0, ['setbpm3', {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
+                            [1, ['number', {'value': that.BPMs[i]}], 0, 0, [0]],
+                            [2, ['divide', {}], 0, 0, [0, 3, 4]],
+                            [3, ['number', {'value': 1}], 0, 0, [2]],
+                            [4, ['number', {'value': 4}], 0, 0, [2]],
+                            [5, ['vspace', {}], 0, 0, [0, null]]];
+            that._logo.blocks.loadNewBlocks(newStack);
+        }, 200 * i);
+    };
+
+    this._saveTempo = function() {
+        // Save a BPM block for each tempo.
+
+        for (var i = 0; i < this.BPMs.length; i++) {
+            this.__save(i);
+        }
+    };
+
+    this._get_save_lock = function() {
+        return this._save_lock;
+    };
+
     this.init = function (logo) {
         this._logo = logo;
         this._directions = [];
@@ -230,7 +257,6 @@ function Tempo () {
             that._logo.hideMsgs();
         };
 
-
         var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('Pause'));
 
         cell.onclick=function() {
@@ -253,12 +279,20 @@ function Tempo () {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save tempo'), '');
 
-        // cell.onclick=function() {
-        //     that.hide();
-        //     that._logo.hideMsgs();
-        // };
+        this._save_lock = false;
+
+        cell.onclick = function () {
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveTempo();
+                setTimeout(function () {
+                    that._save_lock = false;
+                }, 1000);
+            }
+        };
 
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
