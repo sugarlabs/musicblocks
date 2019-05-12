@@ -12244,7 +12244,7 @@ function Logo () {
     };
 
     /**
-     * Updates the music notation.
+     * Updates the music notation used for Lilypond output.
      * @privileged
      * @param   note
      * @param   {number}   duration
@@ -12350,8 +12350,24 @@ function Logo () {
             this.markup[turtle] = [];
         }
 
-        if (typeof(note) === 'number') {
-            this.notationMarkup(turtle, toFixed2(note), false);
+        if (typeof(note) === 'object') {
+            // If it is hertz, add a markup.
+            markup = '';
+            try {
+                for (var i = 0; i < note.length; i++) {
+                    if (typeof(note[i]) === 'number') {
+                        if (markup = '') {
+                            markup = toFixed2(note[i]);
+                            break;
+                        }
+                    }
+                }
+                if (markup.length > 0) {
+                    this.notationMarkup(turtle, markup, false);
+                }
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
 
