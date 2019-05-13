@@ -2121,6 +2121,15 @@ function Logo () {
             break;
         case 'wait':
             if (args.length === 1) {
+                if (that.bpm[turtle].length > 0) {
+                    var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                } else {
+                    var bpmFactor = TONEBPM / that._masterBPM;
+                }
+
+                var noteBeatValue = bpmFactor / (1 / args[0]);
+                this.previousTurtleTime[turtle] = this.turtleTime[turtle];
+                this.turtleTime[turtle] += noteBeatValue;
                 that._doWait(turtle, args[0]);
             }
             break;
