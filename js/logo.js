@@ -5139,16 +5139,18 @@ function Logo () {
                     }
                 }
             } else {
-                // Play rhythm block as if it were a drum.
                 if (that.drumStyle[turtle].length > 0) {
+                    // Play rhythm block as if it were a drum.
                     that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
+                    that.inNoteBlock[turtle].push(blk);
                 } else {
-                    // Load the synth for this drum
-                    that.synth.loadSynth(0, DEFAULTDRUM);
-                    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                    // Or use the current synth.
+                    that.clearNoteParams(turtle, blk, []);
+                    that.inNoteBlock[turtle].push(blk);
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])] = ['G'];
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])] = [4];
+                    that.noteCents[turtle][last(that.inNoteBlock[turtle])] = [0];
                 }
-
-                that.inNoteBlock[turtle].push(blk);
 
                 if (that.bpm[turtle].length > 0) {
                     var bpmFactor = TONEBPM / last(that.bpm[turtle]);
