@@ -1162,8 +1162,8 @@ function PitchTimeMatrix () {
 
     this._dividenotes = function(that,noteToDivide) {
         noteToDivide = parseInt(noteToDivide);
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0],this._logo.tupletRhythms[noteToDivide][1],this._logo.tupletRhythms[noteToDivide][2]*2]]).concat(this._logo.tupletRhythms.slice(noteToDivide+1));
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide+1).concat(this._logo.tupletRhythms.slice(noteToDivide));
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2]*2]]).concat(this._logo.tupletRhythms.slice(noteToDivide+1));
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide+1).concat(this._logo.tupletRhythms.slice(noteToDivide));
         this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
         this.sorted = true;
         this.init(this._logo);
@@ -1195,7 +1195,7 @@ function PitchTimeMatrix () {
 
     this._createpiesubmenu = function(noteToDivide,noteValue) {
         docById('wheelDivptm').style.display = '';
-        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
@@ -1207,7 +1207,7 @@ function PitchTimeMatrix () {
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
-        this._menuWheel.createWheel(["dvd",'dlt','ad',String(1/noteValue)]);
+        this._menuWheel.createWheel(['divide', 'delete', 'add', '1/'+String(noteValue)]);
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -1215,7 +1215,7 @@ function PitchTimeMatrix () {
         this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.createWheel(['x', '-','+','2']);
+        this._exitWheel.createWheel(['x', '-', '+', '2']);
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '200px';
         docById('wheelDivptm').style.width = '200px';
@@ -1233,7 +1233,7 @@ function PitchTimeMatrix () {
             that._exitWheel.removeWheel();
         };
         this._menuWheel.navItems[0].navigateFunction = function () {
-            that._dividenotes(that,noteToDivide);
+            that._dividenotes(that, noteToDivide);
         };
         
     };
@@ -1248,8 +1248,7 @@ function PitchTimeMatrix () {
 
             var that = this;
             cell.onclick = function() {
-                console.log(this.getAttribute('id'),this.getAttribute('alt'));
-                that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('alt'));
+                that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'));
             }
         }
         
