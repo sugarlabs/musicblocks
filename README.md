@@ -13,6 +13,8 @@ musical concepts in an integrative and fun way.
 Using Music Blocks
 ------------------
 
+Music Blocks is available under the GNU Affero General Public License (AGPL), a free, copyleft license.
+
 Music Blocks is designed to run in a web browser.
 
 The easiest way to run Music Blocks is to open [Music
