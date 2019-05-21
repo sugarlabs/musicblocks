@@ -685,13 +685,14 @@ table {
     width: 455px;
     height: 349px;
     /* background: rgba(196, 196, 196, 1.0) !important; */
-    background: #fff !important;
+    background: #e8e8e8 !important;
     /* overflow-y: auto; */
     overflow-x: hidden;
     -webkit-user-select: none;
     border-radius: 5px;
     box-shadow: 0 1px 10px #8080808f;
 }
+
 #right-arrow {
     left: 410px;
     background: url('../header-icons/right-arrow.png');
@@ -750,15 +751,18 @@ table {
     padding-left: 30px;
     font-size: 1.5em;
 }
+
 #helpDiv p:first-child {
     padding-left: -10px;
 }
+
 #helpDiv p:not(:first-child) {
     text-align: left;
     padding-left: 30px;
     font-size: 0.9em;
     line-height: 20px;
 }
+
 #helpButtonsDiv {
     position: relative;
     left: 0px;
@@ -774,6 +778,7 @@ table {
     overflow-x: hidden;
     overflow-y: auto;
     width: 345px;
+    background: #e8e8e8 !important;
 }
 
 #pscDiv {
