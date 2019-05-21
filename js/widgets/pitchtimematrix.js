@@ -1160,10 +1160,9 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._dividenotes = function(that,noteToDivide) {
+    this._addNotes = function(that, noteToDivide) {
         noteToDivide = parseInt(noteToDivide);
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0],this._logo.tupletRhythms[noteToDivide][1],this._logo.tupletRhythms[noteToDivide][2]*2]]).concat(this._logo.tupletRhythms.slice(noteToDivide+1));
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide+1).concat(this._logo.tupletRhythms.slice(noteToDivide));
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + 1).concat(this._logo.tupletRhythms.slice(noteToDivide));
         this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
         this.sorted = true;
         this.init(this._logo);
@@ -1191,14 +1190,82 @@ function PitchTimeMatrix () {
         docById('wheelDivptm').style.display = 'none';
         that._menuWheel.removeWheel();
         that._exitWheel.removeWheel();
-    }
+    };
 
-    this._createpiesubmenu = function(noteToDivide,noteValue) {
+    this._deleteNotes = function(that, noteToDivide) {
+        noteToDivide = parseInt(noteToDivide);
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
+        this.sorted = true;
+        this.init(this._logo);
+        this.sorted = false;
+
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            switch (this._logo.tupletRhythms[i][0]) {
+            case 'simple':
+            case 'notes':
+                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
+                tupletParam.push([]);
+                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
+                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
+                }
+
+                this.addTuplet(tupletParam);
+                break;
+            default:
+                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
+                break;
+            }
+        }
+
+        this.makeClickable();
+        docById('wheelDivptm').style.display = 'none';
+        that._menuWheel.removeWheel();
+        that._exitWheel.removeWheel();
+    };
+
+    this._divideNotes = function(that, noteToDivide, divideNoteBy) {
+        noteToDivide = parseInt(noteToDivide);
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        for (var i = 0; i < divideNoteBy - 1; i++){
+            this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
+        }
+        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
+        this.sorted = true;
+        this.init(this._logo);
+        this.sorted = false;
+
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            switch (this._logo.tupletRhythms[i][0]) {
+            case 'simple':
+            case 'notes':
+                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
+                tupletParam.push([]);
+                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
+                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
+                }
+
+                this.addTuplet(tupletParam);
+                break;
+            default:
+                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
+                break;
+            }
+        }
+
+        this.makeClickable();
+        docById('wheelDivptm').style.display = 'none';
+        that._menuWheel.removeWheel();
+        that._exitWheel.removeWheel();
+    };
+
+    this._createpiesubmenu = function(noteToDivide, noteValue) {
         docById('wheelDivptm').style.display = '';
-        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.clickModeRotate = false;
         this._menuWheel.colors = platformColor.pitchWheelcolors;
         this._menuWheel.slicePathFunction = slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -1207,22 +1274,28 @@ function PitchTimeMatrix () {
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
-        this._menuWheel.createWheel(["dvd",'dlt','ad',String(1/noteValue)]);
+        this._menuWheel.createWheel(['divide', 'delete', 'add', '1/'+String(noteValue)]);
+        
+        this.divideNoteBy = 2;
+        
         this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.keynavigateEnabled = false;
+        this._exitWheel.clickModeRotate = false;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
         this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.createWheel(['x', '-','+','2']);
+        this._exitWheel.createWheel(['x', '-', '+', String(this.divideNoteBy)]);
+        
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '200px';
         docById('wheelDivptm').style.width = '200px';
+        
         var x = docById(noteToDivide).getBoundingClientRect().x;
         var y = docById(noteToDivide).getBoundingClientRect().y;
         
-
         docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
@@ -1232,8 +1305,25 @@ function PitchTimeMatrix () {
             that._menuWheel.removeWheel();
             that._exitWheel.removeWheel();
         };
+        this._exitWheel.navItems[2].navigateFunction = function () {
+            that.divideNoteBy = that.divideNoteBy + 1;
+            docById('wheelnav-_exitWheel-title-3').children[0].textContent = that.divideNoteBy;
+        };
+        this._exitWheel.navItems[1].navigateFunction = function () {
+            if (that.divideNoteBy > 2) {
+                that.divideNoteBy = that.divideNoteBy - 1;
+                docById('wheelnav-_exitWheel-title-3').children[0].textContent = that.divideNoteBy;
+            }
+        };
+
         this._menuWheel.navItems[0].navigateFunction = function () {
-            that._dividenotes(that,noteToDivide);
+            that._divideNotes(that, noteToDivide, that.divideNoteBy);
+        };
+        this._menuWheel.navItems[1].navigateFunction = function () {
+            that._deleteNotes(that, noteToDivide);
+        };
+        this._menuWheel.navItems[2].navigateFunction = function () {
+            that._addNotes(that, noteToDivide);
         };
         
     };
@@ -1248,8 +1338,7 @@ function PitchTimeMatrix () {
 
             var that = this;
             cell.onclick = function() {
-                console.log(this.getAttribute('id'),this.getAttribute('alt'));
-                that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('alt'));
+                that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'));
             }
         }
         
