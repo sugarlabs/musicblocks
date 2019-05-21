@@ -230,7 +230,11 @@ function HelpWidget () {
     this._showPage = function(page) {
         var helpBody = docById('helpBodyDiv');
         var body = '';
-        body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
+        if ([_('Welcome to Music Blocks'), _('Meet Mr. Mouse!'), _('Guide'), _('About'), _('Congratulations.')].indexOf(HELPCONTENT[page][0]) !== -1) {
+            body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
+        } else {
+            body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"width="64px" height="64px"></p>';
+        }
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
         
