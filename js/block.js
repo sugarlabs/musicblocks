@@ -3037,7 +3037,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20], this.value);
                     break;
                 case 'arc':
-                    this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 295, 300, 315, 330, 345, 360], this.value);
+                    this._piemenuNumber([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345, 360], this.value);
                     break;
                 case 'rhythmicdot2':
                     this._piemenuNumber([1, 2, 3], this.value);
