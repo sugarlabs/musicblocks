@@ -128,6 +128,8 @@ var DRUMNAMES = [
     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
+    //.TRANS: sound effect
+    [_('raindrop'), 'raindrop', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: animal sound effect
     [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
@@ -153,7 +155,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/bassoon", "samples/celeste",
+    "samples/bassoon", "samples/celeste", "samples/raindrop",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
     "samples/japanese_drum", // "samples/japanese_bell",
@@ -502,6 +504,7 @@ function Synth() {
                 {'name': 'hi hat', 'data': HIHAT_SAMPLE},
                 {'name': 'splash', 'data': SPLASH_SAMPLE},
                 {'name': 'bubbles', 'data': BUBBLES_SAMPLE},
+                {'name': 'raindrop', 'data': RAINDROP_SAMPLE},
                 {'name': 'cow bell', 'data': COWBELL_SAMPLE},
                 {'name': 'dog', 'data': DOG_SAMPLE},
                 {'name': 'kick drum', 'data': KICK_SAMPLE},

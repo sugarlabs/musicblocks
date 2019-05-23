@@ -300,6 +300,7 @@ const SELECTORSTRINGS = [
     _('slap'),
     _('splash'),
     _('bubbles'),
+    _('raindrop'),
     _('cat'),
     _('cricket'),
     _('dog'),
