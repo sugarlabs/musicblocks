@@ -86,6 +86,9 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuExitTime = null;
     this._triggerLongPress = false;
 
+    // Don't trigger notes on top of each other.
+    this._triggerLock = false;
+    
     // If we update the parameters of a meter block, we have extra
     // actions to attend to.
     this._check_meter_block = null;
@@ -3613,7 +3616,16 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                // console.log(obj[0] + obj[1] + ' 1 / 8 ' + DEFAULTVOICE);
+                that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, that.blocks.logo.defaultBPMFactor / 8);
 
             __selectionChanged();
         };
