@@ -48,6 +48,12 @@ function MeterWidget() {
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
+        this._logo.synth.setMasterVolume(PREVIEWVOLUME);
+        this._logo.synth.loadSynth(0, 'kick drum');
+        this._logo.setSynthVolume(0, 'kick drum', PREVIEWVOLUME);
+        this._logo.synth.loadSynth(0, 'snare drum');
+        this._logo.setSynthVolume(0, 'snare drum', PREVIEWVOLUME);
+
         // For the button callbacks
         var that = this;
 
@@ -213,8 +219,19 @@ function MeterWidget() {
     this.__playOneBeat = function(i, ms) {
         if (this.__getPauseStatus()) {
             console.log('PAUSING');
+            for (var i = 0; i < this._strongBeats.length; i++) {
+                this._playWheel.navItems[i].navItem.hide();
+            }
             return;
         }
+
+        var j = i - 1;
+        if (j < 0) {
+            j += this._strongBeats.length;
+        }
+
+        this._playWheel.navItems[i].navItem.show();
+        this._playWheel.navItems[j].navItem.hide();
 
         if (this._strongBeats[i]) {
             this.__playDrum('snare drum');
@@ -229,16 +246,14 @@ function MeterWidget() {
     };
 
     this._playBeat = function() {
-        this._logo.synth.setMasterVolume(PREVIEWVOLUME);
-        this._logo.synth.loadSynth(0, 'kick drum');
-        this._logo.setSynthVolume(0, 'kick drum', PREVIEWVOLUME);
-        this._logo.synth.loadSynth(0, 'snare drum');
-        this._logo.setSynthVolume(0, 'snare drum', PREVIEWVOLUME);
-
         if (this._logo.bpm[0].length > 0) {
             var bpmFactor = TONEBPM / last(this._logo.bpm[0]);
         } else {
             var bpmFactor = TONEBPM / this._logo._masterBPM;
+        }
+
+        for (var i = 0; i < this._strongBeats.length; i++) {
+            this._playWheel.navItems[i].navItem.hide();
         }
 
         var noteBeatValue = (bpmFactor * 1000) * this._beatValue;
@@ -320,7 +335,7 @@ function MeterWidget() {
         this._meterWheel = new wheelnav('meterWheelDiv', null, 400, 400);
         // Strong beat is shown on this wheel
         this._beatWheel = new wheelnav('_beatWheel', this._meterWheel.raphael);
-        // Play button
+        // Play wheel is to show which beat is playing at any one time.
         this._playWheel = new wheelnav('_playWheel', this._meterWheel.raphael);
 
         wheelnav.cssMeter = true;
@@ -388,6 +403,36 @@ function MeterWidget() {
         */
 
         this._beatWheel.createWheel(beatList)
+
+        this._playWheel.colors = [platformColor.paletteColors.boxes[0]];
+        this._playWheel.slicePathFunction = slicePath().DonutSlice;
+        this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._playWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._playWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._playWheel.sliceSelectedPathCustom = this._playWheel.slicePathCustom;
+        this._playWheel.sliceInitPathCustom = this._playWheel.slicePathCustom;
+        this._playWheel.clickModeRotate = false;
+        this._playWheel.navAngle = -90;
+        this._playWheel.titleRotateAngle = 90;
+
+        var beatList = [];
+        for (var i = 0; i < numberOfBeats; i++) {
+            beatList.push(' ');
+        }
+
+        // Always make the meter a complete circle.
+        /*
+        var n = (1 - (numberOfBeats * beatValue)) / beatValue;
+        for (var i = 0; i < n; i++) {
+            playList.push(null);
+        }
+        */
+
+        this._playWheel.createWheel(beatList)
+
+        for (var i = 0; i < numberOfBeats; i++) {
+            this._playWheel.navItems[i].navItem.hide();
+        }
 
         var that = this;
 
