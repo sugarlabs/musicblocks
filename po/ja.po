@@ -4021,6 +4021,9 @@ msgstr "あひる"
 msgid "cat"
 msgstr "ねこ"
 
+msgid "raindrop"
+msgstr "雨のしずく"
+
 #: js/basicblocks.js:2802
 #: js/synthutils.js:122
 #: js/musicutils.js:300
