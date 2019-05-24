@@ -229,8 +229,12 @@ function MeterWidget() {
     };
 
     this._playBeat = function() {
+        this._logo.synth.setMasterVolume(PREVIEWVOLUME);
         this._logo.synth.loadSynth(0, 'kick drum');
+        this._logo.setSynthVolume(0, 'kick drum', PREVIEWVOLUME);
         this._logo.synth.loadSynth(0, 'snare drum');
+        this._logo.setSynthVolume(0, 'snare drum', PREVIEWVOLUME);
+
         if (this._logo.bpm[0].length > 0) {
             var bpmFactor = TONEBPM / last(this._logo.bpm[0]);
         } else {
@@ -349,11 +353,14 @@ function MeterWidget() {
             this._strongBeats.push(false);
         }
 
+        // Always make the meter a complete circle.
+        /* 
         var n = (1 - (numberOfBeats * beatValue)) / beatValue;
         for (var i = 0; i < n; i++) {
             beatList.push(null);
         }
-
+        */
+        
         this._meterWheel.createWheel(beatList);
 
         this._beatWheel.colors = platformColor.modeWheelcolors;
@@ -371,10 +378,13 @@ function MeterWidget() {
             beatList.push('x');
         }
 
+        // Always make the meter a complete circle.
+        /*
         var n = (1 - (numberOfBeats * beatValue)) / beatValue;
         for (var i = 0; i < n; i++) {
             beatList.push(null);
         }
+        */
 
         this._beatWheel.createWheel(beatList)
 
