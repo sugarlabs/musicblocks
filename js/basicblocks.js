@@ -1253,6 +1253,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('meterwidget');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['meterwidget'] = newblock;
+    //.TRANS: musical meter, e.g., 4:4
+    newblock.staticLabels.push(_('meter'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('meterwidget')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('modewidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = newblock;

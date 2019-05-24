@@ -175,6 +175,7 @@ function Activity() {
         MUSICBLOCKS_EXTRAS = [
             'Tone',
             'widgets/modewidget',
+            'widgets/meterwidget',
             'widgets/pitchtimematrix',
             'widgets/pitchdrummatrix',
             'widgets/rhythmruler',
@@ -2982,6 +2983,7 @@ function Activity() {
                     case 'pitchslider':
                     case 'musickeyboard':
                     case 'modewidget':
+                    case 'meterwidget':
                     case 'status':
                         var args = {
                             'collapsed': myBlock.collapsed
@@ -3913,6 +3915,7 @@ function Activity() {
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                     storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+                    storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
                     storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
@@ -4032,6 +4035,9 @@ function Activity() {
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                    docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
                     // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
                     // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
                     // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');

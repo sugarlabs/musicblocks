@@ -71,6 +71,7 @@ function Logo () {
     this.pitchSlider = null;
     this.musicKeyboard = null;
     this.modeWidget = null;
+    this.meterWidget = null;
     this.statusMatrix = null;
     this.playbackWidget = null;
 
@@ -159,6 +160,7 @@ function Logo () {
     this._currentDrumlock = null;
     this.inTimbre = false;
     this.insideModeWidget = false;
+    this.insideMeterWidget = false;
     this.insideTemperament = false;
     this.inSetTimbre = {};
 
@@ -348,6 +350,8 @@ function Logo () {
     // Mode widget
     this._modeBlock = null;
 
+    // Meter widget
+    this._meterBlock = null;
     // Status matrix
     this.inStatusMatrix = false;
     this.updatingStatusMatrix = false;
@@ -1451,6 +1455,7 @@ function Logo () {
         this.inTimbre = false;
         this.inRhythmRuler = false;
         this.insideModeWidget = false;
+        this.insideMeterWidget = false;
         this.insideTemperament = false;
         this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
@@ -1459,6 +1464,7 @@ function Logo () {
         this.drumBlocks = [];
         this.tuplet = false;
         this._modeBlock = null;
+        this._meterBlock = null;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -3871,6 +3877,28 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
+        case 'meterwidget':
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            if (that.meterWidget == null) {
+                that.meterWidget = new MeterWidget();
+            }
+
+            that.insideMeterWidget = true;
+
+            var listenerName = '_meterwidget_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.meterWidget.init(that, that._meterBlock);
+                that.insideMeterWidget = false;
+            }
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
         case 'temperament1':
             break;
         case 'temperament':
@@ -5323,6 +5351,10 @@ function Logo () {
             } else {
                 var arg0 = args[0];
             }
+
+            if (that.insideMeterWidget) {
+		that._meterBlock = blk;
+	    }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
