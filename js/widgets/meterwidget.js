@@ -372,6 +372,7 @@ function MeterWidget() {
         this._beatWheel.sliceInitPathCustom = this._beatWheel.slicePathCustom;
         this._beatWheel.clickModeRotate = false;
         this._beatWheel.navAngle = -90;
+        this._beatWheel.titleRotateAngle = 90;
 
         var beatList = [];
         for (var i = 0; i < numberOfBeats; i++) {
