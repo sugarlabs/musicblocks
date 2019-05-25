@@ -325,7 +325,7 @@ function MeterWidget() {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
-    this._piemenuMeter = function (numberOfBeats, beatValue) {
+   this._piemenuMeter = function (numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
         docById('meterWheelDiv').style.display = '';
@@ -404,7 +404,7 @@ function MeterWidget() {
 
         this._beatWheel.createWheel(beatList)
 
-        this._playWheel.colors = [platformColor.paletteColors.boxes[0]];
+        this._playWheel.colors = [platformColor.orange];
         this._playWheel.slicePathFunction = slicePath().DonutSlice;
         this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._playWheel.slicePathCustom.minRadiusPercent = 0.3;

@@ -84,6 +84,7 @@ window.platformColor = {
     graphicsLabelBackground: '#728FF9',
     rhythmcellcolor: '#c8c8c8',
     hitAreaGraphicsBeginFill: '#FFF',
+    orange: '#e37a00', // 5YR
     piemenuBasic: ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'],
     exitWheelcolors: ['#808080', '#c0c0c0'],
     exitWheelcolors2: ['#808080', '#a08080', '#80a080'],
