@@ -615,8 +615,7 @@ function ModeWidget() {
         for (var i = 0; i < 12; i++) {
             // Reverse the order so that Do is last.
             var j = 11 - i;
-            var cell = table.rows[MODEMAP[j][0]].cells[MODEMAP[j][1]];
-            if (cell.style.backgroundColor !== 'black') {
+            if (!this._selectedNotes[j]) {
                 continue;
             }
 
@@ -652,8 +651,7 @@ function ModeWidget() {
         var p = 0;
 
         for (var i = 0; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            if (cell.style.backgroundColor !== 'black') {
+            if (!this._selectedNotes[i]) {
                 continue;
             }
 
