@@ -1134,9 +1134,9 @@ widget launches.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode2.svg "launching widget with Major mode")
 
 In the above example, the widget has been launched with *Major* mode
-(the default). Note that the notes included in the mode are indicated by
-the black boxes, which are arrayed in a circular pattern of tweleve
-half-steps to complete the octave.
+(the default). Note that the notes included in the mode are indicated
+by the protuding sectors with 'X's, which are arrayed in a circular
+pattern of tweleve half-steps to complete the octave.
 
 Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
