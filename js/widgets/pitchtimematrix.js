@@ -1177,7 +1177,11 @@ function PitchTimeMatrix () {
                 }
             }
         }
-        this._blockMap = newBlockMap;
+        this._blockMap = newBlockMap.filter((el,i) => {
+            return i === newBlockMap.findIndex(ele => {
+                return JSON.stringify(ele) === JSON.stringify(el)
+            })
+        });
     }
 
     this.blockConnection = function (len, bottomOfClamp) {
@@ -1354,7 +1358,7 @@ function PitchTimeMatrix () {
         for (var i = 0; i <= noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
-        for (var i = noteToDivide+1; i <= this._logo.tupletRhythms.length; i++) {
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i+1]]);
         }
         this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + 1).concat(this._logo.tupletRhythms.slice(noteToDivide));
@@ -1369,7 +1373,7 @@ function PitchTimeMatrix () {
         for (var i = 0; i < noteToDivide; i++){
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
-        for (var i = noteToDivide+1; i <= this._logo.tupletRhythms.length; i++) {
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i],[i-1]]);
         }
         this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
@@ -1380,7 +1384,6 @@ function PitchTimeMatrix () {
 
     this._divideNotes = function(that, noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide);
-        var oldTupletRhythms = this._logo.tupletRhythms;
         this._blockMapHelper = [];
         for (var i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -1396,7 +1399,7 @@ function PitchTimeMatrix () {
         }
         j++;
         this._blockMapHelper[noteToDivide][1].push(j);
-        for (var i = noteToDivide+1; i < oldTupletRhythms.length; i++) {
+        for (var i = noteToDivide+1; i < this._colBlocks.length; i++) {
             j++;
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
@@ -1416,6 +1419,20 @@ function PitchTimeMatrix () {
             upCellId = mouseDownCell.id;
         }
 
+        this._blockMapHelper = [];
+        for(var i = 0; i < downCellId; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[i]]);
+        }
+        var j = i;
+        for(var i = downCellId; i <= upCellId; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+        }
+        j++;
+        for(var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+            j++;
+        }
+
         var newNote = 0;
         for (var i = downCellId; i <= upCellId; i++) {
             newNote = newNote+(1/parseFloat(this._logo.tupletRhythms[i][2]));
@@ -1424,6 +1441,7 @@ function PitchTimeMatrix () {
         this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
         
         this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
         this._restartGrid(that);
     }
 
