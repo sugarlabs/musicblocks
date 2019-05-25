@@ -1190,7 +1190,7 @@ Note: The build-in modes in Music Blocks can be found in [musicutils.js](https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Phrase maker* block.
 
-### <a name="meterss"></a>4.5 Meters
+### <a name="meters"></a>4.5 Meters
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter1.svg "meter widget block")
 
