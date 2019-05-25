@@ -53,13 +53,14 @@ also available.
        6. [Using a Scale of Pitches in the Phrase Maker](#USING-A-SCALE)
     3. [Generating Rhythms](#rhythms)
     4. [Musical Modes](#modes)
-    5. [The Pitch-Drum Matrix](#pitch-drum)
-    6. [Exploring Musical Proportions](#stairs)
-    7. [Generating Arbitrary Pitches](#slider)
-    8. [Changing Tempo](#tempo)
-    9. [Custom Timbres](#timbre)
-    10. [Music Keyboard](#keyboard)
-    11. [Changing Temperament](#temperament)
+    5. [Meters](#meters)
+    6. [The Pitch-Drum Matrix](#pitch-drum)
+    7. [Exploring Musical Proportions](#stairs)
+    8. [Generating Arbitrary Pitches](#slider)
+    9. [Changing Tempo](#tempo)
+    10. [Custom Timbres](#timbre)
+    11. [Music Keyboard](#keyboard)
+    12. [Changing Temperament](#temperament)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -1189,7 +1190,28 @@ Note: The build-in modes in Music Blocks can be found in [musicutils.js](https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Phrase maker* block.
 
-### <a name="pitch-drum"></a>4.5 The Pitch-Drum Matrix
+### <a name="meterss"></a>4.5 Meters
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter1.svg "meter widget block")
+
+The *Meter Widget* block is used to explore strong and weak
+beats. Launch the widget with the meter you want to explore. (In the
+example, the meter is 4 beats per measure, where each beat is one
+quarter note.)
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter2.svg "Meter Widget")
+
+Inside the widget, you can click on a sector to indicate a strong
+beat. (Clicking on the *X* will revert the beat to a weak beat.) In
+the figure, the first and third beats are strong.
+
+The *Play* button will play the beat, using a snare drum for strong beats and a kick drum for weak beats.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter3.svg "on strong beat do blocks")
+
+The *Save* button will export *On strong beat do* blocks for each strong beat.
+
+### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum2.svg "Pitch-drum matrix")
 
@@ -1210,7 +1232,7 @@ As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-### <a name="stairs"></a>4.6 Exploring Musical Proportions
+### <a name="stairs"></a>4.7 Exploring Musical Proportions
 
 The *Pitch Staircase* block is used to launch a widget similar to the
 *Phrase maker*, which can be used to generate different pitches
@@ -1254,7 +1276,7 @@ the rows in the matrix.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
 
-### <a name="slider"></a>4.7 Generating Arbritary Pitches
+### <a name="slider"></a>4.8 Generating Arbritary Pitches
 
 The *Pitch Slider* block is used to launch a widget that is used to
 generate arbitray pitches. It differs from the *Pitch Staircase*
@@ -1288,7 +1310,7 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchslider5.svg " Pitch Slider block")
 
-### <a name="tempo"></a>4.8 Changing Tempo
+### <a name="tempo"></a>4.9 Changing Tempo
 
 The *Tempo* block is used to launch a widget that enables the user to
 visualize Tempo, defined in beats per minute (BPM). When the *Tempo* block
@@ -1313,7 +1335,7 @@ in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
 
-### <a name="timbre"></a>4.9 Custom Timbres
+### <a name="timbre"></a>4.10 Custom Timbres
 
 While Music Blocks comes with many built-in instruments, it is also
 possible to create custom timbres with unique sound qualities.
@@ -1400,7 +1422,7 @@ As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
-### <a name="keyboard"></a>4.10 Music Keyboard
+### <a name="keyboard"></a>4.11 Music Keyboard
 
 The Music Keyboard is used to generate notes by pressing keys of a virtual
 keyboard.
@@ -1420,7 +1442,7 @@ all of the notes played. Click on the Save button to output code (a
 series of *Note* blocks). The Clear button is used to delete all keys
 pressed previously in order to start new.
 
-###  <a name="temperament"></a>4.11 Changing Temperament
+###  <a name="temperament"></a>4.12 Changing Temperament
 
 *Tempering* is the process of altering the size of an interval by
 making it narrower or wider than pure. It is also possible to change
