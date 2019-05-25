@@ -49,8 +49,8 @@ also available.
        2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
        3. [Creating Tuplets](#CREATING-TUPLETS)
        4. [What is a Tuplet?](#WHAT-IS-TUPLET)
-       5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
-       6. [Using a Scale of Pitches in the Matrix](#USING-A-SCALE)
+       5. [Using Individual Notes in the Phrase Maker](#INDIVIDUAL-NOTES)
+       6. [Using a Scale of Pitches in the Phrase Maker](#USING-A-SCALE)
     3. [Generating Rhythms](#rhythms)
     4. [Musical Modes](#modes)
     5. [The Pitch-Drum Matrix](#pitch-drum)
@@ -1015,14 +1015,14 @@ defining your matrix.
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TripletChart.svg "triplet chart")
 
-#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Matrix
+#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Phrase Maker
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
 
-#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Matrix
+#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Phrase Maker
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix15.svg)
 
@@ -1148,8 +1148,7 @@ right are:
 *Play all*, which will play a scale using the current mode;
 
 *Save*, which will save the current mode as the *Custom* mode and save
-a stack of *Pitch* blocks that can be used with the *Pitch-time
-Matrix* block;
+a stack of *Pitch* blocks that can be used with the *Phrase Maker* block;
 
 *Rotate counter-clockwise*, which will rotate the mode
 counter-clockwise (See the example below);
