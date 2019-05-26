@@ -716,7 +716,7 @@ function ModeWidget() {
 
         this._modeWheel.createWheel(noteList);
 
-        this._noteWheel.colors = platformColor.modeWheelcolors;
+        this._noteWheel.colors = platformColor.noteValueWheelcolors; // modeWheelcolors;
         this._noteWheel.slicePathFunction = slicePath().DonutSlice;
         this._noteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._noteWheel.slicePathCustom.minRadiusPercent = 0.75;
