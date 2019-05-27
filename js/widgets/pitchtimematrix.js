@@ -81,6 +81,9 @@ function PitchTimeMatrix () {
     // restore any notes that might be present.
 
     this._blockMap = [];
+    this.blockNo = null;
+    this.notesBlockMap = [];
+    this._blockMapHelper = [];
 
     this.clearBlocks = function() {
         this._rowBlocks = [];
@@ -1160,9 +1163,166 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._addNotes = function(that, noteToDivide) {
-        noteToDivide = parseInt(noteToDivide);
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + 1).concat(this._logo.tupletRhythms.slice(noteToDivide));
+    this._syncMarkedBlocks = function() {
+        var newBlockMap = []
+        for (var i = 0; i < this._blockMap.length; i++) {
+            if (this._blockMap[i][0] === -1){
+                continue;
+            }
+            for (var j = 0; j < this._blockMapHelper.length; j++) {
+                if (JSON.stringify(this._blockMap[i][1]) === JSON.stringify(this._blockMapHelper[j][0])) {
+                    for (var k =0; k < this._blockMapHelper[j][1].length; k++) {
+                        newBlockMap.push([this._blockMap[i][0],this._colBlocks[this._blockMapHelper[j][1][k]],this._blockMap[i][2]])
+                    }
+                }
+            }
+        }
+        this._blockMap = newBlockMap.filter((el,i) => {
+            return i === newBlockMap.findIndex(ele => {
+                return JSON.stringify(ele) === JSON.stringify(el)
+            })
+        });
+    }
+
+    this.blockConnection = function (len, bottomOfClamp) {
+        var n = this._logo.blocks.blockList.length - len;
+        if (bottomOfClamp == null) {
+            this._logo.blocks.blockList[this.blockNo].connections[2] = n;
+            this._logo.blocks.blockList[n].connections[0] = this.blockNo;
+        } else {
+            var c = this._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+            this._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+            this._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+        }
+
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+    };
+
+    this._deleteRhythmBlock = function(blockToDelete) {
+        if (last(this._logo.blocks.blockList[blockToDelete].connections) !== null) {
+            this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[last(this._logo.blocks.blockList[blockToDelete].connections)]);
+        }
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockToDelete]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.refreshCanvas();
+    }
+
+    this._addRhythmBlock = function(value, times) {
+        var RHYTHMOBJ = [];
+        value = toFraction(value);
+        var topOfClamp = this._logo.blocks.blockList[this.blockNo].connections[1];
+        var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
+        if (this._logo.blocks.blockList[bottomOfClamp].name === 'vspace') {
+            RHYTHMOBJ = [[0,["rhythm2",{}],0,0,[null,1,2,5]],[1,["number",{"value":times}],0,0,[0]],[2,["divide",{}],0,0,[0,3,4]],[3,["number",{"value":value[1]}],0,0,[2]],[4,["number",{"value":value[0]}],0,0,[2]],[5,["vspace",{}],0,0,[0,null]]];
+        } else {
+            RHYTHMOBJ = [[0, 'vspace', 0, 0, [null, 1]],[1,["rhythm2",{}],0,0,[0,2,3,6]],[2,["number",{"value":times}],0,0,[1]],[3,["divide",{}],0,0,[1,4,5]],[4,["number",{"value":value[1]}],0,0,[3]],[5,["number",{"value":value[0]}],0,0,[3]],[6,["vspace",{}],0,0,[1,null]]];
+        }
+        this._logo.blocks.loadNewBlocks(RHYTHMOBJ);
+        var that = this;
+        if (this._logo.blocks.blockList[bottomOfClamp].name === 'vspace') {
+            setTimeout(that.blockConnection(6, bottomOfClamp), 500);
+        } else {
+            setTimeout(that.blockConnection(7, bottomOfClamp), 500);
+        }
+        this._logo.blocks.refreshCanvas();
+    };
+
+
+    this._update = function (i, value, k) {
+        var updates = [];
+        value = toFraction(value);
+        updates.push(this._logo.blocks.blockList[i].connections[1]);
+        updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[1]);
+        updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[2]);
+        this._logo.blocks.blockList[updates[0]].value = parseFloat(k);
+        this._logo.blocks.blockList[updates[0]].text.text = k.toString();
+        this._logo.blocks.blockList[updates[0]].updateCache();
+        this._logo.blocks.blockList[updates[1]].value = parseFloat(value[1]);
+        this._logo.blocks.blockList[updates[1]].text.text = value[1].toString();
+        this._logo.blocks.blockList[updates[1]].updateCache();
+        this._logo.blocks.blockList[updates[2]].value = parseFloat(value[0]);
+        this._logo.blocks.blockList[updates[2]].text.text = value[0].toString();
+        this._logo.blocks.blockList[updates[2]].updateCache();
+        this._logo.refreshCanvas();
+        saveLocally();
+    }
+
+
+    this._mapNotesBlocks = function() {
+        this.notesBlockMap = [];
+        var blk = this._logo.blocks.blockList[this.blockNo].connections[1];
+        var myBlock = this._logo.blocks.blockList[blk];
+
+
+        var bottomBlockLoop = 0;
+        while (last(myBlock.connections) != null) {
+            bottomBlockLoop += 1;
+            if (bottomBlockLoop > 2 * this._logo.blocks.blockList) {
+                // Could happen if the block data is malformed.
+                console.log('infinite loop finding bottomBlock?');
+                break;
+            }
+            
+            blk = last(myBlock.connections);
+            myBlock = this._logo.blocks.blockList[blk];
+            if (myBlock.name === 'rhythm2') {
+                this.notesBlockMap.push(blk);
+            }
+        }
+    }
+
+    this.recalculateBlocks = function(){
+        var adjustedNotes = [];
+        adjustedNotes.push([this._logo.tupletRhythms[0][2], 1])
+        var startidx = 1;
+        for (var i = 1; i < this._logo.tupletRhythms.length; i++) {
+            if (this._logo.tupletRhythms[i][2] === last(adjustedNotes)[0]) {
+                startidx  += 1;
+            } else {
+                adjustedNotes[adjustedNotes.length-1][1] = startidx;
+                adjustedNotes.push([this._logo.tupletRhythms[i][2], 1]);
+                startidx = 1;
+            }
+        }
+        if (startidx > 1) {
+            adjustedNotes[adjustedNotes.length-1][1] = startidx;
+        }
+        return adjustedNotes;
+    };
+
+    this._readjustNotesBlocks = function(){
+        this._mapNotesBlocks();
+        var adjustedNotes = this.recalculateBlocks();
+        
+        var colBlocks = [];
+        var n = adjustedNotes.length - this.notesBlockMap.length;
+        if (n>=0) {
+            for (var i = 0; i < this.notesBlockMap.length; i++) {
+                this._update(this.notesBlockMap[i], adjustedNotes[i][0], adjustedNotes[i][1]);
+            }
+        } else {
+            for (var i = 0; i < adjustedNotes.length; i++) {
+                this._update(this.notesBlockMap[i], adjustedNotes[i][0], adjustedNotes[i][1]);
+            }
+        }
+        
+        for (var i = 0; i < n; i++) {
+            this._addRhythmBlock(adjustedNotes[this.notesBlockMap.length+i][0], adjustedNotes[this.notesBlockMap.length+i][1])
+        }
+        for (var i = n; i < 0; i++) {
+            this._deleteRhythmBlock(this.notesBlockMap[this.notesBlockMap.length+i]);
+        }
+        this._mapNotesBlocks();
+        for (var i = 0; i < this.notesBlockMap.length; i++) {
+            for (var j =0 ; j < adjustedNotes[i][1];  j++) {
+                colBlocks.push([this.notesBlockMap[i], j])
+            }
+        }
+        this._colBlocks = colBlocks;
+    }
+
+    this._restartGrid = function(that) {
         this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
         this.sorted = true;
         this.init(this._logo);
@@ -1190,74 +1350,100 @@ function PitchTimeMatrix () {
         docById('wheelDivptm').style.display = 'none';
         that._menuWheel.removeWheel();
         that._exitWheel.removeWheel();
+    };
+
+    this._addNotes = function(that, noteToDivide) {
+        noteToDivide = parseInt(noteToDivide);
+        this._blockMapHelper = [];
+        for (var i = 0; i <= noteToDivide; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i+1]]);
+        }
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + 1).concat(this._logo.tupletRhythms.slice(noteToDivide));
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
     };
 
     this._deleteNotes = function(that, noteToDivide) {
         noteToDivide = parseInt(noteToDivide);
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
-        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
-        this.sorted = true;
-        this.init(this._logo);
-        this.sorted = false;
-
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            switch (this._logo.tupletRhythms[i][0]) {
-            case 'simple':
-            case 'notes':
-                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
-                tupletParam.push([]);
-                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
-                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
-                }
-
-                this.addTuplet(tupletParam);
-                break;
-            default:
-                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
-                break;
-            }
+        this._blockMapHelper = [];
+        for (var i = 0; i < noteToDivide; i++){
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
-
-        this.makeClickable();
-        docById('wheelDivptm').style.display = 'none';
-        that._menuWheel.removeWheel();
-        that._exitWheel.removeWheel();
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i],[i-1]]);
+        }
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
     };
 
     this._divideNotes = function(that, noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide);
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
-        for (var i = 0; i < divideNoteBy - 1; i++){
+        this._blockMapHelper = [];
+        for (var i = 0; i < noteToDivide; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._blockMapHelper.push([this._colBlocks[noteToDivide], []]);
+        var j = 0;
+
+        for (var i = 0; i < divideNoteBy - 1; i++) {
             this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
+            j=noteToDivide+i;
+            this._blockMapHelper[noteToDivide][1].push(j);
         }
-        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
-        this.sorted = true;
-        this.init(this._logo);
-        this.sorted = false;
-
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            switch (this._logo.tupletRhythms[i][0]) {
-            case 'simple':
-            case 'notes':
-                var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
-                tupletParam.push([]);
-                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
-                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
-                }
-
-                this.addTuplet(tupletParam);
-                break;
-            default:
-                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
-                break;
-            }
+        j++;
+        this._blockMapHelper[noteToDivide][1].push(j);
+        for (var i = noteToDivide+1; i < this._colBlocks.length; i++) {
+            j++;
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
-
-        this.makeClickable();
-        docById('wheelDivptm').style.display = 'none';
-        that._menuWheel.removeWheel();
-        that._exitWheel.removeWheel();
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
     };
+
+    this._tieNotes = function(mouseDownCell,mouseUpCell) {
+        var downCellId = null; 
+        var upCellId = null;
+        if (mouseDownCell.id<mouseUpCell.id){
+            downCellId = mouseDownCell.id; 
+            upCellId = mouseUpCell.id;
+        } else {
+            downCellId = mouseUpCell.id; 
+            upCellId = mouseDownCell.id;
+        }
+
+        this._blockMapHelper = [];
+        for(var i = 0; i < downCellId; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[i]]);
+        }
+        var j = i;
+        for(var i = downCellId; i <= upCellId; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+        }
+        j++;
+        for(var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++){
+            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+            j++;
+        }
+
+        var newNote = 0;
+        for (var i = downCellId; i <= upCellId; i++) {
+            newNote = newNote+(1/parseFloat(this._logo.tupletRhythms[i][2]));
+        }
+        
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
+        
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
+    }
 
     this._createpiesubmenu = function(noteToDivide, noteValue) {
         docById('wheelDivptm').style.display = '';
@@ -1337,9 +1523,27 @@ function PitchTimeMatrix () {
             cell.setAttribute('id',  j);
 
             var that = this;
-            cell.onclick = function() {
-                that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'));
+
+            __mouseDownHandler = function(event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
             }
+
+            __mouseUpHandler = function(event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieNotes(that._mouseDownCell, that._mouseUpCell);
+                } else {
+                    that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'));
+                }
+            }
+
+            cell.removeEventListener('mousedown', __mouseDownHandler);
+            cell.addEventListener('mousedown', __mouseDownHandler);
+
+            cell.removeEventListener('mouseup', __mouseUpHandler);
+            cell.addEventListener('mouseup', __mouseUpHandler);
         }
         
         var rowCount = this.rowLabels.length;
