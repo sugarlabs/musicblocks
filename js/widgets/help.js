@@ -83,7 +83,7 @@ function HelpWidget () {
                 helpDiv.style.display = 'none';
             } else {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
-	    }
+            }
 
             // var cell = this._addLabel(row, ICONSIZE, label);
             topDiv.innerHTML = label;
@@ -96,7 +96,7 @@ function HelpWidget () {
             // leftArrow.style.opacity = "0";
             leftArrow.style.display = "none";
             leftArrow.classList.remove('hover');
-	}
+        }
 
         var cell = document.createElement('div');
         cell.classList.add('close-button');
@@ -192,10 +192,10 @@ function HelpWidget () {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-			            var language = localStorage.languagePreference;
-			            if (language === undefined) {
-			                language = navigator.language;
-			            }
+                        var language = localStorage.languagePreference;
+                        if (language === undefined) {
+                            language = navigator.language;
+                        }
 
                         switch(language) {
                         case 'ja':
@@ -219,7 +219,28 @@ function HelpWidget () {
                     }
 
                     body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
+
+                    if (BLOCKHELP[name].length > 3) {
+                        body += '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' + _('Load blocks') + '/>';
+                    }
+
                     helpBody.innerHTML = body;
+
+                    var loadButton = docById('loadButton');
+                    if (loadButton !== null) {
+                        loadButton.onclick = function() {
+                            // Load the blocks, or if it is a string,
+                            // load the macro assocuated with this block
+                            if (typeof(BLOCKHELP[name][3]) === 'string') {
+                                var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 100, 100);
+                            } else {
+                                var blocksToLoad = BLOCKHELP[name][3];
+                            }
+
+                            console.log('CLICK: ' + blocksToLoad);
+                            blocks.loadNewBlocks(blocksToLoad);
+                        };
+                    }
                 } else {
                     helpDiv.style.display = 'none';
                 }
