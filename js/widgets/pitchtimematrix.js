@@ -1353,16 +1353,18 @@ function PitchTimeMatrix () {
         that._exitWheel.removeWheel();
     };
 
-    this._addNotes = function(that, noteToDivide) {
+    this._addNotes = function(that, noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (var i = 0; i <= noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i], [i+1]]);
+            this._blockMapHelper.push([this._colBlocks[i], [i+parseInt(notesToAdd)]]);
         }
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + 1).concat(this._logo.tupletRhythms.slice(noteToDivide));
+        for (var i = 0;i < parseInt(notesToAdd);i++){
+            this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
+        }
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
@@ -1477,7 +1479,7 @@ function PitchTimeMatrix () {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.createWheel(['x', ' ']);
 
-        var tabsLabels = ['','','','','','','','','','','','','','2','3','4','5','7','',''];
+        var tabsLabels = ['','','','','','','','','','','','','1','2','3','4','5','6','7',''];
 
         this._tabsWheel.colors = platformColor.pitchWheelcolors;
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1518,16 +1520,18 @@ function PitchTimeMatrix () {
             that._deleteNotes(that, noteToDivide);
         };
         this._menuWheel.navItems[2].navigateFunction = function () {
-            that._addNotes(that, noteToDivide);
+            that._addNotes(that, noteToDivide, that.divideNoteBy);
         };
         this._menuWheel.navItems[3].navigateFunction = function () {
             if( !flag ){
-                for(var i = 13; i < 18; i++){
+                for(var i = 12; i < 19; i++){
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.divideNoteBy;
                     that._tabsWheel.navItems[i].navItem.show();
                 }
                 flag = 1;
             }else{
-                for(var i = 13; i < 18; i++){
+                for(var i = 12; i < 19; i++){
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.divideNoteBy;
                     that._tabsWheel.navItems[i].navItem.hide();
                 }
                 flag = 0;
@@ -1535,7 +1539,7 @@ function PitchTimeMatrix () {
             // that._dividesubmenu(noteValue)
         };
 
-        for(var i = 13; i < 18; i++){
+        for(var i = 12; i < 19; i++){
             this._tabsWheel.navItems[i].navigateFunction = function () {
                 var j = that._tabsWheel.selectedNavItemIndex;
                 that.divideNoteBy = tabsLabels[j];
