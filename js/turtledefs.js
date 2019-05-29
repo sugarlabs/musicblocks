@@ -324,7 +324,6 @@ function createHelpContent() {
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg'],
         'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
-	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg'],
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
@@ -332,8 +331,8 @@ function createHelpContent() {
         'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg'],
         'backward': [_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', 'box-1-block.svg'],
         // Action palette
-        'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg'],
-        'start': [_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', 'start-block.svg'],
+        'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg', 'actionhelp'],
+        'start': [_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', 'repeat-block.svg'],
         'listen': [_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', 'broadcast-block.svg'],
         'dispatch': [_('The Broadcast block is used to trigger an event.'), 'documentation', 'broadcast-block.svg'],
         'do': [_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', 'do-block.svg'],
@@ -361,7 +360,7 @@ function createHelpContent() {
         'back': [_('The Back block moves the mouse backward.'), 'documentation', 'forward-block.svg'],
         'left': [_('The Left block turns the mouse to the left.'), 'documentation', 'forward-block.svg'],
         'right': [_('The Right block turns the mouse to the right.'), 'documentation', 'forward-block.svg'],
-        'arc': [_('The Arc block moves the mouse in a arc.'), 'documentation', 'arc-block.svg'],
+        'arc': [_('The Arc block moves the mouse in a arc.'), 'documentation', 'arc-block.svg', 'archelp'],
         'setxy': [_('The Set XY block moves the mouse to a specific position on the screen.'), 'documentation', 'mouse-button-block.svg'],
         'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg'],
         'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
@@ -377,9 +376,9 @@ function createHelpContent() {
         // Media palette
         'print': [_('The Print block displays text at the top of the screen.'), 'documentation', 'print-block.svg'],
         'text': [_('The Text block holds a text string.'), 'documentation', 'show-block.svg'],
-        'media': [_('The Media block is used to import an image.'), 'documentation', 'avatar-block.svg'],
+        'media': [_('The Media block is used to import an image.'), 'documentation', 'avatar-block.svg', 'turtleshell'],
         'show': [_('The Show block is used to display text or images on the canvas.'), 'documentation', 'show-block.svg'],
-        'turtleshell': [_('The Shell block is used to change the appearance of the mouse.'), 'documentation', 'avatar-block.svg'],
+        'turtleshell': [_('The Shell block is used to change the appearance of the mouse.'), 'documentation', 'avatar-block.svg', 'turtleshell'],
         'speak': [_('The Speak block outputs to the text-to-speech synthesizer'), 'documentation', 'speak-block.svg'],
         'height': [_('The Height block returns the height of the canvas.'), 'documentation', 'width-block.svg'],
         'width': [_('The Width block returns the width of the canvas.'), 'documentation', 'width-block.svg'],
@@ -415,7 +414,7 @@ function createHelpContent() {
         'bpmfactor': [_('The Beats per minute block returns the current beats per minute.'), 'documentation', 'bpmfactor-block.svg'],
         // 'beatfactor': [_(''), 'documentation', 'status.svg'],
         // pitch palette
-        'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental-block.svg'],
+        'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental-block.svg', 'accidental'],
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'set-scalar-transposition-block.svg'],
         'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'register-block.svg'],
         'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'invert.svg'],
@@ -444,11 +443,11 @@ function createHelpContent() {
         'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic-block.svg'],
         'harmonic': [_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', 'status.svg'],
         'partial': [_('The Partial block is used to specify a weight for a specific partical harmonic.'), 'documentation', 'status.svg'],
-        'fmsynth': [_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', 'fmsynth-block.svg'],
-        'amsynth': [_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', 'amsynth-block.svg'],
+        'fmsynth': [_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', 'fmsynth-block.svg', 'fmsynthhelp'],
+        'amsynth': [_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', 'amsynth-block.svg', 'amsynthhelp'],
         'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', 'duosynth-block.svg'],
         // Volume palette
-        'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'articulation-block.svg'],
+        'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', 'articulation-block.svg', 'articulationhelp'],
         'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', 'status.svg'],
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', 'status.svg'],

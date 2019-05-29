@@ -220,25 +220,41 @@ function HelpWidget () {
 
                     body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
 
-                    if (BLOCKHELP[name].length > 3) {
-                        body += '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' + _('Load blocks') + '/>';
-                    }
+                    body += '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' + _('Load blocks') + '/>';
 
                     helpBody.innerHTML = body;
 
                     var loadButton = docById('loadButton');
                     if (loadButton !== null) {
                         loadButton.onclick = function() {
-                            // Load the blocks, or if it is a string,
-                            // load the macro assocuated with this block
-                            if (typeof(BLOCKHELP[name][3]) === 'string') {
-                                var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 100, 100);
-                            } else {
-                                var blocksToLoad = BLOCKHELP[name][3];
-                            }
+                            if (BLOCKHELP[name].length < 4) {
+                                // If there is nothing specified, just
+                                // load the block.
+                                console.log('CLICK: ' + name);
+                                var obj = blocks.palettes.getProtoNameAndPalette
+(name);
+                                var protoblk = obj[0];
+                                var paletteName = obj[1];
+                                var protoName = obj[2];
 
-                            console.log('CLICK: ' + blocksToLoad);
-                            blocks.loadNewBlocks(blocksToLoad);
+                                var protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                                if (protoResult) {
+                                    blocks.palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
+                                        blocks.moveBlock(newBlock, 100, 100);
+                                    });
+                                }
+                            } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                                // If it is a string, load the macro
+                                // assocuated with this block
+                                var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 100, 100);
+                                console.log('CLICK: ' + blocksToLoad);
+                                blocks.loadNewBlocks(blocksToLoad);
+                            } else {
+                                // Load the blocks.
+                                var blocksToLoad = BLOCKHELP[name][3];
+                                console.log('CLICK: ' + blocksToLoad);
+                                blocks.loadNewBlocks(blocksToLoad);
+                            }
                         };
                     }
                 } else {

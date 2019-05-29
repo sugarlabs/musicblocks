@@ -337,6 +337,8 @@ function Palettes () {
             // Don't return deprecated blocks.
             if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) {
                 return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+            } else if (name === b && !this.blocks.protoBlockDict[b].hidden) {
+                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
             }
         }
 
@@ -412,8 +414,8 @@ function Palettes () {
                     }
 
                     if (i === MULTIPALETTES.length) {
-			// Put plugins in last multipalette selector
-			i = MULTIPALETTES.length - 1; 
+                        // Put plugins in last multipalette selector
+                        i = MULTIPALETTES.length - 1; 
                         console.log("We didn't find a multipalette for " + name);
                         this.buttons[name].x = this.x[i];
                         this.buttons[name].y = this.y[i] + this.scrollDiff;
