@@ -281,9 +281,9 @@ function createHelpContent() {
         // Meter palette
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg'],
         'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg'],
-        'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm-block.svg'],
+        'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm-block.svg', 'bpmhelp'],
         'everybeatdo': [_('The On-every-note block let you specify actions to take on every note.'), 'documentation', 'on-every-beat-do-block.svg'],
-        'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beat-count-block.svg'],
+        'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beat-count-block.svg', 'beatvaluehelp'],
         'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do-block.svg'],
         // Pitch palette
         'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg'],
@@ -307,8 +307,8 @@ function createHelpContent() {
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
         'neighbor2': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg'],
         // Volume palette
-        'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg'],
-        'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg'],
+        'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg', 'crescendohelp'],
+        'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg', 'crescendohelp'],
         'setsynthvolume': [_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('eg guitar violin snare drum etc.') + ' ' + _('The default volume is 50.') + ' ' + _('The range is 0 for silence to 100 for full volume.'), 'documentation', 'set-synth-volume-block.svg'],
         'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'set-master-volume-block.svg'],
         // Drum palette
@@ -324,6 +324,7 @@ function createHelpContent() {
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg'],
         'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
+	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg'],
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg'],
@@ -333,14 +334,14 @@ function createHelpContent() {
         // Action palette
         'action': [_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', 'action-block.svg', 'actionhelp'],
         'start': [_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', 'repeat-block.svg'],
-        'listen': [_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', 'broadcast-block.svg'],
-        'dispatch': [_('The Broadcast block is used to trigger an event.'), 'documentation', 'broadcast-block.svg'],
+        'listen': [_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', 'broadcast-block.svg', 'broadcasthelp'],
+        'dispatch': [_('The Broadcast block is used to trigger an event.'), 'documentation', 'broadcast-block.svg', 'broadcasthelp'],
         'do': [_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', 'do-block.svg'],
         // Boxes palette
-        'storebox1': [_('The Store in Box 1 block is used to store a value in Box 1.'), 'documentation', 'box-1-block.svg'],
-        'box1': [_('The Box 1 block returns the value stored in Box 1.'), 'documentation', 'box-1-block.svg'],
-        'storebox2': [_('The Store in Box 2 block is used to store a value in Box 2.'), 'documentation', 'box-2-block.svg'],
-        'box2': [_('The Box 2 block returns the value stored in Box 2.'), 'documentation', 'box-2-block.svg'],
+        'storebox1': [_('The Store in Box 1 block is used to store a value in Box 1.'), 'documentation', 'box-1-block.svg', 'box1help'],
+        'box1': [_('The Box 1 block returns the value stored in Box 1.'), 'documentation', 'box-1-block.svg', 'box1help'],
+        'storebox2': [_('The Store in Box 2 block is used to store a value in Box 2.'), 'documentation', 'box-2-block.svg', 'box2help'],
+        'box2': [_('The Box 2 block returns the value stored in Box 2.'), 'documentation', 'box-2-block.svg', 'box2help'],
         'increment': [_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks such as Color and Pen size.'), 'documentation', 'box-2-block.svg'],
         'incrementOne': [_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', 'box-1-block.svg'],
         // Number palette
@@ -382,18 +383,18 @@ function createHelpContent() {
         'speak': [_('The Speak block outputs to the text-to-speech synthesizer'), 'documentation', 'speak-block.svg'],
         'height': [_('The Height block returns the height of the canvas.'), 'documentation', 'width-block.svg'],
         'width': [_('The Width block returns the width of the canvas.'), 'documentation', 'width-block.svg'],
-        'toppos': [_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg'],
-        'bottompos': [_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg'],
+        'toppos': [_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg', 'bottomposhelp'],
+        'bottompos': [_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg', 'bottomposhelp'],
         'leftpos': [_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg'],
         'rightpos': [_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg'],
         // Sensors palette
         'mousebutton': [_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
         'mousex': [_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
         'mousey': [_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
-        'myclick': [_('The Click block returns True if a mouse has been clicked.'), 'documentation', 'click-block.svg'],
+        'myclick': [_('The Click block returns True if a mouse has been clicked.'), 'documentation', 'click-block.svg', 'clickhelp'],
         // Mice palette
-        'setturtlename2': [_('The Set-name block is used to name a mouse.'), 'documentation', 'click-block.svg'],
-        'turtlename': [_('The Mouse-name block returns the name of a mouse.'), 'documentation', 'click-block.svg'],
+        'setturtlename2': [_('The Set-name block is used to name a mouse.'), 'documentation', 'click-block.svg', 'clickhelp'],
+        'turtlename': [_('The Mouse-name block returns the name of a mouse.'), 'documentation', 'click-block.svg', 'clickhelp'],
         // Advanced blocks
         // Rhythm palette
         'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg'],
@@ -418,7 +419,7 @@ function createHelpContent() {
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'set-scalar-transposition-block.svg'],
         'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'register-block.svg'],
         'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'invert.svg'],
-        'deltapitch': [_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'delta-pitch-block.svg'],
+        'deltapitch': [_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'delta-pitch-block.svg', 'deltapitchhelp'],
         '// customNote': ['', 'documentation', 'status.svg'],
         //.TRANS: 'ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa' are East Indian note names.
         'eastindiansolfege': [_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', 'eastindian-block.svg'],
@@ -429,16 +430,16 @@ function createHelpContent() {
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
         // Intervals palette
         'movable': [_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', 'movable-block.svg'],
-        'definemode': [_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', 'define-mode-block.svg'],
+        'definemode': [_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', 'define-mode-block.svg', 'definemode'],
         'semitoneinterval': [_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', 'semitoneinterval.svg'],
         'measureintervalscalar': [_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', 'status.svg'],
         'measureintervalsemitones': [_('The Semi-tone interval block measures the distance between two notes in semi-tones.'), 'documentation', 'status.svg'],
         'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', 'doubly-block.svg'],
         // Tone palette
         'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'set-timbre-block.svg'],
-        'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg'],
+        'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg', 'chorushelp'],
         'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser-block.svg'],
-        'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion-block.svg'],
+        'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion-block.svg', 'dishelp'],
         'tremolo': [_('The Tremolo block adds a wavering effect.'), 'documentation', 'tremolo-block.svg'],
         'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic-block.svg'],
         'harmonic': [_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', 'status.svg'],
@@ -582,7 +583,7 @@ function createHelpContent() {
         BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
         BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
         BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
-        BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg'];
+        BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg', 'broadcasthelp'],
         BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg'];
         BLOCKHELP['if'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg'];
         BLOCKHELP['ifthenelse'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'elif-conditional-block.svg'];
