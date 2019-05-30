@@ -403,7 +403,7 @@ function createHelpContent() {
         'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg', 'multiplybeathelp'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg'],
-        'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg'],
+        'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg', 'swinghelp'],
         'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'osctime-block.svg'],
         // Meter palette
         'pickup': [_('The Pickup block is used to accommodate any notes that come in before the beat.'), 'documentation', 'pickup-block.svg'],
