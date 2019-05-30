@@ -97,61 +97,149 @@ function Block(protoblock, blocks, overrideName) {
     this.original = {'x': 0, 'y': 0};
     this.offset = {'x': 0, 'y': 0};
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
-    this._createCache = function (callback, args, counter) {
-        if (counter === undefined) {
-            var loopCount = 0;
-        } else {
-            var loopCount = counter;
+    // // Internal function for creating cache.
+    // // Includes workaround for a race condition.
+    // this._createCache = function (callback, args, counter) {
+    //     if (counter === undefined) {
+    //         var loopCount = 0;
+    //     } else {
+    //         var loopCount = counter;
+    //     }
+
+    //     if (loopCount > 3) {
+    //         console.log('COULD NOT CREATE CACHE');
+    //         return;
+    //     }
+
+    //     var that = this;
+    //     this.bounds = this.container.getBounds();
+
+    //     if (this.bounds === null) {
+    //         setTimeout(function () {
+    //             console.log('// Try regenerating the artwork');
+    //             that.regenerateArtwork(true, []);
+    //             that._createCache(callback, args, loopCount + 1);
+    //         }, 100);
+    //     } else {
+    //         this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
+    //         callback(this, args);
+    //     }
+    // };
+
+    // // Internal function for creating cache.
+    // // Includes workaround for a race condition.
+    // this.updateCache = function (counter) {
+    //     if (counter === undefined) {
+    //         var loopCount = 0;
+    //     } else {
+    //         var loopCount = counter;
+    //     }
+
+    //     if (loopCount > 3) {
+    //         console.log('COULD NOT UPDATE CACHE');
+    //         return;
+    //     }
+
+    //     var that = this;
+
+    //     if (this.bounds == null) {
+    //         setTimeout(function () {
+    //             console.log('UPDATE CACHE: BOUNDS NOT READY');
+    //             that.updateCache(loopCount + 1);
+    //         }, 200);
+    //     } else {
+    //         this.container.updateCache();
+    //         this.blocks.refreshCanvas();
+    //     }
+    // };
+
+
+    this._createCache = (callback, args, counter) =>
+    new Promise((resolve, reject) => {
+        try {
+            let loopCount = 0;
+
+            // if (counter !== undefined) loopCount = counter;
+
+            const delay = timeout =>
+                new Promise(resolve => setTimeout(() => resolve(), timeout));
+
+            const checkBounds = async () => {
+
+                if (loopCount > 3) return reject(new Error('Could not create cache'));
+
+                this.bounds = this.container.getBounds();
+
+                if (this.bounds === null) {
+                    loopCount += 1;
+                    await delay(100);
+                    console.log('// Try regenerating the artwork');
+                    this.regenerateArtwork(true, []);
+                    return checkBounds()
+                }
+
+                this.container.cache(
+                    this.bounds.x,
+                    this.bounds.y,
+                    this.bounds.width,
+                    this.bounds.height
+                );
+                
+                callback(args);
+                resolve();
+            }
+
+
+        } catch (e) {
+            return reject(e)
         }
 
-        if (loopCount > 3) {
-            console.log('COULD NOT CREATE CACHE');
-            return;
-        }
+    })
 
-        var that = this;
-        this.bounds = this.container.getBounds();
+    this.updateCache = (counter) =>
+    new Promise((resolve, reject) => {
+        try {
+            let loopCount = 0;
 
-        if (this.bounds === null) {
-            setTimeout(function () {
-                console.log('// Try regenerating the artwork');
-                that.regenerateArtwork(true, []);
-                that._createCache(callback, args, loopCount + 1);
-            }, 100);
-        } else {
-            this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
-            callback(this, args);
-        }
-    };
+            // if (counter !== undefined) loopCount = counter;
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
-    this.updateCache = function (counter) {
-        if (counter === undefined) {
-            var loopCount = 0;
-        } else {
-            var loopCount = counter;
-        }
+            const delay = timeout =>
+                new Promise(resolve => setTimeout(() => resolve(), timeout));
 
-        if (loopCount > 3) {
-            console.log('COULD NOT UPDATE CACHE');
-            return;
-        }
+            const checkBounds = async () => {
 
-        var that = this;
+                if (loopCount > 3) return reject(new Error('Could not update cache'));
 
-        if (this.bounds == null) {
-            setTimeout(function () {
-                console.log('UPDATE CACHE: BOUNDS NOT READY');
-                that.updateCache(loopCount + 1);
-            }, 200);
-        } else {
-            this.container.updateCache();
+                this.bounds = this.container.getBounds();
+
+                if (this.bounds === null) {
+                    loopCount += 1;
+                    await delay(200);
+                    console.log('UPDATE CACHE: BOUNDS NOT READY');
+                    return checkBounds()
+                }
+
+                this.container.updateCache();
             this.blocks.refreshCanvas();
+                
+                callback(counter);
+                resolve();
+            }
+
+
+        } catch (e) {
+            return reject(e)
         }
-    };
+
+    })
+
+
+
+
+
+
+
+
 
     this.ignore = function () {
         if (this.bitmap === null) {
