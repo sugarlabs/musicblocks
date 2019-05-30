@@ -388,9 +388,9 @@ function createHelpContent() {
         'leftpos': [_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg', 'lrhelp'],
         'rightpos': [_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg', 'lrhelp'],
         // Sensors palette
-        'mousebutton': [_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
-        'mousex': [_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
-        'mousey': [_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
+        'mousebutton': [_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg', 'mousebuttonhelp'],
+        'mousex': [_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg', 'mousebuttonhelp'],
+        'mousey': [_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', 'mouse-button-block.svg', 'mousebuttonhelp'],
         'myclick': [_('The Click block returns True if a mouse has been clicked.'), 'documentation', 'click-block.svg', 'clickhelp'],
         // Mice palette
         'setturtlename2': [_('The Set-name block is used to name a mouse.'), 'documentation', 'click-block.svg', 'clickhelp'],
@@ -429,7 +429,7 @@ function createHelpContent() {
         'consonantstepsizeup': [_('The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode.'), 'documentation', 'status.svg'],
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
         // Intervals palette
-        'movable': [_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', 'movable-block.svg'],
+        'movable': [_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', 'moveable-block.svg', 'movablehelp'],
         'definemode': [_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', 'define-mode-block.svg', 'definemode'],
         'semitoneinterval': [_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', 'semitoneinterval.svg'],
         'measureintervalscalar': [_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', 'status.svg'],
