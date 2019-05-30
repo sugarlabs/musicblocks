@@ -412,7 +412,7 @@ function createHelpContent() {
         'offbeatdo': [_('The On-weak-beat block let you specify actions to take on weak (off) beats.'), 'documentation', 'on-every-beat-do-block.svg'],
         'no-clock': [_('The No clock block decouples the notes from the master clock.'), 'documentation', 'no-clock.svg'],
         'elapsednotes': [_('The Whole notes played block returns the total number of whole notes played.'), 'documentation', 'elapsednotes-block.svg', 'elapsedhelp'],
-        'notecounter': [_('The Note counter block can be used to count the number of contained notes.'), 'documentation', 'notecounter-block.svg'],
+        'notecounter': [_('The Note counter block can be used to count the number of contained notes.'), 'documentation', 'notecounter-block.svg', 'notecounterhelp'],
         'measurevalue': [_('The Measure count block returns the current measure.'), 'documentation', 'measurevalue-block.svg'],
         'bpmfactor': [_('The Beats per minute block returns the current beats per minute.'), 'documentation', 'bpmfactor-block.svg'],
         // 'beatfactor': [_(''), 'documentation', 'status.svg'],
