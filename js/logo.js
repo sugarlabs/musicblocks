@@ -4092,7 +4092,7 @@ function Logo () {
                         switch (that.tupletRhythms[i][0]) {
                         case 'notes':
                         case 'simple':
-                            var tupletParam = that.tupletParams;
+                            var tupletParam = [that.tupletParams[i]];
                             tupletParam.push([]);
                             for (var j = 2; j < that.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(that.tupletRhythms[i][j]);
