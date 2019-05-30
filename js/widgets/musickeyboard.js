@@ -1,6 +1,6 @@
 // Copyright (c) 2015 Jefferson Lee
 // Copyright (c) 2018 Ritwik Abhishek
-// Copyright (c) 2018,19 Walter Bender
+// Copyright (c) 2018 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -231,6 +231,7 @@ function MusicKeyboard() {
                 that._save(selected1);
             }
         };
+<<<<<<< HEAD
 
 
     
@@ -241,6 +242,46 @@ function MusicKeyboard() {
             selected1 = [];
         };
 
+=======
+         
+        var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+
+        cell.onclick = function() {
+            mkbDiv.style.visibility = 'hidden';
+            mkbButtonsDiv.style.visibility = 'hidden';
+            document.getElementById('keyboardHolder').style.display = 'none';
+            document.getElementById('keyboardHolder2').style.display = 'none';
+            var myNode = document.getElementById('myrow');
+            myNode.innerHTML = '';
+            var myNode = document.getElementById('myrow2');
+            myNode.innerHTML = '';
+            selected = [];
+            selected1 = [];
+        };
+>>>>>>> fd4213781a3e53989d4fe40ef6348b89fd3a67b4
+
+
+        var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
+
+        cell.onclick=function() {
+            selected = [];
+            selected1 = [];
+        };
+
+        // var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+
+        // cell.onclick = function() {
+        //     mkbDiv.style.visibility = 'hidden';
+        //     mkbButtonsDiv.style.visibility = 'hidden';
+        //     document.getElementById('keyboardHolder').style.display = 'none';
+        //     document.getElementById('keyboardHolder2').style.display = 'none';
+        //     var myNode = document.getElementById('myrow');
+        //     myNode.innerHTML = '';
+        //     var myNode = document.getElementById('myrow2');
+        //     myNode.innerHTML = '';
+        //     selected = [];
+        //     selected1 = [];
+        // };
 
         var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
@@ -265,7 +306,6 @@ function MusicKeyboard() {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -281,7 +321,6 @@ function MusicKeyboard() {
         };
 
         mkbDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -297,6 +336,7 @@ function MusicKeyboard() {
         };
 
         mkbDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

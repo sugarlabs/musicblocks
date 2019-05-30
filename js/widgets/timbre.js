@@ -1,4 +1,4 @@
-// Copyright (c) 2017-19 Walter Bender
+// Copyright (c) 2017,18 Walter Bender
 // Copyright (c) 2017 Tayba Wasim
 // Copyright (c) 2017 Prachi Agrawal
 //
@@ -600,6 +600,22 @@ function TimbreWidget () {
             blk.text.text = label;
             blk.updateCache();
         };
+     
+
+
+    
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick = function () {
+            docById('timbreDiv').style.visibility = 'hidden';
+            docById('timbreButtonsDiv').style.visibility = 'hidden';
+            docById('timbreTableDiv').style.visibility = 'hidden';
+            docById('timbreName').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
+        };
+
+
+
 
         var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('Synthesizer'));
         synthButtonCell.id = 'synthButtonCell';

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -68,6 +68,7 @@ function ModeWidget() {
         this._playButton = cell;
 
         cell.onclick=function() {
+<<<<<<< HEAD
             that._logo.resetSynth(0);
             if (that._playingStatus()) {
                 that._playing = false;
@@ -80,12 +81,24 @@ function ModeWidget() {
 
                 that._playAll();
             }
+=======
+            that._playAll();
+>>>>>>> fd4213781a3e53989d4fe40ef6348b89fd3a67b4
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
         cell.onclick=function() {
             that._save();
+        }
+
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
         }
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
@@ -151,7 +164,6 @@ function ModeWidget() {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -167,7 +179,6 @@ function ModeWidget() {
         };
 
         modeDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -183,6 +194,7 @@ function ModeWidget() {
         };
 
         modeDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

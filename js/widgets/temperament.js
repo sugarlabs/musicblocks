@@ -1720,6 +1720,29 @@ function TemperamentWidget () {
                 that._graphOfNotes();
             }
         }
+     
+
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick = function () {
+        //     that._logo.synth.setMasterVolume(0);
+        //     that._logo.synth.stop();
+        //     docById('temperamentDiv').style.visibility = 'hidden';
+        //     docById('temperamentButtonsDiv').style.visibility = 'hidden';
+        //     docById('temperamentTableDiv').style.visibility = 'hidden';
+        //     if (docById('wheelDiv2') != null) {
+        //         docById('wheelDiv2').style.display = 'none';
+        //         that.notesCircle.removeWheel();
+        //     }
+        //     if (docById('wheelDiv3') != null) {
+        //         docById('wheelDiv3').style.display = 'none';
+        //         that.wheel.removeWheel();  
+        //     }
+        //     if (docById('wheelDiv4') != null) {
+        //         docById('wheelDiv4').style.display = 'none';
+        //         that.wheel1.removeWheel();  
+        //     }
+        // };
+
 
         var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add pitches'));
 
@@ -1768,7 +1791,6 @@ function TemperamentWidget () {
         };
 
         canvas.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1784,7 +1806,6 @@ function TemperamentWidget () {
         };
 
         temperamentDiv.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1800,6 +1821,7 @@ function TemperamentWidget () {
         };
 
         temperamentDiv.onmousedown = function (e) {
+            that._dragging = true;
             that._target = e.target;
         };
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
@@ -13,8 +13,7 @@
 
 function HelpWidget () {
     const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    // const BUTTONSIZE = 53;
-    const BUTTONSIZE = 82;
+    const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     const HELPWIDTH = 400;
     const HELPHEIGHT = 600;
@@ -36,27 +35,22 @@ function HelpWidget () {
         helpDiv.style.left = '200px';
         helpDiv.style.top = '150px';
 
-        var topDiv = document.createElement('div');
-        // topDiv.style.position = "absolute";
-        // topDiv.style.top = "0";
-        topDiv.classList.add('top-wrapper');
+        // The widget buttons
+        var widgetButtonsDiv = docById('helpButtonsDiv');
+        widgetButtonsDiv.style.display = 'inline';
+        widgetButtonsDiv.style.visibility = 'visible';
+        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
+        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="helpButtonTable"></table>';
 
-        helpDiv.appendChild(topDiv);
+        var buttonTable = docById('helpButtonTable');
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
 
         // For the button callbacks
         var that = this;
 
         if (blocks === null) {
-            topDiv.innerHTML = _('Take a tour');
-            var rightArrow = document.getElementById("right-arrow");
-            rightArrow.style.display = "block";
-            rightArrow.classList.add('hover');
-
-            var leftArrow = document.getElementById("left-arrow");
-            leftArrow.style.display = "block";
-            leftArrow.classList.add('hover');
-
-            var cell = docById("left-arrow");
+            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('Previous page'));
 
             cell.onclick=function() {
                 page = page - 1;
@@ -67,9 +61,17 @@ function HelpWidget () {
                 that._showPage(page);
             };
 
-            var cell = docById("right-arrow");
+            cell.onmouseover=function() {
+                this.style.backgroundColor = platformColor.selectorSelected;
+            };
 
-            cell.onclick = function() {
+            cell.onmouseout=function() {
+                this.style.backgroundColor = platformColor.selectorBackground;
+            };
+
+            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('Next page'));
+
+            cell.onclick=function() {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {
                     page = 0;
@@ -78,6 +80,13 @@ function HelpWidget () {
                 that._showPage(page);
             };
 
+            cell.onmouseover=function() {
+                this.style.backgroundColor = platformColor.selectorSelected;
+            };
+
+            cell.onmouseout=function() {
+                this.style.backgroundColor = platformColor.selectorBackground;
+            };
         } else {
             if (blocks.activeBlock.name === null) {
                 helpDiv.style.display = 'none';
@@ -85,6 +94,7 @@ function HelpWidget () {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
             }
 
+<<<<<<< HEAD
             // var cell = this._addLabel(row, ICONSIZE, label);
             topDiv.innerHTML = label;
             var rightArrow = document.getElementById("right-arrow");
@@ -97,18 +107,28 @@ function HelpWidget () {
             leftArrow.style.display = "none";
             leftArrow.classList.remove('hover');
         }
+=======
+            var cell = this._addLabel(row, ICONSIZE, label);
+	}
+>>>>>>> fd4213781a3e53989d4fe40ef6348b89fd3a67b4
 
-        var cell = document.createElement('div');
-        cell.classList.add('close-button');
-        topDiv.appendChild(cell);
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
             helpDiv.style.display = 'none';
         };
 
-        var dragCell = document.createElement("div");
-        dragCell.classList.add('drag-button');
-        topDiv.appendChild(dragCell);
+        cell.onmouseover=function() {
+            this.style.backgroundColor = platformColor.selectorSelected;
+        };
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = platformColor.selectorBackground;
+        };
+
+        // We use this cell as a handle for dragging.
+        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
+        dragCell.style.cursor = 'move';
 
         this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
         this._dy = dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top;
@@ -130,23 +150,21 @@ function HelpWidget () {
         };
 
         canvas.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
         canvas.ondrop = function(e) {
             if (that._dragging) {
                 that._dragging = false;
-                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE / 2;
+                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE/2;
                 helpDiv.style.left = x + 'px';
-                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE / 2;
+                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE/2;
                 helpDiv.style.top = y + 'px';
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
         helpDiv.ondragover = function(e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -162,6 +180,7 @@ function HelpWidget () {
         };
 
         helpDiv.onmousedown = function(e) {
+            that._dragging = true;
             that._target = e.target;
         };
 
@@ -192,10 +211,17 @@ function HelpWidget () {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
+<<<<<<< HEAD
                         var language = localStorage.languagePreference;
                         if (language === undefined) {
                             language = navigator.language;
                         }
+=======
+			var language = localStorage.languagePreference;
+			if (language === undefined) {
+			    language = navigator.language;
+			}
+>>>>>>> fd4213781a3e53989d4fe40ef6348b89fd3a67b4
 
                         switch(language) {
                         case 'ja':
@@ -207,9 +233,6 @@ function HelpWidget () {
                             break;
                         case 'es':
                             path = path + '-es';
-                            break;
-                        case 'pt':
-                            path = path + '-pt';
                             break;
                         default:
                             break;
@@ -274,14 +297,13 @@ function HelpWidget () {
         }
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
-        
+
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
-            console.log(page + ' ' + link);
+	    console.log(page + ' ' + link);
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
-        
-    helpBody.style.color = "#505050";
+
     helpBody.innerHTML = body;
     };
 
@@ -293,17 +315,38 @@ function HelpWidget () {
         }
 };
 
-    // this._addLabel = function(row, iconSize, label) {
-    //     var cell = row.insertCell(-1);
-    //     cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
-    //     cell.style.height = cell.style.width;
-    //     cell.style.minHeight = cell.style.height;
-    //     cell.style.maxHeight = cell.style.height;
-    //     // cell.style.backgroundColor = platformColor.selectorBackground;
-    //     cell.style.backgroundColor = '#2196F3';
+    this._addButton = function(row, icon, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + 'px';
+        cell.style.minWidth = cell.style.width;
+        cell.style.maxWidth = cell.style.width;
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = platformColor.selectorBackground;
 
-    //     return cell;
-    // };
+        cell.onmouseover=function() {
+            this.style.backgroundColor = platformColor.selectorSelected;
+        }
+
+        cell.onmouseout=function() {
+            this.style.backgroundColor = platformColor.selectorBackground;
+        }
+
+        return cell;
+    };
+
+    this._addLabel = function(row, iconSize, label) {
+        var cell = row.insertCell(-1);
+        cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
+        cell.style.height = cell.style.width;
+        cell.style.minHeight = cell.style.height;
+        cell.style.maxHeight = cell.style.height;
+        cell.style.backgroundColor = platformColor.selectorBackground;
+
+        return cell;
+    };
 
     this.hide = function () {
         docById('helpDiv').style.visibility = 'hidden';

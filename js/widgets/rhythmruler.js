@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-18 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1513,6 +1513,55 @@ function RhythmRuler () {
 		}, 1000);
 	    }
         };
+    
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+
+        cell.onclick = function () {
+            // If the piemenu was open, close it.
+            // docById('wheelDiv').style.display = 'none';
+            // docById('contextWheelDiv').style.display = 'none';
+
+            // Save the new dissect history.
+            var dissectHistory = [];
+            var drums = [];
+            for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
+                var history = [];
+                for (var j = 0; j < that.Rulers[i][1].length; j++) {
+                    history.push(that.Rulers[i][1][j]);
+                }
+
+                docById('dissectNumber').classList.add('hasKeyboard');
+                dissectHistory.push([history, that.Drums[i]]);
+                drums.push(that.Drums[i]);
+            }
+
+            // Look for any old entries that we may have missed.
+            for (var i = 0; i < that._dissectHistory.length; i++) {
+                var drum = that._dissectHistory[i][1];
+                if (drums.indexOf(drum) === -1) {
+                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+                    dissectHistory.push([history, drum]);
+                }
+            }
+
+            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
+            rulerTableDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            rulerDiv.style.visibility = 'hidden';
+
+            that._playing = false;
+            that._playingOne = false;
+            that._playingAll = false;
+            that._logo.hideMsgs();
+        };
+
+
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
@@ -1559,6 +1608,7 @@ function RhythmRuler () {
                 numberInput.value = 128;
             }
         };
+
 
         var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
         cell.onclick = function () {
@@ -1648,7 +1698,6 @@ function RhythmRuler () {
         };
 
         canvas.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1666,7 +1715,6 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragover = function (e) {
-            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1684,6 +1732,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.onmousedown = function (e) {
+            that._dragging = true;
             that._target = e.target;
         };
 
