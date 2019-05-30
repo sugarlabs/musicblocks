@@ -1253,6 +1253,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // macro
     var newblock = new ProtoBlock('meterwidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['meterwidget'] = newblock;
@@ -1266,6 +1267,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // macro
     var newblock = new ProtoBlock('modewidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = newblock;

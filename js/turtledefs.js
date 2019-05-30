@@ -279,8 +279,8 @@ function createHelpContent() {
         'rest2': [_('A rest of the specified note value duration can be constructed using a Silence block.'), 'documentation', 'silence-block.svg'],
         'mynotevalue': [_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg'],
         // Meter palette
-        'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg'],
-        'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg'],
+        'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg', 'meter'],
+        'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg', 'setmasterbpm2'],
         'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm-block.svg', 'bpmhelp'],
         'everybeatdo': [_('The On-every-note block let you specify actions to take on every note.'), 'documentation', 'on-every-beat-do-block.svg'],
         'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beat-count-block.svg', 'beatvaluehelp'],
@@ -324,7 +324,7 @@ function createHelpContent() {
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg'],
         'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
-	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg'],
+	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg', 'meterwidget'],
         // Flow palette
         'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg', 'foreverhelp'],
@@ -385,8 +385,8 @@ function createHelpContent() {
         'width': [_('The Width block returns the width of the canvas.'), 'documentation', 'width-block.svg'],
         'toppos': [_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg', 'bottomposhelp'],
         'bottompos': [_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', 'bottom-top-block.svg', 'bottomposhelp'],
-        'leftpos': [_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg'],
-        'rightpos': [_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg'],
+        'leftpos': [_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg', 'lrhelp'],
+        'rightpos': [_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', 'left-right-block.svg', 'lrhelp'],
         // Sensors palette
         'mousebutton': [_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', 'mouse-button-block.svg'],
         'mousex': [_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', 'mouse-button-block.svg'],
