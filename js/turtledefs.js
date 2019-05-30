@@ -305,7 +305,9 @@ function createHelpContent() {
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
-        'neighbor2': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg'],
+	// Ornament palette
+        'neighbor2': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg', 'neighbor2help'],
+        'neighbor': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg', 'neighborhelp'],
         // Volume palette
         'crescendo': [_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', 'crescendo-block.svg', 'crescendohelp'],
         'decrescendo': [_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', 'decrescendo-block.svg', 'crescendohelp'],
