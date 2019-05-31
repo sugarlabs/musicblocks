@@ -465,9 +465,9 @@ function createHelpContent() {
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'set-temperament-block.svg'],
         'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'tuplet4-block.svg', 'tuplet4'],
         // Flow palette
-        'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'while-block.svg'],
-        'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'until-block.svg'],
-        'waitfor': [_('The Waitfor block will wait until the condition is true.'), 'documentation', 'waitfor-block.svg'],
+        'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'while-block.svg', 'whilehelp'],
+        'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'until-block.svg', 'untilhelp'],
+        'waitfor': [_('The Waitfor block will wait until the condition is true.'), 'documentation', 'waitfor-block.svg', 'waitforhelp'],
         'break': [_('The Stop block will stop a loop') + ': ' + _('Forever, Repeat, While, or Until.'), 'documentation', 'status.svg'],
         'switch': [_('The Switch block will run the code in the matching Case.'), 'documentation', 'switch-block.svg', 'switchhelp'],
         'case': [_('The Case block is used inside of a Switch to define matches.'), 'documentation', 'switch-block.svg', 'switchhelp'],
