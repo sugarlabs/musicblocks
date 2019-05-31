@@ -328,7 +328,7 @@ function createHelpContent() {
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
 	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg', 'meterwidget'],
         // Flow palette
-        'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg'],
+        'repeat': [_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', 'repeat-block.svg', 'repeathelp'],
         'forever': [_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', 'forever-block.svg', 'foreverhelp'],
         'if':  [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg', 'ifhelp'],
         'ifthenelse': [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', 'elif-conditional-block.svg', 'elifhelp'],
@@ -419,7 +419,7 @@ function createHelpContent() {
         // pitch palette
         'accidental': [_('The Accidental block is used to create sharps and flats'), 'documentation', 'accidental-block.svg', 'accidental'],
         'settransposition': [_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', 'set-scalar-transposition-block.svg'],
-        'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'register-block.svg'],
+        'register': [_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', 'register-block.svg', 'registerhelp'],
         'invert1': [_('The Invert block rotates any contained notes around a target note.'), 'documentation', 'invert-block.svg', 'inverthelp'],
         'deltapitch': [_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', 'delta-pitch-block.svg', 'deltapitchhelp'],
         '// customNote': ['', 'documentation', 'status.svg'],
