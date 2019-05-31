@@ -276,7 +276,7 @@ function createHelpContent() {
         // Rhythm palette
         'newnote': [_('The Note block is a container for one or more Pitch blocks.') + ' ' + _('The Note block specifies the duration (note value) of its contents.'), 'documentation', 'note-value-block.svg', 'note1'],
         'playdrum': [_('You can use multiple Drum blocks within a Note block.'), 'documentation', 'drum-block.svg', 'note4'],
-        'rest2': [_('A rest of the specified note value duration can be constructed using a Silence block.'), 'documentation', 'silence-block.svg'],
+        'rest2': [_('A rest of the specified note value duration can be constructed using a Silence block.'), 'documentation', 'silence-block.svg', 'rest2'],
         'mynotevalue': [_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Meter palette
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg', 'meter'],
@@ -296,12 +296,12 @@ function createHelpContent() {
         'pitchinhertz': [_('The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played.'), 'documentation', 'status-block.svg'],
         'mypitch': [_('The Pitch number block is the value of the pitch of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Intervals palette
-        'setkey2': [_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', 'set-key-block.svg'],
+        'setkey2': [_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', 'set-key-block.svg', 'movablehelp'],
         'modelength': [_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', 'set-key-block.svg'],
         'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', 'scalar-interval-block.svg', 'intervalhelp'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', 'set-temperament-block.svg'],
         // Tone palette
-        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg'],
+        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg', 'settimbrehelp'],
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
@@ -402,7 +402,7 @@ function createHelpContent() {
         'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg', 'dothelp'],
         'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg', 'multiplybeathelp'],
-        'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg'],
+        'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg', 'skiphelp'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg', 'swinghelp'],
         'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'osctime-block.svg', 'osctimehelp'],
         // Meter palette
@@ -427,7 +427,7 @@ function createHelpContent() {
         'eastindiansolfege': [_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', 'eastindian-block.svg', 'eihelp'],
         'accidentalname': [_('The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat.'), 'documentation', 'accidental-block.svg'],
         'number2octave': [_('The Number to octave block will convert a pitch number to an octave.'), 'documentation', 'status.svg'],
-        'setpitchnumberoffset': [_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', 'setpitchnumberoffset-block.svg'],
+        'setpitchnumberoffset': [_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', 'setpitchnumberoffset-block.svg', 'pitchnumberhelp'],
         'consonantstepsizeup': [_('The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode.'), 'documentation', 'status.svg'],
         'consonantstepsizedown': [_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', 'status.svg'],
         // Intervals palette
@@ -463,7 +463,7 @@ function createHelpContent() {
         'pitchdrummatrix': [_('The Pitch drum matrix is used to map pitches to drum sounds.'), 'documentation', 'pitchdrum-block.svg'],
         'temperament': [_('The Temperament tool is used to define custom tuning.'), 'documentation', 'temperament-block.svg'],
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'set-temperament-block.svg'],
-        'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'tuplet4-block.svg'],
+        'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'tuplet4-block.svg', 'tuplet4'],
         // Flow palette
         'while': [_('The While block will repeat while the condition is true.'), 'documentation', 'while-block.svg'],
         'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'until-block.svg'],
