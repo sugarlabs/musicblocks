@@ -302,7 +302,7 @@ function createHelpContent() {
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', 'set-temperament-block.svg'],
         // Tone palette
         'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg', 'settimbrehelp'],
-        'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg'],
+        'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg', 'staccatohelp'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg', 'slurhelp'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
 	// Ornament palette
@@ -317,14 +317,14 @@ function createHelpContent() {
         // 'playdrum' is described on the Rhythm palette.
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'set-drum-block.svg', 'setdrumhelp'],
         // Widgets palette
-        'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status-block.svg'],
+        'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status-block.svg', 'status'],
         'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
         'rhythmruler2': [_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'],
         'pitchslider': [_('The Pitch-slider block opens a tool to generate arbitray pitches.'), 'documentation', 'pitch-slider-block.svg', 'pitchslider'],
         'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythm2'],
         'stuplet': [_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg', 'musickeyboard2'],
-        'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
+        'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg', 'tempo'],
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
 	'meterwidget': [_('The Meter block opens a tool to select strong beats for the meter.'), 'documentation', 'meterwidget-block.svg', 'meterwidget'],
         // Flow palette
@@ -400,7 +400,7 @@ function createHelpContent() {
         // Advanced blocks
         // Rhythm palette
         'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg', 'dothelp'],
-        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
+        'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg', 'tiehelp'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg', 'multiplybeathelp'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg', 'skiphelp'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg', 'swinghelp'],
@@ -461,7 +461,7 @@ function createHelpContent() {
         'pitchslider': [_('The Pitch slider tool to is used to generate pitches at selected frequencies.'), 'documentation', 'pitch-slider-block.svg'],
         'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'pitchstaircase-block.svg', 'pitchstaircase'],
         'pitchdrummatrix': [_('The Pitch drum matrix is used to map pitches to drum sounds.'), 'documentation', 'pitchdrum-block.svg'],
-        'temperament': [_('The Temperament tool is used to define custom tuning.'), 'documentation', 'temperament-block.svg'],
+        'temperament': [_('The Temperament tool is used to define custom tuning.'), 'documentation', 'temperament-block.svg', 'temperament'],
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'set-temperament-block.svg'],
         'tuplet4': [_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', 'tuplet4-block.svg', 'tuplet4'],
         // Flow palette
@@ -469,9 +469,9 @@ function createHelpContent() {
         'until': [_('The Until block will repeat until the condition is true.'), 'documentation', 'until-block.svg'],
         'waitfor': [_('The Waitfor block will wait until the condition is true.'), 'documentation', 'waitfor-block.svg'],
         'break': [_('The Stop block will stop a loop') + ': ' + _('Forever, Repeat, While, or Until.'), 'documentation', 'status.svg'],
-        'switch': [_('The Switch block will run the code in the matching Case.'), 'documentation', 'switch-block.svg'],
-        'case': [_('The Case block is used inside of a Switch to define matches.'), 'documentation', 'switch-block.svg'],
-        'default': [_('The Default block is used inside of a Switch to define a default action.'), 'documentation', 'switch-block.svg'],
+        'switch': [_('The Switch block will run the code in the matching Case.'), 'documentation', 'switch-block.svg', 'switchhelp'],
+        'case': [_('The Case block is used inside of a Switch to define matches.'), 'documentation', 'switch-block.svg', 'switchhelp'],
+        'default': [_('The Default block is used inside of a Switch to define a default action.'), 'documentation', 'switch-block.svg', 'switchhelp'],
         'duplicatenotes': [_('The Duplicate block will run each block multiple times.') + ' ' + _('The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.'), 'documentation', 'duplicate-block.svg', 'duphelp'],
         // Action palette
         'arg': [_('The Arg block contains the value of an argument passed to an action.'), 'documentation', 'status.svg'],
