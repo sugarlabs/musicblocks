@@ -321,7 +321,7 @@ function createHelpContent() {
         'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
         'rhythmruler2': [_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'],
         'pitchslider': [_('The Pitch-slider block opens a tool to generate arbitray pitches.'), 'documentation', 'pitch-slider-block.svg', 'pitchslider'],
-        'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'],
+        'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythm2'],
         'stuplet': [_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg', 'musickeyboard2'],
         'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
@@ -399,7 +399,7 @@ function createHelpContent() {
         'turtlename': [_('The Mouse-name block returns the name of a mouse.'), 'documentation', 'click-block.svg', 'clickhelp'],
         // Advanced blocks
         // Rhythm palette
-        'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg'],
+        'rhythmicdot2': [_('The Dot block extends the duration of a note by 50%.') + ' ' + _('Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.'), 'documentation', 'rhythmic2dot-block.svg', 'dothelp'],
         'tie': [_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', 'tie-block.svg'],
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg', 'multiplybeathelp'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg'],
