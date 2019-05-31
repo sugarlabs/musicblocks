@@ -274,27 +274,27 @@ function createHelpContent() {
 
     BLOCKHELP = {
         // Rhythm palette
-        'newnote': [_('The Note block is a container for one or more Pitch blocks.') + ' ' + _('The Note block specifies the duration (note value) of its contents.'), 'documentation', 'note-value-block.svg'],
+        'newnote': [_('The Note block is a container for one or more Pitch blocks.') + ' ' + _('The Note block specifies the duration (note value) of its contents.'), 'documentation', 'note-value-block.svg', 'note1'],
         'playdrum': [_('You can use multiple Drum blocks within a Note block.'), 'documentation', 'drum-block.svg', 'note4'],
         'rest2': [_('A rest of the specified note value duration can be constructed using a Silence block.'), 'documentation', 'silence-block.svg'],
-        'mynotevalue': [_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'mynotevalue': [_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Meter palette
         'meter': [_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', 'meter-block.svg', 'meter'],
         'setmasterbpm2': [_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', 'master-beats-per-minute-block.svg', 'setmasterbpm2'],
         'setbpm3': [_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', 'bpm-block.svg', 'bpmhelp'],
-        'everybeatdo': [_('The On-every-note block let you specify actions to take on every note.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'everybeatdo': [_('The On-every-note block let you specify actions to take on every note.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         'beatvalue': [_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'beat-count-block.svg', 'beatvaluehelp'],
-        'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do-block.svg'],
+        'elapsednotes2': [_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Pitch palette
-        'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg'],
-        'solfege': [_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', 'note-value-block.svg'],
-        'notename': [_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', 'note-name-block.svg'],
+        'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg', 'note1'],
+        'solfege': [_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', 'note-value-block.svg', 'note1'],
+        'notename': [_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', 'note-name-block.svg', 'note2'],
         'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', 'pitch-number-block.svg'],
         'steppitch': [_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('eg if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', 'set-key-block.svg'],
         'hertz': [_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', 'hertz-block.svg', 'note3'],
         'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg'],
         'pitchinhertz': [_('The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played.'), 'documentation', 'status-block.svg'],
-        'mypitch': [_('The Pitch number block is the value of the pitch of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'mypitch': [_('The Pitch number block is the value of the pitch of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Intervals palette
         'setkey2': [_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', 'set-key-block.svg'],
         'modelength': [_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', 'set-key-block.svg'],
@@ -349,11 +349,11 @@ function createHelpContent() {
         // Number palette
         'number': [_('The Number block holds a number.'), 'documentation', 'repeat-block.svg'],
         'random': [_('The Random block returns a random number.'), 'documentation', 'random-block.svg'],
-        'oneOf': [_('The One-of block returns one of two choices.'), 'documentation', 'one-of-block.svg'],
+        'oneOf': [_('The One-of block returns one of two choices.'), 'documentation', 'one-of-block.svg', 'oneofhelp'],
         'plus': [_('The Plus block is used to add.'), 'documentation', 'scalar-transpose-block.svg'],
         'minus': [_('The Minus block is used to subtract.'), 'documentation', 'set-heading-block.svg'],
         'multiply': [_('The Multiply block is used to multiply.'), 'documentation', 'scalar-transpose-block.svg'],
-        'divide': [_('The Divide block is used to divide.'), 'documentation', 'note-value-block.svg'],
+        'divide': [_('The Divide block is used to divide.'), 'documentation', 'note-value-block.svg', 'note1'],
         // Boolean palette
         'greater': [_('The Greater-than block returns True if the top number is greater than the bottom number.'), 'documentation', 'box-2-block.svg'],
         'less': [_('The Less-than block returns True if the top number is less than the bottom number.'), 'documentation', 'box-2-block.svg'],
@@ -365,7 +365,7 @@ function createHelpContent() {
         'right': [_('The Right block turns the mouse to the right.'), 'documentation', 'forward-block.svg', 'forwardhelp'],
         'arc': [_('The Arc block moves the mouse in a arc.'), 'documentation', 'arc-block.svg', 'archelp'],
         'setxy': [_('The Set XY block moves the mouse to a specific position on the screen.'), 'documentation', 'mouse-button-block.svg'],
-        'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
         'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
         'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'set-heading-block.svg'],
@@ -404,12 +404,12 @@ function createHelpContent() {
         'multiplybeatfactor': [_('The Multiply note value block changes the duration of notes by changing their note values.'), 'documentation', 'multiplybeatfactor-block.svg', 'multiplybeathelp'],
         'skipnotes': [_('The Skip notes block will cause notes to be skipped.'), 'documentation', 'skip-notes-block.svg'],
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg', 'swinghelp'],
-        'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'osctime-block.svg'],
+        'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'osctime-block.svg', 'osctimehelp'],
         // Meter palette
         'pickup': [_('The Pickup block is used to accommodate any notes that come in before the beat.'), 'documentation', 'pickup-block.svg'],
         'bpm': [_('The Beats per minute block changes the beats per minute of any contained notes.'), 'documentation', 'status.svg'],
-        'onbeatdo': [_('The On-strong-beat block let you specify actions to take on specified beats.'), 'documentation', 'on-every-beat-do-block.svg'],
-        'offbeatdo': [_('The On-weak-beat block let you specify actions to take on weak (off) beats.'), 'documentation', 'on-every-beat-do-block.svg'],
+        'onbeatdo': [_('The On-strong-beat block let you specify actions to take on specified beats.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
+        'offbeatdo': [_('The On-weak-beat block let you specify actions to take on weak (off) beats.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         'no-clock': [_('The No clock block decouples the notes from the master clock.'), 'documentation', 'no-clock.svg'],
         'elapsednotes': [_('The Whole notes played block returns the total number of whole notes played.'), 'documentation', 'elapsednotes-block.svg', 'elapsedhelp'],
         'notecounter': [_('The Note counter block can be used to count the number of contained notes.'), 'documentation', 'notecounter-block.svg', 'notecounterhelp'],
@@ -440,7 +440,7 @@ function createHelpContent() {
         // Tone palette
         'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'set-timbre-block.svg'],
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg', 'chorushelp'],
-        'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser-block.svg'],
+        'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser-block.svg', 'phaserhelp'],
         'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion-block.svg', 'dishelp'],
         'tremolo': [_('The Tremolo block adds a wavering effect.'), 'documentation', 'tremolo-block.svg'],
         'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic-block.svg', 'harmonichelp'],
@@ -581,7 +581,7 @@ function createHelpContent() {
     }
 
     if (beginnerMode && language === 'ja') {
-        BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg'];
+        BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', 'on-every-beat-do.svg', 'everybeathelp'],
         BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', 'set-key-block.svg'];
         BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
         BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
