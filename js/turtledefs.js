@@ -366,8 +366,8 @@ function createHelpContent() {
         'arc': [_('The Arc block moves the mouse in a arc.'), 'documentation', 'arc-block.svg', 'archelp'],
         'setxy': [_('The Set XY block moves the mouse to a specific position on the screen.'), 'documentation', 'mouse-button-block.svg'],
         'scrollxy': [_('The Scroll XY block moves the canvas.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
-        'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg'],
-        'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg'],
+        'x': [_('The X block returns the horizontal position of the mouse.'), 'documentation', 'x-block.svg', 'xyhelp'],
+        'y': [_('The Y block returns the vertical position of the mouse.'), 'documentation', 'x-block.svg', 'xyhelp'],
         'heading': [_('The Heading block returns the orientation of the mouse.'), 'documentation', 'set-heading-block.svg'],
         // Pen palette
         'setpensize': [_('The Set-pen-size block changes the size of the pen.'), 'documentation', 'set-pen-size-block.svg'],
