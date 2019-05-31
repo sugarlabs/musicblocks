@@ -292,13 +292,13 @@ function createHelpContent() {
         'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', 'pitch-number-block.svg', 'note5'],
         'steppitch': [_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('eg if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', 'set-key-block.svg'],
         'hertz': [_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', 'hertz-block.svg', 'note3'],
-        'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg'],
+        'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg', 'scalartranshelp'],
         'pitchinhertz': [_('The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played.'), 'documentation', 'status-block.svg'],
         'mypitch': [_('The Pitch number block is the value of the pitch of the note currently being played.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         // Intervals palette
         'setkey2': [_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', 'set-key-block.svg'],
         'modelength': [_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', 'set-key-block.svg'],
-        'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', 'scalar-interval-block.svg'],
+        'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', 'scalar-interval-block.svg', 'intervalhelp'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', 'set-temperament-block.svg'],
         // Tone palette
         'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg'],
@@ -315,7 +315,7 @@ function createHelpContent() {
         'setnotevolume': [_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', 'set-master-volume-block.svg'],
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
-        'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
+        'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'set-drum-block.svg', 'setdrumhelp'],
         // Widgets palette
         'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status-block.svg'],
         'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
