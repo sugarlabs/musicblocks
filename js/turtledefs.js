@@ -289,7 +289,7 @@ function createHelpContent() {
         'pitch': [_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', 'note-value-block.svg', 'note1'],
         'solfege': [_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', 'note-value-block.svg', 'note1'],
         'notename': [_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', 'note-name-block.svg', 'note2'],
-        'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', 'pitch-number-block.svg'],
+        'pitchnumber': [_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', 'pitch-number-block.svg', 'note5'],
         'steppitch': [_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('eg if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', 'set-key-block.svg'],
         'hertz': [_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', 'hertz-block.svg', 'note3'],
         'setscalartransposition': [_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', 'scalar-transpose-block.svg'],
@@ -318,11 +318,11 @@ function createHelpContent() {
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', 'rhythm-ruler-block.svg'],
         // Widgets palette
         'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', 'status-block.svg'],
-        'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg'],
-        'rhythmruler2': [_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', 'rhythm-ruler-block.svg'],
-        'pitchslider': [_('The Pitch-slider block opens a tool to generate arbitray pitches.'), 'documentation', 'pitch-slider-block.svg'],
-        'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg'],
-        'stuplet': [_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'pitch-time-matrix-block.svg'],
+        'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
+        'rhythmruler2': [_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'],
+        'pitchslider': [_('The Pitch-slider block opens a tool to generate arbitray pitches.'), 'documentation', 'pitch-slider-block.svg', 'pitchslider'],
+        'rhythm2': [_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'],
+        'stuplet': [_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', 'pitch-time-matrix-block.svg', 'matrix'],
         'musickeyboard': [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg', 'musickeyboard2'],
         'tempo': [_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', 'tempo-block.svg'],
         'modewidget': [_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', 'custom-mode-block.svg'],
@@ -348,7 +348,7 @@ function createHelpContent() {
         'incrementOne': [_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', 'box-1-block.svg'],
         // Number palette
         'number': [_('The Number block holds a number.'), 'documentation', 'repeat-block.svg'],
-        'random': [_('The Random block returns a random number.'), 'documentation', 'random-block.svg'],
+        'random': [_('The Random block returns a random number.'), 'documentation', 'random-block.svg', 'randomhelp'],
         'oneOf': [_('The One-of block returns one of two choices.'), 'documentation', 'one-of-block.svg', 'oneofhelp'],
         'plus': [_('The Plus block is used to add.'), 'documentation', 'scalar-transpose-block.svg'],
         'minus': [_('The Minus block is used to subtract.'), 'documentation', 'set-heading-block.svg'],
@@ -406,7 +406,7 @@ function createHelpContent() {
         'newswing2': [_('The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.'), 'documentation', 'newswing2-block.svg', 'swinghelp'],
         'osctime': [_('The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.'), 'documentation', 'osctime-block.svg', 'osctimehelp'],
         // Meter palette
-        'pickup': [_('The Pickup block is used to accommodate any notes that come in before the beat.'), 'documentation', 'pickup-block.svg'],
+        'pickup': [_('The Pickup block is used to accommodate any notes that come in before the beat.'), 'documentation', 'pickup-block.svg', 'pickup'],
         'bpm': [_('The Beats per minute block changes the beats per minute of any contained notes.'), 'documentation', 'status.svg'],
         'onbeatdo': [_('The On-strong-beat block let you specify actions to take on specified beats.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
         'offbeatdo': [_('The On-weak-beat block let you specify actions to take on weak (off) beats.'), 'documentation', 'on-every-beat-do-block.svg', 'everybeathelp'],
@@ -459,7 +459,7 @@ function createHelpContent() {
         'noisename': [_('The Noise name block is used to select a noise synthesizer.'), 'documentation', 'status.svg'],
         // Widgets palette
         'pitchslider': [_('The Pitch slider tool to is used to generate pitches at selected frequencies.'), 'documentation', 'pitch-slider-block.svg'],
-        'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'pitchstaircase-block.svg'],
+        'pitchstaircase': [_('The Pitch staircase tool to is used to generate pitches from a given ratio.'), 'documentation', 'pitchstaircase-block.svg', 'pitchstaircase'],
         'pitchdrummatrix': [_('The Pitch drum matrix is used to map pitches to drum sounds.'), 'documentation', 'pitchdrum-block.svg'],
         'temperament': [_('The Temperament tool is used to define custom tuning.'), 'documentation', 'temperament-block.svg'],
         'temperamentname': [_('The Temperament name block is used to select a tuning method.'), 'documentation', 'set-temperament-block.svg'],
@@ -586,7 +586,7 @@ function createHelpContent() {
         BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', 'start-block.svg'];
         BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', 'box-2-block.svg'];
         BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', 'broadcast-block.svg', 'broadcasthelp'],
-        BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg'];
+        BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', 'rhythm-ruler-block.svg', 'rhythmruler2'];
         BLOCKHELP['if'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'if-conditional-block.svg', 'ifhelp'];
         BLOCKHELP['ifthenelse'] = [_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', 'elif-conditional-block.svg', 'elifhelp'];
         BLOCKHELP['musickeyboard'] = [_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', 'music-keyboard-block.svg', 'musickeyboardja'];
