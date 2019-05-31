@@ -304,7 +304,7 @@ function createHelpContent() {
         'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', 'start-block.svg', 'settimbrehelp'],
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', 'staccato-block.svg', 'staccatohelp'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', 'slur-block.svg', 'slurhelp'],
-        'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg'],
+        'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', 'vibrato-block.svg', 'vibratohelp'],
 	// Ornament palette
         'neighbor2': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg', 'neighbor2help'],
         'neighbor': [_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', 'neighbor-block.svg', 'neighborhelp'],
@@ -442,7 +442,7 @@ function createHelpContent() {
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', 'chorus-block.svg', 'chorushelp'],
         'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', 'phaser-block.svg', 'phaserhelp'],
         'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', 'distortion-block.svg', 'dishelp'],
-        'tremolo': [_('The Tremolo block adds a wavering effect.'), 'documentation', 'tremolo-block.svg'],
+        'tremolo': [_('The Tremolo block adds a wavering effect.'), 'documentation', 'tremolo-block.svg', 'tremolohelp'],
         'harmonic2': [_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', 'harmonic-block.svg', 'harmonichelp'],
         'harmonic': [_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', 'status.svg'],
         'partial': [_('The Partial block is used to specify a weight for a specific partical harmonic.'), 'documentation', 'status.svg'],
