@@ -1235,19 +1235,20 @@ function PitchTimeMatrix () {
         value = toFraction(value);
         updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[1]);
         updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[2]);
-        if (noteCase === 'rhythm') {
+        if (noteCase === 'rhythm' || noteCase==='stupletvalue') {
             updates.push(this._logo.blocks.blockList[i].connections[1]);
             this._logo.blocks.blockList[updates[2]].value = parseFloat(k);
             this._logo.blocks.blockList[updates[2]].text.text = k.toString();
             this._logo.blocks.blockList[updates[2]].updateCache();
+        } else if (noteCase === ' rhythm' || (noteCase === 'stuplet' && value!== null)) {
+            this._logo.blocks.blockList[updates[0]].value = parseFloat(value[1]);
+            this._logo.blocks.blockList[updates[0]].text.text = value[1].toString();
+            this._logo.blocks.blockList[updates[0]].updateCache();
+            this._logo.blocks.blockList[updates[1]].value = parseFloat(value[0]);
+            this._logo.blocks.blockList[updates[1]].text.text = value[0].toString();
+            this._logo.blocks.blockList[updates[1]].updateCache();
+            this._logo.refreshCanvas();
         }
-        this._logo.blocks.blockList[updates[0]].value = parseFloat(value[1]);
-        this._logo.blocks.blockList[updates[0]].text.text = value[1].toString();
-        this._logo.blocks.blockList[updates[0]].updateCache();
-        this._logo.blocks.blockList[updates[1]].value = parseFloat(value[0]);
-        this._logo.blocks.blockList[updates[1]].text.text = value[0].toString();
-        this._logo.blocks.blockList[updates[1]].updateCache();
-        this._logo.refreshCanvas();
         saveLocally();
     }
 
@@ -1651,6 +1652,156 @@ function PitchTimeMatrix () {
         }
     }
 
+    this._updateTupletValue = function (that, noteToDivide, oldTupletValue, newTupletValue) {
+        noteToDivide = parseInt(noteToDivide);
+        oldTupletValue = parseInt(oldTupletValue);
+        newTupletValue = parseInt(newTupletValue);
+        this._blockMapHelper = [];
+        if (oldTupletValue < newTupletValue) {
+            var k=0;
+            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+                if (i == noteToDivide) {
+                    break;
+                }
+                for (var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                    k++;
+                }
+            }
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
+                this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                k++;
+            }
+            var l = k;
+            k = k + newTupletValue - oldTupletValue;
+            for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+                for (var j = 0; j<this._logo.tupletRhythms[i].length-2; j++){
+                    this._blockMapHelper.push([this._colBlocks[l], [k]]);
+                    l++
+                    k++;
+                }
+            }
+            for (var i = oldTupletValue; i < newTupletValue; i++) {
+                this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length ).concat(this._logo.tupletRhythms[noteToDivide].slice(this._logo.tupletRhythms[noteToDivide].length - 1));
+            }
+        }else {
+            var k=0;
+            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+                if (i == noteToDivide) {
+                    break;
+                }
+                for (var j = 0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                    k++;
+                }
+            }
+            
+            for (var i = oldTupletValue; i > newTupletValue; i--) {
+                this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length -1);
+            }
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++){
+                this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                k++;
+            }
+            var l = k+ oldTupletValue - newTupletValue;
+            for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+                for(var j =0; j < this._logo.tupletRhythms[i].length-2; j++){
+                    this._blockMapHelper.push([this._colBlocks[l], [k]]);
+                    l++
+                    k++;
+                }
+            }
+        }
+        var notesBlockMap =  this._mapNotesBlocks('stuplet');
+        var colBlocks = [];
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            for (var j =0 ; j < this._logo.tupletRhythms[i].length-2;  j++) {
+                colBlocks.push([notesBlockMap[i], j]);
+            }
+        }
+        this._colBlocks = colBlocks;
+        this._restartGrid(that);
+        this._syncMarkedBlocks();
+        this._update(notesBlockMap[noteToDivide], null, newTupletValue, 'stupletvalue');
+    }
+
+    this._createpiesubmenutupletvalue = function (noteToDivide, tupletValue) {
+        docById('wheelDivptm').style.display = '';
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        var tabsLabels = ['1','2','3','-','4','5','6','7','8','+','9','10'];
+
+        wheelnav.cssMode = true;
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.clickModeRotate = false;
+        this._menuWheel.colors = platformColor.pitchWheelcolors;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.animatetime = 0; // 300;
+        this._menuWheel.createWheel(tabsLabels);
+        
+        this.newNoteValue = String(tupletValue);
+        
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.keynavigateEnabled = false;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.createWheel(['x', this.newNoteValue]);
+        
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '250px';
+        docById('wheelDivptm').style.width = '250px';
+        
+        var x = docById(noteToDivide).getBoundingClientRect().x;
+        var y = docById(noteToDivide).getBoundingClientRect().y;
+        
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+        
+        var __enterValue = function () {
+            var i = that._menuWheel.selectedNavItemIndex;
+            var value = tabsLabels[i];
+            
+            that.newNoteValue = String(value);
+            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
+        }
+        this._menuWheel.navItems[3].navigateFunction = function () {
+            that.newNoteValue = String(parseInt(that.newNoteValue)-1);
+            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);           
+        }
+        this._menuWheel.navItems[9].navigateFunction = function () {
+            that.newNoteValue = String(parseInt(that.newNoteValue)+1);
+            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
+        }
+        for (var i = 0; i < tabsLabels.length; i++) {
+            if( i===9 || i==3 ){
+                continue;
+            }
+            this._menuWheel.navItems[i].navigateFunction = __enterValue;
+        }
+    }
+
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
@@ -1685,6 +1836,9 @@ function PitchTimeMatrix () {
             if(cellTuplet !== undefined){
                 cell.onclick = function(){
                     that._createpiesubmenutupletnote(this.getAttribute('id'));
+                }
+                cellTuplet.onclick = function (){
+                    that._createpiesubmenutupletvalue(this.getAttribute('id'),this.getAttribute('colspan'));
                 }
             } else {
                 cell.removeEventListener('mousedown', __mouseDownHandler);
