@@ -1375,6 +1375,9 @@ function PitchTimeMatrix () {
     };
 
     this._deleteNotes = function(that, noteToDivide) {
+        if (this._logo.tupletRhythms.length === 1) {
+            return;
+        }
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (var i = 0; i < noteToDivide; i++){
@@ -1785,9 +1788,11 @@ function PitchTimeMatrix () {
             that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
         }
         this._menuWheel.navItems[3].navigateFunction = function () {
-            that.newNoteValue = String(parseInt(that.newNoteValue)-1);
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);           
+            if (that.newNoteValue > 1) {
+                that.newNoteValue = String(parseInt(that.newNoteValue)-1);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);           
+            }
         }
         this._menuWheel.navItems[9].navigateFunction = function () {
             that.newNoteValue = String(parseInt(that.newNoteValue)+1);
