@@ -1455,107 +1455,6 @@ function PitchTimeMatrix () {
         this._restartGrid(that);
     }
 
-    this._createpiesubmenu = function(noteToDivide, noteValue) {
-        docById('wheelDivptm').style.display = '';
-        this.divideNoteBy = 2;
-
-        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
-        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
-        this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
-        wheelnav.cssMode = true;
-        this._menuWheel.keynavigateEnabled = false;
-        this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = platformColor.pitchWheelcolors;
-        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
-        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
-        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.animatetime = 0; // 300;
-        this._menuWheel.createWheel(['divide', 'delete', 'add', String(this.divideNoteBy)]);
-        
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.keynavigateEnabled = false;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.createWheel(['x', ' ']);
-
-        var tabsLabels = ['','','','','','','','','','','','','1','2','3','4','5','6','7',''];
-
-        this._tabsWheel.colors = platformColor.pitchWheelcolors;
-        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
-        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.clickModeRotate = false;
-        this._tabsWheel.createWheel(tabsLabels);
-
-        for(var i=0;i<tabsLabels.length;i++){
-            this._tabsWheel.navItems[i].navItem.hide();
-        }
-        
-        docById('wheelDivptm').style.position = 'absolute';
-        docById('wheelDivptm').style.height = '250px';
-        docById('wheelDivptm').style.width = '250px';
-        
-        var x = docById(noteToDivide).getBoundingClientRect().x;
-        var y = docById(noteToDivide).getBoundingClientRect().y;
-        
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
-        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
-
-        var that = this;
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            docById('wheelDivptm').style.display = 'none';
-            that._menuWheel.removeWheel();
-            that._exitWheel.removeWheel();
-        };
-
-        var flag = 0;
-        this._menuWheel.navItems[0].navigateFunction = function () {
-            that._divideNotes(that, noteToDivide, that.divideNoteBy);
-        };
-        this._menuWheel.navItems[1].navigateFunction = function () {
-            that._deleteNotes(that, noteToDivide);
-        };
-        this._menuWheel.navItems[2].navigateFunction = function () {
-            that._addNotes(that, noteToDivide, that.divideNoteBy);
-        };
-        this._menuWheel.navItems[3].navigateFunction = function () {
-            if( !flag ){
-                for(var i = 12; i < 19; i++){
-                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.divideNoteBy;
-                    that._tabsWheel.navItems[i].navItem.show();
-                }
-                flag = 1;
-            }else{
-                for(var i = 12; i < 19; i++){
-                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.divideNoteBy;
-                    that._tabsWheel.navItems[i].navItem.hide();
-                }
-                flag = 0;
-            }
-            // that._dividesubmenu(noteValue)
-        };
-
-        for(var i = 12; i < 19; i++){
-            this._tabsWheel.navItems[i].navigateFunction = function () {
-                var j = that._tabsWheel.selectedNavItemIndex;
-                that.divideNoteBy = tabsLabels[j];
-                docById('wheelnav-wheelDivptm-title-3').children[0].textContent = tabsLabels[j];
-            }
-        }
-        
-    };
-
     this._updateTuplet = function (that,noteToDivide, newNoteValue) {
         this._logo.tupletParams[noteToDivide][1] = newNoteValue
         this._restartGrid(that);
@@ -1563,98 +1462,7 @@ function PitchTimeMatrix () {
         this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'stuplet');
 
     }
-
-    this._createpiesubmenutupletnote = function (noteToDivide) {
-        docById('wheelDivptm').style.display = '';
-
-        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
-        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
-
-        var tabsLabels = ['<-','Enter','1','2','3','4','5','6','7','8','9','10'];
-
-        wheelnav.cssMode = true;
-        this._menuWheel.keynavigateEnabled = false;
-        this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = platformColor.pitchWheelcolors;
-        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
-        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
-        this._menuWheel.animatetime = 0; // 300;
-        this._menuWheel.createWheel(tabsLabels);
-        
-        this.newNoteValue = '/';
-        
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.keynavigateEnabled = false;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.5;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.createWheel(['x', this.newNoteValue]);
-
-        docById('wheelDivptm').style.position = 'absolute';
-        docById('wheelDivptm').style.height = '250px';
-        docById('wheelDivptm').style.width = '250px';
-        
-        var x = docById(noteToDivide).getBoundingClientRect().x;
-        var y = docById(noteToDivide).getBoundingClientRect().y;
-        
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
-        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
-
-        var that = this;
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            docById('wheelDivptm').style.display = 'none';
-            that._menuWheel.removeWheel();
-            that._exitWheel.removeWheel();
-        };
-        var first = false;
-        var second = false;
-        
-        var __enterValue = function () {
-            var i = that._menuWheel.selectedNavItemIndex;
-            var value = tabsLabels[i];
-            if (!first){
-                that.newNoteValue = String(value)+'/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                first = true;
-            } else{
-                if (!second){
-                    that.newNoteValue = that.newNoteValue+String(value);
-                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                    second = true;
-                }
-            }
-        }
-        this._menuWheel.navItems[0].navigateFunction = function () {
-            if (second && first){
-                var word = that.newNoteValue.split('/');
-                that.newNoteValue = word[0]+'/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                second = false;
-            } else if(first){
-                that.newNoteValue ='/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                first = false;
-            }
-        }
-        this._menuWheel.navItems[1].navigateFunction = function () {
-            if (second && first){
-                var word = that.newNoteValue.split('/');
-                that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]));
-            }
-        }
-        for (var i = 2; i < tabsLabels.length; i++) {
-            this._menuWheel.navItems[i].navigateFunction = __enterValue;
-        }
-    }
-
+    
     this._updateTupletValue = function (that, noteToDivide, oldTupletValue, newTupletValue) {
         noteToDivide = parseInt(noteToDivide);
         oldTupletValue = parseInt(oldTupletValue);
@@ -1728,13 +1536,23 @@ function PitchTimeMatrix () {
         this._update(notesBlockMap[noteToDivide], null, newTupletValue, 'stupletvalue');
     }
 
-    this._createpiesubmenutupletvalue = function (noteToDivide, tupletValue) {
+    this._createpiesubmenu = function (noteToDivide, tupletValue,condition) {
         docById('wheelDivptm').style.display = '';
 
         this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
 
-        var tabsLabels = ['1','2','3','-','4','5','6','7','8','+','9','10'];
+        if (condition === 'tupletvalue') {
+            var mainTabsLabels = ['1','2','3','-','4','5','6','7','8','+','9','10'];
+            this.newNoteValue = String(tupletValue);
+        } else if (condition === 'tupletnote') {
+            mainTabsLabels = ['<-','Enter','1','2','3','4','5','6','7','8','9','10'];
+            this.newNoteValue = '/';
+        } else if (condition === 'rhythmnote') {
+            this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
+            this.newNoteValue = 2;
+            mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
+        }
 
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
@@ -1742,25 +1560,62 @@ function PitchTimeMatrix () {
         this._menuWheel.colors = platformColor.pitchWheelcolors;
         this._menuWheel.slicePathFunction = slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
-        this._menuWheel.createWheel(tabsLabels);
-        
-        this.newNoteValue = String(tupletValue);
         
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.keynavigateEnabled = false;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.createWheel(['x', this.newNoteValue]);
+        var exitTabLabel = [];
+
+        if (condition === 'tupletvalue') {
+            exitTabLabel = ['x', this.newNoteValue];
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        } else if (condition === 'tupletnote') {
+            exitTabLabel = ['x', this.newNoteValue];
+
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.5;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.5;
+
+        } else if (condition === 'rhythmnote') {
+            exitTabLabel = ['x', ' '];
+            var tabsLabels = ['','','','','','','','','','','','','1','2','3','4','5','6','7',''];
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+
+            this._tabsWheel.colors = platformColor.pitchWheelcolors;
+            this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
+            this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
+            this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+            this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+            this._tabsWheel.clickModeRotate = false;
+            this._tabsWheel.createWheel(tabsLabels);
+
+            for(var i=0;i<tabsLabels.length;i++){
+                this._tabsWheel.navItems[i].navItem.hide();
+            }
+
+        }
+        this._menuWheel.createWheel(mainTabsLabels);
+        this._exitWheel.createWheel(exitTabLabel);
+
         
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '250px';
@@ -1778,32 +1633,107 @@ function PitchTimeMatrix () {
             that._menuWheel.removeWheel();
             that._exitWheel.removeWheel();
         };
-        
-        var __enterValue = function () {
-            var i = that._menuWheel.selectedNavItemIndex;
-            var value = tabsLabels[i];
-            
-            that.newNoteValue = String(value);
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
-        }
-        this._menuWheel.navItems[3].navigateFunction = function () {
-            if (that.newNoteValue > 1) {
+        if (condition === 'tupletvalue') {
+            var __enterValue = function () {
+                var i = that._menuWheel.selectedNavItemIndex;
+                var value = mainTabsLabels[i];
+                
+                that.newNoteValue = String(value);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
+            }
+            this._menuWheel.navItems[3].navigateFunction = function () {
+                if (that.newNoteValue>1){
                 that.newNoteValue = String(parseInt(that.newNoteValue)-1);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);           
+                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);    }       
             }
-        }
-        this._menuWheel.navItems[9].navigateFunction = function () {
-            that.newNoteValue = String(parseInt(that.newNoteValue)+1);
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-            that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
-        }
-        for (var i = 0; i < tabsLabels.length; i++) {
-            if( i===9 || i==3 ){
-                continue;
+            this._menuWheel.navItems[9].navigateFunction = function () {
+                that.newNoteValue = String(parseInt(that.newNoteValue)+1);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
             }
-            this._menuWheel.navItems[i].navigateFunction = __enterValue;
+            for (var i = 0; i < mainTabsLabels.length; i++) {
+                if(i===9 || i==3){
+                    continue;
+                }
+                this._menuWheel.navItems[i].navigateFunction = __enterValue;
+            }
+        } else if (condition === 'tupletnote') {
+            var first = false;
+            var second = false;
+            
+            var __enterValue = function () {
+                var i = that._menuWheel.selectedNavItemIndex;
+                var value = mainTabsLabels[i];
+                if (!first){
+                    that.newNoteValue = String(value)+'/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    first = true;
+                } else{
+                    if (!second){
+                        that.newNoteValue = that.newNoteValue+String(value);
+                        docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                        second = true;
+                    }
+                }
+            }
+            this._menuWheel.navItems[0].navigateFunction = function () {
+                if (second && first){
+                    var word = that.newNoteValue.split('/');
+                    that.newNoteValue = word[0]+'/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    second = false;
+                } else if(first){
+                    that.newNoteValue ='/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    first = false;
+                }
+            }
+            this._menuWheel.navItems[1].navigateFunction = function () {
+                if (second && first){
+                    var word = that.newNoteValue.split('/');
+                    that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]));
+                }
+            }
+            for (var i = 2; i < mainTabsLabels.length; i++) {
+                this._menuWheel.navItems[i].navigateFunction = __enterValue;
+            }
+
+        } else if (condition === 'rhythmnote') {
+            var flag = 0;
+            this._menuWheel.navItems[0].navigateFunction = function () {
+                that._divideNotes(that, noteToDivide, that.newNoteValue);
+            };
+            this._menuWheel.navItems[1].navigateFunction = function () {
+                that._deleteNotes(that, noteToDivide);
+            };
+            this._menuWheel.navItems[2].navigateFunction = function () {
+                that._addNotes(that, noteToDivide, that.newNoteValue);
+            };
+            this._menuWheel.navItems[3].navigateFunction = function () {
+                if( !flag ){
+                    for(var i = 12; i < 19; i++){
+                        docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                        that._tabsWheel.navItems[i].navItem.show();
+                    }
+                    flag = 1;
+                }else{
+                    for(var i = 12; i < 19; i++){
+                        docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                        that._tabsWheel.navItems[i].navItem.hide();
+                    }
+                    flag = 0;
+                }
+            };
+
+            for(var i = 12; i < 19; i++){
+                this._tabsWheel.navItems[i].navigateFunction = function () {
+                    var j = that._tabsWheel.selectedNavItemIndex;
+                    that.newNoteValue = tabsLabels[j];
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = tabsLabels[j];
+                }
+            }
         }
     }
 
@@ -1834,16 +1764,16 @@ function PitchTimeMatrix () {
                 if (that._mouseDownCell !== that._mouseUpCell) {
                     that._tieNotes(that._mouseDownCell, that._mouseUpCell);
                 } else {
-                    that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'));
+                    that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'),'rhythmnote');
                 }
             }
 
             if(cellTuplet !== undefined){
                 cell.onclick = function(){
-                    that._createpiesubmenutupletnote(this.getAttribute('id'));
+                    that._createpiesubmenu(this.getAttribute('id'),null,'tupletnote');
                 }
                 cellTuplet.onclick = function (){
-                    that._createpiesubmenutupletvalue(this.getAttribute('id'),this.getAttribute('colspan'));
+                    that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
                 }
             } else {
                 cell.removeEventListener('mousedown', __mouseDownHandler);
