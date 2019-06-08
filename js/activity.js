@@ -493,6 +493,64 @@ function Activity() {
         homeButtonContainers[1].visible = one;
     };
 
+
+    __saveHelpBlock = function (name, delay) {
+        // Save the artwork for an individual help block.
+        // (1) clear the block list
+        // (2) generate the help blocks
+        // (3) save the blocks as svg
+        setTimeout(function () {
+            sendAllToTrash(false, true);
+            setTimeout(function () {
+                if (BLOCKHELP[name].length < 4) {
+                    // If there is nothing specified, just
+                    // load the block.
+                    console.log('CLICK: ' + name);
+                    var obj = blocks.palettes.getProtoNameAndPalette
+(name);
+                    var protoblk = obj[0];
+                    var paletteName = obj[1];
+                    var protoName = obj[2];
+
+                    var protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                    if (protoResult) {
+                        blocks.palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
+                            blocks.moveBlock(newBlock, 0, 0);
+                        });
+                    }
+                } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                    // If it is a string, load the macro
+                    // assocuated with this block
+                    var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 0, 0);
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                } else {
+                    // Load the blocks.
+                    var blocksToLoad = BLOCKHELP[name][3];
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                }
+
+                setTimeout(function () {
+                    save.saveBlockArtwork(BLOCKHELP[name][3]);
+                }, 500);
+
+            }, 500);
+        }, delay + 1000);
+    };
+
+    _saveHelpBlocks = function () {
+        // Save the artwork for every help block.
+        var i = 0;
+        for(var name in BLOCKHELP) {
+            console.log(name);
+            __saveHelpBlock(name, i * 2000);
+            i += 1;
+        }
+
+        sendAllToTrash(true, true);
+    };
+
     /*
      * @return {SVG} returns SVG of blocks
      */
@@ -1579,7 +1637,7 @@ function Activity() {
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function () {
-		console.log('DO SEARCH!!!');
+                console.log('DO SEARCH!!!');
                 searchWidget.focus();
                 doSearch();
             }, 500);
@@ -1788,6 +1846,9 @@ function Activity() {
                 break;
             case 86: // 'V'
                 blocks.pasteStack();
+                break;
+            case 72:  // 'H' save block help
+                _saveHelpBlocks();
                 break;
             }
         } else if (event.ctrlKey) {
@@ -4675,7 +4736,7 @@ function Activity() {
             }, 200); // 2000
         }
 
-	prepSearchWidget();
+        prepSearchWidget();
 
         document.addEventListener('mousewheel', scrollEvent, false);
         document.addEventListener('DOMMouseScroll', scrollEvent, false);
