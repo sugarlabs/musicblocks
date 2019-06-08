@@ -532,7 +532,8 @@ function Activity() {
                 }
 
                 setTimeout(function () {
-                    save.saveBlockArtwork(BLOCKHELP[name][3]);
+                    // save.saveBlockArtwork(BLOCKHELP[name][3]);
+                    save.saveBlockArtwork(name + '_block.svg');
                 }, 500);
 
             }, 500);

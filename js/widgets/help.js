@@ -215,7 +215,8 @@ function HelpWidget () {
                             break;
                         }
 
-                        body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
+                        // body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
+                           body = body + '<p><img src="' + path + '/' + name + '_block.svg"></p>';
                     }
 
                     body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
