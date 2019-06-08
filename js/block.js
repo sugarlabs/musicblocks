@@ -99,58 +99,76 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function (callback, args, counter) {
-        if (counter === undefined) {
-            var loopCount = 0;
-        } else {
-            var loopCount = counter;
-        }
-
-        if (loopCount > 3) {
-            console.log('COULD NOT CREATE CACHE');
-            return;
-        }
-
+    this._createCache = function (callback, args) {
         var that = this;
-        this.bounds = this.container.getBounds();
-
-        if (this.bounds === null) {
-            setTimeout(function () {
-                console.log('// Try regenerating the artwork');
-                that.regenerateArtwork(true, []);
-                that._createCache(callback, args, loopCount + 1);
-            }, 100);
-        } else {
-            this.container.cache(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
-            callback(this, args);
+        return new Promise(function (resolve, reject) {
+    
+            var loopCount = 0;
+    
+            async function checkBounds(counter) {
+        try {
+            if (counter !== undefined) {
+                loopCount = counter;
+        
+            } 
+            if (loopCount > 3) {
+                throw new Error ('COULD NOT CREATE CACHE');
+            }
+    
+            that.bounds = that.container.getBounds();
+    
+            if (that.bounds === null) {
+                    console.log('// Try regenerating the artwork');
+                    that.regenerateArtwork(true, []);
+                    checkBounds(loopCount + 1);
+                    await that.pause(100);
+            } else {
+                that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+                callback(that, args);
+                resolve();
+            }
+        }catch (e) {
+            reject(e)
         }
-    };
+            }
+            checkBounds();
+            })
+        };
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this.updateCache = function (counter) {
-        if (counter === undefined) {
+        var that = this;
+        return new Promise(function (resolve, reject) {
+
             var loopCount = 0;
-        } else {
-            var loopCount = counter;
-        }
+            
+            async function updateBounds(counter) {
+      try {
+        if (counter !== undefined) {
+            loopCount = counter;   
+        } 
 
         if (loopCount > 3) {
-            console.log('COULD NOT UPDATE CACHE');
-            return;
+            throw new Error('COULD NOT UPDATE CACHE');     
         }
 
-        var that = this;
 
-        if (this.bounds == null) {
-            setTimeout(function () {
+        if (that.bounds == null) {
                 console.log('UPDATE CACHE: BOUNDS NOT READY');
-                that.updateCache(loopCount + 1);
-            }, 200);
+                updateBounds(loopCount + 1);
+             await that.pause(200);
         } else {
-            this.container.updateCache();
-            this.blocks.refreshCanvas();
+            that.container.updateCache();
+            that.blocks.refreshCanvas();
+            resolve();
         }
+    }catch (e) {
+        reject(e)
+    }
+}
+    updateBounds();
+        })
     };
 
     this.ignore = function () {
