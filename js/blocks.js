@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -845,8 +845,10 @@ function Blocks (activity) {
         }
 
         // If the note value block is collapsed, spoof size.
-        if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
-            size = 1
+        if (this.blocksToCollapse.indexOf(blk) != -1) {
+            size = 1;
+        } else if ((myBlock.name === 'newnote' || myBlock.name === 'interval' || myBlock.name === 'osctime') && myBlock.collapsed) {
+            size = 1;
         }
 
         // check on any connected block
@@ -1608,8 +1610,11 @@ function Blocks (activity) {
                                             delete that.protoBlockDict['myDo_' + that.blockList[connection].value];
                                             that.palettes.hide();
                                             that.palettes.updatePalettes('action');
-                                            // that.palettes.show();
-                                        }, 50); // 500
+                                            // Fixes #1779
+                                            setTimeout(function () {
+                                                that.palettes.show();
+                                            }, 500);
+                                        }, 50);
 
                                         break;
                                     }
@@ -2033,7 +2038,11 @@ function Blocks (activity) {
             var label = _(TEMPERAMENTS[0][1]);  // equal by default
             for (var i = 0; i < TEMPERAMENTS.length; i++) {
                 if (TEMPERAMENTS[i][1] === myBlock.value) {
-                    label = TEMPERAMENTS[i][0];
+                    if (TEMPERAMENTS[i][0].length === 0) {
+                        label = TEMPERAMENTS[i][2];
+                    } else {
+                        label = TEMPERAMENTS[i][0];
+                    }
                     break;
                 }
             }
@@ -2844,6 +2853,8 @@ function Blocks (activity) {
         for (var i = 0; i < myBlock.protoblock.defaults.length; i++) {
             var value = myBlock.protoblock.defaults[i];
 
+            console.log('==============');
+            console.log(value);
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
@@ -4274,7 +4285,7 @@ function Blocks (activity) {
      * @return {void}
      */
     this.saveStack = function () {
-	console.log(this.selectedStack);
+        console.log(this.selectedStack);
         if (this.selectedStack == null) {
             return;
         }
@@ -4374,7 +4385,7 @@ function Blocks (activity) {
         var myBlock = new ProtoBlock('macro_' + name);
         var blkName = 'macro_' + name;
         this.protoBlockDict[blkName] = myBlock;
-	console.log('Adding ' + name + ' to myblocks palette');
+        console.log('Adding ' + name + ' to myblocks palette');
         if (!('myblocks' in this.palettes.dict)) {
             this.palettes.add('myblocks');
         }
@@ -4463,6 +4474,7 @@ function Blocks (activity) {
                 }
             } else if (this.blockList[b].name === 'storein') {
                 if (this.blockList[b].connections[1] != null) {
+                    console.log('found storein name: ' + this.blockList[this.blockList[b].connections[1]].value);
                     currentStoreinNames.push(this.blockList[this.blockList[b].connections[1]].value);
                 }
             }
@@ -4600,6 +4612,7 @@ function Blocks (activity) {
             if (name === _('action')) {
                 this.setActionProtoVisiblity(true);
             }
+
             var oldName = name;
             var i = 1;
             while (currentActionNames.indexOf(name) !== -1) {
@@ -4611,6 +4624,9 @@ function Blocks (activity) {
                     break;
                 }
             }
+
+            // Add this name to the list so we don't repeat it.
+            currentActionNames.push(name);
 
             if (oldName !== name) {
                 // Change the name of the action...
@@ -5142,6 +5158,10 @@ function Blocks (activity) {
                 var postProcess = function (args) {
                     var thisBlock = args[0];
                     var value = args[1];
+                    if (['simple 1', 'simple 2', 'simple 3', 'simple 4'].indexOf(value) !== -1) {
+                        value = 'sine';
+                    }
+
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
                 };

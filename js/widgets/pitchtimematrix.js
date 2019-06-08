@@ -1,5 +1,5 @@
 // Copyright (c) 2015 Yash Khandelwal
-// Copyright (c) 2015-18 Walter Bender
+// Copyright (c) 2015-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -132,6 +132,10 @@ function PitchTimeMatrix () {
         }
     };
 
+    this._get_save_lock = function() {
+        return this._save_lock;
+    };
+
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
@@ -178,6 +182,22 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick=function() {
+            that._rowOffset = [];
+            for (var i = 0; i < that._rowMap.length; i++) {
+                that._rowMap[i] = i;
+            }
+
+            that._logo.synth.stopSound(0, that._instrumentName);
+            that._logo.synth.stop();
+            that._stopOrCloseClicked = true;
+            ptmTableDiv.style.visibility = 'hidden';
+            ptmButtonsDiv.style.visibility = 'hidden';
+            ptmDiv.style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
         cell.onclick=function() {
             that._logo.setTurtleDelay(0);
@@ -187,9 +207,18 @@ function PitchTimeMatrix () {
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-        cell.onclick=function() {
-            that._save();
-        }
+        this._save_lock = false;
+
+        cell.onclick = function () {
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._save();
+                setTimeout(function () {
+                    that._save_lock = false;
+                }, 1000);
+            }
+        };
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
         cell.onclick=function() {
@@ -208,21 +237,21 @@ function PitchTimeMatrix () {
             that._sort();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            that._rowOffset = [];
-            for (var i = 0; i < that._rowMap.length; i++) {
-                that._rowMap[i] = i;
-            }
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick=function() {
+        //     that._rowOffset = [];
+        //     for (var i = 0; i < that._rowMap.length; i++) {
+        //         that._rowMap[i] = i;
+        //     }
 
-            that._logo.synth.stopSound(0, that._instrumentName);
-            that._logo.synth.stop();
-            that._stopOrCloseClicked = true;
-            ptmTableDiv.style.visibility = 'hidden';
-            ptmButtonsDiv.style.visibility = 'hidden';
-            ptmDiv.style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        //     that._logo.synth.stopSound(0, that._instrumentName);
+        //     that._logo.synth.stop();
+        //     that._stopOrCloseClicked = true;
+        //     ptmTableDiv.style.visibility = 'hidden';
+        //     ptmButtonsDiv.style.visibility = 'hidden';
+        //     ptmDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -248,6 +277,7 @@ function PitchTimeMatrix () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -263,6 +293,7 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -278,7 +309,6 @@ function PitchTimeMatrix () {
         };
 
         ptmDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
@@ -351,9 +381,22 @@ function PitchTimeMatrix () {
 
             var ptmTableRow = ptmTable.insertRow();
 
+            var drumName = getDrumName(this.rowLabels[i]);
+
+            // Depending on the row, we choose a different background color.
+            if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
+                cellColor = platformColor.graphicsLabelBackground;
+            } else {
+                if (drumName === null) {
+                    cellColor = platformColor.pitchLabelBackground;
+                } else {
+                    cellColor = platformColor.drumLabelBackground;
+                }
+            }
+
             // A cell for the row label graphic
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -361,8 +404,6 @@ function PitchTimeMatrix () {
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
             cell.innerHTML = '';
-
-            var drumName = getDrumName(this.rowLabels[i]);
 
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -387,7 +428,7 @@ function PitchTimeMatrix () {
 
             // A cell for the row label
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -458,7 +499,7 @@ function PitchTimeMatrix () {
         // Create tables to store individual note values.
         ptmCell.innerHTML = '<table  class="ptmTable" cellpadding="0px"><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
 
-        // Sort the if there are note blocks.
+        // Sort them if there are note blocks.
         this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function () {
@@ -934,23 +975,40 @@ function PitchTimeMatrix () {
 
             // Add the notes to the matrix a la addNote.
             for (var j = 0; j < this.rowLabels.length; j++) {
+                // Depending on the row, we choose a different background color.
+                if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[j]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.drumBackground;
+                    }
+                }
+
                 var ptmRow = docById('ptm' + j);
                 var cell = ptmRow.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / tupletNoteValue);
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = cellColor;
+
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
+
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
@@ -1003,24 +1061,41 @@ function PitchTimeMatrix () {
 
         for (var j = 0; j < numBeats; j++) {
             for (var i = 0; i < rowCount; i++) {
+                // Depending on the row, we choose a different background color.
+                if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[i]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.drumBackground;
+                    }
+                }
+
                 // the buttons get add to the embedded table
                 var row = docById('ptm' + i);
                 var cell = row.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = cellColor;
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
+
                 cell.onmouseover=function() {
                     if (this.style.backgroundColor !== 'black'){
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
+
                 cell.onmouseout=function() {
                     if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
@@ -1094,7 +1169,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._setNotes(j, i, false);
                 }
             }
@@ -1117,7 +1192,7 @@ function PitchTimeMatrix () {
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                         that._notesToPlay[j][0] = ['R'];
                         that._setNotes(j, i, false);
                     } else {
@@ -1132,7 +1207,7 @@ function PitchTimeMatrix () {
                     var j = Number(obj[1]);
                     if (isMouseDown) {
                         if (this.style.backgroundColor === 'black') {
-                            this.style.backgroundColor = platformColor.selectorBackground;
+                            this.style.backgroundColor = this.getAttribute('cellColor');
                             that._notesToPlay[j][0] = ['R'];
                             that._setNotes(j, i, false);
                         } else {
@@ -1242,7 +1317,7 @@ function PitchTimeMatrix () {
         // Play all of the notes in the matrix.
         this.playingNow = !this.playingNow;
 
-        var playButtonCell = row.cells[0];
+        var playButtonCell = row.cells[1];
 
         if (this.playingNow) {
             playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
@@ -1261,7 +1336,6 @@ function PitchTimeMatrix () {
 
             // We have an array of pitches and note values.
             var note = this._notesToPlay[this._notesCounter][0];
-            console.log(this._noteStored);
             var pitchNotes = [];
             var synthNotes = [];
             var drumNotes = [];
@@ -1323,7 +1397,8 @@ function PitchTimeMatrix () {
             }
 
             if (note[0] !== 'R' && pitchNotes.length > 0) {
-                this._logo.synth.trigger(0, pitchNotes, this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
+                this._playChord(pitchNotes, this._logo.defaultBPMFactor / noteValue);
+                // this._logo.synth.trigger(0, pitchNotes[0], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
@@ -1430,10 +1505,11 @@ function PitchTimeMatrix () {
                             }
                         }
                     }
-                       }
+                }
 
                 if (note[0] !== 'R' && pitchNotes.length > 0) {
-                    that._logo.synth.trigger(0, pitchNotes, that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
+                    that._playChord(pitchNotes, that._logo.defaultBPMFactor / noteValue);
+                    // that._logo.synth.trigger(0, pitchNotes[0], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
@@ -1469,6 +1545,31 @@ function PitchTimeMatrix () {
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+    };
+
+    this._playChord = function (notes, noteValue) {
+        var that = this;
+        setTimeout(function() {
+            that._logo.synth.trigger(0, notes[0], noteValue, that._instrumentName, null, null);
+        }, 1);
+
+        if (notes.length > 1) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[1], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
+
+        if (notes.length > 2) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[2], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
+
+        if (notes.length > 3) {
+            setTimeout(function() {
+                that._logo.synth.trigger(0, notes[3], noteValue, that._instrumentName, null, null);
+            }, 1);
+        }
     };
 
     this._processGraphics = function (obj) {
@@ -1583,9 +1684,7 @@ function PitchTimeMatrix () {
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
-
             this._logo.synth.trigger(0, [Number(obj[1])], noteValue, obj[0], null, null);
-
         }
     };
 
@@ -1596,7 +1695,7 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._notesToPlay[j][0] = ['R'];
                     this._setNotes(j, i, false);
                 }

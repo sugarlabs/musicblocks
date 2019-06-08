@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1253,6 +1253,21 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // macro
+    var newblock = new ProtoBlock('meterwidget');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['meterwidget'] = newblock;
+    //.TRANS: musical meter, e.g., 4:4
+    newblock.staticLabels.push(_('meter'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('meterwidget')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('modewidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = newblock;
@@ -1541,18 +1556,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = newblock;
     // #TRANS: on musical 'offbeat' do some action
-    if (language === 'ja') {
-        newblock.staticLabels.push(_('on weak beat'), _('beat'));
-        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do1'));
-    } else {
-        // #TRANS: 'on' musical 'beat' 'do' some action
-        newblock.staticLabels.push(_('on weak beat'), _('beat'), _('do'));
-    }
+    newblock.staticLabels.push(_('on weak beat do'));
     newblock.oneArgBlock();
     newblock.defaults.push(_('action'));
-    newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
+    newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('offbeatdo')) {
         newblock.hidden = true;
     }
@@ -2986,7 +2994,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('floortom');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['floortom'] = newblock;
-    newblock.staticLabels.push(_('floor tom tom'));
+    newblock.staticLabels.push(_('floor tom'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('floortom')) {
@@ -3738,7 +3746,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['divide'] = newblock;
     newblock.fontsize = 9;
-    newblock.staticLabels.push('➗');
+    if (language === 'ja') {
+        newblock.staticLabels.push('➗');
+    } else {
+        newblock.staticLabels.push('/');
+    }
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {
@@ -4403,7 +4415,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.staticLabels.push(_('right2'));
     } else {
         //.TRANS: right side of the screen
-        newblock.staticLabels.push(_('right'));
+        newblock.staticLabels.push(_('right (screen)'));
     }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
@@ -4419,7 +4431,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.staticLabels.push(_('left2'));
     } else {
         //.TRANS: left side of the screen
-        newblock.staticLabels.push(_('left'));
+        newblock.staticLabels.push(_('left (screen)'));
     }
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
@@ -4430,7 +4442,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('toppos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['toppos'] = newblock;
-    newblock.staticLabels.push(_('top'));
+    newblock.staticLabels.push(_('top (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('toppos')) {
@@ -4440,7 +4452,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('bottompos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['bottompos'] = newblock;
-    newblock.staticLabels.push(_('bottom'));
+    newblock.staticLabels.push(_('bottom (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('bottompos')) {
@@ -4587,7 +4599,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(55);
     newblock.defaults.push(null);
     newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'mediain';
+    newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('turtleshell')) {
         newblock.hidden = true;
     }

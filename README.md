@@ -3,8 +3,8 @@ MUSIC BLOCKS
 
 “All musicians are subconsciously mathematicians” – Monk
 
-Music Blocks is a collection of manipulative tools for exploring
-musical concepts in an integrative and fun way.
+Music Blocks is a programming language and collection of manipulative tools for exploring
+musical and mathematical concepts in an integrative and fun way.
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
 
@@ -12,6 +12,8 @@ musical concepts in an integrative and fun way.
 
 Using Music Blocks
 ------------------
+
+Music Blocks is available under the GNU Affero General Public License (AGPL), a free, copyleft license.
 
 Music Blocks is designed to run in a web browser.
 

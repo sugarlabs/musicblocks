@@ -210,6 +210,15 @@ function Publisher(Planet) {
             var published = {};
             published.ProjectDescription = description.value;
             published.ProjectTags = this.getTags();
+            document.getElementById('publisher-submit').style.cursor = 'wait';
+            document.getElementById('publisher-cancel').style.cursor = 'wait';
+            for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
+              document.getElementById('publisher-form').getElementsByTagName("INPUT")[i].style.cursor = 'wait';
+            }
+            for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
+              document.getElementById('publisher-form').getElementsByTagName("TEXTAREA")[i].style.cursor = 'wait';
+            }
+            document.body.style.cursor = 'wait';
             Planet.ServerInterface.addProject(send, function(data) {
                 this.afterPublishProject(data, id, title.value, published);
             }.bind(this));
@@ -263,6 +272,15 @@ function Publisher(Planet) {
             this.throwError(_('Server Error') + ' (' + data.error + ') - ' + _('Try Again'));
             this.hideProgressBar();
         }
+        document.getElementById('publisher-submit').style.cursor = 'pointer';
+        document.getElementById('publisher-cancel').style.cursor = 'pointer';
+        for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
+          document.getElementById('publisher-form').getElementsByTagName("INPUT")[i].style.cursor = 'text';
+        }
+        for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
+          document.getElementById('publisher-form').getElementsByTagName("TEXTAREA")[i].style.cursor = 'text';
+        }
+        document.body.style.cursor = 'default';
     };
 
     this.throwError = function(error) {

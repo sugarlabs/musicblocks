@@ -204,7 +204,7 @@ Valid blocks styles in turtleblocksjs:
 * `booleanZeroArgBlock`: E.g., mouse button.
 * `booleanOneBooleanArgBlock`: E.g., not
 * `booleanTwoBooleanArgBlock`: E.g., and
-* `booleanOneArgBlock`: E.g.,
+* `booleanOneArgBlock`: E.g., found mouse
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
 
