@@ -168,7 +168,7 @@ paleta <em>bateria</em>.</p>
 repetições. Seja qual for a pilha de blocos colocados dentro do seu grampo, ela será
 repetida. Pode ser usado para repetir notas individuais ou frases inteiras
 de música.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/duplicatenote_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/duplicatenote_block.svg?sanitize=true" alt="alt tag" title="Duplicate block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/duplicatenotes_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/duplicatenotes_block.svg?sanitize=true" alt="alt tag" title="Duplicate block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Duplicar</em>, encontrado na paleta <em>Ritmos</em>, é usado para
 repetir quaisquer notas que estejam envolvidas. É semelhante ao uso de um bloco <em>Repetir</em>, mas
 em vez de repetir uma sequência de notas várias vezes, cada nota é
