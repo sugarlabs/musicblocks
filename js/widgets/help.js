@@ -16,8 +16,6 @@ function HelpWidget () {
     // const BUTTONSIZE = 53;
     const BUTTONSIZE = 82;
     const ICONSIZE = 32;
-    const HELPWIDTH = 400;
-    const HELPHEIGHT = 600;
 
     this.init = function (blocks) {
         var w = window.innerWidth;
@@ -211,8 +209,7 @@ function HelpWidget () {
                             break;
                         }
 
-                        // body = body + '<p><img src="' + path + '/' + BLOCKHELP[name][2] + '"></p>';
-                           body = body + '<p><img src="' + path + '/' + name + '_block.svg"></p>';
+                        body = body + '<p><img src="' + path + '/' + name + '_block.svg"></p>';
                     }
 
                     body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
@@ -289,18 +286,6 @@ function HelpWidget () {
             }
         }
     };
-
-    // this._addLabel = function(row, iconSize, label) {
-    //     var cell = row.insertCell(-1);
-    //     cell.innerHTML = '&nbsp;&nbsp;' + label + '&nbsp;&nbsp;';
-    //     cell.style.height = cell.style.width;
-    //     cell.style.minHeight = cell.style.height;
-    //     cell.style.maxHeight = cell.style.height;
-    //     // cell.style.backgroundColor = platformColor.selectorBackground;
-    //     cell.style.backgroundColor = '#2196F3';
-
-    //     return cell;
-    // };
 
     this.hide = function () {
         docById('helpDiv').style.visibility = 'hidden';
