@@ -596,7 +596,11 @@ function Activity() {
                         svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
                     } else if (p === 5) {
                         // Add block value to SVG between tspans
-                        svg += parts[p] + '>' + blocks.blockList[i].value + '<';
+                        if (typeof(blocks.blockList[i].value) === 'string') {
+                            console.log(_(blocks.blockList[i].value));
+                            svg += parts[p] + '>' + _(blocks.blockList[i].value) + '<';
+                        } else {
+                            svg += parts[p] + '>' + blocks.blockList[i].value + '<';                        }
                     } else if (p === parts.length - 2) {
                         svg += parts[p] + '>';
                     } else if (p === parts.length - 1) {
