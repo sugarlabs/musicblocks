@@ -36,27 +36,23 @@ function HelpWidget () {
         helpDiv.style.left = '200px';
         helpDiv.style.top = '150px';
 
-        var topDiv = document.createElement('div');
-        // topDiv.style.position = "absolute";
-        // topDiv.style.top = "0";
+        var topDiv = docById('helpButtonsDiv');
         topDiv.classList.add('top-wrapper');
-
-        helpDiv.appendChild(topDiv);
 
         // For the button callbacks
         var that = this;
 
         if (blocks === null) {
             topDiv.innerHTML = _('Take a tour');
-            var rightArrow = document.getElementById("right-arrow");
-            rightArrow.style.display = "block";
+            var rightArrow = document.getElementById('right-arrow');
+            rightArrow.style.display = 'block';
             rightArrow.classList.add('hover');
 
-            var leftArrow = document.getElementById("left-arrow");
-            leftArrow.style.display = "block";
+            var leftArrow = document.getElementById('left-arrow');
+            leftArrow.style.display = 'block';
             leftArrow.classList.add('hover');
 
-            var cell = docById("left-arrow");
+            var cell = docById('left-arrow');
 
             cell.onclick=function() {
                 page = page - 1;
@@ -67,7 +63,7 @@ function HelpWidget () {
                 that._showPage(page);
             };
 
-            var cell = docById("right-arrow");
+            var cell = docById('right-arrow');
 
             cell.onclick = function() {
                 page = page + 1;
@@ -87,14 +83,14 @@ function HelpWidget () {
 
             // var cell = this._addLabel(row, ICONSIZE, label);
             topDiv.innerHTML = label;
-            var rightArrow = document.getElementById("right-arrow");
-            // rightArrow.style.opacity = "0";
-            rightArrow.style.display = "none";
+            var rightArrow = document.getElementById('right-arrow');
+            // rightArrow.style.opacity = '0';
+            rightArrow.style.display = 'none';
             rightArrow.classList.remove('hover');
 
-            var leftArrow = document.getElementById("left-arrow");
-            // leftArrow.style.opacity = "0";
-            leftArrow.style.display = "none";
+            var leftArrow = document.getElementById('left-arrow');
+            // leftArrow.style.opacity = '0';
+            leftArrow.style.display = 'none';
             leftArrow.classList.remove('hover');
         }
 
@@ -106,7 +102,7 @@ function HelpWidget () {
             helpDiv.style.display = 'none';
         };
 
-        var dragCell = document.createElement("div");
+        var dragCell = document.createElement('div');
         dragCell.classList.add('drag-button');
         topDiv.appendChild(dragCell);
 
@@ -282,8 +278,8 @@ function HelpWidget () {
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
         
-    helpBody.style.color = "#505050";
-    helpBody.innerHTML = body;
+        helpBody.style.color = "#505050";
+        helpBody.innerHTML = body;
     };
 
     this.showPageByName = function(pageName) {
@@ -292,7 +288,7 @@ function HelpWidget () {
                 this._showPage(i);
             }
         }
-};
+    };
 
     // this._addLabel = function(row, iconSize, label) {
     //     var cell = row.insertCell(-1);
@@ -317,5 +313,5 @@ function HelpWidget () {
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
-    }
+    };
 };

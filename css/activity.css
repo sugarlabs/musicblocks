@@ -707,11 +707,8 @@ table {
     top: 20%;
     left: 20%;
     width: 455px;
-    height: 349px;
-    /* background: rgba(196, 196, 196, 1.0) !important; */
+    height: 375px;
     background: #e8e8e8 !important;
-    /* overflow-y: auto; */
-    overflow-x: hidden;
     -webkit-user-select: none;
     border-radius: 5px;
     box-shadow: 0 1px 10px #8080808f;
@@ -721,10 +718,12 @@ table {
     left: 410px;
     background: url('../header-icons/right-arrow.png');
 }
+
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
 }
+
 #right-arrow, #left-arrow {
     position: absolute;
     top: 195px;
@@ -732,6 +731,7 @@ table {
     height: 40px;
     width: 40px;
 }
+
 .hover:hover {
     cursor: pointer;
 }
@@ -750,6 +750,7 @@ table {
     text-align: center;
     height: 55px;
 }
+
 .close-button {
     position: absolute;
     font-size: 1em;
@@ -760,6 +761,7 @@ table {
     background-size: 18px;
     cursor: pointer;
 }
+
 .drag-button {
     position: absolute;
     right: 20px;
@@ -797,11 +799,11 @@ table {
 #helpBodyDiv {
     position: relative;
     left: 45px;
-    top: 75px;
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
-    width: 345px;
+    width: 365px;
+    height: 300px;
     background: #e8e8e8 !important;
 }
 
