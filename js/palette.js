@@ -2353,3 +2353,11 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
 
     img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
 };
+
+function delayExecution(duration) {
+    return new Promise(function (resolve){
+        setTimeout(function () {
+            resolve();
+        }, duration);
+    })
+}
