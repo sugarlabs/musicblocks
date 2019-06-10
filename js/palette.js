@@ -2317,7 +2317,7 @@ function Palette(palettes, name) {
 };
 
 
-function initPalettes (palettes) {
+async function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
     for (var i = 0; i < BUILTINPALETTES.length; i++) {
@@ -2328,11 +2328,11 @@ function initPalettes (palettes) {
 
     // Give the palettes time to load.
     // We are in no hurry since we are waiting on the splash screen.
-    setTimeout(function () {
+    await delayExecution(1000)
         palettes.show();
         palettes.bringToTop();
         palettes.showSelection(0);
-    }, 1000); // 6000
+  // 6000
 };
 
 
@@ -2353,3 +2353,11 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
 
     img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
 };
+
+function delayExecution(duration) {
+    return new Promise(function (resolve){
+        setTimeout(function () {
+            resolve();
+        }, duration);
+    })
+}
