@@ -71,7 +71,7 @@ const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Preference for sharps or flats
 const SHARPPREFERENCE = ['g major', 'd major', 'a major', 'e major', 'b major', 'f# major', 'c# major', 'e minor', 'b minor', 'f# minor', 'c# minor', 'g# minor', 'd# minor'];
-const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor'];
+const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor', 'd harmonic minor', 'g harmonic minor', 'c harmonic minor', 'f harmonic minor', 'bb harmonic minor', 'eb harmonic minor'];
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
@@ -88,7 +88,7 @@ function getSharpFlatPreference (keySignature) {
     var obj = keySignatureToMode(keySignature);
     var obj2 = modeMapper(obj[0], obj[1]);
     var ks = obj2[0] + ' ' + obj2[1];
-
+    console.log(ks);
     if (SHARPPREFERENCE.indexOf(ks) !== -1) {
         return 'sharp';
     } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
