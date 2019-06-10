@@ -2741,7 +2741,7 @@ msgstr ""
 
 #: js/turtledefs.js:537
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線がどのくらいすきとおるかをせっていする。すうちが大きいほど、線がすきとおる。"
 
 #: js/turtledefs.js:538
 msgid "The Fill block fills in a shape with a color."
