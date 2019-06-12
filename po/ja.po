@@ -310,7 +310,7 @@ msgstr "偽"
 #: js/musicutils.js:335
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr "重嬰"
+msgstr "ダブルシャープ"
 
 #: js/block.js:3423
 #: js/logo.js:6764
@@ -322,14 +322,14 @@ msgstr "重嬰"
 #.TRANS: sharp is a music term related to pitch
 ## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "sharp"
-msgstr "シャープ(嬰)"
+msgstr "シャープ"
 
 #: js/block.js:3423
 #: js/musicutils.js:328
 #: js/musicutils.js:335
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr "ナチュラル(本位)"
+msgstr "ナチュラル"
 
 #: js/block.js:3423
 #: js/logo.js:6767
@@ -341,14 +341,14 @@ msgstr "ナチュラル(本位)"
 #.TRANS: flat is a music term related to pitch
 ## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "flat"
-msgstr "フラット(変)"
+msgstr "フラット"
 
 #: js/block.js:3423
 #: js/musicutils.js:324
 #: js/musicutils.js:335
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr "重変"
+msgstr "ダブルフラット"
 
 #: js/block.js:4975
 #: js/basicblocks.js:515
