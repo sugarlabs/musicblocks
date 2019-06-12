@@ -1233,14 +1233,19 @@ function PitchTimeMatrix () {
     this._update = function (i, value, k, noteCase) {
         var updates = [];
         value = toFraction(value);
-        updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[1]);
-        updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[2]);
+        if (noteCase === 'tupletnote'){
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[1]);
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[2]);
+        }else{
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[1]);
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[2]);
+        }
         if (noteCase === 'rhythm' || noteCase==='stupletvalue') {
             updates.push(this._logo.blocks.blockList[i].connections[1]);
             this._logo.blocks.blockList[updates[2]].value = parseFloat(k);
             this._logo.blocks.blockList[updates[2]].text.text = k.toString();
             this._logo.blocks.blockList[updates[2]].updateCache();
-        } else if (noteCase === ' rhythm' || (noteCase === 'stuplet' && value!== null)) {
+        } else if (noteCase === ' rhythm' || (noteCase === 'stuplet' || noteCase === 'tupletnote' && value!== null)) {
             this._logo.blocks.blockList[updates[0]].value = parseFloat(value[1]);
             this._logo.blocks.blockList[updates[0]].text.text = value[1].toString();
             this._logo.blocks.blockList[updates[0]].updateCache();
@@ -1458,9 +1463,13 @@ function PitchTimeMatrix () {
     this._updateTuplet = function (that,noteToDivide, newNoteValue) {
         this._logo.tupletParams[noteToDivide][1] = newNoteValue
         this._restartGrid(that);
-        var notesBlockMap =  this._mapNotesBlocks('stuplet');
-        this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'stuplet');
-
+        if (condition === 'simpletupletnote') {
+            var notesBlockMap =  this._mapNotesBlocks('stuplet');
+            this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'stuplet');
+        } else {
+            var notesBlockMap =  this._mapNotesBlocks('tuplet4');
+            this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'tupletnote');
+        }
     }
     
     this._updateTupletValue = function (that, noteToDivide, oldTupletValue, newTupletValue) {
@@ -1545,7 +1554,7 @@ function PitchTimeMatrix () {
         if (condition === 'tupletvalue') {
             var mainTabsLabels = ['1','2','3','-','4','5','6','7','8','+','9','10'];
             this.newNoteValue = String(tupletValue);
-        } else if (condition === 'tupletnote') {
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
             mainTabsLabels = ['<-','Enter','1','2','3','4','5','6','7','8','9','10'];
             this.newNoteValue = '/';
         } else if (condition === 'rhythmnote') {
@@ -1580,7 +1589,7 @@ function PitchTimeMatrix () {
 
             this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
             this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
-        } else if (condition === 'tupletnote') {
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
             exitTabLabel = ['x', this.newNoteValue];
 
             this._menuWheel.slicePathCustom.minRadiusPercent = 0.5;
@@ -1659,7 +1668,7 @@ function PitchTimeMatrix () {
                 }
                 this._menuWheel.navItems[i].navigateFunction = __enterValue;
             }
-        } else if (condition === 'tupletnote') {
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
             var first = false;
             var second = false;
             
@@ -1693,7 +1702,7 @@ function PitchTimeMatrix () {
             this._menuWheel.navItems[1].navigateFunction = function () {
                 if (second && first){
                     var word = that.newNoteValue.split('/');
-                    that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]));
+                    that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]), condition);
                 }
             }
             for (var i = 2; i < mainTabsLabels.length; i++) {
@@ -1769,11 +1778,17 @@ function PitchTimeMatrix () {
             }
 
             if(cellTuplet !== undefined){
-                cell.onclick = function(){
-                    that._createpiesubmenu(this.getAttribute('id'),null,'tupletnote');
-                }
-                cellTuplet.onclick = function (){
-                    that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
+                if (this._logo.tupletRhythms[0][0] === 'notes') {
+                    cell.onclick = function(){
+                        that._createpiesubmenu(this.getAttribute('id'),null,'tupletnote');
+                    }
+                } else {
+                    cell.onclick = function(){
+                        that._createpiesubmenu(this.getAttribute('id'),null,'simpletupletnote');
+                    }
+                    cellTuplet.onclick = function (){
+                        that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
+                    }
                 }
             } else {
                 cell.removeEventListener('mousedown', __mouseDownHandler);
