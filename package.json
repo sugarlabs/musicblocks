@@ -25,7 +25,8 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-chrome-launcher": "^1.0.0",
     "karma-jasmine": "^0.3.7",
-    "phantomjs-prebuilt": "^2.1.5"
+    "phantomjs-prebuilt": "^2.1.5",
+    "karma-firefox-launcher": "^0.1.4"
   },
   "repository": {
     "type": "git",
