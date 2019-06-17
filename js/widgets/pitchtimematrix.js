@@ -487,6 +487,9 @@ function PitchTimeMatrix () {
                 counter['pitchblocks']++;
                 cell.onclick = function(event) {
                     cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
                     that._createcolumnpiesubmenu(cell.getAttribute('alt'));
                 }
                 this._noteStored.push(noteObj[0] + noteObj[1]);
