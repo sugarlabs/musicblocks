@@ -1470,6 +1470,9 @@ function PitchTimeMatrix () {
 
 
         var bottomBlockLoop = 0;
+        if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
+            notesBlockMap.push(blk);
+        }
         while (last(myBlock.connections) != null) {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * this._logo.blocks.blockList) {
@@ -1478,11 +1481,11 @@ function PitchTimeMatrix () {
                 break;
             }
 
-            if (myBlock.name === blockName) {
-                notesBlockMap.push(blk);
-            }
             blk = last(myBlock.connections);
             myBlock = this._logo.blocks.blockList[blk];
+            if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
+                notesBlockMap.push(blk);
+            }
         }
         return notesBlockMap
     }
