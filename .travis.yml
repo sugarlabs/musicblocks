@@ -1,7 +1,7 @@
 language: node_js
 node_js:
     - "0.10"
-    services:
+services:
   - xvfb
 script: node_modules/karma/bin/karma start my.conf.js --single-run
 before_install:
