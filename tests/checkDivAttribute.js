@@ -1,7 +1,12 @@
-describe('getDivAttribute', function() {
-    var d = document.querySelector('.box');
+/*
+ * Test the function
+ */
 
-    it('Should be bar', function() {
-        expect(d.getAttribute('foo')).toBe('bar');
+describe("Drag Drop widget", function() {
+    it("Draggable has fout items", function() {
+      expect(dragDrop.draggable.length).toBe(4);
     });
-});
+    it("This widget has two properties", function() {
+      expect(Object.keys(dragDrop).length).toBe(2);
+    });
+  });
