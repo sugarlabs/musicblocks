@@ -1449,7 +1449,8 @@ function PitchTimeMatrix () {
             this._logo.blocks.blockList[updates[2]].value = parseFloat(k);
             this._logo.blocks.blockList[updates[2]].text.text = k.toString();
             this._logo.blocks.blockList[updates[2]].updateCache();
-        } else if (noteCase === ' rhythm' || (noteCase === 'stuplet' || noteCase === 'tupletnote' && value!== null)) {
+        } 
+        if (noteCase === 'rhythm' || (noteCase === 'stuplet' || noteCase === 'tupletnote' && value!== null)) {
             this._logo.blocks.blockList[updates[0]].value = parseFloat(value[1]);
             this._logo.blocks.blockList[updates[0]].text.text = value[1].toString();
             this._logo.blocks.blockList[updates[0]].updateCache();
@@ -1664,7 +1665,7 @@ function PitchTimeMatrix () {
         this._restartGrid(that);
     }
 
-    this._updateTuplet = function (that,noteToDivide, newNoteValue) {
+    this._updateTuplet = function (that,noteToDivide, newNoteValue, condition) {
         this._logo.tupletParams[noteToDivide][1] = newNoteValue
         this._restartGrid(that);
         if (condition === 'simpletupletnote') {
