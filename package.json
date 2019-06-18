@@ -1,11 +1,4 @@
-
 {
-  "name": "musicblocks",
-  "version": "1.0.0",
-  "description": "A Musicical World",
-  "scripts": { 
-    "test": "karma start karma.conf.js --single-run --browsers PhantomJS"
-  },
   "amd": {},
   "volo": {
     "baseUrl": "lib",
