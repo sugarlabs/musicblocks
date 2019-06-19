@@ -16,4 +16,4 @@ var dragDrop = {
 	  }, {
 		name: "Glass"
 	}]
-};s
+};
