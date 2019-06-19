@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-    - "0.10"
+  - "iojs"
+  - "7"
 services:
   - xvfb
 script: node_modules/karma/bin/karma start my.conf.js --single-run
