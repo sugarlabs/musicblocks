@@ -42,7 +42,7 @@ describe("Testing async functions", function() {
   it('it should delay for few minutes', async function() {
     let completed = false;
     completed  = await delayExecution();
-    expect(completed).toEqual(true);
+    expect(completed).toBeTruthy();
   });
   
 });
