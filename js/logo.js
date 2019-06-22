@@ -4108,6 +4108,7 @@ function Logo () {
                     that.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
+                    that.pitchTimeMatrix.blockNo = blk;
                     that.pitchTimeMatrix.sorted = false;
                     that.pitchTimeMatrix.init(that);
 
@@ -4119,7 +4120,7 @@ function Logo () {
                         switch (that.tupletRhythms[i][0]) {
                         case 'notes':
                         case 'simple':
-                            var tupletParam = that.tupletParams;
+                            var tupletParam = [that.tupletParams[i]];
                             tupletParam.push([]);
                             for (var j = 2; j < that.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(that.tupletRhythms[i][j]);

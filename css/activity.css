@@ -802,8 +802,12 @@ table {
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
+<<<<<<< HEAD
     width: 365px;
     height: 300px;
+=======
+    width: 345px;
+>>>>>>> sparsh0204-phrasemaker_divide_note
     background: #e8e8e8 !important;
 }
 

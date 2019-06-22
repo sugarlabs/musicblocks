@@ -92,6 +92,7 @@ window.platformColor = {
     accidentalsWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428'],
     accidentalsWheelcolorspush: '#c0c0c0',
     octavesWheelcolors: ['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0', '#c0c0c0'],
+    blockLabelsWheelcolors:['#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6','#ffb2bc', '#ffccd6', '#ffb2bc', '#ffccd6'],
     noteValueWheelcolors: ['#ffb2bc', '#ffccd6'],
     tabsWheelcolors: ['#ffb2bc', '#ffccd6'],
     numberWheelcolors: ['#ffb2bc', '#ffccd6'],
