@@ -11,12 +11,12 @@ services:
   - xvfb
 
 before_install:
-- export CHROME_BIN=chromium-browser
-- export DISPLAY=:99.0
+ - export CHROME_BIN=chromium-browser
+ - export DISPLAY=:99.0
 
 before_script:
-- "sudo chown root /opt/google/chrome/chrome-sandbox"
-- "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
+ - "sudo chown root /opt/google/chrome/chrome-sandbox"
+ - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
 
 addons:	
   chrome: stable
