@@ -86,7 +86,7 @@ function PitchTimeMatrix () {
     this._blockMapHelper = [];
     this.columnBlocksMap = [];
 
-    this.clearBlocks = function() {
+    this.clearBlocks = function () {
         this._rowBlocks = [];
         this._colBlocks = [];
         this._rowMap = [];
@@ -136,7 +136,7 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._get_save_lock = function() {
+    this._get_save_lock = function () {
         return this._save_lock;
     };
 
@@ -187,7 +187,7 @@ function PitchTimeMatrix () {
         var that = this;
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
+        cell.onclick=function () {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
@@ -204,12 +204,12 @@ function PitchTimeMatrix () {
         }
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-        cell.onclick=function() {
+        cell.onclick=function () {
             that._logo.setTurtleDelay(0);
 
             that._logo.resetSynth(0);
             that.playAll(row);
-        }
+        };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         this._save_lock = false;
@@ -226,37 +226,21 @@ function PitchTimeMatrix () {
         };
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._clear();
-        }
+        };
 
         if (!localStorage.beginnerMode) {
             var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
-            cell.onclick=function() {
+            cell.onclick=function () {
                 that._export();
-            }
+            };
         }
 
         var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._sort();
-        }
-
-        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        // cell.onclick=function() {
-        //     that._rowOffset = [];
-        //     for (var i = 0; i < that._rowMap.length; i++) {
-        //         that._rowMap[i] = i;
-        //     }
-
-        //     that._logo.synth.stopSound(0, that._instrumentName);
-        //     that._logo.synth.stop();
-        //     that._stopOrCloseClicked = true;
-        //     ptmTableDiv.style.visibility = 'hidden';
-        //     ptmButtonsDiv.style.visibility = 'hidden';
-        //     ptmDiv.style.visibility = 'hidden';
-        //     that._logo.hideMsgs();
-        // }
+        };
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -659,7 +643,7 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            if (condition === 'graphicsblocks'){
+            if (condition === 'graphicsblocks') {
                 that._blockLabelsWheel.removeWheel();
             }
         };
@@ -689,7 +673,7 @@ function PitchTimeMatrix () {
         var __enterValue = function () {
             var i = that._pitchWheel.selectedNavItemIndex;
             var value = valueLabel[i];
-            if (that.x){
+            if (that.x) {
                 that.blockValue = that.xblockValue;
             } else {
                 that.blockValue = that.yblockValue;
@@ -866,7 +850,7 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            if (condition === 'graphicsblocks'){
+            if (condition === 'graphicsblocks') {
                 that._blockLabelsWheel.removeWheel();
             }
         };
@@ -917,7 +901,7 @@ function PitchTimeMatrix () {
                 
                 that.rowLabels[index] = label;
             }
-            setTimeout(function (){
+            setTimeout(function () {
                 var noteLabelBlock = that._logo.blocks.blockList[block].connections[1];
                 that._logo.blocks.blockList[noteLabelBlock].text.text = that.blockValue;
                 that._logo.blocks.blockList[noteLabelBlock].value = parseInt(that.blockValue);
@@ -969,7 +953,7 @@ function PitchTimeMatrix () {
 
     }
 
-    this._createcolumnpiesubmenu = function(index, condition){
+    this._createcolumnpiesubmenu = function(index, condition) {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
 
@@ -1080,7 +1064,7 @@ function PitchTimeMatrix () {
         var block = this.columnBlocksMap[index][0];
         var noteValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
 
-        if(condition === 'pitchblocks'){
+        if(condition === 'pitchblocks') {
             var octaveValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
             var accidentalsValue = 2;
 
@@ -1102,7 +1086,7 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            if (condition === 'pitchblocks'){
+            if (condition === 'pitchblocks') {
                 that._accidentalsWheel.removeWheel();
                 that._octavesWheel.removeWheel();
             }
@@ -1111,7 +1095,7 @@ function PitchTimeMatrix () {
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
-            if(condition === 'pitchblocks'){
+            if(condition === 'pitchblocks') {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
@@ -1136,7 +1120,7 @@ function PitchTimeMatrix () {
                 }
                 that.rowLabels[index] = noteObj[0];
                 that.rowArgs[index] = noteObj[1];
-            } else if (condition === 'drumblocks'){
+            } else if (condition === 'drumblocks') {
                 that.rowLabels[index] = label;
             }
 
@@ -1185,7 +1169,7 @@ function PitchTimeMatrix () {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var timeout = 0;
-            if(condition === 'pitchblocks'){
+            if(condition === 'pitchblocks') {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 if (attr !== '♮') {
                     label += attr;
@@ -1195,7 +1179,7 @@ function PitchTimeMatrix () {
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
-            } else if(condition === 'drumblocks'){
+            } else if(condition === 'drumblocks') {
                 if (that._logo.instrumentNames[0] === undefined || that._logo.instrumentNames[0].indexOf(label) === -1) {
                     if (that._logo.instrumentNames[0] === undefined) {
                         that._logo.instrumentNames[0] = [];
@@ -1309,11 +1293,11 @@ function PitchTimeMatrix () {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover=function() {
+        cell.onmouseover=function () {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
-        cell.onmouseout=function() {
+        cell.onmouseout=function () {
             this.style.backgroundColor = platformColor.selectorBackground;
         }
 
@@ -1325,7 +1309,7 @@ function PitchTimeMatrix () {
         return data;
     };
 
-    this._sort = function() {
+    this._sort = function () {
         if (this.sorted) {
             console.log('already sorted');
             return;
@@ -1478,7 +1462,7 @@ function PitchTimeMatrix () {
         this.makeClickable();
     };
 
-    this._export = function() {
+    this._export = function () {
         var exportWindow = window.open('');
         console.log(exportWindow);
         var exportDocument = exportWindow.document;
@@ -1795,14 +1779,14 @@ function PitchTimeMatrix () {
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
 
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
+                cell.onmouseover=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
 
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
+                cell.onmouseout=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
@@ -1882,14 +1866,14 @@ function PitchTimeMatrix () {
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
 
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
+                cell.onmouseover=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
 
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
+                cell.onmouseout=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
@@ -1955,10 +1939,10 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._syncMarkedBlocks = function() {
+    this._syncMarkedBlocks = function () {
         var newBlockMap = []
         for (var i = 0; i < this._blockMap.length; i++) {
-            if (this._blockMap[i][0] === -1){
+            if (this._blockMap[i][0] === -1) {
                 continue;
             }
             for (var j = 0; j < this._blockMapHelper.length; j++) {
@@ -2024,7 +2008,7 @@ function PitchTimeMatrix () {
     this._update = function (i, value, k, noteCase) {
         var updates = [];
         value = toFraction(value);
-        if (noteCase === 'tupletnote'){
+        if (noteCase === 'tupletnote') {
             updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[1]);
             updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[2]);
         }else{
@@ -2085,7 +2069,7 @@ function PitchTimeMatrix () {
         return notesBlockMap
     }
 
-    this.recalculateBlocks = function(){
+    this.recalculateBlocks = function () {
         var adjustedNotes = [];
         adjustedNotes.push([this._logo.tupletRhythms[0][2], 1])
         var startidx = 1;
@@ -2104,7 +2088,7 @@ function PitchTimeMatrix () {
         return adjustedNotes;
     };
 
-    this._readjustNotesBlocks = function(){
+    this._readjustNotesBlocks = function () {
         var notesBlockMap = this._mapNotesBlocks('rhythm2');
         var adjustedNotes = this.recalculateBlocks();
         
@@ -2174,7 +2158,7 @@ function PitchTimeMatrix () {
         for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i+parseInt(notesToAdd)]]);
         }
-        for (var i = 0;i < parseInt(notesToAdd);i++){
+        for (var i = 0;i < parseInt(notesToAdd);i++) {
             this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
         }
         this._readjustNotesBlocks();
@@ -2188,7 +2172,7 @@ function PitchTimeMatrix () {
         }
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
-        for (var i = 0; i < noteToDivide; i++){
+        for (var i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
@@ -2229,7 +2213,7 @@ function PitchTimeMatrix () {
     this._tieNotes = function(mouseDownCell,mouseUpCell) {
         var downCellId = null; 
         var upCellId = null;
-        if (mouseDownCell.id<mouseUpCell.id){
+        if (mouseDownCell.id<mouseUpCell.id) {
             downCellId = mouseDownCell.id; 
             upCellId = mouseUpCell.id;
         } else {
@@ -2238,15 +2222,15 @@ function PitchTimeMatrix () {
         }
 
         this._blockMapHelper = [];
-        for(var i = 0; i < downCellId; i++){
+        for(var i = 0; i < downCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i],[i]]);
         }
         var j = i;
-        for(var i = downCellId; i <= upCellId; i++){
+        for(var i = downCellId; i <= upCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i],[j]]);
         }
         j++;
-        for(var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++){
+        for(var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i],[j]]);
             j++;
         }
@@ -2298,7 +2282,7 @@ function PitchTimeMatrix () {
             var l = k;
             k = k + newTupletValue - oldTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for (var j = 0; j<this._logo.tupletRhythms[i].length-2; j++){
+                for (var j = 0; j<this._logo.tupletRhythms[i].length-2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2322,13 +2306,13 @@ function PitchTimeMatrix () {
             for (var i = oldTupletValue; i > newTupletValue; i--) {
                 this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length -1);
             }
-            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++){
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
                 this._blockMapHelper.push([this._colBlocks[k], [k]]);
                 k++;
             }
             var l = k+ oldTupletValue - newTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for(var j =0; j < this._logo.tupletRhythms[i].length-2; j++){
+                for(var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2348,17 +2332,17 @@ function PitchTimeMatrix () {
         this._update(notesBlockMap[noteToDivide], null, newTupletValue, 'stupletvalue');
     }
 
-    this._createpiesubmenu = function (noteToDivide, tupletValue,condition) {
+    this._createpiesubmenu = function (noteToDivide, tupletValue, condition) {
         docById('wheelDivptm').style.display = '';
 
         this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
 
         if (condition === 'tupletvalue') {
-            var mainTabsLabels = ['1','2','3','-','4','5','6','7','8','+','9','10'];
+            var mainTabsLabels = ['1', '2', '3', '-', '4', '5', '6', '7', '8', '+', '9', '10'];
             this.newNoteValue = String(tupletValue);
         } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
-            mainTabsLabels = ['<-','Enter','1','2','3','4','5','6','7','8','9','10'];
+            mainTabsLabels = ['<-', 'Enter', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
             this.newNoteValue = '/';
         } else if (condition === 'rhythmnote') {
             this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
@@ -2375,7 +2359,7 @@ function PitchTimeMatrix () {
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
-        
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.keynavigateEnabled = false;
         this._exitWheel.clickModeRotate = false;
@@ -2403,7 +2387,7 @@ function PitchTimeMatrix () {
 
         } else if (condition === 'rhythmnote') {
             exitTabLabel = ['x', ' '];
-            var tabsLabels = ['','','','','','','','','','','','','1','2','3','4','5','6','7',''];
+            var tabsLabels = ['', '', '', '', '', '', '', '', '', '', '', '', '1', '2', '3', '4', '5', '6', '7', ''];
             this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
 
@@ -2420,14 +2404,14 @@ function PitchTimeMatrix () {
             this._tabsWheel.clickModeRotate = false;
             this._tabsWheel.createWheel(tabsLabels);
 
-            for(var i=0;i<tabsLabels.length;i++){
+            for(var i = 0; i < tabsLabels.length;i++) {
                 this._tabsWheel.navItems[i].navItem.hide();
             }
 
         }
+
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
-
         
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '250px';
@@ -2436,7 +2420,7 @@ function PitchTimeMatrix () {
         var x = docById(noteToDivide).getBoundingClientRect().x;
         var y = docById(noteToDivide).getBoundingClientRect().y;
         
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var that = this;
@@ -2445,6 +2429,7 @@ function PitchTimeMatrix () {
             that._menuWheel.removeWheel();
             that._exitWheel.removeWheel();
         };
+
         if (condition === 'tupletvalue') {
             var __enterValue = function () {
                 var i = that._menuWheel.selectedNavItemIndex;
@@ -2453,22 +2438,26 @@ function PitchTimeMatrix () {
                 that.newNoteValue = String(value);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                 that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
-            }
+            };
+
             this._menuWheel.navItems[3].navigateFunction = function () {
-                if (that.newNoteValue>1){
-                that.newNoteValue = String(parseInt(that.newNoteValue)-1);
+                if (that.newNoteValue > 1) {
+                that.newNoteValue = String(parseInt(that.newNoteValue) - 1);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                 that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);    }       
-            }
+            };
+
             this._menuWheel.navItems[9].navigateFunction = function () {
-                that.newNoteValue = String(parseInt(that.newNoteValue)+1);
+                that.newNoteValue = String(parseInt(that.newNoteValue) + 1);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                 that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
-            }
+            };
+
             for (var i = 0; i < mainTabsLabels.length; i++) {
-                if(i===9 || i==3){
+                if (i === 9 || i == 3) {
                     continue;
                 }
+
                 this._menuWheel.navItems[i].navigateFunction = __enterValue;
             }
         } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
@@ -2478,36 +2467,39 @@ function PitchTimeMatrix () {
             var __enterValue = function () {
                 var i = that._menuWheel.selectedNavItemIndex;
                 var value = mainTabsLabels[i];
-                if (!first){
-                    that.newNoteValue = String(value)+'/';
+                if (!first) {
+                    that.newNoteValue = String(value) + '/';
                     docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                     first = true;
                 } else{
-                    if (!second){
+                    if (!second) {
                         that.newNoteValue = that.newNoteValue+String(value);
                         docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                         second = true;
                     }
                 }
-            }
+            };
+
             this._menuWheel.navItems[0].navigateFunction = function () {
-                if (second && first){
+                if (second && first) {
                     var word = that.newNoteValue.split('/');
-                    that.newNoteValue = word[0]+'/';
+                    that.newNoteValue = word[0] + '/';
                     docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                     second = false;
-                } else if(first){
-                    that.newNoteValue ='/';
+                } else if (first) {
+                    that.newNoteValue = '/';
                     docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
                     first = false;
                 }
-            }
+            };
+
             this._menuWheel.navItems[1].navigateFunction = function () {
-                if (second && first){
+                if (second && first) {
                     var word = that.newNoteValue.split('/');
                     that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]), condition);
                 }
-            }
+            };
+
             for (var i = 2; i < mainTabsLabels.length; i++) {
                 this._menuWheel.navItems[i].navigateFunction = __enterValue;
             }
@@ -2517,29 +2509,34 @@ function PitchTimeMatrix () {
             this._menuWheel.navItems[0].navigateFunction = function () {
                 that._divideNotes(that, noteToDivide, that.newNoteValue);
             };
+
             this._menuWheel.navItems[1].navigateFunction = function () {
                 that._deleteNotes(that, noteToDivide);
             };
+
             this._menuWheel.navItems[2].navigateFunction = function () {
                 that._addNotes(that, noteToDivide, that.newNoteValue);
             };
+
             this._menuWheel.navItems[3].navigateFunction = function () {
-                if( !flag ){
-                    for(var i = 12; i < 19; i++){
+                if (!flag) {
+                    for(var i = 12; i < 19; i++) {
                         docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
                         that._tabsWheel.navItems[i].navItem.show();
                     }
+
                     flag = 1;
-                }else{
-                    for(var i = 12; i < 19; i++){
+                } else {
+                    for (var i = 12; i < 19; i++) {
                         docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
                         that._tabsWheel.navItems[i].navItem.hide();
                     }
+
                     flag = 0;
                 }
             };
 
-            for(var i = 12; i < 19; i++){
+            for (var i = 12; i < 19; i++) {
                 this._tabsWheel.navItems[i].navigateFunction = function () {
                     var j = that._tabsWheel.selectedNavItemIndex;
                     that.newNoteValue = tabsLabels[j];
@@ -2547,9 +2544,9 @@ function PitchTimeMatrix () {
                 }
             }
         }
-    }
+    };
 
-    this.makeClickable = function() {
+    this.makeClickable = function () {
         // Once the entire matrix is generated, this function makes it
         // clickable.
         var rowNote = docById('ptmNoteValueRow');
@@ -2559,7 +2556,7 @@ function PitchTimeMatrix () {
             cell.setAttribute('id',  j);
 
             var cellTuplet = rowTuplet.cells[j];
-            if(cellTuplet!== undefined){
+            if (cellTuplet !== undefined) {
                 cellTuplet.setAttribute('id',  j);
             }
 
@@ -2580,16 +2577,16 @@ function PitchTimeMatrix () {
                 }
             }
 
-            if(cellTuplet !== undefined){
+            if (cellTuplet !== undefined) {
                 if (this._logo.tupletRhythms[0][0] === 'notes') {
-                    cell.onclick = function(){
+                    cell.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),null,'tupletnote');
                     }
                 } else {
-                    cell.onclick = function(){
+                    cell.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),null,'simpletupletnote');
                     }
-                    cellTuplet.onclick = function (){
+                    cellTuplet.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
                     }
                 }
@@ -2626,7 +2623,7 @@ function PitchTimeMatrix () {
                 var that = this;
                 var isMouseDown = false;
 
-                cell.onmousedown = function() {
+                cell.onmousedown = function () {
                     isMouseDown = true;
                     var obj = this.id.split(':');
                     var i = Number(obj[0]);
@@ -2641,7 +2638,7 @@ function PitchTimeMatrix () {
                     }
                 }
 
-                cell.onmouseover = function() {
+                cell.onmouseover = function () {
                     var obj = this.id.split(':');
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
@@ -2657,7 +2654,7 @@ function PitchTimeMatrix () {
                     }
                 }
 
-                cell.onmouseup = function() {
+                cell.onmouseup = function () {
                      isMouseDown = false;
                 }
             }
@@ -2856,7 +2853,7 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._resetMatrix = function() {
+    this._resetMatrix = function () {
         var row = docById('ptmNoteValueRow');
         for (var i = 0; i < row.cells.length; i++) {
             var cell = row.cells[i];
@@ -2882,7 +2879,7 @@ function PitchTimeMatrix () {
         time = 1 / noteValue;
         var that = this;
 
-        setTimeout(function() {
+        setTimeout(function () {
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
                 that._resetMatrix();
@@ -2989,24 +2986,24 @@ function PitchTimeMatrix () {
 
     this._playChord = function (notes, noteValue) {
         var that = this;
-        setTimeout(function() {
+        setTimeout(function () {
             that._logo.synth.trigger(0, notes[0], noteValue, that._instrumentName, null, null);
         }, 1);
 
         if (notes.length > 1) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[1], noteValue, that._instrumentName, null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[2], noteValue, that._instrumentName, null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[3], noteValue, that._instrumentName, null, null);
             }, 1);
         }
@@ -3128,7 +3125,7 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._clear = function() {
+    this._clear = function () {
         // "Unclick" every entry in the matrix.
         for (var i = 0; i < this.rowLabels.length; i++) {
             var row = docById('ptm' + i);
@@ -3143,7 +3140,7 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._save = function() {
+    this._save = function () {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
 
