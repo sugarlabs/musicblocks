@@ -1,10 +1,21 @@
+
 language: node_js
-node_js: '8'
-script: node_modules/karma/bin/karma start my.conf.js --single-run    
+dist: trusty
+sudo: required
+node_js:
+ - '8'
+
+script: node_modules/karma/bin/karma start my.conf.js --single-run
+
 services:
   - xvfb
+
 before_install:
 - export CHROME_BIN=chromium-browser
 - export DISPLAY=:99.0
+
 before_script:
     - npm install
+    
+addons:  
+chrome: stable

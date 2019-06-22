@@ -16,7 +16,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^2.0.1",
     "jasmine-core": "^2.3.2",
-    "karma-chrome-launcher": "^0.2.0"
+    "karma-chrome-launcher": "^2.2.0"
   },
   "dependencies": {
     "stable": "^0.1.8"
