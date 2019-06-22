@@ -2,7 +2,7 @@ language: node_js
 node_js: '8'
 script: node_modules/karma/bin/karma start my.conf.js --single-run    
 services:
-  - xvfb 
+  - xvfb
 before_install:
 - export CHROME_BIN=chromium-browser
 - export DISPLAY=:99.0
