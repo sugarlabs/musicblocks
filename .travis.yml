@@ -15,7 +15,8 @@ before_install:
 - export DISPLAY=:99.0
 
 before_script:
-    - npm install
-    
-addons:  
-chrome: stable
+- "sudo chown root /opt/google/chrome/chrome-sandbox"
+- "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
+
+addons:	
+  chrome: stable
