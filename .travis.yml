@@ -5,7 +5,7 @@ sudo: required
 node_js:
  - '8'
 
-script: node_modules/karma/bin/karma start my.conf.js --single-run
+script: ./node_modules/karma/bin/karma start my.conf.js --single-run
 
 before_script:
  - "sudo chown root /opt/google/chrome/chrome-sandbox"
