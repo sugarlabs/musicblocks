@@ -12,7 +12,7 @@ before_install:
  - sh -e /etc/init.d/xvfb start	    
  - sleep 3 # give xvfb some time to start	 
  
- before_script:
+before_script:
   - npm install
  
 addons:	
