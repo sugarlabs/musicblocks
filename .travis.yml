@@ -7,7 +7,6 @@ node_js:
 
 script: node_modules/karma/bin/karma start my.conf.js --single-run
 
-
 before_script:
  - "sudo chown root /opt/google/chrome/chrome-sandbox"
  - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
