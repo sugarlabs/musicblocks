@@ -8,16 +8,15 @@ describe("Testing async functions", function() {
     await delayExecution();
   });
   
-  it('Give the palettes time to load', async function() {
-        // Arrange
+  it('should be able to give the palette time to load', async function() {
+       // Arrange
     let completed = false;
-    
-    // Act
+      // Act
     completed  = await delayExecution();
-      // Assert
-
+       // Assert
     expect(completed).toBeTruthy();
   });
   
 });
+
 
