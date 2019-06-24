@@ -2357,7 +2357,7 @@ function makePaletteBitmap(palette, data, name, callback, extras) {
 function delayExecution(duration) {
     return new Promise(function (resolve){
         setTimeout(function () {
-            resolve();
+            resolve(true);
         }, duration);
     })
 }
