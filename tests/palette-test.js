@@ -9,9 +9,15 @@ describe("Testing async functions", function() {
   });
   
   it('Give the palettes time to load', async function() {
+        // Arrange
     let completed = false;
+    
+    // Act
     completed  = await delayExecution();
+      // Assert
+
     expect(completed).toBeTruthy();
   });
   
 });
+
