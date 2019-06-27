@@ -16,5 +16,19 @@ describe("Testing async functions", () => {
         done();
     });
   }); 
+
+
+  it("it should delete action block and avoid palette refresh race condition ", done => {
+    // Arrange
+    let action = false;
+
+    // Act
+    flag = deleteAction()
+      .then(() => {
+        // Assert
+        expect(action).toBeTruthy();
+        done();
+    });
+  }); 
   
 });

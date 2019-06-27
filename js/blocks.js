@@ -3530,7 +3530,7 @@ function Blocks (activity) {
     function Delay(duration) {
         return new Promise(function (resolve){
             setTimeout(function () {
-                resolve();
+                resolve(true);
             }, duration);
         })
     }
@@ -5720,7 +5720,7 @@ function Blocks (activity) {
     function deleteAction(timeout) {
         return new Promise(function (resolve){
             setTimeout(function () {
-                resolve();
+                resolve(true);
             }, timeout);
         })
     }
