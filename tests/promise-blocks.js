@@ -5,14 +5,14 @@
 describe("Testing async functions", function() {
   
   beforeEach(async function() {
-    await Delay();
+    await delay();
   });
   
   it('should delay for few seconds', async function() {
        // Arrange
     let flag = false;
       // Act
-    flag  = await Delay();
+    flag  = await delay();
        // Assert
     expect(flag).toBeTruthy();
   });
