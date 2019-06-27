@@ -3494,7 +3494,7 @@ function Blocks (activity) {
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock = function (name) {
+    this._newLocalArgBlock =  async function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if ('myArg_' + name in this.protoBlockDict) {
@@ -3521,13 +3521,19 @@ function Blocks (activity) {
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
         var that = this;
-        setTimeout(function () {
+        await Delay(100) 
             // that.palettes.hide();
             that.palettes.updatePalettes('action');
             // that.palettes.show();
-        }, 100); // 500
+         ; // 500
     };
-
+    function Delay(duration) {
+        return new Promise(function (resolve){
+            setTimeout(function () {
+                resolve(true);
+            }, duration);
+        })
+    }
     /*
      * Remove any unneeded Named Do blocks.
      * @param - name
@@ -5629,7 +5635,7 @@ function Blocks (activity) {
     * @public
     * @return {void}
     */
-    this.deleteActionBlock = function (myBlock) {
+    this.deleteActionBlock = async function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
@@ -5704,12 +5710,21 @@ function Blocks (activity) {
             this.deleteActionTimeout += 50; // 500
             var timeout = this.deleteActionTimeout;
             var that = this;
-            setTimeout(function () {
+            await deleteAction (timeout)
                 that.deleteActionTimeout -= 50; // 500
                 that.palettes.removeActionPrototype(actionName);
-            }, timeout);
+        ;
         }
     };
+    
+    function deleteAction(timeout) {
+        return new Promise(function (resolve){
+            setTimeout(function () {
+                resolve(true);
+            }, timeout);
+        })
+    }
+
 
     /*
      * Send a stack of blocks to the trash.
