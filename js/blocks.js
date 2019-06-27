@@ -3530,7 +3530,7 @@ function Blocks (activity) {
     function Delay(duration) {
         return new Promise(function (resolve){
             setTimeout(function () {
-                resolve(true);
+                resolve();
             }, duration);
         })
     }
