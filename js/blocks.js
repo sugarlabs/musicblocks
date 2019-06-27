@@ -3527,7 +3527,8 @@ function Blocks (activity) {
             // that.palettes.show();
          ; // 500
     };
-  
+
+
     /*
      * Remove any unneeded Named Do blocks.
      * @param - name
@@ -5822,7 +5823,6 @@ function deleteAction(timeout) {
     })
 }
 
-
 function Delay(duration) {
     return new Promise(function (resolve){
         setTimeout(function () {
@@ -5830,3 +5830,4 @@ function Delay(duration) {
         }, duration);
     })
 }
+  
