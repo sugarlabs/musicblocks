@@ -3527,13 +3527,7 @@ function Blocks (activity) {
             // that.palettes.show();
          ; // 500
     };
-    function Delay(duration) {
-        return new Promise(function (resolve){
-            setTimeout(function () {
-                resolve(true);
-            }, duration);
-        })
-    }
+  
     /*
      * Remove any unneeded Named Do blocks.
      * @param - name
@@ -5717,14 +5711,6 @@ function Blocks (activity) {
         }
     };
     
-    function deleteAction(timeout) {
-        return new Promise(function (resolve){
-            setTimeout(function () {
-                resolve(true);
-            }, timeout);
-        })
-    }
-
 
     /*
      * Send a stack of blocks to the trash.
@@ -5826,3 +5812,21 @@ function Blocks (activity) {
 
     return this;
 };
+
+
+function deleteAction(timeout) {
+    return new Promise(function (resolve){
+        setTimeout(function () {
+            resolve(true);
+        }, timeout);
+    })
+}
+
+
+function Delay(duration) {
+    return new Promise(function (resolve){
+        setTimeout(function () {
+            resolve(true);
+        }, duration);
+    })
+}
