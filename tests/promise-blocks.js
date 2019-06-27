@@ -12,7 +12,7 @@ describe("Testing async functions", function() {
        // Arrange
     let flag = false;
       // Act
-    completed  = await Delay();
+    flag  = await Delay();
        // Assert
     expect(flag).toBeTruthy();
   });
