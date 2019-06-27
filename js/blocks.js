@@ -5720,7 +5720,7 @@ function Blocks (activity) {
     function deleteAction(timeout) {
         return new Promise(function (resolve){
             setTimeout(function () {
-                resolve(true);
+                resolve();
             }, timeout);
         })
     }
