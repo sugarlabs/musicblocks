@@ -14,6 +14,7 @@ module.exports = function(config) {
     files: [
     'js/palette.js',
     'tests/*js',
+    'js/blocks.js'
      ],
 
     // list of files to exclude
