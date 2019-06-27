@@ -13,7 +13,9 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
     'js/palette.js',
-    'tests/promise-palette.js'    ],
+    'tests/promise-palette.js',
+    'tests/promise-block.js'
+     ],
 
     // list of files to exclude
     exclude: [
