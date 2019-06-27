@@ -2,33 +2,19 @@
  * Test the function
  */
 
-describe("Testing async functions", () => {
+describe("Testing async functions", function() {
   
-  it("delay after few seconds", done => {
-    // Arrange
+  beforeEach(async function() {
+    await Delay();
+  });
+  
+  it('should delay for few seconds', async function() {
+       // Arrange
     let flag = false;
-
-    // Act
-    flag = Delay()
-      .then(() => {
-        // Assert
-        expect(flag).toBeTruthy();
-        done();
-    });
-  }); 
-
-
-  it("it should delete action block and avoid palette refresh race condition ", done => {
-    // Arrange
-    let action = false;
-
-    // Act
-    flag = deleteAction()
-      .then(() => {
-        // Assert
-        expect(action).toBeTruthy();
-        done();
-    });
-  }); 
+      // Act
+    completed  = await Delay();
+       // Assert
+    expect(flag).toBeTruthy();
+  });
   
 });
