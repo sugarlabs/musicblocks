@@ -3494,7 +3494,7 @@ function Blocks (activity) {
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock =  async function (name) {
+    this._newLocalArgBlock = async function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if ('myArg_' + name in this.protoBlockDict) {
@@ -3522,13 +3522,12 @@ function Blocks (activity) {
         // Add delay to avoid race condition.
         var that = this;
         await delay(100) 
-            // that.palettes.hide();
-            that.palettes.updatePalettes('action');
-            // that.palettes.show();
-         ; // 500
-    };
-
-
+        // that.palettes.hide();
+        that.palettes.updatePalettes('action');
+        // that.palettes.show();
+     ; // 500
+};
+      
     /*
      * Remove any unneeded Named Do blocks.
      * @param - name
@@ -5630,7 +5629,7 @@ function Blocks (activity) {
     * @public
     * @return {void}
     */
-    this.deleteActionBlock = async function (myBlock) {
+     this.deleteActionBlock = async function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
@@ -5706,12 +5705,11 @@ function Blocks (activity) {
             var timeout = this.deleteActionTimeout;
             var that = this;
             await delay(timeout)
-                that.deleteActionTimeout -= 50; // 500
-                that.palettes.removeActionPrototype(actionName);
-        ;
-        }
-    };
-    
+            that.deleteActionTimeout -= 50; // 500
+            that.palettes.removeActionPrototype(actionName);
+    ;
+    }
+};
 
     /*
      * Send a stack of blocks to the trash.
@@ -5813,8 +5811,6 @@ function Blocks (activity) {
 
     return this;
 };
-
-
 function delay(duration,timeout) {
     return new Promise(function (resolve){
         setTimeout(function () {
