@@ -597,7 +597,7 @@ function PitchTimeMatrix () {
 
     this._createaddcolumnpiesubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['pitch', 'hertz', 'drum', 'arc', 'forward'];
+        var valueLabel = ['pitch', 'hertz', 'drum', 'arc', 'forward', 'right', 'setcolor'];
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
 
@@ -674,12 +674,16 @@ function PitchTimeMatrix () {
                 var n = that._logo.blocks.blockList.length - 3;
                 rLabel = 'arc';
                 rArg = [90, 100];
-            } else if (label === 'forward') {
-                const BLOCKOBJ = [[0,["forward",{}],0,0,[null,1,null]],[1,["number",{"value":100}],0,0,[0]]];                
+            } else if (label === 'forward' || label === 'right' || label === 'setcolor') {
+                var val = 100;
+                if (label === 'setcolor'){
+                    val = 0;
+                }
+                const BLOCKOBJ = [[0,[label,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
-                rLabel = 'forward';
-                rArg = 100;
+                rLabel = label;
+                rArg = val;
             }
             var blocksNo = null;
             var aboveBlock = null;
@@ -697,6 +701,8 @@ function PitchTimeMatrix () {
                         break;
                     }
                 case 'forward':
+                case 'right':
+                case 'setcolor':
                     for(var i = MATRIXGRAPHICS.length - 1; i >= 0; i--) {
                         blocksNo = that._mapNotesBlocks(MATRIXGRAPHICS[i]);
                         if(blocksNo.length >= 1){
