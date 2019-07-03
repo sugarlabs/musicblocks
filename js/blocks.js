@@ -1188,6 +1188,11 @@ function Blocks (activity) {
         };
 
         var thisBlockobj = this.blockList[thisBlock];
+        if (thisBlockobj.name === 'vspace') {
+            return;
+        }
+s
+        var thisBlockobj = this.blockList[thisBlock];
         if (thisBlockobj.name === 'rest2') {
             this._deletePitchBlocks(thisBlock);
         } else {
