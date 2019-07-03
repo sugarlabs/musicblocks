@@ -12,9 +12,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-    'js/palette.js',
-    'js/blocks.js',
-    'tests/*js',
+    
      ],
 
     // list of files to exclude

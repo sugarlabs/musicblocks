@@ -92,3 +92,4 @@ Performance Tools
 -----------------
 
 Performance tools used are in-browsers perfomance profiling and jsperf.com (https://jsperf.com/) 
+Note: When running testing code on (https://jsperf.com/) tests should be run more than once 
