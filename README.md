@@ -87,3 +87,10 @@ music, your lesson plans, your artwork, and your code.
 
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
+
+
+Performance Tools
+-----------------
+
+Performance tools used are in-browsers perfomance profiling and jsperf.com (https://jsperf.com/) 
+Note: When running testing code on (https://jsperf.com/) tests should be run more than once 
