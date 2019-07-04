@@ -3527,7 +3527,7 @@ function Blocks (activity) {
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
         var that = this
-        await delayRun(100)
+        await delayExecution(100)
         // that.palettes.hide();
         that.palettes.updatePalettes('action');
         // that.palettes.show();
@@ -5711,7 +5711,7 @@ function Blocks (activity) {
             this.deleteActionTimeout += 50; // 500
             var timeout = this.deleteActionTimeout;
             var that = this;
-        await delayRun(timeout)
+        await delayExecution(timeout)
         that.deleteActionTimeout -= 50; // 500
         that.palettes.removeActionPrototype(actionName); 
         }
@@ -5817,11 +5817,3 @@ function Blocks (activity) {
     return this;
 };
  
-function delayRun(duration,timeout) {
-    return new Promise(function(resolve,reject) {
-        setTimeout(function(){
-            resolve(true);
-        },duration,timeout);
-    
-     })
-}
