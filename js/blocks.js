@@ -1,3 +1,4 @@
+
 // Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -1191,6 +1192,7 @@ function Blocks (activity) {
             return;
         }
 
+        var thisBlockobj = this.blockList[thisBlock];
         if (thisBlockobj.name === 'rest2') {
             this._deletePitchBlocks(thisBlock);
         } else {
@@ -3498,7 +3500,7 @@ function Blocks (activity) {
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock = function (name) {
+    this._newLocalArgBlock = async function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if ('myArg_' + name in this.protoBlockDict) {
@@ -3524,14 +3526,15 @@ function Blocks (activity) {
 
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
-        var that = this;
-        setTimeout(function () {
-            // that.palettes.hide();
-            that.palettes.updatePalettes('action');
-            // that.palettes.show();
-        }, 100); // 500
-    };
+        var that = this
+        await delayExecution(100)
+        // that.palettes.hide();
+        that.palettes.updatePalettes('action');
+        // that.palettes.show();
+         // 500
 
+};
+      
     /*
      * Remove any unneeded Named Do blocks.
      * @param - name
@@ -5633,7 +5636,7 @@ function Blocks (activity) {
     * @public
     * @return {void}
     */
-    this.deleteActionBlock = function (myBlock) {
+     this.deleteActionBlock =  async function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
@@ -5708,13 +5711,11 @@ function Blocks (activity) {
             this.deleteActionTimeout += 50; // 500
             var timeout = this.deleteActionTimeout;
             var that = this;
-            setTimeout(function () {
-                that.deleteActionTimeout -= 50; // 500
-                that.palettes.removeActionPrototype(actionName);
-            }, timeout);
+        await delayExecution(timeout)
+        that.deleteActionTimeout -= 50; // 500
+        that.palettes.removeActionPrototype(actionName); 
         }
-    };
-
+};
     /*
      * Send a stack of blocks to the trash.
      * @param - myBlock
@@ -5815,3 +5816,4 @@ function Blocks (activity) {
 
     return this;
 };
+ 

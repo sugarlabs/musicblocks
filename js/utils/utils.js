@@ -1098,3 +1098,10 @@ function hexToRGB(hex) {
     } : null;
 };
 
+function delayExecution(duration) {
+    return new Promise(function(resolve,reject) {
+        setTimeout(function(){
+            resolve(true);
+        }, duration);
+    })
+}
