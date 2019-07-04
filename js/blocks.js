@@ -1191,7 +1191,7 @@ function Blocks (activity) {
         if (thisBlockobj.name === 'vspace') {
             return;
         }
-s
+
         var thisBlockobj = this.blockList[thisBlock];
         if (thisBlockobj.name === 'rest2') {
             this._deletePitchBlocks(thisBlock);
@@ -3500,7 +3500,7 @@ s
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock = function (name) {
+    this._newLocalArgBlock = async function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if ('myArg_' + name in this.protoBlockDict) {
@@ -3527,14 +3527,11 @@ s
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
         var that = this
-     return new Promise(function (resolve,reject){
-     setTimeout(function () {
+        await delayRun(100)
         // that.palettes.hide();
         that.palettes.updatePalettes('action');
         // that.palettes.show();
-        resolve(true);
-    }, 100); // 500
-})
+         // 500
 
 };
       
@@ -5639,7 +5636,7 @@ s
     * @public
     * @return {void}
     */
-     this.deleteActionBlock = function (myBlock) {
+     this.deleteActionBlock =  async function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
@@ -5714,13 +5711,9 @@ s
             this.deleteActionTimeout += 50; // 500
             var timeout = this.deleteActionTimeout;
             var that = this;
-          return new Promise(function (resolve,reject){
-          setTimeout(function () {
+        await delayRun(timeout)
         that.deleteActionTimeout -= 50; // 500
         that.palettes.removeActionPrototype(actionName); 
-        resolve(true);
-    }, timeout); // 6000
-})
         }
 };
     /*
@@ -5823,3 +5816,12 @@ s
 
     return this;
 };
+ 
+function delayRun(duration,timeout) {
+    return new Promise(function(resolve,reject) {
+        setTimeout(function(){
+            resolve(true);
+        },duration,timeout);
+    
+     })
+}
