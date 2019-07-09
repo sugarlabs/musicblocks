@@ -14,7 +14,10 @@
     "eslint-config-standard": "^7.1.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^2.1.1",
+    "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-minify-css": "^1.2.4",
     "gulp-uglify": "^3.0.2",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5"
@@ -23,7 +26,6 @@
     "build": "webpack"
   },
   "dependencies": {
-    "gulp": "^4.0.2",
     "autoprefixer": "^9.6.0",
     "cssnano": "^4.1.10",
     "gulp-concat": "^2.6.1",
