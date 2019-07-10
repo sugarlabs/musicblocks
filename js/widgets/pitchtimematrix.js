@@ -242,6 +242,12 @@ function PitchTimeMatrix () {
             that._sort();
         };
 
+        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add Note'));
+        cell.setAttribute('id', 'addnotes');
+        cell.onclick = function () {
+            that._createaddcolumnpiesubmenu();
+        };
+
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
@@ -531,32 +537,6 @@ function PitchTimeMatrix () {
             ptmRow.setAttribute('id', 'ptm' + j);
 
             j += 1;
-        }
-
-        var height = (Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1);
-        var width = 1;
-        var colSpan = 3;
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            width = width + this._noteWidth(this._logo.tupletRhythms[i][2]);
-        }
-        var ptmTableRow = ptmTable.insertRow();
-        var ptmCell = ptmTableRow.insertCell();
-        ptmCell.style.height = height + 'px';
-        ptmCell.style.width = width + 'px';
-        ptmCell.style.minWidth = ptmCell.style.width;
-        ptmCell.style.maxWidth = ptmCell.style.width;
-        ptmCell.style.backgroundColor = cellColor;
-        ptmCell.style.padding = '0px';
-        ptmCell.style.left =  '1px';
-        ptmCell.style.textAlign= 'center';
-        ptmCell.style.verticalAlign = 'middle';
-        ptmCell.innerHTML = 'add note';
-        ptmCell.setAttribute('colSpan', colSpan);
-        ptmCell.setAttribute('id', 'addnotes');
-
-        ptmCell.onclick = function(event) {
-            cell = event.target;
-            that._createaddcolumnpiesubmenu();
         }
 
         // An extra row for the note and tuplet values
