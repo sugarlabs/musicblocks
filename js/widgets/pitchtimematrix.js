@@ -577,9 +577,15 @@ function PitchTimeMatrix () {
 
     this._createaddcolumnpiesubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['pitch', 'hertz', 'drum', 'arc', 'forward', 'right', 'setcolor'];
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        var valueLabel = ['pitch', 'hertz', 'drum', 'arc', 'graphics'];
+        var drumLabels = [ "snare drum", "kick drum", "tom tom", "floor tom tom", "cup drum", "darbuka drum", "japanese drum", "hi hat", "ride bell", "cow bell", "triangle bell", "finger cymbals", "chime", "gong", "clang", "crash", "clap", "slap"];
+        var tabsLabels = MATRIXGRAPHICS;
+        var graphic2Labels = MATRIXGRAPHICS2;
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 1800, 1800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        this._tabsWheel = new wheelnav('_tabsWheel', this._pitchWheel.raphael);
+        this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
+        this._graphic2Wheel = new wheelnav('_graphic2Wheel', this._pitchWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -587,8 +593,8 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = platformColor.pitchWheelcolors;        
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.25;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.7;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
@@ -603,11 +609,57 @@ function PitchTimeMatrix () {
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
+
+        this._tabsWheel.colors = platformColor.pitchWheelcolors;
+        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.clickModeRotate = false;
+        this._tabsWheel.titleRotateAngle = 90;
+
+        this._tabsWheel.createWheel(tabsLabels);
+
+        for(var i = 0; i < tabsLabels.length;i++) {
+            this._tabsWheel.navItems[i].navItem.hide();
+        }
+        this._drumWheel.colors = platformColor.pitchWheelcolors;
+        this._drumWheel.slicePathFunction = slicePath().DonutSlice;
+        this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._drumWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._drumWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._drumWheel.sliceSelectedPathCustom = this._drumWheel.slicePathCustom;
+        this._drumWheel.sliceInitPathCustom = this._drumWheel.slicePathCustom;
+        this._drumWheel.clickModeRotate = false;
+
+        this._drumWheel.createWheel(drumLabels);
+
+        for(var i = 0; i < drumLabels.length;i++) {
+            this._drumWheel.navItems[i].navItem.hide();
+        }
+
+        this._graphic2Wheel.colors = platformColor.pitchWheelcolors;
+        this._graphic2Wheel.slicePathFunction = slicePath().DonutSlice;
+        this._graphic2Wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._graphic2Wheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._graphic2Wheel.slicePathCustom.maxRadiusPercent = 1;
+        this._graphic2Wheel.sliceSelectedPathCustom = this._graphic2Wheel.slicePathCustom;
+        this._graphic2Wheel.sliceInitPathCustom = this._graphic2Wheel.slicePathCustom;
+        this._graphic2Wheel.clickModeRotate = false;
+        this._graphic2Wheel.titleRotateAngle = 90;
+
+        this._graphic2Wheel.createWheel(graphic2Labels);
+
+        for(var i = 0; i < graphic2Labels.length;i++) {
+            this._graphic2Wheel.navItems[i].navItem.hide();
+        }
 
         var x = docById('addnotes').getBoundingClientRect().x;
         var y = docById('addnotes').getBoundingClientRect().y;
@@ -624,12 +676,56 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
+            that._tabsWheel.removeWheel();
+            that._drumWheel.removeWheel();
+            that._graphic2Wheel.removeWheel();
         };
+
+        var __subMenuChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            if (label === 'pitch') {
+                __selectionChanged();
+            } else if (label === 'hertz') {
+                __selectionChanged();
+            } else if (label === 'graphics') {
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphic2Labels.length;i++) {
+                    that._graphic2Wheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < tabsLabels.length;i++) {
+                    that._tabsWheel.navItems[i].navItem.show();
+                }
+            } else if (label === 'drum') {
+                for(var i = 0; i < tabsLabels.length;i++) {
+                    that._tabsWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphic2Labels.length;i++) {
+                    that._graphic2Wheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.show();
+                }
+            } else if (label === 'arc') {
+                for(var i = 0; i < tabsLabels.length;i++) {
+                    that._tabsWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphic2Labels.length;i++) {
+                    that._graphic2Wheel.navItems[i].navItem.show();
+                }
+            }
+        }
+
 
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
             var rLabel = null;
-            var rArg = null;        
+            var rArg = null;
+            var blockLabel = '';    
             if (label === 'pitch') {
                 const BLOCKOBJ = [[0,["pitch",{}],0,0,[null,1,2,null]],[1,["solfege",{"value":"sol"}],0,0,[0]],[2,["number",{"value":4}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
@@ -643,26 +739,29 @@ function PitchTimeMatrix () {
                 rLabel = 'hertz';
                 rArg = 392;
             } else if (label === 'drum') {
-                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":"snare drum"}],0,0,[0]]];                
+                blockLabel = that._drumWheel.navItems[that._drumWheel.selectedNavItemIndex].title;
+                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":"blockLabel"}],0,0,[0]]];                
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
-                rLabel = 'snare drum';
+                rLabel = blockLabel;
                 rArg = -1;
             } else if (label === 'arc') {
-                const BLOCKOBJ = [[0,["arc",{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
+                blockLabel = that._graphic2Wheel.navItems[that._graphic2Wheel.selectedNavItemIndex].title;
+                const BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 3;
-                rLabel = 'arc';
+                rLabel = blockLabel;
                 rArg = [90, 100];
-            } else if (label === 'forward' || label === 'right' || label === 'setcolor') {
+            } else if (label === 'graphics') {
+                blockLabel = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
                 var val = 100;
-                if (label === 'setcolor'){
+                if (blockLabel === 'setcolor'){
                     val = 0;
                 }
-                const BLOCKOBJ = [[0,[label,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
+                const BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
-                rLabel = label;
+                rLabel = blockLabel;
                 rArg = val;
             }
             var blocksNo = null;
@@ -680,9 +779,7 @@ function PitchTimeMatrix () {
                     if (aboveBlock !== null){
                         break;
                     }
-                case 'forward':
-                case 'right':
-                case 'setcolor':
+                case 'graphics':
                     for(var i = MATRIXGRAPHICS.length - 1; i >= 0; i--) {
                         blocksNo = that._mapNotesBlocks(MATRIXGRAPHICS[i]);
                         if(blocksNo.length >= 1){
@@ -759,7 +856,16 @@ function PitchTimeMatrix () {
             that.makeClickable();
         }
         for (var i = 0; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __selectionChanged;
+            this._pitchWheel.navItems[i].navigateFunction = __subMenuChanged;
+        }
+        for (var i = 0; i < drumLabels.length; i++) {
+            this._drumWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+        for (var i = 0; i < graphic2Labels.length; i++) {
+            this._graphic2Wheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+        for (var i = 0; i < tabsLabels.length; i++) {
+            this._tabsWheel.navItems[i].navigateFunction = __selectionChanged;
         }
     }
 
