@@ -18,7 +18,7 @@ const gulp = require('gulp');
 
 // File paths
 const files = { 
-    // scssPath: 'css/**/*.sass',
+
     jsPath: 'js/**/*.js',
     cssPath: 'css/*.css',
     sassPath: 'css/*.sass'
@@ -28,7 +28,7 @@ const files = {
 function sassTask(){    
     return src(files.sassPath)
         .pipe(sourcemaps.init()) // initialize sourcemaps first
-        .pipe(sass()) // compile SCSS to CSS
+        .pipe(sass()) // compile SASS to CSS
         .pipe(postcss([ autoprefixer(), cssnano() ])) // PostCSS plugins
         .pipe(sourcemaps.write('.')) // write sourcemaps file in current directory
         .pipe(dest('dist/css')
@@ -48,7 +48,6 @@ function cssTask () {
 function jsTask(){
     return src([
         files.jsPath
-        //,'!' + 'includes/js/jquery.min.js', // to exclude any specific files
         ])
         .pipe(concat('app.min.js'))
         .pipe(babel({
@@ -68,15 +67,15 @@ function cacheBustTask(){
         .pipe(dest('.'));
 }
 
-// Watch task: watch SCSS and JS files for changes
-// If any change, run scss and js tasks simultaneously
+// Watch task: watch SASS , CSS and JS files for changes
+// If any change, run sass, css and js tasks simultaneously
 function watchTask(){
     watch([ files.jsPath, files.cssPath, files.sassPath ], 
         parallel( jsTask, cssTask, sassTask));    
 }
 
 // Export the default Gulp task so it can be run
-// Runs the scss and js tasks simultaneously
+// Runs the sass ,css and js tasks simultaneously
 // then runs cacheBust, then watch task
 exports.default = series(
     parallel( jsTask, cssTask , sassTask ), 
