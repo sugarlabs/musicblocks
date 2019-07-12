@@ -8,12 +8,6 @@
     }
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^7.1.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1"
-=======
     "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
     "eslint": "^3.18.0",
@@ -39,6 +33,5 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5"
->>>>>>> 4807e30a47de722a5005598e8c6463663d856756
   }
 }
