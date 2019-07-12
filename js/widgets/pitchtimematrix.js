@@ -577,15 +577,13 @@ function PitchTimeMatrix () {
 
     this._createaddcolumnpiesubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['pitch', 'hertz', 'drum', 'arc', 'graphics'];
-        var drumLabels = [ "snare drum", "kick drum", "tom tom", "floor tom tom", "cup drum", "darbuka drum", "japanese drum", "hi hat", "ride bell", "cow bell", "triangle bell", "finger cymbals", "chime", "gong", "clang", "crash", "clap", "slap"];
-        var tabsLabels = MATRIXGRAPHICS;
-        var graphic2Labels = MATRIXGRAPHICS2;
+        var valueLabel = ['pitch', 'hertz', 'drum', 'graphics'];
+        var drumLabels = DRUMS;
+        var graphicLabels = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
         this._pitchWheel = new wheelnav('wheelDivptm', null, 1800, 1800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
-        this._tabsWheel = new wheelnav('_tabsWheel', this._pitchWheel.raphael);
         this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
-        this._graphic2Wheel = new wheelnav('_graphic2Wheel', this._pitchWheel.raphael);
+        this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -615,21 +613,6 @@ function PitchTimeMatrix () {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
 
-        this._tabsWheel.colors = platformColor.pitchWheelcolors;
-        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
-        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.clickModeRotate = false;
-        this._tabsWheel.titleRotateAngle = 90;
-
-        this._tabsWheel.createWheel(tabsLabels);
-
-        for(var i = 0; i < tabsLabels.length;i++) {
-            this._tabsWheel.navItems[i].navItem.hide();
-        }
         this._drumWheel.colors = platformColor.pitchWheelcolors;
         this._drumWheel.slicePathFunction = slicePath().DonutSlice;
         this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -645,20 +628,20 @@ function PitchTimeMatrix () {
             this._drumWheel.navItems[i].navItem.hide();
         }
 
-        this._graphic2Wheel.colors = platformColor.pitchWheelcolors;
-        this._graphic2Wheel.slicePathFunction = slicePath().DonutSlice;
-        this._graphic2Wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._graphic2Wheel.slicePathCustom.minRadiusPercent = 0.7;
-        this._graphic2Wheel.slicePathCustom.maxRadiusPercent = 1;
-        this._graphic2Wheel.sliceSelectedPathCustom = this._graphic2Wheel.slicePathCustom;
-        this._graphic2Wheel.sliceInitPathCustom = this._graphic2Wheel.slicePathCustom;
-        this._graphic2Wheel.clickModeRotate = false;
-        this._graphic2Wheel.titleRotateAngle = 90;
+        this._graphicWheel.colors = platformColor.pitchWheelcolors;
+        this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
+        this._graphicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._graphicWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._graphicWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._graphicWheel.sliceSelectedPathCustom = this._graphicWheel.slicePathCustom;
+        this._graphicWheel.sliceInitPathCustom = this._graphicWheel.slicePathCustom;
+        this._graphicWheel.clickModeRotate = false;
+        this._graphicWheel.titleRotateAngle = 90;
 
-        this._graphic2Wheel.createWheel(graphic2Labels);
+        this._graphicWheel.createWheel(graphicLabels);
 
-        for(var i = 0; i < graphic2Labels.length;i++) {
-            this._graphic2Wheel.navItems[i].navItem.hide();
+        for(var i = 0; i < graphicLabels.length;i++) {
+            this._graphicWheel.navItems[i].navItem.hide();
         }
 
         var x = docById('addnotes').getBoundingClientRect().x;
@@ -676,46 +659,41 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            that._tabsWheel.removeWheel();
             that._drumWheel.removeWheel();
-            that._graphic2Wheel.removeWheel();
+            that._graphicWheel.removeWheel();
         };
 
         var __subMenuChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
             if (label === 'pitch') {
                 __selectionChanged();
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
+                }
             } else if (label === 'hertz') {
                 __selectionChanged();
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
+                }
             } else if (label === 'graphics') {
                 for(var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.hide();
                 }
-                for(var i = 0; i < graphic2Labels.length;i++) {
-                    that._graphic2Wheel.navItems[i].navItem.hide();
-                }
-                for(var i = 0; i < tabsLabels.length;i++) {
-                    that._tabsWheel.navItems[i].navItem.show();
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.show();
                 }
             } else if (label === 'drum') {
-                for(var i = 0; i < tabsLabels.length;i++) {
-                    that._tabsWheel.navItems[i].navItem.hide();
-                }
-                for(var i = 0; i < graphic2Labels.length;i++) {
-                    that._graphic2Wheel.navItems[i].navItem.hide();
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
                 }
                 for(var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.show();
-                }
-            } else if (label === 'arc') {
-                for(var i = 0; i < tabsLabels.length;i++) {
-                    that._tabsWheel.navItems[i].navItem.hide();
-                }
-                for(var i = 0; i < drumLabels.length;i++) {
-                    that._drumWheel.navItems[i].navItem.hide();
-                }
-                for(var i = 0; i < graphic2Labels.length;i++) {
-                    that._graphic2Wheel.navItems[i].navItem.show();
                 }
             }
         }
@@ -745,43 +723,33 @@ function PitchTimeMatrix () {
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = blockLabel;
                 rArg = -1;
-            } else if (label === 'arc') {
-                blockLabel = that._graphic2Wheel.navItems[that._graphic2Wheel.selectedNavItemIndex].title;
-                const BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
-                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
-                var n = that._logo.blocks.blockList.length - 3;
-                rLabel = blockLabel;
-                rArg = [90, 100];
             } else if (label === 'graphics') {
-                blockLabel = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
+                blockLabel = that._graphicWheel.navItems[that._graphicWheel.selectedNavItemIndex].title;
                 var val = 100;
                 if (blockLabel === 'setcolor'){
                     val = 0;
                 }
-                const BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
-                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
-                var n = that._logo.blocks.blockList.length - 2;
+                var BLOCKOBJ = [];
+                if (blockLabel === 'arc' || blockLabel === 'setxy'){
+                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
+                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                    var n = that._logo.blocks.blockList.length - 3;
+                    rArg = [90, 100];
+                } else {
+                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
+                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                    var n = that._logo.blocks.blockList.length - 2;
+                    rArg = val;
+                }
                 rLabel = blockLabel;
-                rArg = val;
             }
             var blocksNo = null;
             var aboveBlock = null;
             
             switch (label) {
-                case 'arc':
-                    for(var i = MATRIXGRAPHICS2.length - 1; i >= 0; i--) {
-                        blocksNo = that._mapNotesBlocks(MATRIXGRAPHICS2[i])
-                        if(blocksNo.length >= 1){
-                            aboveBlock = last(blocksNo);
-                            break;
-                        }
-                    }
-                    if (aboveBlock !== null){
-                        break;
-                    }
                 case 'graphics':
-                    for(var i = MATRIXGRAPHICS.length - 1; i >= 0; i--) {
-                        blocksNo = that._mapNotesBlocks(MATRIXGRAPHICS[i]);
+                    for(var i = graphicLabels.length - 1; i >= 0; i--) {
+                        blocksNo = that._mapNotesBlocks(graphicLabels[i]);
                         if(blocksNo.length >= 1){
                             aboveBlock = last(blocksNo);
                             break;
@@ -861,11 +829,8 @@ function PitchTimeMatrix () {
         for (var i = 0; i < drumLabels.length; i++) {
             this._drumWheel.navItems[i].navigateFunction = __selectionChanged;
         }
-        for (var i = 0; i < graphic2Labels.length; i++) {
-            this._graphic2Wheel.navItems[i].navigateFunction = __selectionChanged;
-        }
-        for (var i = 0; i < tabsLabels.length; i++) {
-            this._tabsWheel.navItems[i].navigateFunction = __selectionChanged;
+        for (var i = 0; i < graphicLabels.length; i++) {
+            this._graphicWheel.navItems[i].navigateFunction = __selectionChanged;
         }
     }
 
@@ -1259,7 +1224,7 @@ function PitchTimeMatrix () {
 
         var accidentals = [ "𝄪", "♯", "♮", "♭", "𝄫" ];
         var noteLabels = [ "ti", "la", "sol", "fa", "mi", "re", "do" ];
-        var drumLabels = [ "snare drum", "kick drum", "tom tom", "floor tom tom", "cup drum", "darbuka drum", "japanese drum", "hi hat", "ride bell", "cow bell", "triangle bell", "finger cymbals", "chime", "gong", "clang", "crash", "clap", "slap"]
+        var drumLabels = DRUMS;
 
         if (condition === 'drumblocks') {
             noteLabels = drumLabels;
