@@ -10,6 +10,7 @@
   "devDependencies": {
     "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
+    "clean-css": "^4.2.1",
     "eslint": "^3.18.0",
     "eslint-config-standard": "^7.1.0",
     "eslint-plugin-promise": "^3.5.0",
@@ -32,6 +33,7 @@
     "gulp-postcss": "^8.0.0",
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5"
+    "gulp-sourcemaps": "^2.6.5",
+    "lodash.template": "^4.5.0"
   }
 }
