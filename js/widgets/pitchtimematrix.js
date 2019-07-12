@@ -468,15 +468,15 @@ function PitchTimeMatrix () {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 cell.setAttribute('alt', i+'__'+'synthsblocks');
-                // cell.onclick = function(event) {
-                //     cell = event.target;
-                //     if (cell.getAttribute('alt') === null) {
-                //         cell = cell.parentNode;
-                //     }
-                //     var index = cell.getAttribute('alt').split('__')[0]
-                //     var condition = cell.getAttribute('alt').split('__')[1]
-                //     that._creatematrixgraphicspiesubmenu(index,condition);
-                // }
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._creatematrixgraphicspiesubmenu(index,condition);
+                }
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
@@ -860,7 +860,7 @@ function PitchTimeMatrix () {
 
     this._creatematrixgraphic2spiesubmenu = function(index, condition) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        var valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
 
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
@@ -967,43 +967,16 @@ function PitchTimeMatrix () {
             } else {
                 that.blockValue = that.yblockValue;
             }
-            if (that.blockValue[0].length === 3) {
-                return;
-            }
-            if (that.blockValue[0] === '0') {
-                that.blockValue[0] = value;
-            } else {
-                that.blockValue[0] = that.blockValue[0]+value;
-            }
+            that.blockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             if (that.blockValue[1] === 'x') {
                 docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
             }else{
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
             }
-            
+            __selectionChanged(false);
 
         }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.x) {
-                that.blockValue = that.xblockValue;
-            } else {
-                that.blockValue = that.yblockValue;
-            }
-            if (that.blockValue[0].length === 1) {
-                that.blockValue[0] = '0';
-            } else {
-                that.blockValue[0] = that.blockValue[0].slice(0, that.blockValue[0].length-1);
-            }
-            if (that.blockValue[1] === 'x') {
-                docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
-            }else{
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
-            }
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
-            __selectionChanged(false);
-        }
-        for (var i = 2; i < valueLabel.length; i++) {
+        for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __enterValue;
         }
 
@@ -1068,13 +1041,26 @@ function PitchTimeMatrix () {
 
     this._creatematrixgraphicspiesubmenu = function(index, condition) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0']
+        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        if (condition === 'synthsblocks'){
+            valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
+        } else if (condition === 'graphicsblocks') {
+            valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+        }
         
         this._pitchWheel = new wheelnav('wheelDivptm', null, 1300, 1300);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
             var blockLabels = MATRIXGRAPHICS.slice();
+            for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
+                var label = _(MATRIXGRAPHICS[i]);
+                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                    blockLabels.push(label.substr(0, 8) + '..');
+                } else {
+                    blockLabels.push(label);
+                }
+            }
         }
         wheelnav.cssMode = true;
 
@@ -1145,31 +1131,12 @@ function PitchTimeMatrix () {
         };
 
         var __enterValue = function () {
-            var i = that._pitchWheel.selectedNavItemIndex;
-            var value = valueLabel[i];
-            if (that.blockValue.length === 3) {
-                return;
-            }
-            if (that.blockValue === '0') {
-                that.blockValue = value;
-            } else {
-                that.blockValue = that.blockValue+value;
-            }
+            that.blockValue = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-
-        }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.blockValue.length === 1) {
-                that.blockValue = '0';
-            } else {
-                that.blockValue = that.blockValue.slice(0,that.blockValue.length-1);
-            }
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
             __selectionChanged(false);
         }
-        for (var i = 2; i < valueLabel.length; i++) {
+        
+        for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __enterValue;
         }
 
