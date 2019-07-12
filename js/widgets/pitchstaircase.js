@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018 Walter Bender
+// Copyright (c) 2016-2019 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -435,6 +435,10 @@ function PitchStaircase () {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function (logo) {
         this._logo = logo;
         for (var i = 0; i < this.Stairs.length; i++) {
@@ -472,6 +476,18 @@ function PitchStaircase () {
 
         var that = this;
 
+         
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        cell.onclick=function() {
+            docById('pscDiv').style.visibility = 'hidden';
+            docById('pscButtonsDiv').style.visibility = 'hidden';
+            docById('pscTableDiv').style.visibility = 'hidden';
+            docById('musicratio1').classList.remove('hasKeyboard');
+            docById('musicratio2').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
+        };
+
+
         var cell = this._addButton(row, 'play-chord.svg', ICONSIZE, _('Play chord'));
         cell.onclick=function() {
             that._playAll();
@@ -499,10 +515,19 @@ function PitchStaircase () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-        cell.onclick=function() {
-            that._save(0);
-        };
+        this._save_lock = false;
 
+        cell.onclick=function() {
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._save(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
+        };
+       
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
@@ -542,15 +567,15 @@ function PitchStaircase () {
 	    }
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            docById('pscDiv').style.visibility = 'hidden';
-            docById('pscButtonsDiv').style.visibility = 'hidden';
-            docById('pscTableDiv').style.visibility = 'hidden';
-            docById('musicratio1').classList.remove('hasKeyboard');
-            docById('musicratio2').classList.remove('hasKeyboard');
-            that._logo.hideMsgs();
-        };
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // cell.onclick=function() {
+        //     docById('pscDiv').style.visibility = 'hidden';
+        //     docById('pscButtonsDiv').style.visibility = 'hidden';
+        //     docById('pscTableDiv').style.visibility = 'hidden';
+        //     docById('musicratio1').classList.remove('hasKeyboard');
+        //     docById('musicratio2').classList.remove('hasKeyboard');
+        //     that._logo.hideMsgs();
+        // };
 
         cell.onmouseover=function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
@@ -584,6 +609,7 @@ function PitchStaircase () {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -599,6 +625,7 @@ function PitchStaircase () {
         };
 
         pscDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -614,7 +641,6 @@ function PitchStaircase () {
         };
 
         pscDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

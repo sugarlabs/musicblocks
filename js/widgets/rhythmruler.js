@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1380,6 +1380,10 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function (logo) {
         console.log('init RhythmRuler');
         this._logo = logo;
@@ -1436,6 +1440,53 @@ function RhythmRuler () {
         // For the button callbacks
         var that = this;
 
+
+        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+
+        cell.onclick = function () {
+            // If the piemenu was open, close it.
+            // docById('wheelDiv').style.display = 'none';
+            // docById('contextWheelDiv').style.display = 'none';
+
+            // Save the new dissect history.
+            var dissectHistory = [];
+            var drums = [];
+            for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
+                var history = [];
+                for (var j = 0; j < that.Rulers[i][1].length; j++) {
+                    history.push(that.Rulers[i][1][j]);
+                }
+
+                docById('dissectNumber').classList.add('hasKeyboard');
+                dissectHistory.push([history, that.Drums[i]]);
+                drums.push(that.Drums[i]);
+            }
+
+            // Look for any old entries that we may have missed.
+            for (var i = 0; i < that._dissectHistory.length; i++) {
+                var drum = that._dissectHistory[i][1];
+                if (drums.indexOf(drum) === -1) {
+                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+                    dissectHistory.push([history, drum]);
+                }
+            }
+
+            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
+            rulerTableDiv.style.visibility = 'hidden';
+            widgetButtonsDiv.style.visibility = 'hidden';
+            rulerDiv.style.visibility = 'hidden';
+
+            that._playing = false;
+            that._playingOne = false;
+            that._playingAll = false;
+            that._logo.hideMsgs();
+        };
+
         this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
 
         this._playAllCell.onclick = function () {
@@ -1448,14 +1499,31 @@ function RhythmRuler () {
         };
 
         var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
+
+        this._save_lock = false;
+
         cell.onclick = function () {
             // that._save(0);
-            that._saveTuplets(0);
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._saveTuplets(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
         };
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = function () {
-            that._saveMachine(0);
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._saveMachine(0);
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
         };
 
         // An input for setting the dissect number
@@ -1509,51 +1577,51 @@ function RhythmRuler () {
             that._clear();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
+        // var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
 
-        cell.onclick = function () {
-            // If the piemenu was open, close it.
-            // docById('wheelDiv').style.display = 'none';
-            // docById('contextWheelDiv').style.display = 'none';
+        // cell.onclick = function () {
+        //     // If the piemenu was open, close it.
+        //     // docById('wheelDiv').style.display = 'none';
+        //     // docById('contextWheelDiv').style.display = 'none';
 
-            // Save the new dissect history.
-            var dissectHistory = [];
-            var drums = [];
-            for (var i = 0; i < that.Rulers.length; i++) {
-                if (that.Drums[i] === null) {
-                    continue;
-                }
+        //     // Save the new dissect history.
+        //     var dissectHistory = [];
+        //     var drums = [];
+        //     for (var i = 0; i < that.Rulers.length; i++) {
+        //         if (that.Drums[i] === null) {
+        //             continue;
+        //         }
 
-                var history = [];
-                for (var j = 0; j < that.Rulers[i][1].length; j++) {
-                    history.push(that.Rulers[i][1][j]);
-                }
+        //         var history = [];
+        //         for (var j = 0; j < that.Rulers[i][1].length; j++) {
+        //             history.push(that.Rulers[i][1][j]);
+        //         }
 
-                docById('dissectNumber').classList.add('hasKeyboard');
-                dissectHistory.push([history, that.Drums[i]]);
-                drums.push(that.Drums[i]);
-            }
+        //         docById('dissectNumber').classList.add('hasKeyboard');
+        //         dissectHistory.push([history, that.Drums[i]]);
+        //         drums.push(that.Drums[i]);
+        //     }
 
-            // Look for any old entries that we may have missed.
-            for (var i = 0; i < that._dissectHistory.length; i++) {
-                var drum = that._dissectHistory[i][1];
-                if (drums.indexOf(drum) === -1) {
-                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
-                    dissectHistory.push([history, drum]);
-                }
-            }
+        //     // Look for any old entries that we may have missed.
+        //     for (var i = 0; i < that._dissectHistory.length; i++) {
+        //         var drum = that._dissectHistory[i][1];
+        //         if (drums.indexOf(drum) === -1) {
+        //             var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+        //             dissectHistory.push([history, drum]);
+        //         }
+        //     }
 
-            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+        //     that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
 
-            rulerTableDiv.style.visibility = 'hidden';
-            widgetButtonsDiv.style.visibility = 'hidden';
-            rulerDiv.style.visibility = 'hidden';
+        //     rulerTableDiv.style.visibility = 'hidden';
+        //     widgetButtonsDiv.style.visibility = 'hidden';
+        //     rulerDiv.style.visibility = 'hidden';
 
-            that._playing = false;
-            that._playingOne = false;
-            that._playingAll = false;
-            that._logo.hideMsgs();
-        };
+        //     that._playing = false;
+        //     that._playingOne = false;
+        //     that._playingAll = false;
+        //     that._logo.hideMsgs();
+        // };
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');
@@ -1580,6 +1648,7 @@ function RhythmRuler () {
         };
 
         canvas.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1597,6 +1666,7 @@ function RhythmRuler () {
         };
 
         rulerDiv.ondragover = function (e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -1614,7 +1684,6 @@ function RhythmRuler () {
         };
 
         rulerDiv.onmousedown = function (e) {
-            that._dragging = true;
             that._target = e.target;
         };
 

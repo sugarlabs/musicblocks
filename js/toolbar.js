@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Austin George
+// Copyright (c) 2018,19 Austin George
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -121,9 +121,15 @@ function Toolbar() {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     var saveWAV = docById('save-wav');
 
-                    saveWAV.onclick = function () {
-                        wave_onclick();
-                    };
+                    // Until we fix #1744, disable recorder on FF
+                    if (platform.FF) {
+                        saveWAV.disabled = true;
+                        saveWAV.className = 'grey-text inactiveLink';
+                    } else {
+                        saveWAV.onclick = function () {
+                            wave_onclick();
+                        };
+                    }
 
                     var saveLY = docById('save-ly');
 
@@ -233,11 +239,12 @@ function Toolbar() {
         };
     };
 
-    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
+    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick,setScroller,_setupBlocksContainerEvents) {
         var displayStatsIcon = docById('displayStatsIcon');
         var loadPluginIcon = docById('loadPluginIcon');
         var delPluginIcon = docById('delPluginIcon');
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -251,6 +258,14 @@ function Toolbar() {
             delPluginIcon.onclick = function () {
                 delPlugin_onclick();
             };
+            enableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
+            disableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
         } else {
             displayStatsIcon.style.display = 'none';
             loadPluginIcon.style.display = 'none';

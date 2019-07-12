@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -173,8 +173,9 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
-            'Tone.min',
+            'Tone',
             'widgets/modewidget',
+            'widgets/meterwidget',
             'widgets/pitchtimematrix',
             'widgets/pitchdrummatrix',
             'widgets/rhythmruler',
@@ -251,6 +252,7 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
+        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -262,6 +264,7 @@ function Activity() {
         largerContainer = null;
         smallerOffContainer = null;
         largerOffContainer = null;
+        resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
 
@@ -374,6 +377,9 @@ function Activity() {
      */
     this._findBlocks = function () {
         // _showHideAuxMenu(false);
+        if (!blocks.visible)  {
+            _changeBlockVisibility();
+        }
         var leftpos = Math.floor(canvas.width / 4);
         var toppos;
         blocks.activeBlock = null;
@@ -487,6 +493,65 @@ function Activity() {
         homeButtonContainers[1].visible = one;
     };
 
+
+    __saveHelpBlock = function (name, delay) {
+        // Save the artwork for an individual help block.
+        // (1) clear the block list
+        // (2) generate the help blocks
+        // (3) save the blocks as svg
+        setTimeout(function () {
+            sendAllToTrash(false, true);
+            setTimeout(function () {
+                if (BLOCKHELP[name].length < 4) {
+                    // If there is nothing specified, just
+                    // load the block.
+                    console.log('CLICK: ' + name);
+                    var obj = blocks.palettes.getProtoNameAndPalette
+(name);
+                    var protoblk = obj[0];
+                    var paletteName = obj[1];
+                    var protoName = obj[2];
+
+                    var protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                    if (protoResult) {
+                        blocks.palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
+                            blocks.moveBlock(newBlock, 0, 0);
+                        });
+                    }
+                } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                    // If it is a string, load the macro
+                    // assocuated with this block
+                    var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 0, 0);
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                } else {
+                    // Load the blocks.
+                    var blocksToLoad = BLOCKHELP[name][3];
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                }
+
+                setTimeout(function () {
+                    // save.saveBlockArtwork(BLOCKHELP[name][3]);
+                    save.saveBlockArtwork(name + '_block.svg');
+                }, 500);
+
+            }, 500);
+        }, delay + 1000);
+    };
+
+    _saveHelpBlocks = function () {
+        // Save the artwork for every help block.
+        var i = 0;
+        for(var name in BLOCKHELP) {
+            console.log(name);
+            __saveHelpBlock(name, i * 2000);
+            i += 1;
+        }
+
+        sendAllToTrash(true, true);
+    };
+
     /*
      * @return {SVG} returns SVG of blocks
      */
@@ -531,7 +596,11 @@ function Activity() {
                         svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
                     } else if (p === 5) {
                         // Add block value to SVG between tspans
-                        svg += parts[p] + '>' + blocks.blockList[i].value + '<';
+                        if (typeof(blocks.blockList[i].value) === 'string') {
+                            console.log(_(blocks.blockList[i].value));
+                            svg += parts[p] + '>' + _(blocks.blockList[i].value) + '<';
+                        } else {
+                            svg += parts[p] + '>' + blocks.blockList[i].value + '<';                        }
                     } else if (p === parts.length - 2) {
                         svg += parts[p] + '>';
                     } else if (p === parts.length - 1) {
@@ -862,6 +931,16 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
+        scrollPaletteContainer = !scrollPaletteContainer;
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
+        if (scrollBlockContainer && !beginnerMode){
+          enableHorizScrollIcon.style.display = 'none';
+          disableHorizScrollIcon.style.display = 'block';
+        }else{
+          enableHorizScrollIcon.style.display = 'block';
+          disableHorizScrollIcon.style.display = 'none';
+        }
     };
 
     /*
@@ -957,12 +1036,18 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale < BLOCKSCALES.length - 1) {
-            blockscale += 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale < BLOCKSCALES.length - 1) {
+                resizeDebounce = true;
+                blockscale += 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
-        setSmallerLargerStatus();
+            setSmallerLargerStatus();
+        }
     };
 
     /*
@@ -972,10 +1057,16 @@ function Activity() {
         blocks.activeBlock = null;
         // hideDOMLabel();
 
-        if (blockscale > 0) {
-            blockscale -= 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale > 0) {
+                resizeDebounce = true;
+                blockscale -= 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+            }
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
         setSmallerLargerStatus();
     };
@@ -1127,6 +1218,85 @@ function Activity() {
             delta: 0
         };
 
+        var __paletteWheelHandler = function (event) {
+            // vertical scroll
+            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+                if (palettes.paletteVisible) {
+                    if (event.clientX > cellSize + MENUWIDTH) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                } else {
+                    if (event.clientX > cellSize) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                }
+            }
+
+            // horizontal scroll
+            if (scrollPaletteContainer) {
+                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    } else {
+                        if (event.clientX > cellSize) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    }
+                }
+            } else {
+                event.preventDefault();
+            }
+
+            refreshCanvas();
+        };
+
+
+      var myCanvas = docById('myCanvas')
+
+      var __heightBasedScroll = function (event) {
+
+          actualReszieHandler(); //check size during init 
+          
+          window.addEventListener("resize",resizeThrottler,false);
+
+          var resizeTimeout;
+
+          function resizeThrottler() {
+            //ignore resize events as long as an actualResizeHandler execution is in queue
+              if(!resizeTimeout) {
+                  resizeTimeout = setTimeout(function () {
+                      resizeTimeout = null;
+                      actualReszieHandler();
+
+                      // The actualResizeHandler will execute at the rate of 15fps
+                  }, 66);
+              }
+            
+          }
+
+      }
+      
+
+    
+      function actualReszieHandler () {
+
+        //handle the resize event
+
+         var h = window.innerHeight;
+
+         if (h < 500) { //activate on mobile
+             myCanvas.addEventListener('wheel', __paletteWheelHandler,false)
+         }else {
+             //cleanup event listeners
+            myCanvas.removeEventListener('wheel', __paletteWheelHandler)
+         }
+          
+      }
+      __heightBasedScroll()
+
+
         var __wheelHandler = function (event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
@@ -1162,6 +1332,7 @@ function Activity() {
         };
 
         docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
+    
 
         var __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
@@ -1260,7 +1431,7 @@ function Activity() {
     };
 
     function getStageY() {
-        return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
     };
 
     function getStageMouseDown() {
@@ -1407,13 +1578,9 @@ function Activity() {
     };
 
     /*
-     * @param  searchWidget      {searchWidget element}
-     * @param  blocks            {all blocks}
-     * @param  searchSuggestions {suggestions from user input}
-     * @param  doSearch          {search function callback}
+      Prepare a list of blocks for the search bar autocompletion.
      */
-    this.prepSearchWidget = function (searchWidget, blocks, searchSuggestions, doSearch) {
-        var that = this;
+    prepSearchWidget = function () {
         searchWidget.style.visibility = 'hidden';
         searchBlockPosition = [100, 100];
 
@@ -1433,9 +1600,10 @@ function Activity() {
 
         searchSuggestions = searchSuggestions.reverse();
 
-        searchWidget.onclick = function () {
-            doSearch();
-        };
+        // searchWidget.onclick = function () {
+        //     console.log('DO SEARCH');
+        //     doSearch();
+        // };
     }
 
     /*
@@ -1474,6 +1642,7 @@ function Activity() {
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function () {
+                console.log('DO SEARCH!!!');
                 searchWidget.focus();
                 doSearch();
             }, 500);
@@ -1682,6 +1851,9 @@ function Activity() {
                 break;
             case 86: // 'V'
                 blocks.pasteStack();
+                break;
+            case 72:  // 'H' save block help
+                _saveHelpBlocks();
                 break;
             }
         } else if (event.ctrlKey) {
@@ -1928,8 +2100,8 @@ function Activity() {
         // If the clientWidth hasn't changed, don't resize (except
         // on init).
         if (!force && this._clientWidth === document.body.clientWidth) {
-            console.log('NO WIDTH CHANGE');
-            return;
+            // console.log('NO WIDTH CHANGE');
+            // return;
         }
 
         this._clientWidth = document.body.clientWidth;
@@ -2252,12 +2424,15 @@ function Activity() {
         if (blocks.visible) {
             logo.hideBlocks();
             palettes.hide();
+            hideBlocksContainer[1].visible = true;
+            hideBlocksContainer[0].visible = false;
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-
+            hideBlocksContainer[1].visible = false;
+            hideBlocksContainer[0].visible = true;
             logo.showBlocks();
             palettes.show();
             palettes.bringToTop();
@@ -2847,7 +3022,8 @@ function Activity() {
                                 'color': turtle.color,
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
-                                'grey': turtle.chroma
+                                'grey': turtle.chroma,
+                                'name': turtle.name
                             };
                         }
                         break;
@@ -2873,6 +3049,7 @@ function Activity() {
                     case 'pitchslider':
                     case 'musickeyboard':
                     case 'modewidget':
+                    case 'meterwidget':
                     case 'status':
                         var args = {
                             'collapsed': myBlock.collapsed
@@ -3010,7 +3187,8 @@ function Activity() {
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
             stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer);
+            stage.removeChild(hideBlocksContainer[0]);
+            stage.removeChild(hideBlocksContainer[1]);
             stage.removeChild(collapseBlocksContainer);
             stage.removeChild(smallerContainer);
             stage.removeChild(smallerOffContainer);
@@ -3041,8 +3219,16 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0);
-        that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer = [];
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[0], x, y, _changeBlockVisibility, null, null, null, null);
+        
+        hideBlocksContainer.push(_makeButton(HIDEBLOCKSFADEDBUTTON, _('Show/hide block'), x, y - btnSize, btnSize, 0));
+        that._loadButtonDragHandler(hideBlocksContainer[1], x, y, _changeBlockVisibility, null, null, null, null);
+        hideBlocksContainer[1].visible = false;
+
+        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
+        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
@@ -3795,6 +3981,7 @@ function Activity() {
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                     storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+                    storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
                     storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
@@ -3914,6 +4101,9 @@ function Activity() {
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                    docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
                     // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
                     // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
                     // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
@@ -4131,7 +4321,7 @@ function Activity() {
         toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin,setScroller, that._setupBlocksContainerEvents);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
         toolbar.renderMergeIcon(_doMergeLoad);
@@ -4550,6 +4740,8 @@ function Activity() {
                 that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
         }
+
+        prepSearchWidget();
 
         document.addEventListener('mousewheel', scrollEvent, false);
         document.addEventListener('DOMMouseScroll', scrollEvent, false);

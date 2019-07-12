@@ -6,16 +6,18 @@
   <title>Music Blocks is a collection of tools for exploring musical concepts.</title>
 
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
-  <link rel="stylesheet" href="css/activity.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/keyboard.css">
+  <link rel="stylesheet" href="css/activities.css">
+  <link rel="stylesheet" href="dist/css/style.css">
+  <link rel="stylesheet" href="dist/css/keyboard.css">
 
   <noscript>
   JavaScript is required to view this page.
   </noscript>
-
-  <script src="js/utils/detectIE.js">
+  <script src="dist/app.min.js/?cb=1562713702124">
   </script>
+
+  <!-- <script src="js/utils/detectIE.js">
+  </script> -->
 
   <!--
   <script src="sounds/samples/manifest.js">
@@ -42,7 +44,7 @@
   <script src="lib/webL10n.js">
   </script>
 
-  <script src="lib/Tone.min.js">
+  <script src="lib/Tone.js">
   </script>
 
   <script src="lib/jquery.ruler.js">
@@ -79,8 +81,8 @@
   <script src="lib/tweenjs.min.js">
   </script>
 
-  <script src="js/widgets/musickeyboard.js">
-  </script>
+  <!-- <script src="js/widgets/musickeyboard.js">
+  </script> -->
 
   <!--
     <script src="lib/movieclip-0.7.1.min.js">
@@ -256,6 +258,14 @@
     <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
 
 
+    <div id="meterDiv" draggable="false">
+      <div id="meterButtonsDiv">
+      </div>
+
+      <div id="meterTableDiv">
+      </div>
+    </div>
+
     <div id="modeDiv" draggable="false">
       <div id="modeButtonsDiv">
       </div>
@@ -390,6 +400,9 @@
     </div>
 
     <div id="helpDiv" draggable="false" style="visibility:hidden">
+      <div id="right-arrow" class="hover"></div>
+      <div id="left-arrow" class="hover"></div>
+      
       <div id="helpButtonsDiv">
       </div>
       <div id="helpBodyDiv">
@@ -447,12 +460,18 @@
     <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden">
     </div>
 
+    <div id="meterWheelDiv" class="wheelNav">
+    </div>
+
     <div id="contextWheelDiv" class="wheelNav">
     </div>
 
     <div id="submenuWheelDiv" class="wheelNav">
     </div>
 
+    <div id="wheelDivptm" class="wheelNav" style="background-size: contain; background-image: url(./images/gray.svg); display: none; left: 400px; top: 400px;">
+    </div>
+    
     <div id="searchBar">
       <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
       <ul class="matches" id="searchResults"></ul>
@@ -475,19 +494,19 @@
       <div class="modal-content">
         <span class="close">&times;</span>
         <p>
-          <div id="fileNameText"></div><input type="text" id="fileName"></input>
+         <div id="fileNameText"></div><input type="text" id="fileName">
         </p>
         <p>
-          <div id="titleText"></div><input type="text" id="title"></input>
+        <div id="titleText"></div><input type="text" id="title">
         </p>
         <p>
-          <div id="authorText"></div><input type="text" id="author"></input>
+         <div id="authorText"></div><input type="text" id="author">
         </p>
         <p>
-          <div id="MIDIText"></div><input type="checkbox" id="MIDICheck"></input>
+          <div id="MIDIText"></div><input type="checkbox" id="MIDICheck">
         </p>
         <p>
-          <div id="guitarText"></div><input type="checkbox" id="guitarCheck"></input>
+          <div id="guitarText"></div><input type="checkbox" id="guitarCheck">
         </p>
         <p><button id="submitLilypond"></button> </p>
           <!-- <button id="submitPDF"></button></p> -->

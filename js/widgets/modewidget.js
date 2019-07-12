@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -11,11 +11,7 @@
 
 
 function ModeWidget() {
-    // Row and column of each halfstep: Note that span cells are
-    // counted only once.
-    const MODEMAP = [[2, 7], [3, 6], [5, 10], [7, 11], [9, 10], [11, 8], [12, 5], [11, 5], [9, 3], [7, 2], [5, 3], [3, 5]];
     const ROTATESPEED = 125;
-    const ORANGE = '#e37a00'; // 5YR
     const BUTTONDIVWIDTH = 535;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
@@ -26,8 +22,10 @@ function ModeWidget() {
         this._locked = false;
         this._pitch = this._logo.keySignature[0][0];
         this._noteValue = 0.333;
-
         this._undoStack = [];
+        this._playing = false;
+        this._selectedNotes = [];
+        this._newPattern = [];
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -56,10 +54,32 @@ function ModeWidget() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick=function() {
-            that._playAll();
+            docById('modeDiv').style.visibility = 'hidden';
+            docById('modeButtonsDiv').style.visibility = 'hidden';
+            docById('modeTableDiv').style.visibility = 'hidden';
+            that._logo.hideMsgs();
+        }
+
+
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
+        this._playButton = cell;
+
+        cell.onclick=function() {
+            that._logo.resetSynth(0);
+            if (that._playingStatus()) {
+                that._playing = false;
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else {
+                that._playing = true;
+
+                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+
+                that._playAll();
+            }
         }
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
@@ -98,14 +118,14 @@ function ModeWidget() {
             that._undo();
         }
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
-            docById('modeDiv').style.visibility = 'hidden';
-            docById('modeButtonsDiv').style.visibility = 'hidden';
-            docById('modeTableDiv').style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        }
+        // cell.onclick=function() {
+        //     docById('modeDiv').style.visibility = 'hidden';
+        //     docById('modeButtonsDiv').style.visibility = 'hidden';
+        //     docById('modeTableDiv').style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -131,6 +151,7 @@ function ModeWidget() {
         };
 
         canvas.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -146,6 +167,7 @@ function ModeWidget() {
         };
 
         modeDiv.ondragover = function(e) {
+            that._dragging = true;
             e.preventDefault();
         };
 
@@ -161,7 +183,6 @@ function ModeWidget() {
         };
 
         modeDiv.onmousedown = function(e) {
-            that._dragging = true;
             that._target = e.target;
         };
 
@@ -173,31 +194,40 @@ function ModeWidget() {
             }
         };
 
-        // The mode table
+        // The mode table (holds a pie menu and a label)
         var modeTableDiv = docById('modeTableDiv');
         modeTableDiv.style.display = 'inline';
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
-        modeTableDiv.innerHTML = '<table id="modeTable"></table>';
+        // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
+        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
+
+        this._piemenuMode();
 
         var table = docById('modeTable');
-        // Create blank rows.
-        for (var i = 0; i < 15; i++) {
-            table.insertRow();
-        }
 
-        this._addNotes();
-
+        /*
+        // Set up the pie menu
+        var row = table.insertRow();
+        var cell = row.insertCell();
+        cell.innerHTML = '<div id="meterWheelDiv"></div>';
+        */
         // A row for the current mode label
         var row = table.insertRow();
         var cell = row.insertCell();
-        cell.colSpan = 18;
+        // cell.colSpan = 18;
         cell.innerHTML = '&nbsp;';
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        this._makeClickable();
+        // Set current mode in pie menu.
+        this._setMode();
+
         //.TRANS: A circle of notes represents the musical mode.
         this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
+    };
+
+    this._playingStatus = function() {
+        return this._playing;
     };
 
     this._addButton = function(row, icon, iconSize, label) {
@@ -222,253 +252,30 @@ function ModeWidget() {
         return cell;
     };
 
-    this._addNotes = function() {
-        // This is a brute-force way of adding notes in a circular
-        // pattern within an HTML table.
-
-        var table = docById('modeTable');
-
-        for (var i = 0; i < 7; i++) {
-            table.rows[2].insertCell();
-            last(table.rows[2].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[2].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 2, 0);
-
-        for (var i = 0; i < 7; i++) {
-            table.rows[2].insertCell();
-            last(table.rows[2].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[2].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 5; i++) {
-            table.rows[3].insertCell();
-            last(table.rows[3].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[3].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[4].insertCell();
-            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 3, 11);
-
-        for (var i = 0; i < 2; i++) {
-            table.rows[4].insertCell();
-            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 3, 1);
-
-        for (var i = 0; i < 5; i++) {
-            table.rows[3].insertCell();
-            last(table.rows[3].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[3].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[4].insertCell();
-            last(table.rows[4].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[4].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 3; i++) {
-            table.rows[5].insertCell();
-            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[6].insertCell();
-            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 5, 10);
-
-        for (var i = 0; i < 6; i++) {
-            table.rows[5].insertCell();
-            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[6].insertCell();
-            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 5, 2);
-
-        for (var i = 0; i < 3; i++) {
-            table.rows[5].insertCell();
-            last(table.rows[5].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[5].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[6].insertCell();
-            last(table.rows[6].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[6].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 2; i++) {
-            table.rows[7].insertCell();
-            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[8].insertCell();
-            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 7, 9);
-
-        for (var i = 0; i < 8; i++) {
-            table.rows[7].insertCell();
-            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[8].insertCell();
-            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 7, 3);
-
-        for (var i = 0; i < 2; i++) {
-            table.rows[7].insertCell();
-            last(table.rows[7].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[7].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[8].insertCell();
-            last(table.rows[8].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[8].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 3; i++) {
-            table.rows[9].insertCell();
-            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[10].insertCell();
-            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 9, 8);
-
-        for (var i = 0; i < 6; i++) {
-            table.rows[9].insertCell();
-            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[10].insertCell();
-            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 9, 4);
-
-        for (var i = 0; i < 3; i++) {
-            table.rows[9].insertCell();
-            last(table.rows[9].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[9].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[10].insertCell();
-            last(table.rows[10].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[10].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 5; i++) {
-            table.rows[11].insertCell();
-            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[12].insertCell();
-            last(table.rows[12].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[12].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 7; i++) {
-            table.rows[13].insertCell();
-            last(table.rows[13].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[13].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 11, 7);
-
-        for (var i = 0; i < 2; i++) {
-            table.rows[11].insertCell();
-            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        this.__addNoteCell(table, 12, 6);
-
-        this.__addNoteCell(table, 11, 5);
-
-        for (var i = 0; i < 5; i++) {
-            table.rows[11].insertCell();
-            last(table.rows[11].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[11].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            table.rows[12].insertCell();
-            last(table.rows[12].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[12].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-
-        for (var i = 0; i < 7; i++) {
-            table.rows[13].insertCell();
-            last(table.rows[13].cells).width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-            last(table.rows[13].cells).height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale / 2) + 'px';
-        }
-    };
-
-    this.__addNoteCell = function(table, row, halfstep) {
-        var cell = table.rows[row].insertCell();
-        cell.rowSpan = 2;
-        cell.colSpan = 2;
-        cell.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.height = cell.height;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.width = cell.width;
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-        cell.style.fontSize = this._cellScale * 100 + '%';
-        cell.innerHTML = '<font color="white">' + halfstep + '</font>';
-        cell.setAttribute('id', halfstep);
-    };
-
-    this._makeClickable = function() {
-        var table = docById('modeTable');
-
+    this._setMode = function() {
         // Read in the current mode to start.
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var currentMode = MUSICALMODES[currentModeName[1]];
 
+        // Add the mode name in the bottom row of the table.
         var table = docById('modeTable');
         var n = table.rows.length - 1;
 
         console.log(_(currentModeName[1]));
         table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
 
+        // Set the notes for this mode.
         var that = this;
         var k = 0;
         var j = 0;
         for (var i = 0; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-
             if (i === j) {
-                cell.style.backgroundColor = 'black';
+                this._noteWheel.navItems[i].navItem.show();
+                this._selectedNotes[i] = true;
                 j += currentMode[k];
                 k += 1;
             } else {
-                cell.style.backgroundColor = platformColor.selectorBackground;
-            }
-
-            if (i === 0) {
-                // The first note of the octave is always selected.
-                cell.onclick = function() {
-                    that._playNote(this.id);
-                }
-            } else {
-                cell.onclick = function() {
-                    that._saveState();
-
-                    if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = platformColor.selectorBackground;
-                        that._setModeName()
-                    } else {
-                        this.style.backgroundColor = 'black';
-                        that._playNote(this.id);
-                        that._setModeName()
-                    }
-                }
+                this._noteWheel.navItems[i].navItem.hide();
             }
         }
     };
@@ -480,35 +287,50 @@ function ModeWidget() {
 
         this._locked = true;
 
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
-
         this._saveState();
-
         this.__invertOnePair(1);
     };
 
     this.__invertOnePair = function(i) {
-        var table = docById('modeTable');
+        var tmp = this._selectedNotes[i];
+        this._selectedNotes[i] = this._selectedNotes[12 - i];
+        if (this._selectedNotes[i]) {
+            this._noteWheel.navItems[i].navItem.show()
+        } else {
+            this._noteWheel.navItems[i].navItem.hide()
+        }
+
+        this._selectedNotes[12 - i] = tmp;
+        if (this._selectedNotes[12 - i]) {
+            this._noteWheel.navItems[12 - i].navItem.show()
+        } else {
+            this._noteWheel.navItems[12 - i].navItem.hide()
+        }
+
         var that = this;
 
-        var thisCell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-        var thatCell = table.rows[MODEMAP[12 - i][0]].cells[MODEMAP[12 - i][1]];
-        var tmp = thisCell.style.backgroundColor;
-        thisCell.style.backgroundColor = thatCell.style.backgroundColor;
-        thatCell.style.backgroundColor = tmp;
-
         if (i === 5) {
-            that._locked = false;
+            that._saveState();
             that._setModeName()
+            that._locked = false;
         } else {
             setTimeout(function() {
                 that.__invertOnePair(i + 1);
             }, ROTATESPEED);
         }
 
+    };
+
+    this._resetNotes = function() {
+        for (var i = 0; i < this._selectedNotes.length; i++) {
+            if (this._selectedNotes[i]) {
+                this._noteWheel.navItems[i].navItem.show();
+            } else {
+                this._noteWheel.navItems[i].navItem.hide();
+            }
+
+            this._playWheel.navItems[i].navItem.hide();
+        }
     };
 
     this._rotateRight = function() {
@@ -518,50 +340,43 @@ function ModeWidget() {
 
         this._locked = true;
 
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
-
         this._saveState();
-
-        var cellColors = [];
-        for (var i = 0; i < 12; i++) {
-            cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
+        this._newPattern = []
+        this._newPattern.push(this._selectedNotes[11]);
+        for (var i = 0; i < 11; i++) {
+            this._newPattern.push(this._selectedNotes[i]);
         }
-        this.__rotateRightOneCell(1, cellColors);
+
+        this.__rotateRightOneCell(1);
 
     };
 
     this.__rotateRightOneCell = function(i, cellColors) {
-        var table = docById('modeTable');
-
-        var prev = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-        var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-        prev.style.backgroundColor = cellColors[i];
-        cell.style.backgroundColor = ORANGE;
+        this._selectedNotes[i] = this._newPattern[i];
+        if (this._selectedNotes[i]) {
+            this._noteWheel.navItems[i].navItem.show()
+        } else {
+            this._noteWheel.navItems[i].navItem.hide()
+        }
 
         var that = this;
 
-        if (i === 11) {
+        if (i === 0) {
             setTimeout(function() {
-                var cell = table.rows[MODEMAP[11][0]].cells[MODEMAP[11][1]];
-		cell.style.backgroundColor = cellColors[0];
-                that._locked = false;
-
-                // Keep rotating until first cell is set.
-                var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-                if (cell.style.backgroundColor !== 'black') {
+                if (that._selectedNotes[0]) {
+                    // We are done.
+                    that._saveState();
+                    that._setModeName();
+                    that._locked = false;
+                } else {
+                    // Keep going until first note is selected.
+                    that._locked = false;
                     that._rotateRight();
-                    // We don't want to 'undo' to a broken mode.
-		    that._undoStack.pop();
                 }
-
-                that._setModeName()
             }, ROTATESPEED);
         } else {
             setTimeout(function() {
-                that.__rotateRightOneCell(i + 1, cellColors);
+                that.__rotateRightOneCell((i + 1) % 12);
             }, ROTATESPEED);
         }
     };
@@ -573,59 +388,49 @@ function ModeWidget() {
 
         this._locked = true;
 
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
-
         this._saveState();
-
-        var cellColors = [];
-        for (var i = 0; i < 12; i++) {
-            cellColors.push(table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]].style.backgroundColor);
+        this._newPattern = []
+        for (var i = 1; i < 12; i++) {
+            this._newPattern.push(this._selectedNotes[i]);
         }
-        this.__rotateLeftOneCell(11, cellColors);
+
+        this._newPattern.push(this._selectedNotes[0]);
+
+        this.__rotateLeftOneCell(11);
     };
 
-    this.__rotateLeftOneCell = function(i, cellColors) {
-        var table = docById('modeTable');
-
-        var prev = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-        var cell = table.rows[MODEMAP[i - 1][0]].cells[MODEMAP[i - 1][1]];
-	prev.style.backgroundColor = cellColors[i - 1];
-        cell.style.backgroundColor = ORANGE;
+    this.__rotateLeftOneCell = function(i) {
+        this._selectedNotes[i] = this._newPattern[i];
+        if (this._selectedNotes[i]) {
+            this._noteWheel.navItems[i].navItem.show()
+        } else {
+            this._noteWheel.navItems[i].navItem.hide()
+        }
 
         var that = this;
 
-        if (i === 1) {
+        if (i === 0) {
             setTimeout(function() {
-                var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-                cell.style.backgroundColor = cellColors[11];
-                that._locked = false;
-
-                // Keep rotating until last cell is set.
-                if (cell.style.backgroundColor !== 'black') {
+                if (that._selectedNotes[0]) {
+                    // We are done.
+                    that._saveState();
+                    that._setModeName();
+                    that._locked = false;
+                } else {
+                    // Keep going until first note is selected.
+                    that._locked = false;
                     that._rotateLeft();
-                    // We don't want to 'undo' to a broken mode.
-		    that._undoStack.pop();
                 }
-
-                that._setModeName()
             }, ROTATESPEED);
         } else {
             setTimeout(function() {
-                that.__rotateLeftOneCell(i - 1, cellColors);
+                that.__rotateLeftOneCell(i - 1);
             }, ROTATESPEED);
         }
     };
 
     this._playAll = function() {
         // Play all of the notes in the widget.
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
-
         if (this._locked) {
             return;
         }
@@ -633,126 +438,108 @@ function ModeWidget() {
         this._logo.synth.stop();
         this._locked = true;
 
-        // this.notes = [];
-        this.cells = [];
-        var firstNote = '';
-
+        // Make a list of notes to play
+        this._notesToPlay = [];
+        // Play the mode ascending.
         for (var i = 0; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            if (cell.style.backgroundColor === 'black') {
-                this.cells.push(i);
-                if (this.cells.length === 1) {
-                    firstNote = true;
-                }
+            if (this._selectedNotes[i]) {
+                this._notesToPlay.push(i);
             }
         }
 
-        if (firstNote !== '') {
-            this.cells.push(12);
+        // Include the octave above the starting note.
+        this._notesToPlay.push(12);
+
+        // And then play the mode descending. 
+        this._notesToPlay.push(12);
+        for (var i = 11; i > -1; i--) {
+            if (this._selectedNotes[i]) {
+                this._notesToPlay.push(i);
+            }
         }
 
         this._lastNotePlayed = null;
-        this.__playNextNote(0, 0);
+        if (this._playing) {
+            this.__playNextNote(0);
+        }
     };
 
-    this.__playNextNote = function(time, noteCounter) {
-        var that = this;
+    this.__playNextNote = function(i) {
         time = this._noteValue + 0.125;
+        var that = this;
 
-        // Did we just play the last note?
-        if (noteCounter === 2 * this.cells.length) {
+        if (i > this._notesToPlay.length - 1) {
             setTimeout(function() {
-                that._lastNotePlayed.style.backgroundColor = 'black';
+                // Did we just play the last note?
+                that._playing = false;
+
+                that._playButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                that._resetNotes();
+                that._locked = false;
             }, 1000 * time);
 
-            this._locked = false;
             return;
         }
 
         setTimeout(function() {
-            var table = docById('modeTable');
-            if (noteCounter > that.cells.length - 1) {
-                var d = noteCounter - that.cells.length;
-                var i = that.cells.length - d - 1;
-            } else {
-                var i = noteCounter;
+            if (that._lastNotePlayed !== null) {
+                that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
             }
 
-            var cell = table.rows[MODEMAP[that.cells[i] % 12][0]].cells[MODEMAP[that.cells[i] % 12][1]];
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            note = that._notesToPlay[i];
+            that._playWheel.navItems[note % 12].navItem.show();
+            that._lastNotePlayed = note;
 
-            if (that._lastNotePlayed != null && that._lastNotePlayed !== cell) {
-                that._lastNotePlayed.style.backgroundColor = 'black';
-            }
-            that._lastNotePlayed = cell;
-
-            var noteToPlay = getNote(that._pitch, 4, that.cells[i], '', false, null, that._logo.errorMsg);
+            var ks = that._logo.keySignature[0];
+            var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
             that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
-            that.__playNextNote(time, noteCounter + 1);
+            if (that._playing) {
+                that.__playNextNote(i + 1);
+            } else {
+                that._locked = false;
+                setTimeout(that._resetNotes(), 500);
+                return;
+            }
         }, 1000 * time);
     };
 
-    this._playNote = function(idx) {
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
+    this._playNote = function(i) {
+        var ks = this._logo.keySignature[0];
 
-        var cell = table.rows[MODEMAP[idx][0]].cells[MODEMAP[idx][1]];
-        if (cell.style.backgroundColor === 'black') {
-            var noteToPlay = getNote(this._pitch, 4, idx, '', false, null, this._logo.errorMsg);
-            this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, DEFAULTVOICE, null, null);
-        }
+        var noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this._logo.errorMsg);
+        this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, DEFAULTVOICE, null, null);
     };
 
     this._saveState = function() {
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
+        state = JSON.stringify(this._selectedNotes);
+        if (state !== last(this._undoStack)) {
+            this._undoStack.push(JSON.stringify(this._selectedNotes));
         }
-
-        var thisState = [];
-        for (var i = 0; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            thisState.push(cell.style.backgroundColor);
-        }
-
-        this._undoStack.push(thisState);
     };
 
     this._undo = function() {
-        var table = docById('modeTable');
-
         if (this._undoStack.length > 0) {
-            var prevState = this._undoStack.pop();
+            var prevState = JSON.parse(this._undoStack.pop());
             for (var i = 0; i < 12; i++) {
-                var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-                cell.style.backgroundColor = prevState[i];
+                this._selectedNotes[i] = prevState[i];
             }
 
+            this._resetNotes();
             this._setModeName()
         }
     };
 
     this._clear = function() {
         // "Unclick" every entry in the widget.
-        var table = docById('modeTable');
-        if (table == null) {
-            return;
-        }
 
         this._saveState();
 
-        // Always set the first cell
-        var cell = table.rows[MODEMAP[0][0]].cells[MODEMAP[0][1]];
-        cell.style.backgroundColor = 'black';
-
         for (var i = 1; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            if (cell.style.backgroundColor === 'black') {
-                cell.style.backgroundColor = platformColor.selectorBackground;
-            }
+            this._selectedNotes[i] = false;
         }
+
+        this._resetNotes();
+        this._setModeName()
     };
 
     this._calculateMode = function() {
@@ -760,8 +547,7 @@ function ModeWidget() {
         var table = docById('modeTable');
         var j = 1;
         for (var i = 1; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            if (cell.style.backgroundColor === 'black') {
+            if (this._selectedNotes[i]) {
                 currentMode.push(j);
                 j = 1;
             } else {
@@ -775,7 +561,7 @@ function ModeWidget() {
 
     this._setModeName = function() {
         var table = docById('modeTable');
-	var n = table.rows.length - 1;
+        var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
         var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
 
@@ -784,6 +570,7 @@ function ModeWidget() {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
+                    console.log('setModeName:' + mode);
                     this._logo.blocks.blockList[this._modeBlock].value = mode;
 
                     this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
@@ -797,6 +584,7 @@ function ModeWidget() {
             }
         }
 
+        // console.log('setModeName:' + 'not found');
         table.rows[n].cells[0].innerHTML = '';
     };
 
@@ -827,8 +615,7 @@ function ModeWidget() {
         for (var i = 0; i < 12; i++) {
             // Reverse the order so that Do is last.
             var j = 11 - i;
-            var cell = table.rows[MODEMAP[j][0]].cells[MODEMAP[j][1]];
-            if (cell.style.backgroundColor !== 'black') {
+            if (!this._selectedNotes[j]) {
                 continue;
             }
 
@@ -864,8 +651,7 @@ function ModeWidget() {
         var p = 0;
 
         for (var i = 0; i < 12; i++) {
-            var cell = table.rows[MODEMAP[i][0]].cells[MODEMAP[i][1]];
-            if (cell.style.backgroundColor !== 'black') {
+            if (!this._selectedNotes[i]) {
                 continue;
             }
 
@@ -889,5 +675,120 @@ function ModeWidget() {
             // that._logo.blocks.palettes.hide();
             that._logo.blocks.loadNewBlocks(newStack);
         }, 2000);
+    };
+
+    this._piemenuMode = function () {
+        // pie menu for mode definition
+
+        docById('meterWheelDiv').style.display = '';
+
+        // Use advanced constructor for multiple wheelnavs in the same div.
+        // The meterWheel is used to hold the half steps.
+        this._modeWheel = new wheelnav('meterWheelDiv', null, 400, 400);
+        // The selected notes are shown on this wheel
+        this._noteWheel = new wheelnav('_noteWheel', this._modeWheel.raphael);
+        // Play wheel is to show which note is playing at any one time.
+        this._playWheel = new wheelnav('_playWheel', this._modeWheel.raphael);
+
+        wheelnav.cssMeter = true;
+
+        // Use the mode wheel color scheme
+        this._modeWheel.colors = platformColor.modeWheelcolors;
+
+        this._modeWheel.slicePathFunction = slicePath().DonutSlice;
+        this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._modeWheel.slicePathCustom.minRadiusPercent = 0.4;
+        this._modeWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
+        this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
+
+        // Disable rotation, set navAngle and create the menus
+        this._modeWheel.clickModeRotate = false;
+        this._modeWheel.navAngle = -90;
+        // this._modeWheel.selectedNavItemIndex = 2;
+        this._modeWheel.animatetime = 0; // 300;
+
+        var labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+        var noteList = [];
+        for (var i = 0; i < 12; i++) {
+            noteList.push(labels[i]);
+        }
+
+        this._modeWheel.createWheel(noteList);
+
+        this._noteWheel.colors = platformColor.noteValueWheelcolors; // modeWheelcolors;
+        this._noteWheel.slicePathFunction = slicePath().DonutSlice;
+        this._noteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._noteWheel.slicePathCustom.minRadiusPercent = 0.75;
+        this._noteWheel.slicePathCustom.maxRadiusPercent = 0.90;
+        this._noteWheel.sliceSelectedPathCustom = this._noteWheel.slicePathCustom;
+        this._noteWheel.sliceInitPathCustom = this._noteWheel.slicePathCustom;
+        this._noteWheel.clickModeRotate = false;
+        this._noteWheel.navAngle = -90;
+        this._noteWheel.titleRotateAngle = 90;
+
+        var noteList = [' '];  // No X on first note, since we don't want to unselect it.
+        this._selectedNotes = [true];  // The first note is always selected.
+        for (var i = 1; i < 12; i++) {
+            noteList.push('x');
+            this._selectedNotes.push(false);
+        }
+
+        this._noteWheel.createWheel(noteList)
+
+        this._playWheel.colors = [platformColor.orange];
+        this._playWheel.slicePathFunction = slicePath().DonutSlice;
+        this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._playWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._playWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._playWheel.sliceSelectedPathCustom = this._playWheel.slicePathCustom;
+        this._playWheel.sliceInitPathCustom = this._playWheel.slicePathCustom;
+        this._playWheel.clickModeRotate = false;
+        this._playWheel.navAngle = -90;
+        this._playWheel.titleRotateAngle = 90;
+
+        var noteList = [];
+        for (var i = 0; i < 12; i++) {
+            noteList.push(' ');
+        }
+
+        this._playWheel.createWheel(noteList)
+
+        for (var i = 0; i < 12; i++) {
+            this._playWheel.navItems[i].navItem.hide();
+        }
+
+        var that = this;
+
+        // If a modeWheel sector is selected, show the corresponding
+        // note wheel sector.
+        var __setNote = function () {
+            var i = that._modeWheel.selectedNavItemIndex;
+            that._saveState();
+            that._selectedNotes[i] = true;
+            that._noteWheel.navItems[i].navItem.show();
+            that._playNote(i);
+            that._setModeName();
+        };
+
+        // If a noteWheel sector is selected, hide it.
+        var __clearNote = function () {
+            var i = that._noteWheel.selectedNavItemIndex;
+            if (i == 0) {
+                return;  // Never hide the first note.
+            }
+
+            that._noteWheel.navItems[i].navItem.hide();
+            that._saveState();
+            that._selectedNotes[i] = false;
+            that._setModeName();
+        };
+
+        for (var i = 0; i < 12; i++) {
+            that._modeWheel.navItems[i].navigateFunction = __setNote;
+            that._noteWheel.navItems[i].navigateFunction = __clearNote;
+            // Start with all notes hidden.
+            that._noteWheel.navItems[i].navItem.hide();
+        }
     };
 };

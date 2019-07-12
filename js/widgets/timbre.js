@@ -1,4 +1,4 @@
-// Copyright (c) 2017,18 Walter Bender
+// Copyright (c) 2017-19 Walter Bender
 // Copyright (c) 2017 Tayba Wasim
 // Copyright (c) 2017 Prachi Agrawal
 //
@@ -552,6 +552,17 @@ function TimbreWidget () {
             effectsButtonCell.style.backgroundColor = platformColor.selectorBackground;
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
+         
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick = function () {
+            docById('timbreDiv').style.visibility = 'hidden';
+            docById('timbreButtonsDiv').style.visibility = 'hidden';
+            docById('timbreTableDiv').style.visibility = 'hidden';
+            docById('timbreName').classList.remove('hasKeyboard');
+            that._logo.hideMsgs();
+        }
+
 
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
 
@@ -563,6 +574,8 @@ function TimbreWidget () {
         cell.onclick = function () {
             that._save();
         };
+
+       
 
         var cell = row.insertCell();
         cell.innerHTML = '<input id="timbreName" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="timbreName" type="text" value="' + this.instrumentName + '" />';
@@ -745,15 +758,15 @@ function TimbreWidget () {
             that._undo();
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick = function () {
-            docById('timbreDiv').style.visibility = 'hidden';
-            docById('timbreButtonsDiv').style.visibility = 'hidden';
-            docById('timbreTableDiv').style.visibility = 'hidden';
-            docById('timbreName').classList.remove('hasKeyboard');
-            that._logo.hideMsgs();
-        };
+        // cell.onclick = function () {
+        //     docById('timbreDiv').style.visibility = 'hidden';
+        //     docById('timbreButtonsDiv').style.visibility = 'hidden';
+        //     docById('timbreTableDiv').style.visibility = 'hidden';
+        //     docById('timbreName').classList.remove('hasKeyboard');
+        //     that._logo.hideMsgs();
+        // };
 
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
@@ -854,6 +867,27 @@ function TimbreWidget () {
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
+
+    this._changeBlock = function (newblk, synthChosen, bottomOfClamp) {
+        var lastBlk = 0;
+        if (this.AMSynthesizer.length !== 0 && synthChosen !== 'AMSynth') {
+            lastBlk = this.AMSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (this.FMSynthesizer.length !== 0 && synthChosen !== 'FMSynth') {
+            lastBlk = this.FMSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (this.duoSynthesizer.length !== 0 && synthChosen !== 'DuoSynth') {
+            lastBlk = this.duoSynthesizer.pop();
+            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+              
+        } else if (synthChosen === 'FMSynth' || synthChosen === 'AMSynth') {
+            setTimeout(this.blockConnection(2, bottomOfClamp), 500);
+        } else {
+            setTimeout(this.blockConnection(3, bottomOfClamp), 500);
+        }
+    }
 
     this._blockReplace = function (oldblk, newblk) {
         // Find the connections from the old block
@@ -999,17 +1033,7 @@ function TimbreWidget () {
                             that.AMSynthesizer.push(n);
                             that.AMSynthParams.push(1);
 
-                            setTimeout(function () {
-                                if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.AMSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.AMSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            that._changeBlock(last(that.AMSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING AM SYNTH!!!');
                             that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
@@ -1056,17 +1080,7 @@ function TimbreWidget () {
                             that.FMSynthesizer.push(n);
                             that.FMSynthParams.push(10);
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.FMSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.FMSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            that._changeBlock(last(that.FMSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING FM SYNTH!!!');
                             that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
@@ -1113,20 +1127,7 @@ function TimbreWidget () {
                             that.NoiseSynthesizer.push(n);
                             that.NoiseSynthParams.push("white");
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.NoiseSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.NoiseSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else if (that.duoSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.duoSynthesizer), last(that.NoiseSynthesizer));
-                                    that.duoSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(2, bottomOfClamp);
-                                }
-                            }, 500);
+                            that._changeBlock(last(that.NoiseSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING NOISE SYNTH!!!');
                             that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
@@ -1172,17 +1173,7 @@ function TimbreWidget () {
                             that.duoSynthParams.push(10);
                             that.duoSynthParams.push(6);
 
-                            setTimeout(function () {
-                                if (that.AMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.AMSynthesizer), last(that.duoSynthesizer));
-                                    that.AMSynthesizer.pop();
-                                } else if (that.FMSynthesizer.length !== 0) {
-                                    that._blockReplace(last(that.FMSynthesizer), last(that.duoSynthesizer));
-                                    that.FMSynthesizer.pop();
-                                } else {
-                                    that.blockConnection(3, bottomOfClamp);
-                                }
-                            }, 500);
+                            that._changeBlock(last(that.duoSynthesizer),synthChosen,bottomOfClamp);
 
                             console.log('CREATING DUO SYNTH!!!');
                             that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
@@ -1426,16 +1417,19 @@ function TimbreWidget () {
 
         var myDiv = docById(selectorID);
         var selectOpt = '<select class="sel" id="' + selID + '">';
+        var selectedFilter = null;
         for (var i = 0; i < FILTERTYPES.length; i++) {
             // work around some weird i18n bug
             if (FILTERTYPES[i][0].length === 0) {
                 if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
                     selectOpt += '<option value="' + FILTERTYPES[i][1] + '" selected>' + FILTERTYPES[i][1] + '</option>';
+                    selectedFilter = FILTERTYPES[i][1];
                 } else {
                     selectOpt += '<option value="' + FILTERTYPES[i][1] + '">' + FILTERTYPES[i][1] + '</option>';
                 }
             } else if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
                 selectOpt += '<option value="' + FILTERTYPES[i][0] + '" selected>' + FILTERTYPES[i][0] + '</option>';
+                selectedFilter = FILTERTYPES[i][0];
             } else {
                 selectOpt += '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + '</option>';
             }
@@ -1450,7 +1444,7 @@ function TimbreWidget () {
         }
 
         if (instrumentsFilters[0][this.instrumentName].length - 1 < f) {
-            instrumentsFilters[0][this.instrumentName].push({'filterType': DEFAULTFILTERTYPE, 'filterRolloff': -12, 'filterFrequency': 392});
+            instrumentsFilters[0][this.instrumentName].push({'filterType': selectedFilter, 'filterRolloff': -12, 'filterFrequency': 392});
         }
     };
 
@@ -1466,6 +1460,12 @@ function TimbreWidget () {
                 var m = elem.id.slice(-1);
                 instrumentsFilters[0][that.instrumentName][m]['filterType'] = elem.value;
                 that._update(m, elem.value, 0);
+                var error = instrumentsFilters[0][that.instrumentName].filter(function(el) {
+                    return el.filterType === elem.value;
+                });
+                if (error.length > 1){
+                    that._logo.errorMsg(_('Filter already present.'));
+                }
                 that._playNote('G4', 1 / 8);
             });
 
@@ -1537,8 +1537,23 @@ function TimbreWidget () {
         this._logo.blocks.loadNewBlocks(FILTEROBJ);
 
         var n = this._logo.blocks.blockList.length - 4;
+        var selectedFilters = instrumentsFilters[0][this.instrumentName].slice();
+        var filterType = FILTERTYPES.slice().filter(function (filter) {
+            for (var i in selectedFilters) {
+                if (selectedFilters[i].filterType === filter[1]) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
         this.fil.push(n);
-        this.filterParams.push(DEFAULTFILTERTYPE);
+        if (filterType.length<=0){
+            this.filterParams.push(DEFAULTFILTERTYPE);
+        } else {
+            this.filterParams.push(filterType[0][1]);
+        }
+
         this.filterParams.push(-12);
         this.filterParams.push(392);
 

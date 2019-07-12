@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 Walter Bender
+// Copyright (c) 2014-2019 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 //
 // This program is free software; you can redistribute it and/or
@@ -71,6 +71,7 @@ function Logo () {
     this.pitchSlider = null;
     this.musicKeyboard = null;
     this.modeWidget = null;
+    this.meterWidget = null;
     this.statusMatrix = null;
     this.playbackWidget = null;
 
@@ -158,6 +159,8 @@ function Logo () {
     this.inMusicKeyboard = false;
     this._currentDrumlock = null;
     this.inTimbre = false;
+    this.insideModeWidget = false;
+    this.insideMeterWidget = false;
     this.insideTemperament = false;
     this.inSetTimbre = {};
 
@@ -347,6 +350,8 @@ function Logo () {
     // Mode widget
     this._modeBlock = null;
 
+    // Meter widget
+    this._meterBlock = null;
     // Status matrix
     this.inStatusMatrix = false;
     this.updatingStatusMatrix = false;
@@ -1449,6 +1454,9 @@ function Logo () {
         this.inMusicKeyboard = false;
         this.inTimbre = false;
         this.inRhythmRuler = false;
+        this.insideModeWidget = false;
+        this.insideMeterWidget = false;
+        this.insideTemperament = false;
         this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
         this.inStatusMatrix = false;
@@ -1456,6 +1464,7 @@ function Logo () {
         this.drumBlocks = [];
         this.tuplet = false;
         this._modeBlock = null;
+        this._meterBlock = null;
 
         // Remove any listeners that might be still active
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
@@ -2118,6 +2127,15 @@ function Logo () {
             break;
         case 'wait':
             if (args.length === 1) {
+                if (that.bpm[turtle].length > 0) {
+                    var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                } else {
+                    var bpmFactor = TONEBPM / that._masterBPM;
+                }
+
+                var noteBeatValue = bpmFactor / (1 / args[0]);
+                this.previousTurtleTime[turtle] = this.turtleTime[turtle];
+                this.turtleTime[turtle] += noteBeatValue;
                 that._doWait(turtle, args[0]);
             }
             break;
@@ -3559,6 +3577,13 @@ function Logo () {
                     that.keySignature[turtle] = args[0] + ' ' + modename;
                     that.notationKey(turtle, args[0], modename);
                 }
+
+                if (that.insideModeWidget) {
+                    // Ensure that the mode for Turtle 0 is set, since it
+                    // is used by the mode widget.
+                    that.keySignature[0] = args[0] + ' ' + modename;
+                    that.notationKey(0, args[0], modename);
+                }
             }
             break;
         case 'definemode':
@@ -3732,6 +3757,8 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {   
+                that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
+                that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
                 that.musicKeyboard.init(that);
             };
 
@@ -3838,11 +3865,36 @@ function Logo () {
                 that.modeWidget = new ModeWidget();
             }
 
+            that.insideModeWidget = true;
+
             var listenerName = '_modewidget_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
                 that.modeWidget.init(that, that._modeBlock);
+                that.insideModeWidget = false;
+            }
+
+            that._setListener(turtle, listenerName, __listener);
+            break;
+        case 'meterwidget':
+            if (args.length === 1) {
+                childFlow = args[0];
+                childFlowCount = 1;
+            }
+
+            if (that.meterWidget == null) {
+                that.meterWidget = new MeterWidget();
+            }
+
+            that.insideMeterWidget = true;
+
+            var listenerName = '_meterwidget_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
+                that.meterWidget.init(that, that._meterBlock);
+                that.insideMeterWidget = false;
             }
 
             that._setListener(turtle, listenerName, __listener);
@@ -4056,6 +4108,7 @@ function Logo () {
                     that.errorMsg(_('You must have at least one pitch block and one rhythm block in the matrix.'), blk);
                 } else {
                     // Process queued up rhythms.
+                    that.pitchTimeMatrix.blockNo = blk;
                     that.pitchTimeMatrix.sorted = false;
                     that.pitchTimeMatrix.init(that);
 
@@ -4067,11 +4120,12 @@ function Logo () {
                         switch (that.tupletRhythms[i][0]) {
                         case 'notes':
                         case 'simple':
-                            var tupletParam = [that.tupletParams[that.tupletRhythms[i][1]]];
+                            var tupletParam = [that.tupletParams[i]];
                             tupletParam.push([]);
                             for (var j = 2; j < that.tupletRhythms[i].length; j++) {
                                 tupletParam[1].push(that.tupletRhythms[i][j]);
                             }
+
                             that.pitchTimeMatrix.addTuplet(tupletParam);
                             break;
                         default:
@@ -5114,16 +5168,18 @@ function Logo () {
                     }
                 }
             } else {
-                // Play rhythm block as if it were a drum.
                 if (that.drumStyle[turtle].length > 0) {
+                    // Play rhythm block as if it were a drum.
                     that.clearNoteParams(turtle, blk, that.drumStyle[turtle]);
+                    that.inNoteBlock[turtle].push(blk);
                 } else {
-                    // Load the synth for this drum
-                    that.synth.loadSynth(0, DEFAULTDRUM);
-                    that.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                    // Or use the current synth.
+                    that.clearNoteParams(turtle, blk, []);
+                    that.inNoteBlock[turtle].push(blk);
+                    that.notePitches[turtle][last(that.inNoteBlock[turtle])] = ['G'];
+                    that.noteOctaves[turtle][last(that.inNoteBlock[turtle])] = [4];
+                    that.noteCents[turtle][last(that.inNoteBlock[turtle])] = [0];
                 }
-
-                that.inNoteBlock[turtle].push(blk);
 
                 if (that.bpm[turtle].length > 0) {
                     var bpmFactor = TONEBPM / last(that.bpm[turtle]);
@@ -5296,6 +5352,10 @@ function Logo () {
             } else {
                 var arg0 = args[0];
             }
+
+            if (that.insideMeterWidget) {
+		that._meterBlock = blk;
+	    }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -6268,6 +6328,14 @@ function Logo () {
                     that.embeddedGraphics[turtle][saveBlk] = [];
 
                     that._processNote(noteValue, saveBlk, turtle);
+                    if (that.bpm[turtle].length > 0) {
+                        var bpmFactor = TONEBPM / last(that.bpm[turtle]);
+                    } else {
+                        var bpmFactor = TONEBPM / that._masterBPM;
+                    }
+
+                    // Wait until this note is played before continuing.
+                    that._doWait(turtle, bpmFactor / noteValue);
 
                     that.inNoteBlock[turtle].pop();
 
@@ -12220,7 +12288,7 @@ function Logo () {
     };
 
     /**
-     * Updates the music notation.
+     * Updates the music notation used for Lilypond output.
      * @privileged
      * @param   note
      * @param   {number}   duration
@@ -12326,8 +12394,24 @@ function Logo () {
             this.markup[turtle] = [];
         }
 
-        if (typeof(note) === 'number') {
-            this.notationMarkup(turtle, toFixed2(note), false);
+        if (typeof(note) === 'object') {
+            // If it is hertz, add a markup.
+            markup = '';
+            try {
+                for (var i = 0; i < note.length; i++) {
+                    if (typeof(note[i]) === 'number') {
+                        if (markup = '') {
+                            markup = toFixed2(note[i]);
+                            break;
+                        }
+                    }
+                }
+                if (markup.length > 0) {
+                    this.notationMarkup(turtle, markup, false);
+                }
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
 
