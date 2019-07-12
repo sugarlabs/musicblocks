@@ -9,11 +9,16 @@
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
+<<<<<<< HEAD
     "@babel/preset-env": "^7.5.4",
     "eslint": "^3.18.0",
+=======
+    "@babel/preset-env": "^7.5.0",
+    "eslint": "^6.0.1",
+>>>>>>> e114e69e733f657673ab9cfc5cb074c2bebc6d70
     "eslint-config-standard": "^7.1.0",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1",
+    "eslint-plugin-standard": "^3.1.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.2.0",
