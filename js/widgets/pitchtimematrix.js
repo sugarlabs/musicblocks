@@ -580,7 +580,7 @@ function PitchTimeMatrix () {
         var valueLabel = ['pitch', 'hertz', 'drum', 'graphics'];
         var drumLabels = DRUMS;
         var graphicLabels = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 1800, 1800);
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 900, 900);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
         this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
@@ -592,7 +592,7 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = platformColor.pitchWheelcolors;        
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.25;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
@@ -616,11 +616,12 @@ function PitchTimeMatrix () {
         this._drumWheel.colors = platformColor.pitchWheelcolors;
         this._drumWheel.slicePathFunction = slicePath().DonutSlice;
         this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._drumWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._drumWheel.slicePathCustom.minRadiusPercent = 0.5;
         this._drumWheel.slicePathCustom.maxRadiusPercent = 1;
         this._drumWheel.sliceSelectedPathCustom = this._drumWheel.slicePathCustom;
         this._drumWheel.sliceInitPathCustom = this._drumWheel.slicePathCustom;
         this._drumWheel.clickModeRotate = false;
+        this._drumWheel.titleRotateAngle = 0;
 
         this._drumWheel.createWheel(drumLabels);
 
@@ -2690,6 +2691,7 @@ function PitchTimeMatrix () {
             }
 
         }
+
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
