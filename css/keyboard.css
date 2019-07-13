@@ -12,14 +12,14 @@ table {
     table-layout:fixed;
 }
 table.white {
-    position: absolute;
+    /* position: absolute; */
     top: 0px;
     left: 0px;
     height: 120px;
     border-spacing: 0px 0px;
 }
 table.black {
-    position: absolute;
+    /* position: absolute; */
     border-collapse: separate;
     border-spacing: 20px 0px;
     height: 60px;

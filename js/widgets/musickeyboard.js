@@ -23,8 +23,9 @@ function MusicKeyboard() {
 
     this.noteNames = [];
     this.octaves = [];
+    this.keyboardShown = true;
 
-    var keyboard = document.getElementById('keyboard');
+    // var keyboard = document.getElementById('keyboard');
     var keyboardHolder = document.getElementById('keyboardHolder2');
     var firstOctave = document.getElementById('firstOctave');
     var firstNote = document.getElementById('firstNote');
@@ -49,7 +50,7 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.octaves[i];
         }
 
-        selected1.push(temp2);
+        selected1.push([temp2,i,'1/4']);
         synth.triggerAttackRelease(temp2, '8n');
     };
 
@@ -83,21 +84,283 @@ function MusicKeyboard() {
         mkbButtonsDiv.style.width = BUTTONDIVWIDTH;
         mkbButtonsDiv.innerHTML = '<table cellpadding="0px" id="mkbButtonTable"></table>';
 
-        var myNode = document.getElementById('myrow');
-        myNode.innerHTML = '';
-        var myNode = document.getElementById('myrow2');
-        myNode.innerHTML = '';
-        selected = [];
-        selected1 = [];
-
         var buttonTable1 = docById('mkbButtonTable');
         var header1 = buttonTable1.createTHead();
         var row1 = header1.insertRow(0);
 
+        var that = this;
+
+        var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+
+        cell.onclick = function() {
+            var mkbTableDiv = docById('mkbTableDiv');
+            mkbTableDiv.innerHTML = '';
+            mkbDiv.style.visibility = 'hidden';
+            mkbButtonsDiv.style.visibility = 'hidden';
+            document.getElementById('keyboardHolder').style.display = 'none';
+            var myNode = document.getElementById('myrow');
+            myNode.innerHTML = '';
+            var myNode = document.getElementById('myrow2');
+            myNode.innerHTML = '';
+            selected = [];
+            selected1 = [];
+        };
+
+
+        var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('Play'));
+
+        cell.onclick = function() {
+            that._logo.setTurtleDelay(0);
+            if (selected.length > 0 ) {
+                for (var q = 0; q < selected.length; q++) {
+                    var zx = selected[q];
+                    var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
+
+                    synth.triggerAttackRelease(res, '8n');
+                    sleep(500);
+                }
+            } else {
+                for (var q = 0; q < selected1.length; q++) {
+                    var zx = selected1[q][0];
+                    var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
+
+                    synth.triggerAttackRelease(res, '8n');
+                    sleep(500);
+                }
+            }
+        };
+
+        var cell = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('Save'));
+
+        cell.onclick = function() {
+            if (selected.length > 0) {
+                that._save(selected);
+            } else {
+                that._save(selected1);
+            }
+        };
+
+
+    
+        var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
+
+        cell.onclick=function() {
+            selected = [];
+            selected1 = [];
+        };
+
+        var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
+        
+        that._createKeyboard();
+
+        this.toggleNotesButton = function () {
+            if (that.keyboardShown) {
+                cell.getElementsByTagName("img")[0].src = 'header-icons/circle.svg';
+                cell.getElementsByTagName("img")[0].title = 'circle';
+                cell.getElementsByTagName("img")[0].alt = 'circle';
+            } else {
+                cell.getElementsByTagName("img")[0].src = 'header-icons/table.svg';
+                cell.getElementsByTagName("img")[0].title = 'table';
+                cell.getElementsByTagName("img")[0].alt = 'table';
+
+            }
+        }
+        cell.onclick = function() {
+            if (that.keyboardShown) {
+                that._createTable();
+            } else {
+                that._createKeyboard();
+            }
+            that.toggleNotesButton();
+            that.keyboardShown = !that.keyboardShown;
+        }
+
+        var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
+        dragCell.style.cursor = 'move';
+
+        this._dx = dragCell.getBoundingClientRect().left - mkbDiv.getBoundingClientRect().left;
+        this._dy = dragCell.getBoundingClientRect().top - mkbDiv.getBoundingClientRect().top;
+        this._dragging = false;
+        this._target = false;
+        this._dragCellHTML = dragCell.innerHTML;
+
+        dragCell.onmouseover = function(e) {
+            // In order to prevent the dragged item from triggering a
+            // browser reload in Firefox, we empty the cell contents
+            // before dragging.
+            dragCell.innerHTML = '';
+        };
+
+        dragCell.onmouseout = function(e) {
+            if (!that._dragging) {
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        canvas.ondragover = function(e) {
+            that._dragging = true;
+            e.preventDefault();
+        };
+
+        canvas.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                mkbDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                mkbDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        mkbDiv.ondragover = function(e) {
+            that._dragging = true;
+            e.preventDefault();
+        };
+
+        mkbDiv.ondrop = function(e) {
+            if (that._dragging) {
+                that._dragging = false;
+                var x = e.clientX - that._dx;
+                mkbDiv.style.left = x + 'px';
+                var y = e.clientY - that._dy;
+                mkbDiv.style.top = y + 'px';
+                dragCell.innerHTML = that._dragCellHTML;
+            }
+        };
+
+        mkbDiv.onmousedown = function(e) {
+            that._target = e.target;
+        };
+
+        mkbDiv.ondragstart = function(e) {
+            if (dragCell.contains(that._target)) {
+                e.dataTransfer.setData('text/plain', '');
+            } else {
+                e.preventDefault();
+            }
+        };
+    };
+
+    this._createTable = function() {
+        var mkbTableDiv = docById('mkbTableDiv');
+        mkbTableDiv.style.display = 'inline';
+        mkbTableDiv.style.visibility = 'visible';
+        mkbTableDiv.style.border = '0px';
+        mkbTableDiv.style.width = '300px';
+        mkbTableDiv.innerHTML = '';
+        
+        mkbTableDiv.innerHTML = '<div id="mkbOuterDiv"><div id="mkbInnerDiv"><table cellpadding="0px" id="mkbTable"></table></div></div>';
+
+        var outerDiv = docById('mkbOuterDiv');
+        outerDiv.style.width = '400px';
+        outerDiv.style.backgroundColor = 'white';
+        outerDiv.style.height = '300px';
+        outerDiv.style.marginTop = '15px';
+
+
+        outerDiv.style.display = 'block';
+
+        var innerDiv = docById('mkbInnerDiv');
+        innerDiv.style.width = '350px';
+        innerDiv.style.left = '0px'
+
+        var mkbTable = docById('mkbTable');
+        if (selected1.length < 1) {
+            outerDiv.innerHTML = 'No note selected';
+            return;
+        }
+
+        j=0;
+        for (var i = 0; i < this.noteNames.length; i++) {
+            var mkbTableRow = mkbTable.insertRow(); 
+            var cell = mkbTableRow.insertCell(); 
+            cell.style.backgroundColor = platformColor.graphicsLabelBackground;
+            cell.style.fontSize = 100 + '%';
+            cell.style.height ='40px';
+            cell.style.width = '80px';
+            cell.style.lineHeight = '200%';
+            cell.className = 'headcol';  // This cell is fixed horizontally.
+            cell.innerHTML = this.noteNames[i]; 
+            var mkbCell = mkbTableRow.insertCell();
+            // Create tables to store individual notes.
+            mkbCell.innerHTML = '<table cellpadding="0px" id="mkbCellTable' + j + '"></table>';
+            var mkbCellTable = docById('mkbCellTable' + j);
+            mkbCellTable.style.marginTop = '-1px';
+
+            // We'll use this element to put the clickable notes for this row.
+            var mkbRow = mkbCellTable.insertRow();
+            mkbRow.setAttribute('id', 'mkb' + j);
+            j += 1;         
+        }
+        var mkbTableRow = mkbTable.insertRow(); 
+        var cell = mkbTableRow.insertCell(); 
+        cell.style.backgroundColor = platformColor.graphicsLabelBackground;
+        cell.style.fontSize = 100 + '%';
+        cell.style.height ='40px';
+        cell.style.width = '80px';
+        cell.style.lineHeight = '200%';
+        cell.className = 'headcol';  // This cell is fixed horizontally.
+        cell.innerHTML = 'duration';
+        var ptmCell = mkbTableRow.insertCell();
+        // Create tables to store individual note values.
+        ptmCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
+        var mkbCellTable = docById('mkbTable');
+        mkbCellTable.style.marginLeft = '27px';
+ 
+        for (var j = 0; j < selected1.length; j++) {
+            for (var i = 0; i < this.noteNames.length; i++) {
+                var row = docById('mkb' + i);
+                var cell = row.insertCell();
+                cell.style.height = '40px';
+                cell.style.width = '40px';
+                cell.style.minWidth = cell.style.width;
+                cell.style.maxWidth = cell.style.width;
+                if (i == selected1[j][1]) {
+                    cell.style.backgroundColor = 'black';
+                } else {
+                    cell.style.backgroundColor = 'rgb(124, 214, 34)';
+                }
+            }
+            var row = docById('mkbNoteDurationRow');
+            var cell = row.insertCell();
+            cell.style.height = '40px';
+            cell.style.width = '40px';
+            cell.style.minWidth = cell.style.width;
+            cell.style.maxWidth = cell.style.width;
+            cell.style.lineHeight = 60 + '%';
+            cell.style.textAlign = 'center';
+            cell.innerHTML = selected1[j][2];
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
+        }        
+    }
+
+    this._createKeyboard = function() {
+        var mkbTableDiv = docById('mkbTableDiv');
+        mkbTableDiv.style.display = 'inline';
+        mkbTableDiv.style.visibility = 'visible';
+        mkbTableDiv.style.border = '0px';
+        mkbTableDiv.style.width = '300px';
+        mkbTableDiv.innerHTML = '';
+
+        mkbTableDiv.innerHTML = ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>'
+
+        var keyboardHolder2 = docById('keyboardHolder2');
+        keyboardHolder2.style.bottom = '10px';
+        keyboardHolder2.style.left = '0px';
+        keyboardHolder2.style.height = '145px'
+        keyboardHolder2.style.width = '700px';
+        keyboardHolder2.style.backgroundColor = 'white';
+
+
+        var myNode = document.getElementById('myrow');
+        myNode.innerHTML = '';
+        var myNode = document.getElementById('myrow2');
+        myNode.innerHTML = '';
+
         // For the button callbacks
         var that = this;
         if (this.noteNames.length === 0) {
-            // document.getElementById('keyboardHolder').style.display = 'block';
             for (var i = 0; i < PITCHES3.length; i++) {
                 this.noteNames.push(PITCHES3[i]);
                 this.octaves.push(4);
@@ -180,161 +443,35 @@ function MusicKeyboard() {
             for (var i = 0; i < idContainer.length; i++) {
                 this.loadHandler(document.getElementById(idContainer[i]), i);
             }
-        // }
+        
+    }
 
+    // keyboard.addEventListener('mousedown', function (e) {
+    //     var target = e.target;
+    //     if (target.tagName === 'TD') {
+    //         if ((target.style.backgroundColor !== 'lightgrey') && (target.style.backgroundColor !== 'rgb(72,72,72)')) {
+    //             selected.push(target.textContent);
+    //             if (target.parentNode === whiteKeys) {
+    //                 target.style.backgroundColor = 'lightgrey';
+    //             } else {
+    //                 target.style.backgroundColor = 'rgb(72,72,72)';
+    //             }
+    //         }
 
-        var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
+    //         handleKeyboard(target.textContent);
+    //     }
+    // });
 
-        cell.onclick = function() {
-            mkbDiv.style.visibility = 'hidden';
-            mkbButtonsDiv.style.visibility = 'hidden';
-            document.getElementById('keyboardHolder').style.display = 'none';
-            document.getElementById('keyboardHolder2').style.display = 'none';
-            var myNode = document.getElementById('myrow');
-            myNode.innerHTML = '';
-            var myNode = document.getElementById('myrow2');
-            myNode.innerHTML = '';
-            selected = [];
-            selected1 = [];
-        };
-
-
-        var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('Play'));
-
-        cell.onclick = function() {
-            that._logo.setTurtleDelay(0);
-            if (selected.length > 0 ) {
-                for (var q = 0; q < selected.length; q++) {
-                    var zx = selected[q];
-                    var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
-
-                    synth.triggerAttackRelease(res, '8n');
-                    sleep(500);
-                }
-            } else {
-                for (var q = 0; q < selected1.length; q++) {
-                    var zx = selected1[q];
-                    var res = zx.replace(SHARP, '#').replace(FLAT, 'b');
-
-                    synth.triggerAttackRelease(res, '8n');
-                    sleep(500);
-                }
-            }
-        };
-
-        var cell = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('Save'));
-
-        cell.onclick = function() {
-            if (selected.length > 0) {
-                that._save(selected);
-            } else {
-                that._save(selected1);
-            }
-        };
-
-
-    
-        var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
-
-        cell.onclick=function() {
-            selected = [];
-            selected1 = [];
-        };
-
-
-        var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - mkbDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - mkbDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                mkbDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                mkbDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        mkbDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        mkbDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                mkbDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                mkbDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        mkbDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        mkbDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-    };
-
-    keyboard.addEventListener('mousedown', function (e) {
-        var target = e.target;
-        if (target.tagName === 'TD') {
-            if ((target.style.backgroundColor !== 'lightgrey') && (target.style.backgroundColor !== 'rgb(72,72,72)')) {
-                selected.push(target.textContent);
-                if (target.parentNode === whiteKeys) {
-                    target.style.backgroundColor = 'lightgrey';
-                } else {
-                    target.style.backgroundColor = 'rgb(72,72,72)';
-                }
-            }
-
-            handleKeyboard(target.textContent);
-        }
-    });
-
-    keyboard.addEventListener('mouseup', function (f) {
-        var target = f.target;
-        if (target.tagName === 'TD') {   
-            if (target.parentNode === whiteKeys) {
-                target.style.backgroundColor = 'white';
-            } else {
-                target.style.backgroundColor = 'black';
-            }
-        }
-    });
+    // keyboard.addEventListener('mouseup', function (f) {
+    //     var target = f.target;
+    //     if (target.tagName === 'TD') {   
+    //         if (target.parentNode === whiteKeys) {
+    //             target.style.backgroundColor = 'white';
+    //         } else {
+    //             target.style.backgroundColor = 'black';
+    //         }
+    //     }
+    // });
 
     function deselect () {
         for (var i = 0; i < selected.length; i++) {
@@ -347,18 +484,6 @@ function MusicKeyboard() {
         }
 
         selected = [];
-    };
-
-    var keyboardShown = true;
-
-    function toggleKeyboard() {
-        if (keyboardShown) {
-            keyboardHolder.style.display = 'none';
-        } else {
-            keyboardHolder.style.display = 'inline';
-        }
-     
-        keyboardShown = !keyboardShown;
     };
 
     function handleKeyboard (key) {
@@ -376,11 +501,11 @@ function MusicKeyboard() {
         var endOfStackIdx = 0;
         for (var i = 0; i < pitches.length; i++) {
             // Could be a note or a frequency.
-            if (typeof(pitches[i]) === 'string') {
-                var note = pitches[i].slice(0);
+            if (typeof(pitches[i][0]) === 'string') {
+                var note = pitches[i][0].slice(0);
                 var notePitch = note.substring(0, note.length - 1);  // e.g., D or D# not D#1
             } else {
-                var note = pitches[i];  // e.g., 392
+                var note = pitches[i][0];  // e.g., 392
             }
 
             // Add the Note block and its value
@@ -404,7 +529,7 @@ function MusicKeyboard() {
             // The last connection in last pitch block is null.
             var lastConnection = null;
 
-            if (typeof(pitches[i]) === 'string') {
+            if (typeof(pitches[i][0]) === 'string') {
                 newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
                 if (['#', 'b', '♯', '♭'].indexOf(notePitch[1]) !== -1) {
                     newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0]] + note[1]}], 0, 0, [thisBlock]]);
