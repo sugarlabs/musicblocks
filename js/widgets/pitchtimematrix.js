@@ -846,6 +846,12 @@ function PitchTimeMatrix () {
                 }
             }
             that.makeClickable();
+            if (label === 'pitch') {
+                that._sort();
+                setTimeout(function() {
+                    that.pitchBlockAdded(n)
+                },2000);
+            }
         }
         for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __subMenuChanged;
@@ -856,6 +862,15 @@ function PitchTimeMatrix () {
         for (var i = 0; i < graphicLabels.length; i++) {
             this._graphicWheel.navItems[i].navigateFunction = __selectionChanged;
         }
+    }
+
+    this.pitchBlockAdded = function(blockN) {
+        for (var i = 0; i < this.columnBlocksMap.length; i++){
+            if(this.columnBlocksMap[i][0] === blockN) {
+                break;
+            }
+        }
+        setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks') ,3000);
     }
 
     this._creatematrixgraphic2spiesubmenu = function(index, condition) {
