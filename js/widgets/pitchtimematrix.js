@@ -1111,7 +1111,7 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.clickModeRotate = false;
-            this._blockLabelsWheel.titleRotateAngle = 90;
+            this._blockLabelsWheel.titleRotateAngle = 0;
             this._blockLabelsWheel.animatetime = 0; // 300;
             this._blockLabelsWheel.createWheel(blockLabels);
         }
