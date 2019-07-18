@@ -19,11 +19,11 @@ table.white {
     border-spacing: 0px 0px;
 }
 table.black {
-    /* position: absolute; */
+    position: absolute;
     border-collapse: separate;
     border-spacing: 20px 0px;
     height: 60px;
-    top: 0px;
+    top: 17px;
     left: 30px;
 }
 table.white > tbody > tr {
