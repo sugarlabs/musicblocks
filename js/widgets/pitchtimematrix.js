@@ -577,10 +577,32 @@ function PitchTimeMatrix () {
 
     this._createaddcolumnpiesubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['pitch', 'hertz', 'drum', 'graphics'];
-        var drumLabels = DRUMS;
-        var graphicLabels = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 900, 900);
+        const VALUES = ['pitch', 'hertz', 'drum', 'graphics'];
+        var valueLabel = [];
+        for (var i = 0; i < VALUES.length; i++) {
+            var label = _(VALUES[i]);
+            valueLabel.push(label);
+        }
+        var drumLabels = [];
+        for (var i = 0; i < DRUMS.length; i++) {
+                var label = _(DRUMS[i]);
+                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                    drumLabels.push(label.substr(0, 8) + '..');
+                } else {
+                    drumLabels.push(label);
+                }
+        }
+        const GRAPHICS = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
+        var graphicLabels = [];
+        for (var i = 0; i < GRAPHICS.length; i++) {
+            var label = _(GRAPHICS[i]);
+            if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                graphicLabels.push(label.substr(0, 8) + '..');
+            } else {
+                graphicLabels.push(label);
+            }
+        }
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
         this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
@@ -622,7 +644,6 @@ function PitchTimeMatrix () {
         this._drumWheel.sliceInitPathCustom = this._drumWheel.slicePathCustom;
         this._drumWheel.clickModeRotate = false;
         this._drumWheel.titleRotateAngle = 0;
-
         this._drumWheel.createWheel(drumLabels);
 
         for(var i = 0; i < drumLabels.length;i++) {
@@ -632,12 +653,12 @@ function PitchTimeMatrix () {
         this._graphicWheel.colors = platformColor.pitchWheelcolors;
         this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
         this._graphicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._graphicWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._graphicWheel.slicePathCustom.minRadiusPercent = 0.5;
         this._graphicWheel.slicePathCustom.maxRadiusPercent = 1;
         this._graphicWheel.sliceSelectedPathCustom = this._graphicWheel.slicePathCustom;
         this._graphicWheel.sliceInitPathCustom = this._graphicWheel.slicePathCustom;
         this._graphicWheel.clickModeRotate = false;
-        this._graphicWheel.titleRotateAngle = 90;
+        this._graphicWheel.titleRotateAngle = 0;
 
         this._graphicWheel.createWheel(graphicLabels);
 
@@ -823,6 +844,12 @@ function PitchTimeMatrix () {
                 }
             }
             that.makeClickable();
+            if (label === 'pitch') {
+                that._sort();
+                setTimeout(function() {
+                    that.pitchBlockAdded(n)
+                },2000);
+            }
         }
         for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __subMenuChanged;
@@ -835,9 +862,18 @@ function PitchTimeMatrix () {
         }
     }
 
+    this.pitchBlockAdded = function(blockN) {
+        for (var i = 0; i < this.columnBlocksMap.length; i++){
+            if(this.columnBlocksMap[i][0] === blockN) {
+                break;
+            }
+        }
+        setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks') ,3000);
+    }
+
     this._creatematrixgraphic2spiesubmenu = function(index, condition) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        var valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
 
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
@@ -944,43 +980,16 @@ function PitchTimeMatrix () {
             } else {
                 that.blockValue = that.yblockValue;
             }
-            if (that.blockValue[0].length === 3) {
-                return;
-            }
-            if (that.blockValue[0] === '0') {
-                that.blockValue[0] = value;
-            } else {
-                that.blockValue[0] = that.blockValue[0]+value;
-            }
+            that.blockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             if (that.blockValue[1] === 'x') {
                 docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
             }else{
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
             }
-            
+            __selectionChanged(false);
 
         }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.x) {
-                that.blockValue = that.xblockValue;
-            } else {
-                that.blockValue = that.yblockValue;
-            }
-            if (that.blockValue[0].length === 1) {
-                that.blockValue[0] = '0';
-            } else {
-                that.blockValue[0] = that.blockValue[0].slice(0, that.blockValue[0].length-1);
-            }
-            if (that.blockValue[1] === 'x') {
-                docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
-            }else{
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
-            }
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
-            __selectionChanged(false);
-        }
-        for (var i = 2; i < valueLabel.length; i++) {
+        for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __enterValue;
         }
 
@@ -1045,13 +1054,26 @@ function PitchTimeMatrix () {
 
     this._creatematrixgraphicspiesubmenu = function(index, condition) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0']
+        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        if (condition === 'synthsblocks'){
+            valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
+        } else if (condition === 'graphicsblocks') {
+            valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+        }
         
         this._pitchWheel = new wheelnav('wheelDivptm', null, 1300, 1300);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
             var blockLabels = MATRIXGRAPHICS.slice();
+            for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
+                var label = _(MATRIXGRAPHICS[i]);
+                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                    blockLabels.push(label.substr(0, 8) + '..');
+                } else {
+                    blockLabels.push(label);
+                }
+            }
         }
         wheelnav.cssMode = true;
 
@@ -1087,7 +1109,7 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.clickModeRotate = false;
-            this._blockLabelsWheel.titleRotateAngle = 90;
+            this._blockLabelsWheel.titleRotateAngle = 0;
             this._blockLabelsWheel.animatetime = 0; // 300;
             this._blockLabelsWheel.createWheel(blockLabels);
         }
@@ -1122,31 +1144,12 @@ function PitchTimeMatrix () {
         };
 
         var __enterValue = function () {
-            var i = that._pitchWheel.selectedNavItemIndex;
-            var value = valueLabel[i];
-            if (that.blockValue.length === 3) {
-                return;
-            }
-            if (that.blockValue === '0') {
-                that.blockValue = value;
-            } else {
-                that.blockValue = that.blockValue+value;
-            }
+            that.blockValue = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-
-        }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.blockValue.length === 1) {
-                that.blockValue = '0';
-            } else {
-                that.blockValue = that.blockValue.slice(0,that.blockValue.length-1);
-            }
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
             __selectionChanged(false);
         }
-        for (var i = 2; i < valueLabel.length; i++) {
+        
+        for (var i = 0; i < valueLabel.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __enterValue;
         }
 
@@ -1225,7 +1228,15 @@ function PitchTimeMatrix () {
 
         var accidentals = [ "𝄪", "♯", "♮", "♭", "𝄫" ];
         var noteLabels = [ "ti", "la", "sol", "fa", "mi", "re", "do" ];
-        var drumLabels = DRUMS;
+        var drumLabels = [];
+        for (var i = 0; i < DRUMS.length; i++) {
+            var label = _(DRUMS[i]);
+            if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                drumLabels.push(label.substr(0, 8) + '..');
+            } else {
+                drumLabels.push(label);
+            }
+        }
 
         if (condition === 'drumblocks') {
             noteLabels = drumLabels;
