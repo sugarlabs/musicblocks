@@ -7920,7 +7920,7 @@ function Logo () {
             if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
                 // Nothing else to do... so cleaning up.
                 if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
-                    await delayExecution(timeout)
+                    await delayExecution(that.turtleDelay)
                         if (that.blocks.visible) {
                             that.blocks.unhighlight(blk);
                         }
