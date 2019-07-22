@@ -1654,7 +1654,7 @@ function Logo () {
      * @param   receivedArg
      * @returns {void}
      */
-    this._runFromBlock = function (that, turtle, blk, isflow, receivedArg) {
+    this._runFromBlock =  async function (that, turtle, blk, isflow, receivedArg) {
         this.runningBlock = blk;
         if (blk == null)
             return;
@@ -1674,9 +1674,9 @@ function Logo () {
                 }
                 that.stepQueue[turtle].push(blk);
             } else {
-                setTimeout(function () {
+                await delayExecution(100)
                     that._runFromBlockNow(that, turtle, blk, isflow, receivedArg);
-                }, delay);
+                
             }
         }
     };
@@ -1830,7 +1830,7 @@ function Logo () {
      * @param   {number}    queueStart  Optional.
      * @returns {void}
      */
-    this._runFromBlockNow = function (that, turtle, blk, isflow, receivedArg, queueStart) {
+    this._runFromBlockNow = async function (that, turtle, blk, isflow, receivedArg, queueStart) {
         ///////
         this.alreadyRunning = true;
         ///////
@@ -7850,7 +7850,7 @@ function Logo () {
             // Because flow can come from calc blocks, we are not
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
-            __checkCompletionState = function () {
+            __checkCompletionState = async function () {
                 if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
                     if (that.runningLilypond) {
                         console.log('saving lilypond output:');
@@ -7883,7 +7883,7 @@ function Logo () {
 
                     // Give the last note time to play.
                     console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
-                    that.lastNoteTimeout = setTimeout(function () {
+                    that.lastNoteTimeout = await delayExecution(1000)
                         console.log('LAST NOTE PLAYED');
                         that.lastNoteTimeout = null;
                         if (that.suppressOutput[turtle] && that.recording) {
@@ -7903,31 +7903,27 @@ function Logo () {
                             // And save the session.
                             that.saveLocally();
                         }
-                    }, 1000);
                 } else if (that.suppressOutput[turtle]) {
-                    setTimeout(function () {
+                    await delayExecution(250)
                         __checkCompletionState();
-                    }, 250);
                 }
             };
 
             if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
                 if (!that.checkingCompletionState) {
                     that.checkingCompletionState = true;
-                    setTimeout(function () {
+                    await delayExecution(250)
                         __checkCompletionState();
-                    }, 250);
                 }
             }
 
             if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
                 // Nothing else to do... so cleaning up.
                 if (that.turtles.turtleList[turtle].queue.length === 0 || blk !== last(that.turtles.turtleList[turtle].queue).parentBlk) {
-                    setTimeout(function () {
+                    await delayExecution(timeout)
                         if (that.blocks.visible) {
                             that.blocks.unhighlight(blk);
                         }
-                    }, that.turtleDelay);
                 }
 
                 // Unhighlight any parent blocks still highlighted.
