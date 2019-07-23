@@ -373,7 +373,7 @@ function Logo () {
     this.mic = null;
     this.volumeAnalyser = null;
     this.pitchAnalyser = null;
-    this.synth = [];
+    
 
     /**
      * Switches optimize mode on if state, off otherwise.
@@ -7883,13 +7883,6 @@ function Logo () {
 
                     // Give the last note time to play.
                     console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
-                    // this.synth = new Tone.simpleSynth().master()
-                    // var loop = new Tone.Loop(function(t) {
-                    //     synth.triggerAttackRelease('C4', '4n', t)
-                    //     Tone.Transport.scheduleOnce(function(t2){
-                    //         synth.triggerAttackRelease('D4', '4n', t2)
-                    //     }, Tone.Transport.position + " + 4n");
-                    // }, '2n').start()
                     that.lastNoteTimeout = setTimeout(function () {
                         console.log('LAST NOTE PLAYED');
                         that.lastNoteTimeout = null;
