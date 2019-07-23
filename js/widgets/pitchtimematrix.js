@@ -635,7 +635,7 @@ function PitchTimeMatrix () {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
 
-        this._drumWheel.colors = platformColor.pitchWheelcolors;
+        this._drumWheel.colors = platformColor.drumWheelcolors;
         this._drumWheel.slicePathFunction = slicePath().DonutSlice;
         this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._drumWheel.slicePathCustom.minRadiusPercent = 0.5;
@@ -650,7 +650,7 @@ function PitchTimeMatrix () {
             this._drumWheel.navItems[i].navItem.hide();
         }
 
-        this._graphicWheel.colors = platformColor.pitchWheelcolors;
+        this._graphicWheel.colors = platformColor.graphicWheelcolors;
         this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
         this._graphicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._graphicWheel.slicePathCustom.minRadiusPercent = 0.5;
@@ -739,14 +739,14 @@ function PitchTimeMatrix () {
                 rLabel = 'hertz';
                 rArg = 392;
             } else if (label === 'drum') {
-                blockLabel = that._drumWheel.navItems[that._drumWheel.selectedNavItemIndex].title;
-                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":"blockLabel"}],0,0,[0]]];                
+                blockLabel = DRUMS[that._drumWheel.selectedNavItemIndex];
+                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":blockLabel}],0,0,[0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = blockLabel;
                 rArg = -1;
             } else if (label === 'graphics') {
-                blockLabel = that._graphicWheel.navItems[that._graphicWheel.selectedNavItemIndex].title;
+                blockLabel = GRAPHICS[that._graphicWheel.selectedNavItemIndex];
                 var val = 100;
                 if (blockLabel === 'setcolor'){
                     val = 0;
@@ -845,10 +845,9 @@ function PitchTimeMatrix () {
             }
             that.makeClickable();
             if (label === 'pitch') {
-                that._sort();
                 setTimeout(function() {
                     that.pitchBlockAdded(n)
-                },2000);
+                },200);
             }
         }
         for (var i = 0; i < valueLabel.length; i++) {
@@ -868,7 +867,7 @@ function PitchTimeMatrix () {
                 break;
             }
         }
-        setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks') ,3000);
+        setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks',true) ,500);
     }
 
     this._creatematrixgraphic2spiesubmenu = function(index, condition) {
@@ -1065,14 +1064,10 @@ function PitchTimeMatrix () {
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
-            var blockLabels = MATRIXGRAPHICS.slice();
+            var blockLabels = [];
             for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
                 var label = _(MATRIXGRAPHICS[i]);
-                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
-                    blockLabels.push(label.substr(0, 8) + '..');
-                } else {
-                    blockLabels.push(label);
-                }
+                blockLabels.push(label);
             }
         }
         wheelnav.cssMode = true;
@@ -1109,7 +1104,7 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.clickModeRotate = false;
-            this._blockLabelsWheel.titleRotateAngle = 0;
+            this._blockLabelsWheel.titleRotateAngle = 90;
             this._blockLabelsWheel.animatetime = 0; // 300;
             this._blockLabelsWheel.createWheel(blockLabels);
         }
@@ -1222,7 +1217,7 @@ function PitchTimeMatrix () {
 
     }
 
-    this._createcolumnpiesubmenu = function(index, condition) {
+    this._createcolumnpiesubmenu = function(index, condition, sortedClose) {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
 
@@ -1231,11 +1226,8 @@ function PitchTimeMatrix () {
         var drumLabels = [];
         for (var i = 0; i < DRUMS.length; i++) {
             var label = _(DRUMS[i]);
-            if (getTextWidth(label, 'bold 30pt Sans') > 200) {
-                drumLabels.push(label.substr(0, 8) + '..');
-            } else {
-                drumLabels.push(label);
-            }
+            drumLabels.push(label);
+            
         }
 
         if (condition === 'drumblocks') {
@@ -1366,6 +1358,9 @@ function PitchTimeMatrix () {
             if (condition === 'pitchblocks') {
                 that._accidentalsWheel.removeWheel();
                 that._octavesWheel.removeWheel();
+            }
+            if (sortedClose === true) {
+                that._sort();
             }
         };
 
