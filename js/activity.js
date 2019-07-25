@@ -731,7 +731,7 @@ function Activity() {
      * Sets up play button functionality
      * Runs music blocks
      */
-    this._doFastButton = function (env) {
+    this._doFastButton = async function (env) {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -800,12 +800,10 @@ function Activity() {
                 document.getElementById('stop').style.color = 'white';
                 logo.doStopTurtle();
 
-                setTimeout(function () {
+                await delayExecution(500)
                     console.log('AND RUNNING');
                     document.getElementById('stop').style.color = '#ea174c';
-
                     logo.runLogoCommands(null, env);
-                }, 500);
             }
         }
     };
