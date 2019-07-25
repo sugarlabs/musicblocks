@@ -87,7 +87,7 @@ window.platformColor = {
     orange: '#e37a00', // 5YR
     piemenuBasic: ['#3ea4a3', '#60bfbc', '#1d8989', '#60bfbc', '#1d8989'],
     exitWheelcolors: ['#808080', '#c0c0c0'],
-    exitWheelcolors2: ['#808080', '#a08080', '#80a080'],
+    exitWheelcolors2: ['#808080', '#92a9ff', '#80a080'],
     pitchWheelcolors: ['#77c428', '#93e042', '#77c428', '#5ba900', '#77c428', '#93e042', '#adfd55'],
     drumWheelcolors:['#1fadae','#3edcdd'],
     graphicWheelcolors:['#92a9ff','#728ff9'],

@@ -879,6 +879,7 @@ function PitchTimeMatrix () {
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
+        this._blockLabelsWheel2 = new wheelnav('_blockLabelsWheel2', this._pitchWheel.raphael);
         var blockLabels = MATRIXGRAPHICS2.slice();
 
         wheelnav.cssMode = true;
@@ -886,9 +887,9 @@ function PitchTimeMatrix () {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;        
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._pitchWheel.colors = platformColor.graphicWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.55;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
@@ -897,11 +898,23 @@ function PitchTimeMatrix () {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(valueLabel);
 
+        this._blockLabelsWheel2.colors = platformColor.pitchWheelcolors;
+        this._blockLabelsWheel2.slicePathFunction = slicePath().DonutSlice;
+        this._blockLabelsWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.55;
+        this._blockLabelsWheel2.slicePathCustom.maxRadiusPercent = 0.8;
+        this._blockLabelsWheel2.sliceSelectedPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.sliceInitPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.clickModeRotate = false;
+        // this._blockLabelsWheel.titleRotateAngle = 90;
+        this._blockLabelsWheel2.animatetime = 0; // 300;
+        this._blockLabelsWheel2.createWheel(valueLabel);
+
         this._exitWheel.colors = platformColor.exitWheelcolors2;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
@@ -938,60 +951,30 @@ function PitchTimeMatrix () {
         this.xblockValue = [xblockLabelValue.toString(),'x'];
         this.yblockValue = [yblockLabelValue.toString(),'y'];
         this._exitWheel.createWheel(['x', this.yblockValue[0], this.xblockValue[0]]);
-        this.blockValue = this.xblockValue;
-        this.x = true;
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            if (condition === 'graphicsblocks') {
-                that._blockLabelsWheel.removeWheel();
-            }
-        };
-        this._exitWheel.navItems[1].navigateFunction = function () {
-            that.x = false;
-            docById('wheelnav-_exitWheel-slice-1').setAttribute("fill", '#80a080');
-            docById('wheelnav-_exitWheel-slice-2').setAttribute("fill", '#a08080');
-            docById('wheelnav-_exitWheel-slice-1').style.fill = '#80a080';
-            docById('wheelnav-_exitWheel-slice-2').style.fill = '#a08080';
-            that._exitWheel.colors[1] = '#80a080';
-            that._exitWheel.colors[2] = '#a08080';
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
-            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
-        };
-        this._exitWheel.navItems[2].navigateFunction = function () {
-            that.x = true;
-            docById('wheelnav-_exitWheel-slice-1').setAttribute("fill", '#a08080');
-            docById('wheelnav-_exitWheel-slice-2').setAttribute("fill", '#80a080');
-            docById('wheelnav-_exitWheel-slice-1').style.fill = '#a08080';
-            docById('wheelnav-_exitWheel-slice-2').style.fill = '#80a080';
-            that._exitWheel.colors[1] = '#a08080';
-            that._exitWheel.colors[2] = '#80a080';
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
-            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
+            that._blockLabelsWheel.removeWheel();
+            that._blockLabelsWheel2.removeWheel();
         };
 
         var __enterValue = function () {
-            var i = that._pitchWheel.selectedNavItemIndex;
-            var value = valueLabel[i];
-            if (that.x) {
-                that.blockValue = that.xblockValue;
-            } else {
-                that.blockValue = that.yblockValue;
-            }
-            that.blockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            if (that.blockValue[1] === 'x') {
-                docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
-            }else{
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
-            }
+            that.xblockValue[0] = that._blockLabelsWheel2.navItems[that._blockLabelsWheel2.selectedNavItemIndex].title;
+            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
             __selectionChanged(false);
-
         }
+        var __enterValue2 = function () {
+            that.yblockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
+            __selectionChanged(false);
+        }
+
         for (var i = 0; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+            this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
+            this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
         }
 
         var __selectionChanged = function (newBlock) {
