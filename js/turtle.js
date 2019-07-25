@@ -92,7 +92,8 @@ function Turtle (name, turtles, drum) {
         ctx.putImageData(imgData, dx, dy);
 
         // Draw under the turtle as the canvas moves.
-        for (var t = 0; t < this.turtles.turtleList.length; t++) {
+        var turt = this.this.turtles.turtleList.length;
+        for (var t = 0; t < turt; t++) {
             if (this.turtles.turtleList[t].trash) {
                 continue;
             }

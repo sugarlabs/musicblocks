@@ -12215,11 +12215,12 @@ function Logo () {
 
     /**
      * Preps synths for each turtle.
-     * @privileged
+     * @privilegeds
      * @returns {void}
      */
     this._prepSynths = function () {
-        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+        var turt = this.turtles.turtleList.length
+        for (var turtle = 0; turtle < turt; turtle++) {
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};
                 instrumentsFilters[turtle] = {};
@@ -12256,7 +12257,8 @@ function Logo () {
 
         if (!this.suppressOutput[turtle]) {
             this._setMasterVolume(DEFAULTVOLUME);
-            for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            var turt = this.turtles.turtleList.length
+            for (var turtle = 0; turtle < turt; turtle++) {
                 for (var synth in this.synthVolume[turtle]) {
                     this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
                 }
