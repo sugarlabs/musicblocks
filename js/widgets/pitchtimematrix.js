@@ -885,8 +885,8 @@ function PitchTimeMatrix () {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = platformColor.graphicWheelcolors;
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.55;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
@@ -896,10 +896,10 @@ function PitchTimeMatrix () {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(valueLabel);
 
-        this._blockLabelsWheel2.colors = platformColor.pitchWheelcolors;
+        this._blockLabelsWheel2.colors = platformColor.blockLabelsWheelcolors;
         this._blockLabelsWheel2.slicePathFunction = slicePath().DonutSlice;
         this._blockLabelsWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.55;
+        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.6;
         this._blockLabelsWheel2.slicePathCustom.maxRadiusPercent = 0.8;
         this._blockLabelsWheel2.sliceSelectedPathCustom = this._blockLabelsWheel2.slicePathCustom;
         this._blockLabelsWheel2.sliceInitPathCustom = this._blockLabelsWheel2.slicePathCustom;
@@ -908,16 +908,16 @@ function PitchTimeMatrix () {
         this._blockLabelsWheel2.animatetime = 0; // 300;
         this._blockLabelsWheel2.createWheel(valueLabel);
 
-        this._exitWheel.colors = platformColor.exitWheelcolors2;
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
 
-        this._blockLabelsWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
         this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
         this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
@@ -948,7 +948,7 @@ function PitchTimeMatrix () {
         
         this.xblockValue = [xblockLabelValue.toString(),'x'];
         this.yblockValue = [yblockLabelValue.toString(),'y'];
-        this._exitWheel.createWheel(['x', this.yblockValue[0], this.xblockValue[0]]);
+        this._exitWheel.createWheel(['x', '']);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
@@ -1058,7 +1058,7 @@ function PitchTimeMatrix () {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;        
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.7;
         
@@ -1079,7 +1079,7 @@ function PitchTimeMatrix () {
         this._exitWheel.clickModeRotate = false;
         
         if (condition === 'graphicsblocks') {
-            this._blockLabelsWheel.colors = platformColor.blockLabelsWheelcolors;
+            this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
             this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
             this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.7;
