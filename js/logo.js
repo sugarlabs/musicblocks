@@ -2185,15 +2185,14 @@ function Logo () {
             }
             break;
         case 'newturtle':
-            var cblk = that.blocks.blockList[blk].connections[1];
+            const  cblk =  that.blocks.blockList[blk].connections[1];
             var turtleName = that.parseArg(that, turtle, cblk, blk, receivedArg);
             if (that._getTargetTurtle(turtleName) === null) {
                 var blockNumber = that.blocks.blockList.length;
-
                 var x = that.turtles.turtleX2screenX(that.turtles.turtleList[turtle].x);
                 var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
-
                 var newBlock = [[0, 'start', x, y, [null, 1, null]], [1, 'setturtlename2', 0, 0, [0, 2, null]], [2, ['text', {'value': turtleName}], 0, 0, [1]]];
+    
                 var __afterLoad = function () {
                     console.log('AFTERLOAD');
                     var thisTurtle = that.blocks.blockList[blockNumber].value;
@@ -2204,18 +2203,12 @@ function Logo () {
                     that.parameterQueue[thisTurtle] = [];
                     that.turtles.turtleList[thisTurtle].running = true;
                     that._runFromBlock(that, thisTurtle, blockNumber, 0, receivedArg);
-                    // Dispatch an event to indicate that this turtle
+                    // // Dispatch an event to indicate that this turtle
                     // is running.
                     that.stage.dispatchEvent(turtleName);
                     document.removeEventListener('finishedLoading', __afterLoad);
                 };
-
-                if (document.addEventListener) {
-                    document.addEventListener('finishedLoading', __afterLoad);
-                } else {
-                    document.attachEvent('finishedLoading', __afterLoad);
-                }
-
+                document.addEventListener ? document.addEventListener('finishedLoading', __afterLoad): document.attachEvent('finishedLoading', __afterLoad);
                 that.blocks.loadNewBlocks(newBlock);
             } else {
                 console.log('Turtle ' + turtleName + ' already exists.');
@@ -2409,7 +2402,7 @@ function Logo () {
             }
 
             if (args.length > 0) {
-                var cblk = that.blocks.blockList[blk].connections[1];
+                const cblk = that.blocks.blockList[blk].connections[1];
                 if (that.blocks.blockList[cblk].name === 'text') {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
