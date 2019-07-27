@@ -1070,7 +1070,7 @@ function PitchTimeMatrix () {
             var setLabel = ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
         }
         
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 1300, 1300);
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
@@ -1166,7 +1166,7 @@ function PitchTimeMatrix () {
         }
 
         this.blockValue = blockLabelValue.toString();
-        this._exitWheel.createWheel(['x',this.blockValue ]);
+        this._exitWheel.createWheel(['x', '']);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
