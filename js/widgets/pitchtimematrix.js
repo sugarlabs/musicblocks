@@ -10,7 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
+const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setheading', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 // Deprecated
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
@@ -242,6 +242,12 @@ function PitchTimeMatrix () {
             that._sort();
         };
 
+        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add Note'));
+        cell.setAttribute('id', 'addnotes');
+        cell.onclick = function () {
+            that._createAddColumnPieSubmenu();
+        };
+
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
@@ -347,7 +353,7 @@ function PitchTimeMatrix () {
             var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 'px';
         } else {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 3) + 'px';
+            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 4) + 'px';
             var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
             outerDiv.style.width = w + 'px';
         }
@@ -444,6 +450,7 @@ function PitchTimeMatrix () {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 cell.setAttribute('alt', i+'__'+'drumblocks');
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -451,8 +458,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._createcolumnpiesubmenu(index,condition);
+                    that._createColumnPieSubmenu(index,condition);
                 }
+
                 this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = this.rowLabels[i];
@@ -462,6 +470,7 @@ function PitchTimeMatrix () {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 cell.setAttribute('alt', i+'__'+'synthsblocks');
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -469,13 +478,15 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition);
+                    that._createMatrixGraphicsPieSubmenu(index,condition,null);
                 }
+
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 cell.setAttribute('alt', i+'__'+'graphicsblocks')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -483,13 +494,15 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition);
+                    that._createMatrixGraphicsPieSubmenu(index,condition,null);
                 }
+
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 cell.setAttribute('alt', i+'__'+'graphicsblocks2')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -497,8 +510,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphic2spiesubmenu(index,condition);
+                    that._createMatrixGraphics2PieSubmenu(index, null);
                 }
+
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
@@ -509,6 +523,7 @@ function PitchTimeMatrix () {
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
                 }
                 cell.setAttribute('alt', i+'__'+'pitchblocks')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -516,8 +531,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._createcolumnpiesubmenu(index,condition);
+                    that._createColumnPieSubmenu(index,condition);
                 }
+
                 this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
@@ -569,14 +585,40 @@ function PitchTimeMatrix () {
         this._initial_h = ptmDiv.style.height;
     };
 
-    this._creatematrixgraphic2spiesubmenu = function(index, condition) {
+    this._createAddColumnPieSubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        const VALUES = ['pitch', 'hertz', 'drum', 'graphics'];
+        var valueLabel = [];
+        for (var i = 0; i < VALUES.length; i++) {
+            var label = _(VALUES[i]);
+            valueLabel.push(label);
+        }
 
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        var drumLabels = [];
+        for (var i = 0; i < DRUMS.length; i++) {
+                var label = _(DRUMS[i]);
+                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                    drumLabels.push(label.substr(0, 8) + '..');
+                } else {
+                    drumLabels.push(label);
+                }
+        }
+
+        const GRAPHICS = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
+        var graphicLabels = [];
+        for (var i = 0; i < GRAPHICS.length; i++) {
+            var label = _(GRAPHICS[i]);
+            if (getTextWidth(label, 'bold 30pt Sans') > 200) {
+                graphicLabels.push(label.substr(0, 8) + '..');
+            } else {
+                graphicLabels.push(label);
+            }
+        }
+
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
-        this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
-        var blockLabels = MATRIXGRAPHICS2.slice();
+        this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
+        this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -584,26 +626,314 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = platformColor.pitchWheelcolors;        
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.25;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.clickModeRotate = false;
+        this._pitchWheel.titleRotateAngle = 90;
+
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(valueLabel);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        this._drumWheel.colors = platformColor.drumWheelcolors;
+        this._drumWheel.slicePathFunction = slicePath().DonutSlice;
+        this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._drumWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._drumWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._drumWheel.sliceSelectedPathCustom = this._drumWheel.slicePathCustom;
+        this._drumWheel.sliceInitPathCustom = this._drumWheel.slicePathCustom;
+        this._drumWheel.clickModeRotate = false;
+        this._drumWheel.titleRotateAngle = 0;
+        this._drumWheel.createWheel(drumLabels);
+
+        for(var i = 0; i < drumLabels.length;i++) {
+            this._drumWheel.navItems[i].navItem.hide();
+        }
+
+        this._graphicWheel.colors = platformColor.graphicWheelcolors;
+        this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
+        this._graphicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._graphicWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._graphicWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._graphicWheel.sliceSelectedPathCustom = this._graphicWheel.slicePathCustom;
+        this._graphicWheel.sliceInitPathCustom = this._graphicWheel.slicePathCustom;
+        this._graphicWheel.clickModeRotate = false;
+        this._graphicWheel.titleRotateAngle = 0;
+
+        this._graphicWheel.createWheel(graphicLabels);
+
+        for(var i = 0; i < graphicLabels.length;i++) {
+            this._graphicWheel.navItems[i].navItem.hide();
+        }
+
+        var x = docById('addnotes').getBoundingClientRect().x;
+        var y = docById('addnotes').getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that._drumWheel.removeWheel();
+            that._graphicWheel.removeWheel();
+        };
+
+        var __subMenuChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            if (label === 'pitch') {
+                __selectionChanged();
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
+                }
+            } else if (label === 'hertz') {
+                __selectionChanged();
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
+                }
+            } else if (label === 'graphics') {
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.show();
+                }
+            } else if (label === 'drum') {
+                for(var i = 0; i < graphicLabels.length;i++) {
+                    that._graphicWheel.navItems[i].navItem.hide();
+                }
+                for(var i = 0; i < drumLabels.length;i++) {
+                    that._drumWheel.navItems[i].navItem.show();
+                }
+            }
+        }
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            var rLabel = null;
+            var rArg = null;
+            var blockLabel = '';    
+            if (label === 'pitch') {
+                const BLOCKOBJ = [[0,["pitch",{}],0,0,[null,1,2,null]],[1,["solfege",{"value":"sol"}],0,0,[0]],[2,["number",{"value":4}],0,0,[0]]];
+                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                var n = that._logo.blocks.blockList.length - 3;
+                rLabel = 'sol';
+                rArg = 4;
+            } else if (label === 'hertz') {
+                const BLOCKOBJ = [[0,["hertz",{}],0,0,[null,1,null]],[1,["number",{"value":392}],0,0,[0]]];
+                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                var n = that._logo.blocks.blockList.length - 2;
+                rLabel = 'hertz';
+                rArg = 392;
+            } else if (label === 'drum') {
+                blockLabel = DRUMS[that._drumWheel.selectedNavItemIndex];
+                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":blockLabel}],0,0,[0]]];
+                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                var n = that._logo.blocks.blockList.length - 2;
+                rLabel = blockLabel;
+                rArg = -1;
+            } else if (label === 'graphics') {
+                blockLabel = GRAPHICS[that._graphicWheel.selectedNavItemIndex];
+                var val = 100;
+                if (blockLabel === 'setcolor'){
+                    val = 0;
+                }
+
+                var BLOCKOBJ = [];
+                if (blockLabel === 'arc' || blockLabel === 'setxy'){
+                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
+                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                    var n = that._logo.blocks.blockList.length - 3;
+                    rArg = [90, 100];
+                } else {
+                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
+                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                    var n = that._logo.blocks.blockList.length - 2;
+                    rArg = val;
+                }
+                rLabel = blockLabel;
+            }
+
+            var blocksNo = null;
+            var aboveBlock = null;
+            
+            switch (label) {
+                case 'graphics':
+                    for(var i = graphicLabels.length - 1; i >= 0; i--) {
+                        blocksNo = that._mapNotesBlocks(graphicLabels[i]);
+                        if(blocksNo.length >= 1){
+                            aboveBlock = last(blocksNo);
+                            break;
+                        }
+                    }
+                    if (aboveBlock !== null){
+                        break;
+                    }
+                case 'drum':
+                    blocksNo = that._mapNotesBlocks("drumname");
+                    if(blocksNo.length >= 1){
+                        aboveBlock = last(blocksNo);
+                    }
+                    if (aboveBlock !== null){
+                        break;
+                    }
+                case 'hertz':
+                    blocksNo = that._mapNotesBlocks("hertz");
+                    if(blocksNo.length >= 1){
+                        aboveBlock = last(blocksNo);
+                    }
+                    if (aboveBlock !== null){
+                        break;
+                    }
+                case 'pitch':
+                    blocksNo = that._mapNotesBlocks("pitch");
+                    if(blocksNo.length >= 1){
+                        aboveBlock = last(blocksNo);
+                    }
+                    if (aboveBlock !== null){
+                        break;
+                    }
+                default:
+                    aboveBlock = that.blockNo
+            }
+
+            if (aboveBlock === that.blockNo){
+                setTimeout(that._addNotesBlockBetween(aboveBlock, n, true), 500);
+                that.rowLabels.splice(0,0,rLabel);
+                that.rowArgs.splice(0,0,rArg);
+                that._rowBlocks.splice(0,0,n);
+
+            } else {
+                setTimeout(that._addNotesBlockBetween(aboveBlock, n, false), 500);
+                for (var i = 0; i < that.columnBlocksMap.length; i++){
+                    if(that.columnBlocksMap[i][0] === aboveBlock) {
+                        break;
+                    }
+                }
+                that.rowLabels.splice(i+1,0,rLabel);
+                that.rowArgs.splice(i+1,0,rArg);
+                that._rowBlocks.splice(i+1,0,n);
+            }
+
+            that.sorted = false;
+            that.init(that._logo);
+            for (var i = 0; i < that._logo.tupletRhythms.length; i++) {
+                switch (that._logo.tupletRhythms[i][0]) {
+                case 'simple':
+                case 'notes':
+                    var tupletParam = [that._logo.tupletParams[i]];
+                    tupletParam.push([]);
+                    for (var j = 2; j < that._logo.tupletRhythms[i].length; j++) {
+                        tupletParam[1].push(that._logo.tupletRhythms[i][j]);
+                    }
+    
+                    that.addTuplet(tupletParam);
+                    break;
+                default:
+                    that.addNotes(that._logo.tupletRhythms[i][1], that._logo.tupletRhythms[i][2]);
+                    break;
+                }
+            }
+            that.makeClickable();
+            if (label === 'pitch') {
+                setTimeout(function() {
+                    that.pitchBlockAdded(n)
+                }, 200);
+            }
+        }
+        for (var i = 0; i < valueLabel.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __subMenuChanged;
+        }
+        for (var i = 0; i < drumLabels.length; i++) {
+            this._drumWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+        for (var i = 0; i < graphicLabels.length; i++) {
+            this._graphicWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+    }
+
+    this.pitchBlockAdded = function(blockN) {
+        for (var i = 0; i < this.columnBlocksMap.length; i++){
+            if(this.columnBlocksMap[i][0] === blockN) {
+                break;
+            }
+        }
+
+        setTimeout(this._createColumnPieSubmenu(i,'pitchblocks',true) , 500);
+    }
+
+    this._createMatrixGraphics2PieSubmenu = function(index, blk) {
+        docById('wheelDivptm').style.display = '';
+        var arcRadiusLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        var arcAngleLabel = ['0', '30', '45', '60', '90', '180'];
+        var setxyValueLabel = ['-200', '-100', '0', '100', '200'];
+
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
+        this._blockLabelsWheel2 = new wheelnav('_blockLabelsWheel2', this._pitchWheel.raphael);
+        var blockLabels = MATRIXGRAPHICS2.slice();
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.475;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.clickModeRotate = false;
 
         this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(valueLabel);
 
-        this._exitWheel.colors = platformColor.exitWheelcolors2;
+        this._blockLabelsWheel2.colors = platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel2.slicePathFunction = slicePath().DonutSlice;
+        this._blockLabelsWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.525;
+        this._blockLabelsWheel2.slicePathCustom.maxRadiusPercent = 0.8;
+        this._blockLabelsWheel2.sliceSelectedPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.sliceInitPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.clickModeRotate = false;
+        // this._blockLabelsWheel.titleRotateAngle = 90;
+        this._blockLabelsWheel2.animatetime = 0; // 300;
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
 
-        this._blockLabelsWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
         this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
         this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
@@ -618,104 +948,65 @@ function PitchTimeMatrix () {
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
+        if (blk !== null) {
+            block = blk;
+        }
+
         var blockLabel = this._logo.blocks.blockList[block].name;
         var xblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         var yblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
         
+        if (blockLabel === 'arc') {
+            this._blockLabelsWheel2.createWheel(arcAngleLabel);
+            this._pitchWheel.createWheel(arcRadiusLabel);
+        } else if (blockLabel === 'setxy') {
+            this._blockLabelsWheel2.createWheel(setxyValueLabel);
+            this._pitchWheel.createWheel(setxyValueLabel);
+        }
+
         this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
         
         this.xblockValue = [xblockLabelValue.toString(),'x'];
         this.yblockValue = [yblockLabelValue.toString(),'y'];
-        this._exitWheel.createWheel(['x', this.yblockValue[0], this.xblockValue[0]]);
-        this.blockValue = this.xblockValue;
-        this.x = true;
+        this._exitWheel.createWheel(['x', '']);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDivptm').style.display = 'none';
             that._pitchWheel.removeWheel();
             that._exitWheel.removeWheel();
-            if (condition === 'graphicsblocks') {
-                that._blockLabelsWheel.removeWheel();
-            }
-        };
-        this._exitWheel.navItems[1].navigateFunction = function () {
-            that.x = false;
-            docById('wheelnav-_exitWheel-slice-1').setAttribute("fill", '#80a080');
-            docById('wheelnav-_exitWheel-slice-2').setAttribute("fill", '#a08080');
-            docById('wheelnav-_exitWheel-slice-1').style.fill = '#80a080';
-            docById('wheelnav-_exitWheel-slice-2').style.fill = '#a08080';
-            that._exitWheel.colors[1] = '#80a080';
-            that._exitWheel.colors[2] = '#a08080';
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
-            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
-        };
-        this._exitWheel.navItems[2].navigateFunction = function () {
-            that.x = true;
-            docById('wheelnav-_exitWheel-slice-1').setAttribute("fill", '#a08080');
-            docById('wheelnav-_exitWheel-slice-2').setAttribute("fill", '#80a080');
-            docById('wheelnav-_exitWheel-slice-1').style.fill = '#a08080';
-            docById('wheelnav-_exitWheel-slice-2').style.fill = '#80a080';
-            that._exitWheel.colors[1] = '#a08080';
-            that._exitWheel.colors[2] = '#80a080';
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
-            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
+            that._blockLabelsWheel.removeWheel();
+            that._blockLabelsWheel2.removeWheel();
         };
 
         var __enterValue = function () {
-            var i = that._pitchWheel.selectedNavItemIndex;
-            var value = valueLabel[i];
-            if (that.x) {
-                that.blockValue = that.xblockValue;
-            } else {
-                that.blockValue = that.yblockValue;
-            }
-            if (that.blockValue[0].length === 3) {
-                return;
-            }
-            if (that.blockValue[0] === '0') {
-                that.blockValue[0] = value;
-            } else {
-                that.blockValue[0] = that.blockValue[0]+value;
-            }
-            if (that.blockValue[1] === 'x') {
-                docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
-            }else{
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
-            }
-            
-
-        }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.x) {
-                that.blockValue = that.xblockValue;
-            } else {
-                that.blockValue = that.yblockValue;
-            }
-            if (that.blockValue[0].length === 1) {
-                that.blockValue[0] = '0';
-            } else {
-                that.blockValue[0] = that.blockValue[0].slice(0, that.blockValue[0].length-1);
-            }
-            if (that.blockValue[1] === 'x') {
-                docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.blockValue[0];
-            }else{
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue[0];
-            }
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
+            that.xblockValue[0] = that._blockLabelsWheel2.navItems[that._blockLabelsWheel2.selectedNavItemIndex].title;
             __selectionChanged(false);
         }
-        for (var i = 2; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+        var __enterValue2 = function () {
+            that.yblockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            __selectionChanged(false);
+        }
+
+        if (blockLabel === 'arc') {
+            for (var i = 0; i < arcRadiusLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
+            }
+            for (var i = 0; i < arcAngleLabel.length; i++) {
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
+            }
+        } else if (blockLabel === 'setxy') {
+            for (var i = 0; i < setxyValueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
+            }
         }
 
         var __selectionChanged = function (newBlock) {
@@ -724,9 +1015,12 @@ function PitchTimeMatrix () {
                 const MATRIXGRAPHICSOBJ = [[0,[label,{}],0,0,[null,1,2,null]],[1,["number",{"value":parseInt(that.xblockValue[0])}],0,0,[0]],[2,["number",{"value":parseInt(that.yblockValue[0])}],0,0,[0]]]
                 that._logo.blocks.loadNewBlocks(MATRIXGRAPHICSOBJ);
                 var n = that._logo.blocks.blockList.length - 3;
-                setTimeout(that._blockReplace(block, n), 500);
+                setTimeout(that._blockReplace(block, n), 100);
                 that.columnBlocksMap[index][0] = n;
                 block = n;
+                setTimeout(function() {
+                    that._createMatrixGraphics2PieSubmenu(index,n)
+                }, 500);
             }
             that.rowLabels[index] = label;
 
@@ -777,73 +1071,116 @@ function PitchTimeMatrix () {
         }
     }
 
-    this._creatematrixgraphicspiesubmenu = function(index, condition) {
+    this._createMatrixGraphicsPieSubmenu = function(index, condition, blk) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0']
+        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        if (condition === 'synthsblocks'){
+            valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
+        } else if (condition === 'graphicsblocks') {
+            valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+            var fwdbkLabel = ['1', '5', '10', '25', '50', '100', '200'];
+            var lrLabel = ['15', '30', '45', '60', '90', '180'];
+            var sheadingLabel = ['0', '45', '90', '135', '180', '225', '270', '315'];
+            var spensizeLabel = ['1', '5', '10', '25', '50'];
+            var setLabel = ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        }
         
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 1300, 1300);
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
-            var blockLabels = MATRIXGRAPHICS.slice();
+            var blockLabels1 = [];
+            var blockLabels2 = [];
+            for (var i = 0; i < 5; i++) {
+                var label = _(MATRIXGRAPHICS[i]);
+                blockLabels1.push(label);
+            }
+            for (var i = 5; i < MATRIXGRAPHICS.length; i++) {
+                var label = _(MATRIXGRAPHICS[i]);
+                blockLabels2.push(label);
+            }
         }
         wheelnav.cssMode = true;
 
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;        
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.525;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.clickModeRotate = false;
 
         this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(valueLabel);
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         
         if (condition === 'graphicsblocks') {
-            this._blockLabelsWheel.colors = platformColor.blockLabelsWheelcolors;
+            this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
             this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
             this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.7;
+            this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
             this._blockLabelsWheel.slicePathCustom.maxRadiusPercent = 1;
             this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.clickModeRotate = false;
             this._blockLabelsWheel.titleRotateAngle = 90;
             this._blockLabelsWheel.animatetime = 0; // 300;
-            this._blockLabelsWheel.createWheel(blockLabels);
         }
 
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
+        if (blk !== null) {
+            block = blk;
+        }
+
         var blockLabel = this._logo.blocks.blockList[block].name;
         var blockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         if (condition === 'graphicsblocks') {
-            this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                this._pitchWheel.createWheel(fwdbkLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                this._pitchWheel.createWheel(lrLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'setheading') {
+                this._pitchWheel.createWheel(sheadingLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'setpensize') {
+                this._pitchWheel.createWheel(spensizeLabel);
+                this._blockLabelsWheel.createWheel(blockLabels2);
+                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
+            } else{
+                this._pitchWheel.createWheel(setLabel);
+                this._blockLabelsWheel.createWheel(blockLabels2);
+                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
+            }
+        } else if (condition === 'synthsblocks') {
+            this._pitchWheel.createWheel(valueLabel);
         }
+
         this.blockValue = blockLabelValue.toString();
-        this._exitWheel.createWheel(['x',this.blockValue ]);
+        this._exitWheel.createWheel(['x', '']);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
@@ -856,32 +1193,37 @@ function PitchTimeMatrix () {
         };
 
         var __enterValue = function () {
-            var i = that._pitchWheel.selectedNavItemIndex;
-            var value = valueLabel[i];
-            if (that.blockValue.length === 3) {
-                return;
-            }
-            if (that.blockValue === '0') {
-                that.blockValue = value;
-            } else {
-                that.blockValue = that.blockValue+value;
-            }
+            that.blockValue = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-
-        }
-        this._pitchWheel.navItems[0].navigateFunction = function () {
-            if (that.blockValue.length === 1) {
-                that.blockValue = '0';
-            } else {
-                that.blockValue = that.blockValue.slice(0,that.blockValue.length-1);
-            }
-            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
-        }
-        this._pitchWheel.navItems[1].navigateFunction = function () {
             __selectionChanged(false);
         }
-        for (var i = 2; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+
+        if (condition === 'graphicsblocks') {
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < fwdbkLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < lrLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < sheadingLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < spensizeLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else{
+                for (var i = 0; i < setLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            }
+        } else if (condition === 'synthsblocks') {
+            for (var i = 0; i < valueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+            }
         }
 
         var __selectionChanged = function (newBlock) {
@@ -896,8 +1238,10 @@ function PitchTimeMatrix () {
                     setTimeout(that._blockReplace(block, n), 500);
                     that.columnBlocksMap[index][0] = n;
                     block = n;
+                    setTimeout(function() {
+                        that._createMatrixGraphicsPieSubmenu(index, condition, n);
+                    }, 500);
                 }
-                
                 
                 that.rowLabels[index] = label;
             }
@@ -945,21 +1289,44 @@ function PitchTimeMatrix () {
             }
             that._noteStored[index] = that.rowLabels[index] + ':' + that.rowArgs[index];
         }
+
         if (condition === 'graphicsblocks') {
-            for (var i = 0; i < blockLabels.length; i++) {
-                this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < blockLabels2.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else{
+                for (var i = 0; i < blockLabels2.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
             }
         }
-
     }
 
-    this._createcolumnpiesubmenu = function(index, condition) {
+    this._createColumnPieSubmenu = function(index, condition, sortedClose) {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
 
         var accidentals = [ "𝄪", "♯", "♮", "♭", "𝄫" ];
         var noteLabels = [ "ti", "la", "sol", "fa", "mi", "re", "do" ];
-        var drumLabels = [ "snare drum", "kick drum", "tom tom", "floor tom tom", "cup drum", "darbuka drum", "japanese drum", "hi hat", "ride bell", "cow bell", "triangle bell", "finger cymbals", "chime", "gong", "clang", "crash", "clap", "slap"]
+        var drumLabels = [];
+        for (var i = 0; i < DRUMS.length; i++) {
+            var label = _(DRUMS[i]);
+            drumLabels.push(label);
+            
+        }
 
         if (condition === 'drumblocks') {
             noteLabels = drumLabels;
@@ -1000,6 +1367,7 @@ function PitchTimeMatrix () {
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
         }
+
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -1054,11 +1422,10 @@ function PitchTimeMatrix () {
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
         
         var block = this.columnBlocksMap[index][0];
@@ -1089,6 +1456,10 @@ function PitchTimeMatrix () {
             if (condition === 'pitchblocks') {
                 that._accidentalsWheel.removeWheel();
                 that._octavesWheel.removeWheel();
+            }
+
+            if (sortedClose === true) {
+                that._sort();
             }
         };
 
@@ -1268,6 +1639,22 @@ function PitchTimeMatrix () {
 
         this._logo.refreshCanvas();
     };
+
+    this._addNotesBlockBetween = function(aboveBlock, block, topBlock) {
+        if (topBlock) {
+            var belowBlock = this._logo.blocks.blockList[aboveBlock].connections[1];
+            this._logo.blocks.blockList[aboveBlock].connections[1] = block;
+        } else {
+            var belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
+            this._logo.blocks.blockList[aboveBlock].connections[this._logo.blocks.blockList[aboveBlock].connections.length - 1] = block;
+        }
+        this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        this._logo.blocks.blockList[block].connections[this._logo.blocks.blockList[block].connections.length - 1] = belowBlock;   
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
 
     this._removePitchBlock = function(blockNo) {
         var c0 = this._logo.blocks.blockList[blockNo].connections[0];
@@ -2004,7 +2391,6 @@ function PitchTimeMatrix () {
         this._logo.blocks.refreshCanvas();
     };
 
-
     this._update = function (i, value, k, noteCase) {
         var updates = [];
         value = toFraction(value);
@@ -2032,7 +2418,6 @@ function PitchTimeMatrix () {
         }
         saveLocally();
     }
-
 
     this._mapNotesBlocks = function(blockName, withName) {
         var notesBlockMap = [];
@@ -2270,19 +2655,19 @@ function PitchTimeMatrix () {
                 if (i == noteToDivide) {
                     break;
                 }
-                for (var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[k], [k]]);
                     k++;
                 }
             }
-            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
                 this._blockMapHelper.push([this._colBlocks[k], [k]]);
                 k++;
             }
             var l = k;
             k = k + newTupletValue - oldTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for (var j = 0; j<this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j = 0; j<this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2297,7 +2682,7 @@ function PitchTimeMatrix () {
                 if (i == noteToDivide) {
                     break;
                 }
-                for (var j = 0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j = 0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[k], [k]]);
                     k++;
                 }
@@ -2306,13 +2691,13 @@ function PitchTimeMatrix () {
             for (var i = oldTupletValue; i > newTupletValue; i--) {
                 this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length -1);
             }
-            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
                 this._blockMapHelper.push([this._colBlocks[k], [k]]);
                 k++;
             }
             var l = k+ oldTupletValue - newTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for(var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for(var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2322,7 +2707,7 @@ function PitchTimeMatrix () {
         var notesBlockMap =  this._mapNotesBlocks('stuplet');
         var colBlocks = [];
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            for (var j =0 ; j < this._logo.tupletRhythms[i].length-2;  j++) {
+            for (var j =0 ; j < this._logo.tupletRhythms[i].length - 2;  j++) {
                 colBlocks.push([notesBlockMap[i], j]);
             }
         }
@@ -2409,6 +2794,7 @@ function PitchTimeMatrix () {
             }
 
         }
+
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
@@ -2586,6 +2972,7 @@ function PitchTimeMatrix () {
                     cell.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),null,'simpletupletnote');
                     }
+
                     cellTuplet.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
                     }
