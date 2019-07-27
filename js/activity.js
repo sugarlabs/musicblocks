@@ -2798,8 +2798,10 @@ function Activity() {
 
         // Show and populate printText div
         var printText = document.getElementById("printText");
-        printText.innerHTML = msg;
         printText.classList.add("show");
+
+        var printTextContent = document.getElementById("printTextContent");
+        printTextContent.innerHTML = msg;
 
     };
 

@@ -1366,7 +1366,7 @@ input.timbreName {
     top: 130px;
     left: 50%;
     margin-left: -500px;
-    padding-top: 10px;
+    padding-top: 2px;
     border: 2px solid rgb(150, 150, 150);
     border-radius: 8px;
     background-color: white;
@@ -1381,4 +1381,16 @@ input.timbreName {
 
   #printText.show {
     visibility: visible;
+  }
+
+  #printText #printTextContent {
+    display: inline-block;
+    width: 940px;
+    vertical-align: 7px;
+  }
+
+  #printText #closeIcon {
+    width: 28px;
+    height: 28px;
+    filter: invert(100%);
   }
