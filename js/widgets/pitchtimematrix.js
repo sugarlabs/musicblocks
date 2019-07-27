@@ -503,7 +503,7 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphic2spiesubmenu(index,condition);
+                    that._creatematrixgraphic2spiesubmenu(index, null);
                 }
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
@@ -870,9 +870,11 @@ function PitchTimeMatrix () {
         setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks',true) ,500);
     }
 
-    this._creatematrixgraphic2spiesubmenu = function(index, condition) {
+    this._creatematrixgraphic2spiesubmenu = function(index, blk) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+        var innerValueLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        var outerValueLabel = ['0', '30', '45', '60', '90', '180'];
+        var setxyValueLabel = ['0', '50', '100', '150', '200'];
 
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
@@ -887,26 +889,24 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.55;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.475;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.clickModeRotate = false;
 
         this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(valueLabel);
 
         this._blockLabelsWheel2.colors = platformColor.blockLabelsWheelcolors;
         this._blockLabelsWheel2.slicePathFunction = slicePath().DonutSlice;
         this._blockLabelsWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.6;
+        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.525;
         this._blockLabelsWheel2.slicePathCustom.maxRadiusPercent = 0.8;
         this._blockLabelsWheel2.sliceSelectedPathCustom = this._blockLabelsWheel2.slicePathCustom;
         this._blockLabelsWheel2.sliceInitPathCustom = this._blockLabelsWheel2.slicePathCustom;
         this._blockLabelsWheel2.clickModeRotate = false;
         // this._blockLabelsWheel.titleRotateAngle = 90;
         this._blockLabelsWheel2.animatetime = 0; // 300;
-        this._blockLabelsWheel2.createWheel(valueLabel);
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -940,10 +940,20 @@ function PitchTimeMatrix () {
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
+        if (blk !== null) {
+            block = blk;
+        }
         var blockLabel = this._logo.blocks.blockList[block].name;
         var xblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         var yblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
         
+        if (blockLabel === 'arc') {
+            this._blockLabelsWheel2.createWheel(outerValueLabel);
+            this._pitchWheel.createWheel(innerValueLabel);
+        } else if (blockLabel === 'setxy') {
+            this._blockLabelsWheel2.createWheel(setxyValueLabel);
+            this._pitchWheel.createWheel(setxyValueLabel);
+        }
         this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
         
         this.xblockValue = [xblockLabelValue.toString(),'x'];
@@ -961,19 +971,26 @@ function PitchTimeMatrix () {
 
         var __enterValue = function () {
             that.xblockValue[0] = that._blockLabelsWheel2.navItems[that._blockLabelsWheel2.selectedNavItemIndex].title;
-            docById('wheelnav-_exitWheel-title-2').children[0].textContent = that.xblockValue[0];
             __selectionChanged(false);
         }
         var __enterValue2 = function () {
             that.yblockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.yblockValue[0];
             __selectionChanged(false);
         }
-
-        for (var i = 0; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
-            this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
+        if (blockLabel === 'arc') {
+            for (var i = 0; i < innerValueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
+            }
+            for (var i = 0; i < outerValueLabel.length; i++) {
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
+            }
+        } else if (blockLabel === 'setxy') {
+            for (var i = 0; i < setxyValueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
+            }
         }
+        
 
         var __selectionChanged = function (newBlock) {
             var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
@@ -981,9 +998,12 @@ function PitchTimeMatrix () {
                 const MATRIXGRAPHICSOBJ = [[0,[label,{}],0,0,[null,1,2,null]],[1,["number",{"value":parseInt(that.xblockValue[0])}],0,0,[0]],[2,["number",{"value":parseInt(that.yblockValue[0])}],0,0,[0]]]
                 that._logo.blocks.loadNewBlocks(MATRIXGRAPHICSOBJ);
                 var n = that._logo.blocks.blockList.length - 3;
-                setTimeout(that._blockReplace(block, n), 500);
+                setTimeout(that._blockReplace(block, n), 100);
                 that.columnBlocksMap[index][0] = n;
                 block = n;
+                setTimeout(function() {
+                    that._creatematrixgraphic2spiesubmenu(index,n)
+                },500);
             }
             that.rowLabels[index] = label;
 
