@@ -2796,12 +2796,13 @@ function Activity() {
             return;
         }
 
-        var msgContainer = msgText.parent;
-        msgContainer.visible = true;
-        msgText.text = msg;
-        msgContainer.updateCache();
-        stage.setChildIndex(msgContainer, stage.children.length - 1);
-        refreshCanvas();
+        // Show and populate printText div
+        var printText = document.getElementById("printText");
+        printText.classList.add("show");
+
+        var printTextContent = document.getElementById("printTextContent");
+        printTextContent.innerHTML = msg;
+
     };
 
     errorMsg = function (msg, blk, text, timeout) {
