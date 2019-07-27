@@ -10,7 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
+const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setheading', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
 // Deprecated
 const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
@@ -475,7 +475,7 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition);
+                    that._creatematrixgraphicspiesubmenu(index,condition,null);
                 }
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
@@ -489,7 +489,7 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition);
+                    that._creatematrixgraphicspiesubmenu(index,condition,null);
                 }
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
@@ -874,9 +874,9 @@ function PitchTimeMatrix () {
 
     this._creatematrixgraphic2spiesubmenu = function(index, blk) {
         docById('wheelDivptm').style.display = '';
-        var innerValueLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
-        var outerValueLabel = ['0', '30', '45', '60', '90', '180'];
-        var setxyValueLabel = ['0', '50', '100', '150', '200'];
+        var arcRadiusLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        var arcAngleLabel = ['0', '30', '45', '60', '90', '180'];
+        var setxyValueLabel = ['-200', '-100', '0', '100', '200'];
 
         this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
@@ -950,8 +950,8 @@ function PitchTimeMatrix () {
         var yblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
         
         if (blockLabel === 'arc') {
-            this._blockLabelsWheel2.createWheel(outerValueLabel);
-            this._pitchWheel.createWheel(innerValueLabel);
+            this._blockLabelsWheel2.createWheel(arcAngleLabel);
+            this._pitchWheel.createWheel(arcRadiusLabel);
         } else if (blockLabel === 'setxy') {
             this._blockLabelsWheel2.createWheel(setxyValueLabel);
             this._pitchWheel.createWheel(setxyValueLabel);
@@ -980,10 +980,10 @@ function PitchTimeMatrix () {
             __selectionChanged(false);
         }
         if (blockLabel === 'arc') {
-            for (var i = 0; i < innerValueLabel.length; i++) {
+            for (var i = 0; i < arcRadiusLabel.length; i++) {
                 this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
             }
-            for (var i = 0; i < outerValueLabel.length; i++) {
+            for (var i = 0; i < arcAngleLabel.length; i++) {
                 this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
             }
         } else if (blockLabel === 'setxy') {
@@ -1056,23 +1056,33 @@ function PitchTimeMatrix () {
         }
     }
 
-    this._creatematrixgraphicspiesubmenu = function(index, condition) {
+    this._creatematrixgraphicspiesubmenu = function(index, condition, blk) {
         docById('wheelDivptm').style.display = '';
         var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
         if (condition === 'synthsblocks'){
             valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
         } else if (condition === 'graphicsblocks') {
             valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+            var fwdbkLabel = ['1', '5', '10', '25', '50', '100', '200'];
+            var lrLabel = ['15', '30', '45', '60', '90', '180'];
+            var sheadingLabel = ['0', '45', '90', '135', '180', '225', '270', '315'];
+            var spensizeLabel = ['1', '5', '10', '25', '50'];
+            var setLabel = ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
         }
         
         this._pitchWheel = new wheelnav('wheelDivptm', null, 1300, 1300);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         if (condition === 'graphicsblocks') {
             this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
-            var blockLabels = [];
-            for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
+            var blockLabels1 = [];
+            var blockLabels2 = [];
+            for (var i = 0; i < 5; i++) {
                 var label = _(MATRIXGRAPHICS[i]);
-                blockLabels.push(label);
+                blockLabels1.push(label);
+            }
+            for (var i = 5; i < MATRIXGRAPHICS.length; i++) {
+                var label = _(MATRIXGRAPHICS[i]);
+                blockLabels2.push(label);
             }
         }
         wheelnav.cssMode = true;
@@ -1089,7 +1099,7 @@ function PitchTimeMatrix () {
         this._pitchWheel.clickModeRotate = false;
 
         this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(valueLabel);
+        
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1111,7 +1121,6 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel.clickModeRotate = false;
             this._blockLabelsWheel.titleRotateAngle = 90;
             this._blockLabelsWheel.animatetime = 0; // 300;
-            this._blockLabelsWheel.createWheel(blockLabels);
         }
 
         var x = docById('labelcol' + index).getBoundingClientRect().x;
@@ -1125,11 +1134,37 @@ function PitchTimeMatrix () {
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
+        if (blk !== null) {
+            block = blk;
+        }
         var blockLabel = this._logo.blocks.blockList[block].name;
         var blockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         if (condition === 'graphicsblocks') {
-            this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                this._pitchWheel.createWheel(fwdbkLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                this._pitchWheel.createWheel(lrLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'setheading') {
+                this._pitchWheel.createWheel(sheadingLabel);
+                this._blockLabelsWheel.createWheel(blockLabels1);
+                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
+            } else if (blockLabel === 'setpensize') {
+                this._pitchWheel.createWheel(spensizeLabel);
+                this._blockLabelsWheel.createWheel(blockLabels2);
+                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
+            } else{
+                this._pitchWheel.createWheel(setLabel);
+                this._blockLabelsWheel.createWheel(blockLabels2);
+                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
+            }
+        } else if (condition === 'synthsblocks') {
+            this._pitchWheel.createWheel(valueLabel);
         }
+
         this.blockValue = blockLabelValue.toString();
         this._exitWheel.createWheel(['x',this.blockValue ]);
 
@@ -1148,10 +1183,34 @@ function PitchTimeMatrix () {
             docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
             __selectionChanged(false);
         }
-        
-        for (var i = 0; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+        if (condition === 'graphicsblocks') {
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < fwdbkLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < lrLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < sheadingLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < spensizeLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            } else{
+                for (var i = 0; i < setLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+                }
+            }
+        } else if (condition === 'synthsblocks') {
+            for (var i = 0; i < valueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterValue;
+            }
         }
+        
 
         var __selectionChanged = function (newBlock) {
             if (condition === 'graphicsblocks') {
@@ -1165,6 +1224,9 @@ function PitchTimeMatrix () {
                     setTimeout(that._blockReplace(block, n), 500);
                     that.columnBlocksMap[index][0] = n;
                     block = n;
+                    setTimeout(function() {
+                        that._creatematrixgraphicspiesubmenu(index, condition, n);
+                    },500);
                 }
                 
                 
@@ -1215,8 +1277,26 @@ function PitchTimeMatrix () {
             that._noteStored[index] = that.rowLabels[index] + ':' + that.rowArgs[index];
         }
         if (condition === 'graphicsblocks') {
-            for (var i = 0; i < blockLabels.length; i++) {
-                this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < blockLabels1.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < blockLabels2.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else{
+                for (var i = 0; i < blockLabels2.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
             }
         }
 
