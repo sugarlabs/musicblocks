@@ -167,7 +167,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('change in pitch'));
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
-    if (beginnerMode && !beginnerBlock('deltapitch')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('deltapitch')) {
         newblock.hidden = true;
     }
 
@@ -178,7 +178,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('scalar change in pitch'));
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
-    if (beginnerMode && !beginnerBlock('deltapitch2')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('deltapitch2')) {
         newblock.hidden = true;
     }
 
