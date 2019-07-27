@@ -206,6 +206,16 @@
   <div id="hideContents" style="display: none;">
 
     <div class="canvasHolder" id="canvasHolder">
+
+      <div id="printText" onclick="hidePrintText()"></div>
+
+      <script>
+        function hidePrintText() {
+          var printText = document.getElementById("printText");
+          printText.classList.remove("show");
+        }
+      </script>
+
       <canvas id="myCanvas" width="1200" height="900">
       </canvas>
 
@@ -594,6 +604,7 @@
       <ul id="newdropdown" class="dropdown-content">
         <li><a id="new-project"></a></li>
       </ul>
+
     </div>
 
   </div> <!-- hideContents -->
