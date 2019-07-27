@@ -245,7 +245,7 @@ function PitchTimeMatrix () {
         var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add Note'));
         cell.setAttribute('id', 'addnotes');
         cell.onclick = function () {
-            that._createaddcolumnpiesubmenu();
+            that._createAddColumnPieSubmenu();
         };
 
         // We use this cell as a handle for dragging.
@@ -450,6 +450,7 @@ function PitchTimeMatrix () {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 cell.setAttribute('alt', i+'__'+'drumblocks');
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -457,8 +458,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._createcolumnpiesubmenu(index,condition);
+                    that._createColumnPieSubmenu(index,condition);
                 }
+
                 this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = this.rowLabels[i];
@@ -468,6 +470,7 @@ function PitchTimeMatrix () {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
                 cell.setAttribute('alt', i+'__'+'synthsblocks');
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -475,13 +478,15 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition,null);
+                    that._createMatrixGraphicsPieSubmenu(index,condition,null);
                 }
+
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 cell.setAttribute('alt', i+'__'+'graphicsblocks')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -489,13 +494,15 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphicspiesubmenu(index,condition,null);
+                    that._createMatrixGraphicsPieSubmenu(index,condition,null);
                 }
+
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
                 cell.setAttribute('alt', i+'__'+'graphicsblocks2')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -503,8 +510,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._creatematrixgraphic2spiesubmenu(index, null);
+                    that._createMatrixGraphics2PieSubmenu(index, null);
                 }
+
                 this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
@@ -515,6 +523,7 @@ function PitchTimeMatrix () {
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
                 }
                 cell.setAttribute('alt', i+'__'+'pitchblocks')
+
                 cell.onclick = function(event) {
                     cell = event.target;
                     if (cell.getAttribute('alt') === null) {
@@ -522,8 +531,9 @@ function PitchTimeMatrix () {
                     }
                     var index = cell.getAttribute('alt').split('__')[0]
                     var condition = cell.getAttribute('alt').split('__')[1]
-                    that._createcolumnpiesubmenu(index,condition);
+                    that._createColumnPieSubmenu(index,condition);
                 }
+
                 this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
@@ -575,7 +585,7 @@ function PitchTimeMatrix () {
         this._initial_h = ptmDiv.style.height;
     };
 
-    this._createaddcolumnpiesubmenu = function() {
+    this._createAddColumnPieSubmenu = function() {
         docById('wheelDivptm').style.display = '';
         const VALUES = ['pitch', 'hertz', 'drum', 'graphics'];
         var valueLabel = [];
@@ -583,6 +593,7 @@ function PitchTimeMatrix () {
             var label = _(VALUES[i]);
             valueLabel.push(label);
         }
+
         var drumLabels = [];
         for (var i = 0; i < DRUMS.length; i++) {
                 var label = _(DRUMS[i]);
@@ -592,6 +603,7 @@ function PitchTimeMatrix () {
                     drumLabels.push(label);
                 }
         }
+
         const GRAPHICS = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
         var graphicLabels = [];
         for (var i = 0; i < GRAPHICS.length; i++) {
@@ -602,6 +614,7 @@ function PitchTimeMatrix () {
                 graphicLabels.push(label);
             }
         }
+
         this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
@@ -669,7 +682,6 @@ function PitchTimeMatrix () {
         var x = docById('addnotes').getBoundingClientRect().x;
         var y = docById('addnotes').getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
@@ -720,7 +732,6 @@ function PitchTimeMatrix () {
             }
         }
 
-
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
             var rLabel = null;
@@ -751,6 +762,7 @@ function PitchTimeMatrix () {
                 if (blockLabel === 'setcolor'){
                     val = 0;
                 }
+
                 var BLOCKOBJ = [];
                 if (blockLabel === 'arc' || blockLabel === 'setxy'){
                     BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
@@ -765,6 +777,7 @@ function PitchTimeMatrix () {
                 }
                 rLabel = blockLabel;
             }
+
             var blocksNo = null;
             var aboveBlock = null;
             
@@ -807,6 +820,7 @@ function PitchTimeMatrix () {
                 default:
                     aboveBlock = that.blockNo
             }
+
             if (aboveBlock === that.blockNo){
                 setTimeout(that._addNotesBlockBetween(aboveBlock, n, true), 500);
                 that.rowLabels.splice(0,0,rLabel);
@@ -824,6 +838,7 @@ function PitchTimeMatrix () {
                 that.rowArgs.splice(i+1,0,rArg);
                 that._rowBlocks.splice(i+1,0,n);
             }
+
             that.sorted = false;
             that.init(that._logo);
             for (var i = 0; i < that._logo.tupletRhythms.length; i++) {
@@ -847,7 +862,7 @@ function PitchTimeMatrix () {
             if (label === 'pitch') {
                 setTimeout(function() {
                     that.pitchBlockAdded(n)
-                },200);
+                }, 200);
             }
         }
         for (var i = 0; i < valueLabel.length; i++) {
@@ -867,10 +882,11 @@ function PitchTimeMatrix () {
                 break;
             }
         }
-        setTimeout(this._createcolumnpiesubmenu(i,'pitchblocks',true) ,500);
+
+        setTimeout(this._createColumnPieSubmenu(i,'pitchblocks',true) , 500);
     }
 
-    this._creatematrixgraphic2spiesubmenu = function(index, blk) {
+    this._createMatrixGraphics2PieSubmenu = function(index, blk) {
         docById('wheelDivptm').style.display = '';
         var arcRadiusLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
         var arcAngleLabel = ['0', '30', '45', '60', '90', '180'];
@@ -932,17 +948,17 @@ function PitchTimeMatrix () {
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
         if (blk !== null) {
             block = blk;
         }
+
         var blockLabel = this._logo.blocks.blockList[block].name;
         var xblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         var yblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
@@ -954,6 +970,7 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel2.createWheel(setxyValueLabel);
             this._pitchWheel.createWheel(setxyValueLabel);
         }
+
         this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
         
         this.xblockValue = [xblockLabelValue.toString(),'x'];
@@ -977,6 +994,7 @@ function PitchTimeMatrix () {
             that.yblockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             __selectionChanged(false);
         }
+
         if (blockLabel === 'arc') {
             for (var i = 0; i < arcRadiusLabel.length; i++) {
                 this._pitchWheel.navItems[i].navigateFunction = __enterValue2;
@@ -990,7 +1008,6 @@ function PitchTimeMatrix () {
                 this._blockLabelsWheel2.navItems[i].navigateFunction = __enterValue;
             }
         }
-        
 
         var __selectionChanged = function (newBlock) {
             var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
@@ -1002,8 +1019,8 @@ function PitchTimeMatrix () {
                 that.columnBlocksMap[index][0] = n;
                 block = n;
                 setTimeout(function() {
-                    that._creatematrixgraphic2spiesubmenu(index,n)
-                },500);
+                    that._createMatrixGraphics2PieSubmenu(index,n)
+                }, 500);
             }
             that.rowLabels[index] = label;
 
@@ -1054,7 +1071,7 @@ function PitchTimeMatrix () {
         }
     }
 
-    this._creatematrixgraphicspiesubmenu = function(index, condition, blk) {
+    this._createMatrixGraphicsPieSubmenu = function(index, condition, blk) {
         docById('wheelDivptm').style.display = '';
         var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
         if (condition === 'synthsblocks'){
@@ -1089,21 +1106,20 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.525;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.clickModeRotate = false;
 
         this._pitchWheel.animatetime = 0; // 300;
-        
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
@@ -1112,7 +1128,7 @@ function PitchTimeMatrix () {
             this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
             this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
             this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.7;
+            this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
             this._blockLabelsWheel.slicePathCustom.maxRadiusPercent = 1;
             this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
             this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
@@ -1124,17 +1140,17 @@ function PitchTimeMatrix () {
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
 
         var block = this.columnBlocksMap[index][0];
         if (blk !== null) {
             block = blk;
         }
+
         var blockLabel = this._logo.blocks.blockList[block].name;
         var blockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
         if (condition === 'graphicsblocks') {
@@ -1181,6 +1197,7 @@ function PitchTimeMatrix () {
             docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
             __selectionChanged(false);
         }
+
         if (condition === 'graphicsblocks') {
             if (blockLabel === 'forward' || blockLabel === 'back') {
                 for (var i = 0; i < fwdbkLabel.length; i++) {
@@ -1208,7 +1225,6 @@ function PitchTimeMatrix () {
                 this._pitchWheel.navItems[i].navigateFunction = __enterValue;
             }
         }
-        
 
         var __selectionChanged = function (newBlock) {
             if (condition === 'graphicsblocks') {
@@ -1223,10 +1239,9 @@ function PitchTimeMatrix () {
                     that.columnBlocksMap[index][0] = n;
                     block = n;
                     setTimeout(function() {
-                        that._creatematrixgraphicspiesubmenu(index, condition, n);
-                    },500);
+                        that._createMatrixGraphicsPieSubmenu(index, condition, n);
+                    }, 500);
                 }
-                
                 
                 that.rowLabels[index] = label;
             }
@@ -1274,6 +1289,7 @@ function PitchTimeMatrix () {
             }
             that._noteStored[index] = that.rowLabels[index] + ':' + that.rowArgs[index];
         }
+
         if (condition === 'graphicsblocks') {
             if (blockLabel === 'forward' || blockLabel === 'back') {
                 for (var i = 0; i < blockLabels1.length; i++) {
@@ -1297,10 +1313,9 @@ function PitchTimeMatrix () {
                 }
             }
         }
-
     }
 
-    this._createcolumnpiesubmenu = function(index, condition, sortedClose) {
+    this._createColumnPieSubmenu = function(index, condition, sortedClose) {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
 
@@ -1352,6 +1367,7 @@ function PitchTimeMatrix () {
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
         }
+
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -1406,11 +1422,10 @@ function PitchTimeMatrix () {
         var x = docById('labelcol' + index).getBoundingClientRect().x;
         var y = docById('labelcol' + index).getBoundingClientRect().y;
 
-
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '300px';
         docById('wheelDivptm').style.width = '300px';
-        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0,x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
         docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
         
         var block = this.columnBlocksMap[index][0];
@@ -1442,6 +1457,7 @@ function PitchTimeMatrix () {
                 that._accidentalsWheel.removeWheel();
                 that._octavesWheel.removeWheel();
             }
+
             if (sortedClose === true) {
                 that._sort();
             }
@@ -2375,7 +2391,6 @@ function PitchTimeMatrix () {
         this._logo.blocks.refreshCanvas();
     };
 
-
     this._update = function (i, value, k, noteCase) {
         var updates = [];
         value = toFraction(value);
@@ -2403,7 +2418,6 @@ function PitchTimeMatrix () {
         }
         saveLocally();
     }
-
 
     this._mapNotesBlocks = function(blockName, withName) {
         var notesBlockMap = [];
@@ -2641,19 +2655,19 @@ function PitchTimeMatrix () {
                 if (i == noteToDivide) {
                     break;
                 }
-                for (var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[k], [k]]);
                     k++;
                 }
             }
-            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
                 this._blockMapHelper.push([this._colBlocks[k], [k]]);
                 k++;
             }
             var l = k;
             k = k + newTupletValue - oldTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for (var j = 0; j<this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j = 0; j<this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2668,7 +2682,7 @@ function PitchTimeMatrix () {
                 if (i == noteToDivide) {
                     break;
                 }
-                for (var j = 0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for (var j = 0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[k], [k]]);
                     k++;
                 }
@@ -2677,13 +2691,13 @@ function PitchTimeMatrix () {
             for (var i = oldTupletValue; i > newTupletValue; i--) {
                 this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length -1);
             }
-            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length-2; j++) {
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
                 this._blockMapHelper.push([this._colBlocks[k], [k]]);
                 k++;
             }
             var l = k+ oldTupletValue - newTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for(var j =0; j < this._logo.tupletRhythms[i].length-2; j++) {
+                for(var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2693,7 +2707,7 @@ function PitchTimeMatrix () {
         var notesBlockMap =  this._mapNotesBlocks('stuplet');
         var colBlocks = [];
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            for (var j =0 ; j < this._logo.tupletRhythms[i].length-2;  j++) {
+            for (var j =0 ; j < this._logo.tupletRhythms[i].length - 2;  j++) {
                 colBlocks.push([notesBlockMap[i], j]);
             }
         }
@@ -2958,6 +2972,7 @@ function PitchTimeMatrix () {
                     cell.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),null,'simpletupletnote');
                     }
+
                     cellTuplet.onclick = function () {
                         that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
                     }
