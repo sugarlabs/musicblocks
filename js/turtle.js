@@ -108,6 +108,8 @@ function Turtle (name, turtles, drum) {
                 ctx.closePath();
             }
         }
+
+        this.turtles.refreshCanvas();
     };
 
     /**

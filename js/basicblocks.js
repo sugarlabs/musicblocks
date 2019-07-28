@@ -5145,7 +5145,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('loudness'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('loudness')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('loudness')) {
         newblock.hidden = true;
     }
 
