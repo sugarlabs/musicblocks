@@ -587,7 +587,8 @@ function PitchTimeMatrix () {
 
     this._createAddColumnPieSubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        const VALUES = ['pitch', 'hertz', 'drum', 'graphics'];
+        const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics'];
+        const VALUES = ['imgsrc:images/chime.svg', 'imgsrc:header-icons/oscillator.svg', 'imgsrc:images/TamTamMini.svg', 'imgsrc:images/mouse.svg'];
         var valueLabel = [];
         for (var i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
@@ -698,7 +699,7 @@ function PitchTimeMatrix () {
         };
 
         var __subMenuChanged = function () {
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
             if (label === 'pitch') {
                 __selectionChanged();
                 for(var i = 0; i < drumLabels.length;i++) {
@@ -733,7 +734,7 @@ function PitchTimeMatrix () {
         }
 
         var __selectionChanged = function () {
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
             var rLabel = null;
             var rArg = null;
             var blockLabel = '';    
@@ -1092,11 +1093,11 @@ function PitchTimeMatrix () {
             var blockLabels1 = [];
             var blockLabels2 = [];
             for (var i = 0; i < 5; i++) {
-                var label = _(MATRIXGRAPHICS[i]);
+                var label = _(GRAPHICS[i]);
                 blockLabels1.push(label);
             }
-            for (var i = 5; i < MATRIXGRAPHICS.length; i++) {
-                var label = _(MATRIXGRAPHICS[i]);
+            for (var i = 5; i < GRAPHICS.length; i++) {
+                var label = _(GRAPHICS[i]);
                 blockLabels2.push(label);
             }
         }
@@ -1157,23 +1158,18 @@ function PitchTimeMatrix () {
             if (blockLabel === 'forward' || blockLabel === 'back') {
                 this._pitchWheel.createWheel(fwdbkLabel);
                 this._blockLabelsWheel.createWheel(blockLabels1);
-                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
             } else if (blockLabel === 'right' || blockLabel === 'left') {
                 this._pitchWheel.createWheel(lrLabel);
                 this._blockLabelsWheel.createWheel(blockLabels1);
-                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
             } else if (blockLabel === 'setheading') {
                 this._pitchWheel.createWheel(sheadingLabel);
                 this._blockLabelsWheel.createWheel(blockLabels1);
-                this._blockLabelsWheel.navigateWheel(blockLabels1.indexOf(blockLabel));
             } else if (blockLabel === 'setpensize') {
                 this._pitchWheel.createWheel(spensizeLabel);
                 this._blockLabelsWheel.createWheel(blockLabels2);
-                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
             } else{
                 this._pitchWheel.createWheel(setLabel);
                 this._blockLabelsWheel.createWheel(blockLabels2);
-                this._blockLabelsWheel.navigateWheel(blockLabels2.indexOf(blockLabel));
             }
         } else if (condition === 'synthsblocks') {
             this._pitchWheel.createWheel(valueLabel);
@@ -1230,6 +1226,7 @@ function PitchTimeMatrix () {
             if (condition === 'graphicsblocks') {
 
                 var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
+                label = MATRIXGRAPHICS[GRAPHICS.indexOf(label)]
 
                 if (newBlock !== false) {
                     const MATRIXGRAPHICSOBJ = [[0,[label,{}],0,0,[null,1,null]],[1,["number",{"value":parseInt(that.blockValue)}],0,0,[0]]]
@@ -1818,6 +1815,7 @@ function PitchTimeMatrix () {
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
             }
+            console.log(obj,typeof(obj[2]));
 
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
