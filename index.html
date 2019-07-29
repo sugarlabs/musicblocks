@@ -207,15 +207,25 @@
 
     <div class="canvasHolder" id="canvasHolder">
 
-      <div id="printText" onclick="hidePrintText()">
+      <div class="popupMsg" id="printText" onclick="hidePrintText()">
         <span id="printTextContent"></span>
-        <img id="closeIcon" src="images/close.svg" alt="Close">
+        <img class="msgCloseIcon" src="images/close.svg" alt="Close">
+      </div>
+
+      <div class="popupMsg" id="errorText" onclick="hideErrorText()">
+        <span id="errorTextContent"></span>
+        <img class="msgCloseIcon" src="images/close.svg" alt="Close">
       </div>
 
       <script>
         function hidePrintText() {
           var printText = document.getElementById("printText");
           printText.classList.remove("show");
+        }
+
+        function hideErrorText() {
+          var errorText = document.getElementById("errorText");
+          errorText.classList.remove("show");
         }
       </script>
 
