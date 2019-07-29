@@ -616,7 +616,7 @@ function PitchTimeMatrix () {
             }
         }
 
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 200, 200);
         this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
         this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
         this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
@@ -626,18 +626,24 @@ function PitchTimeMatrix () {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;        
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.25;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._pitchWheel.colors = [platformColor.paletteColors['pitch'][0],
+				   platformColor.paletteColors['pitch'][1],
+				   platformColor.paletteColors['drum'][0],
+				   platformColor.paletteColors['turtle'][0]];
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 1.0;
         
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.clickModeRotate = false;
-        this._pitchWheel.titleRotateAngle = 90;
-
 
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(valueLabel);
+        this._pitchWheel.navItems[0].setTooltip(_('pitch'));
+        this._pitchWheel.navItems[1].setTooltip(_('hertz'));
+        this._pitchWheel.navItems[2].setTooltip(_('drum'));
+        this._pitchWheel.navItems[3].setTooltip(_('graphics'));
+
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
