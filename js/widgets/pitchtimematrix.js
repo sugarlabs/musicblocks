@@ -577,7 +577,8 @@ function PitchTimeMatrix () {
 
     this._createaddcolumnpiesubmenu = function() {
         docById('wheelDivptm').style.display = '';
-        const VALUES = ['pitch', 'hertz', 'drum', 'graphics'];
+        const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics'];
+        const VALUES = ['imgsrc:images/chime.svg', 'imgsrc:header-icons/oscillator.svg', 'imgsrc:images/TamTamMini.svg', 'imgsrc:images/mouse.svg'];
         var valueLabel = [];
         for (var i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
@@ -688,7 +689,7 @@ function PitchTimeMatrix () {
         };
 
         var __subMenuChanged = function () {
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
             if (label === 'pitch') {
                 __selectionChanged();
                 for(var i = 0; i < drumLabels.length;i++) {
@@ -724,7 +725,7 @@ function PitchTimeMatrix () {
 
 
         var __selectionChanged = function () {
-            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title; 
+            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
             var rLabel = null;
             var rArg = null;
             var blockLabel = '';    
@@ -1800,6 +1801,7 @@ function PitchTimeMatrix () {
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
             }
+            console.log(obj,typeof(obj[2]));
 
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
