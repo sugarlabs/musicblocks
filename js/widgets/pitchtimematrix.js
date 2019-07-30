@@ -12,13 +12,13 @@
 
 const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setheading', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
-// Deprecated
-const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
+const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];  // Deprecated
+
 
 function PitchTimeMatrix () {
     const BUTTONDIVWIDTH = 535;  // 8 buttons 535 = (55 + 4) * 9
-    const OUTERWINDOWWIDTH = 758; // 728;
-    const INNERWINDOWWIDTH = 630; // 600;
+    const OUTERWINDOWWIDTH = 758;
+    const INNERWINDOWWIDTH = 630;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
@@ -87,6 +87,8 @@ function PitchTimeMatrix () {
     this.columnBlocksMap = [];
 
     this.clearBlocks = function () {
+        // When creating a new matrix, we want to clear out any old
+        // block references.
         this._rowBlocks = [];
         this._colBlocks = [];
         this._rowMap = [];
@@ -94,13 +96,18 @@ function PitchTimeMatrix () {
     };
 
     this.addRowBlock = function(rowBlock) {
+        // When creating a matrix, we add rows whenever we encounter a
+        // pitch or drum block (and some graphics blocks).
         this._rowMap.push(this._rowBlocks.length);
         this._rowOffset.push(0);
         this._rowBlocks.push(rowBlock);
     };
 
     this.addColBlock = function(rhythmBlock, n) {
-        // Search for previous instance of the same block (from a repeat)
+        // When creating a matrix, we add columns when we encounter
+        // rhythm blocks.
+        // Search for previous instance of the same block (from a
+        // repeat).
         var startIdx = 0;
         for (var i = 0; i < this._colBlocks.length; i++) {
             var obj = this._colBlocks[i];
@@ -115,6 +122,8 @@ function PitchTimeMatrix () {
     };
 
     this.addNode = function(pitchBlock, rhythmBlock, n) {
+        // A node exists for each cell in the matrix. It is used to
+        // preserve and restore the state of the cell.
         var j = 0;
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
@@ -128,6 +137,7 @@ function PitchTimeMatrix () {
     };
 
     this.removeNode = function(pitchBlock, rhythmBlock, n) {
+        // When the matrix is changed, we may need to remove nodes.
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
@@ -137,6 +147,7 @@ function PitchTimeMatrix () {
     };
 
     this._get_save_lock = function () {
+        // Debounce the save button.
         return this._save_lock;
     };
 
@@ -215,7 +226,7 @@ function PitchTimeMatrix () {
         this._save_lock = false;
 
         cell.onclick = function () {
-            // Debounce button
+            // Debounce the save button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
                 that._save();
@@ -245,7 +256,7 @@ function PitchTimeMatrix () {
         var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add Note'));
         cell.setAttribute('id', 'addnotes');
         cell.onclick = function () {
-            that._createAddColumnPieSubmenu();
+            that._createAddRowPieSubmenu();
         };
 
         // We use this cell as a handle for dragging.
@@ -465,7 +476,7 @@ function PitchTimeMatrix () {
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = this.rowLabels[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
-                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
+                this._noteStored.push(this.rowLabels[i].replace(/ /g,': '));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
@@ -497,7 +508,7 @@ function PitchTimeMatrix () {
                     that._createMatrixGraphicsPieSubmenu(index,condition,null);
                 }
 
-                this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
+                this._noteStored.push(this.rowLabels[i] + ': ' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
@@ -513,7 +524,7 @@ function PitchTimeMatrix () {
                     that._createMatrixGraphics2PieSubmenu(index, null);
                 }
 
-                this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
+                this._noteStored.push(this.rowLabels[i] + ': ' + this.rowArgs[i][0] + ': ' + this.rowArgs[i][1]);
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
@@ -585,10 +596,11 @@ function PitchTimeMatrix () {
         this._initial_h = ptmDiv.style.height;
     };
 
-    this._createAddColumnPieSubmenu = function() {
+    this._createAddRowPieSubmenu = function() {
+	// This menu is used to add new rows to the matrix.
         docById('wheelDivptm').style.display = '';
         const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics'];
-        const VALUES = ['imgsrc:images/chime.svg', 'imgsrc:header-icons/oscillator.svg', 'imgsrc:images/TamTamMini.svg', 'imgsrc:images/mouse.svg'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: header-icons/oscillator.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg'];
         var valueLabel = [];
         for (var i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
@@ -627,9 +639,9 @@ function PitchTimeMatrix () {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._pitchWheel.colors = [platformColor.paletteColors['pitch'][0],
-				   platformColor.paletteColors['pitch'][1],
-				   platformColor.paletteColors['drum'][0],
-				   platformColor.paletteColors['turtle'][0]];
+                                   platformColor.paletteColors['pitch'][1],
+                                   platformColor.paletteColors['drum'][0],
+                                   platformColor.paletteColors['turtle'][0]];
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 1.0;
         
@@ -643,7 +655,6 @@ function PitchTimeMatrix () {
         this._pitchWheel.navItems[1].setTooltip(_('hertz'));
         this._pitchWheel.navItems[2].setTooltip(_('drum'));
         this._pitchWheel.navItems[3].setTooltip(_('graphics'));
-
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -666,7 +677,7 @@ function PitchTimeMatrix () {
         this._drumWheel.titleRotateAngle = 0;
         this._drumWheel.createWheel(drumLabels);
 
-        for(var i = 0; i < drumLabels.length;i++) {
+        for (var i = 0; i < drumLabels.length;i++) {
             this._drumWheel.navItems[i].navItem.hide();
         }
 
@@ -682,7 +693,7 @@ function PitchTimeMatrix () {
 
         this._graphicWheel.createWheel(graphicLabels);
 
-        for(var i = 0; i < graphicLabels.length;i++) {
+        for (var i = 0; i < graphicLabels.length;i++) {
             this._graphicWheel.navItems[i].navItem.hide();
         }
 
@@ -708,32 +719,32 @@ function PitchTimeMatrix () {
             var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
             if (label === 'pitch') {
                 __selectionChanged();
-                for(var i = 0; i < drumLabels.length;i++) {
+                for (var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.hide();
                 }
-                for(var i = 0; i < graphicLabels.length;i++) {
+                for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
                 }
             } else if (label === 'hertz') {
                 __selectionChanged();
-                for(var i = 0; i < drumLabels.length;i++) {
+                for (var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.hide();
                 }
-                for(var i = 0; i < graphicLabels.length;i++) {
+                for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
                 }
             } else if (label === 'graphics') {
-                for(var i = 0; i < drumLabels.length;i++) {
+                for (var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.hide();
                 }
-                for(var i = 0; i < graphicLabels.length;i++) {
+                for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.show();
                 }
             } else if (label === 'drum') {
-                for(var i = 0; i < graphicLabels.length;i++) {
+                for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
                 }
-                for(var i = 0; i < drumLabels.length;i++) {
+                for (var i = 0; i < drumLabels.length;i++) {
                     that._drumWheel.navItems[i].navItem.show();
                 }
             }
@@ -745,20 +756,20 @@ function PitchTimeMatrix () {
             var rArg = null;
             var blockLabel = '';    
             if (label === 'pitch') {
-                const BLOCKOBJ = [[0,["pitch",{}],0,0,[null,1,2,null]],[1,["solfege",{"value":"sol"}],0,0,[0]],[2,["number",{"value":4}],0,0,[0]]];
+                const BLOCKOBJ = [[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 3;
                 rLabel = 'sol';
                 rArg = 4;
             } else if (label === 'hertz') {
-                const BLOCKOBJ = [[0,["hertz",{}],0,0,[null,1,null]],[1,["number",{"value":392}],0,0,[0]]];
+                const BLOCKOBJ = [[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = 'hertz';
                 rArg = 392;
             } else if (label === 'drum') {
                 blockLabel = DRUMS[that._drumWheel.selectedNavItemIndex];
-                const BLOCKOBJ = [[0,["playdrum",{}],0,0,[null,1,null]],[1,["drumname",{"value":blockLabel}],0,0,[0]]];
+                const BLOCKOBJ = [[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': blockLabel}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = blockLabel;
@@ -772,12 +783,12 @@ function PitchTimeMatrix () {
 
                 var BLOCKOBJ = [];
                 if (blockLabel === 'arc' || blockLabel === 'setxy'){
-                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,2,null]],[1,["number",{"value":90}],0,0,[0]],[2,["number",{"value":100}],0,0,[0]]];
+                    BLOCKOBJ = [[0, [blockLabel, {}], 0, 0, [null, 1, 2, null]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, ['number', {'value': 100}], 0, 0, [0]]];
                     that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                     var n = that._logo.blocks.blockList.length - 3;
                     rArg = [90, 100];
                 } else {
-                    BLOCKOBJ = [[0,[blockLabel,{}],0,0,[null,1,null]],[1,["number",{"value":val}],0,0,[0]]];
+                    BLOCKOBJ = [[0, [blockLabel, {}], 0, 0, [null, 1, null]], [1, ['number', {'value': val}], 0, 0, [0]]];
                     that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                     var n = that._logo.blocks.blockList.length - 2;
                     rArg = val;
@@ -789,8 +800,8 @@ function PitchTimeMatrix () {
             var aboveBlock = null;
             
             switch (label) {
-                case 'graphics':
-                    for(var i = graphicLabels.length - 1; i >= 0; i--) {
+                case 'graphics': 
+                    for (var i = graphicLabels.length - 1; i >= 0; i--) {
                         blocksNo = that._mapNotesBlocks(graphicLabels[i]);
                         if(blocksNo.length >= 1){
                             aboveBlock = last(blocksNo);
@@ -800,39 +811,39 @@ function PitchTimeMatrix () {
                     if (aboveBlock !== null){
                         break;
                     }
-                case 'drum':
-                    blocksNo = that._mapNotesBlocks("drumname");
+                case 'drum': 
+                    blocksNo = that._mapNotesBlocks('drumname');
                     if(blocksNo.length >= 1){
                         aboveBlock = last(blocksNo);
                     }
                     if (aboveBlock !== null){
                         break;
                     }
-                case 'hertz':
-                    blocksNo = that._mapNotesBlocks("hertz");
+                case 'hertz': 
+                    blocksNo = that._mapNotesBlocks('hertz');
                     if(blocksNo.length >= 1){
                         aboveBlock = last(blocksNo);
                     }
                     if (aboveBlock !== null){
                         break;
                     }
-                case 'pitch':
-                    blocksNo = that._mapNotesBlocks("pitch");
+                case 'pitch': 
+                    blocksNo = that._mapNotesBlocks('pitch');
                     if(blocksNo.length >= 1){
                         aboveBlock = last(blocksNo);
                     }
                     if (aboveBlock !== null){
                         break;
                     }
-                default:
+                default: 
                     aboveBlock = that.blockNo
             }
 
             if (aboveBlock === that.blockNo){
                 setTimeout(that._addNotesBlockBetween(aboveBlock, n, true), 500);
-                that.rowLabels.splice(0,0,rLabel);
-                that.rowArgs.splice(0,0,rArg);
-                that._rowBlocks.splice(0,0,n);
+                that.rowLabels.splice(0, 0, rLabel);
+                that.rowArgs.splice(0, 0, rArg);
+                that._rowBlocks.splice(0, 0, n);
 
             } else {
                 setTimeout(that._addNotesBlockBetween(aboveBlock, n, false), 500);
@@ -841,17 +852,17 @@ function PitchTimeMatrix () {
                         break;
                     }
                 }
-                that.rowLabels.splice(i+1,0,rLabel);
-                that.rowArgs.splice(i+1,0,rArg);
-                that._rowBlocks.splice(i+1,0,n);
+                that.rowLabels.splice(i+1, 0, rLabel);
+                that.rowArgs.splice(i+1, 0, rArg);
+                that._rowBlocks.splice(i+1, 0, n);
             }
 
             that.sorted = false;
             that.init(that._logo);
             for (var i = 0; i < that._logo.tupletRhythms.length; i++) {
                 switch (that._logo.tupletRhythms[i][0]) {
-                case 'simple':
-                case 'notes':
+                case 'simple': 
+                case 'notes': 
                     var tupletParam = [that._logo.tupletParams[i]];
                     tupletParam.push([]);
                     for (var j = 2; j < that._logo.tupletRhythms[i].length; j++) {
@@ -860,7 +871,7 @@ function PitchTimeMatrix () {
     
                     that.addTuplet(tupletParam);
                     break;
-                default:
+                default: 
                     that.addNotes(that._logo.tupletRhythms[i][1], that._logo.tupletRhythms[i][2]);
                     break;
                 }
@@ -890,7 +901,7 @@ function PitchTimeMatrix () {
             }
         }
 
-        setTimeout(this._createColumnPieSubmenu(i,'pitchblocks',true) , 500);
+        setTimeout(this._createColumnPieSubmenu(i, 'pitchblocks', true) , 500);
     }
 
     this._createMatrixGraphics2PieSubmenu = function(index, blk) {
@@ -980,8 +991,8 @@ function PitchTimeMatrix () {
 
         this._blockLabelsWheel.navigateWheel(blockLabels.indexOf(blockLabel));
         
-        this.xblockValue = [xblockLabelValue.toString(),'x'];
-        this.yblockValue = [yblockLabelValue.toString(),'y'];
+        this.xblockValue = [xblockLabelValue.toString(), 'x'];
+        this.yblockValue = [yblockLabelValue.toString(), 'y'];
         this._exitWheel.createWheel(['x', '']);
 
         var that = this;
@@ -1019,14 +1030,14 @@ function PitchTimeMatrix () {
         var __selectionChanged = function (newBlock) {
             var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
             if (newBlock !== false) {
-                const MATRIXGRAPHICSOBJ = [[0,[label,{}],0,0,[null,1,2,null]],[1,["number",{"value":parseInt(that.xblockValue[0])}],0,0,[0]],[2,["number",{"value":parseInt(that.yblockValue[0])}],0,0,[0]]]
+                const MATRIXGRAPHICSOBJ = [[0, [label, {}], 0, 0, [null, 1, 2, null]], [1, ['number', {'value': parseInt(that.xblockValue[0])}], 0, 0, [0]], [2, ['number', {'value': parseInt(that.yblockValue[0])}], 0, 0, [0]]]
                 that._logo.blocks.loadNewBlocks(MATRIXGRAPHICSOBJ);
                 var n = that._logo.blocks.blockList.length - 3;
                 setTimeout(that._blockReplace(block, n), 100);
                 that.columnBlocksMap[index][0] = n;
                 block = n;
                 setTimeout(function() {
-                    that._createMatrixGraphics2PieSubmenu(index,n)
+                    that._createMatrixGraphics2PieSubmenu(index, n)
                 }, 500);
             }
             that.rowLabels[index] = label;
@@ -1062,10 +1073,10 @@ function PitchTimeMatrix () {
                 cell.innerHTML = _(that.rowLabels[index]) + '<br>' + that.rowArgs[index][0] + ' ' + that.rowArgs[index][1];
                 cell.style.fontSize = Math.floor(that._cellScale * 12) + 'px';
             }
-            noteStored = that.rowLabels[index] + ':' + that.rowArgs[index][0] + ':' + that.rowArgs[index][1];
+            noteStored = that.rowLabels[index] + ': ' + that.rowArgs[index][0] + ': ' + that.rowArgs[index][1];
             for (var i = 0; i < that._notesToPlay.length; i++) {
                 var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[index]);
-                cell = docById(index+':'+i);
+                cell = docById(index+': '+i);
                 if (cell.style.backgroundColor === 'black') {
                     that._notesToPlay[i][0][noteIndex] = noteStored;
                 }
@@ -1080,7 +1091,7 @@ function PitchTimeMatrix () {
 
     this._createMatrixGraphicsPieSubmenu = function(index, condition, blk) {
         docById('wheelDivptm').style.display = '';
-        var valueLabel = ['<-','Enter','1','2','3','4','5','6','7','8','9','0'];
+        var valueLabel = ['<-', 'Enter', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
         if (condition === 'synthsblocks'){
             valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
         } else if (condition === 'graphicsblocks') {
@@ -1235,7 +1246,7 @@ function PitchTimeMatrix () {
                 label = MATRIXGRAPHICS[GRAPHICS.indexOf(label)]
 
                 if (newBlock !== false) {
-                    const MATRIXGRAPHICSOBJ = [[0,[label,{}],0,0,[null,1,null]],[1,["number",{"value":parseInt(that.blockValue)}],0,0,[0]]]
+                    const MATRIXGRAPHICSOBJ = [[0, [label, {}], 0, 0, [null, 1, null]], [1, ['number', {'value': parseInt(that.blockValue)}], 0, 0, [0]]]
                     that._logo.blocks.loadNewBlocks(MATRIXGRAPHICSOBJ);
                     var n = that._logo.blocks.blockList.length - 2;
                     setTimeout(that._blockReplace(block, n), 500);
@@ -1256,7 +1267,7 @@ function PitchTimeMatrix () {
                 var z = that._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
                 that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(that._logo.blocks.blockList[noteLabelBlock].text, z);
                 that._logo.blocks.blockList[noteLabelBlock].updateCache()
-            },600);
+            }, 600);
             that.rowArgs[index] = parseInt(that.blockValue);
 
             var cell = docById('headcol' + index);
@@ -1278,19 +1289,19 @@ function PitchTimeMatrix () {
             }
             var noteStored = null;
             if (condition === 'graphicsblocks') {
-                noteStored = that.rowLabels[index] + ':' + that.rowArgs[index];
+                noteStored = that.rowLabels[index] + ': ' + that.rowArgs[index];
             } else if (condition === 'synthsblocks') {
                 noteStored = that.rowArgs[index];
             }
 
             for (var i = 0; i < that._notesToPlay.length; i++) {
                 var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[index]);
-                cell = docById(index+':'+i);
+                cell = docById(index+': '+i);
                 if (cell.style.backgroundColor === 'black') {
                     that._notesToPlay[i][0][noteIndex] = noteStored;
                 }
             }
-            that._noteStored[index] = that.rowLabels[index] + ':' + that.rowArgs[index];
+            that._noteStored[index] = that.rowLabels[index] + ': ' + that.rowArgs[index];
         }
 
         if (condition === 'graphicsblocks') {
@@ -1322,8 +1333,8 @@ function PitchTimeMatrix () {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
 
-        var accidentals = [ "𝄪", "♯", "♮", "♭", "𝄫" ];
-        var noteLabels = [ "ti", "la", "sol", "fa", "mi", "re", "do" ];
+        var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
+        var noteLabels = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
         var drumLabels = [];
         for (var i = 0; i < DRUMS.length; i++) {
             var label = _(DRUMS[i]);
@@ -1441,7 +1452,7 @@ function PitchTimeMatrix () {
             for (var i = 0; i < accidentals.length; i++) {
                 if (noteValue.indexOf(accidentals[i]) !== -1) {
                     accidentalsValue = i;
-                    noteValue = noteValue.substr(0,noteValue.indexOf(accidentals[i]));
+                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
                     break;
                 }
             }
@@ -1488,7 +1499,7 @@ function PitchTimeMatrix () {
             if (condition === 'pitchblocks') {
                 var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
                 that._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(that._logo.blocks.blockList[noteLabelBlock].connections[0], octave);
-                var noteObj = [label,octave];
+                var noteObj = [label, octave];
                 if (flag) {
                     noteObj = getNote(label, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
                 }
@@ -1533,7 +1544,7 @@ function PitchTimeMatrix () {
 
             for (var i = 0; i < that._notesToPlay.length; i++) {
                 var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[index]);
-                cell = docById(index+':'+i);
+                cell = docById(index+': '+i);
                 if (cell.style.backgroundColor === 'black') {
                     that._notesToPlay[i][0][noteIndex] = noteStored;
                 }
@@ -1695,7 +1706,7 @@ function PitchTimeMatrix () {
     };
 
     this._generateDataURI = function(file) {
-        var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
+        var data = 'data: text/html;charset=utf-8, ' + encodeURIComponent(file);
         return data;
     };
 
@@ -1821,7 +1832,7 @@ function PitchTimeMatrix () {
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
             }
-            console.log(obj,typeof(obj[2]));
+            console.log(obj, typeof(obj[2]));
 
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
@@ -1834,8 +1845,8 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
-            case 'simple':
-            case 'notes':
+            case 'simple': 
+            case 'notes': 
                 var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                 tupletParam.push([]);
                 for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
@@ -1844,7 +1855,7 @@ function PitchTimeMatrix () {
 
                 this.addTuplet(tupletParam);
                 break;
-            default:
+            default: 
                 this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
                 break;
             }
@@ -1995,9 +2006,9 @@ function PitchTimeMatrix () {
 
         var saveDocument = exportDocument;
         var uriData = saveDocument.documentElement.outerHTML;
-        exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background:#C374E9;' + 'border-radius:5%;' + 'padding:0.3em;' + 'text-decoration:none;' + 'margin:0.5em;' + 'color:white;" ' + 'download>Download Matrix</a>';
-        exportDocument.getElementById("downloadb1").download = "MusicMatrix";
-        exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
+        exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background: #C374E9;' + 'border-radius: 5%;' + 'padding: 0.3em;' + 'text-decoration: none;' + 'margin: 0.5em;' + 'color: white;" ' + 'download>Download Matrix</a>';
+        exportDocument.getElementById('downloadb1').download = 'MusicMatrix';
+        exportDocument.getElementById('downloadb1').href = this._generateDataURI(uriData);
         exportDocument.close();
     };
 
@@ -2008,14 +2019,14 @@ function PitchTimeMatrix () {
             var newNote = SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             var octave = note[2];
-            var newNote = SOLFEGECONVERSIONTABLE[note.substr(0,2)];
+            var newNote = SOLFEGECONVERSIONTABLE[note.substr(0, 2)];
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
     };
 
     this.addTuplet = function(param) {
-        // The first two parameters are the interval for the tuplet,
+        // The first two parameters are the interval for the tuplet, 
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 
@@ -2049,7 +2060,7 @@ function PitchTimeMatrix () {
         // The tuplet is note value is calculated as #notes x note value
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
 
-        // Set the cells to "rest"
+        // Set the cells to 'rest'
         for (var i = 0; i < numberOfNotes; i++) {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
@@ -2339,12 +2350,12 @@ function PitchTimeMatrix () {
             for (var j = 0; j < this._blockMapHelper.length; j++) {
                 if (JSON.stringify(this._blockMap[i][1]) === JSON.stringify(this._blockMapHelper[j][0])) {
                     for (var k =0; k < this._blockMapHelper[j][1].length; k++) {
-                        newBlockMap.push([this._blockMap[i][0],this._colBlocks[this._blockMapHelper[j][1][k]],this._blockMap[i][2]])
+                        newBlockMap.push([this._blockMap[i][0], this._colBlocks[this._blockMapHelper[j][1][k]], this._blockMap[i][2]])
                     }
                 }
             }
         }
-        this._blockMap = newBlockMap.filter((el,i) => {
+        this._blockMap = newBlockMap.filter((el, i) => {
             return i === newBlockMap.findIndex(ele => {
                 return JSON.stringify(ele) === JSON.stringify(el)
             })
@@ -2381,9 +2392,9 @@ function PitchTimeMatrix () {
         var topOfClamp = this._logo.blocks.blockList[this.blockNo].connections[1];
         var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
         if (this._logo.blocks.blockList[bottomOfClamp].name === 'vspace') {
-            RHYTHMOBJ = [[0,["rhythm2",{}],0,0,[null,1,2,5]],[1,["number",{"value":times}],0,0,[0]],[2,["divide",{}],0,0,[0,3,4]],[3,["number",{"value":value[1]}],0,0,[2]],[4,["number",{"value":value[0]}],0,0,[2]],[5,["vspace",{}],0,0,[0,null]]];
+            RHYTHMOBJ = [[0, ['rhythm2', {}], 0, 0, [null, 1, 2, 5]], [1, ['number', {'value': times}], 0, 0, [0]], [2, ['divide', {}], 0, 0, [0, 3, 4]], [3, ['number', {'value': value[1]}], 0, 0, [2]], [4, ['number', {'value': value[0]}], 0, 0, [2]], [5, ['vspace', {}], 0, 0, [0, null]]];
         } else {
-            RHYTHMOBJ = [[0, 'vspace', 0, 0, [null, 1]],[1,["rhythm2",{}],0,0,[0,2,3,6]],[2,["number",{"value":times}],0,0,[1]],[3,["divide",{}],0,0,[1,4,5]],[4,["number",{"value":value[1]}],0,0,[3]],[5,["number",{"value":value[0]}],0,0,[3]],[6,["vspace",{}],0,0,[1,null]]];
+            RHYTHMOBJ = [[0, 'vspace', 0, 0, [null, 1]], [1, ['rhythm2', {}], 0, 0, [0, 2, 3, 6]], [2, ['number', {'value': times}], 0, 0, [1]], [3, ['divide', {}], 0, 0, [1, 4, 5]], [4, ['number', {'value': value[1]}], 0, 0, [3]], [5, ['number', {'value': value[0]}], 0, 0, [3]], [6, ['vspace', {}], 0, 0, [1, null]]];
         }
         this._logo.blocks.loadNewBlocks(RHYTHMOBJ);
         var that = this;
@@ -2432,7 +2443,7 @@ function PitchTimeMatrix () {
         var bottomBlockLoop = 0;
         if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
             if (withName) {
-                notesBlockMap.push([blk,myBlock.name]);
+                notesBlockMap.push([blk, myBlock.name]);
             } else {
                 notesBlockMap.push(blk);
             }
@@ -2449,7 +2460,7 @@ function PitchTimeMatrix () {
             myBlock = this._logo.blocks.blockList[blk];
             if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
                 if (withName) {
-                    notesBlockMap.push([blk,myBlock.name]);
+                    notesBlockMap.push([blk, myBlock.name]);
                 } else {
                     notesBlockMap.push(blk);
                 }
@@ -2516,8 +2527,8 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
-            case 'simple':
-            case 'notes':
+            case 'simple': 
+            case 'notes': 
                 var tupletParam = [this._logo.tupletParams[i]];
                 tupletParam.push([]);
                 for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
@@ -2526,7 +2537,7 @@ function PitchTimeMatrix () {
 
                 this.addTuplet(tupletParam);
                 break;
-            default:
+            default: 
                 this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
                 break;
             }
@@ -2565,7 +2576,7 @@ function PitchTimeMatrix () {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i],[i-1]]);
+            this._blockMapHelper.push([this._colBlocks[i], [i-1]]);
         }
         this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
         this._readjustNotesBlocks();
@@ -2579,7 +2590,7 @@ function PitchTimeMatrix () {
         for (var i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
         this._blockMapHelper.push([this._colBlocks[noteToDivide], []]);
         var j = 0;
 
@@ -2599,7 +2610,7 @@ function PitchTimeMatrix () {
         this._restartGrid(that);
     };
 
-    this._tieNotes = function(mouseDownCell,mouseUpCell) {
+    this._tieNotes = function(mouseDownCell, mouseUpCell) {
         var downCellId = null; 
         var upCellId = null;
         if (mouseDownCell.id<mouseUpCell.id) {
@@ -2611,16 +2622,16 @@ function PitchTimeMatrix () {
         }
 
         this._blockMapHelper = [];
-        for(var i = 0; i < downCellId; i++) {
-            this._blockMapHelper.push([this._colBlocks[i],[i]]);
+        for (var i = 0; i < downCellId; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         var j = i;
-        for(var i = downCellId; i <= upCellId; i++) {
-            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+        for (var i = downCellId; i <= upCellId; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
         j++;
-        for(var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i],[j]]);
+        for (var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
             j++;
         }
 
@@ -2629,14 +2640,14 @@ function PitchTimeMatrix () {
             newNote = newNote+(1/parseFloat(this._logo.tupletRhythms[i][2]));
         }
         
-        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0,downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
         
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
     }
 
-    this._updateTuplet = function (that,noteToDivide, newNoteValue, condition) {
+    this._updateTuplet = function (that, noteToDivide, newNoteValue, condition) {
         this._logo.tupletParams[noteToDivide][1] = newNoteValue
         this._restartGrid(that);
         if (condition === 'simpletupletnote') {
@@ -2701,7 +2712,7 @@ function PitchTimeMatrix () {
             }
             var l = k+ oldTupletValue - newTupletValue;
             for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
-                for(var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
+                for (var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                     this._blockMapHelper.push([this._colBlocks[l], [k]]);
                     l++
                     k++;
@@ -2793,7 +2804,7 @@ function PitchTimeMatrix () {
             this._tabsWheel.clickModeRotate = false;
             this._tabsWheel.createWheel(tabsLabels);
 
-            for(var i = 0; i < tabsLabels.length;i++) {
+            for (var i = 0; i < tabsLabels.length;i++) {
                 this._tabsWheel.navItems[i].navItem.hide();
             }
 
@@ -2827,20 +2838,20 @@ function PitchTimeMatrix () {
                 
                 that.newNoteValue = String(value);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
             };
 
             this._menuWheel.navItems[3].navigateFunction = function () {
                 if (that.newNoteValue > 1) {
                 that.newNoteValue = String(parseInt(that.newNoteValue) - 1);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);    }       
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);    }       
             };
 
             this._menuWheel.navItems[9].navigateFunction = function () {
                 that.newNoteValue = String(parseInt(that.newNoteValue) + 1);
                 docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
-                that._updateTupletValue(that,noteToDivide, tupletValue,that.newNoteValue);
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
             };
 
             for (var i = 0; i < mainTabsLabels.length; i++) {
@@ -2886,7 +2897,7 @@ function PitchTimeMatrix () {
             this._menuWheel.navItems[1].navigateFunction = function () {
                 if (second && first) {
                     var word = that.newNoteValue.split('/');
-                    that._updateTuplet(that,noteToDivide, parseInt(word[1])/parseInt(word[0]), condition);
+                    that._updateTuplet(that, noteToDivide, parseInt(word[1])/parseInt(word[0]), condition);
                 }
             };
 
@@ -2910,7 +2921,7 @@ function PitchTimeMatrix () {
 
             this._menuWheel.navItems[3].navigateFunction = function () {
                 if (!flag) {
-                    for(var i = 12; i < 19; i++) {
+                    for (var i = 12; i < 19; i++) {
                         docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
                         that._tabsWheel.navItems[i].navItem.show();
                     }
@@ -2963,22 +2974,22 @@ function PitchTimeMatrix () {
                 if (that._mouseDownCell !== that._mouseUpCell) {
                     that._tieNotes(that._mouseDownCell, that._mouseUpCell);
                 } else {
-                    that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'),'rhythmnote');
+                    that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('alt'), 'rhythmnote');
                 }
             }
 
             if (cellTuplet !== undefined) {
                 if (this._logo.tupletRhythms[0][0] === 'notes') {
                     cell.onclick = function () {
-                        that._createpiesubmenu(this.getAttribute('id'),null,'tupletnote');
+                        that._createpiesubmenu(this.getAttribute('id'), null, 'tupletnote');
                     }
                 } else {
                     cell.onclick = function () {
-                        that._createpiesubmenu(this.getAttribute('id'),null,'simpletupletnote');
+                        that._createpiesubmenu(this.getAttribute('id'), null, 'simpletupletnote');
                     }
 
                     cellTuplet.onclick = function () {
-                        that._createpiesubmenu(this.getAttribute('id'),this.getAttribute('colspan'),'tupletvalue');
+                        that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('colspan'), 'tupletvalue');
                     }
                 }
             } else {
@@ -3009,14 +3020,14 @@ function PitchTimeMatrix () {
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 // Give each clickable cell a unique id
-                cell.setAttribute('id', i + ':' + j);
+                cell.setAttribute('id', i + ': ' + j);
 
                 var that = this;
                 var isMouseDown = false;
 
                 cell.onmousedown = function () {
                     isMouseDown = true;
-                    var obj = this.id.split(':');
+                    var obj = this.id.split(': ');
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
                     if (this.style.backgroundColor === 'black') {
@@ -3030,7 +3041,7 @@ function PitchTimeMatrix () {
                 }
 
                 cell.onmouseover = function () {
-                    var obj = this.id.split(':');
+                    var obj = this.id.split(': ');
                     var i = Number(obj[0]);
                     var j = Number(obj[1]);
                     if (isMouseDown) {
@@ -3183,7 +3194,7 @@ function PitchTimeMatrix () {
                 } else if (note[i].slice(0, 4) === 'http') {
                     drumNotes.push(note[i]);
                 } else {
-                    var obj = note[i].split(':');
+                    var obj = note[i].split(': ');
                     if (obj.length > 1) {
                         // Deprecated
                         if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
@@ -3319,7 +3330,7 @@ function PitchTimeMatrix () {
                         } else if (note[i].slice(0, 4) === 'http') {
                             drumNotes.push(note[i]);
                         } else {
-                            var obj = note[i].split(':');
+                            var obj = note[i].split(': ');
                             // Deprecated
                             if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
                                 synthNotes.push(note[i]);
@@ -3402,47 +3413,47 @@ function PitchTimeMatrix () {
 
     this._processGraphics = function (obj) {
         switch(obj[0]) {
-        case 'forward':
+        case 'forward': 
             this._logo.turtles.turtleList[0].doForward(obj[1]);
             break;
-        case 'back':
+        case 'back': 
             this._logo.turtles.turtleList[0].doForward(-obj[1]);
             break;
-        case 'right':
+        case 'right': 
             this._logo.turtles.turtleList[0].doRight(obj[1]);
             break;
-        case 'left':
+        case 'left': 
             this._logo.turtles.turtleList[0].doRight(-obj[1]);
             break;
-        case 'setcolor':
+        case 'setcolor': 
             this._logo.turtles.turtleList[0].doSetColor(obj[1]);
             break;
-        case 'sethue':
+        case 'sethue': 
             this._logo.turtles.turtleList[0].doSetHue(obj[1]);
             break;
-        case 'setshade':
+        case 'setshade': 
             this._logo.turtles.turtleList[0].doSetValue(obj[1]);
             break;
-        case 'setgrey':
+        case 'setgrey': 
             this._logo.turtles.turtleList[0].doSetChroma(obj[1]);
             break;
-        case 'settranslucency':
+        case 'settranslucency': 
             var alpha = 1.0 - (obj[1] / 100);
             this._logo.turtles.turtleList[0].doSetPenAlpha(alpha);
             break;
-        case 'setpensize':
+        case 'setpensize': 
             this._logo.turtles.turtleList[0].doSetPensize(obj[1]);
             break;
-        case 'setheading':
+        case 'setheading': 
             this._logo.turtles.turtleList[0].doSetHeading(obj[1]);
             break;
-        case 'arc':
+        case 'arc': 
             this._logo.turtles.turtleList[0].doArc(obj[1], obj[2]);
             break;
-        case 'setxy':
+        case 'setxy': 
             this._logo.turtles.turtleList[0].doSetXY(obj[1], obj[2]);
             break;
-        default:
+        default: 
             console.log('unknown graphics command ' + obj[0]);
             break;
         }
@@ -3479,12 +3490,12 @@ function PitchTimeMatrix () {
         } else {
             var drumName = getDrumName(note);
             var graphicsBlock = false;
-            graphicNote = note.split(':');
+            graphicNote = note.split(': ');
             if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
                 var graphicsBlock = true;
             }
 
-            var obj = note.split(':');
+            var obj = note.split(': ');
         }
 
         var row = docById('ptm' + j);
@@ -3517,7 +3528,7 @@ function PitchTimeMatrix () {
     };
 
     this._clear = function () {
-        // "Unclick" every entry in the matrix.
+        // 'Unclick' every entry in the matrix.
         for (var i = 0; i < this.rowLabels.length; i++) {
             var row = docById('ptm' + i);
             for (var j = 0; j < row.cells.length; j++) {
@@ -3639,7 +3650,7 @@ function PitchTimeMatrix () {
                         var obj = null;
                         var drumName = null;
                     } else {
-                       var obj = note[0][j].split(':');
+                       var obj = note[0][j].split(': ');
                        var drumName = getDrumName(note[0][j]);
                     }
 
