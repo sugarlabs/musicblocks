@@ -379,9 +379,9 @@ function PitchTimeMatrix () {
         var ptmTable = docById('ptmTable');
 
         if (!this.sorted) {
-            this.columnBlocksMap = this._mapNotesBlocks('all',true);
+            this.columnBlocksMap = this._mapNotesBlocks('all', true);
             for (i = 0; i < this.columnBlocksMap.length; i++) {
-                if ((MATRIXGRAPHICS.indexOf(this.columnBlocksMap[i][1])!== -1) || (MATRIXGRAPHICS2.indexOf(this.columnBlocksMap[i][1])!==-1) || (MATRIXSYNTHS.indexOf(this.columnBlocksMap[i][1])!==-1) || (['playdrum','pitch'].indexOf(this.columnBlocksMap[i][1])!==-1)) {
+                if ((MATRIXGRAPHICS.indexOf(this.columnBlocksMap[i][1]) !== -1) || (MATRIXGRAPHICS2.indexOf(this.columnBlocksMap[i][1]) !==-1) || (MATRIXSYNTHS.indexOf(this.columnBlocksMap[i][1]) !==-1) || (['playdrum','pitch'].indexOf(this.columnBlocksMap[i][1]) !==-1)) {
                     continue;
                 }
                 this.columnBlocksMap = this.columnBlocksMap.slice(0, i).concat(this.columnBlocksMap.slice(i + 1));
@@ -597,10 +597,10 @@ function PitchTimeMatrix () {
     };
 
     this._createAddRowPieSubmenu = function() {
-	// This menu is used to add new rows to the matrix.
+        // This menu is used to add new rows to the matrix.
         docById('wheelDivptm').style.display = '';
-        const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics'];
-        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg'];
+        const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics', 'pen'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg', 'imgsrc: images/pen.svg'];
         var valueLabel = [];
         for (var i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
@@ -612,7 +612,7 @@ function PitchTimeMatrix () {
         for (var i = 0; i < GRAPHICS.length; i++) {
             var label = _(GRAPHICS[i]);
             if (getTextWidth(label, 'bold 30pt Sans') > 200) {
-                graphicLabels.push(label.substr(0, 8) + '..');
+                graphicLabels.push(label.substr(0, 8) + '...');
             } else {
                 graphicLabels.push(label);
             }
@@ -620,7 +620,6 @@ function PitchTimeMatrix () {
 
         this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
-        this._graphicWheel = new wheelnav('_graphicWheel', this._menuWheel.raphael);
 
         wheelnav.cssMode = true;
 
@@ -628,9 +627,10 @@ function PitchTimeMatrix () {
         this._menuWheel.slicePathFunction = slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._menuWheel.colors = [platformColor.paletteColors['pitch'][0],
-                                   platformColor.paletteColors['pitch'][1],
-                                   platformColor.paletteColors['drum'][0],
-                                   platformColor.paletteColors['turtle'][0]];
+                                  platformColor.paletteColors['pitch'][1],
+                                  platformColor.paletteColors['drum'][0],
+                                  platformColor.paletteColors['turtle'][0],
+                                  platformColor.paletteColors['turtle'][1]];
         this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
         this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
         
@@ -644,6 +644,7 @@ function PitchTimeMatrix () {
         this._menuWheel.navItems[1].setTooltip(_('hertz'));
         this._menuWheel.navItems[2].setTooltip(_('drum'));
         this._menuWheel.navItems[3].setTooltip(_('graphics'));
+        this._menuWheel.navItems[4].setTooltip(_('pen'));
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -654,22 +655,6 @@ function PitchTimeMatrix () {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
-
-        this._graphicWheel.colors = platformColor.graphicWheelcolors;
-        this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
-        this._graphicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._graphicWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._graphicWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._graphicWheel.sliceSelectedPathCustom = this._graphicWheel.slicePathCustom;
-        this._graphicWheel.sliceInitPathCustom = this._graphicWheel.slicePathCustom;
-        this._graphicWheel.clickModeRotate = false;
-        this._graphicWheel.titleRotateAngle = 0;
-
-        this._graphicWheel.createWheel(graphicLabels);
-
-        for (var i = 0; i < graphicLabels.length;i++) {
-            this._graphicWheel.navItems[i].navItem.hide();
-        }
 
         var x = docById('addnotes').getBoundingClientRect().x;
         var y = docById('addnotes').getBoundingClientRect().y;
@@ -685,31 +670,11 @@ function PitchTimeMatrix () {
             docById('wheelDivptm').style.display = 'none';
             that._menuWheel.removeWheel();
             that._exitWheel.removeWheel();
-            that._graphicWheel.removeWheel();
         };
 
         var __subMenuChanged = function () {
             var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex]; 
-            if (label === 'pitch') {
-                __selectionChanged();
-                for (var i = 0; i < graphicLabels.length;i++) {
-                    that._graphicWheel.navItems[i].navItem.hide();
-                }
-            } else if (label === 'hertz') {
-                __selectionChanged();
-                for (var i = 0; i < graphicLabels.length;i++) {
-                    that._graphicWheel.navItems[i].navItem.hide();
-                }
-            } else if (label === 'graphics') {
-                for (var i = 0; i < graphicLabels.length;i++) {
-                    that._graphicWheel.navItems[i].navItem.show();
-                }
-            } else if (label === 'drum') {
-                __selectionChanged();
-                for (var i = 0; i < graphicLabels.length;i++) {
-                    that._graphicWheel.navItems[i].navItem.hide();
-                }
-            }
+            __selectionChanged();
         }
 
         var __selectionChanged = function () {
@@ -717,87 +682,82 @@ function PitchTimeMatrix () {
             var rLabel = null;
             var rArg = null;
             var blockLabel = '';    
-            if (label === 'pitch') {
-                const BLOCKOBJ = [[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]];
-                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+            switch(label) {
+            case 'pitch':
+                that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]]);
                 var n = that._logo.blocks.blockList.length - 3;
                 rLabel = 'sol';
                 rArg = 4;
-            } else if (label === 'hertz') {
-                const BLOCKOBJ = [[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]];
-                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                break;
+            case 'hertz':
+                that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]]);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = 'hertz';
                 rArg = 392;
-            } else if (label === 'drum') {
-                const BLOCKOBJ = [[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': DEFAULTDRUM}], 0, 0, [0]]];
-                that._logo.blocks.loadNewBlocks(BLOCKOBJ);
+                break;
+            case 'drum':
+                that._logo.blocks.loadNewBlocks([[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': DEFAULTDRUM}], 0, 0, [0]]]);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = blockLabel;
                 rArg = -1;
-            } else if (label === 'graphics') {
-                blockLabel = GRAPHICS[that._graphicWheel.selectedNavItemIndex];
-                var val = 100;
-                if (blockLabel === 'setcolor'){
-                    val = 0;
-                }
-
-                var BLOCKOBJ = [];
-                if (blockLabel === 'arc' || blockLabel === 'setxy'){
-                    BLOCKOBJ = [[0, [blockLabel, {}], 0, 0, [null, 1, 2, null]], [1, ['number', {'value': 90}], 0, 0, [0]], [2, ['number', {'value': 100}], 0, 0, [0]]];
-                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
-                    var n = that._logo.blocks.blockList.length - 3;
-                    rArg = [90, 100];
-                } else {
-                    BLOCKOBJ = [[0, [blockLabel, {}], 0, 0, [null, 1, null]], [1, ['number', {'value': val}], 0, 0, [0]]];
-                    that._logo.blocks.loadNewBlocks(BLOCKOBJ);
-                    var n = that._logo.blocks.blockList.length - 2;
-                    rArg = val;
-                }
-                rLabel = blockLabel;
+                break;
+            case 'graphics':
+                that._logo.blocks.loadNewBlocks([[0, ['forward', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 100}], 0, 0, [0]]]);
+                var n = that._logo.blocks.blockList.length - 2;
+                rLabel = 'forward';
+                rArg = 100;
+                break;
+            case 'pen':
+                that._logo.blocks.loadNewBlocks([[0, ['setcolor', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 0}], 0, 0, [0]]]);
+                var n = that._logo.blocks.blockList.length - 2;
+                rLabel = 'setcolor';
+                rArg = 0;
+                break;
+            default:
+                console.log(label + ' not found');
+                break;
             }
 
             var blocksNo = null;
             var aboveBlock = null;
             
             switch (label) {
-                case 'graphics': 
-                    for (var i = graphicLabels.length - 1; i >= 0; i--) {
-                        blocksNo = that._mapNotesBlocks(graphicLabels[i]);
-                        if(blocksNo.length >= 1){
-                            aboveBlock = last(blocksNo);
-                            break;
-                        }
-                    }
-                    if (aboveBlock !== null){
-                        break;
-                    }
-                case 'drum': 
-                    blocksNo = that._mapNotesBlocks('drumname');
-                    if(blocksNo.length >= 1){
+            case 'graphics': 
+            case 'pen': 
+                for (var i = graphicLabels.length - 1; i >= 0; i--) {
+                    blocksNo = that._mapNotesBlocks(graphicLabels[i]);
+                    if (blocksNo.length >= 1){
                         aboveBlock = last(blocksNo);
-                    }
-                    if (aboveBlock !== null){
+                        console.log(aboveBlock)
                         break;
                     }
-                case 'hertz': 
-                    blocksNo = that._mapNotesBlocks('hertz');
-                    if(blocksNo.length >= 1){
-                        aboveBlock = last(blocksNo);
-                    }
-                    if (aboveBlock !== null){
-                        break;
-                    }
-                case 'pitch': 
-                    blocksNo = that._mapNotesBlocks('pitch');
-                    if(blocksNo.length >= 1){
-                        aboveBlock = last(blocksNo);
-                    }
-                    if (aboveBlock !== null){
-                        break;
-                    }
-                default: 
-                    aboveBlock = that.blockNo
+                }
+                break;
+            case 'drum': 
+                blocksNo = that._mapNotesBlocks('drumname');
+                if (blocksNo.length >= 1){
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            case 'hertz': 
+                blocksNo = that._mapNotesBlocks('hertz');
+                if (blocksNo.length >= 1){
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            case 'pitch': 
+                blocksNo = that._mapNotesBlocks('pitch');
+                if (blocksNo.length >= 1){
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            default: 
+                aboveBlock = that.blockNo
+                break;
+            }
+
+            if (aboveBlock === null) {
+                console.log('WARNING: aboveBlock is null');
             }
 
             if (aboveBlock === that.blockNo){
@@ -805,14 +765,14 @@ function PitchTimeMatrix () {
                 that.rowLabels.splice(0, 0, rLabel);
                 that.rowArgs.splice(0, 0, rArg);
                 that._rowBlocks.splice(0, 0, n);
-
             } else {
                 setTimeout(that._addNotesBlockBetween(aboveBlock, n, false), 500);
                 for (var i = 0; i < that.columnBlocksMap.length; i++){
-                    if(that.columnBlocksMap[i][0] === aboveBlock) {
+                    if (that.columnBlocksMap[i][0] === aboveBlock) {
                         break;
                     }
                 }
+
                 that.rowLabels.splice(i+1, 0, rLabel);
                 that.rowArgs.splice(i+1, 0, rArg);
                 that._rowBlocks.splice(i+1, 0, n);
@@ -844,17 +804,15 @@ function PitchTimeMatrix () {
                 }, 200);
             }
         }
+
         for (var i = 0; i < valueLabel.length; i++) {
             this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
-        }
-        for (var i = 0; i < graphicLabels.length; i++) {
-            this._graphicWheel.navItems[i].navigateFunction = __selectionChanged;
         }
     }
 
     this.pitchBlockAdded = function(blockN) {
         for (var i = 0; i < this.columnBlocksMap.length; i++){
-            if(this.columnBlocksMap[i][0] === blockN) {
+            if (this.columnBlocksMap[i][0] === blockN) {
                 break;
             }
         }
@@ -1403,7 +1361,7 @@ function PitchTimeMatrix () {
         var block = this.columnBlocksMap[index][0];
         var noteValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
 
-        if(condition === 'pitchblocks') {
+        if (condition === 'pitchblocks') {
             var octaveValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
             var accidentalsValue = 2;
 
@@ -1438,7 +1396,7 @@ function PitchTimeMatrix () {
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
-            if(condition === 'pitchblocks') {
+            if (condition === 'pitchblocks') {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
@@ -1512,7 +1470,7 @@ function PitchTimeMatrix () {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var timeout = 0;
-            if(condition === 'pitchblocks') {
+            if (condition === 'pitchblocks') {
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 if (attr !== '♮') {
                     label += attr;
@@ -1522,7 +1480,7 @@ function PitchTimeMatrix () {
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
-            } else if(condition === 'drumblocks') {
+            } else if (condition === 'drumblocks') {
                 if (that._logo.instrumentNames[0] === undefined || that._logo.instrumentNames[0].indexOf(label) === -1) {
                     if (that._logo.instrumentNames[0] === undefined) {
                         that._logo.instrumentNames[0] = [];
@@ -2397,7 +2355,6 @@ function PitchTimeMatrix () {
         var blk = this._logo.blocks.blockList[this.blockNo].connections[1];
         var myBlock = this._logo.blocks.blockList[blk];
 
-
         var bottomBlockLoop = 0;
         if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
             if (withName) {
@@ -2406,6 +2363,7 @@ function PitchTimeMatrix () {
                 notesBlockMap.push(blk);
             }
         }
+
         while (last(myBlock.connections) != null) {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * this._logo.blocks.blockList) {
@@ -2416,7 +2374,7 @@ function PitchTimeMatrix () {
 
             blk = last(myBlock.connections);
             myBlock = this._logo.blocks.blockList[blk];
-            if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
+            if (myBlock.name === blockName || (blockName === 'all' && myBlock.name !== 'hidden' && myBlock.name !== 'vspace' && myBlock.name !== 'hiddennoflow')) {
                 if (withName) {
                     notesBlockMap.push([blk, myBlock.name]);
                 } else {
@@ -2424,6 +2382,7 @@ function PitchTimeMatrix () {
                 }
             }
         }
+
         return notesBlockMap
     }
 
