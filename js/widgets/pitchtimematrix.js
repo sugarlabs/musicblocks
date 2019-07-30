@@ -600,7 +600,7 @@ function PitchTimeMatrix () {
 	// This menu is used to add new rows to the matrix.
         docById('wheelDivptm').style.display = '';
         const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics'];
-        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: header-icons/oscillator.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg'];
         var valueLabel = [];
         for (var i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
