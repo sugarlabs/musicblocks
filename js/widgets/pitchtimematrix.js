@@ -607,16 +607,6 @@ function PitchTimeMatrix () {
             valueLabel.push(label);
         }
 
-        var drumLabels = [];
-        for (var i = 0; i < DRUMS.length; i++) {
-                var label = _(DRUMS[i]);
-                if (getTextWidth(label, 'bold 30pt Sans') > 200) {
-                    drumLabels.push(label.substr(0, 8) + '..');
-                } else {
-                    drumLabels.push(label);
-                }
-        }
-
         const GRAPHICS = MATRIXGRAPHICS2.concat(MATRIXGRAPHICS);
         var graphicLabels = [];
         for (var i = 0; i < GRAPHICS.length; i++) {
@@ -628,33 +618,32 @@ function PitchTimeMatrix () {
             }
         }
 
-        this._pitchWheel = new wheelnav('wheelDivptm', null, 200, 200);
-        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
-        this._drumWheel = new wheelnav('_drumWheel', this._pitchWheel.raphael);
-        this._graphicWheel = new wheelnav('_graphicWheel', this._pitchWheel.raphael);
+        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+        this._graphicWheel = new wheelnav('_graphicWheel', this._menuWheel.raphael);
 
         wheelnav.cssMode = true;
 
-        this._pitchWheel.keynavigateEnabled = false;
-        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
-        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = [platformColor.paletteColors['pitch'][0],
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.colors = [platformColor.paletteColors['pitch'][0],
                                    platformColor.paletteColors['pitch'][1],
                                    platformColor.paletteColors['drum'][0],
                                    platformColor.paletteColors['turtle'][0]];
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
         
-        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
-        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
-        this._pitchWheel.clickModeRotate = false;
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.clickModeRotate = false;
 
-        this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(valueLabel);
-        this._pitchWheel.navItems[0].setTooltip(_('pitch'));
-        this._pitchWheel.navItems[1].setTooltip(_('hertz'));
-        this._pitchWheel.navItems[2].setTooltip(_('drum'));
-        this._pitchWheel.navItems[3].setTooltip(_('graphics'));
+        this._menuWheel.animatetime = 0; // 300;
+        this._menuWheel.createWheel(valueLabel);
+        this._menuWheel.navItems[0].setTooltip(_('pitch'));
+        this._menuWheel.navItems[1].setTooltip(_('hertz'));
+        this._menuWheel.navItems[2].setTooltip(_('drum'));
+        this._menuWheel.navItems[3].setTooltip(_('graphics'));
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -665,21 +654,6 @@ function PitchTimeMatrix () {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(['x', ' ']);
-
-        this._drumWheel.colors = platformColor.drumWheelcolors;
-        this._drumWheel.slicePathFunction = slicePath().DonutSlice;
-        this._drumWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._drumWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._drumWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._drumWheel.sliceSelectedPathCustom = this._drumWheel.slicePathCustom;
-        this._drumWheel.sliceInitPathCustom = this._drumWheel.slicePathCustom;
-        this._drumWheel.clickModeRotate = false;
-        this._drumWheel.titleRotateAngle = 0;
-        this._drumWheel.createWheel(drumLabels);
-
-        for (var i = 0; i < drumLabels.length;i++) {
-            this._drumWheel.navItems[i].navItem.hide();
-        }
 
         this._graphicWheel.colors = platformColor.graphicWheelcolors;
         this._graphicWheel.slicePathFunction = slicePath().DonutSlice;
@@ -709,49 +683,37 @@ function PitchTimeMatrix () {
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function () {
             docById('wheelDivptm').style.display = 'none';
-            that._pitchWheel.removeWheel();
+            that._menuWheel.removeWheel();
             that._exitWheel.removeWheel();
-            that._drumWheel.removeWheel();
             that._graphicWheel.removeWheel();
         };
 
         var __subMenuChanged = function () {
-            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
+            var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex]; 
             if (label === 'pitch') {
                 __selectionChanged();
-                for (var i = 0; i < drumLabels.length;i++) {
-                    that._drumWheel.navItems[i].navItem.hide();
-                }
                 for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
                 }
             } else if (label === 'hertz') {
                 __selectionChanged();
-                for (var i = 0; i < drumLabels.length;i++) {
-                    that._drumWheel.navItems[i].navItem.hide();
-                }
                 for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
                 }
             } else if (label === 'graphics') {
-                for (var i = 0; i < drumLabels.length;i++) {
-                    that._drumWheel.navItems[i].navItem.hide();
-                }
                 for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.show();
                 }
             } else if (label === 'drum') {
+                __selectionChanged();
                 for (var i = 0; i < graphicLabels.length;i++) {
                     that._graphicWheel.navItems[i].navItem.hide();
-                }
-                for (var i = 0; i < drumLabels.length;i++) {
-                    that._drumWheel.navItems[i].navItem.show();
                 }
             }
         }
 
         var __selectionChanged = function () {
-            var label = VALUESLABEL[that._pitchWheel.selectedNavItemIndex]; 
+            var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex]; 
             var rLabel = null;
             var rArg = null;
             var blockLabel = '';    
@@ -768,8 +730,7 @@ function PitchTimeMatrix () {
                 rLabel = 'hertz';
                 rArg = 392;
             } else if (label === 'drum') {
-                blockLabel = DRUMS[that._drumWheel.selectedNavItemIndex];
-                const BLOCKOBJ = [[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': blockLabel}], 0, 0, [0]]];
+                const BLOCKOBJ = [[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': DEFAULTDRUM}], 0, 0, [0]]];
                 that._logo.blocks.loadNewBlocks(BLOCKOBJ);
                 var n = that._logo.blocks.blockList.length - 2;
                 rLabel = blockLabel;
@@ -884,10 +845,7 @@ function PitchTimeMatrix () {
             }
         }
         for (var i = 0; i < valueLabel.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __subMenuChanged;
-        }
-        for (var i = 0; i < drumLabels.length; i++) {
-            this._drumWheel.navItems[i].navigateFunction = __selectionChanged;
+            this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
         }
         for (var i = 0; i < graphicLabels.length; i++) {
             this._graphicWheel.navItems[i].navigateFunction = __selectionChanged;
