@@ -2838,7 +2838,7 @@ function Activity() {
             var line = new createjs.Shape();
             errorMsgArrow.addChild(line);
             line.graphics.setStrokeStyle(4).beginStroke('#ff0031').moveTo(fromX, fromY).lineTo(toX, toY);
-            stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
+            stage.setChildIndex(errorMsgArrow, stage.children.length - 2);
 
             var angle = Math.atan2(toX - fromX, fromY - toY) / Math.PI * 180;
             var head = new createjs.Shape();
@@ -2899,11 +2899,11 @@ function Activity() {
                 stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
                 break;
             default:
-                var errorMsgContainer = errorMsgText.parent;
-                errorMsgContainer.visible = true;
-                errorMsgText.text = msg;
-                stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
-                errorMsgContainer.updateCache();
+                // Show and populate errorText div
+                var errorText = document.getElementById("errorText");
+                errorText.classList.add("show");
+                var errorTextContent = document.getElementById("errorTextContent");
+                errorTextContent.innerHTML = msg;
                 break;
         }
 
