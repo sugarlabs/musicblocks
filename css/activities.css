@@ -1358,3 +1358,39 @@ input.timbreName {
     pointer-events: none !important;
     cursor: default !important;
  }
+
+ #printText {
+    width: 1000px;
+    height: 30px;
+    position: absolute;
+    top: 130px;
+    left: 50%;
+    margin-left: -500px;
+    padding-top: 2px;
+    border: 2px solid rgb(150, 150, 150);
+    border-radius: 8px;
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    visibility: hidden;
+  }
+
+  #printText.show {
+    visibility: visible;
+  }
+
+  #printText #printTextContent {
+    display: inline-block;
+    width: 940px;
+    vertical-align: 7px;
+  }
+
+  #printText #closeIcon {
+    width: 28px;
+    height: 28px;
+    filter: invert(100%);
+  }
