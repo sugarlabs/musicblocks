@@ -7,6 +7,9 @@
       "webL10n": "github:sugarlabs/webL10n/master"
     }
   },
+  "scripts": {
+    "serve": "python -m SimpleHTTPServer 3000"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
@@ -29,6 +32,8 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "lodash.template": "^4.5.0"
+    "http-server": "^0.11.1",
+    "lodash.template": "^4.5.0",
+    "node-static": "^0.7.11"
   }
 }

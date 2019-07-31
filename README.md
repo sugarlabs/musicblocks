@@ -24,10 +24,30 @@ Chrome, and Opera work best).
 If you want to run Music Blocks offline,
 [download](https://github.com/sugarlabs/musicblocks/archive/master.zip)
 or [git clone](https://github.com/sugarlabs/musicblocks.git) this repo
-and point your browser to the index.html file found in the musicblocks
-directory on your local file system.
+and run through a local server.
 
-You can also run Music Blocks by setting up a local server.
+How to set up the Local Server
+-----------------------------
+HTTPServer is set to start listening on port 3000
+
+STEPS TO FOLLOW 
+1)In your terminal, cd into the Music Blocks directory wish you to access via
+browsers and HTTP.
+
+1) Check if you have python installed on the terminal by typing `python` then you `exit()`
+ 
+2) Run `npm run serve` after you hit enter you will see a message:
+
+  `Serving HTTP on 0.0.0.0 port 3000 ...`
+
+3)Open your favorite browser and put in any of the following addresses:
+ 
+ `localhost:3000`
+  `127.0.0.1:3000`
+
+4)As long as the HTTP server is running, the terminal will update as data are
+loaded from the Python web server. 
+
 
 See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
