@@ -1030,6 +1030,7 @@ function PitchTimeMatrix () {
 
     this._createMatrixGraphicsPieSubmenu = function(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
+	console.log(blockIndex);
         docById('wheelDivptm').style.display = '';
         // Different blocks get different arg wheel values.
         if (condition === 'synthsblocks'){
@@ -1186,24 +1187,32 @@ function PitchTimeMatrix () {
         }
 
         var __selectionChanged = function (updatingArgs) {
+            var thisBlockName = 'hertz';
+
             if (condition === 'graphicsblocks') {
                 var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
-                label = MATRIXGRAPHICS[GRAPHICS.indexOf(label)]
-
-                if (updatingArgs === undefined) {
-                    var newBlock = that._logo.blocks.blockList.length;
-                    that._logo.blocks.loadNewBlocks([[0, label, 0, 0, [null, 1, null]], [1, ['number', {'value': parseInt(that.blockValue)}], 0, 0, [0]]]);
-
-                    setTimeout(function() {
-                        that._blockReplace(thisBlock, newBlock);
-                        that.columnBlocksMap[blockIndex][0] = newBlock;
-                        thisBlock = newBlock;
-                        that._createMatrixGraphicsPieSubmenu(blockIndex, condition, newBlock);
-                    }, 500);
+                var i = blockLabelsGraphics.indexOf(label);
+                if (i === -1) {
+                    i = blockLabelsPen.indexOf(label);
+                    if (i !== -1) {
+                        var thisBlockName = blockNamesPen[i];
+                    }
+                } else {
+                    var thisBlockName = blockNamesGraphics[i];
                 }
             }
 
-            if (updatingArgs) {
+            if (updatingArgs === undefined) {
+                var newBlock = that._logo.blocks.blockList.length;
+                that._logo.blocks.loadNewBlocks([[0, thisBlockName, 0, 0, [null, 1, null]], [1, ['number', {'value': parseInt(that.blockValue)}], 0, 0, [0]]]);
+
+                setTimeout(function() {
+                    that._blockReplace(thisBlock, newBlock);
+                    that.columnBlocksMap[blockIndex][0] = newBlock;
+                    thisBlock = newBlock;
+                    that._createMatrixGraphicsPieSubmenu(blockIndex, condition, newBlock);
+                }, 500);
+            } else {
                 // Just updating a block arg value
                 var argBlock = that._logo.blocks.blockList[thisBlock].connections[1];
                 that._logo.blocks.blockList[argBlock].text.text = that.blockValue;
@@ -1215,7 +1224,7 @@ function PitchTimeMatrix () {
             }
 
             // Update the stored values for this node.
-            that.rowLabels[blockIndex] = label;
+            that.rowLabels[blockIndex] = thisBlockName;
             that.rowArgs[blockIndex] = parseInt(that.blockValue);
 
             // Update the cell label.
