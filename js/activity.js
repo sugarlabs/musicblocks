@@ -2776,10 +2776,7 @@ function Activity() {
      */
     hideMsgs = function () {
         errorMsgText.parent.visible = false;
-        if (errorMsgArrow != null) {
-            errorMsgArrow.removeAllChildren();
-            refreshCanvas();
-        }
+        hideArrows();
 
         msgText.parent.visible = false;
         for (var i in errorArtwork) {
@@ -2788,6 +2785,13 @@ function Activity() {
 
         refreshCanvas();
     };
+
+    hideArrows = function() {
+        if (errorMsgArrow != null) {
+            errorMsgArrow.removeAllChildren();
+            refreshCanvas();
+        }
+    }
 
 
     textMsg = function (msg) {
@@ -2838,7 +2842,7 @@ function Activity() {
             var line = new createjs.Shape();
             errorMsgArrow.addChild(line);
             line.graphics.setStrokeStyle(4).beginStroke('#ff0031').moveTo(fromX, fromY).lineTo(toX, toY);
-            stage.setChildIndex(errorMsgArrow, stage.children.length - 2);
+            stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
 
             var angle = Math.atan2(toX - fromX, fromY - toY) / Math.PI * 180;
             var head = new createjs.Shape();
