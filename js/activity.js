@@ -1540,7 +1540,7 @@ function Activity() {
         var container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
-        container.y = 110;
+        container.y = 80;
         errorArtwork[name] = container;
         errorArtwork[name].name = name;
         errorArtwork[name].visible = false;
