@@ -1540,7 +1540,7 @@ function Activity() {
         var container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
-        container.y = 110;
+        container.y = 80;
         errorArtwork[name] = container;
         errorArtwork[name].name = name;
         errorArtwork[name].visible = false;
@@ -2776,10 +2776,7 @@ function Activity() {
      */
     hideMsgs = function () {
         errorMsgText.parent.visible = false;
-        if (errorMsgArrow != null) {
-            errorMsgArrow.removeAllChildren();
-            refreshCanvas();
-        }
+        hideArrows();
 
         msgText.parent.visible = false;
         for (var i in errorArtwork) {
@@ -2788,6 +2785,13 @@ function Activity() {
 
         refreshCanvas();
     };
+
+    hideArrows = function() {
+        if (errorMsgArrow != null) {
+            errorMsgArrow.removeAllChildren();
+            refreshCanvas();
+        }
+    }
 
 
     textMsg = function (msg) {
@@ -2899,11 +2903,11 @@ function Activity() {
                 stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
                 break;
             default:
-                var errorMsgContainer = errorMsgText.parent;
-                errorMsgContainer.visible = true;
-                errorMsgText.text = msg;
-                stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
-                errorMsgContainer.updateCache();
+                // Show and populate errorText div
+                var errorText = document.getElementById("errorText");
+                errorText.classList.add("show");
+                var errorTextContent = document.getElementById("errorTextContent");
+                errorTextContent.innerHTML = msg;
                 break;
         }
 
