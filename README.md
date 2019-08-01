@@ -28,10 +28,10 @@ and run through a local server.
 
 How to set up a local server
 ----------------------------
-Some web browsers have restrictions that prevent Music Blocks from
-running from the file://. To circumvent this, we provide instructions
-for launching a web server on your computer to which you can connect
-to Music Blocks.
+Some web browsers (e.g., Firefox v68) have restrictions that prevent
+Music Blocks from running from the file://. To circumvent this, we
+provide instructions for launching a web server on your computer to
+which you can connect to Music Blocks.
 
 (1) In a terminal, cd to the directory where you downloaded Music
 Blocks (e.g., <code>cd /musicblocks</code>)
