@@ -10,7 +10,7 @@ musical and mathematical concepts in an integrative and fun way.
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
 
-Using Music Blocks
+Running Music Blocks
 ------------------
 
 Music Blocks is available under the GNU Affero General Public License (AGPL), a free, copyleft license.
@@ -49,6 +49,7 @@ HTTPServer is set to start listening on Port 3000.
 
 Using Music Blocks
 ------------------
+Once Music Blocks is running, you'll want suggestions on how to use it.
 See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
