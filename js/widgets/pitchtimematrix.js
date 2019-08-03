@@ -254,7 +254,7 @@ function PitchTimeMatrix () {
             that._sort();
         };
 
-        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add Note'));
+        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add note'));
         cell.setAttribute('id', 'addnotes');
         cell.onclick = function () {
             that._createAddRowPieSubmenu();

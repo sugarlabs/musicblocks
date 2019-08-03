@@ -1359,15 +1359,14 @@ input.timbreName {
     cursor: default !important;
  }
 
- #printText {
+ .popupMsg {
     width: 1000px;
     height: 30px;
     position: absolute;
     top: 130px;
     left: 50%;
     margin-left: -500px;
-    padding-top: 2px;
-    border: 2px solid rgb(150, 150, 150);
+    padding-top: 2px; 
     border-radius: 8px;
     background-color: white;
     font-family: Arial, Helvetica, sans-serif;
@@ -1377,19 +1376,28 @@ input.timbreName {
     text-overflow: ellipsis;
     cursor: pointer;
     visibility: hidden;
+}
+
+ #printText {
+    border: 2px solid rgb(150, 150, 150);
   }
 
-  #printText.show {
+  #errorText {
+    border: 2px solid red;
+    background-color: pink;
+  }
+
+  #printText.show, #errorText.show {
     visibility: visible;
   }
 
-  #printText #printTextContent {
+ #printTextContent, #errorTextContent {
     display: inline-block;
     width: 940px;
     vertical-align: 7px;
   }
 
-  #printText #closeIcon {
+  .msgCloseIcon {
     width: 28px;
     height: 28px;
     filter: invert(100%);
