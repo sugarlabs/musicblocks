@@ -26,6 +26,9 @@ function MusicKeyboard() {
     var w = window.innerWidth;
     this._cellScale = w / 1200;
 
+    this._stopOrCloseClicked = false;
+    this.playingNow = false;
+
     this.noteNames = [];
     this.octaves = [];
     this.keyboardShown = true;
@@ -187,6 +190,7 @@ function MusicKeyboard() {
     this.init = function(logo) {
         this._logo = logo; 
 
+        this.playingNow = false;
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
@@ -236,7 +240,7 @@ function MusicKeyboard() {
         cell.onclick = function() {
             that._logo.setTurtleDelay(0);
             that.processSelected();
-            that.playAll()
+            that.playAll(row1)
         };
 
         var cell = this._addButton(row1, 'export-chunk.svg', ICONSIZE, _('Save'));
@@ -347,40 +351,61 @@ function MusicKeyboard() {
         };
     };
 
-    this.playAll = function() {
-        if (selected1.length < 1) {
-            return;
-        }
-        var notes = [];
-        for (var i = 0; i < selected1[0][0].length; i++) {
-            if (this.keyboardShown) {
-                var id = this.idContainer.findIndex(function(ele) {
-                    return ele[1] === selected1[0][1][i]
-                });
-                var ele = docById(this.idContainer[id][0]);
-                ele.style.backgroundColor = 'lightgrey';
+    this.playAll = function(row) {
+        this.playingNow = !this.playingNow;
+
+        var playButtonCell = row.cells[1];
+
+        if (this.playingNow) {
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
+            if (selected1.length < 1) {
+                return;
             }
-            
-            var zx = selected1[0][0][i];     
-            var res = zx;       
-            if( typeof(zx) === 'string') {
-                res = zx.replace(SHARP, '#').replace(FLAT, 'b');
+            var notes = [];
+            for (var i = 0; i < selected1[0][0].length; i++) {
+                if (this.keyboardShown) {
+                    var id = this.idContainer.findIndex(function(ele) {
+                        return ele[1] === selected1[0][1][i]
+                    });
+                    var ele = docById(this.idContainer[id][0]);
+                    ele.style.backgroundColor = 'lightgrey';
+                }
+                
+                var zx = selected1[0][0][i];     
+                var res = zx;       
+                if( typeof(zx) === 'string') {
+                    res = zx.replace(SHARP, '#').replace(FLAT, 'b');
+                }
+                notes.push(res)
             }
-            notes.push(res)
+            if (!this.keyboardShown) {
+                var cell = docById('cells-0');
+                cell.style.backgroundColor = platformColor.selectorBackground
+            }
+            this._stopOrCloseClicked = false;
+            this._playChord(notes, selected1[0][2]);
+            var maxWidth = Math.max.apply(Math, selected1[0][2]);
+            this.playOne(1, maxWidth, playButtonCell)
+        } else {
+            if (!this.keyboardShown) {
+                this._createTable();
+            } else {
+                this._createKeyboard();
+            }
+            this._stopOrCloseClicked = true;
+            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+
         }
-        if (!this.keyboardShown) {
-            var cell = docById('cells-0');
-            cell.style.backgroundColor = platformColor.selectorBackground
-        }
-        this._playChord(notes,selected1[0][2]);
-        var maxWidth = Math.max.apply(Math, selected1[0][2]);
-        this.playOne(1,maxWidth)
     }
 
-    this.playOne = function(counter, time) {
+    this.playOne = function(counter, time, playButtonCell) {
         var that = this;
         setTimeout(function () {
             if (counter < selected1.length) {
+                if (that._stopOrCloseClicked) {
+                    return;
+                }
                 if (!that.keyboardShown) {
                     var cell = docById('cells-' + counter);
                     cell.style.backgroundColor = platformColor.selectorBackground
@@ -410,10 +435,14 @@ function MusicKeyboard() {
                     }
                     notes.push(res)
                 }
-                that._playChord(notes,selected1[counter][2]);
+                if (that.playingNow) {
+                    that._playChord(notes,selected1[counter][2]);
+                }
                 var maxWidth = Math.max.apply(Math, selected1[counter][2]);
-                that.playOne(counter+1,maxWidth)
+                that.playOne(counter+1, maxWidth, playButtonCell)
             } else {
+                playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that.playingNow = false;
                 if (!that.keyboardShown) {
                     that._createTable();
                 } else {
@@ -450,8 +479,21 @@ function MusicKeyboard() {
 
     this._keysLayout = function() {
         this.layout = [];
+        var sortableList = [];
         for (var i = 0; i < this.noteNames.length; i++){
-            this.layout.push([this.noteNames[i], this.octaves[i], this._rowBlocks[i]])
+            if (this.noteNames[i] === 'hertz') {
+                sortableList.push([this.octaves[i], this.noteNames[i], this.octaves[i], this._rowBlocks[i]]);
+            } else {
+                sortableList.push([noteToFrequency(this.noteNames[i]+ this.octaves[i], this._logo.keySignature[0]), this.noteNames[i], this.octaves[i], this._rowBlocks[i]]);
+            }
+        }
+        var sortedList = sortableList.sort(
+            function(a, b) {
+                return a[0] - b[0]
+            }
+        )
+        for (var i = 0; i < sortedList.length; i++) {
+            this.layout.push([sortedList[i][1], sortedList[i][2], sortedList[i][3]]);
         }
     }
 
