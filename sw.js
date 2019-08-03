@@ -110,9 +110,3 @@ self.addEventListener("refreshOffline", function () {
 
 
 
-
-
-
-
-
-

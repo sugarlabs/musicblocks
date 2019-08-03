@@ -7475,3 +7475,5 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "half note 𝅗𝅥"
 #~msgstr "半音符 𝅗𝅥"
 
+msgid "Add note"
+msgstr "音符を足す"
