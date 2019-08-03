@@ -41,5 +41,5 @@
   ],
   "start_url": "index.html",
   "display": "standalone",
-  "orientation": "potrait"
+  "orientation": "portrait"
 }

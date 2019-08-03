@@ -137,38 +137,28 @@ function Block(protoblock, blocks, overrideName) {
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this.updateCache = function (counter) {
-        var that = this;
-        return new Promise(function (resolve, reject) {
-
+    this.updateCache = async function (counter) {
+        if (counter === undefined) {
             var loopCount = 0;
-            
-            async function updateBounds(counter) {
-      try {
-        if (counter !== undefined) {
-            loopCount = counter;   
-        } 
+        } else {
+            var loopCount = counter;
+        }
 
         if (loopCount > 3) {
-            throw new Error('COULD NOT UPDATE CACHE');     
+            console.log('COULD NOT UPDATE CACHE');
+            return;
         }
 
+        var that = this;
 
-        if (that.bounds == null) {
+        if (this.bounds == null) {
+         await delayExecution(200);
                 console.log('UPDATE CACHE: BOUNDS NOT READY');
-                updateBounds(loopCount + 1);
-             await that.pause(200);
+                that.updateCache(loopCount + 1);
         } else {
-            that.container.updateCache();
-            that.blocks.refreshCanvas();
-            resolve();
+            this.container.updateCache();
+            this.blocks.refreshCanvas();
         }
-    }catch (e) {
-        reject(e)
-    }
-}
-    updateBounds();
-        })
     };
 
     this.ignore = function () {
