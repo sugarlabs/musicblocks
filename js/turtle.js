@@ -1311,7 +1311,7 @@ function Turtle (name, turtles, drum) {
      * 
      */
    
-    this.updateCache = function () {
+    this.updateCache = async function () {
         var that = this;
 
         if (that.bounds == null) {
@@ -1329,7 +1329,7 @@ function Turtle (name, turtles, drum) {
      * Sets timeout to null and blinkFinished boolean to true (if they have not been already changed)
      * 
      */
-    this.stopBlink = async function () {
+    this.stopBlink = function () {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
