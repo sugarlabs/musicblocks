@@ -512,16 +512,17 @@ function MusicKeyboard() {
     }
 
     this._setNoteCell = function(j, colIndex, start, playNote) {
-        var temp1 = this.layout[j][0];
+        var n = this.layout.length
+        var temp1 = this.layout[n-j-1][0];
         if (temp1 === 'hertz') {
-            var temp2 = this.layout[j][1];
+            var temp2 = this.layout[n-j-1][1];
         } else if (temp1 in FIXEDSOLFEGE1) {
-            var temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, '#').replace(FLAT, 'b') + this.layout[j][1];
+            var temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n-j-1][1];
         } else {
-            var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[j][1];
+            var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n-j-1][1];
         }
         var ele = docById(j + ':' + colIndex);
-        this._selectedHelper.push([parseInt(start), temp2, this.layout[j][2], ele.getAttribute('alt')]);
+        this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], ele.getAttribute('alt')]);
         if (playNote) {
             synth.triggerAttackRelease(temp2, ele.getAttribute('alt'));
         }
@@ -617,7 +618,7 @@ function MusicKeyboard() {
         }
 
         j=0;
-        for (var i = 0; i < this.layout.length; i++) {
+        for (var i = this.layout.length - 1; i >= 0; i--) {
             var mkbTableRow = mkbTable.insertRow(); 
             var cell = mkbTableRow.insertCell(); 
             cell.style.backgroundColor = platformColor.graphicsLabelBackground;
@@ -658,7 +659,7 @@ function MusicKeyboard() {
         for (var j = 0; j < selected1.length; j++) {
             var maxWidth = Math.max.apply(Math, selected1[j][2]);
             var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selected1[j][2])) + 'px';
-
+            var n = this.layout.length;
             for (var i = 0; i < this.layout.length; i++) {
                 var row = docById('mkb' + i);
                 var cell = row.insertCell();
@@ -667,8 +668,8 @@ function MusicKeyboard() {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 
-                if (selected1[j][1].indexOf(this.layout[i][2]) !== -1) {
-                    var ind = selected1[j][1].indexOf(this.layout[i][2]);
+                if (selected1[j][1].indexOf(this.layout[n-i-1][2]) !== -1) {
+                    var ind = selected1[j][1].indexOf(this.layout[n-i-1][2]);
                     cell.setAttribute('alt', selected1[j][2][ind])
                     cell.style.backgroundColor = 'black';
                 } else {
