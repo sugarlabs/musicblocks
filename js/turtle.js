@@ -1310,6 +1310,7 @@ function Turtle (name, turtles, drum) {
      * Includes workaround for a race condition. 
      * 
      */
+   
     this.updateCache = async function () {
         var that = this;
 
