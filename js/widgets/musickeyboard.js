@@ -352,6 +352,9 @@ function MusicKeyboard() {
     };
 
     this.playAll = function(row) {
+        if (selected1.length <= 0) {
+            return;
+        }
         this.playingNow = !this.playingNow;
 
         var playButtonCell = row.cells[1];
@@ -449,7 +452,7 @@ function MusicKeyboard() {
                     that._createKeyboard();
                 }
             }
-        }, time * 1000)
+        }, time * 1000 + 125);
     }
 
     this._playChord = function (notes, noteValue) {
