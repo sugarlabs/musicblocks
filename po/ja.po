@@ -7415,8 +7415,8 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
 #~msgstr "完全ブロックには 1, 4, 5, 8 いずれかの数をいれて下さい"
 
-#~msgid "table"
-#~msgstr "グラフ"
+msgid "table"
+msgstr "グラフ"
 
 #~msgid "cp"
 #~msgstr "ヌ"
