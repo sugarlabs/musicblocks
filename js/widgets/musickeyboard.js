@@ -261,6 +261,12 @@ function MusicKeyboard() {
             selected1 = [];
         };
 
+        var cell = this._addButton(row1, 'add2.svg', ICONSIZE, _('Add note'));
+        cell.setAttribute('id', 'addnotes');
+        cell.onclick = function () {
+            that._createAddRowPieSubmenu();
+        };
+
         var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
         
         that._createKeyboard();
@@ -727,6 +733,112 @@ function MusicKeyboard() {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }     
         this.makeClickable();   
+    }
+
+    this._createAddRowPieSubmenu = function() {
+        docById('wheelDivptm').style.display = '';
+        const VALUESLABEL = ['pitch', 'hertz'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg'];
+        var valueLabel = [];
+        for (var i = 0; i < VALUES.length; i++) {
+            var label = _(VALUES[i]);
+            valueLabel.push(label);
+        }
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.colors = [platformColor.paletteColors['pitch'][0],
+                                  platformColor.paletteColors['pitch'][1]]
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.clickModeRotate = false;
+
+        this._menuWheel.animatetime = 0; // 300;
+        this._menuWheel.createWheel(valueLabel);
+        this._menuWheel.navItems[0].setTooltip(_('pitch'));
+        this._menuWheel.navItems[1].setTooltip(_('hertz'));
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var x = docById('addnotes').getBoundingClientRect().x;
+        var y = docById('addnotes').getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var __selectionChanged = function () {
+            var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex];
+            var newBlock = that._logo.blocks.blockList.length;
+
+            switch(label) {
+                case 'pitch':
+                    console.log('loading new pitch block');
+                    that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]]);
+                    rLabel = 'sol';
+                    rArg = 4;
+                    break;
+                case 'hertz':
+                    console.log('loading new Hertz block');
+                    that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]]);
+                    rLabel = 'hertz';
+                    rArg = 392;
+                    break;
+            }    
+            var aboveBlock = last(that.layout)[2];
+            setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock), 500);
+            that.layout.push([rLabel, rArg, newBlock]);
+            that._sortLayout();
+            if (that.keyboardShown) {
+                that._createKeyboard();
+            } else {
+                that._createTable();
+            }
+        }
+
+        for (var i = 0; i < valueLabel.length; i++) {
+            this._menuWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+
+    }
+
+
+    this._addNotesBlockBetween = function(aboveBlock, block) {
+        
+        var belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
+        this._logo.blocks.blockList[aboveBlock].connections[this._logo.blocks.blockList[aboveBlock].connections.length - 1] = block;
+        this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        this._logo.blocks.blockList[block].connections[this._logo.blocks.blockList[block].connections.length - 1] = belowBlock;   
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
     }
 
     this._sortLayout = function() {
