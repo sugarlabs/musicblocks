@@ -1310,13 +1310,27 @@ function Turtle (name, turtles, drum) {
      * Includes workaround for a race condition. 
      * 
      */
-    this.updateCache = async function () {
+    // this.updateCache = async function () {
+    //     var that = this;
+
+    //     if (that.bounds == null) {
+    //         console.log('Block container for ' + that.name + ' not yet ready.');
+    //         await delayExecution(300)
+    //             that.updateCache();
+    //     } else {
+    //         that.container.updateCache();
+    //         that.turtles.refreshCanvas();
+    //     }
+    // };
+
+    this.updateCache = function () {
         var that = this;
 
         if (that.bounds == null) {
             console.log('Block container for ' + that.name + ' not yet ready.');
-            await delayExecution(300)
+            setTimeout(function () {
                 that.updateCache();
+            }, 300);
         } else {
             that.container.updateCache();
             that.turtles.refreshCanvas();
@@ -1356,7 +1370,26 @@ function Turtle (name, turtles, drum) {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    this.blink =  async function (duration, volume) {
+    // this.blink =  async function (duration, volume) {
+    //     var that = this;
+    //     this._sizeInUse = that.bitmap.scaleX;
+    //     this._blinkTimeout = null;
+
+    //     //
+    //     if (duration > 16) {
+    //         return;
+    //     }
+
+    //     this.stopBlink();
+
+    //     this.container.visible = false;
+    //     this._blinkTimeout = await delayExecution(100)
+    //         that.container.visible = true;
+    //         that.turtles.refreshCanvas();
+    //     this.turtles.refreshCanvas();
+
+
+    this.blink = function (duration, volume) {
         var that = this;
         this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
@@ -1369,10 +1402,13 @@ function Turtle (name, turtles, drum) {
         this.stopBlink();
 
         this.container.visible = false;
-        this._blinkTimeout = await delayExecution(100)
+        this._blinkTimeout = setTimeout(function () {
             that.container.visible = true;
             that.turtles.refreshCanvas();
+        }, 100);
         this.turtles.refreshCanvas();
+
+
 
         /*
 

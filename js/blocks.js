@@ -3500,7 +3500,41 @@ function Blocks (activity) {
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock = async function (name) {
+    // this._newLocalArgBlock = async function (name) {
+    //     // name === 1, 2, 3, ...
+    //     var blkname = 'arg_' + name;
+    //     if ('myArg_' + name in this.protoBlockDict) {
+    //         return;
+    //     }
+
+    //     if (blkname in this.protoBlockDict) {
+    //         return;
+    //     }
+
+    //     var myNamedArgBlock = new ProtoBlock('namedarg');
+    //     this.protoBlockDict['myArg_' + blkname] = myNamedArgBlock;
+    //     myNamedArgBlock.palette = this.palettes.dict['action'];
+    //     myNamedArgBlock.defaults.push(name);
+    //     myNamedArgBlock.staticLabels.push('arg ' + name);
+    //     myNamedArgBlock.parameterBlock();
+
+    //     if (blkname === 'arg_1') {
+    //         return;
+    //     }
+
+    //     myNamedArgBlock.palette.add(myNamedArgBlock, true);
+
+    //     // Force regeneration of palette after adding new block.
+    //     // Add delay to avoid race condition.
+    //     var that = this
+    //     await delayExecution(100)
+    //     // that.palettes.hide();
+    //     that.palettes.updatePalettes('action');
+    //     // that.palettes.show();
+    //      // 500
+
+
+    this._newLocalArgBlock = function (name) {
         // name === 1, 2, 3, ...
         var blkname = 'arg_' + name;
         if ('myArg_' + name in this.protoBlockDict) {
@@ -3526,13 +3560,12 @@ function Blocks (activity) {
 
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
-        var that = this
-        await delayExecution(100)
-        // that.palettes.hide();
-        that.palettes.updatePalettes('action');
-        // that.palettes.show();
-         // 500
-
+        var that = this;
+        setTimeout(function () {
+            // that.palettes.hide();
+            that.palettes.updatePalettes('action');
+            // that.palettes.show();
+        }, 100); // 500
 };
       
     /*
@@ -5636,7 +5669,7 @@ function Blocks (activity) {
     * @public
     * @return {void}
     */
-     this.deleteActionBlock =  async function (myBlock) {
+     this.deleteActionBlock = function (myBlock) {
         var actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             var actionName = actionArg.value;
@@ -5708,13 +5741,23 @@ function Blocks (activity) {
 
             // Delete action blocks from action palette.
             // Use a timeout to avoid palette refresh race condition.
-            this.deleteActionTimeout += 50; // 500
-            var timeout = this.deleteActionTimeout;
-            var that = this;
-        await delayExecution(timeout)
-        that.deleteActionTimeout -= 50; // 500
-        that.palettes.removeActionPrototype(actionName); 
-        }
+            // this.deleteActionTimeout += 50; // 500
+//             var timeout = this.deleteActionTimeout;
+//             var that = this;
+//         await delayExecution(timeout)
+//         that.deleteActionTimeout -= 50; // 500
+//         that.palettes.removeActionPrototype(actionName); 
+//         }
+// };
+
+this.deleteActionTimeout += 50; // 500
+var timeout = this.deleteActionTimeout;
+var that = this;
+setTimeout(function () {
+    that.deleteActionTimeout -= 50; // 500
+    that.palettes.removeActionPrototype(actionName);
+}, timeout);
+}
 };
     /*
      * Send a stack of blocks to the trash.

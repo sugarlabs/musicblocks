@@ -7,13 +7,21 @@
       "webL10n": "github:sugarlabs/webL10n/master"
     }
   },
+  "main": "main.js",
   "scripts": {
-    "serve": "python -m SimpleHTTPServer 3000"
+    "start": "electron .",
+    "serve": "python -m SimpleHTTPServer 3000",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -w",
+    "build": "concurrently \"npm run serve\" \"npm start\""
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
     "clean-css": "^4.2.1",
+    "electron": "^4.0.1",
+    "electron-builder": "^20.38.4",
+    "electron-prebuilt": "^1.4.13",
     "eslint": "^4.18.2",
     "eslint-config-standard": "^7.1.0",
     "eslint-plugin-promise": "^3.5.0",
@@ -25,15 +33,38 @@
     "gulp-uglify": "^3.0.2"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
     "autoprefixer": "^9.6.0",
+    "concurrently": "^4.1.1",
     "cssnano": "^4.1.10",
+    "electron-prompt": "^1.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^8.0.0",
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
+    "http": "0.0.0",
     "http-server": "^0.11.1",
     "lodash.template": "^4.5.0",
-    "node-static": "^0.7.11"
-  }
+    "node-static": "^0.7.11",
+    "path": "^0.12.7"
+  },
+  "build": {
+    "appId": "org.sugarlabs.musicblocks",
+    "mac": {
+      "category": "org.sugarlabs.musicblocks"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    }
+  },
+  "postinstall": "electron-builder install-app-deps"
 }
