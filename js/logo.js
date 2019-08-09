@@ -3752,13 +3752,14 @@ function Logo () {
             that.inMusicKeyboard = true;
             that.musicKeyboard.noteNames = [];
             that.musicKeyboard.octaves = [];
+            that.musicKeyboard._rowBlocks = [];
 
             var listenerName = '_musickeyboard_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {   
-                that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
-                that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
+                // that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
+                // that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
                 that.musicKeyboard.init(that);
             };
 
@@ -5059,6 +5060,8 @@ function Logo () {
                 if (that.drumStyle[turtle].length === 0) {
                     that.musicKeyboard.noteNames.push(nnote[0]);
                     that.musicKeyboard.octaves.push(nnote[1]);
+                    that.musicKeyboard.addRowBlock(blk);
+
                 }
             } else {
                 if (true) { // that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
@@ -7196,6 +7199,7 @@ function Logo () {
             } else if (that.inMusicKeyboard) {
                 that.musicKeyboard.noteNames.push('hertz');
                 that.musicKeyboard.octaves.push(arg);
+                that.musicKeyboard.addRowBlock(blk);
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency, direction) {
