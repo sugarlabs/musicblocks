@@ -505,15 +505,26 @@ function MusicKeyboard() {
             }
         )
         var unique = [];
+        this.remove = [];
+        var that = this;
         sortedList = sortedList.filter(
             function (item){
-                if( unique.indexOf(item[1]+item[2])===-1){
+                if(unique.indexOf(item[1] + item[2]) === -1){
                     unique.push(item[1]+item[2])
                     return true;
                 }
+                that.remove.push(item[3])
                 return false;
             }
         )
+        function removeBlock(i) {
+            setTimeout(function() { 
+                that._removePitchBlock(that.remove[i]); 
+            }, 200);
+        }
+        for (var i = 0; i < this.remove.length; i++){
+            removeBlock(i);
+        }
         for (var i = 0; i < sortedList.length; i++) {
             this.layout.push([sortedList[i][1], sortedList[i][2], sortedList[i][3]]);
         }
@@ -874,13 +885,15 @@ function MusicKeyboard() {
         )
         this._selectedHelper.map(
             function (item) {
-                if (item[2]===that.remove[1]) {
+                if (item[2] === that.remove[1]) {
                     item[2] = that.remove[0];
                 }
                 return item
             }
         )
-
+        if (this.remove.length) {
+            this._removePitchBlock(this.remove[1])
+        }
 
         if (that.keyboardShown) {
             that._createKeyboard();
@@ -889,9 +902,27 @@ function MusicKeyboard() {
         }
     }
 
+    this._removePitchBlock = function(blockNo) {
+        var c0 = this._logo.blocks.blockList[blockNo].connections[0];
+        var c1 = last(this._logo.blocks.blockList[blockNo].connections);
+        if (this._logo.blocks.blockList[c0].name === "musickeyboard") {
+            this._logo.blocks.blockList[c0].connections[1] = c1;
+        } else {
+            this._logo.blocks.blockList[c0].connections[this._logo.blocks.blockList[c0].connections.length-1] = c1;
+        }
+        if (c1) {
+            this._logo.blocks.blockList[c1].connections[0] = c0;
+        }
+
+        this._logo.blocks.blockList[blockNo].connections[this._logo.blocks.blockList[blockNo].connections.length - 1] = null;
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockNo]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
+
     this._createColumnPieSubmenu = function(index, condition) {
         index = parseInt(index);
-        // console.log(this._selectedHelper);
         docById('wheelDivptm').style.display = '';
 
         var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
