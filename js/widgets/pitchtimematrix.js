@@ -226,14 +226,14 @@ function PitchTimeMatrix () {
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         this._save_lock = false;
 
-        cell.onclick = function () {
+        cell.onclick = async function () {
             // Debounce the save button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
                 that._save();
-                setTimeout(function () {
+                await delayExecution(1000)
                     that._save_lock = false;
-                }, 1000);
+                
             }
         };
 
@@ -960,19 +960,18 @@ function PitchTimeMatrix () {
             }
         }
 
-        var __selectionChanged = function (updatingArgs) {
+        var __selectionChanged =  async function (updatingArgs) {
             var thisBlockName = _blockNames[that._blockLabelsWheel.selectedNavItemIndex];
             if (updatingArgs === undefined) {
                 // Creating a new block and removing the old one.
                 var newBlock = that._logo.blocks.blockList.length;
                 that._logo.blocks.loadNewBlocks([[0, thisBlockName, 0, 0, [null, 1, 2, null]], [1, ['number', {'value': parseInt(that.xblockValue[0])}], 0, 0, [0]], [2, ['number', {'value': parseInt(that.yblockValue[0])}], 0, 0, [0]]]);
 
-                setTimeout(function() {
+                await delayExecution(500)
                     that._blockReplace(thisBlock, newBlock);
                     that.columnBlocksMap[blockIndex][0] = newBlock;
                     thisBlock = newBlock;
                     that._createMatrixGraphics2PieSubmenu(blockIndex, newBlock);
-                }, 500);
             } else {
                 // Just updating a block arg value
                 var argBlock = that._logo.blocks.blockList[thisBlock].connections[1];
@@ -1186,7 +1185,7 @@ function PitchTimeMatrix () {
             }
         }
 
-        var __selectionChanged = function (updatingArgs) {
+        var __selectionChanged = async function (updatingArgs) {
             var thisBlockName = 'hertz';
 
             if (condition === 'graphicsblocks') {
@@ -1206,12 +1205,11 @@ function PitchTimeMatrix () {
                 var newBlock = that._logo.blocks.blockList.length;
                 that._logo.blocks.loadNewBlocks([[0, thisBlockName, 0, 0, [null, 1, null]], [1, ['number', {'value': parseInt(that.blockValue)}], 0, 0, [0]]]);
 
-                setTimeout(function() {
+                await delayExecution(500)
                     that._blockReplace(thisBlock, newBlock);
                     that.columnBlocksMap[blockIndex][0] = newBlock;
                     thisBlock = newBlock;
                     that._createMatrixGraphicsPieSubmenu(blockIndex, condition, newBlock);
-                }, 500);
             } else {
                 // Just updating a block arg value
                 var argBlock = that._logo.blocks.blockList[thisBlock].connections[1];
