@@ -825,12 +825,11 @@ function MusicKeyboard() {
             var aboveBlock = last(that.layout)[2];
             setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock), 500);
             that.layout.push([rLabel, rArg, newBlock]);
-            that._sortLayout();
-            if (that.keyboardShown) {
-                that._createKeyboard();
-            } else {
-                that._createTable();
-            }
+            that._createTable();
+            setTimeout(function() {
+                that.pitchBlockAdded(label)
+            }, 200);
+            that.keyboardShown = false;
         }
 
         for (var i = 0; i < valueLabel.length; i++) {
@@ -839,6 +838,13 @@ function MusicKeyboard() {
 
     }
 
+    this.pitchBlockAdded = function(label) {
+        if (label === 'pitch') {
+            setTimeout(this._createColumnPieSubmenu(0 , 'pitchblocks') , 500);
+        } else {
+            setTimeout(this._createColumnPieSubmenu(0 , 'synthsblocks') , 500);
+        }
+    }
 
     this._addNotesBlockBetween = function(aboveBlock, block) {
         
