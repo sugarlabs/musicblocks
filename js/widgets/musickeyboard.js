@@ -748,6 +748,8 @@ function MusicKeyboard() {
 
     this._createAddRowPieSubmenu = function() {
         docById('wheelDivptm').style.display = '';
+        var pitchLabels =  ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
+        var hertzLabels = [261, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ['pitch', 'hertz'];
         const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg'];
         var valueLabel = [];
@@ -807,43 +809,60 @@ function MusicKeyboard() {
         var __selectionChanged = function () {
             var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex];
             var newBlock = that._logo.blocks.blockList.length;
+            if (label === 'pitch') {
+                for (var i = 0; i < pitchLabels.length; i++) {
+                    if (pitchLabels[i].indexOf(last(that.layout)[0]) !== -1 || last(that.layout)[0].indexOf(pitchLabels[i]) !== -1) {
+                        break;
+                    }
+                }
+                var rLabel = pitchLabels[(i+1)%pitchLabels.length];
+                var rArg = last(that.layout)[1];
+                if ((i + 1) % pitchLabels.length === 0) {
+                    rArg += 1;
+                }
+            } else {
+                var rLabel = 'hertz';
+                var rArg = 392;
+                var flag = false;
+                for (var i = 0; i < hertzLabels.length; i++) {
+                    flag = false
+                    for (var j = 0; j < that.layout.length; j++) {
+                        if (that.layout[j][0] === 'hertz') {
+                            if (that.layout[j][1] === hertzLabels[i]) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (flag) {
+                        continue;
+                    }
+                    rArg = hertzLabels[i];
+                    break;
+                }
+            }
+            
 
             switch(label) {
                 case 'pitch':
                     console.log('loading new pitch block');
-                    that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]]);
-                    rLabel = 'sol';
-                    rArg = 4;
+                    that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': rLabel}], 0, 0, [0]], [2, ['number', {'value': rArg}], 0, 0, [0]]]);
                     break;
                 case 'hertz':
                     console.log('loading new Hertz block');
-                    that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]]);
-                    rLabel = 'hertz';
-                    rArg = 392;
+                    that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': rArg}], 0, 0, [0]]]);
                     break;
             }    
             var aboveBlock = last(that.layout)[2];
             setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock), 500);
             that.layout.push([rLabel, rArg, newBlock]);
-            that._createTable();
-            setTimeout(function() {
-                that.pitchBlockAdded(label)
-            }, 200);
-            that.keyboardShown = false;
+            that._sortLayout();
         }
 
         for (var i = 0; i < valueLabel.length; i++) {
             this._menuWheel.navItems[i].navigateFunction = __selectionChanged;
         }
 
-    }
-
-    this.pitchBlockAdded = function(label) {
-        if (label === 'pitch') {
-            setTimeout(this._createColumnPieSubmenu(0 , 'pitchblocks') , 500);
-        } else {
-            setTimeout(this._createColumnPieSubmenu(0 , 'synthsblocks') , 500);
-        }
     }
 
     this._addNotesBlockBetween = function(aboveBlock, block) {
