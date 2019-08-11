@@ -62,9 +62,11 @@ function MusicKeyboard() {
             selected1 = [];
             return;
         }
+
         this._selectedHelper.sort(function(a, b) {
             return a[0]-b[0];
         })
+
         for (var i = 1; i < this._selectedHelper.length; i++) {
             if(this._selectedHelper[i][0] - this._selectedHelper[i-1][0] < 125) {
                 this._selectedHelper[i][0] = this._selectedHelper[i-1][0];
@@ -79,13 +81,13 @@ function MusicKeyboard() {
                 selected1[j][2].push(this._selectedHelper[i][3])
                 i++;
             }
+
             j++;
             if(i < this._selectedHelper.length){
                 selected1.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], this._selectedHelper[i][0]])
             }
         }
     }
-
 
     this.addKeyboardShortcuts = function() {
         var that = this;
@@ -110,19 +112,20 @@ function MusicKeyboard() {
                     start[id] = new Date();
                 }
             }
+
             if (ele !== null && ele !== undefined) {
                 temp1[id] = ele.getAttribute('alt').split('__')[0];
                 if (temp1[id] === 'hertz') {
-                    temp2[id] = that.layout[i][1];
+                    temp2[id] = parseInt(ele.getAttribute('alt').split('__')[1]);
                 } else if (temp1[id] in FIXEDSOLFEGE1) {
                     temp2[id] = FIXEDSOLFEGE1[temp1[id]].replace(SHARP, '#').replace(FLAT, 'b') + ele.getAttribute('alt').split('__')[1];
                 } else {
                     temp2[id] = temp1[id].replace(SHARP, '#').replace(FLAT, 'b') + ele.getAttribute('alt').split('__')[1];
                 }
+
                 synth.triggerAttack(temp2[id]);
                 prevKey = event.keyCode;
             }
-            
         }
 
         var __keyboardup = function(event) {
@@ -137,6 +140,7 @@ function MusicKeyboard() {
                 var ele = docById(id);
                 duration = (new Date() - start[id]) / 1000.0;
             }
+
             if (ele !== null && ele !== undefined) {
                 var no = ele.getAttribute('alt').split('__')[2];
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
@@ -153,7 +157,6 @@ function MusicKeyboard() {
                 delete temp1[id];
                 delete temp2[id];
             }
-            
         }
 
         document.onkeydown = __keyboarddown;
@@ -169,13 +172,16 @@ function MusicKeyboard() {
         } else {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
+
         var that = this;
         var duration = 0;
         var start = 0;
+
         element.onmousedown = function() {
             start = new Date();
             synth.triggerAttack(temp2);
         }
+
         element.onmouseup = function() {
             duration = (new Date() - start)/1000.0;
             synth.triggerRelease(temp2)
@@ -214,6 +220,7 @@ function MusicKeyboard() {
         var buttonTable1 = docById('mkbButtonTable');
         var header1 = buttonTable1.createTHead();
         var row1 = header1.insertRow(0);
+        this._keysLayout();
 
         var that = this;
 
@@ -225,7 +232,11 @@ function MusicKeyboard() {
             mkbTableDiv.innerHTML = '';
             mkbDiv.style.visibility = 'hidden';
             mkbButtonsDiv.style.visibility = 'hidden';
-            document.getElementById('keyboardHolder2').style.display = 'none';
+
+            if (document.getElementById('keyboardHolder2')) {
+                document.getElementById('keyboardHolder2').style.display = 'none';
+            }
+
             var myNode = document.getElementById('myrow');
             myNode.innerHTML = '';
             var myNode = document.getElementById('myrow2');
@@ -249,13 +260,17 @@ function MusicKeyboard() {
             that._save();
         };
 
-
-    
         var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
             that._selectedHelper =[];
             selected1 = [];
+        };
+
+        var cell = this._addButton(row1, 'add2.svg', ICONSIZE, _('Add note'));
+        cell.setAttribute('id', 'addnotes');
+        cell.onclick = function () {
+            that._createAddRowPieSubmenu();
         };
 
         var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
@@ -274,6 +289,7 @@ function MusicKeyboard() {
 
             }
         }
+
         cell.onclick = function() {
             if (that.keyboardShown) {
                 that._createTable();
@@ -355,8 +371,8 @@ function MusicKeyboard() {
         if (selected1.length <= 0) {
             return;
         }
-        this.playingNow = !this.playingNow;
 
+        this.playingNow = !this.playingNow;
         var playButtonCell = row.cells[1];
 
         if (this.playingNow) {
@@ -365,12 +381,14 @@ function MusicKeyboard() {
             if (selected1.length < 1) {
                 return;
             }
+
             var notes = [];
             for (var i = 0; i < selected1[0][0].length; i++) {
                 if (this.keyboardShown) {
                     var id = this.idContainer.findIndex(function(ele) {
                         return ele[1] === selected1[0][1][i]
                     });
+
                     var ele = docById(this.idContainer[id][0]);
                     ele.style.backgroundColor = 'lightgrey';
                 }
@@ -380,12 +398,15 @@ function MusicKeyboard() {
                 if( typeof(zx) === 'string') {
                     res = zx.replace(SHARP, '#').replace(FLAT, 'b');
                 }
+
                 notes.push(res)
             }
+
             if (!this.keyboardShown) {
                 var cell = docById('cells-0');
                 cell.style.backgroundColor = platformColor.selectorBackground
             }
+
             this._stopOrCloseClicked = false;
             this._playChord(notes, selected1[0][2]);
             var maxWidth = Math.max.apply(Math, selected1[0][2]);
@@ -396,9 +417,9 @@ function MusicKeyboard() {
             } else {
                 this._createKeyboard();
             }
+
             this._stopOrCloseClicked = true;
             playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-
         }
     }
 
@@ -409,10 +430,12 @@ function MusicKeyboard() {
                 if (that._stopOrCloseClicked) {
                     return;
                 }
+
                 if (!that.keyboardShown) {
                     var cell = docById('cells-' + counter);
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
+
                 if (that.keyboardShown) {
                     for (var i = 0; i < selected1[counter-1][0].length; i++) {
                             var id = that.idContainer.findIndex(function(ele) {
@@ -422,15 +445,18 @@ function MusicKeyboard() {
                             ele.style.backgroundColor = 'white';
                     }
                 }
+
                 var notes = [];
                 for (var i = 0; i < selected1[counter][0].length; i++) {
                     if (that.keyboardShown) {
                         var id = that.idContainer.findIndex(function(ele) {
                             return ele[1] === selected1[counter][1][i];
                         });
+
                         var ele = docById(that.idContainer[id][0]);
                         ele.style.backgroundColor = 'lightgrey';
                     }
+
                     var zx = selected1[counter][0][i];
                     var res = zx;
                     if(typeof(zx)==='string'){
@@ -438,9 +464,11 @@ function MusicKeyboard() {
                     }
                     notes.push(res)
                 }
+
                 if (that.playingNow) {
                     that._playChord(notes,selected1[counter][2]);
                 }
+
                 var maxWidth = Math.max.apply(Math, selected1[counter][2]);
                 that.playOne(counter+1, maxWidth, playButtonCell)
             } else {
@@ -490,11 +518,37 @@ function MusicKeyboard() {
                 sortableList.push([noteToFrequency(this.noteNames[i]+ this.octaves[i], this._logo.keySignature[0]), this.noteNames[i], this.octaves[i], this._rowBlocks[i]]);
             }
         }
+
         var sortedList = sortableList.sort(
             function(a, b) {
                 return a[0] - b[0]
             }
         )
+
+        var unique = [];
+        this.remove = [];
+        var that = this;
+        sortedList = sortedList.filter(
+            function (item){
+                if(unique.indexOf(item[1] + item[2]) === -1){
+                    unique.push(item[1]+item[2])
+                    return true;
+                }
+                that.remove.push(item[3])
+                return false;
+            }
+        )
+
+        function removeBlock(i) {
+            setTimeout(function() { 
+                that._removePitchBlock(that.remove[i]); 
+            }, 200);
+        }
+
+        for (var i = 0; i < this.remove.length; i++){
+            removeBlock(i);
+        }
+
         for (var i = 0; i < sortedList.length; i++) {
             this.layout.push([sortedList[i][1], sortedList[i][2], sortedList[i][3]]);
         }
@@ -505,6 +559,7 @@ function MusicKeyboard() {
         this._selectedHelper = this._selectedHelper.filter(function(ele) {
             return ele[0]!=parseInt(d)
         });
+
         for (var j = 0; j < this.layout.length; j++) {
             var row = docById('mkb' + j);
             var cell = row.cells[colIndex];
@@ -524,6 +579,7 @@ function MusicKeyboard() {
         } else {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n-j-1][1];
         }
+
         var ele = docById(j + ':' + colIndex);
         this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], ele.getAttribute('alt')]);
         if (playNote) {
@@ -619,8 +675,9 @@ function MusicKeyboard() {
             outerDiv.innerHTML = 'No note selected';
             return;
         }
-
+        var that = this;
         j=0;
+        var n = this.layout.length;
         for (var i = this.layout.length - 1; i >= 0; i--) {
             var mkbTableRow = mkbTable.insertRow(); 
             var cell = mkbTableRow.insertCell(); 
@@ -631,7 +688,28 @@ function MusicKeyboard() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
-            cell.innerHTML = this.layout[i][0]+this.layout[i][1].toString(); 
+	    if (this.layout[i][0] === 'hertz') {
+                cell.innerHTML = this.layout[i][1].toString() + 'HZ';
+            } else {
+                cell.innerHTML = _(this.layout[i][0]) + '<sub>' + this.layout[i][1].toString() + '</sub>';
+            }
+            cell.setAttribute('id', 'labelcol' + (n - i - 1));
+            if (this.layout[i][0] === 'hertz'){
+                cell.setAttribute('alt', (n - i - 1) + '__' + 'synthsblocks');
+            } else {
+                cell.setAttribute('alt', (n - i - 1) + '__' + 'pitchblocks')
+            }
+
+            cell.onclick = function(event) {
+                cell = event.target;
+                if (cell.getAttribute('alt') === null) {
+                    cell = cell.parentNode;
+                }
+
+                var index = cell.getAttribute('alt').split('__')[0]
+                var condition = cell.getAttribute('alt').split('__')[1]
+                that._createColumnPieSubmenu(index, condition);
+            }
             var mkbCell = mkbTableRow.insertCell();
             // Create tables to store individual notes.
             mkbCell.innerHTML = '<table cellpadding="0px" id="mkbCellTable' + j + '"></table>';
@@ -699,6 +777,446 @@ function MusicKeyboard() {
         this.makeClickable();   
     }
 
+    this._createAddRowPieSubmenu = function() {
+        docById('wheelDivptm').style.display = '';
+        var pitchLabels =  ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
+        var hertzLabels = [261, 294, 327, 348, 392, 436, 490, 523];
+        const VALUESLABEL = ['pitch', 'hertz'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg'];
+        var valueLabel = [];
+        for (var i = 0; i < VALUES.length; i++) {
+            var label = _(VALUES[i]);
+            valueLabel.push(label);
+        }
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.colors = [platformColor.paletteColors['pitch'][0],
+                                  platformColor.paletteColors['pitch'][1]]
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.clickModeRotate = false;
+
+        this._menuWheel.animatetime = 0; // 300;
+        this._menuWheel.createWheel(valueLabel);
+        this._menuWheel.navItems[0].setTooltip(_('pitch'));
+        this._menuWheel.navItems[1].setTooltip(_('hertz'));
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var x = docById('addnotes').getBoundingClientRect().x;
+        var y = docById('addnotes').getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var __selectionChanged = function () {
+            var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex];
+            var newBlock = that._logo.blocks.blockList.length;
+            if (label === 'pitch') {
+                for (var i = 0; i < pitchLabels.length; i++) {
+                    if (pitchLabels[i].indexOf(last(that.layout)[0]) !== -1 || last(that.layout)[0].indexOf(pitchLabels[i]) !== -1) {
+                        break;
+                    }
+                }
+                var rLabel = pitchLabels[(i+1)%pitchLabels.length];
+                var rArg = last(that.layout)[1];
+                if ((i + 1) % pitchLabels.length === 0) {
+                    rArg += 1;
+                }
+            } else {
+                var rLabel = 'hertz';
+                var rArg = 392;
+                var flag = false;
+                for (var i = 0; i < hertzLabels.length; i++) {
+                    flag = false
+                    for (var j = 0; j < that.layout.length; j++) {
+                        if (that.layout[j][0] === 'hertz') {
+                            if (that.layout[j][1] === hertzLabels[i]) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (flag) {
+                        continue;
+                    }
+
+                    rArg = hertzLabels[i];
+                    break;
+                }
+            }
+            
+            switch(label) {
+                case 'pitch':
+                    console.log('loading new pitch block');
+                    that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': rLabel}], 0, 0, [0]], [2, ['number', {'value': rArg}], 0, 0, [0]]]);
+                    break;
+                case 'hertz':
+                    console.log('loading new Hertz block');
+                    that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': rArg}], 0, 0, [0]]]);
+                    break;
+            }    
+            var aboveBlock = last(that.layout)[2];
+            setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock), 500);
+            that.layout.push([rLabel, rArg, newBlock]);
+            that._sortLayout();
+        }
+
+        for (var i = 0; i < valueLabel.length; i++) {
+            this._menuWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+    }
+
+    this._addNotesBlockBetween = function(aboveBlock, block) {
+        
+        var belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
+        this._logo.blocks.blockList[aboveBlock].connections[this._logo.blocks.blockList[aboveBlock].connections.length - 1] = block;
+        this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        this._logo.blocks.blockList[block].connections[this._logo.blocks.blockList[block].connections.length - 1] = belowBlock;   
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
+
+    this._sortLayout = function() {
+        var that = this;
+        this.layout.sort(
+            function(a, b){
+                var aValue, bValue;
+                if (a[0] == 'hertz') {
+                    aValue = a[1];
+                } else {
+                    aValue = noteToFrequency(a[0] + a[1], that._logo.keySignature[0])
+                }
+                if (b[0] == 'hertz') {
+                    bValue = b[1];
+                } else {
+                    bValue = noteToFrequency(b[0] + b[1], that._logo.keySignature[0])
+                }
+                return aValue - bValue;
+            }
+        )
+
+        var unique = [];
+        this.remove = [];
+        this.layout = this.layout.filter(
+            function (item, pos){
+                if( unique.indexOf(item[0]+item[1])===-1){
+                    unique.push(item[0]+item[1])
+                    return true;
+                }
+                that.remove = [that.layout[pos-1][2], that.layout[pos][2]]
+                return false;
+            }
+        )
+        this._selectedHelper.map(
+            function (item) {
+                if (item[2] === that.remove[1]) {
+                    item[2] = that.remove[0];
+                }
+                return item
+            }
+        )
+        if (this.remove.length) {
+            this._removePitchBlock(this.remove[1])
+        }
+
+        if (that.keyboardShown) {
+            that._createKeyboard();
+        } else {
+            that._createTable();
+        }
+    }
+
+    this._removePitchBlock = function(blockNo) {
+        var c0 = this._logo.blocks.blockList[blockNo].connections[0];
+        var c1 = last(this._logo.blocks.blockList[blockNo].connections);
+        if (this._logo.blocks.blockList[c0].name === "musickeyboard") {
+            this._logo.blocks.blockList[c0].connections[1] = c1;
+        } else {
+            this._logo.blocks.blockList[c0].connections[this._logo.blocks.blockList[c0].connections.length-1] = c1;
+        }
+        if (c1) {
+            this._logo.blocks.blockList[c1].connections[0] = c0;
+        }
+
+        this._logo.blocks.blockList[blockNo].connections[this._logo.blocks.blockList[blockNo].connections.length - 1] = null;
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockNo]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
+
+    this._createColumnPieSubmenu = function(index, condition) {
+        index = parseInt(index);
+        docById('wheelDivptm').style.display = '';
+
+        var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
+        var noteLabels = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+
+        if (condition === 'synthsblocks'){
+            var noteLabels = ['261', '294', '327', '348', '392', '436', '490', '523'];
+        }
+        
+
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        if (condition === 'pitchblocks') {
+            this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+            this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        if (condition === 'pitchblocks') {
+            this._pitchWheel.colors = platformColor.pitchWheelcolors;
+            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        } else if (condition === 'synthsblocks') {
+            this._pitchWheel.titleRotateAngle = 0;
+            this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.6;
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
+            this._pitchWheel.titleRotateAngle = 90;
+            this._pitchWheel.clickModeRotate = false;
+        }
+
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        if (condition === 'pitchblocks') {
+            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
+            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
+            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+
+            var accidentalLabels = [];
+            for (var i = 0; i < accidentals.length; i++) {
+                accidentalLabels.push(accidentals[i]);
+            }
+
+            for (var i = 0; i < 9; i++) {
+                accidentalLabels.push(null);
+                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
+            }
+
+            this._accidentalsWheel.animatetime = 0; // 300;
+            this._accidentalsWheel.createWheel(accidentalLabels);
+            this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+        
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
+            this._octavesWheel.animatetime = 0; // 300;
+            this._octavesWheel.createWheel(octaveLabels);
+        }
+        
+        var x = docById('labelcol' + index).getBoundingClientRect().x;
+        var y = docById('labelcol' + index).getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+        
+        index = this.layout.length - index - 1;
+        var block = this.layout[index][2];
+        var noteValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
+
+        if (condition === 'pitchblocks') {
+            var octaveValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
+            var accidentalsValue = 2;
+
+            for (var i = 0; i < accidentals.length; i++) {
+                if (noteValue.indexOf(accidentals[i]) !== -1) {
+                    accidentalsValue = i;
+                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    break;
+                }
+            }
+
+            this._accidentalsWheel.navigateWheel(accidentalsValue)
+            this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
+            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
+
+        }
+        
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            if (condition === 'pitchblocks') {
+                that._accidentalsWheel.removeWheel();
+                that._octavesWheel.removeWheel();
+            }
+            that._sortLayout();
+        };
+
+        var __hertzSelectionChanged = function () {
+            blockValue = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var argBlock = that._logo.blocks.blockList[block].connections[1];
+            that._logo.blocks.blockList[argBlock].text.text = blockValue;
+            that._logo.blocks.blockList[argBlock].value = parseInt(blockValue);
+            
+            var z = that._logo.blocks.blockList[argBlock].container.children.length - 1;
+            that._logo.blocks.blockList[argBlock].container.setChildIndex(that._logo.blocks.blockList[argBlock].text, z);
+            that._logo.blocks.blockList[argBlock].updateCache()
+
+            var cell = docById('labelcol' + (that.layout.length - index -1));
+            that.layout[index][1] = parseInt(blockValue);
+            cell.innerHTML = that.layout[index][0]+that.layout[index][1].toString();
+            that._selectedHelper.map(
+                function(item){
+                    if (item[2]==that.layout[index][2]) {
+                        item[1] = parseInt(blockValue);
+                    }
+                    return item
+                }
+            );
+            
+        }
+
+        if (condition === 'synthsblocks') {
+            for (var i = 0; i < noteLabels.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __hertzSelectionChanged;
+            }
+        }
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            if (condition === 'pitchblocks') {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                var flag = false;
+                if (attr !== '♮') {
+                    label += attr;
+                    flag = true;
+                }
+            }
+
+            var noteLabelBlock = that._logo.blocks.blockList[block].connections[1];
+            that._logo.blocks.blockList[noteLabelBlock].text.text = label;
+            that._logo.blocks.blockList[noteLabelBlock].value = label;
+            
+            var z = that._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
+            that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(that._logo.blocks.blockList[noteLabelBlock].text, z);
+            that._logo.blocks.blockList[noteLabelBlock].updateCache();
+            if (condition === 'pitchblocks') {
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                that._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(that._logo.blocks.blockList[noteLabelBlock].connections[0], octave);
+                
+            }
+
+            var cell = docById('labelcol' + (that.layout.length - index -1));
+            that.layout[index][0] = label;
+            that.layout[index][1] = octave;
+            cell.innerHTML = that.layout[index][0] + that.layout[index][1].toString();
+            var temp1 = label;
+            if (temp1 in FIXEDSOLFEGE1) {
+                var temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, '#').replace(FLAT, 'b') + octave;
+            } else {
+                var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + octave;
+            }
+
+            that._selectedHelper.map(
+                function(a){
+                    if (a[2]==that.layout[index][2]) {
+                        a[1]=temp2;
+                    }
+                    return a
+                }
+            );
+        };
+
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+            if (attr !== '♮') {
+                label += attr;
+            }
+
+            var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            var obj = getNote(label, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
+            that._logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            // that._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            
+            __selectionChanged();
+        };
+
+        if (condition === 'pitchblocks') {
+            for (var i = 0; i < noteLabels.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+
+            for (var i = 0; i < accidentals.length; i++) {
+                this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+    
+            for (var i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+        }
+
+    };
+
     this._createKeyboard = function() {
         document.onkeydown = null;
 
@@ -739,7 +1257,7 @@ function MusicKeyboard() {
             this.noteNames.push(PITCHES3[0]);
             this.octaves.push(5);
         }
-        this._keysLayout();
+        
         document.getElementById('keyboardHolder2').style.display = 'block';
         that.idContainer = [];
         var myrowId = 0;
@@ -854,7 +1372,7 @@ function MusicKeyboard() {
         }
     
         this.addKeyboardShortcuts();
-    }
+    };
 
     this._save = function() {
         this.processSelected();
@@ -927,7 +1445,7 @@ function MusicKeyboard() {
             }
         }
         this._logo.blocks.loadNewBlocks(newStack);
-    }
+    };
 
     this.clearBlocks = function() {
         this.noteNames = [];
