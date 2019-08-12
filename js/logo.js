@@ -1654,7 +1654,7 @@ function Logo () {
      * @param   receivedArg
      * @returns {void}
      */
-    this._runFromBlock = function (that, turtle, blk, isflow, receivedArg) {
+    this._runFromBlock = async function (that, turtle, blk, isflow, receivedArg) {
         this.runningBlock = blk;
         if (blk == null)
             return;
@@ -1674,9 +1674,8 @@ function Logo () {
                 }
                 that.stepQueue[turtle].push(blk);
             } else {
-                setTimeout(function () {
+                await delayExecution(delay)
                     that._runFromBlockNow(that, turtle, blk, isflow, receivedArg);
-                }, delay);
             }
         }
     };
