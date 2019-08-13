@@ -1325,9 +1325,9 @@ function Turtle (name, turtles, drum) {
     };
 
     /** 
-     * Stops blinking of turtle if not already finished.
-     * Sets timeout to null and blinkFinished boolean to true (if they have not been already changed)
-     * 
+     * Stops blinking of turtle if not already finished.  Sets timeout
+     * to null and blinkFinished boolean to true (if they have not
+     * been already changed)
      */
     this.stopBlink = function () {
         if (this._blinkTimeout != null || !this.blinkFinished) {
@@ -1359,21 +1359,23 @@ function Turtle (name, turtles, drum) {
      */
     this.blink =  async function (duration, volume) {
         var that = this;
-        this._sizeInUse = that.bitmap.scaleX;
+        // this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
 
-        //
+        // No time to blick for really short notes. (t = 1 / duration)
         if (duration > 16) {
             return;
         }
 
         this.stopBlink();
+        this.blinkFinished = false;
 
         this.container.visible = false;
+        this.turtles.refreshCanvas();
         this._blinkTimeout = await delayExecution(100)
+            this.blinkFinished = true;
             that.container.visible = true;
             that.turtles.refreshCanvas();
-        this.turtles.refreshCanvas();
 
         /*
 
