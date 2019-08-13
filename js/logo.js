@@ -4423,7 +4423,7 @@ function Logo () {
             break;
         case 'steppitch':
             // Similar to pitch but calculated from previous note played.
-            if (!that.inMatrix && that.inNoteBlock[turtle].length === 0) {
+            if (!that.inMatrix && !that.inMusicKeyboard && that.inNoteBlock[turtle].length === 0) {
                 that.errorMsg(_('The Scalar Step Block must be used inside of a Note Block.'), blk);
                 that.stopTurtle = true;
                 break;
@@ -4461,7 +4461,7 @@ function Logo () {
                     }
                 }
 
-                if (!that.inMatrix) {
+                if (!that.inMatrix && !that.inMusicKeyboard) {
                     that.notePitches[turtle][last(that.inNoteBlock[turtle])].push(noteObj[0]);
                     that.noteOctaves[turtle][last(that.inNoteBlock[turtle])].push(noteObj[1]);
                     that.noteCents[turtle][last(that.inNoteBlock[turtle])].push(cents);
@@ -4504,6 +4504,13 @@ function Logo () {
 
                 that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
                 that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
+            } else if (that.inMusicKeyboard) {
+                if (that.drumStyle[turtle].length === 0) {
+                    that.musicKeyboard.noteNames.push(noteObj1[0]);
+                    that.musicKeyboard.octaves.push(noteObj1[1]);
+                    that.musicKeyboard.addRowBlock(blk);
+                    that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
+                }
             }
 
             if (turtle in that.intervals && that.intervals[turtle].length > 0) {
@@ -5061,7 +5068,7 @@ function Logo () {
                     that.musicKeyboard.noteNames.push(nnote[0]);
                     that.musicKeyboard.octaves.push(nnote[1]);
                     that.musicKeyboard.addRowBlock(blk);
-
+                    that.lastNotePlayed[turtle] = [noteObj[0] + noteObj[1], 4];
                 }
             } else {
                 if (true) { // that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
@@ -5357,8 +5364,8 @@ function Logo () {
             }
 
             if (that.insideMeterWidget) {
-		that._meterBlock = blk;
-	    }
+                that._meterBlock = blk;
+            }
 
             if (args[1] === null || typeof(args[1]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
