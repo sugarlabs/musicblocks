@@ -779,6 +779,7 @@ function MusicKeyboard() {
 
     this._createAddRowPieSubmenu = function() {
         docById('wheelDivptm').style.display = '';
+        docById('wheelDivptm').style.zIndex = '300';
         var pitchLabels =  ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
         var hertzLabels = [261, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ['pitch', 'hertz'];
@@ -980,6 +981,7 @@ function MusicKeyboard() {
     this._createColumnPieSubmenu = function(index, condition) {
         index = parseInt(index);
         docById('wheelDivptm').style.display = '';
+        docById('wheelDivptm').style.zIndex = '300';
 
         var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
         var noteLabels = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
@@ -1273,7 +1275,8 @@ function MusicKeyboard() {
                     var el = docById('blackRow'+myrow2Id.toString());
                     el.style.background = 'transparent';
                     el.style.border = 'none';
-                    el.style.zIndex = '-1';
+                    el.style.zIndex = '10';
+                    el.style.position = 'relative';
                     p--;
                     myrow2Id++;
                     continue;
@@ -1293,6 +1296,8 @@ function MusicKeyboard() {
                 that.idContainer.push(['whiteRow' + myrowId.toString(), this.layout[p][2]]);
                 newel.innerHTML = '<small>(' + String.fromCharCode(WHITEKEYS[myrowId]) + ')</small><br/>' + this.layout[p][1];
                 myrowId++;
+                newel.style.position = 'relative';
+                newel.style.zIndex = '100';
                 parenttbl.appendChild(newel);
             } else if (this.layout[p][0].indexOf(SHARP) !== -1 || this.layout[p][0].indexOf('#') !== -1) {
                 var parenttbl2 = document.getElementById('myrow2');
@@ -1304,7 +1309,8 @@ function MusicKeyboard() {
                     var el = docById('blackRow' + myrow2Id.toString());
                     el.style.background = 'transparent';
                     el.style.border = 'none';
-                    el.style.zIndex = '-1';
+                    el.style.zIndex = '10';
+                    el.style.position = 'relative';
                     p--;
                     myrow2Id++;
                     continue;
@@ -1332,7 +1338,8 @@ function MusicKeyboard() {
                     var el = docById('blackRow' + myrow2Id.toString());
                     el.style.background = 'transparent';
                     el.style.border = 'none';
-                    el.style.zIndex = '-1';
+                    el.style.zIndex = '10';
+                    el.style.position = 'relative';
                     p--;
                     myrow2Id++;
                     continue;
@@ -1363,6 +1370,8 @@ function MusicKeyboard() {
                     newel.innerHTML = '<small>('+String.fromCharCode(WHITEKEYS[myrowId])+')</small><br/>'+this.layout[p][0] + this.layout[p][1];
                 }
                 myrowId++;
+                newel.style.position = 'relative';
+                newel.style.zIndex = '100';
                 parenttbl.appendChild(newel);
             }
         }
