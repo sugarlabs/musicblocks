@@ -9323,7 +9323,7 @@ function Logo () {
      * @param   {number}    delay
      * @returns {void}
      */
-    this._dispatchTurtleSignals = function (turtle, beatValue, blk, delay) {
+    this._dispatchTurtleSignals = async function (turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
         if (!turtle in this.embeddedGraphics) {
@@ -9608,9 +9608,9 @@ function Logo () {
             }
         }
 
-        // Cheat by 0.5% so that the mouse has time to complete its work.
+        // Cheat by 2.5% so that the mouse has time to complete its work.
         // var stepTime = beatValue * 1000 / NOTEDIV;
-        var stepTime = (beatValue - delay) * 995 / NOTEDIV;
+        var stepTime = (beatValue - delay) * 975 / NOTEDIV;
         if (stepTime < 0) {
             stepTime = 0;
         }
@@ -9640,9 +9640,9 @@ function Logo () {
         }
 
         // Mark the end time of this note's graphics operations.
-        setTimeout(function() {
+        await delayExecution(beatValue * 1000);
             that.embeddedGraphicsFinished[turtle] = true;
-        }, beatValue * 1000);
+    
 
         for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
             var b = this.embeddedGraphics[turtle][blk][i];
