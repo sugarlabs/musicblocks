@@ -9608,9 +9608,9 @@ function Logo () {
             }
         }
 
-        // Cheat by 2.5% so that the mouse has time to complete its work.
+        // Cheat by 0.5% so that the mouse has time to complete its work.
         // var stepTime = beatValue * 1000 / NOTEDIV;
-        var stepTime = (beatValue - delay) * 975 / NOTEDIV;
+        var stepTime = (beatValue - delay) * 995 / NOTEDIV;
         if (stepTime < 0) {
             stepTime = 0;
         }
