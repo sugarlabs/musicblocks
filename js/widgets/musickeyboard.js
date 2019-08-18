@@ -65,13 +65,21 @@ function MusicKeyboard() {
 
         this._selectedHelper.sort(function(a, b) {
             return a[0]-b[0];
-        })
+        });
 
+        var last = this._selectedHelper[0][0];
         for (var i = 1; i < this._selectedHelper.length; i++) {
-            if(this._selectedHelper[i][0] - this._selectedHelper[i-1][0] < 125) {
+            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < 125)) {
+                last = this._selectedHelper[i][0];
                 this._selectedHelper[i][0] = this._selectedHelper[i-1][0];
+                i++;
             }
-        }
+            if (i < this._selectedHelper.length) {
+                last = this._selectedHelper[i][0]
+                this._selectedHelper[i][0] = this._selectedHelper[i-1][0] + (this._selectedHelper[i-1][3]*1000) + 125;
+            }
+        };
+
         selected1 = [[[this._selectedHelper[0][1]], [this._selectedHelper[0][2]], [this._selectedHelper[0][3]], this._selectedHelper[0][0]]];
         var j = 0
         for (var i = 1; i < this._selectedHelper.length; i++) {
@@ -581,13 +589,27 @@ function MusicKeyboard() {
         }
 
         var ele = docById(j + ':' + colIndex);
-        this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], ele.getAttribute('alt')]);
+        this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
+        this._selectedHelper.sort(function(a, b) {
+            return a[0]-b[0];
+        })
         if (playNote) {
             synth.triggerAttackRelease(temp2, ele.getAttribute('alt'));
         }
     }
 
     this.makeClickable = function() {
+        var rowNote = docById('mkbNoteDurationRow');
+        for (var i = 0;i < selected1.length; i++) {
+            var cell = rowNote.cells[i];
+            var that = this;
+            cell.onclick = function(event) {
+                var cell = event.target;
+                that._createpiesubmenu(cell.getAttribute('id'), cell.getAttribute('start'), cell.getAttribute('dur'));
+
+            }
+        }
+
         for (var i = 0; i < this.layout.length; i++) {
             // The buttons get added to the embedded table.
             var row = docById('mkb' + i);
@@ -688,7 +710,7 @@ function MusicKeyboard() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
-	    if (this.layout[i][0] === 'hertz') {
+	        if (this.layout[i][0] === 'hertz') {
                 cell.innerHTML = this.layout[i][1].toString() + 'HZ';
             } else {
                 cell.innerHTML = _(this.layout[i][0]) + '<sub>' + this.layout[i][1].toString() + '</sub>';
@@ -772,9 +794,181 @@ function MusicKeyboard() {
             cell.innerHTML = dur[0].toString() + '/' + dur[1].toString();
             cell.setAttribute('id', 'cells-' + j);
             cell.setAttribute('start', selected1[j][3]);
+            cell.setAttribute('dur', maxWidth);
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }     
         this.makeClickable();   
+    }
+
+    this._createpiesubmenu = function (cellId, start) {
+        docById('wheelDivptm').style.display = '';
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
+        this.newNoteValue = 2;
+        mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
+        
+
+        wheelnav.cssMode = true;
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.clickModeRotate = false;
+        this._menuWheel.colors = platformColor.pitchWheelcolors;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.animatetime = 0; // 300;
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.keynavigateEnabled = false;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        var exitTabLabel = [];
+
+        
+        exitTabLabel = ['x', ' '];
+        var tabsLabels = ['', '', '', '', '', '', '', '', '', '', '', '', '1', '2', '3', '4', '5', '6', '7', ''];
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
+
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+
+        this._tabsWheel.colors = platformColor.pitchWheelcolors;
+        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+        this._tabsWheel.clickModeRotate = false;
+        this._tabsWheel.createWheel(tabsLabels);
+
+        for (var i = 0; i < tabsLabels.length;i++) {
+            this._tabsWheel.navItems[i].navItem.hide();
+        }
+
+        this._menuWheel.createWheel(mainTabsLabels);
+        this._exitWheel.createWheel(exitTabLabel);
+        
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '250px';
+        docById('wheelDivptm').style.width = '250px';
+        
+        var x = docById(cellId).getBoundingClientRect().x;
+        var y = docById(cellId).getBoundingClientRect().y;
+        
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var flag = 0;
+        this._menuWheel.navItems[0].navigateFunction = function () {
+            that._divideNotes(cellId,start, that.newNoteValue);
+        };
+
+        this._menuWheel.navItems[1].navigateFunction = function () {
+            that._deleteNotes( start);
+        };
+
+        this._menuWheel.navItems[2].navigateFunction = function () {
+            that._addNotes(cellId, start, that.newNoteValue);
+        };
+
+        this._menuWheel.navItems[3].navigateFunction = function () {
+            if (!flag) {
+                for (var i = 12; i < 19; i++) {
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                    that._tabsWheel.navItems[i].navItem.show();
+                }
+
+                flag = 1;
+            } else {
+                for (var i = 12; i < 19; i++) {
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                    that._tabsWheel.navItems[i].navItem.hide();
+                }
+
+                flag = 0;
+            }
+        };
+
+        for (var i = 12; i < 19; i++) {
+            this._tabsWheel.navItems[i].navigateFunction = function () {
+                var j = that._tabsWheel.selectedNavItemIndex;
+                that.newNoteValue = tabsLabels[j];
+                docById('wheelnav-wheelDivptm-title-3').children[0].textContent = tabsLabels[j];
+            }
+        }
+        
+    };
+
+    this._addNotes = function(cellId, start, divideNoteBy) {
+        start = parseInt(start);
+        var cell = docById(cellId);
+        var dur = cell.getAttribute('dur');
+        this._selectedHelper = this._selectedHelper.reduce(function(prevValue, curValue) {
+            if (curValue[0] === start) {
+                prevValue = prevValue.concat([curValue]);
+                var oldcurValue = curValue.slice();
+                for (var i=0;i<divideNoteBy;i++) {
+                    var newcurValue = oldcurValue.slice()
+                    newcurValue[0] = oldcurValue.slice()[0] +(oldcurValue.slice()[3]*1000);
+                    prevValue = prevValue.concat([newcurValue]);
+                    oldcurValue = newcurValue;
+                }
+                return prevValue
+            } else if (curValue[0] > start) {
+                curValue[0] = curValue[0] + dur*1000*divideNoteBy
+                return prevValue.concat([curValue])
+            }
+            return prevValue.concat([curValue])
+        }, []);  
+        this._createTable();     
+    }
+
+    this._deleteNotes = function(start) {
+        start = parseInt(start);   
+        this._selectedHelper = this._selectedHelper.filter(function(ele) {
+            return ele[0] !== start;
+        });
+        this._createTable();
+
+    }
+
+    this._divideNotes = function(cellId, start, divideNoteBy) {
+        start = parseInt(start);
+        this._selectedHelper = this._selectedHelper.reduce(function(prevValue, curValue) {
+            if (curValue[0] === start) {
+                if (curValue[3] / divideNoteBy < 0.125) {
+                    return prevValue.concat([curValue]);
+                };
+                var newcurValue = curValue.slice()
+                newcurValue[3] = curValue[3] / divideNoteBy;
+                prevValue = prevValue.concat([newcurValue]);
+                var oldcurValue = newcurValue.slice()
+                for (var i=0; i < divideNoteBy - 1; i++) {
+                    var newcurValue2 = oldcurValue.slice()
+                    newcurValue2[0] = parseInt(newcurValue2[0]+(newcurValue2[3]*1000))
+                    prevValue = prevValue.concat([newcurValue2])
+                    oldcurValue = newcurValue2
+                }
+                return prevValue
+            }
+            return prevValue.concat([curValue])
+        }, []);
+        this._createTable();
     }
 
     this._createAddRowPieSubmenu = function() {
