@@ -810,7 +810,7 @@ function MusicKeyboard() {
         this._durationWheel = new wheelnav('_durationWheel', this._menuWheel.raphael);
         this.newNoteValue = 2;
         var mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
-        var editDurationLabels = ['<-', 'Enter', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+        var editDurationLabels = ['1/16', '1/8', '1/4', '1/3', '3/8', '1/2', '5/8', '2/3', '3/4', '7/8', '1/1']
 
 
         wheelnav.cssMode = true;
@@ -834,29 +834,27 @@ function MusicKeyboard() {
 
         
         var tabsLabels = ['', '', '', '', '', '', '', '', '', '', '', '', '1', '2', '3', '4', '5', '6', '7', ''];
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.5;
 
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
 
         this._tabsWheel.colors = platformColor.pitchWheelcolors;
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
         this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.7;
         this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.clickModeRotate = false;
         this._tabsWheel.createWheel(tabsLabels);
 
-        this.newDurationValue = '/';
-
         this._durationWheel.colors = platformColor.pitchWheelcolors;
         this._durationWheel.keynavigateEnabled = false;
         this._durationWheel.slicePathFunction = slicePath().DonutSlice;
         this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._durationWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._durationWheel.slicePathCustom.minRadiusPercent = 0.7;
         this._durationWheel.slicePathCustom.maxRadiusPercent = 1;
         this._durationWheel.sliceSelectedPathCustom = this._durationWheel.slicePathCustom;
         this._durationWheel.sliceInitPathCustom = this._durationWheel.slicePathCustom;
@@ -868,7 +866,7 @@ function MusicKeyboard() {
         }
 
         this._menuWheel.createWheel(mainTabsLabels);
-        this._exitWheel.createWheel(['x', this.newDurationValue]);
+        this._exitWheel.createWheel(['x', '']);
         
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '250px';
@@ -918,47 +916,16 @@ function MusicKeyboard() {
             }
         };
 
-        var first = false;
-        var second = false;
-
-        var __enterValue = function () {
+        var __selectValue = function () {
             var i = that._durationWheel.selectedNavItemIndex;
             var value = editDurationLabels[i];
-            if (!first) {
-                that.newDurationValue = String(value) + '/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
-                first = true;
-            } else{
-                if (!second) {
-                    that.newDurationValue = that.newDurationValue+String(value);
-                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
-                    second = true;
-                }
-            }
-        };
+            var duration = value.split('/');
+            that._updateDuration(start, duration);
+        }
 
-        this._durationWheel.navItems[0].navigateFunction = function () {
-            if (second && first) {
-                var word = that.newDurationValue.split('/');
-                that.newDurationValue = word[0] + '/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
-                second = false;
-            } else if (first) {
-                that.newDurationValue = '/';
-                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
-                first = false;
-            }
-        };
-
-        this._durationWheel.navItems[1].navigateFunction = function () {
-            if (second && first) {
-                var duration = that.newDurationValue.split('/');
-                that._updateDuration(start, duration);
-            }
-        };
-
-        for (var i = 2; i < editDurationLabels.length; i++) {
-            this._durationWheel.navItems[i].navigateFunction = __enterValue;
+        
+        for (var i = 0; i < editDurationLabels.length; i++) {
+            this._durationWheel.navItems[i].navigateFunction = __selectValue;
         }
 
         for (var i = 12; i < 19; i++) {
