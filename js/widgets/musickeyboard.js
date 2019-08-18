@@ -810,7 +810,7 @@ function MusicKeyboard() {
         this._durationWheel = new wheelnav('_durationWheel', this._menuWheel.raphael);
         this.newNoteValue = 2;
         var mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
-        var editDurationLabels = ['1/16', '1/8', '1/4', '1/3', '3/8', '1/2', '5/8', '2/3', '3/4', '7/8', '1/1']
+        var editDurationLabels = ['1/8', '1/4', '1/3', '3/8', '1/2', '5/8', '2/3', '3/4', '7/8', '1/1']
 
 
         wheelnav.cssMode = true;
