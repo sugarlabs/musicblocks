@@ -807,9 +807,11 @@ function MusicKeyboard() {
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
 
         this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
+        this._durationWheel = new wheelnav('_durationWheel', this._menuWheel.raphael);
         this.newNoteValue = 2;
-        mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
-        
+        var mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
+        var editDurationLabels = ['<-', 'Enter', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
 
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
@@ -819,6 +821,7 @@ function MusicKeyboard() {
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.titleRotateAngle = 90;
         this._menuWheel.animatetime = 0; // 300;
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
@@ -828,33 +831,44 @@ function MusicKeyboard() {
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        var exitTabLabel = [];
 
         
-        exitTabLabel = ['x', ' '];
         var tabsLabels = ['', '', '', '', '', '', '', '', '', '', '', '', '1', '2', '3', '4', '5', '6', '7', ''];
-        this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 0.6;
 
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
 
         this._tabsWheel.colors = platformColor.pitchWheelcolors;
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
         this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
+        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.8;
         this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
         this._tabsWheel.clickModeRotate = false;
         this._tabsWheel.createWheel(tabsLabels);
+
+        this.newDurationValue = '/';
+
+        this._durationWheel.colors = platformColor.pitchWheelcolors;
+        this._durationWheel.keynavigateEnabled = false;
+        this._durationWheel.slicePathFunction = slicePath().DonutSlice;
+        this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._durationWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._durationWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._durationWheel.sliceSelectedPathCustom = this._durationWheel.slicePathCustom;
+        this._durationWheel.sliceInitPathCustom = this._durationWheel.slicePathCustom;
+        this._durationWheel.clickModeRotate = false;
+        this._durationWheel.createWheel(editDurationLabels);
 
         for (var i = 0; i < tabsLabels.length;i++) {
             this._tabsWheel.navItems[i].navItem.hide();
         }
 
         this._menuWheel.createWheel(mainTabsLabels);
-        this._exitWheel.createWheel(exitTabLabel);
+        this._exitWheel.createWheel(['x', this.newDurationValue]);
         
         docById('wheelDivptm').style.position = 'absolute';
         docById('wheelDivptm').style.height = '250px';
@@ -904,6 +918,49 @@ function MusicKeyboard() {
             }
         };
 
+        var first = false;
+        var second = false;
+
+        var __enterValue = function () {
+            var i = that._durationWheel.selectedNavItemIndex;
+            var value = editDurationLabels[i];
+            if (!first) {
+                that.newDurationValue = String(value) + '/';
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
+                first = true;
+            } else{
+                if (!second) {
+                    that.newDurationValue = that.newDurationValue+String(value);
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
+                    second = true;
+                }
+            }
+        };
+
+        this._durationWheel.navItems[0].navigateFunction = function () {
+            if (second && first) {
+                var word = that.newDurationValue.split('/');
+                that.newDurationValue = word[0] + '/';
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
+                second = false;
+            } else if (first) {
+                that.newDurationValue = '/';
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newDurationValue;
+                first = false;
+            }
+        };
+
+        this._durationWheel.navItems[1].navigateFunction = function () {
+            if (second && first) {
+                var duration = that.newDurationValue.split('/');
+                that._updateDuration(start, duration);
+            }
+        };
+
+        for (var i = 2; i < editDurationLabels.length; i++) {
+            this._durationWheel.navItems[i].navigateFunction = __enterValue;
+        }
+
         for (var i = 12; i < 19; i++) {
             this._tabsWheel.navItems[i].navigateFunction = function () {
                 var j = that._tabsWheel.selectedNavItemIndex;
@@ -913,6 +970,21 @@ function MusicKeyboard() {
         }
         
     };
+
+    this._updateDuration = function(start, duration) {
+        start = parseInt(start);
+        duration = parseInt(duration[0])/parseInt(duration[1]);
+        var newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
+        this._selectedHelper = this._selectedHelper.map(
+            function(item){
+                if (item[0] === start) {
+                    item[3] = newduration
+                }
+                return item
+            }
+        );
+        this._createTable();
+    }
 
     this._addNotes = function(cellId, start, divideNoteBy) {
         start = parseInt(start);
