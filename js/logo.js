@@ -9639,11 +9639,6 @@ function Logo () {
             this.dispatchFactor[turtle] = NOTEDIV;
         }
 
-        // Mark the end time of this note's graphics operations.
-        await delayExecution(beatValue * 1000);
-            that.embeddedGraphicsFinished[turtle] = true;
-    
-
         for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
             var b = this.embeddedGraphics[turtle][blk][i];
             var name = this.blocks.blockList[b].name;
@@ -9657,7 +9652,7 @@ function Logo () {
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __pen(turtle, name, arg, waitTime);
 
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name, arg]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, name, arg]);
                 break;
             case 'penup':
             case 'pendown':
@@ -9665,34 +9660,34 @@ function Logo () {
                     __pen(turtle, name, null, waitTime);
                 }
 
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, name]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, name]);
                 break;
             case 'clear':
                 __clear(turtle, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'clear']);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'clear']);
                 break;
             case 'fill':
                 __fill(turtle, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'fill']);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'fill']);
                 break;
             case 'hollowline':
                 __hollowline(turtle, waitTime);
 
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'hollowline']);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'hollowline']);
                 break;
             case 'controlpoint1':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __cp1(turtle, arg1, arg2, waitTime);
 
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'controlpoint1', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'controlpoint1', arg1, arg2]);
                 break;
             case 'controlpoint2':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __cp2(turtle, arg1, arg2, waitTime);
 
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'controlpoint2', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'controlpoint2', arg1, arg2]);
                 break;
             case 'bezier':
                 // TODO: Is there a reasonable way to break the bezier
@@ -9700,53 +9695,53 @@ function Logo () {
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __bezier(turtle, arg1, arg2, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'bezier', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'bezier', arg1, arg2]);
                 break;
             case 'setheading':
-                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __setheading(turtle, arg, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'setheading', arg]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'setheading', arg]);
                 break;
             case 'right':
-                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
-                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    var deltaArg = arg / (NOTEDIV / this.dispatchFactor[turtle]);
                     __right(turtle, deltaArg, deltaTime);
-                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'right', deltaArg]);
+                    this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + deltaTime / 1000, 'right', deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
                 break;
             case 'left':
-                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
-                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    var deltaArg = arg / (NOTEDIV / this.dispatchFactor[turtle]);
                     __right(turtle, -deltaArg, deltaTime);
-                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'right', -deltaArg]);
+                    this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + deltaTime / 1000, 'right', -deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
                 break;
             case 'forward':
-                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
-                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    var deltaArg = arg / (NOTEDIV / this.dispatchFactor[turtle]);
                     __forward(turtle, deltaArg, deltaTime);
-                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', deltaArg]);
+                    this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
                 break;
             case 'back':
-                var arg = that.parseArg(that, turtle, that.blocks.blockList[b].connections[1], b, that.receivedArg);
+                var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
-                    var deltaArg = arg / (NOTEDIV / that.dispatchFactor[turtle]);
+                    var deltaArg = arg / (NOTEDIV / this.dispatchFactor[turtle]);
                     __forward(turtle, -deltaArg, deltaTime);
-                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', -deltaArg]);
+                    this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + deltaTime / 1000, 'forward', -deltaArg]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -9755,38 +9750,38 @@ function Logo () {
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __setxy(turtle, arg1, arg2, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'setxy', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'setxy', arg1, arg2]);
                 break;
             case 'scrollxy':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __scrollxy(turtle, arg1, arg2, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'scrollxy', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'scrollxy', arg1, arg2]);
                 break;
             case 'show':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 __show(turtle, arg1, arg2, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'show', arg1, arg2]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'show', arg1, arg2]);
                 break;
             case 'speak':
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __speak(turtle, arg, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'speak', arg]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'speak', arg]);
                 break;
             case 'print':
                 var arg = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 __print(arg, waitTime);
-                that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + waitTime / 1000, 'print', arg]);
+                this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + waitTime / 1000, 'print', arg]);
                 break;
             case 'arc':
                 var arg1 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[1], b, this.receivedArg);
                 var arg2 = this.parseArg(this, turtle, this.blocks.blockList[b].connections[2], b, this.receivedArg);
                 for (var t = 0; t < (NOTEDIV / this.dispatchFactor[turtle]); t++) {
                     var deltaTime = waitTime + t * stepTime * this.dispatchFactor[turtle];
-                    var deltaArg = arg1 / (NOTEDIV / that.dispatchFactor[turtle]);
+                    var deltaArg = arg1 / (NOTEDIV / this.dispatchFactor[turtle]);
                     __arc(turtle, deltaArg, arg2, deltaTime);
-                    that.playbackQueue[turtle].push([that.previousTurtleTime[turtle] + deltaTime / 1000, 'arc', deltaArg, arg2]);
+                    this.playbackQueue[turtle].push([this.previousTurtleTime[turtle] + deltaTime / 1000, 'arc', deltaArg, arg2]);
                 }
 
                 waitTime += NOTEDIV * stepTime;
@@ -9796,6 +9791,10 @@ function Logo () {
                 break;
             }
         }
+
+	// Mark the end time of this note's graphics operations.
+        await delayExecution(beatValue * 1000)
+        this.embeddedGraphicsFinished[turtle] = true;
     };
 
     /**
