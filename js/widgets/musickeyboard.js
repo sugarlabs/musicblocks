@@ -566,23 +566,23 @@ function MusicKeyboard() {
     }
 
     this._setNotes = function(colIndex, rowIndex, playNote) {
-        var d = docById('cells-' + colIndex).getAttribute('start');
+        var start = docById('cells-' + colIndex).getAttribute('start');
         this._selectedHelper = this._selectedHelper.filter(function(ele) {
-            return ele[0]!=parseInt(d)
+            return ele[0]!=parseInt(start)
         });
-        flag = true;
+        silence = true;
         for (var j = 0; j < this.layout.length; j++) {
             var row = docById('mkb' + j);
             var cell = row.cells[colIndex];
             if (cell.style.backgroundColor === 'black') {
-                this._setNoteCell(j, colIndex, d, playNote);
-                flag = false
+                this._setNoteCell(j, colIndex, start, playNote);
+                silence = false
             }
         }
-        if (flag) {
+        if (silence) {
             var ele = docById('cells-' + colIndex);
             var dur = ele.getAttribute('dur');
-            this._selectedHelper.push([parseInt(d), 'R', null, parseFloat(dur)]);
+            this._selectedHelper.push([parseInt(start), 'R', null, parseFloat(dur)]);
             this._selectedHelper.sort(function(a, b) {
                 return a[0]-b[0];
             })
