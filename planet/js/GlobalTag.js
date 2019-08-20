@@ -11,30 +11,30 @@
 
 function GlobalTag(Planet) {
     var tagNames = [
-	//.TRANS: planet tag name
-	_('All Projects'),
-	//.TRANS: planet tag name
-	_('My Projects'),
-	//.TRANS: planet tag name
-	_('Examples'),
-	//.TRANS: planet tag name
-	_('Music'),
-	//.TRANS: planet tag name
-	_('Art'),
-	//.TRANS: planet tag name
-	_('Math'),
-	//.TRANS: planet tag name
-	_('Interactive'),
-	//.TRANS: planet tag name
-	_('Design'),
-	//.TRANS: planet tag name
-	_('Game'),
-	//.TRANS: planet tag name
-	_('Media'),
-	//.TRANS: planet tag name
-	_('Sensors'),
-	//.TRANS: planet tag name
-	_('Effects'),
+      //.TRANS: All Projects tag
+      _("All Projects"),
+      //.TRANS: My Projects tag
+      _("My Projects"),
+      //.TRANS: Examples tag
+      _("Examples"),
+      //.TRANS: Music tag
+      _("Music"),
+      //.TRANS: Art tag
+      _("Art"),
+      //.TRANS: Math tag
+      _("Math"),
+      //.TRANS: Interactive tag
+      _("Interactive"),
+      //.TRANS: Design tag
+      _("Design"),
+      //.TRANS: Game tag
+      _("Game"),
+      //.TRANS: Media tag
+      _("Media"),
+      //.TRANS: Sensors tag
+      _("Sensors"),
+      //.TRANS: Effects tag
+      _("Effects")
     ];
 
     this.id = null;
