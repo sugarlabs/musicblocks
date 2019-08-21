@@ -18,12 +18,12 @@
 function Activity() {
 
     _THIS_IS_MUSIC_BLOCKS_ = true;
-    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
-    _ERRORMSGTIMEOUT_ = 15000;
     LEADING = 0;
-    cellSize = 55;
-    searchSuggestions = [];
-    homeButtonContainers = [];
+   var _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+  var  _ERRORMSGTIMEOUT_ = 15000;
+  var cellSize = 55;
+  var  searchSuggestions = [];
+  var    homeButtonContainers = [];
 
     var that = this;
 
@@ -74,9 +74,9 @@ function Activity() {
         } catch (e) {};
     }
 
-    firstTimeUser = false;
+    var firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        beginnerMode = true;
+       var beginnerMode = true;
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;
@@ -930,8 +930,8 @@ function Activity() {
      */
     function setScroller() {
         blocks.activeBlock = null;
-        scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
+       var scrollBlockContainer = !scrollBlockContainer;
+        var scrollPaletteContainer = !scrollPaletteContainer;
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
         var disableHorizScrollIcon = docById('disableHorizScrollIcon');
         if (scrollBlockContainer && !beginnerMode){
@@ -1038,7 +1038,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale < BLOCKSCALES.length - 1) {
-                resizeDebounce = true;
+               var resizeDebounce = true;
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
                 setTimeout(function () {
@@ -1059,7 +1059,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale > 0) {
-                resizeDebounce = true;
+              var resizeDebounce = true;
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
@@ -1412,7 +1412,7 @@ function Activity() {
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-            palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+           var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
             if (palette) {
                 // if we are moving the palettes, deselect the active block.
                 blocks.activeBlock = null;
