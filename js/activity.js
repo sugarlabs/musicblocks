@@ -18,12 +18,12 @@
 function Activity() {
 
     _THIS_IS_MUSIC_BLOCKS_ = true;
-    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
-    _ERRORMSGTIMEOUT_ = 15000;
     LEADING = 0;
-    cellSize = 55;
-    searchSuggestions = [];
-    homeButtonContainers = [];
+   var _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+  var  _ERRORMSGTIMEOUT_ = 15000;
+  var cellSize = 55;
+  var  searchSuggestions = [];
+  var    homeButtonContainers = [];
 
     var that = this;
 
@@ -74,9 +74,9 @@ function Activity() {
         } catch (e) {};
     }
 
-    firstTimeUser = false;
+    var firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        beginnerMode = true;
+       var beginnerMode = true;
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;
@@ -341,7 +341,7 @@ function Activity() {
         const TURTLESTEP = -1; // Run in step-by-step mode
 
         BLOCKSCALES = [1, 1.5, 2, 3, 4];
-        blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+       var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
         }
@@ -689,7 +689,7 @@ function Activity() {
 
         if (chartBitmap != null) {
             stage.removeChild(chartBitmap);
-            chartBitmap = null;
+           var chartBitmap = null;
         }
 
         logo.boxes = {};
@@ -930,8 +930,8 @@ function Activity() {
      */
     function setScroller() {
         blocks.activeBlock = null;
-        scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
+       var scrollBlockContainer = !scrollBlockContainer;
+        var scrollPaletteContainer = !scrollPaletteContainer;
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
         var disableHorizScrollIcon = docById('disableHorizScrollIcon');
         if (scrollBlockContainer && !beginnerMode){
@@ -981,7 +981,7 @@ function Activity() {
      * Renders and carries out analysis
      * of the MB project
      */
-    closeAnalytics = this.closeAnalytics;
+     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
@@ -992,14 +992,14 @@ function Activity() {
             return;
         }
 
-        ctx = myChart.getContext('2d');
+      var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
-        myRadarChart = null;
-        scores = analyzeProject(blocks);
-        data = scoreToChartData(scores);
-        Analytics = this;
-        Analytics.close = th.closeAnalytics;
+      var myRadarChart = null;
+      var  scores = analyzeProject(blocks);
+      var data = scoreToChartData(scores);
+      var  Analytics = this;
+      Analytics.close = th.closeAnalytics;
 
         __callback = function () {
             imageData = myRadarChart.toBase64Image();
@@ -1038,7 +1038,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale < BLOCKSCALES.length - 1) {
-                resizeDebounce = true;
+               var resizeDebounce = true;
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
                 setTimeout(function () {
@@ -1059,7 +1059,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale > 0) {
-                resizeDebounce = true;
+              var resizeDebounce = true;
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
@@ -1412,7 +1412,7 @@ function Activity() {
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-            palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+           var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
             if (palette) {
                 // if we are moving the palettes, deselect the active block.
                 blocks.activeBlock = null;
