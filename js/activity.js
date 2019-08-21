@@ -340,11 +340,11 @@ function Activity() {
         const DEFAULTDELAY = 500; // milleseconds
         const TURTLESTEP = -1; // Run in step-by-step mode
 
-        BLOCKSCALES = [1, 1.5, 2, 3, 4];
-       var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
-        if (blockscale === -1) {
-            blockscale = 1;
-        }
+    //     BLOCKSCALES = [1, 1.5, 2, 3, 4];
+    //   var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+    //     if (blockscale === -1) {
+    //         blockscale = 1;
+    //     }
 
         // Used to track mouse state for mouse button block
         stageMouseDown = false;
@@ -1034,6 +1034,12 @@ function Activity() {
      */
     doLargerBlocks = function () {
         blocks.activeBlock = null;
+     
+        BLOCKSCALES = [1, 1.5, 2, 3, 4];
+      var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+        if (blockscale === -1) {
+            blockscale = 1;
+        }
         // hideDOMLabel();
 
         if (!resizeDebounce) {
@@ -1055,6 +1061,11 @@ function Activity() {
      */
     doSmallerBlocks = function () {
         blocks.activeBlock = null;
+        BLOCKSCALES = [1, 1.5, 2, 3, 4];
+        var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+          if (blockscale === -1) {
+              blockscale = 1;
+          }
         // hideDOMLabel();
 
         if (!resizeDebounce) {
@@ -1076,6 +1087,11 @@ function Activity() {
      * then the icons to make them smaller/bigger will be hidden
      */
     setSmallerLargerStatus = function () {
+        BLOCKSCALES = [1, 1.5, 2, 3, 4];
+        var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+          if (blockscale === -1) {
+              blockscale = 1;
+          }
         if (BLOCKSCALES[blockscale] > 1) {
             smallerContainer.visible = true;
             smallerOffContainer.visible = false;
