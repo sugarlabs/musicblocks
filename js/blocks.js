@@ -1003,7 +1003,6 @@ function Blocks (activity) {
      * @return {void}
      */
     this.addDefaultBlock = function (parentblk, oldBlock, skipOldBlock) {
-        NOTEBLOCKS = ['newnote', 'osctime'];
         if (parentblk == null) {
             return;
         }
