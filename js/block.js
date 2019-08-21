@@ -445,7 +445,7 @@ function Block(protoblock, blocks, overrideName) {
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
-                z = that.container.children.length - 1;
+               var z = that.container.children.length - 1;
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
@@ -795,7 +795,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+               var artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
@@ -825,7 +825,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+               var artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
@@ -898,7 +898,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
-            artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
+            var artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
 
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
@@ -2074,7 +2074,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Ensure text is on top.
-        z = this.container.children.length - 1;
+        var z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
     };
 
@@ -3284,7 +3284,7 @@ function Block(protoblock, blocks, overrideName) {
         var dblk = this.connections[0];
         // We are connected to a divide block.
         // Is the divide block connected to a note value block?
-        cblk = this.blocks.blockList[dblk].connections[0];
+       var cblk = this.blocks.blockList[dblk].connections[0];
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blocks.blockList[cblk].name) {
