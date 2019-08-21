@@ -341,7 +341,7 @@ function Activity() {
         const TURTLESTEP = -1; // Run in step-by-step mode
 
         BLOCKSCALES = [1, 1.5, 2, 3, 4];
-        blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+       var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
         }
@@ -689,7 +689,7 @@ function Activity() {
 
         if (chartBitmap != null) {
             stage.removeChild(chartBitmap);
-            chartBitmap = null;
+           var chartBitmap = null;
         }
 
         logo.boxes = {};
@@ -981,7 +981,7 @@ function Activity() {
      * Renders and carries out analysis
      * of the MB project
      */
-    closeAnalytics = this.closeAnalytics;
+     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
@@ -992,14 +992,14 @@ function Activity() {
             return;
         }
 
-        ctx = myChart.getContext('2d');
+      var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
-        myRadarChart = null;
-        scores = analyzeProject(blocks);
-        data = scoreToChartData(scores);
-        Analytics = this;
-        Analytics.close = th.closeAnalytics;
+      var myRadarChart = null;
+      var  scores = analyzeProject(blocks);
+      var data = scoreToChartData(scores);
+      var  Analytics = this;
+      Analytics.close = th.closeAnalytics;
 
         __callback = function () {
             imageData = myRadarChart.toBase64Image();
