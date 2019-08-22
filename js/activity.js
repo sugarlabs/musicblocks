@@ -341,7 +341,7 @@ function Activity() {
         const TURTLESTEP = -1; // Run in step-by-step mode
 
         BLOCKSCALES = [1, 1.5, 2, 3, 4];
-       var blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+       blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
         }
@@ -1034,6 +1034,7 @@ function Activity() {
      */
     doLargerBlocks = function () {
         blocks.activeBlock = null;
+     
         // hideDOMLabel();
 
         if (!resizeDebounce) {
@@ -1055,6 +1056,7 @@ function Activity() {
      */
     doSmallerBlocks = function () {
         blocks.activeBlock = null;
+      
         // hideDOMLabel();
 
         if (!resizeDebounce) {
