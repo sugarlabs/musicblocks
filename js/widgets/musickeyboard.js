@@ -392,7 +392,7 @@ function MusicKeyboard() {
 
             var notes = [];
             for (var i = 0; i < selected1[0][0].length; i++) {
-                if (this.keyboardShown) {
+                if (this.keyboardShown && selected1[0][1][0] !== null) {
                     var id = this.idContainer.findIndex(function(ele) {
                         return ele[1] === selected1[0][1][i]
                     });
@@ -444,7 +444,7 @@ function MusicKeyboard() {
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
 
-                if (that.keyboardShown) {
+                if (that.keyboardShown  && selected1[counter-1][1][0] !== null) {
                     for (var i = 0; i < selected1[counter-1][0].length; i++) {
                             var id = that.idContainer.findIndex(function(ele) {
                                 return ele[1] === selected1[counter-1][1][i];
@@ -456,7 +456,7 @@ function MusicKeyboard() {
 
                 var notes = [];
                 for (var i = 0; i < selected1[counter][0].length; i++) {
-                    if (that.keyboardShown) {
+                    if (that.keyboardShown && selected1[counter][1][0] !== null) {
                         var id = that.idContainer.findIndex(function(ele) {
                             return ele[1] === selected1[counter][1][i];
                         });
@@ -492,6 +492,9 @@ function MusicKeyboard() {
     }
 
     this._playChord = function (notes, noteValue) {
+        if (notes[0] === 'R') {
+            return;
+        }
         var that = this;
         setTimeout(function () {
             synth.triggerAttackRelease(notes[0], noteValue[0]);
@@ -563,17 +566,26 @@ function MusicKeyboard() {
     }
 
     this._setNotes = function(colIndex, rowIndex, playNote) {
-        var d = docById('cells-' + colIndex).getAttribute('start');
+        var start = docById('cells-' + colIndex).getAttribute('start');
         this._selectedHelper = this._selectedHelper.filter(function(ele) {
-            return ele[0]!=parseInt(d)
+            return ele[0]!=parseInt(start)
         });
-
+        silence = true;
         for (var j = 0; j < this.layout.length; j++) {
             var row = docById('mkb' + j);
             var cell = row.cells[colIndex];
             if (cell.style.backgroundColor === 'black') {
-                this._setNoteCell(j, colIndex, d, playNote);
+                this._setNoteCell(j, colIndex, start, playNote);
+                silence = false
             }
+        }
+        if (silence) {
+            var ele = docById('cells-' + colIndex);
+            var dur = ele.getAttribute('dur');
+            this._selectedHelper.push([parseInt(start), 'R', null, parseFloat(dur)]);
+            this._selectedHelper.sort(function(a, b) {
+                return a[0]-b[0];
+            })
         }
     }
 
@@ -1658,32 +1670,35 @@ function MusicKeyboard() {
             // The last connection in last pitch block is null.
             var lastConnection = null;
 
-            // if (typeof(pitches[i][0]) === 'string') {
-            for (var j = 0; j < note[0].length; j++) {
-                if (j > 0) {
-                    if (typeof(note[0][j-1]) === 'string') {
-                        thisBlock = previousBlock+3;
-                    } else {
-                        thisBlock = previousBlock+2;
+            if (note[0][0] === 'R') {
+                newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
+            } else {
+                for (var j = 0; j < note[0].length; j++) {
+                    if (j > 0) {
+                        if (typeof(note[0][j-1]) === 'string') {
+                            thisBlock = previousBlock+3;
+                        } else {
+                            thisBlock = previousBlock+2;
+                        }
+                        var n = newStack[previousBlock][4].length;
+                        newStack[previousBlock][4][n-1] = thisBlock;
                     }
-                    var n = newStack[previousBlock][4].length;
-                    newStack[previousBlock][4][n-1] = thisBlock;
-                }
-                if (typeof(note[0][j]) === 'string') {
-                    newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                    if (['#', 'b', '♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
-                        newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length - 1]}], 0, 0, [thisBlock]]);
+                    if (typeof(note[0][j]) === 'string') {
+                        newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
+                        if (['#', 'b', '♯', '♭'].indexOf(note[0][j][1]) !== -1) {
+                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length - 1]}], 0, 0, [thisBlock]]);
+                        } else {
+                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length-1]}], 0, 0, [thisBlock]]);
+                        }
+                        
                     } else {
-                        newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                        newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length-1]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock, 'hertz', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
+                        newStack.push([thisBlock + 1, ['number', {'value': note[0][j]}], 0, 0, [thisBlock]]);
                     }
-                    
-                } else {
-                    newStack.push([thisBlock, 'hertz', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
-                    newStack.push([thisBlock + 1, ['number', {'value': note[0][j]}], 0, 0, [thisBlock]]);
+                    previousBlock = thisBlock
                 }
-                previousBlock = thisBlock
             }
         }
         this._logo.blocks.loadNewBlocks(newStack);
