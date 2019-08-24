@@ -185,7 +185,7 @@ function MusicKeyboard() {
         element.onmouseup = function() {
             duration = (new Date() - start)/1000.0;
             synth.triggerRelease(temp2);
-            if (beginnerMode) {
+            if (beginnerMode === 'true') {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {
                 duration = parseFloat(duration).toFixed(2);
