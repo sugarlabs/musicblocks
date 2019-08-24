@@ -55,16 +55,22 @@ function MusicKeyboard() {
             return a[0] - b[0];
         });
 
+        var mindur = 63;
+
+        if (beginnerMode === 'true') {
+            mindur = 125;
+        }
+
         var last = this._selectedHelper[0][0];
         for (var i = 1; i < this._selectedHelper.length; i++) {
-            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < 125)) {
+            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < mindur)) {
                 last = this._selectedHelper[i][0];
                 this._selectedHelper[i][0] = this._selectedHelper[i-1][0];
                 i++;
             }
             if (i < this._selectedHelper.length) {
                 last = this._selectedHelper[i][0]
-                this._selectedHelper[i][0] = this._selectedHelper[i-1][0] + (this._selectedHelper[i-1][3]*1000) + 125;
+                this._selectedHelper[i][0] = this._selectedHelper[i-1][0] + (this._selectedHelper[i-1][3]*1000) + mindur;
             }
         };
 
@@ -142,8 +148,9 @@ function MusicKeyboard() {
                 if (beginnerMode === 'true') {
                     duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
                 } else {
-                    duration = parseFloat(duration).toFixed(2);
+                    duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
                 }
+                console.log(duration);
                 if (duration === 0) {
                     duration = 0.125;
                 }
@@ -188,7 +195,7 @@ function MusicKeyboard() {
             if (beginnerMode === 'true') {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {
-                duration = parseFloat(duration).toFixed(2);
+                duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
             }
             if (duration === 0) {
                 duration = 0.125;
