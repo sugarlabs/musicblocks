@@ -150,7 +150,6 @@ function MusicKeyboard() {
                 } else {
                     duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
                 }
-                console.log(duration);
                 if (duration === 0) {
                     duration = 0.125;
                 }
@@ -709,7 +708,7 @@ function MusicKeyboard() {
         outerDiv.style.backgroundColor = 'white';
         outerDiv.style.marginTop = '15px';
 
-        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
+        var w = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
         var innerDiv = docById('mkbInnerDiv');
         innerDiv.style.width = w + 'px';
         innerDiv.style.marginLeft = Math.floor(MATRIXSOLFEWIDTH * this._cellScale)*1.5 + 'px';
