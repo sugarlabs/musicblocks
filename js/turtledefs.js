@@ -90,7 +90,7 @@ function createDefaultStack() {
     console.log('language setting is ' + language);
     if (language === 'ja') {
         DATAOBJS =
-            [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+            [[0, 'start', (screen.width / 3)-140, 100, [null, 1, null]],
 
              [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
@@ -138,7 +138,7 @@ function createDefaultStack() {
             ];
     } else {
         DATAOBJS =
-            [[0, 'start', screen.width / 3, 100, [null, 1, null]],
+            [[0, 'start', (screen.width / 3)-140, 100, [null, 1, null]],
 
              [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
