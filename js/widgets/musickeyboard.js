@@ -731,7 +731,7 @@ function MusicKeyboard() {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
-	        if (this.layout[i][0] === 'hertz') {
+                if (this.layout[i][0] === 'hertz') {
                 cell.innerHTML = this.layout[i][1].toString() + 'HZ';
             } else {
                 cell.innerHTML = _(this.layout[i][0]) + '<sub>' + this.layout[i][1].toString() + '</sub>';
@@ -831,7 +831,7 @@ function MusicKeyboard() {
         this._durationWheel = new wheelnav('_durationWheel', this._menuWheel.raphael);
         this.newNoteValue = 2;
         var mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
-        var editDurationLabels = ['1/8', '1/4', '1/3', '3/8', '1/2', '5/8', '2/3', '3/4', '7/8', '1/1']
+        var editDurationLabels = ['1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8', '1/1']
 
 
         wheelnav.cssMode = true;
