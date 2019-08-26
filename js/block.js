@@ -1870,6 +1870,8 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (this.blocks.blockList[c1].name === 'notename') {
                     return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
                 }
+
+                return '?';
             }
             break;
         case 'scaledegree':
