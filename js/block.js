@@ -4002,6 +4002,11 @@ function Block(protoblock, blocks, overrideName) {
         this._noteValueWheel.clickModeRotate = false;
         this._noteValueWheel.createWheel(noteValueLabels);
 
+        this._noteValueWheel.navItems[0].setTooltip(_('triple'));
+        this._noteValueWheel.navItems[1].setTooltip(_('duple'));
+        this._noteValueWheel.navItems[2].setTooltip(_('septuple'));
+        this._noteValueWheel.navItems[3].setTooltip(_('quintuple'));
+
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
