@@ -3935,10 +3935,10 @@ function Logo () {
         case 'setmasterbpm':
             if (args.length === 1 && typeof(args[0]) === 'number') {
                 if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that.errorMsg(_('Beats per minute must be > 30.'), blk);
                     that._masterBPM = 30;
                 } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that.errorMsg(_('Maximum beats per minute is 1000.'), blk);
                     that._masterBPM = 1000;
                 } else {
                     that._masterBPM = args[0];
@@ -3957,10 +3957,10 @@ function Logo () {
         case 'setbpm':
             if (args.length === 2 && typeof(args[0]) === 'number') {
                 if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that.errorMsg(_('Beats per minute must be > 30.'), blk);
                     var bpm = 30;
                 } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that.errorMsg(_('Maximum beats per minute is 1000.'), blk);
                     var bpm = 1000;
                 } else {
                     var bpm = args[0];
@@ -3985,10 +3985,10 @@ function Logo () {
             if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
                 var bpm  = args[0] * args[1] / 0.25
                 if (bpm < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    that.errorMsg(_('Beats per minute must be > 30.'), blk);
                     that._masterBPM = 30;
                 } else if (bpm > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    that.errorMsg(_('Maximum beats per minute is 1000.'), blk);
                     that._masterBPM = 1000;
                 } else {
                     that._masterBPM = bpm;
@@ -4006,12 +4006,16 @@ function Logo () {
             break;
         case 'setbpm3':
             if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
-                var bpm  = args[0] * args[1] / 0.25
+                var bpm  = args[0] * args[1] / 0.25;
                 if (bpm < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
+                    var obj = rationalToFraction(args[1]);
+                    var target = 30 * 0.25 / args[1];
+                    that.errorMsg(obj[0] + '/' + obj[1] + ' ' + _('beats per minute must be greater than') + ' ' + target, blk);
                     bpm = 30;
                 } else if (bpm > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
+                    var obj = rationalToFraction(args[1]);
+                    var target = 1000 * 0.25 / args[1];
+                    that.errorMsg(_('maximum') + ' ' + obj[0] + '/' + obj[1] + ' ' + _('beats per minute is') + ' ' + target, blk);
                     bpm = 1000;
                 } else {
                     bpm = bpm;
@@ -9792,7 +9796,7 @@ function Logo () {
             }
         }
 
-	// Mark the end time of this note's graphics operations.
+        // Mark the end time of this note's graphics operations.
         await delayExecution(beatValue * 1000)
         this.embeddedGraphicsFinished[turtle] = true;
     };
@@ -12536,8 +12540,8 @@ function Logo () {
         if (beat !== null) {
             this.notationStaging[turtle].push('tempo', bpm, beat);
         } else {
-            obj = rationalToFraction(factor);
-            this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
+            var obj = rationalToFraction(beatValue);
+            // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
     };
 
