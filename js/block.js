@@ -3253,6 +3253,7 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     case 'meter':
                         this._check_meter_block = cblk;
+                    case 'setbpm3':
                     case 'setbpm2':
                     case 'setmasterbpm2':
                     case 'stuplet':
@@ -3303,6 +3304,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             case 'meter':
                 this._check_meter_block = cblk;
+            case 'setbpm3':
             case 'setbpm2':
             case 'setmasterbpm2':
             case 'stuplet':

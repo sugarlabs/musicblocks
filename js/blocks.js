@@ -4049,6 +4049,7 @@ function Blocks (activity) {
                         break;
                     case 'meter':
                         this.blockList[blk]._check_meter_block = cblk;
+                    case 'setbpm3':
                     case 'setbpm2':
                     case 'setmasterbpm2':
                     case 'stuplet':
@@ -4109,6 +4110,7 @@ function Blocks (activity) {
                 break;
             case 'meter':
                 this.blockList[blk]._check_meter_block = cblk;
+            case 'setbpm3':
             case 'setbpm2':
             case 'setmasterbpm2':
             case 'stuplet':
