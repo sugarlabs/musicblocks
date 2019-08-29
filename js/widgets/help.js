@@ -180,7 +180,7 @@ function HelpWidget () {
                 if (name in BLOCKHELP) {
                     var helpBody = docById('helpBodyDiv');
 
-                    body = '';
+                  var body = '';
                     if (BLOCKHELP[name].length > 1) {
                         var path = BLOCKHELP[name][1];
                         // We need to add a case here whenever we add
