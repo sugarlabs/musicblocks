@@ -16,14 +16,14 @@
 // scratch. -- Walter Bender, October 2014.
 
 function Activity() {
-
     _THIS_IS_MUSIC_BLOCKS_ = true;
     LEADING = 0;
-   var _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
-  var  _ERRORMSGTIMEOUT_ = 15000;
-  var cellSize = 55;
-  var  searchSuggestions = [];
-  var    homeButtonContainers = [];
+    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+
+    var  _ERRORMSGTIMEOUT_ = 15000;
+    var cellSize = 55;
+    var  searchSuggestions = [];
+    var    homeButtonContainers = [];
 
     var that = this;
 
