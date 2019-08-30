@@ -2196,15 +2196,15 @@ function Palette(palettes, name) {
         var lastBlock = this.palettes.blocks.blockList.length;
 
         if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blockIsMacro(blkname)) {
-            moved = true;
-           var saveX = this.protoContainers[blkname].x;
-           var saveY = this.protoContainers[blkname].y;
+            var moved = true;
+            var saveX = this.protoContainers[blkname].x;
+            var saveY = this.protoContainers[blkname].y;
             this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
             callback(lastBlock);
         } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blkname in this.palettes.pluginMacros) {
-            moved = true;
-            saveX = this.protoContainers[blkname].x;
-            saveY = this.protoContainers[blkname].y;
+            var moved = true;
+            var saveX = this.protoContainers[blkname].x;
+            var saveY = this.protoContainers[blkname].y;
             this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
             callback(lastBlock);
 
