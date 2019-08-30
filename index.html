@@ -13,7 +13,7 @@
   <noscript>
   JavaScript is required to view this page.
   </noscript>
-  <script src="dist/app.min.js/?cb=1566155195010">
+  <script src="dist/app.min.js/?cb=1566155195010" defer>
   </script>
 
   <!-- <script src="js/utils/detectIE.js">
@@ -29,42 +29,42 @@
   </script>
   -->
 
-  <script src="lib/reqwest.js">
+  <script src="lib/reqwest.js" defer>
   </script>
 
 
-  <script src="lib/jquery-2.1.4.js"></script>
+  <script src="lib/jquery-2.1.4.js" defer></script>
 
-  <script src="lib/jquery-ui.js"></script>
+  <script src="lib/jquery-ui.js" defer></script>
 
-  <script src="lib/materialize.min.js">
+  <script src="lib/materialize.min.js" defer>
 
   </script>
 
-  <script src="lib/webL10n.js">
+  <script src="lib/webL10n.js" defer>
   </script>
 
-  <script src="lib/Tone.js">
+  <script src="lib/Tone.js" defer>
   </script>
 
-  <script src="lib/jquery.ruler.js">
+  <script src="lib/jquery.ruler.js" defer>
   </script>
 
-  <script src="lib/modernizr-2.6.2.min.js">
+  <script src="lib/modernizr-2.6.2.min.js" defer>
   </script>
 
-  <script src="lib/recorder.js">
+  <script src="lib/recorder.js" defer>
   </script>
 
-  <script src="lib/raphael.min.js">
+  <script src="lib/raphael.min.js" defer>
   </script>
 
-  <script src="lib/wheelnav.js">
+  <script src="lib/wheelnav.js" defer>
   </script>
 
   <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
-  <script data-main="js/loader" src="lib/require.js">
+  <script data-main="js/loader" src="lib/require.js" defer>
   </script>
 
   <link rel="manifest" href="android_chrome_manifest.json">
@@ -75,10 +75,10 @@
   <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="lib/materialize-iso.css">
 
-  <script src="lib/easeljs.min.js">
+  <script src="lib/easeljs.min.js" defer>
   </script>
 
-  <script src="lib/tweenjs.min.js">
+  <script src="lib/tweenjs.min.js" defer>
   </script>
 
   <!-- <script src="js/widgets/musickeyboard.js">
@@ -183,7 +183,9 @@
                 init();
             });
         };
-      })(jQuery);
+        (jQuery)
+      
+    
 
       $(document).ready(function() {
         $("solfa").fixMe();
@@ -194,6 +196,7 @@
         });
 
       });
+    })
 
       var isDragging = false;
     </script>
