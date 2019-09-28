@@ -992,7 +992,7 @@ function Logo () {
                     this.errorMsg(NOMICERRORMSG);
                     value = 0;
                 } else {
-                    if (_THIS_IS_TURTLE_BLOCKS) {
+                    if (_THIS_IS_TURTLE_BLOCKS_) {
                         value = Math.round(this.mic.getLevel() * 1000);
                     } else {
                         if (this.volumeAnalyser == null) {
@@ -3949,7 +3949,7 @@ function Logo () {
 
             if (that.inTempo) {
                 that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
+                var bpmnumberblock = that.blocks.blockList[blk].connections[1];
                 that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
             }
             break;
