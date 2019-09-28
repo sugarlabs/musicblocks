@@ -375,7 +375,7 @@ function Tempo () {
         for (var i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
             this._widgetFirstTimes.push(this._logo.firstNoteTime);
-            if (this.BPMs[i] < 0) {
+            if (this.BPMs[i] <= 0) {
                 this.BPMs[i] = 30;
             }
 
