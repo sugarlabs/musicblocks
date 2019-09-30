@@ -3167,6 +3167,13 @@ function Block(protoblock, blocks, overrideName) {
             var __keypress = function (event) {
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
+                    // Make sure that we close the input form on Enter.
+                    that.label.style.display = 'none';
+                    if (that.labelattr != null) {
+                        that.labelattr.style.display = 'none';
+                    }
+
+                    docById('wheelDiv').style.display = 'none';
                 }
             };
 
@@ -5429,6 +5436,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.labelattr != null) {
                 this.labelattr.style.display = 'none';
             }
+
             docById('wheelDiv').style.display = 'none';
         }
 
