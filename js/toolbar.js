@@ -85,6 +85,7 @@ function Toolbar() {
                 html_onclick();
             };
         } else {
+	    console.log('ADVANCED MODE BUTTONS')
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
@@ -93,6 +94,7 @@ function Toolbar() {
                 saveHTML.onclick = function () {
                     html_onclick();
                 };
+
                 var saveSVG = docById('save-svg');
                 var savePNG = docById('save-png');
                 var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
@@ -108,10 +110,10 @@ function Toolbar() {
                     savePNG.disabled = false;
                     saveSVG.className = '';
                     savePNG.className = '';
+
                     saveSVG.onclick = function () {
                         svg_onclick();
                     };
-
 
                     savePNG.onclick = function () {
                         png_onclick();
@@ -122,14 +124,14 @@ function Toolbar() {
                     var saveWAV = docById('save-wav');
 
                     // Until we fix #1744, disable recorder on FF
-                    if (platform.FF) {
+                    // if (platform.FF) {
                         saveWAV.disabled = true;
                         saveWAV.className = 'grey-text inactiveLink';
-                    } else {
-                        saveWAV.onclick = function () {
-                            wave_onclick();
-                        };
-                    }
+                    // } else {
+                    //    saveWAV.onclick = function () {
+                    //        wave_onclick();
+                    //    };
+                    // }
 
                     var saveLY = docById('save-ly');
 
@@ -258,10 +260,12 @@ function Toolbar() {
             delPluginIcon.onclick = function () {
                 delPlugin_onclick();
             };
+
             enableHorizScrollIcon.onclick = function () {
               setScroller();
               _setupBlocksContainerEvents();
             }
+
             disableHorizScrollIcon.onclick = function () {
               setScroller();
               _setupBlocksContainerEvents();

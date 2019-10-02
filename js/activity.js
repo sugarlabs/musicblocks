@@ -76,7 +76,7 @@ function Activity() {
 
     var firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
-       var beginnerMode = true;
+	beginnerMode = true;
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;
