@@ -734,6 +734,12 @@ saveLilypondOutput = function(logo) {
                             var instrumentName = _('mouse');
                         }
 
+			console.log(instrumentName);
+
+			if (instrumentName === '') {
+                            var instrumentName = _('mouse');
+                        }
+
                         if (instrumentName === _('start') || instrumentName === _('start drum')) {
                             instrumentName = RODENTS[tNumber % 12];
                         } else if (instrumentName === tNumber.toString()) {
