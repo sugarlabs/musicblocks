@@ -11116,6 +11116,56 @@ function Logo () {
                     }
                 }
                 break;
+            case 'turtleheap':
+                var value = null;
+                var cblk = that.blocks.blockList[blk].connections[1];
+                var targetTurtle = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                for (var i = 0; i < that.turtles.turtleList.length; i++) {
+                    var thisTurtle = that.turtles.turtleList[i];
+                    if (targetTurtle === thisTurtle.name) {
+                        var cblk2 = that.blocks.blockList[blk].connections[2];
+                        if (cblk2 == null) {
+                            that.errorMsg(NANERRORMSG, blk);
+                        } else {
+                            var a = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                            if (typeof(a) === 'number') {
+                                if (!(i in that.turtleHeaps)) {
+                                    that.turtleHeaps[i] = [];
+                                }
+
+                                   if (a < 1) {
+                                    a = 1;
+                                    that.errorMsg(_('Index must be > 0.'))
+                                }
+
+                                if (a > 1000) {
+                                    a = 1000;
+                                    that.errorMsg(_('Maximum heap size is 1000.'))
+                                }
+
+                                // If index > heap length, grow the heap.
+                                while (that.turtleHeaps[i].length < a) {
+                                    that.turtleHeaps[i].push(0);
+                                }
+
+                                value = that.turtleHeaps[i][a - 1];
+                                that.blocks.blockList[blk].value = value;
+                            } else {
+                                that.errorMsg(NANERRORMSG, blk);
+                            }
+                        }
+                    }
+                }
+
+                if (value == null) {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        that.errorMsg(_('Cannot find mouse') + ' ' + targetTurtle, blk);
+                    } else {
+                        that.errorMsg(_('Cannot find turtle') + ' ' + targetTurtle, blk);
+                    }
+                    that.blocks.blockList[blk].value = -1;
+                }
+                break;
             case 'turtlenote':
             case 'turtlenote2':
                 var value = null;

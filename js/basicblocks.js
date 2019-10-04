@@ -3991,25 +3991,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // ACTIONS PALETTE
 
-    var newblock = new ProtoBlock('do');
-    newblock.palette = palettes.dict['action'];
-    blocks.protoBlockDict['do'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do1'));
-    } else {
-        //.TRANS: do (take) an action
-        newblock.staticLabels.push(_('do'));
-    }
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    //.TRANS: a stack of blocks to run (an action to take)
-    newblock.defaults.push(_('action'));
-    newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('do')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('return');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = newblock;
@@ -4143,6 +4124,25 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('namedarg')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('do');
+    newblock.palette = palettes.dict['action'];
+    blocks.protoBlockDict['do'] = newblock;
+    if (language === 'ja') {
+        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+        newblock.staticLabels.push(_('do1'));
+    } else {
+        //.TRANS: do (take) an action
+        newblock.staticLabels.push(_('do'));
+    }
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    //.TRANS: a stack of blocks to run (an action to take)
+    newblock.defaults.push(_('action'));
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('do')) {
         newblock.hidden = true;
     }
 
@@ -5267,6 +5267,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // Mice palette (blocks for interacting between ensemble)
 
+    var newblock = new ProtoBlock('turtleheap');
+    newblock.palette = palettes.dict['ensemble'];
+    blocks.protoBlockDict['turtleheap'] = newblock;
+    newblock.staticLabels.push(_('mouse index heap'));
+    newblock.staticLabels.push(_('mouse name'));
+    newblock.staticLabels.push(_('index'));
+    newblock.twoArgMathBlock();
+    newblock.adjustWidthToLabel();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'numberin';
+    newblock.defaults.push(_('Mr. Mouse'));
+    newblock.defaults.push(1);
+    if (beginnerMode && !beginnerBlock('turtleheap')) {
+        newblock.hidden = true;
+    }
+
     var newblock = new ProtoBlock('stopTurtle');
     newblock.palette = palettes.dict['ensemble'];
     blocks.protoBlockDict['stopTurtle'] = newblock;
@@ -5408,7 +5424,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgMathBlock();
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'anyin';
-    newblock.hidden = true;
     newblock.defaults.push(_('Mr. Mouse'));
     newblock.hidden = true;
 
