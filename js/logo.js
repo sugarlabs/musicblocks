@@ -7598,6 +7598,20 @@ function Logo () {
                 break;
             }
 
+            if (typeof(args[0]) == 'string') {
+                // Look for a block with that name
+                for (var i = 0; i < that.blocks.blockList.length; i++) {
+                    if (that.blocks.blockList[i].protoblock.staticLabels.length > 0 && that.blocks.blockList[i].protoblock.staticLabels[0] == args[0]) {
+                        args[0] = i;
+                        break;
+                    }
+                }
+            }
+
+            if (typeof(args[0]) == 'string') {
+                args[0] = -1;
+            }
+
             if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;

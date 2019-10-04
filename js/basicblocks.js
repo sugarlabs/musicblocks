@@ -4959,7 +4959,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('run block'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
+    newblock.dockTypes[1] = 'anyin';
     if (beginnerMode && !beginnerBlock('runblock')) {
         newblock.hidden = true;
     }
