@@ -3830,6 +3830,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('random'), _('min'), _('max'));
     newblock.adjustWidthToLabel();
     newblock.twoArgMathBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(0, 12);
     if (beginnerMode && !beginnerBlock('random')) {
         newblock.hidden = true;

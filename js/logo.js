@@ -10387,6 +10387,16 @@ function Logo () {
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     if (typeof(a) === 'number' && typeof(b) === 'number') {
                         that.blocks.blockList[blk].value = that._doRandom(a, b);
+                    } else if (typeof(a) === 'string' && typeof(b) === 'string' && SOLFEGENAMES.indexOf(a) != -1 && SOLFEGENAMES.indexOf(b) != -1) {
+                        var ai = SOLFEGENAMES.indexOf(a);
+                        var bi = SOLFEGENAMES.indexOf(b);
+                        if (ai > bi) {
+                            ai = SOLFEGENAMES.indexOf(b);
+                            bi = SOLFEGENAMES.indexOf(a);
+                        }
+
+                        var ii = that._doRandom(ai, bi);
+                        that.blocks.blockList[blk].value = SOLFEGENAMES[ii];
                     } else {
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         that.blocks.blockList[blk].value = false
