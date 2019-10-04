@@ -2311,9 +2311,14 @@ function Logo () {
                     // the last one, otherwise the child of the
                     // while block is executed multiple times.
                     var queueLength = that.turtles.turtleList[turtle].queue.length;
+		    var kept_one = false;
                     for (var i = queueLength - 1; i > 0; i--) {
                         if (that.turtles.turtleList[turtle].queue[i].parentBlk === blk) {
-                            that.turtles.turtleList[turtle].queue.pop();
+			    if (kept_one) {
+				that.turtles.turtleList[turtle].queue.pop();
+			    } else {
+				kept_one = true;
+			    }
                         }
                     }
 
