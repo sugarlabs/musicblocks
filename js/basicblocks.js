@@ -4944,6 +4944,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: Move the position of a block on the screen.
     newblock.staticLabels.push(_('move block'), _('block number'), _('x'), _('y'));
     newblock.adjustWidthToLabel();
+
     newblock.threeArgBlock();
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
@@ -4960,6 +4961,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.dockTypes[1] = 'anyin';
+    newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('runblock')) {
         newblock.hidden = true;
     }
