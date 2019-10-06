@@ -4412,13 +4412,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('rightpos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['rightpos'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: right2 is right as in right side of the screen
-        newblock.staticLabels.push(_('right2'));
-    } else {
-        //.TRANS: right side of the screen
-        newblock.staticLabels.push(_('right (screen)'));
-    }
+    //.TRANS: right side of the screen
+    newblock.staticLabels.push(_('right (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('rightpos')) {
@@ -4428,13 +4423,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('leftpos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['leftpos'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: left2 is left as in left side of the screen
-        newblock.staticLabels.push(_('left2'));
-    } else {
-        //.TRANS: left side of the screen
-        newblock.staticLabels.push(_('left (screen)'));
-    }
+    //.TRANS: left side of the screen
+    newblock.staticLabels.push(_('left (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('leftpos')) {
