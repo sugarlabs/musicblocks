@@ -5774,7 +5774,35 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-                that.drumStyle[turtle].pop();
+                var drumname = that.drumStyle[turtle].pop();
+                that.pitchDrumTable[turtle] = {};
+            };
+
+            that._setListener(turtle, listenerName, __listener);
+            if (that.inRhythmRuler) {
+                that._currentDrumBlock = blk;
+                that.rhythmRuler.Drums.push(blk);
+                that.rhythmRuler.Rulers.push([[],[]]);
+            }
+            break;
+        case 'mapdrum':
+            var drumname = DEFAULTDRUM;
+            for (var drum in DRUMNAMES) {
+                if (DRUMNAMES[drum][0] === args[0]) {
+                    drumname = DRUMNAMES[drum][1];
+                } else if (DRUMNAMES[drum][1] === args[0]) {
+                    drumname = args[0];
+                }
+            }
+
+            that.drumStyle[turtle].push(drumname);
+            childFlow = args[1];
+            childFlowCount = 1;
+
+            var listenerName = '_setdrum_' + turtle;
+            that._setDispatchBlock(blk, turtle, listenerName);
+
+            var __listener = function (event) {
             };
 
             that._setListener(turtle, listenerName, __listener);

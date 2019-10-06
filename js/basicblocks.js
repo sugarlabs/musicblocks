@@ -3035,6 +3035,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('mapdrum');
+    newblock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['mapdrum'] = newblock;
+    //.TRANS: map a pitch to a drum sound
+    newblock.staticLabels.push(_('map pitch to drum'));
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('mapdrum')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('setdrum');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['setdrum'] = newblock;

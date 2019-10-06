@@ -693,23 +693,23 @@ function PitchDrumMatrix() {
             var octave = noteObj[1];
 
             // Add the set drum block and its value
-            var setdrumidx = newStack.length;
-            var drumnameidx = setdrumidx + 1;
-            var pitchidx = setdrumidx + 2;
-            var notenameidx = setdrumidx + 3;
-            var octaveidx = setdrumidx + 4;
-            var hiddenidx = setdrumidx + 5;
+            var mapdrumidx = newStack.length;
+            var drumnameidx = mapdrumidx + 1;
+            var pitchidx = mapdrumidx + 2;
+            var notenameidx = mapdrumidx + 3;
+            var octaveidx = mapdrumidx + 4;
+            var hiddenidx = mapdrumidx + 5;
 
-            newStack.push([setdrumidx, 'setdrum', 0, 0, [previousBlock, drumnameidx, pitchidx, hiddenidx]]);
-            newStack.push([drumnameidx, ['drumname', {'value': drumName}], 0, 0, [setdrumidx]]);
-            newStack.push([pitchidx, 'pitch', 0, 0, [setdrumidx, notenameidx, octaveidx, null]]);
+            newStack.push([mapdrumidx, 'mapdrum', 0, 0, [previousBlock, drumnameidx, pitchidx, hiddenidx]]);
+            newStack.push([drumnameidx, ['drumname', {'value': drumName}], 0, 0, [mapdrumidx]]);
+            newStack.push([pitchidx, 'pitch', 0, 0, [mapdrumidx, notenameidx, octaveidx, null]]);
             newStack.push([notenameidx, ['solfege', {'value': SOLFEGECONVERSIONTABLE[pitch]}], 0, 0, [pitchidx]]);
             newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
 
             if (i === pairs.length - 1) {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, null]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [mapdrumidx, null]]);
             } else {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, hiddenidx + 1]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [mapdrumidx, hiddenidx + 1]]);
             }
 
             var previousBlock = hiddenidx;
