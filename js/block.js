@@ -2426,6 +2426,7 @@ function Block(protoblock, blocks, overrideName) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
+                    console.log('MOUSE OUT EVENT');
                     this._labelChanged(true, true);
                     hideDOMLabel();
                 }
@@ -3139,6 +3140,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
+                console.log('__BLUR EVENT');
                 that._labelChanged(false, true);
 
                 event.preventDefault();
@@ -3154,14 +3156,16 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
 
-
+            /*
             var __input = function (event) {
+                console.log('__INPUT EVENT');
                 that._labelChanged(false, true);
             };
+            */
 
             if (this.name === 'text' || this.name === 'number') {
                 this.label.addEventListener('blur', __blur);
-                this.label.addEventListener('input', __input);
+                // this.label.addEventListener('input', __input);
             }
 
             var __keypress = function (event) {
@@ -3179,9 +3183,12 @@ function Block(protoblock, blocks, overrideName) {
 
             this.label.addEventListener('keypress', __keypress);
 
+            /*
             this.label.addEventListener('change', function () {
+                console.log('CHANGE EVENT');
                 that._labelChanged(false, true);
             });
+            */
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
             this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
@@ -3211,6 +3218,7 @@ function Block(protoblock, blocks, overrideName) {
      */
      this._exitKeyPressed = function(event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+            console.log('KEYPRESS EVENT');
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener('keypress', this._exitKeyPressed);
@@ -4086,6 +4094,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
+            console.log('CHANGE2 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -4275,6 +4284,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
+            console.log('CHANGE3 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -4458,6 +4468,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
+            console.log('CHANGE4 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -5422,7 +5433,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
-        console.log('LABEL CHANGED ' + this.name);
+        console.log('LABEL CHANGED: ' + this.name + ' close input: ' + closeInput + ' notPieMenu: ' + notPieMenu);
 
         if (this === null || this.label === null) {
             this._labelLock = false;
