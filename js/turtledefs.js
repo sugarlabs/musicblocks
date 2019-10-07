@@ -568,6 +568,7 @@ function createHelpContent() {
         'newturtle': [_('The New mouse block will create a new mouse.'), 'documentation', ''],
         'foundturtle': [_('The Found mouse block will return true if the specified mouse can be found.'), 'documentation', ''],
         'turtlesync': [_('The Mouse sync block aligns the beat count between mice.'), 'documentation', ''],
+        'turtleheap': [_('The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.'), 'documentation', ''],
         'turtlenote2': [_('The Mouse note block returns the current note value being played by the specified mouse.'), 'documentation', ''],
         'turtlepitch': [_('The Mouse pitch block returns the current pitch number being played by the specified mouse.'), 'documentation', ''],
         'turtleelapsednotes': [_('The Mouse elapse notes block returns the number of notes played by the specified mouse.'), 'documentation', ''],
