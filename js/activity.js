@@ -76,7 +76,7 @@ function Activity() {
 
     var firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
-	beginnerMode = true;
+        beginnerMode = true;
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;
@@ -1831,36 +1831,44 @@ function Activity() {
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
             case 66: // 'B'
+                textMsg('Alt-B ' + _('Saving block artwork'));
                 save.saveBlockArtwork();
                 break;
             case 67: // 'C'
+                textMsg('Alt-C ' + _('Copy'));
                 blocks.prepareStackForCopy();
                 break;
             case 68: // 'D'
                 palettes.dict['myblocks'].promptMacrosDelete()
                 break;
             case 69: // 'E'
+                textMsg('Alt-E ' + _('Erase'));
                 _allClear();
                 break;
             case 80: // 'P'
                 // logo.playback(-1);
                 break;
             case 82: // 'R'
+                textMsg('Alt-R ' + _('Play'));
                 that._doFastButton();
                 break;
             case 83: // 'S'
+                textMsg('Alt-S ' + _('Stop'));
                 logo.doStopTurtle();
                 break;
             case 86: // 'V'
+                textMsg('Alt-V ' + _('Paste'));
                 blocks.pasteStack();
                 break;
             case 72:  // 'H' save block help
+                textMsg('Alt-H ' + _('Save block help'));
                 _saveHelpBlocks();
                 break;
             }
         } else if (event.ctrlKey) {
             switch (event.keyCode) {
             case V:
+                textMsg('Ctl-V ' + _('Paste'));
                 pasteBox.createBox(turtleBlocksScale, 200, 200);
                 pasteBox.show();
                 docById('paste').style.left = (pasteBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
@@ -1871,39 +1879,47 @@ function Activity() {
                 break;
             }
         } else if (event.shiftKey && !disableKeys) {
+            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
             switch (event.keyCode) {
             case KEYCODE_D:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('D ' + solfnotes_[6]);
                     __makeNewNote(5, 'do');
                 }
                 break;
             case KEYCODE_R:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('R ' + solfnotes_[5]);
                     __makeNewNote(5, 're');
                 }
                 break;
             case KEYCODE_M:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('M ' + solfnotes_[4]);
                     __makeNewNote(5, 'mi');
                 }
                 break;
             case KEYCODE_F:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('F ' + solfnotes_[3]);
                     __makeNewNote(5, 'fa');
                 }
                 break;
             case KEYCODE_S:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('S ' + solfnotes_[2]);
                     __makeNewNote(5, 'sol');
                 }
                 break;
             case KEYCODE_L:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('L ' + solfnotes_[1]);
                     __makeNewNote(5, 'la');
                 }
                 break;
             case KEYCODE_T:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('T ' + solfnotes_[0]);
                     __makeNewNote(5, 'ti');
                 }
                 break;
@@ -1914,22 +1930,28 @@ function Activity() {
                     pasted();
                 }
             } else if (!disableKeys) {
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
                 switch (event.keyCode) {
                 case END:
+                    textMsg('END ' + _('Jumping to the bottom of the page.'));
                     blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
                     break;
                 case PAGE_UP:
+                    textMsg('PAGE_UP ' + _('Scrolling up.'));
                     blocksContainer.y += logo.canvas.height / 2;
                     stage.update();
                     break;
                 case PAGE_DOWN:
+                    textMsg('PAGE_DOWN ' + _('Scrolling down.'));
                     blocksContainer.y -= logo.canvas.height / 2;
                     stage.update();
                     break;
                 case DEL:
+                    textMsg('DEL ' + _('Extracting block'));
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
+                    textMsg('UP ARROW ' + _('Moving block up.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1945,6 +1967,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_DOWN:
+                    textMsg('UP ARROW ' + _('Moving block down.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1960,6 +1983,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_LEFT:
+                    textMsg('LEFT ARROW ' + _('Moving block left.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1970,6 +1994,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_RIGHT:
+                    textMsg('RIGHT ARROW ' + _('Moving block right.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1980,6 +2005,7 @@ function Activity() {
                     stage.update();
                     break;
                 case HOME:
+                    textMsg('HOME ' + _('Jump to home position.'));
                     if (palettes.mouseOver) {
                         var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
                         palettes.menuScrollEvent(1, dy);
@@ -2002,6 +2028,7 @@ function Activity() {
                     break;
                 case ESC:
                     if (searchWidget.style.visibility === 'visible') {
+                        textMsg('ESC ' + _('Hide blocks.'));
                         searchWidget.style.visibility = 'hidden';
                     } else {
                         // toggle full screen
@@ -2012,6 +2039,7 @@ function Activity() {
                     if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
                         doSearch();
                     } else {
+                        textMsg('Return ' + _('Play'));
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
                         }
@@ -2019,36 +2047,43 @@ function Activity() {
                     break;
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('d ' + solfnotes_[6]);
                         __makeNewNote(4, 'do');
                     }
                     break;
                 case KEYCODE_R:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('r ' + solfnotes_[5]);
                         __makeNewNote(4, 're');
                     }
                     break;
                 case KEYCODE_M:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('m ' + solfnotes_[4]);
                         __makeNewNote(4, 'mi');
                     }
                     break;
                 case KEYCODE_F:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('f ' + solfnotes_[3]);
                         __makeNewNote(4, 'fa');
                     }
                     break;
                 case KEYCODE_S:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('s ' + solfnotes_[2]);
                         __makeNewNote(4, 'sol');
                     }
                     break;
                 case KEYCODE_L:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('l ' + solfnotes_[1]);
                         __makeNewNote(4, 'la');
                     }
                     break;
                 case KEYCODE_T:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('t ' + solfnotes_[0]);
                         __makeNewNote(4, 'ti');
                     }
                     break;
