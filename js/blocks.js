@@ -3071,7 +3071,7 @@ function Blocks (activity) {
      * @public
      * @return {void}
      */
-    this.findUniqueActionName = function (name) {
+    this.findUniqueActionName = function (name, actionBlk) {
         // If we have a stack named 'action', make the protoblock visible.
         if (name === _('action')) {
             this.setActionProtoVisiblity(true);
@@ -3083,7 +3083,9 @@ function Blocks (activity) {
             if ((this.blockList[blk].name === 'text' || this.blockList[blk].name === 'string') && !this.blockList[blk].trash) {
                 var c = this.blockList[blk].connections[0];
                 if (c != null && this.blockList[c].name === 'action' && !this.blockList[c].trash) {
-                    actionNames.push(this.blockList[blk].value);
+                    if (actionBlk !== c) {
+                        actionNames.push(this.blockList[blk].value);
+                    }
                 }
             }
         }
@@ -3094,6 +3096,7 @@ function Blocks (activity) {
             value = name + i.toString();
             i += 1;
         }
+
         return value;
     };
 

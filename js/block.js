@@ -5492,7 +5492,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 // Ensure new name is unique.
-                var uniqueValue = this.blocks.findUniqueActionName(newValue);
+                var uniqueValue = this.blocks.findUniqueActionName(newValue, c);
                 if (uniqueValue !== newValue) {
                     newValue = uniqueValue;
                     this.value = newValue;
