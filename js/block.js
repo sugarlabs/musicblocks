@@ -3140,7 +3140,6 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                console.log('__BLUR EVENT');
                 that._labelChanged(false, true);
 
                 event.preventDefault();
@@ -3218,7 +3217,6 @@ function Block(protoblock, blocks, overrideName) {
      */
      this._exitKeyPressed = function(event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
-            console.log('KEYPRESS EVENT');
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener('keypress', this._exitKeyPressed);
@@ -4094,7 +4092,6 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            console.log('CHANGE2 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -4284,7 +4281,6 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            console.log('CHANGE3 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -4468,7 +4464,6 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('keypress', this._exitKeyPressed.bind(this));
 
         this.label.addEventListener('change', function () {
-            console.log('CHANGE4 EVENT');
             that._labelChanged(false, false);
         });
 
@@ -5642,7 +5637,7 @@ function Block(protoblock, blocks, overrideName) {
                 // cblock.  We only do something if blk is attached to
                 // the name connection (1).
                 blk = this.blocks.blockList.indexOf(this);
-                if (cblock.connections[1] === blk && closeInput) {
+                if (cblock.connections[1] === blk) {
                     // If the label was the name of a storein, update the
                     // associated box this.blocks and the palette buttons.
                     if (this.value !== 'box') {
