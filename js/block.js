@@ -17,7 +17,7 @@ const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote', 'interval', 'osctime'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval', 'osctime'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'effectsname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'effectsname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
@@ -4233,8 +4233,8 @@ function Block(protoblock, blocks, overrideName) {
         if (this._numberWheel.navItems.length > 20) {
             console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
             for (var i = 0; i < this._numberWheel.navItems.length; i++) {
-                this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-                this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+                this._numberWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
+                this._numberWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
             }
         }
 
@@ -4746,8 +4746,8 @@ function Block(protoblock, blocks, overrideName) {
         var language = localStorage.languagePreference;
         // if (language === 'ja') {
             for (var i = 0; i < this._voiceWheel.navItems.length; i++) {
-                this._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-                this._voiceWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+                this._voiceWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
+                this._voiceWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
             }
         // }
 
@@ -5258,8 +5258,8 @@ function Block(protoblock, blocks, overrideName) {
             var language = localStorage.languagePreference;
             if (language === 'ja') {
                 for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+                    that._modeNameWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
+                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
                 }
             }
 
@@ -5487,6 +5487,10 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.blocks.palettes.removeActionPrototype(oldValue);
 
+                if (newValue === '') {
+                    newValue = 'action';
+                }
+
                 // Ensure new name is unique.
                 var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
@@ -5521,6 +5525,18 @@ function Block(protoblock, blocks, overrideName) {
                 this.label.value = newValue;
                 this.updateCache();
                 break;
+            case 'storein':
+                if (newValue === '') {
+                    newValue = 'box';
+                    this.value = newValue;
+                    var label = this.value.toString();
+                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
+                        label = label.substr(0, STRINGLEN) + '...';
+                    }
+                    this.text.text = label;
+                    this.label.value = newValue;
+                    this.updateCache();
+                }
             default:
                 break;
             }
