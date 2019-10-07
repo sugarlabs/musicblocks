@@ -1,4 +1,3 @@
-
 // Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -1367,8 +1366,6 @@ function Blocks (activity) {
 
         // Is the added block above or below?
         var insertAfterDefault = true;
-
-        console.log('moving ' + this.blockList[thisBlock].name);
 
         for (var b = 0; b < this.blockList.length; b++) {
             // Don't connect to yourself.
@@ -2859,8 +2856,6 @@ function Blocks (activity) {
         for (var i = 0; i < myBlock.protoblock.defaults.length; i++) {
             var value = myBlock.protoblock.defaults[i];
 
-            console.log('==============');
-            console.log(value);
             if (myBlock.name === 'action') {
                 // Make sure we don't make two actions with the same name.
                 value = this.findUniqueActionName(_('action'));
