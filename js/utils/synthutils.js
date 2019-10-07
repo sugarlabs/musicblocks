@@ -567,7 +567,8 @@ function Synth() {
 
     // Until we fix #1744, disable recorder on FF
     if (!platform.FF) {
-        this.recorder = new Recorder(Tone.Master);
+	// recoder breaks with Tone.js v13.8.25
+        // this.recorder = new Recorder(Tone.Master);
     }
 
     // Function that provides default parameters for various synths
