@@ -320,6 +320,7 @@ function createHelpContent() {
         // Drum palette
         // 'playdrum' is described on the Rhythm palette.
         'setdrum': [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', null, 'setdrumhelp'],
+        'mapdrum': [_('Replace every instance of a pitch with a drum sound.'), 'documentation', null, 'mapdrumhelp'],
         // Widgets palette
         'status': [_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', null, 'status'],
         'matrix': [_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', null, 'matrix'],
