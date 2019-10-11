@@ -701,9 +701,9 @@ function Activity() {
             logo.turtleHeaps[turtle] = [];
             logo.notationStaging[turtle] = [];
             logo.notationDrumStaging[turtle] = [];
-	    if (noErase == undefined || !noErase) {
-		turtles.turtleList[turtle].doClear(true, true, true);
-	    }
+            if (noErase == undefined || !noErase) {
+                turtles.turtleList[turtle].doClear(true, true, true);
+            }
         }
 
         blocksContainer.x = 0;
@@ -1787,7 +1787,7 @@ function Activity() {
         if (event.keyCode === TAB) { // || event.keyCode === BACKSPACE) {
             // Prevent browser from grabbing TAB key
             event.preventDefault();
-	    return false;
+            return false;
         }
 
         const ESC = 27;
@@ -2424,9 +2424,11 @@ function Activity() {
         }
 
         if (addStartBlock) {
+            console.log('ADDING START BLOCK');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
             setPlaybackStatus();
+            _allClear(false);
         } else if (!doNotSave) {
             // Overwrite session data too.
             saveLocally();
@@ -2578,7 +2580,6 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-        console.log('DO LOAD ' + merge);
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -2597,7 +2598,7 @@ function Activity() {
         document.querySelector('#myOpenFile').click();
         window.scroll(0, 0);
         that.doHardStopButton();
-	console.log('Calling all clear from doLoad');
+        console.log('Calling all clear from doLoad');
         _allClear(true);
     };
 
