@@ -5799,10 +5799,11 @@ function Logo () {
             childFlow = args[1];
             childFlowCount = 1;
 
-            var listenerName = '_setdrum_' + turtle;
+            var listenerName = '_mapdrum_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
+		that.drumStyle[turtle].pop();
             };
 
             that._setListener(turtle, listenerName, __listener);
