@@ -2619,7 +2619,7 @@ function Block(protoblock, blocks, overrideName) {
         var labelElem = docById('labelDiv');
 
         if (this.name === 'text') {
-            labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
+            labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" tabindex="-1" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
@@ -3122,7 +3122,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             } else {
                 console.log('NUMBER LABEL');
-                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
+                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
             }
@@ -4085,7 +4085,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + noteValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + noteValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
@@ -4274,7 +4274,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + selectedValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
@@ -4457,7 +4457,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + selectedValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
