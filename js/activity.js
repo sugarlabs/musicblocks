@@ -683,7 +683,7 @@ function Activity() {
     /*
      * Clears "canvas"
      */
-    _allClear = function () {
+    _allClear = function (noErase) {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -701,7 +701,9 @@ function Activity() {
             logo.turtleHeaps[turtle] = [];
             logo.notationStaging[turtle] = [];
             logo.notationDrumStaging[turtle] = [];
-            turtles.turtleList[turtle].doClear(true, true, true);
+	    if (noErase == undefined || !noErase) {
+		turtles.turtleList[turtle].doClear(true, true, true);
+	    }
         }
 
         blocksContainer.x = 0;
@@ -1842,7 +1844,7 @@ function Activity() {
                 break;
             case 69: // 'E'
                 textMsg('Alt-E ' + _('Erase'));
-                _allClear();
+                _allClear(false);
                 break;
             case 80: // 'P'
                 // logo.playback(-1);
@@ -2124,7 +2126,6 @@ function Activity() {
 
         console.log('window inner/outer width/height: ' + window.innerWidth + ', ' + window.innerHeight + ' ' + window.outerWidth + ', ' + window.outerHeight);
 
-
         if (!platform.androidWebkit) {
             var w = window.innerWidth;
             var h = window.innerHeight;
@@ -2213,8 +2214,6 @@ function Activity() {
         polarBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
         polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
         update = true;
-
-
 
         // Hide tooltips on mobile
         if (platform.mobile) {
@@ -2598,7 +2597,8 @@ function Activity() {
         document.querySelector('#myOpenFile').click();
         window.scroll(0, 0);
         that.doHardStopButton();
-        _allClear();
+	console.log('Calling all clear from doLoad');
+        _allClear(true);
     };
 
     window.prepareExport = prepareExport;
@@ -2737,7 +2737,7 @@ function Activity() {
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
-            console.log('Loading start and a matrix');
+            console.log('Loading start');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
             setPlaybackStatus();
@@ -2756,7 +2756,7 @@ function Activity() {
         var __afterLoad = function () {
             if (!turtles.running()) {
                 setTimeout(function () {
-                    console.log('reset turtles ' + turtles.turtleList.length);
+                    console.log('reset turtles after load: ' + turtles.turtleList.length);
 
                     for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                         logo.turtleHeaps[turtle] = [];
@@ -2805,7 +2805,6 @@ function Activity() {
 
         update = true;
     };
-
 
     /*
      * Hides all message containers
@@ -4201,7 +4200,7 @@ function Activity() {
                 console.log('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
-                _allClear();
+                _allClear(false);
 
                 // First, hide the palettes as they will need updating.
                 for (var name in blocks.palettes.dict) {
