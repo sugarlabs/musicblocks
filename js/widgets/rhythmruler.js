@@ -529,6 +529,14 @@ function RhythmRuler () {
         if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
             var noteValues = this.Rulers[this._rulerSelected][0];
 
+            var noteValue = noteValues[newCellIndex];
+            if(inputNum * noteValue > 256) {
+                this._logo.errorMsg(_('Maximum value of 256 has been exceeded.'));
+                return;
+            } else {
+                this._logo.hideMsgs();
+            }
+
             var divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(['dissect', this._rulerSelected]);
@@ -538,17 +546,10 @@ function RhythmRuler () {
 
             ruler.deleteCell(newCellIndex);
 
-            var noteValue = noteValues[newCellIndex];
+            // var noteValue = noteValues[newCellIndex];
             var newNoteValue = 0;
             
-            if(inputNum * noteValue <= 256) {
-                newNoteValue = inputNum * noteValue;
-                this._logo.hideMsgs();
-            } else {
-                console.log('Top max value exceeded');
-                this._logo.errorMsg(_('Maximum value of 256 has been exceeded.'));
-                newNoteValue = inputNum;
-            }
+            newNoteValue = inputNum * noteValue;
 
             var tempwidth = this._noteWidth(newNoteValue);
             var tempwidthPixels = parseFloat(inputNum) * parseFloat(tempwidth) + 'px';
@@ -1381,7 +1382,7 @@ function RhythmRuler () {
     };
 
     this._get_save_lock = function() {
-	return this._save_lock;
+        return this._save_lock;
     };
 
     this.init = function (logo) {
@@ -1504,24 +1505,24 @@ function RhythmRuler () {
 
         cell.onclick = async function () {
             // that._save(0);
-	    // Debounce button
-	    if (!that._get_save_lock()) {
-		that._save_lock = true;
-		that._saveTuplets(0);
-		await delayExecution(1000)
-		    that._save_lock = false;
-	    }
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveTuplets(0);
+                await delayExecution(1000)
+                    that._save_lock = false;
+            }
         };
 
         var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
         cell.onclick = async function () {
-	    // Debounce button
-	    if (!that._get_save_lock()) {
-		that._save_lock = true;
-		that._saveMachine(0);
-		await delayExecution(1000)
-		    that._save_lock = false;
-	    }
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveMachine(0);
+                await delayExecution(1000)
+                    that._save_lock = false;
+            }
         };
 
         // An input for setting the dissect number
