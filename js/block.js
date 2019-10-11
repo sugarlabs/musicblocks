@@ -4169,11 +4169,11 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.display = '';
         this.label.focus();
 
-        // Hide the widget when the selection is made.
         for (var i = 0; i < tabsLabels.length; i++) {
             this._tabsWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
-                __exitMenu();
+		// Hide the widget when the selection is made.
+                // __exitMenu();
             };
         }
 
