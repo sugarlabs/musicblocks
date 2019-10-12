@@ -369,7 +369,7 @@ function Synth() {
                 var len = notes.length;
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
-                return pitchToFrequency(note, octave, 0, null);
+                return pitchToFrequency(note, octave, 0, 'c major');
             } else if (typeof(notes) === 'number') {
                 return notes;
             } else {
@@ -379,7 +379,7 @@ function Synth() {
                         var len = notes[i].length;
                         var note = notes[i].substring(0, len - 1);
                         var octave = Number(notes[i].slice(-1));
-                        results.push(pitchToFrequency(note, octave, 0, null));
+                        results.push(pitchToFrequency(note, octave, 0, 'c major'));
                     } else {
                         results.push(notes[i]);
                     }

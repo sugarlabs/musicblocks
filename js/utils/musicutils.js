@@ -994,7 +994,7 @@ function getTemperamentName(name) {
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === '') {
+    if (keySignature === '' || keySignature == null) {
         console.log('No key signature provided; reverting to C major.');
        return ['C', 'major'];
     }
