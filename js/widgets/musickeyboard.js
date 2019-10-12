@@ -185,10 +185,12 @@ function MusicKeyboard() {
 
         element.onmousedown = function() {
             start = new Date();
+            element.style.backgroundColor = platformColor.orange;
             synth.triggerAttack(temp2);
-        }
+        };
 
-        element.onmouseup = function() {
+        element.onmouseout = function() {
+            element.style.backgroundColor = '#ffffff';
             duration = (new Date() - start)/1000.0;
             synth.triggerRelease(temp2);
             if (beginnerMode === 'true') {
@@ -200,7 +202,22 @@ function MusicKeyboard() {
                 duration = 0.125;
             }
             that._selectedHelper.push([start.getTime(), temp2,no, duration]);
-        }
+        };
+
+        element.onmouseup = function() {
+            element.style.backgroundColor = '#ffffff';
+            duration = (new Date() - start)/1000.0;
+            synth.triggerRelease(temp2);
+            if (beginnerMode === 'true') {
+                duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
+            } else {
+                duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
+            }
+            if (duration === 0) {
+                duration = 0.125;
+            }
+            that._selectedHelper.push([start.getTime(), temp2,no, duration]);
+        };
     };
 
     this.init = function(logo) {
@@ -248,9 +265,15 @@ function MusicKeyboard() {
             }
 
             var myNode = document.getElementById('myrow');
-            myNode.innerHTML = '';
+            if (myNode != null) {
+                myNode.innerHTML = '';
+            }
+
             var myNode = document.getElementById('myrow2');
-            myNode.innerHTML = '';
+            if (myNode != null) {
+                myNode.innerHTML = '';
+            }
+
             selected = [];
             selectedNotes = [];
         };
