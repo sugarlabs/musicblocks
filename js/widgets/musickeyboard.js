@@ -29,6 +29,7 @@ function MusicKeyboard() {
     this._stopOrCloseClicked = false;
     this.playingNow = false;
 
+    this.instruments = [];
     this.noteNames = [];
     this.octaves = [];
     this.keyboardShown = true;
@@ -37,11 +38,12 @@ function MusicKeyboard() {
 
     // Map between keyboard element ids and the note associated with the key.
     this.noteMapper = {};
+    this.instrumentMapper = {};
     var selectedNotes = [];
 
     this._rowBlocks = [];
 
-    // Each element in the array is [start time, note, block number, duration].
+    // Each element in the array is [start time, note, id, duration].
     this._selectedHelper = [];
 
     this.addRowBlock = function(rowBlock) {
@@ -136,7 +138,7 @@ function MusicKeyboard() {
                     temp2[id] = temp1[id].replace(SHARP, '#').replace(FLAT, 'b') + ele.getAttribute('alt').split('__')[1];
                 }
 
-                that._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
+                that._logo.synth.trigger(0, temp2[id], 1, that.instrumentMapper[id], null, null);
                 prevKey = event.keyCode;
             }
         };
@@ -181,7 +183,7 @@ function MusicKeyboard() {
                     duration = -duration;
                 }
 
-                that._logo.synth.stopSound(0, DEFAULTVOICE, temp2[id]);
+                that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
                 // that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
                 that._selectedHelper.push([startTime[id], temp2[id], id, duration]);
@@ -210,6 +212,7 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
 
+        this.instrumentMapper[element.id] = this.instruments[i];
         this.noteMapper[element.id] = temp2;
 
         var that = this;
@@ -221,7 +224,7 @@ function MusicKeyboard() {
             startDate = new Date();
             startTime = startDate.getTime();  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            that._logo.synth.trigger(0, that.noteMapper[element.id], 1, DEFAULTVOICE, null, null);
+            that._logo.synth.trigger(0, that.noteMapper[element.id], 1, that.instrumentMapper[element.id], null, null);
         };
 
         element.onmousedown = function() {
@@ -239,7 +242,7 @@ function MusicKeyboard() {
             var now = new Date();
             duration = now.getTime() - startTime;
             duration /= 1000;
-            that._logo.synth.stopSound(0, DEFAULTVOICE, that.noteMapper[element.id]);
+            that._logo.synth.stopSound(0, that.instrumentMapper[element.id], that.noteMapper[element.id]);
             if (beginnerMode === 'true') {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {

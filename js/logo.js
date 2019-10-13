@@ -2311,14 +2311,14 @@ function Logo () {
                     // the last one, otherwise the child of the
                     // while block is executed multiple times.
                     var queueLength = that.turtles.turtleList[turtle].queue.length;
-		    var kept_one = false;
+                    var kept_one = false;
                     for (var i = queueLength - 1; i > 0; i--) {
                         if (that.turtles.turtleList[turtle].queue[i].parentBlk === blk) {
-			    if (kept_one) {
-				that.turtles.turtleList[turtle].queue.pop();
-			    } else {
-				kept_one = true;
-			    }
+                            if (kept_one) {
+                                that.turtles.turtleList[turtle].queue.pop();
+                            } else {
+                                kept_one = true;
+                            }
                         }
                     }
 
@@ -3755,6 +3755,7 @@ function Logo () {
             }
 
             that.inMusicKeyboard = true;
+            that.musicKeyboard.instruments = [];
             that.musicKeyboard.noteNames = [];
             that.musicKeyboard.octaves = [];
             that.musicKeyboard._rowBlocks = [];
@@ -4519,6 +4520,7 @@ function Logo () {
                 that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
             } else if (that.inMusicKeyboard) {
                 if (that.drumStyle[turtle].length === 0) {
+                    that.musicKeyboard.instruments.push(last(that.instrumentNames[turtle]));
                     that.musicKeyboard.noteNames.push(noteObj1[0]);
                     that.musicKeyboard.octaves.push(noteObj1[1]);
                     that.musicKeyboard.addRowBlock(blk);
@@ -5078,6 +5080,7 @@ function Logo () {
                 }
 
                 if (that.drumStyle[turtle].length === 0) {
+                    that.musicKeyboard.instruments.push(last(that.instrumentNames[turtle]));
                     that.musicKeyboard.noteNames.push(nnote[0]);
                     that.musicKeyboard.octaves.push(nnote[1]);
                     that.musicKeyboard.addRowBlock(blk);
@@ -5803,7 +5806,7 @@ function Logo () {
             that._setDispatchBlock(blk, turtle, listenerName);
 
             var __listener = function (event) {
-		that.drumStyle[turtle].pop();
+                that.drumStyle[turtle].pop();
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -7246,6 +7249,7 @@ function Logo () {
                 that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
                 that.pitchTimeMatrix.rowArgs.push(arg);
             } else if (that.inMusicKeyboard) {
+                that.musicKeyboard.instruments.push(last(that.instrumentNames[turtle]));
                 that.musicKeyboard.noteNames.push('hertz');
                 that.musicKeyboard.octaves.push(arg);
                 that.musicKeyboard.addRowBlock(blk);
