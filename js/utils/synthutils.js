@@ -1164,14 +1164,18 @@ function Synth() {
         }
     };
 
-    this.stopSound = function (turtle, instrumentName) {
+    this.stopSound = function (turtle, instrumentName, note) {
         var flag = instrumentsSource[instrumentName][0];
         switch(flag) {
         case 1:  // drum
             instruments[turtle][instrumentName].stop();
             break;
         default:
-            instruments[turtle][instrumentName].triggerRelease();
+	    if (note == undefined) {
+		instruments[turtle][instrumentName].triggerRelease();
+	    } else {
+		instruments[turtle][instrumentName].triggerRelease(note);
+	    }
             break;
         }
     };
