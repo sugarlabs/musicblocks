@@ -25,7 +25,6 @@ function MusicKeyboard() {
     this._cellScale = w / 1200;
 
     var beginnerMode = localStorage.beginnerMode;
-    console.log('BEGINNER MODE: ' + beginnerMode);
 
     this._stopOrCloseClicked = false;
     this.playingNow = false;
@@ -50,7 +49,8 @@ function MusicKeyboard() {
     };
 
     this.processSelected = function() {
-        console.log(this._selectedHelper);
+	// Consolidate chords
+
         if (this._selectedHelper.length === 0) {
             selectedNotes = [];
             return;
@@ -99,8 +99,6 @@ function MusicKeyboard() {
                 selectedNotes.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], this._selectedHelper[i][0]])
             }
         }
-
-        console.log(selectedNotes);
     };
 
     this.addKeyboardShortcuts = function() {
@@ -110,7 +108,9 @@ function MusicKeyboard() {
         var temp1 = {};
         var temp2 = {};
         var prevKey = 0;
+
         var __keyboarddown = function(event) {
+	    console.log('KEYBOARD EVENT: ' + event.keyCode);
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
                 var i = WHITEKEYS.indexOf(event.keyCode);
                 var id = 'whiteRow' + i.toString();
@@ -137,10 +137,10 @@ function MusicKeyboard() {
                     temp2[id] = temp1[id].replace(SHARP, '#').replace(FLAT, 'b') + ele.getAttribute('alt').split('__')[1];
                 }
 
-                this._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
+                that._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
                 prevKey = event.keyCode;
             }
-        }
+        };
 
         var __keyboardup = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -169,18 +169,19 @@ function MusicKeyboard() {
                     duration = 0.125;
                 }
 
-                if ( this._logo.synth instanceof Tone.PolySynth ) {
-                    this._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
-                } else if ( temp2[id] && event.keyCode === prevKey ) {
-                    this._logo.synth.stop();
+                if (that._logo.synth instanceof Tone.PolySynth) {
+                    that._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
+                } else if (temp2[id] && event.keyCode === prevKey) {
+                    that._logo.synth.stop();
                 }
 
-                that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
+                // that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
+		that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], id, duration]);
                 delete start[id];
                 delete temp1[id];
                 delete temp2[id];
             }
-        }
+        };
 
         document.onkeydown = __keyboarddown;
         document.onkeyup = __keyboardup;
@@ -238,12 +239,10 @@ function MusicKeyboard() {
 
 
         element.onmouseout = function() {
-            console.log('ONMOUSEOUT');
             // __endNote();
         };
 
         element.onmouseup = function() {
-            console.log('ONMOUSEUP');
             __endNote(this);
         };
     };
@@ -563,7 +562,6 @@ function MusicKeyboard() {
     }
 
     this._playChord = function (notes, noteValue) {
-        console.log(noteValue);
         if (notes[0] === 'R') {
             return;
         }
@@ -1198,11 +1196,9 @@ function MusicKeyboard() {
             
             switch (label) {
                 case 'pitch':
-                    console.log('loading new pitch block');
                     that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': rLabel}], 0, 0, [0]], [2, ['number', {'value': rArg}], 0, 0, [0]]]);
                     break;
                 case 'hertz':
-                    console.log('loading new Hertz block');
                     that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': rArg}], 0, 0, [0]]]);
                     break;
             }    
@@ -1710,7 +1706,7 @@ function MusicKeyboard() {
 
     this._save = function() {
         this.processSelected();
-        console.log('generating keyboard pitches for: ' + selectedNotes);
+        console.log('Generating action stack for: ' + selectedNotes);
         var newStack = [[0, ['action', {'collapsed':false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 
