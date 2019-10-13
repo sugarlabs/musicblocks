@@ -90,7 +90,7 @@ function getSharpFlatPreference (keySignature) {
     var obj = keySignatureToMode(keySignature);
     var obj2 = modeMapper(obj[0], obj[1]);
     var ks = obj2[0] + ' ' + obj2[1];
-    console.log(ks);
+
     if (SHARPPREFERENCE.indexOf(ks) !== -1) {
         return 'sharp';
     } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
