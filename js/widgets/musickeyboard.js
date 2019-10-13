@@ -213,7 +213,7 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
 
-        this.instrumentMapper[element.id] = this.instruments[i];
+        this.instrumentMapper[element.id] = this.layout[i][3];
         this.noteMapper[element.id] = temp2;
 
         var that = this;
@@ -603,7 +603,7 @@ function MusicKeyboard() {
             if (this.noteNames[i] === 'hertz') {
                 sortableList.push([this.octaves[i], this.noteNames[i], this.octaves[i], this._rowBlocks[i], this.instruments[i]]);
             } else {
-                sortableList.push([noteToFrequency(this.noteNames[i]+ this.octaves[i], this._logo.keySignature[0]), this.noteNames[i], this.octaves[i], this._rowBlocks[i], this.instruments[i]]);
+                sortableList.push([noteToFrequency(this.noteNames[i] + this.octaves[i], this._logo.keySignature[0]), this.noteNames[i], this.octaves[i], this._rowBlocks[i], this.instruments[i]]);
             }
         }
 
@@ -639,7 +639,7 @@ function MusicKeyboard() {
         }
 
         for (var i = 0; i < sortedList.length; i++) {
-            this.layout.push([sortedList[i][1], sortedList[i][2], sortedList[i][3]]);
+            this.layout.push([sortedList[i][1], sortedList[i][2], sortedList[i][3], sortedList[i][4]]);
         }
     };
 
