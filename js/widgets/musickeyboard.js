@@ -12,20 +12,20 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function MusicKeyboard() {
-    var synth = new Tone.PolySynth(10).toMaster();
-
     const BUTTONDIVWIDTH = 535;  // 5 buttons
     const OUTERWINDOWWIDTH = 758;
     const INNERWINDOWWIDTH = 50;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const BLACKKEYS = [87,69,82,84,89,85,73,79];
-    const WHITEKEYS = [65,83,68,70,71,72,74,75,76];
+    // Mapping between keycodes and virtual keyboard
+    const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
+    const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
 
     var w = window.innerWidth;
     this._cellScale = w / 1200;
 
     var beginnerMode = localStorage.beginnerMode;
+    console.log('BEGINNER MODE: ' + beginnerMode);
 
     this._stopOrCloseClicked = false;
     this.playingNow = false;
@@ -36,9 +36,13 @@ function MusicKeyboard() {
     this.layout = [];
     this.idContainer = [];
 
+    // Map between keyboard element ids and the note associated with the key.
+    this.noteMapper = {};
     var selectedNotes = [];
 
     this._rowBlocks = [];
+
+    // Each element in the array is [start time, note, block number, duration].
     this._selectedHelper = [];
 
     this.addRowBlock = function(rowBlock) {
@@ -46,38 +50,44 @@ function MusicKeyboard() {
     };
 
     this.processSelected = function() {
+        console.log(this._selectedHelper);
         if (this._selectedHelper.length === 0) {
             selectedNotes = [];
             return;
         }
 
+        // We want to sort the list by startTime.
         this._selectedHelper.sort(function(a, b) {
             return a[0] - b[0];
         });
 
-        var mindur = 63;
 
+        /*
         if (beginnerMode === 'true') {
-            mindur = 125;
+            var minimumDuration = 125; // 1/8 note
+        } else {
+            var minimumDuration = 62.5; // 1/16 note
         }
 
         var last = this._selectedHelper[0][0];
         for (var i = 1; i < this._selectedHelper.length; i++) {
-            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < mindur)) {
+            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < minimumDuration)) {
                 last = this._selectedHelper[i][0];
-                this._selectedHelper[i][0] = this._selectedHelper[i-1][0];
+                this._selectedHelper[i][0] = this._selectedHelper[i - 1][0];
                 i++;
             }
+
             if (i < this._selectedHelper.length) {
                 last = this._selectedHelper[i][0]
-                this._selectedHelper[i][0] = this._selectedHelper[i-1][0] + (this._selectedHelper[i-1][3]*1000) + mindur;
+                this._selectedHelper[i][0] = this._selectedHelper[i - 1][0] + (this._selectedHelper[i - 1][3]*1000) + minimumDuration;
             }
-        };
+        }
+        */
 
         selectedNotes = [[[this._selectedHelper[0][1]], [this._selectedHelper[0][2]], [this._selectedHelper[0][3]], this._selectedHelper[0][0]]];
         var j = 0
         for (var i = 1; i < this._selectedHelper.length; i++) {
-            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] === this._selectedHelper[i-1][0])) {
+            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] === this._selectedHelper[i - 1][0])) {
                 selectedNotes[j][0].push(this._selectedHelper[i][1])
                 selectedNotes[j][1].push(this._selectedHelper[i][2])
                 selectedNotes[j][2].push(this._selectedHelper[i][3])
@@ -89,7 +99,9 @@ function MusicKeyboard() {
                 selectedNotes.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], this._selectedHelper[i][0]])
             }
         }
-    }
+
+        console.log(selectedNotes);
+    };
 
     this.addKeyboardShortcuts = function() {
         var that = this;
@@ -125,7 +137,7 @@ function MusicKeyboard() {
                     temp2[id] = temp1[id].replace(SHARP, '#').replace(FLAT, 'b') + ele.getAttribute('alt').split('__')[1];
                 }
 
-                synth.triggerAttack(temp2[id]);
+                this._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
                 prevKey = event.keyCode;
             }
         }
@@ -135,12 +147,14 @@ function MusicKeyboard() {
                 var i = WHITEKEYS.indexOf(event.keyCode);
                 var id = 'whiteRow'+i.toString();
                 var ele = docById(id);
-                duration = (new Date() - start[id]) / 1000.0;
+                var s = new Date();
+                duration = (s.getMilliseconds() - start[id].getMilliseconds()) / 1000.0;
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 var i = BLACKKEYS.indexOf(event.keyCode);
                 var id = 'blackRow'+i.toString();
                 var ele = docById(id);
-                duration = (new Date() - start[id]) / 1000.0;
+                var s = new Date();
+                duration = (s.getMilliseconds() - start[id].getMilliseconds()) / 1000.0;
             }
 
             if (ele !== null && ele !== undefined) {
@@ -150,15 +164,18 @@ function MusicKeyboard() {
                 } else {
                     duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
                 }
+
                 if (duration === 0) {
                     duration = 0.125;
                 }
-                if ( synth instanceof Tone.PolySynth ) {
-                    synth.triggerRelease(temp2[id]);
-                } else if ( temp2[id] && event.keyCode === prevKey ) {;
-                    synth.triggerRelease();
+
+                if ( this._logo.synth instanceof Tone.PolySynth ) {
+                    this._logo.synth.trigger(0, temp2[id], 1, DEFAULTVOICE, null, null);
+                } else if ( temp2[id] && event.keyCode === prevKey ) {
+                    this._logo.synth.stop();
                 }
-                that._selectedHelper.push([start[id].getTime(), temp2[id], parseInt(no), duration]);
+
+                that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
                 delete start[id];
                 delete temp1[id];
                 delete temp2[id];
@@ -169,7 +186,7 @@ function MusicKeyboard() {
         document.onkeyup = __keyboardup;
     }
 
-    this.loadHandler = function(element, i, no) {
+    this.loadHandler = function(element, i, blockNum) {
         var temp1 = this.layout[i][0];
         if (temp1 === 'hertz') {
             var temp2 = this.layout[i][1];
@@ -179,44 +196,55 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
 
+        this.noteMapper[element.id] = temp2;
+
         var that = this;
         var duration = 0;
-        var start = 0;
+        var startDate = new Date();
+        var startTime = 0;
 
-        element.onmousedown = function() {
-            start = new Date();
+        __startNote = function(element) {
+            startDate = new Date();
+            startTime = startDate.getTime();  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            synth.triggerAttack(temp2);
+            that._logo.synth.trigger(0, that.noteMapper[element.id], 1, DEFAULTVOICE, null, null);
         };
 
-        element.onmouseout = function() {
+        element.onmousedown = function() {
+            __startNote(this);
+        };
+
+        __endNote = function(element) {
             element.style.backgroundColor = '#ffffff';
-            duration = (new Date() - start)/1000.0;
-            synth.triggerRelease(temp2);
+            var now = new Date();
+            duration = now.getTime() - startTime;
+            duration /= 1000;
+            that._logo.synth.stopSound(0, DEFAULTVOICE, that.noteMapper[element.id]);
             if (beginnerMode === 'true') {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {
                 duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
             }
+
             if (duration === 0) {
                 duration = 0.125;
+            } else if (duration < 0) {
+                console.log('NEG DURATION');
+                duration = -duration;
             }
-            that._selectedHelper.push([start.getTime(), temp2,no, duration]);
+
+            that._selectedHelper.push([startTime, that.noteMapper[element.id], element.id, duration]);
+        };
+
+
+        element.onmouseout = function() {
+            console.log('ONMOUSEOUT');
+            // __endNote();
         };
 
         element.onmouseup = function() {
-            element.style.backgroundColor = '#ffffff';
-            duration = (new Date() - start)/1000.0;
-            synth.triggerRelease(temp2);
-            if (beginnerMode === 'true') {
-                duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-            } else {
-                duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
-            }
-            if (duration === 0) {
-                duration = 0.125;
-            }
-            that._selectedHelper.push([start.getTime(), temp2,no, duration]);
+            console.log('ONMOUSEUP');
+            __endNote(this);
         };
     };
 
@@ -421,11 +449,16 @@ function MusicKeyboard() {
             var notes = [];
             for (var i = 0; i < selectedNotes[0][0].length; i++) {
                 if (this.keyboardShown && selectedNotes[0][1][0] !== null) {
+                    /*
                     var id = this.idContainer.findIndex(function(ele) {
-                        return ele[1] === selectedNotes[0][1][i]
+                        console.log(ele[1] + ' ==? ' + selectedNotes[0][1][i]);
+                        return ele[1] === selectedNotes[0][1][i];
                     });
+                    */
 
-                    var ele = docById(this.idContainer[id][0]);
+                    // var ele = docById(this.idContainer[id][0]);
+                    // console.log(i + ' ' + this.idContainer[id][0]);
+                    var ele = docById(selectedNotes[0][1][i]);
                     ele.style.backgroundColor = 'lightgrey';
                 }
                 
@@ -474,16 +507,20 @@ function MusicKeyboard() {
 
                 if (that.keyboardShown && selectedNotes[counter-1][1][0] !== null) {
                     for (var i = 0; i < selectedNotes[counter-1][0].length; i++) {
+                        /*
                             var id = that.idContainer.findIndex(function(ele) {
                                 return ele[1] === selectedNotes[counter-1][1][i];
                             });
                             var ele = docById(that.idContainer[id][0]);
                             var eleid = ele.getAttribute('id');
-                            if (eleid.includes('blackRow')) {
-                                ele.style.backgroundColor = 'black';
-                            } else {
-                                ele.style.backgroundColor = 'white';
-                            }
+                        */
+                        var eleid = selectedNotes[counter-1][1][i];
+                        var ele = docById(eleid);
+                        if (eleid.includes('blackRow')) {
+                            ele.style.backgroundColor = 'black';
+                        } else {
+                            ele.style.backgroundColor = 'white';
+                        }
                     }
                 }
 
@@ -494,7 +531,8 @@ function MusicKeyboard() {
                             return ele[1] === selectedNotes[counter][1][i];
                         });
 
-                        var ele = docById(that.idContainer[id][0]);
+                        var ele = docById(selectedNotes[counter][1][i]);
+                        // var ele = docById(that.idContainer[id][0]);
                         ele.style.backgroundColor = 'lightgrey';
                     }
 
@@ -507,7 +545,7 @@ function MusicKeyboard() {
                 }
 
                 if (that.playingNow) {
-                    that._playChord(notes,selectedNotes[counter][2]);
+                    that._playChord(notes, selectedNotes[counter][2]);
                 }
 
                 var maxWidth = Math.max.apply(Math, selectedNotes[counter][2]);
@@ -525,28 +563,31 @@ function MusicKeyboard() {
     }
 
     this._playChord = function (notes, noteValue) {
+        console.log(noteValue);
         if (notes[0] === 'R') {
             return;
         }
+
+        var that = this;
         setTimeout(function () {
-            synth.triggerAttackRelease(notes[0], noteValue[0]);
+            that._logo.synth.trigger(0, notes[0], noteValue[0], DEFAULTVOICE, null, null);
         }, 1);
 
         if (notes.length > 1) {
             setTimeout(function () {
-                synth.triggerAttackRelease(notes[1], noteValue[1]);
+                that._logo.synth.trigger(0, notes[1], noteValue[1], DEFAULTVOICE, null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
             setTimeout(function () {
-                synth.triggerAttackRelease(notes[2], noteValue[2]);
+                that._logo.synth.trigger(0, notes[2], noteValue[2], DEFAULTVOICE, null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
             setTimeout(function () {
-                synth.triggerAttackRelease(notes[3], noteValue[3]);
+                that._logo.synth.trigger(0, notes[3], noteValue[3], DEFAULTVOICE, null, null);
             }, 1);
         }
     };
@@ -634,11 +675,13 @@ function MusicKeyboard() {
 
         var ele = docById(j + ':' + colIndex);
         this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
+
         this._selectedHelper.sort(function(a, b) {
             return a[0]-b[0];
-        })
+        });
+
         if (playNote) {
-            synth.triggerAttackRelease(temp2, ele.getAttribute('alt'));
+            this._logo.synth.triggerAttackRelease(temp2, ele.getAttribute('alt'));
         }
     }
 
@@ -815,8 +858,8 @@ function MusicKeyboard() {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 
-                if (selectedNotes[j][1].indexOf(this.layout[n-i-1][2]) !== -1) {
-                    var ind = selectedNotes[j][1].indexOf(this.layout[n-i-1][2]);
+                if (selectedNotes[j][1].indexOf(this.layout[n-i - 1][2]) !== -1) {
+                    var ind = selectedNotes[j][1].indexOf(this.layout[n - i - 1][2]);
                     cell.setAttribute('alt', selectedNotes[j][2][ind])
                     cell.style.backgroundColor = 'black';
                 } else {
