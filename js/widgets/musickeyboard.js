@@ -43,7 +43,7 @@ function MusicKeyboard() {
 
     this._rowBlocks = [];
 
-    // Each element in the array is [start time, note, id, duration].
+    // Each element in the array is [start time, note, id, duration, voice].
     this._selectedHelper = [];
 
     this.addRowBlock = function(rowBlock) {
@@ -86,19 +86,20 @@ function MusicKeyboard() {
         }
         */
 
-        selectedNotes = [[[this._selectedHelper[0][1]], [this._selectedHelper[0][2]], [this._selectedHelper[0][3]], this._selectedHelper[0][0]]];
+        selectedNotes = [[[this._selectedHelper[0][1]], [this._selectedHelper[0][2]], [this._selectedHelper[0][3]], [this._selectedHelper[0][4]], this._selectedHelper[0][0]]];
         var j = 0
         for (var i = 1; i < this._selectedHelper.length; i++) {
             while (i < this._selectedHelper.length && (this._selectedHelper[i][0] === this._selectedHelper[i - 1][0])) {
                 selectedNotes[j][0].push(this._selectedHelper[i][1])
                 selectedNotes[j][1].push(this._selectedHelper[i][2])
                 selectedNotes[j][2].push(this._selectedHelper[i][3])
+                selectedNotes[j][3].push(this._selectedHelper[i][4])
                 i++;
             }
 
             j++;
             if (i < this._selectedHelper.length) {
-                selectedNotes.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], this._selectedHelper[i][0]])
+                selectedNotes.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], [this._selectedHelper[i][4]], this._selectedHelper[i][0]])
             }
         }
     };
@@ -186,7 +187,7 @@ function MusicKeyboard() {
                 that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
                 // that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
-                that._selectedHelper.push([startTime[id], temp2[id], id, duration]);
+                that._selectedHelper.push([startTime[id], temp2[id], id, duration, that.instrumentMapper[id]]);
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
@@ -256,7 +257,7 @@ function MusicKeyboard() {
                 duration = -duration;
             }
 
-            that._selectedHelper.push([startTime, that.noteMapper[element.id], element.id, duration]);
+            that._selectedHelper.push([startTime, that.noteMapper[element.id], element.id, duration, that.instrumentMapper[element.id]]);
         };
 
 
@@ -498,7 +499,7 @@ function MusicKeyboard() {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0][2]);
+            this._playChord(notes, selectedNotes[0][2], selectedNotes[0][3]);
             var maxWidth = Math.max.apply(Math, selectedNotes[0][2]);
             this.playOne(1, maxWidth, playButtonCell)
         } else {
@@ -526,8 +527,8 @@ function MusicKeyboard() {
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
 
-                if (that.keyboardShown && selectedNotes[counter-1][1][0] !== null) {
-                    for (var i = 0; i < selectedNotes[counter-1][0].length; i++) {
+                if (that.keyboardShown && selectedNotes[counter - 1][1][0] !== null) {
+                    for (var i = 0; i < selectedNotes[counter - 1][0].length; i++) {
                         /*
                             var id = that.idContainer.findIndex(function(ele) {
                                 return ele[1] === selectedNotes[counter-1][1][i];
@@ -566,11 +567,11 @@ function MusicKeyboard() {
                 }
 
                 if (that.playingNow) {
-                    that._playChord(notes, selectedNotes[counter][2]);
+                    that._playChord(notes, selectedNotes[counter][2], selectedNotes[counter][3]);
                 }
 
                 var maxWidth = Math.max.apply(Math, selectedNotes[counter][2]);
-                that.playOne(counter+1, maxWidth, playButtonCell);
+                that.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 that.playingNow = false;
@@ -583,31 +584,31 @@ function MusicKeyboard() {
         }, time * 1000 + 125);
     }
 
-    this._playChord = function (notes, noteValue) {
+    this._playChord = function (notes, noteValue, instruments) {
         if (notes[0] === 'R') {
             return;
         }
 
         var that = this;
         setTimeout(function () {
-            that._logo.synth.trigger(0, notes[0], noteValue[0], DEFAULTVOICE, null, null);
+            that._logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
 
         if (notes.length > 1) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[1], noteValue[1], DEFAULTVOICE, null, null);
+                that._logo.synth.trigger(0, notes[1], noteValue[1], instruments[1], null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[2], noteValue[2], DEFAULTVOICE, null, null);
+                that._logo.synth.trigger(0, notes[2], noteValue[2], instruments[2], null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[3], noteValue[3], DEFAULTVOICE, null, null);
+                that._logo.synth.trigger(0, notes[3], noteValue[3], instruments[3], null, null);
             }, 1);
         }
     };
@@ -879,7 +880,7 @@ function MusicKeyboard() {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
 
-                if (selectedNotes[j][1].indexOf(this.layout[n-i - 1][2]) !== -1) {
+                if (selectedNotes[j][1].indexOf(this.layout[n - i - 1][2]) !== -1) {
                     var ind = selectedNotes[j][1].indexOf(this.layout[n - i - 1][2]);
                     cell.setAttribute('alt', selectedNotes[j][2][ind])
                     cell.style.backgroundColor = 'black';
