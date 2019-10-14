@@ -21,6 +21,22 @@ function MusicKeyboard() {
     const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
 
+    // Order of elements in notesPlayed array
+    const _STARTTIME_ = 0;
+    const _NOTEOCTAVE_ = 1;
+    const _OBJID_ = 2;
+    const _DURATION_ = 3;
+    const _VOICE_ = 4;
+    const _BLKNO_ = 5;
+
+    // Order of elements in selectedNotes array
+    const _NOTE_ = 0;
+    const _OID_ = 1;
+    const _DUR_ = 2;
+    const _V_ = 3;
+    const _BNO_ = 4;
+    const _ST_ = 5;
+
     var w = window.innerWidth;
     this._cellScale = w / 1200;
 
@@ -38,13 +54,14 @@ function MusicKeyboard() {
 
     // Map between keyboard element ids and the note associated with the key.
     this.noteMapper = {};
+    this.blockNumberMapper = {};
     this.instrumentMapper = {};
     var selectedNotes = [];
 
     this._rowBlocks = [];
 
     // Each element in the array is [start time, note, id, duration, voice].
-    this._selectedHelper = [];
+    this._notesPlayed = [];
 
     this.addRowBlock = function(rowBlock) {
         this._rowBlocks.push(rowBlock);
@@ -53,13 +70,13 @@ function MusicKeyboard() {
     this.processSelected = function() {
         // Consolidate chords
 
-        if (this._selectedHelper.length === 0) {
+        if (this._notesPlayed.length === 0) {
             selectedNotes = [];
             return;
         }
 
         // We want to sort the list by startTime.
-        this._selectedHelper.sort(function(a, b) {
+        this._notesPlayed.sort(function(a, b) {
             return a[0] - b[0];
         });
 
@@ -71,35 +88,38 @@ function MusicKeyboard() {
             var minimumDuration = 62.5; // 1/16 note
         }
 
-        var last = this._selectedHelper[0][0];
-        for (var i = 1; i < this._selectedHelper.length; i++) {
-            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] - last < minimumDuration)) {
-                last = this._selectedHelper[i][0];
-                this._selectedHelper[i][0] = this._selectedHelper[i - 1][0];
+        var last = this._notesPlayed[0][0];
+        for (var i = 1; i < this._notesPlayed.length; i++) {
+            while (i < this._notesPlayed.length && (this._notesPlayed[i][0] - last < minimumDuration)) {
+                last = this._notesPlayed[i][0];
+                this._notesPlayed[i][0] = this._notesPlayed[i - 1][0];
                 i++;
             }
 
-            if (i < this._selectedHelper.length) {
-                last = this._selectedHelper[i][0]
-                this._selectedHelper[i][0] = this._selectedHelper[i - 1][0] + (this._selectedHelper[i - 1][3]*1000) + minimumDuration;
+            if (i < this._notesPlayed.length) {
+                last = this._notesPlayed[i][0]
+                this._notesPlayed[i][0] = this._notesPlayed[i - 1][0] + (this._notesPlayed[i - 1][3]*1000) + minimumDuration;
             }
         }
         */
 
-        selectedNotes = [[[this._selectedHelper[0][1]], [this._selectedHelper[0][2]], [this._selectedHelper[0][3]], [this._selectedHelper[0][4]], this._selectedHelper[0][0]]];
+	// selectedNotes is used for playback. Coincident notes are
+	// grouped together. It is built from notesPlayed.
+        selectedNotes = [[[this._notesPlayed[0][_NOTEOCTAVE_]], [this._notesPlayed[0][_OBJID_]], [this._notesPlayed[0][_DURATION_]], [this._notesPlayed[0][_VOICE_]], [this._notesPlayed[0][_BLKNO_]], this._notesPlayed[0][_STARTTIME_]]];
         var j = 0
-        for (var i = 1; i < this._selectedHelper.length; i++) {
-            while (i < this._selectedHelper.length && (this._selectedHelper[i][0] === this._selectedHelper[i - 1][0])) {
-                selectedNotes[j][0].push(this._selectedHelper[i][1])
-                selectedNotes[j][1].push(this._selectedHelper[i][2])
-                selectedNotes[j][2].push(this._selectedHelper[i][3])
-                selectedNotes[j][3].push(this._selectedHelper[i][4])
+        for (var i = 1; i < this._notesPlayed.length; i++) {
+            while (i < this._notesPlayed.length && (this._notesPlayed[i][_STARTTIME_] === this._notesPlayed[i - 1][_STARTTIME_])) {
+                selectedNotes[j][_NOTE_].push(this._notesPlayed[i][_NOTEOCTAVE_])
+                selectedNotes[j][_OID_].push(this._notesPlayed[i][_OBJID_])
+                selectedNotes[j][_DUR_].push(this._notesPlayed[i][_DURATION_])
+                selectedNotes[j][_V_].push(this._notesPlayed[i][_VOICE_])
+                selectedNotes[j][_BNO_].push(this._notesPlayed[i][_BLKNO_])
                 i++;
             }
 
             j++;
-            if (i < this._selectedHelper.length) {
-                selectedNotes.push([[this._selectedHelper[i][1]], [this._selectedHelper[i][2]], [this._selectedHelper[i][3]], [this._selectedHelper[i][4]], this._selectedHelper[i][0]])
+            if (i < this._notesPlayed.length) {
+                selectedNotes.push([[this._notesPlayed[i][_NOTEOCTAVE_]], [this._notesPlayed[i][_OBJID_]], [this._notesPlayed[i][_DURATION_]], [this._notesPlayed[i][_VOICE_]], [this._notesPlayed[i][_BLKNO_]], this._notesPlayed[i][_STARTTIME_]])
             }
         }
     };
@@ -186,8 +206,7 @@ function MusicKeyboard() {
 
                 that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
-                // that._selectedHelper.push([start[id].getMilliseconds(), temp2[id], parseInt(no), duration]);
-                that._selectedHelper.push([startTime[id], temp2[id], id, duration, that.instrumentMapper[id]]);
+                that._notesPlayed.push([startTime[id], temp2[id], id, duration, that.instrumentMapper[id], that.blockNumberMapper[id]]);
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
@@ -203,7 +222,7 @@ function MusicKeyboard() {
         document.onkeyup = __keyboardup;
     };
 
-    this.loadHandler = function(element, i, blockNum) {
+    this.loadHandler = function(element, i, blockNumber) {
         var temp1 = this.layout[i][0];
         if (temp1 === 'hertz') {
             var temp2 = this.layout[i][1];
@@ -213,6 +232,7 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
 
+	this.blockNumberMapper[element.id] = blockNumber;
         this.instrumentMapper[element.id] = this.layout[i][3];
         this.noteMapper[element.id] = temp2;
 
@@ -257,9 +277,8 @@ function MusicKeyboard() {
                 duration = -duration;
             }
 
-            that._selectedHelper.push([startTime, that.noteMapper[element.id], element.id, duration, that.instrumentMapper[element.id]]);
+            that._notesPlayed.push([startTime, that.noteMapper[element.id], element.id, duration, that.instrumentMapper[element.id], that.blockNumberMapper[element.id]]);
         };
-
 
         element.onmouseout = function() {
             // __endNote();
@@ -328,7 +347,6 @@ function MusicKeyboard() {
             selectedNotes = [];
         };
 
-
         var cell = this._addButton(row1, 'play-button.svg', ICONSIZE, _('Play'));
 
         cell.onclick = function() {
@@ -346,7 +364,7 @@ function MusicKeyboard() {
         var cell = this._addButton(row1, 'erase-button.svg', ICONSIZE, _('Clear'));
 
         cell.onclick=function() {
-            that._selectedHelper =[];
+            that._notesPlayed =[];
             selectedNotes = [];
             if (!that.keyboardShown) {
                 that._createTable();
@@ -469,13 +487,13 @@ function MusicKeyboard() {
             }
 
             var notes = [];
-            for (var i = 0; i < selectedNotes[0][0].length; i++) {
-                if (this.keyboardShown && selectedNotes[0][1][0] !== null) {
-                    var ele = docById(selectedNotes[0][1][i]);
+            for (var i = 0; i < selectedNotes[0][_NOTE_].length; i++) {
+                if (this.keyboardShown && selectedNotes[0][_OID_][0] !== null) {
+                    var ele = docById(selectedNotes[0][_OID_][i]);
                     ele.style.backgroundColor = 'lightgrey';
                 }
 
-                var zx = selectedNotes[0][0][i];
+                var zx = selectedNotes[0][_NOTE_][i];
                 var res = zx;
                 if( typeof(zx) === 'string') {
                     res = zx.replace(SHARP, '#').replace(FLAT, 'b');
@@ -490,8 +508,8 @@ function MusicKeyboard() {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0][2], selectedNotes[0][3]);
-            var maxWidth = Math.max.apply(Math, selectedNotes[0][2]);
+            this._playChord(notes, selectedNotes[0][_DUR_], selectedNotes[0][_V_]);
+            var maxWidth = Math.max.apply(Math, selectedNotes[0][_DUR_]);
             this.playOne(1, maxWidth, playButtonCell)
         } else {
             if (!this.keyboardShown) {
@@ -506,6 +524,7 @@ function MusicKeyboard() {
     };
 
     this.playOne = function(counter, time, playButtonCell) {
+	console.log(selectedNotes);
         var that = this;
         setTimeout(function () {
             if (counter < selectedNotes.length) {
@@ -518,9 +537,9 @@ function MusicKeyboard() {
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
 
-                if (that.keyboardShown && selectedNotes[counter - 1][1][0] !== null) {
-                    for (var i = 0; i < selectedNotes[counter - 1][0].length; i++) {
-                        var eleid = selectedNotes[counter-1][1][i];
+                if (that.keyboardShown && selectedNotes[counter - 1][_OID_][0] !== null) {
+                    for (var i = 0; i < selectedNotes[counter - 1][_NOTE_].length; i++) {
+                        var eleid = selectedNotes[counter-1][_OID_][i];
                         var ele = docById(eleid);
                         if (eleid.includes('blackRow')) {
                             ele.style.backgroundColor = 'black';
@@ -531,17 +550,17 @@ function MusicKeyboard() {
                 }
 
                 var notes = [];
-                for (var i = 0; i < selectedNotes[counter][0].length; i++) {
-                    if (that.keyboardShown && selectedNotes[counter][1][0] !== null) {
+                for (var i = 0; i < selectedNotes[counter][_NOTE_].length; i++) {
+                    if (that.keyboardShown && selectedNotes[counter][_OID_][0] !== null) {
                         var id = that.idContainer.findIndex(function(ele) {
-                            return ele[1] === selectedNotes[counter][1][i];
+                            return ele[1] === selectedNotes[counter][_OID_][i];
                         });
 
                         var ele = docById(selectedNotes[counter][1][i]);
                         ele.style.backgroundColor = 'lightgrey';
                     }
 
-                    var zx = selectedNotes[counter][0][i];
+                    var zx = selectedNotes[counter][_NOTE_][i];
                     var res = zx;
                     if(typeof(zx) === 'string'){
                         res = zx.replace(SHARP, '#').replace(FLAT, 'b');
@@ -550,10 +569,10 @@ function MusicKeyboard() {
                 }
 
                 if (that.playingNow) {
-                    that._playChord(notes, selectedNotes[counter][2], selectedNotes[counter][3]);
+                    that._playChord(notes, selectedNotes[counter][_DUR_], selectedNotes[counter][_V_]);
                 }
 
-                var maxWidth = Math.max.apply(Math, selectedNotes[counter][2]);
+                var maxWidth = Math.max.apply(Math, selectedNotes[counter][_DUR_]);
                 that.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
@@ -574,6 +593,9 @@ function MusicKeyboard() {
 
         var that = this;
         setTimeout(function () {
+	    console.log(notes);
+	    console.log(noteValue);
+	    console.log(instruments);
             that._logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
 
@@ -645,7 +667,7 @@ function MusicKeyboard() {
 
     this._setNotes = function(colIndex, playNote) {
         var start = docById('cells-' + colIndex).getAttribute('start');
-        this._selectedHelper = this._selectedHelper.filter(function(ele) {
+        this._notesPlayed = this._notesPlayed.filter(function(ele) {
             return ele[0]!=parseInt(start)
         });
         silence = true;
@@ -660,8 +682,8 @@ function MusicKeyboard() {
         if (silence) {
             var ele = docById('cells-' + colIndex);
             var dur = ele.getAttribute('dur');
-            this._selectedHelper.push([parseInt(start), 'R', null, parseFloat(dur)]);
-            this._selectedHelper.sort(function(a, b) {
+            this._notesPlayed.push([parseInt(start), 'R', null, parseFloat(dur)]);
+            this._notesPlayed.sort(function(a, b) {
                 return a[0] - b[0];
             });
         }
@@ -679,9 +701,9 @@ function MusicKeyboard() {
         }
 
         var ele = docById(j + ':' + colIndex);
-        this._selectedHelper.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
+        this._notesPlayed.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
 
-        this._selectedHelper.sort(function(a, b) {
+        this._notesPlayed.sort(function(a, b) {
             return a[0] - b[0];
         });
 
@@ -857,8 +879,8 @@ function MusicKeyboard() {
 	console.log(selectedNotes);
 
         for (var j = 0; j < selectedNotes.length; j++) {
-            var maxWidth = Math.max.apply(Math, selectedNotes[j][2]);
-            var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j][2])) * 2 + 'px';
+            var maxWidth = Math.max.apply(Math, selectedNotes[j][_DUR_]);
+            var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j][_DUR_])) * 2 + 'px';
             var n = this.layout.length;
             for (var i = 0; i < this.layout.length; i++) {
                 var row = docById('mkb' + i);
@@ -868,9 +890,9 @@ function MusicKeyboard() {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
 
-                if (selectedNotes[j][1].indexOf(this.layout[n - i - 1][2]) !== -1) {
-                    var ind = selectedNotes[j][1].indexOf(this.layout[n - i - 1][2]);
-                    cell.setAttribute('alt', selectedNotes[j][2][ind])
+                if (selectedNotes[j][_BNO_].indexOf(this.layout[n - i - 1][2]) !== -1) {
+                    var ind = selectedNotes[j][_BNO_].indexOf(this.layout[n - i - 1][2]);
+                    cell.setAttribute('alt', selectedNotes[j][_DUR_][ind])
                     cell.style.backgroundColor = 'black';
                 } else {
                     cell.setAttribute('alt', maxWidth)
@@ -880,7 +902,7 @@ function MusicKeyboard() {
                 cell.setAttribute('cellColor', cellColor);
             }
 
-            var dur = toFraction(Math.max.apply(Math, selectedNotes[j][2]));
+            var dur = toFraction(Math.max.apply(Math, selectedNotes[j][_DUR_]));
             var row = docById('mkbNoteDurationRow');
             var cell = row.insertCell();
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
@@ -891,7 +913,7 @@ function MusicKeyboard() {
             cell.style.textAlign = 'center';
             cell.innerHTML = dur[0].toString() + '/' + dur[1].toString();
             cell.setAttribute('id', 'cells-' + j);
-            cell.setAttribute('start', selectedNotes[j][3]);
+            cell.setAttribute('start', selectedNotes[j][_ST_]);
             cell.setAttribute('dur', maxWidth);
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
@@ -1038,7 +1060,7 @@ function MusicKeyboard() {
         start = parseInt(start);
         duration = parseInt(duration[0])/parseInt(duration[1]);
         var newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-        this._selectedHelper = this._selectedHelper.map(
+        this._notesPlayed = this._notesPlayed.map(
             function(item){
                 if (item[0] === start) {
                     item[3] = newduration
@@ -1053,7 +1075,7 @@ function MusicKeyboard() {
         start = parseInt(start);
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
-        this._selectedHelper = this._selectedHelper.reduce(function(prevValue, curValue) {
+        this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
             if (curValue[0] === start) {
                 prevValue = prevValue.concat([curValue]);
                 var oldcurValue = curValue.slice();
@@ -1076,7 +1098,7 @@ function MusicKeyboard() {
 
     this._deleteNotes = function(start) {
         start = parseInt(start);
-        this._selectedHelper = this._selectedHelper.filter(function(ele) {
+        this._notesPlayed = this._notesPlayed.filter(function(ele) {
             return ele[0] !== start;
         });
         this._createTable();
@@ -1085,7 +1107,7 @@ function MusicKeyboard() {
 
     this._divideNotes = function(start, divideNoteBy) {
         start = parseInt(start);
-        this._selectedHelper = this._selectedHelper.reduce(function(prevValue, curValue) {
+        this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
             if (curValue[0] === start) {
                 if (curValue[3] / divideNoteBy < 0.125) {
                     return prevValue.concat([curValue]);
@@ -1269,7 +1291,7 @@ function MusicKeyboard() {
             }
         );
 
-        this._selectedHelper.map(
+        this._notesPlayed.map(
             function (item) {
                 if (item[2] === that.remove[1]) {
                     item[2] = that.remove[0];
@@ -1454,7 +1476,7 @@ function MusicKeyboard() {
             var cell = docById('labelcol' + (that.layout.length - index -1));
             that.layout[index][1] = parseInt(blockValue);
             cell.innerHTML = that.layout[index][0]+that.layout[index][1].toString();
-            that._selectedHelper.map(
+            that._notesPlayed.map(
                 function(item){
                     if (item[2]==that.layout[index][2]) {
                         item[1] = parseInt(blockValue);
@@ -1506,7 +1528,7 @@ function MusicKeyboard() {
                 var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + octave;
             }
 
-            that._selectedHelper.map(
+            that._notesPlayed.map(
                 function(item) {
                     if (item[2] == that.layout[index][2]) {
                         item[1] = temp2;
