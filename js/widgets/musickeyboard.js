@@ -80,7 +80,7 @@ function MusicKeyboard() {
 
         // We want to sort the list by startTime.
         this._notesPlayed.sort(function(a, b) {
-            return a[0] - b[0];
+            return a.startTime - b.startTime;
         });
 
 
@@ -108,21 +108,21 @@ function MusicKeyboard() {
 
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
-        selectedNotes = [[[this._notesPlayed[0][_NOTEOCTAVE_]], [this._notesPlayed[0][_OBJID_]], [this._notesPlayed[0][_DURATION_]], [this._notesPlayed[0][_VOICE_]], [this._notesPlayed[0][_BLKNO_]], this._notesPlayed[0][_STARTTIME_]]];
+        selectedNotes = [[[this._notesPlayed[0].noteOctave], [this._notesPlayed[0].objId], [this._notesPlayed[0].duration], [this._notesPlayed[0].voice], [this._notesPlayed[0].blkNo], this._notesPlayed[0].startTime]];
         var j = 0
         for (var i = 1; i < this._notesPlayed.length; i++) {
-            while (i < this._notesPlayed.length && (this._notesPlayed[i][_STARTTIME_] === this._notesPlayed[i - 1][_STARTTIME_])) {
-                selectedNotes[j][_NOTE_].push(this._notesPlayed[i][_NOTEOCTAVE_])
-                selectedNotes[j][_OID_].push(this._notesPlayed[i][_OBJID_])
-                selectedNotes[j][_DUR_].push(this._notesPlayed[i][_DURATION_])
-                selectedNotes[j][_V_].push(this._notesPlayed[i][_VOICE_])
-                selectedNotes[j][_BNO_].push(this._notesPlayed[i][_BLKNO_])
+            while (i < this._notesPlayed.length && (this._notesPlayed[i].startTime === this._notesPlayed[i - 1].startTime)) {
+                selectedNotes[j][_NOTE_].push(this._notesPlayed[i].noteOctave)
+                selectedNotes[j][_OID_].push(this._notesPlayed[i].objId)
+                selectedNotes[j][_DUR_].push(this._notesPlayed[i].duration)
+                selectedNotes[j][_V_].push(this._notesPlayed[i].voice)
+                selectedNotes[j][_BNO_].push(this._notesPlayed[i].blkNo)
                 i++;
             }
 
             j++;
             if (i < this._notesPlayed.length) {
-                selectedNotes.push([[this._notesPlayed[i][_NOTEOCTAVE_]], [this._notesPlayed[i][_OBJID_]], [this._notesPlayed[i][_DURATION_]], [this._notesPlayed[i][_VOICE_]], [this._notesPlayed[i][_BLKNO_]], this._notesPlayed[i][_STARTTIME_]])
+                selectedNotes.push([[this._notesPlayed[i].noteOctave], [this._notesPlayed[i].objId], [this._notesPlayed[i].duration], [this._notesPlayed[i].voice], [this._notesPlayed[i].blkNo], this._notesPlayed[i].startTime])
             }
         }
     };
@@ -209,7 +209,7 @@ function MusicKeyboard() {
 
                 that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
-                that._notesPlayed.push([startTime[id], temp2[id], id, duration, that.instrumentMapper[id], that.blockNumberMapper[id]]);
+                that._notesPlayed.push({'startTime': startTime[id], 'noteOctave': temp2[id], 'objId': id, 'duration': duration, 'voice': that.instrumentMapper[id], 'blkNo': that.blockNumberMapper[id]});
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
@@ -280,7 +280,7 @@ function MusicKeyboard() {
                 duration = -duration;
             }
 
-            that._notesPlayed.push([startTime, that.noteMapper[element.id], element.id, duration, that.instrumentMapper[element.id], that.blockNumberMapper[element.id]]);
+            that._notesPlayed.push({'startTime': startTime, 'noteOctave': that.noteMapper[element.id], 'objId': element.id, 'duration': duration, 'voice': that.instrumentMapper[element.id], 'blkNo': that.blockNumberMapper[element.id]});
         };
 
         element.onmouseout = function() {
@@ -669,7 +669,7 @@ function MusicKeyboard() {
     this._setNotes = function(colIndex, playNote) {
         var start = docById('cells-' + colIndex).getAttribute('start');
         this._notesPlayed = this._notesPlayed.filter(function(ele) {
-            return ele[0]!=parseInt(start)
+            return ele.startTime != parseInt(start)
         });
         silence = true;
         for (var j = 0; j < this.layout.length; j++) {
@@ -683,9 +683,9 @@ function MusicKeyboard() {
         if (silence) {
             var ele = docById('cells-' + colIndex);
             var dur = ele.getAttribute('dur');
-            this._notesPlayed.push([parseInt(start), 'R', null, parseFloat(dur)]);
+            this._notesPlayed.push({'startTime': parseInt(start), 'noteOctave': 'R', 'objId': null, 'duration': parseFloat(dur)});
             this._notesPlayed.sort(function(a, b) {
-                return a[0] - b[0];
+                return a.startTime - b.startTime;
             });
         }
     }
@@ -702,10 +702,10 @@ function MusicKeyboard() {
         }
 
         var ele = docById(j + ':' + colIndex);
-        this._notesPlayed.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
+        this._notesPlayed.push({'startTime': parseInt(start), 'noteOctave': temp2, 'objId': this.layout[n-j-1][2], 'duration': parseFloat(ele.getAttribute('alt'))});
 
         this._notesPlayed.sort(function(a, b) {
-            return a[0] - b[0];
+            return a.startTime - b.startTime;
         });
 
         if (playNote) {
@@ -1061,8 +1061,8 @@ function MusicKeyboard() {
         var newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
         this._notesPlayed = this._notesPlayed.map(
             function(item){
-                if (item[0] === start) {
-                    item[3] = newduration
+                if (item.startTime === start) {
+                    item.duration = newduration
                 }
                 return item
             }
@@ -1075,18 +1075,18 @@ function MusicKeyboard() {
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue[0] === start) {
+            if (curValue.startTime === start) {
                 prevValue = prevValue.concat([curValue]);
-                var oldcurValue = curValue.slice();
+                var oldcurValue = JSON.parse(JSON.stringify(curValue));
                 for (var i=0;i<divideNoteBy;i++) {
-                    var newcurValue = oldcurValue.slice()
-                    newcurValue[0] = oldcurValue.slice()[0] +(oldcurValue.slice()[3]*1000);
+                    var newcurValue = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue.startTime = oldcurValue.startTime +(oldcurValue.duration*1000);
                     prevValue = prevValue.concat([newcurValue]);
                     oldcurValue = newcurValue;
                 }
                 return prevValue
-            } else if (curValue[0] > start) {
-                curValue[0] = curValue[0] + dur*1000*divideNoteBy
+            } else if (curValue.startTime > start) {
+                curValue.startTime = curValue.startTime + dur*1000*divideNoteBy
                 return prevValue.concat([curValue])
             }
             return prevValue.concat([curValue])
@@ -1098,7 +1098,7 @@ function MusicKeyboard() {
     this._deleteNotes = function(start) {
         start = parseInt(start);
         this._notesPlayed = this._notesPlayed.filter(function(ele) {
-            return ele[0] !== start;
+            return ele.startTime !== start;
         });
         this._createTable();
 
@@ -1107,17 +1107,17 @@ function MusicKeyboard() {
     this._divideNotes = function(start, divideNoteBy) {
         start = parseInt(start);
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue[0] === start) {
-                if (curValue[3] / divideNoteBy < 0.125) {
+            if (curValue.startTime === start) {
+                if (curValue.duration / divideNoteBy < 0.125) {
                     return prevValue.concat([curValue]);
                 };
-                var newcurValue = curValue.slice()
-                newcurValue[3] = curValue[3] / divideNoteBy;
+                var newcurValue = JSON.parse(JSON.stringify(curValue));
+                newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
                 var oldcurValue = newcurValue.slice()
                 for (var i=0; i < divideNoteBy - 1; i++) {
-                    var newcurValue2 = oldcurValue.slice()
-                    newcurValue2[0] = parseInt(newcurValue2[0]+(newcurValue2[3]*1000))
+                    var newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue2.startTime = parseInt(newcurValue2.startTime+(newcurValue2.duration*1000))
                     prevValue = prevValue.concat([newcurValue2])
                     oldcurValue = newcurValue2
                 }
@@ -1292,8 +1292,8 @@ function MusicKeyboard() {
 
         this._notesPlayed.map(
             function (item) {
-                if (item[2] === that.remove[1]) {
-                    item[2] = that.remove[0];
+                if (item.objId === that.remove[1]) {
+                    item.objId = that.remove[0];
                 }
                 return item;
             }
@@ -1477,8 +1477,8 @@ function MusicKeyboard() {
             cell.innerHTML = that.layout[index][0]+that.layout[index][1].toString();
             that._notesPlayed.map(
                 function(item){
-                    if (item[2]==that.layout[index][2]) {
-                        item[1] = parseInt(blockValue);
+                    if (item.objId==that.layout[index][2]) {
+                        item.noteOctave = parseInt(blockValue);
                     }
                     return item;
                 }
@@ -1529,8 +1529,8 @@ function MusicKeyboard() {
 
             that._notesPlayed.map(
                 function(item) {
-                    if (item[2] == that.layout[index][2]) {
-                        item[1] = temp2;
+                    if (item.objId == that.layout[index][2]) {
+                        item.noteOctave = temp2;
                     }
                     return item;
                 }
