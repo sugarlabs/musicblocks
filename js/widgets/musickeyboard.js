@@ -108,6 +108,7 @@ function MusicKeyboard() {
 
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
+
         selectedNotes = [{
             'noteOctave': [this._notesPlayed[0].noteOctave], 
             'objId': [this._notesPlayed[0].objId], 
@@ -556,7 +557,7 @@ function MusicKeyboard() {
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
 
-                if (that.keyboardShown && selectedNotes[counter - 1].objID[0] !== null) {
+                if (that.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
                     for (var i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
                         var eleid = selectedNotes[counter-1].objId[i];
                         var ele = docById(eleid);
@@ -570,7 +571,7 @@ function MusicKeyboard() {
 
                 var notes = [];
                 for (var i = 0; i < selectedNotes[counter].noteOctave.length; i++) {
-                    if (that.keyboardShown && selectedNotes[counter].objID[0] !== null) {
+                    if (that.keyboardShown && selectedNotes[counter].objId[0] !== null) {
                         var id = that.idContainer.findIndex(function(ele) {
                             return ele[1] === selectedNotes[counter].objId[i];
                         });
