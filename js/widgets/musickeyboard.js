@@ -103,8 +103,8 @@ function MusicKeyboard() {
         }
         */
 
-	// selectedNotes is used for playback. Coincident notes are
-	// grouped together. It is built from notesPlayed.
+        // selectedNotes is used for playback. Coincident notes are
+        // grouped together. It is built from notesPlayed.
         selectedNotes = [[[this._notesPlayed[0][_NOTEOCTAVE_]], [this._notesPlayed[0][_OBJID_]], [this._notesPlayed[0][_DURATION_]], [this._notesPlayed[0][_VOICE_]], [this._notesPlayed[0][_BLKNO_]], this._notesPlayed[0][_STARTTIME_]]];
         var j = 0
         for (var i = 1; i < this._notesPlayed.length; i++) {
@@ -232,7 +232,7 @@ function MusicKeyboard() {
             var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[i][1];
         }
 
-	this.blockNumberMapper[element.id] = blockNumber;
+        this.blockNumberMapper[element.id] = blockNumber;
         this.instrumentMapper[element.id] = this.layout[i][3];
         this.noteMapper[element.id] = temp2;
 
@@ -524,7 +524,6 @@ function MusicKeyboard() {
     };
 
     this.playOne = function(counter, time, playButtonCell) {
-	console.log(selectedNotes);
         var that = this;
         setTimeout(function () {
             if (counter < selectedNotes.length) {
@@ -593,9 +592,6 @@ function MusicKeyboard() {
 
         var that = this;
         setTimeout(function () {
-	    console.log(notes);
-	    console.log(noteValue);
-	    console.log(instruments);
             that._logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
 
@@ -708,7 +704,7 @@ function MusicKeyboard() {
         });
 
         if (playNote) {
-	    this._logo.synth.trigger(0, temp2, ele.getAttribute('alt'), this.instruments[0], null, null);
+            this._logo.synth.trigger(0, temp2, ele.getAttribute('alt'), this.instruments[0], null, null);
         }
     };
 
@@ -875,8 +871,6 @@ function MusicKeyboard() {
         ptmCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var mkbCellTable = docById('mkbTable');
         var cellColor = 'rgb(124, 214, 34)';
-
-	console.log(selectedNotes);
 
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j][_DUR_]);
