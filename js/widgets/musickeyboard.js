@@ -80,7 +80,7 @@ function MusicKeyboard() {
 
         // We want to sort the list by startTime.
         this._notesPlayed.sort(function(a, b) {
-            return a[0] - b[0];
+            return a.startTime - b.startTime;
         });
 
 
@@ -108,21 +108,37 @@ function MusicKeyboard() {
 
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
-        selectedNotes = [[[this._notesPlayed[0][_NOTEOCTAVE_]], [this._notesPlayed[0][_OBJID_]], [this._notesPlayed[0][_DURATION_]], [this._notesPlayed[0][_VOICE_]], [this._notesPlayed[0][_BLKNO_]], this._notesPlayed[0][_STARTTIME_]]];
+
+        selectedNotes = [{
+            'noteOctave': [this._notesPlayed[0].noteOctave], 
+            'objId': [this._notesPlayed[0].objId], 
+            'duration': [this._notesPlayed[0].duration], 
+            'voice': [this._notesPlayed[0].voice], 
+            'blkNo': [this._notesPlayed[0].blkNo], 
+            'startTime': this._notesPlayed[0].startTime
+        }];
+
         var j = 0
         for (var i = 1; i < this._notesPlayed.length; i++) {
-            while (i < this._notesPlayed.length && (this._notesPlayed[i][_STARTTIME_] === this._notesPlayed[i - 1][_STARTTIME_])) {
-                selectedNotes[j][_NOTE_].push(this._notesPlayed[i][_NOTEOCTAVE_])
-                selectedNotes[j][_OID_].push(this._notesPlayed[i][_OBJID_])
-                selectedNotes[j][_DUR_].push(this._notesPlayed[i][_DURATION_])
-                selectedNotes[j][_V_].push(this._notesPlayed[i][_VOICE_])
-                selectedNotes[j][_BNO_].push(this._notesPlayed[i][_BLKNO_])
+            while (i < this._notesPlayed.length && (this._notesPlayed[i].startTime === this._notesPlayed[i - 1].startTime)) {
+                selectedNotes[j].noteOctave.push(this._notesPlayed[i].noteOctave)
+                selectedNotes[j].objId.push(this._notesPlayed[i].objId)
+                selectedNotes[j].duration.push(this._notesPlayed[i].duration)
+                selectedNotes[j].voice.push(this._notesPlayed[i].voice)
+                selectedNotes[j].blkNo.push(this._notesPlayed[i].blkNo)
                 i++;
             }
 
             j++;
             if (i < this._notesPlayed.length) {
-                selectedNotes.push([[this._notesPlayed[i][_NOTEOCTAVE_]], [this._notesPlayed[i][_OBJID_]], [this._notesPlayed[i][_DURATION_]], [this._notesPlayed[i][_VOICE_]], [this._notesPlayed[i][_BLKNO_]], this._notesPlayed[i][_STARTTIME_]])
+                selectedNotes.push({
+                    'noteOctave': [this._notesPlayed[i].noteOctave], 
+                    'objId': [this._notesPlayed[i].objId], 
+                    'duration': [this._notesPlayed[i].duration], 
+                    'voice': [this._notesPlayed[i].voice], 
+                    'blkNo': [this._notesPlayed[i].blkNo], 
+                    'startTime': this._notesPlayed[i].startTime
+                })
             }
         }
     };
@@ -209,7 +225,7 @@ function MusicKeyboard() {
 
                 that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
-                that._notesPlayed.push([startTime[id], temp2[id], id, duration, that.instrumentMapper[id], that.blockNumberMapper[id]]);
+                that._notesPlayed.push({'startTime': startTime[id], 'noteOctave': temp2[id], 'objId': id, 'duration': duration, 'voice': that.instrumentMapper[id], 'blkNo': that.blockNumberMapper[id]});
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
@@ -280,7 +296,7 @@ function MusicKeyboard() {
                 duration = -duration;
             }
 
-            that._notesPlayed.push([startTime, that.noteMapper[element.id], element.id, duration, that.instrumentMapper[element.id], that.blockNumberMapper[element.id]]);
+            that._notesPlayed.push({'startTime': startTime, 'noteOctave': that.noteMapper[element.id], 'objId': element.id, 'duration': duration, 'voice': that.instrumentMapper[element.id], 'blkNo': that.blockNumberMapper[element.id]});
         };
 
         element.onmouseout = function() {
@@ -492,13 +508,13 @@ function MusicKeyboard() {
             }
 
             var notes = [];
-            for (var i = 0; i < selectedNotes[0][_NOTE_].length; i++) {
-                if (this.keyboardShown && selectedNotes[0][_OID_][0] !== null) {
-                    var ele = docById(selectedNotes[0][_OID_][i]);
+            for (var i = 0; i < selectedNotes[0].noteOctave.length; i++) {
+                if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
+                    var ele = docById(selectedNotes[0].objId[i]);
                     ele.style.backgroundColor = 'lightgrey';
                 }
 
-                var zx = selectedNotes[0][_NOTE_][i];
+                var zx = selectedNotes[0].noteOctave[i];
                 var res = zx;
                 if( typeof(zx) === 'string') {
                     res = zx.replace(SHARP, '#').replace(FLAT, 'b');
@@ -513,8 +529,8 @@ function MusicKeyboard() {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0][_DUR_], selectedNotes[0][_V_]);
-            var maxWidth = Math.max.apply(Math, selectedNotes[0][_DUR_]);
+            this._playChord(notes, selectedNotes[0].duration, selectedNotes[0].voice);
+            var maxWidth = Math.max.apply(Math, selectedNotes[0].duration);
             this.playOne(1, maxWidth, playButtonCell)
         } else {
             if (!this.keyboardShown) {
@@ -541,9 +557,9 @@ function MusicKeyboard() {
                     cell.style.backgroundColor = platformColor.selectorBackground
                 }
 
-                if (that.keyboardShown && selectedNotes[counter - 1][_OID_][0] !== null) {
-                    for (var i = 0; i < selectedNotes[counter - 1][_NOTE_].length; i++) {
-                        var eleid = selectedNotes[counter-1][_OID_][i];
+                if (that.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
+                    for (var i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
+                        var eleid = selectedNotes[counter-1].objId[i];
                         var ele = docById(eleid);
                         if (eleid.includes('blackRow')) {
                             ele.style.backgroundColor = 'black';
@@ -554,17 +570,17 @@ function MusicKeyboard() {
                 }
 
                 var notes = [];
-                for (var i = 0; i < selectedNotes[counter][_NOTE_].length; i++) {
-                    if (that.keyboardShown && selectedNotes[counter][_OID_][0] !== null) {
+                for (var i = 0; i < selectedNotes[counter].noteOctave.length; i++) {
+                    if (that.keyboardShown && selectedNotes[counter].objId[0] !== null) {
                         var id = that.idContainer.findIndex(function(ele) {
-                            return ele[1] === selectedNotes[counter][_OID_][i];
+                            return ele[1] === selectedNotes[counter].objId[i];
                         });
 
-                        var ele = docById(selectedNotes[counter][1][i]);
+                        var ele = docById(selectedNotes[counter].objId[i]);
                         ele.style.backgroundColor = 'lightgrey';
                     }
 
-                    var zx = selectedNotes[counter][_NOTE_][i];
+                    var zx = selectedNotes[counter].noteOctave[i];
                     var res = zx;
                     if(typeof(zx) === 'string'){
                         res = zx.replace(SHARP, '#').replace(FLAT, 'b');
@@ -573,10 +589,10 @@ function MusicKeyboard() {
                 }
 
                 if (that.playingNow) {
-                    that._playChord(notes, selectedNotes[counter][_DUR_], selectedNotes[counter][_V_]);
+                    that._playChord(notes, selectedNotes[counter].duration, selectedNotes[counter].voice);
                 }
 
-                var maxWidth = Math.max.apply(Math, selectedNotes[counter][_DUR_]);
+                var maxWidth = Math.max.apply(Math, selectedNotes[counter].duration);
                 that.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
@@ -669,7 +685,7 @@ function MusicKeyboard() {
     this._setNotes = function(colIndex, playNote) {
         var start = docById('cells-' + colIndex).getAttribute('start');
         this._notesPlayed = this._notesPlayed.filter(function(ele) {
-            return ele[0]!=parseInt(start)
+            return ele.startTime != parseInt(start)
         });
         silence = true;
         for (var j = 0; j < this.layout.length; j++) {
@@ -683,9 +699,9 @@ function MusicKeyboard() {
         if (silence) {
             var ele = docById('cells-' + colIndex);
             var dur = ele.getAttribute('dur');
-            this._notesPlayed.push([parseInt(start), 'R', null, parseFloat(dur)]);
+            this._notesPlayed.push({'startTime': parseInt(start), 'noteOctave': 'R', 'objId': null, 'duration': parseFloat(dur)});
             this._notesPlayed.sort(function(a, b) {
-                return a[0] - b[0];
+                return a.startTime - b.startTime;
             });
         }
     }
@@ -702,10 +718,10 @@ function MusicKeyboard() {
         }
 
         var ele = docById(j + ':' + colIndex);
-        this._notesPlayed.push([parseInt(start), temp2, this.layout[n-j-1][2], parseFloat(ele.getAttribute('alt'))]);
+        this._notesPlayed.push({'startTime': parseInt(start), 'noteOctave': temp2, 'objId': this.layout[n-j-1][2], 'duration': parseFloat(ele.getAttribute('alt'))});
 
         this._notesPlayed.sort(function(a, b) {
-            return a[0] - b[0];
+            return a.startTime - b.startTime;
         });
 
         if (playNote) {
@@ -878,8 +894,8 @@ function MusicKeyboard() {
         var cellColor = 'rgb(124, 214, 34)';
 
         for (var j = 0; j < selectedNotes.length; j++) {
-            var maxWidth = Math.max.apply(Math, selectedNotes[j][_DUR_]);
-            var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j][_DUR_])) * 2 + 'px';
+            var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
+            var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + 'px';
             var n = this.layout.length;
             for (var i = 0; i < this.layout.length; i++) {
                 var row = docById('mkb' + i);
@@ -889,9 +905,9 @@ function MusicKeyboard() {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
 
-                if (selectedNotes[j][_BNO_].indexOf(this.layout[n - i - 1][2]) !== -1) {
-                    var ind = selectedNotes[j][_BNO_].indexOf(this.layout[n - i - 1][2]);
-                    cell.setAttribute('alt', selectedNotes[j][_DUR_][ind])
+                if (selectedNotes[j].blkNo.indexOf(this.layout[n - i - 1][2]) !== -1) {
+                    var ind = selectedNotes[j].blkNo.indexOf(this.layout[n - i - 1][2]);
+                    cell.setAttribute('alt', selectedNotes[j].duration[ind])
                     cell.style.backgroundColor = 'black';
                 } else {
                     cell.setAttribute('alt', maxWidth)
@@ -901,7 +917,7 @@ function MusicKeyboard() {
                 cell.setAttribute('cellColor', cellColor);
             }
 
-            var dur = toFraction(Math.max.apply(Math, selectedNotes[j][_DUR_]));
+            var dur = toFraction(Math.max.apply(Math, selectedNotes[j].duration));
             var row = docById('mkbNoteDurationRow');
             var cell = row.insertCell();
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
@@ -912,7 +928,7 @@ function MusicKeyboard() {
             cell.style.textAlign = 'center';
             cell.innerHTML = dur[0].toString() + '/' + dur[1].toString();
             cell.setAttribute('id', 'cells-' + j);
-            cell.setAttribute('start', selectedNotes[j][_ST_]);
+            cell.setAttribute('start', selectedNotes[j].startTime);
             cell.setAttribute('dur', maxWidth);
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
@@ -1061,8 +1077,8 @@ function MusicKeyboard() {
         var newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
         this._notesPlayed = this._notesPlayed.map(
             function(item){
-                if (item[0] === start) {
-                    item[3] = newduration
+                if (item.startTime === start) {
+                    item.duration = newduration
                 }
                 return item
             }
@@ -1075,18 +1091,18 @@ function MusicKeyboard() {
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue[0] === start) {
+            if (curValue.startTime === start) {
                 prevValue = prevValue.concat([curValue]);
-                var oldcurValue = curValue.slice();
+                var oldcurValue = JSON.parse(JSON.stringify(curValue));
                 for (var i=0;i<divideNoteBy;i++) {
-                    var newcurValue = oldcurValue.slice()
-                    newcurValue[0] = oldcurValue.slice()[0] +(oldcurValue.slice()[3]*1000);
+                    var newcurValue = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue.startTime = oldcurValue.startTime +(oldcurValue.duration*1000);
                     prevValue = prevValue.concat([newcurValue]);
                     oldcurValue = newcurValue;
                 }
                 return prevValue
-            } else if (curValue[0] > start) {
-                curValue[0] = curValue[0] + dur*1000*divideNoteBy
+            } else if (curValue.startTime > start) {
+                curValue.startTime = curValue.startTime + dur*1000*divideNoteBy
                 return prevValue.concat([curValue])
             }
             return prevValue.concat([curValue])
@@ -1098,7 +1114,7 @@ function MusicKeyboard() {
     this._deleteNotes = function(start) {
         start = parseInt(start);
         this._notesPlayed = this._notesPlayed.filter(function(ele) {
-            return ele[0] !== start;
+            return ele.startTime !== start;
         });
         this._createTable();
 
@@ -1107,17 +1123,17 @@ function MusicKeyboard() {
     this._divideNotes = function(start, divideNoteBy) {
         start = parseInt(start);
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue[0] === start) {
-                if (curValue[3] / divideNoteBy < 0.125) {
+            if (curValue.startTime === start) {
+                if (curValue.duration / divideNoteBy < 0.125) {
                     return prevValue.concat([curValue]);
                 };
-                var newcurValue = curValue.slice()
-                newcurValue[3] = curValue[3] / divideNoteBy;
+                var newcurValue = JSON.parse(JSON.stringify(curValue));
+                newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
                 var oldcurValue = newcurValue.slice()
                 for (var i=0; i < divideNoteBy - 1; i++) {
-                    var newcurValue2 = oldcurValue.slice()
-                    newcurValue2[0] = parseInt(newcurValue2[0]+(newcurValue2[3]*1000))
+                    var newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue2.startTime = parseInt(newcurValue2.startTime+(newcurValue2.duration*1000))
                     prevValue = prevValue.concat([newcurValue2])
                     oldcurValue = newcurValue2
                 }
@@ -1292,8 +1308,8 @@ function MusicKeyboard() {
 
         this._notesPlayed.map(
             function (item) {
-                if (item[2] === that.remove[1]) {
-                    item[2] = that.remove[0];
+                if (item.objId === that.remove[1]) {
+                    item.objId = that.remove[0];
                 }
                 return item;
             }
@@ -1477,8 +1493,8 @@ function MusicKeyboard() {
             cell.innerHTML = that.layout[index][0]+that.layout[index][1].toString();
             that._notesPlayed.map(
                 function(item){
-                    if (item[2]==that.layout[index][2]) {
-                        item[1] = parseInt(blockValue);
+                    if (item.objId==that.layout[index][2]) {
+                        item.noteOctave = parseInt(blockValue);
                     }
                     return item;
                 }
@@ -1529,8 +1545,8 @@ function MusicKeyboard() {
 
             that._notesPlayed.map(
                 function(item) {
-                    if (item[2] == that.layout[index][2]) {
-                        item[1] = temp2;
+                    if (item.objId == that.layout[index][2]) {
+                        item.noteOctave = temp2;
                     }
                     return item;
                 }
@@ -1766,7 +1782,7 @@ function MusicKeyboard() {
 
             // note value is saved as a fraction
             newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
-            var maxWidth = Math.max.apply(Math, note[2]);
+            var maxWidth = Math.max.apply(Math, note.duration);
 
             var obj = toFraction(maxWidth);
             newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
@@ -1780,31 +1796,31 @@ function MusicKeyboard() {
             // The last connection in last pitch block is null.
             var lastConnection = null;
 
-            if (note[0][0] === 'R') {
+            if (note.noteOctave[0] === 'R') {
                 newStack.push([thisBlock + 1, 'rest2', 0, 0, [previousBlock, lastConnection]]);
             } else {
-                for (var j = 0; j < note[0].length; j++) {
+                for (var j = 0; j < note.noteOctave.length; j++) {
                     if (j > 0) {
-                        if (typeof(note[0][j-1]) === 'string') {
-                            thisBlock = previousBlock+3;
+                        if (typeof(note.noteOctave[j - 1]) === 'string') {
+                            thisBlock = previousBlock + 3;
                         } else {
-                            thisBlock = previousBlock+2;
+                            thisBlock = previousBlock + 2;
                         }
                         var n = newStack[previousBlock][4].length;
-                        newStack[previousBlock][4][n-1] = thisBlock;
+                        newStack[previousBlock][4][n - 1] = thisBlock;
                     }
-                    if (typeof(note[0][j]) === 'string') {
+                    if (typeof(note.noteOctave[j]) === 'string') {
                         newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
-                        if (['#', 'b', '♯', '♭'].indexOf(note[0][j][1]) !== -1) {
-                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]] + note[0][j][1]}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length - 1]}], 0, 0, [thisBlock]]);
+                        if (['#', 'b', '♯', '♭'].indexOf(note.noteOctave[j][1]) !== -1) {
+                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]] + note.noteOctave[j][1]}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, ['number', {'value': note.noteOctave[j][note.noteOctave[j].length - 1]}], 0, 0, [thisBlock]]);
                         } else {
-                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note[0][j][0]]}], 0, 0, [thisBlock]]);
-                            newStack.push([thisBlock + 2, ['number', {'value': note[0][j][note[0][j].length-1]}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 1, ['solfege', {'value': SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]]}], 0, 0, [thisBlock]]);
+                            newStack.push([thisBlock + 2, ['number', {'value': note.noteOctave[j][note.noteOctave[j].length-1]}], 0, 0, [thisBlock]]);
                         }
                     } else {
                         newStack.push([thisBlock, 'hertz', 0, 0, [previousBlock, thisBlock + 1, lastConnection]]);
-                        newStack.push([thisBlock + 1, ['number', {'value': note[0][j]}], 0, 0, [thisBlock]]);
+                        newStack.push([thisBlock + 1, ['number', {'value': note.noteOctave[j]}], 0, 0, [thisBlock]]);
                     }
                     previousBlock = thisBlock
                 }
