@@ -1782,7 +1782,7 @@ function MusicKeyboard() {
 
             // note value is saved as a fraction
             newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
-            var maxWidth = Math.max.apply(Math, note[2]);
+            var maxWidth = Math.max.apply(Math, note.duration);
 
             var obj = toFraction(maxWidth);
             newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
@@ -1801,13 +1801,13 @@ function MusicKeyboard() {
             } else {
                 for (var j = 0; j < note.noteOctave.length; j++) {
                     if (j > 0) {
-                        if (typeof(note.noteOctave[j-1]) === 'string') {
-                            thisBlock = previousBlock+3;
+                        if (typeof(note.noteOctave[j - 1]) === 'string') {
+                            thisBlock = previousBlock + 3;
                         } else {
-                            thisBlock = previousBlock+2;
+                            thisBlock = previousBlock + 2;
                         }
                         var n = newStack[previousBlock][4].length;
-                        newStack[previousBlock][4][n-1] = thisBlock;
+                        newStack[previousBlock][4][n - 1] = thisBlock;
                     }
                     if (typeof(note.noteOctave[j]) === 'string') {
                         newStack.push([thisBlock, 'pitch', 0, 0, [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]]);
