@@ -686,7 +686,7 @@ function MusicKeyboard() {
         });
 
         if (playNote) {
-            this._logo.synth.triggerAttackRelease(temp2, ele.getAttribute('alt'));
+	    this._logo.synth.trigger(0, temp2, ele.getAttribute('alt'), this.instruments[0], null, null);
         }
     };
 
@@ -788,8 +788,9 @@ function MusicKeyboard() {
             outerDiv.innerHTML = 'No note selected';
             return;
         }
+
         var that = this;
-        j=0;
+        j = 0;
         var n = this.layout.length;
         for (var i = this.layout.length - 1; i >= 0; i--) {
             var mkbTableRow = mkbTable.insertRow();
@@ -806,6 +807,7 @@ function MusicKeyboard() {
             } else {
                 cell.innerHTML = _(this.layout[i][0]) + '<sub>' + this.layout[i][1].toString() + '</sub>';
             }
+
             cell.setAttribute('id', 'labelcol' + (n - i - 1));
             if (this.layout[i][0] === 'hertz') {
                 cell.setAttribute('alt', (n - i - 1) + '__' + 'synthsblocks');
@@ -851,6 +853,8 @@ function MusicKeyboard() {
         ptmCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var mkbCellTable = docById('mkbTable');
         var cellColor = 'rgb(124, 214, 34)';
+
+	console.log(selectedNotes);
 
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j][2]);
