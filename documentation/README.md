@@ -6,7 +6,7 @@ Blocks](href="https://turtle.sugarlabs.org). It has extensions for
 exploring music: pitch and rhythm.
 
 Music Blocks is designed to run in a browser. Most of the development
-has been done in Chrome. 
+has been done in Chrome.
 
 Browser       | Comments
 ------------- | -------------
@@ -72,19 +72,19 @@ Toolbars
 
 There are four toolbars:
 
-(1) The *Main* toolbar across the top of the screen. There you will 
-find the *Play* button, the *Stop* button, the *New Project* button, 
-buttons for loading and saving projects and the *Find and Share 
+(1) The *Main* toolbar across the top of the screen. There you will
+find the *Play* button, the *Stop* button, the *New Project* button,
+buttons for loading and saving projects and the *Find and Share
 projects* button.
 
 (2) The *Secondary* toolbar, in the lower-right corner of the
 screen. There you will find the *Home* button, buttons for show/hide
 blocks, expand/collapse blocks and decrease/increase block size.
 
-(3) The *Auxilary* toolbar below the *main* toolbar. It appears when 
-*auxilary menu* button is clicked. There you will find the buttons *Run 
-slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*, 
-etc. and also the button for selecting language.  
+(3) The *Auxilary* toolbar below the *main* toolbar. It appears when
+*auxilary menu* button is clicked. There you will find the buttons *Run
+slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*,
+etc. and also the button for selecting language.
 
 (4) the *Palette* toolbar on the left side of the screen. (An
 additional menu appears when a "right click" is applied to a stack of
@@ -120,14 +120,14 @@ palettes contain the blocks used to create programs.
 
 See the
 [Turtle Blocks Programming Guide](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
-for general details on how to use the blocks. 
+for general details on how to use the blocks.
 
 See the
 [Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md)
-for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*, 
+for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 *Tone*, *Ornament*, *Volume*, *Drum*, and *Widget*.
 
-All of the other palettes are described in the 
+All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Defining a note
@@ -182,9 +182,9 @@ inside a note in order to create sound-sync animations.
 A quick tour of selected blocks
 -------------------------------
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/settimbre_block.svg "Set timbre block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setinstrument_block.svg "Set instrument block")
 
-The *Set timbre* block, found on the *Tone* palette, lets you choose a
+The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
 make any notes contained within the block's clamp will sound as if
 they are being played on a guitar.

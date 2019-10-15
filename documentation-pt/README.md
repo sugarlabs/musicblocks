@@ -78,7 +78,7 @@ ocultados a qualquer momento durante a execução do programa.</p>
 <p>Existem quatro barras de ferramentas:</p>
 <p>(1) A barra de ferramenta <em>Principal</em> na parte superior da tela. Lá você vai
 encontrar o botao <em>Executar</em>, o botão<em>Parar</em>, o botão <em>Novo Projeto</em>,
-os botões para carregar e salvar projetos e o botão <em>Encontrar e compartilhar 
+os botões para carregar e salvar projetos e o botão <em>Encontrar e compartilhar
 projetos</em>.</p>
 <p>(2) A barra de ferramentas <em>Secundária</em>, no canto inferior direito da
 tela. Lá você encontrará o botão <em>Início</em>, botões para mostrar/ocultar
@@ -152,7 +152,7 @@ você pode colocar quantos blocos de <em>Tom</em> você quiser em uma nota. Eles
 vão tocar juntos como um acorde. Você também pode inserir blocos gráficos
 dentro de uma nota para criar animações sincronizadas com o som.</p>
 <h2><a id="user-content-a-quick-tour-of-selected-blocks" class="anchor" aria-hidden="true" href="#a-quick-tour-of-selected-blocks"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Um rápido passseio por blocos selecionados</h2>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/settimbre_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/settimbre_block.svg?sanitize=true" alt="alt tag" title="Set timbre block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setinstrument_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setinstrument_block.svg?sanitize=true" alt="alt tag" title="Set instrument block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir timbre</em>, encontrado na paleta de <em>Tom</em>, permite que você escolha um
 timbre para uma nota. No exemplo acima, um modelo de guitarra é usado para
 fazer quaisquer notas contidas no grampo do bloco soar como se
@@ -238,7 +238,7 @@ criar alguma interatividade no seu programa.</p>
 <p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/push_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/push_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
 <p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/pop_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/pop_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
 <p>Os blocos <em>Empurrar</em> e <em>Pop</em>, encontrados na paleta <em>Pilha</em>, são usados ​​para
-armazenar e recuperar valores de/para um programa de pilha primeiro incluído, último excluído 
+armazenar e recuperar valores de/para um programa de pilha primeiro incluído, último excluído
 (first-in e last-out, FILO).</p>
 <p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/print_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/print_block.svg?sanitize=true" alt="alt tag" title="print" style="max-width:100%;"></a></p>
 <p>O bloco <em>Exibir</em>, encontrado na paleta <em>Extras</em>, é usado para exibir

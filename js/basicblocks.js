@@ -2013,17 +2013,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
-    var newblock = new ProtoBlock('settimbre');
+    var newblock = new ProtoBlock('setinstrument');
     newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['settimbre'] = newblock;
+    blocks.protoBlockDict['setinstrument'] = newblock;
     //.TRANS: set the characteristics of a custom instrument
-    newblock.staticLabels.push(_('set timbre'));
+    newblock.staticLabels.push(_('set instrument'));
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
     newblock.defaults.push(_('custom'));
-    if (beginnerMode && !beginnerBlock('settimbre')) {
+    if (beginnerMode && !beginnerBlock('setinstrument')) {
         newblock.hidden = true;
     }
 
