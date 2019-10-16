@@ -11,29 +11,29 @@
 
 function GlobalTag(Planet) {
     var tagNames = [
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('All Projects'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('My Projects'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Examples'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Music'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Art'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Math'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Interactive'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Design'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Game'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Media'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Sensors'),
-	//.TRANS: planet tag name
+	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Effects'),
     ];
 
