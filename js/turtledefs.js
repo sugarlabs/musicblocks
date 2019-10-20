@@ -529,7 +529,7 @@ function createHelpContent() {
         'nobackground': [_('The No background block eliminates the background from the saved SVG output.'), 'documentation', ''],
         'makeblock': [_('The Make block block creates a new block.'), 'documentation', ''],
         'dockblock': [_('The Dock block block connections two blocks.'), 'documentation', ''],
-        'runblock': [_('The Run block block runs a block.'), 'documentation', ''],
+        'runblock': [_('The Run block block runs a block. It accepts two types of arguments: block number or block name.'), 'documentation', ''],
         'moveblock': [_('The Move block block moves a block.'), 'documentation', ''],
         'deleteblock': [_('The Delete block block removes a block.'), 'documentation', ''],
         'openpalette': [_('The Open palette block opens a palette.'), 'documentation', ''],
