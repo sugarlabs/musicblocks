@@ -1076,7 +1076,7 @@ function RhythmRuler () {
             var ruler = docById('ruler' + selectedRuler);
             var noteValues = that.Rulers[selectedRuler][0];
             if (that.Drums[selectedRuler] === null) {
-                var stack_value = _('snare drum') + ' ' + _('rhythm');
+                var stack_value = _('rhythm');
             } else {
                 var stack_value = (that._logo.blocks.blockList[that._logo.blocks.blockList[that.Drums[selectedRuler]].connections[1]].value).split(' ')[0] + ' ' + _('rhythm');
             }
@@ -1092,7 +1092,7 @@ function RhythmRuler () {
                     var idx = newStack.length;
                     var noteValue = noteValues[i];
                     var obj = rationalToFraction(1 / Math.abs(noteValue));
-                    var n = obj[1]/sameNoteValue ;
+                    var n = obj[1] / sameNoteValue ;
                     if (Number.isInteger(n)) {
                         newStack.push([idx, 'stuplet', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
                         newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
@@ -1114,6 +1114,7 @@ function RhythmRuler () {
                     } else {
                         newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, idx + 7]]);
                     }
+
                     previousBlock = idx + 6;
                     sameNoteValue = 1;
                 }
@@ -1126,6 +1127,48 @@ function RhythmRuler () {
                 that._saveTuplets(selectedRuler + 1);
             }
         }, 500);
+    };
+
+    this._saveTupletsMerged = function(noteValues) {
+        var that = this;
+        for (var name in this._logo.blocks.palettes.dict) {
+            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        this._logo.refreshCanvas();
+
+        var stack_value = _('rhythm');
+        var delta = 42;
+        var newStack = [[0, ['action', {'collapsed': true}], 100 + delta, 100 + delta, [null, 1, 2, null]], [1, ['text', {'value': stack_value}], 0, 0, [0]]];
+        var previousBlock = 0;
+        var sameNoteValue = 1;
+        for (var i = 0; i < noteValues.length; i++) {
+            if (noteValues[i] === noteValues[i + 1] && i < noteValues.length - 1) {
+                sameNoteValue += 1;
+                continue;
+            } else {
+                var idx = newStack.length;
+                var noteValue = noteValues[i];
+                var obj = rationalToFraction(1 / Math.abs(noteValue));
+                newStack.push([idx, 'rhythm2', 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                newStack.push([idx + 1, ['number', {'value': sameNoteValue}], 0, 0, [idx]]);
+                newStack.push([idx + 2, 'divide', 0, 0, [idx, idx + 3, idx + 4]]);
+                newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
+                newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
+                    
+                if (i == noteValues.length - 1) {
+                    newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
+                } else {
+                    newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, idx + 7]]);
+                }
+
+                previousBlock = idx + 6;
+                sameNoteValue = 1;
+            }
+        }
+
+        that._logo.blocks.loadNewBlocks(newStack);
     };
 
     this._saveMachine = function(selectedRuler) {
@@ -1381,6 +1424,35 @@ function RhythmRuler () {
         }, 500);
     };
 
+    this._mergeRulers = function () {
+        // Merge the rulers into one set of rhythms.
+        rList = [];
+        for (var r = 0; r < this.Rulers.length; r++) {
+            var t = 0;
+            var selectedRuler = this.Rulers[r];
+            var noteValues = selectedRuler[0];
+            for (var i = 0; i < noteValues.length; i++) {
+                t += 1 / noteValues[i];
+                if (rList.indexOf(t) === -1) {
+                    rList.push(t);
+                }
+            }
+        }
+
+        rList.sort(function(a, b){return a - b});
+
+        var noteValues = [];
+        for (var i = 0; i < rList.length; i++) {
+            if (i === 0) {
+                noteValues.push(1 / rList[i]);
+            } else {
+                noteValues.push(1 / (rList[i] - rList[i - 1]));
+            }
+        }
+
+        return noteValues;
+    };
+
     this._get_save_lock = function() {
         return this._save_lock;
     };
@@ -1508,7 +1580,12 @@ function RhythmRuler () {
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
-                that._saveTuplets(0);
+
+                // Save a merged version of the rulers.
+                that._saveTupletsMerged(that._mergeRulers());
+                
+                // Rather than each ruler individually.
+                // that._saveTuplets(0);
                 await delayExecution(1000)
                     that._save_lock = false;
             }
