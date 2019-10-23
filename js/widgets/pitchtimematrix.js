@@ -442,6 +442,8 @@ function PitchTimeMatrix () {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
                 } else if (noteName === 'C' && this.rowArgs[i] === 5) {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
+                } else if (noteName === 'do' && this.rowArgs[i] === 5) {
+                    cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
                 }
             }
 
