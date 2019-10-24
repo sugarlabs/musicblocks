@@ -4183,6 +4183,7 @@ function Activity() {
             };
 
             this.loadProjectFromData = function (data, merge) {
+                console.log('LOAD PROJECT FROM DATA');
                 if (merge === undefined) {
                     merge = false;
                 }
@@ -4511,6 +4512,8 @@ function Activity() {
 
                                 stage.addEventListener('trashsignal', __listener, false);
                                 sendAllToTrash(false, false);
+                                console.log('clearing on load...');
+                                _allClear(false);
                                 if (planet) {
                                     planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
                                 }
