@@ -2015,7 +2015,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     // macro
     var newblock = new ProtoBlock('settimbre');
     newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setinstrument'] = newblock;
+    blocks.protoBlockDict['settimbre'] = newblock;
     //.TRANS: set the characteristics of a custom instrument
     newblock.staticLabels.push(_('set instrument'));
     newblock.adjustWidthToLabel();
