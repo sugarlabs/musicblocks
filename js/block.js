@@ -4327,7 +4327,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < wheelLabels.length; i++) {
             this._numberWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
-                __exitMenu();
+                // __exitMenu();
             };
         }
 
