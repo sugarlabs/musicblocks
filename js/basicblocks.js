@@ -2013,7 +2013,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
-    var newblock = new ProtoBlock('setinstrument');
+    var newblock = new ProtoBlock('settimbre');
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['setinstrument'] = newblock;
     //.TRANS: set the characteristics of a custom instrument
