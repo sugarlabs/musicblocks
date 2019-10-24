@@ -1,3 +1,17 @@
+/*
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://example.com/MaterialIcons-Regular.eot);
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(https://example.com/MaterialIcons-Regular.woff2) format('woff2'),
+    url(https://example.com/MaterialIcons-Regular.woff) format('woff'),
+    url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
+}
+*/
+ 
 .modal {
    display: none;
    position: fixed;
@@ -653,6 +667,15 @@ table {
     background: rgba(255, 255, 255, 0.85) !important;
 }
 
+#mkbKeyboardDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 1020px;
+}
+
 #mkbTableDiv {
     position: relative;
     left: 0px;
@@ -684,7 +707,6 @@ table {
     overflow-x:auto;
     margin-left: 53px;
 }
-
 
 #tempoDiv {
     position: absolute;
