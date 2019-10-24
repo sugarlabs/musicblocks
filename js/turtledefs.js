@@ -61,7 +61,7 @@ function beginnerBlock(name) {
            'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
+           'setinstrument', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
            'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
@@ -92,7 +92,7 @@ function createDefaultStack() {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
 
-             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+             [1, 'setinstrument', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
              [3, 'hidden', 0, 0, [1, null]],
 
@@ -140,7 +140,7 @@ function createDefaultStack() {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
 
-             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
+             [1, 'setinstrument', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
              [3, 'hidden', 0, 0, [1, null]],
 
@@ -305,7 +305,7 @@ function createHelpContent() {
         'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', null, 'intervalhelp'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', ''],
         // Tone palette
-        'settimbre': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'settimbrehelp'],
+        'setinstrument': [_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'setinstrumenthelp'],
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'staccatohelp'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'slurhelp'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', null, 'vibratohelp'],
@@ -443,7 +443,7 @@ function createHelpContent() {
         'measureintervalsemitones': [_('The Semi-tone interval block measures the distance between two notes in semi-tones.'), 'documentation', ''],
         'doubly': [_('The Doubly block will double the size of an interval.'), 'documentation', null, 'doublyhelp'],
         // Tone palette
-        'voicename': [_('The Set timbre block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', ''],
+        'voicename': [_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', ''],
         'chorus': [_('The Chorus block adds a chorus effect.'), 'documentation', null, 'chorushelp'],
         'phaser': [_('The Phaser block adds a sweeping sound.'), 'documentation', null, 'phaserhelp'],
         'dis': [_('The Distortion block adds distortion to the pitch.'), 'documentation', null, 'dishelp'],
@@ -589,7 +589,7 @@ function createHelpContent() {
     if (beginnerMode && language === 'ja') {
         BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'everybeathelp'],
         BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', ''];
-        BLOCKHELP['settimbre'] = [_('The Set timbre block selects a voice for the synthesizer,'), 'documentation', ''];
+        BLOCKHELP['setinstrument'] = [_('The Set instrument block selects a voice for the synthesizer,'), 'documentation', ''];
         BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', ''];
         BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', null, 'broadcasthelp'],
         BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', null, 'rhythmruler2'];

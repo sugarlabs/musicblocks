@@ -2017,13 +2017,13 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['settimbre'] = newblock;
     //.TRANS: set the characteristics of a custom instrument
-    newblock.staticLabels.push(_('set timbre'));
+    newblock.staticLabels.push(_('set instrument'));
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
     newblock.defaults.push(_('custom'));
-    if (beginnerMode && !beginnerBlock('settimbre')) {
+    if (beginnerMode && !beginnerBlock('setinstrument')) {
         newblock.hidden = true;
     }
 
