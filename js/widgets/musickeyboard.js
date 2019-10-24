@@ -138,7 +138,7 @@ function MusicKeyboard() {
                     'voice': [this._notesPlayed[i].voice], 
                     'blkNo': [this._notesPlayed[i].blkNo], 
                     'startTime': this._notesPlayed[i].startTime
-                })
+                });
             }
         }
     };
@@ -226,6 +226,8 @@ function MusicKeyboard() {
                 that._logo.synth.stopSound(0, that.instrumentMapper[id], temp2[id]);
 
                 that._notesPlayed.push({'startTime': startTime[id], 'noteOctave': temp2[id], 'objId': id, 'duration': duration, 'voice': that.instrumentMapper[id], 'blkNo': that.blockNumberMapper[id]});
+                that._createTable();
+
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
@@ -297,6 +299,7 @@ function MusicKeyboard() {
             }
 
             that._notesPlayed.push({'startTime': startTime, 'noteOctave': that.noteMapper[element.id], 'objId': element.id, 'duration': duration, 'voice': that.instrumentMapper[element.id], 'blkNo': that.blockNumberMapper[element.id]});
+            that._createTable();
         };
 
         element.onmouseout = function() {
@@ -342,8 +345,8 @@ function MusicKeyboard() {
         var cell = this._addButton(row1,'close-button.svg', ICONSIZE, _('close'));
 
         cell.onclick = function() {
-	    document.onkeydown = saveOnKeyDown;
-	    document.onkeyup = saveOnKeyUp;
+            document.onkeydown = saveOnKeyDown;
+            document.onkeyup = saveOnKeyUp;
 
             var mkbTableDiv = docById('mkbTableDiv');
             mkbTableDiv.innerHTML = '';
@@ -387,9 +390,9 @@ function MusicKeyboard() {
         cell.onclick=function() {
             that._notesPlayed =[];
             selectedNotes = [];
-            if (!that.keyboardShown) {
+            // if (!that.keyboardShown) {
                 that._createTable();
-            }
+            // }
         };
 
         var cell = this._addButton(row1, 'add2.svg', ICONSIZE, _('Add note'));
@@ -398,19 +401,20 @@ function MusicKeyboard() {
             that._createAddRowPieSubmenu();
         };
 
-        var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
+        // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
 
         that._createKeyboard();
 
+        /*
         this.toggleNotesButton = function () {
             if (that.keyboardShown) {
-                cell.getElementsByTagName("img")[0].src = 'header-icons/keyboard.svg';
-                cell.getElementsByTagName("img")[0].title = 'keyboard';
-                cell.getElementsByTagName("img")[0].alt = 'keyboard';
+                cell.getElementsByTagName('img')[0].src = 'header-icons/keyboard.svg';
+                cell.getElementsByTagName('img')[0].title = 'keyboard';
+                cell.getElementsByTagName('img')[0].alt = 'keyboard';
             } else {
-                cell.getElementsByTagName("img")[0].src = 'header-icons/table.svg';
-                cell.getElementsByTagName("img")[0].title = 'table';
-                cell.getElementsByTagName("img")[0].alt = 'table';
+                cell.getElementsByTagName('img')[0].src = 'header-icons/table.svg';
+                cell.getElementsByTagName('img')[0].title = 'table';
+                cell.getElementsByTagName('img')[0].alt = 'table';
 
             }
         };
@@ -424,6 +428,7 @@ function MusicKeyboard() {
             that.toggleNotesButton();
             that.keyboardShown = !that.keyboardShown;
         };
+        */
 
         var dragCell = this._addButton(row1, 'grab.svg', ICONSIZE, _('Drag'));
         dragCell.style.cursor = 'move';
@@ -820,11 +825,11 @@ function MusicKeyboard() {
         var w = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
         var innerDiv = docById('mkbInnerDiv');
         innerDiv.style.width = w + 'px';
-        innerDiv.style.marginLeft = Math.floor(MATRIXSOLFEWIDTH * this._cellScale)*1.5 + 'px';
+        innerDiv.style.marginLeft = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
 
         var mkbTable = docById('mkbTable');
         if (selectedNotes.length < 1) {
-            outerDiv.innerHTML = 'No note selected';
+            outerDiv.innerHTML = '';
             return;
         }
 
@@ -888,10 +893,9 @@ function MusicKeyboard() {
         cell.className = 'headcol';  // This cell is fixed horizontally.
         cell.innerHTML = 'duration';
 
-        var ptmCell = mkbTableRow.insertCell();
-        ptmCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
-        var mkbCellTable = docById('mkbTable');
-        var cellColor = 'rgb(124, 214, 34)';
+        var newCell = mkbTableRow.insertCell();
+        newCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
+        var cellColor = 'lightgrey';
 
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
@@ -933,6 +937,8 @@ function MusicKeyboard() {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
+        var innerDiv = docById('mkbInnerDiv');
+        innerDiv.scrollLeft += 3000; // Force to the right.
         this.makeClickable();
     }
 
@@ -1588,14 +1594,14 @@ function MusicKeyboard() {
     this._createKeyboard = function() {
         document.onkeydown = null;
 
-        var mkbTableDiv = docById('mkbTableDiv');
-        mkbTableDiv.style.display = 'inline';
-        mkbTableDiv.style.visibility = 'visible';
-        mkbTableDiv.style.border = '0px';
-        mkbTableDiv.style.width = '300px';
-        mkbTableDiv.innerHTML = '';
+        var mkbKeyboardDiv = docById('mkbKeyboardDiv');
+        mkbKeyboardDiv.style.display = 'inline';
+        mkbKeyboardDiv.style.visibility = 'visible';
+        mkbKeyboardDiv.style.border = '0px';
+        mkbKeyboardDiv.style.width = '300px';
+        mkbKeyboardDiv.innerHTML = '';
 
-        mkbTableDiv.innerHTML = ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>'
+        mkbKeyboardDiv.innerHTML = ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>'
 
         var keyboardHolder2 = docById('keyboardHolder2');
         keyboardHolder2.style.bottom = '10px';
