@@ -305,7 +305,7 @@ function createHelpContent() {
         'interval': [_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', null, 'intervalhelp'],
         'settemperament': [_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', ''],
         // Tone palette
-        'setinstrument': [_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'setinstrumenthelp'],
+        'settimbre': [_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'settimbrehelp'],
         'newstaccato': [_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'staccatohelp'],
         'newslur': [_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'slurhelp'],
         'vibrato': [_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', null, 'vibratohelp'],
@@ -589,7 +589,7 @@ function createHelpContent() {
     if (beginnerMode && language === 'ja') {
         BLOCKHELP['beatvalue'] = [_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'everybeathelp'],
         BLOCKHELP['setkey2'] = [_('The Set key block is used to set the key and mode,'), 'documentation', ''];
-        BLOCKHELP['setinstrument'] = [_('The Set instrument block selects a voice for the synthesizer,'), 'documentation', ''];
+        BLOCKHELP['settimbre'] = [_('The Set instrument block selects a voice for the synthesizer,'), 'documentation', ''];
         BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', ''];
         BLOCKHELP['listen'] = [_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', null, 'broadcasthelp'],
         BLOCKHELP['setdrum'] = [_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', null, 'rhythmruler2'];
