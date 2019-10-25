@@ -1825,6 +1825,9 @@ msgstr "<h2>おんりつを せってい ブロック</h2><br>ミュージック
 msgid "The Set timbre block selects a voice for the synthesizer,"
 msgstr "<h2>ねいろをせってい ブロック</h2>なかに はいっている 「おんぷブロック」 の ねいろを せっていする。"
 
+msgid "The Set instrument block selects a voice for the synthesizer,"
+msgstr "<h2>ねいろをせってい ブロック</h2>なかに はいっている 「おんぷブロック」 の ねいろを せっていする。"
+
 #: js/turtledefs.js:304
 #: js/turtledefs.js:439
 msgid "eg guitar piano violin or cello."
@@ -3910,6 +3913,9 @@ msgstr "シンセの なまえ"
 #: js/basicblocks.js:2018
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
+msgstr "ねいろを せってい"
+
+msgid "set instrument"
 msgstr "ねいろを せってい"
 
 #: js/basicblocks.js:2031

@@ -1870,6 +1870,9 @@ msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュ�
 msgid "The Set timbre block selects a voice for the synthesizer,"
 msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
 
+msgid "The Set instrument block selects a voice for the synthesizer,"
+msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
+
 #: js/turtledefs.js:304
 #: js/turtledefs.js:439
 msgid "eg guitar piano violin or cello."
@@ -3955,6 +3958,9 @@ msgstr "シンセの名前"
 #: js/basicblocks.js:2018
 #.TRANS: set the characteristics of a custom instrument
 msgid "set timbre"
+msgstr "音色をせってい"
+
+msgid "set instrument"
 msgstr "音色をせってい"
 
 #: js/basicblocks.js:2031
