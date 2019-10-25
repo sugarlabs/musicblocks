@@ -348,6 +348,8 @@ function MusicKeyboard() {
             document.onkeydown = saveOnKeyDown;
             document.onkeyup = saveOnKeyUp;
 
+            var mkbKeyboardDiv = docById('mkbKeyboardDiv');
+            mkbKeyboardDiv.innerHTML = '';
             var mkbTableDiv = docById('mkbTableDiv');
             mkbTableDiv.innerHTML = '';
             mkbDiv.style.visibility = 'hidden';
@@ -516,7 +518,9 @@ function MusicKeyboard() {
             for (var i = 0; i < selectedNotes[0].noteOctave.length; i++) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
                     var ele = docById(selectedNotes[0].objId[i]);
-                    ele.style.backgroundColor = 'lightgrey';
+		    if (ele !== null) {
+			ele.style.backgroundColor = 'lightgrey';
+                    }
                 }
 
                 var zx = selectedNotes[0].noteOctave[i];
