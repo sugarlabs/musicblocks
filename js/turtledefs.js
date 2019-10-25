@@ -61,7 +61,7 @@ function beginnerBlock(name) {
            'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
            'pitch', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
            'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'setinstrument', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
+           'settimbre', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
            'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
            'playdrum', 'playeffect', 'setdrum', // drum palette
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
@@ -92,7 +92,7 @@ function createDefaultStack() {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
 
-             [1, 'setinstrument', 0, 0, [0, 2, 4, 3]],
+             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
              [3, 'hidden', 0, 0, [1, null]],
 
@@ -140,7 +140,7 @@ function createDefaultStack() {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
 
-             [1, 'setinstrument', 0, 0, [0, 2, 4, 3]],
+             [1, 'settimbre', 0, 0, [0, 2, 4, 3]],
              [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]],
              [3, 'hidden', 0, 0, [1, null]],
 
