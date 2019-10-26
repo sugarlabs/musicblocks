@@ -2460,7 +2460,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2489,7 +2489,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2518,7 +2518,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2640,7 +2640,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2669,7 +2669,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2698,7 +2698,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2727,7 +2727,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2756,7 +2756,7 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inNoteBlock[turtle].length > 0) {
                     that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2929,7 +2929,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2964,7 +2964,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -2989,7 +2989,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -3014,7 +3014,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -3041,7 +3041,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -3066,7 +3066,7 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (that.inNoteBlock[turtle].length > 0) {
                 that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
@@ -4513,8 +4513,16 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
-                that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                if (that.pitchTimeMatrix.rowLabels.length > 0) {
+                    if (last(that.pitchTimeMatrix.rowLabels) === 'hertz') {
+                        var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
+                        that.pitchTimeMatrix.rowLabelsPush('hertz', false);
+                        that.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                    } else {
+                        that.pitchTimeMatrix.rowLabelsPush(noteObj1[0], true);
+                        that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                    }
+                }
 
                 that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
                 that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
@@ -4621,7 +4629,7 @@ function Logo () {
                     that.drumBlocks.push(blk);
                 }
             } else if (that.inMatrix) {
-                that.pitchTimeMatrix.rowLabels.push(drumname);
+                that.pitchTimeMatrix.rowLabelsPush(drumname, false);
                 that.pitchTimeMatrix.rowArgs.push(-1);
 
                 that.pitchTimeMatrix.addRowBlock(blk);
@@ -4961,14 +4969,14 @@ function Logo () {
 
                     // If we are in a setdrum clamp, override the pitch.
                     if (that.drumStyle[turtle].length > 0) {
-                        that.pitchTimeMatrix.rowLabels.push(last(that.drumStyle[turtle]));
+                        that.pitchTimeMatrix.rowLabelsPush(last(that.drumStyle[turtle]), false);
                         that.pitchTimeMatrix.rowArgs.push(-1);
                     } else {
                         // Was the pitch arg a note name or solfege name?
                         if (useSolfegeName && noteObj[0] in SOLFEGECONVERSIONTABLE) {
-                            that.pitchTimeMatrix.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj[0]]);
+                            that.pitchTimeMatrix.rowLabelsPush(SOLFEGECONVERSIONTABLE[noteObj[0]], false);
                         } else {
-                            that.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                            that.pitchTimeMatrix.rowLabelsPush(noteObj[0], false);
                         }
 
                         that.pitchTimeMatrix.rowArgs.push(noteObj[1]);
@@ -7246,8 +7254,11 @@ function Logo () {
                     that.pitchBlocks.push(blk);
                 }
 
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+                that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                 that.pitchTimeMatrix.rowArgs.push(arg);
+                // convert hertz to note/octave
+                var note = frequencyToPitch(arg);
+                that.lastNotePlayed[turtle] = [note[0] + note[1], 4];
             } else if (that.inMusicKeyboard) {
                 that.musicKeyboard.instruments.push(last(that.instrumentNames[turtle]));
                 that.musicKeyboard.noteNames.push('hertz');
@@ -7335,7 +7346,8 @@ function Logo () {
                     if (that.pitchBlocks.indexOf(blk) === -1) {
                         that.pitchBlocks.push(blk);
                     }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
+
+                    that.pitchTimeMatrix.rowLabelsPush(that.blocks.blockList[blk].name, false);
                     that.pitchTimeMatrix.rowArgs.push(args[0]);
                 } else if (that.inPitchSlider) {
                     that.pitchSlider.Sliders.push([args[0], 0, 0]);
