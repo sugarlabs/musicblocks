@@ -4458,8 +4458,9 @@ function Logo () {
 
             if (that.lastNotePlayed[turtle] == null) {
                 that.errorMsg(_('The Scalar Step Block must be preceded by a Pitch Block.'), blk);
-                that.stopTurtle = true;
-                break;
+                that.lastNotePlayed[turtle] = ['G4', 4];
+                // that.stopTurtle = true;
+                // break;
             }
 
             function addPitch(note, octave, cents, direction) {
