@@ -153,24 +153,6 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.rowLabelsPush = function(label, convert) {
-        // When convert is true, we are using step pitch, so preserve
-        // the form of the previous note.
-        if (convert && this.rowLabels.length > 0) {
-            if (SOLFEGENAMES1.indexOf(last(this.rowLabels)) !== -1) {
-                if (label in SOLFEGECONVERSIONTABLE) {
-                    this.rowLabels.push(SOLFEGECONVERSIONTABLE[label]);
-                } else {
-                    this.rowLabels.push(label);
-                }
-            } else {
-                this.rowLabels.push(label);
-            }
-        } else {
-            this.rowLabels.push(label);
-        }
-    };
-
     this._get_save_lock = function () {
         // Debounce the save button.
         return this._save_lock;
@@ -464,7 +446,7 @@ function PitchTimeMatrix () {
                 var noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
-                } else if (['C', 'do'].indexOf(noteName) !== 0 && this.rowArgs[i] === 5) {
+                } else if (['C', 'do'].indexOf(noteName) !== -1 && this.rowArgs[i] === 5) {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
                 }
             }
