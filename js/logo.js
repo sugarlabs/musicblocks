@@ -4515,24 +4515,22 @@ function Logo () {
                 }
 
                 if (that.pitchTimeMatrix.rowLabels.length > 0) {
-                    if (that.pitchTimeMatrix.rowLabels.length > 0) {
-                        if (last(that.pitchTimeMatrix.rowLabels) === 'hertz') {
-                            var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
-                            that.pitchTimeMatrix.rowLabels.push('hertz');
-                            that.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                    if (last(that.pitchTimeMatrix.rowLabels) === 'hertz') {
+                        var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
+                        that.pitchTimeMatrix.rowLabels.push('hertz');
+                        that.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                    } else {
+                        if (SOLFEGENAMES1.indexOf(last(that.pitchTimeMatrix.rowLabels)) !== -1) {
+                            that.pitchTimeMatrix.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj1[0]]);
                         } else {
-                            if (SOLFEGENAMES1.indexOf(last(that.pitchTimeMatrix.rowLabels)) !== -1) {
-                                that.pitchTimeMatrix.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj1[0]]);
-                            } else {
-                                that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
-                            }
-
-                            that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                            that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
                         }
-                   } else {
-                       that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
-                       that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
-                   }
+
+                        that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                    }
+                } else {
+                    that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                    that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
                 }
 
                 that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
