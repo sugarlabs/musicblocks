@@ -55,8 +55,6 @@ function MusicKeyboard() {
     };
 
     this.processSelected = function() {
-        // Consolidate chords
-
         if (this._notesPlayed.length === 0) {
             selectedNotes = [];
             return;
@@ -68,27 +66,26 @@ function MusicKeyboard() {
         });
 
 
-        /*
+	// Cluster notes that start at the same time.
         if (beginnerMode === 'true') {
             var minimumDuration = 125; // 1/8 note
         } else {
             var minimumDuration = 62.5; // 1/16 note
         }
 
-        var last = this._notesPlayed[0][0];
+        var last = this._notesPlayed[0].startTime;
         for (var i = 1; i < this._notesPlayed.length; i++) {
-            while (i < this._notesPlayed.length && (this._notesPlayed[i][0] - last < minimumDuration)) {
-                last = this._notesPlayed[i][0];
-                this._notesPlayed[i][0] = this._notesPlayed[i - 1][0];
+            while (i < this._notesPlayed.length && (this._notesPlayed[i].startTime - last < minimumDuration)) {
+                last = this._notesPlayed[i].startTime;
+                this._notesPlayed[i].startTime = this._notesPlayed[i - 1].startTime;
                 i++;
             }
 
             if (i < this._notesPlayed.length) {
-                last = this._notesPlayed[i][0]
-                this._notesPlayed[i][0] = this._notesPlayed[i - 1][0] + (this._notesPlayed[i - 1][3]*1000) + minimumDuration;
+                last = this._notesPlayed[i].startTime;
+                this._notesPlayed[i].startTime = this._notesPlayed[i - 1].startTime + (this._notesPlayed[i - 1].duration * 1000) + minimumDuration;
             }
         }
-        */
 
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
@@ -1088,8 +1085,11 @@ function MusicKeyboard() {
         start = parseInt(start);
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
+
+	console.log(start + ' ' + dur);
+
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue.startTime === start) {
+            if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
                 var oldcurValue = JSON.parse(JSON.stringify(curValue));
                 for (var i = 0; i < divideNoteBy; i++) {
@@ -1100,8 +1100,8 @@ function MusicKeyboard() {
                 }
 
                 return prevValue;
-            } else if (curValue.startTime > start) {
-                curValue.startTime = curValue.startTime + dur*1000*divideNoteBy
+            } else if (parseInt(curValue.startTime) > start) {
+                curValue.startTime = curValue.startTime + dur * 1000 * divideNoteBy;
                 return prevValue.concat([curValue]);
             }
 
@@ -1113,8 +1113,9 @@ function MusicKeyboard() {
 
     this._deleteNotes = function(start) {
         start = parseInt(start);
+
         this._notesPlayed = this._notesPlayed.filter(function(ele) {
-            return ele.startTime !== start;
+            return parseInt(ele.startTime) !== start;
         });
 
         this._createTable();
@@ -1122,23 +1123,33 @@ function MusicKeyboard() {
 
     this._divideNotes = function(start, divideNoteBy) {
         start = parseInt(start);
+
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
-            if (curValue.startTime === start) {
-                if (curValue.duration / divideNoteBy < 0.125) {
-                    return prevValue.concat([curValue]);
-                };
+            if (parseInt(curValue.startTime) === start) {
+		if (beginnerMode === 'true') {
+                    if (curValue.duration / divideNoteBy < 0.125) {
+			return prevValue.concat([curValue]);
+                    }
+		} else {
+                    if (curValue.duration / divideNoteBy < 0.0625) {
+			return prevValue.concat([curValue]);
+                    }
+		}
+
                 var newcurValue = JSON.parse(JSON.stringify(curValue));
                 newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
-                var oldcurValue = newcurValue.slice()
-                for (var i=0; i < divideNoteBy - 1; i++) {
+                var oldcurValue = newcurValue;
+                for (var i = 0; i < divideNoteBy - 1; i++) {
                     var newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
-                    newcurValue2.startTime = parseInt(newcurValue2.startTime+(newcurValue2.duration*1000))
+                    newcurValue2.startTime = parseInt(newcurValue2.startTime + (newcurValue2.duration * 1000))
                     prevValue = prevValue.concat([newcurValue2])
                     oldcurValue = newcurValue2
                 }
+
                 return prevValue
             }
+
             return prevValue.concat([curValue])
         }, []);
 
