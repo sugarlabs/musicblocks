@@ -4514,23 +4514,24 @@ function Logo () {
                 }
 
                 if (that.pitchTimeMatrix.rowLabels.length > 0) {
-                    if (last(that.pitchTimeMatrix.rowLabels) === 'hertz') {
-                        var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
-                        that.pitchTimeMatrix.rowLabels.push('hertz');
-                        that.pitchTimeMatrix.rowArgs.push(parseInt(freq));
-                    } else {
-                        if (that.pitchTimeMatrix.rowLabels.length > 0) {
+                    if (that.pitchTimeMatrix.rowLabels.length > 0) {
+                        if (last(that.pitchTimeMatrix.rowLabels) === 'hertz') {
+                            var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
+                            that.pitchTimeMatrix.rowLabels.push('hertz');
+                            that.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                        } else {
                             if (SOLFEGENAMES1.indexOf(last(that.pitchTimeMatrix.rowLabels)) !== -1) {
                                 that.pitchTimeMatrix.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj1[0]]);
                             } else {
                                 that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
                             }
-                        } else {
-                            that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
-                        }
 
-                        that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
-                    }
+                            that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                        }
+                   } else {
+                       that.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                       that.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                   }
                 }
 
                 that.previousNotePlayed[turtle] = that.lastNotePlayed[turtle];
@@ -4538,8 +4539,25 @@ function Logo () {
             } else if (that.inMusicKeyboard) {
                 if (that.drumStyle[turtle].length === 0) {
                     that.musicKeyboard.instruments.push(last(that.instrumentNames[turtle]));
-                    that.musicKeyboard.noteNames.push(noteObj1[0]);
-                    that.musicKeyboard.octaves.push(noteObj1[1]);
+                    if (that.musicKeyboard.noteNames.length > 0) {
+                        if (last(that.musicKeyboard.noteNames) === 'hertz') {
+                            var freq = pitchToFrequency(noteObj[0], noteObj[1], 0, that.keySignature[turtle]);
+                            that.musicKeyboard.noteNames.push('hertz');
+                            that.musicKeyboard.octaves.push(parseInt(freq));
+                        } else {
+                            if (SOLFEGENAMES1.indexOf(last(that.musicKeyboard.noteNames)) !== -1) {
+                                that.musicKeyboard.noteNames.push(SOLFEGECONVERSIONTABLE[noteObj1[0]]);
+                            } else {
+                                that.musicKeyboard.noteNames.push(noteObj1[0]);
+                            }
+
+                            that.musicKeyboard.octaves.push(noteObj1[1]);
+                        }
+                    } else {
+                        that.musicKeyboard.noteNames.push(noteObj1[0]);
+                        that.musicKeyboard.octaves.push(noteObj1[1]);
+                    }
+
                     that.musicKeyboard.addRowBlock(blk);
                     that.lastNotePlayed[turtle] = [noteObj1[0] + noteObj1[1], 4];
                 }
@@ -7273,6 +7291,9 @@ function Logo () {
                 that.musicKeyboard.noteNames.push('hertz');
                 that.musicKeyboard.octaves.push(arg);
                 that.musicKeyboard.addRowBlock(blk);
+                // convert hertz to note/octave
+                var note = frequencyToPitch(arg);
+                that.lastNotePlayed[turtle] = [note[0] + note[1], 4];
             } else if (that.inNoteBlock[turtle].length > 0) {
 
                 function addPitch(note, octave, cents, frequency, direction) {
