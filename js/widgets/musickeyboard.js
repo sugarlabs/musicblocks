@@ -66,7 +66,7 @@ function MusicKeyboard() {
         });
 
 
-	// Cluster notes that start at the same time.
+        // Cluster notes that start at the same time.
         if (beginnerMode === 'true') {
             var minimumDuration = 125; // 1/8 note
         } else {
@@ -1086,7 +1086,7 @@ function MusicKeyboard() {
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
 
-	console.log(start + ' ' + dur);
+        console.log(start + ' ' + dur);
 
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
             if (parseInt(curValue.startTime) === start) {
@@ -1126,15 +1126,15 @@ function MusicKeyboard() {
 
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
             if (parseInt(curValue.startTime) === start) {
-		if (beginnerMode === 'true') {
+                if (beginnerMode === 'true') {
                     if (curValue.duration / divideNoteBy < 0.125) {
-			return prevValue.concat([curValue]);
+                        return prevValue.concat([curValue]);
                     }
-		} else {
+                } else {
                     if (curValue.duration / divideNoteBy < 0.0625) {
-			return prevValue.concat([curValue]);
+                        return prevValue.concat([curValue]);
                     }
-		}
+                }
 
                 var newcurValue = JSON.parse(JSON.stringify(curValue));
                 newcurValue.duration = curValue.duration / divideNoteBy;
@@ -1225,7 +1225,8 @@ function MusicKeyboard() {
                         break;
                     }
                 }
-                var rLabel = pitchLabels[(i+1)%pitchLabels.length];
+
+                var rLabel = pitchLabels[(i + 1)%pitchLabels.length];
                 var rArg = last(that.layout).noteOctave;
                 if ((i + 1) % pitchLabels.length === 0) {
                     rArg += 1;
@@ -1265,8 +1266,9 @@ function MusicKeyboard() {
 
             var aboveBlock = last(that.layout).blockNumber;
             setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock), 500);
-            that.layout.push([rLabel, rArg, newBlock]);
+            that.layout.push({'noteName': rLabel, 'noteOctave': rArg, 'blockNumber': newBlock, 'voice': last(that.layout).voice});
             that._sortLayout();
+            that._createTable();
         }
 
         for (var i = 0; i < valueLabel.length; i++) {
@@ -1277,7 +1279,10 @@ function MusicKeyboard() {
     this._addNotesBlockBetween = function (aboveBlock, block) {
         var belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
         this._logo.blocks.blockList[aboveBlock].connections[this._logo.blocks.blockList[aboveBlock].connections.length - 1] = block;
-        this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        if (belowBlock !== null) {
+            this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        }
+
         this._logo.blocks.blockList[block].connections[0] = aboveBlock;
         this._logo.blocks.blockList[block].connections[this._logo.blocks.blockList[block].connections.length - 1] = belowBlock;
         this._logo.blocks.adjustDocks(this.blockNo, true);
