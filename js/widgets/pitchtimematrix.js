@@ -80,8 +80,8 @@ function PitchTimeMatrix () {
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
-
     this._blockMap = [];
+
     this.blockNo = null;
     this.notesBlockMap = [];
     this._blockMapHelper = [];
@@ -101,6 +101,12 @@ function PitchTimeMatrix () {
         // pitch or drum block (and some graphics blocks).
         this._rowMap.push(this._rowBlocks.length);
         this._rowOffset.push(0);
+        // In case there is a repeat block, use a unique block number
+        // for each instance.
+        while (this._rowBlocks.indexOf(rowBlock) !== -1) {
+            rowBlock = rowBlock + 1000000;
+        }
+
         this._rowBlocks.push(rowBlock);
     };
 
@@ -122,26 +128,26 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.addNode = function(pitchBlock, rhythmBlock, n) {
+    this.addNode = function(rowBlock, rhythmBlock, n) {
         // A node exists for each cell in the matrix. It is used to
         // preserve and restore the state of the cell.
         var j = 0;
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 console.log('node is already in the list');
                 j += 1;
             }
         }
 
-        this._blockMap.push([pitchBlock, [rhythmBlock, n], j]);
+        this._blockMap.push([rowBlock, [rhythmBlock, n], j]);
     };
 
-    this.removeNode = function(pitchBlock, rhythmBlock, n) {
+    this.removeNode = function(rowBlock, rhythmBlock, n) {
         // When the matrix is changed, we may need to remove nodes.
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 this._blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
             }
         }
@@ -151,7 +157,6 @@ function PitchTimeMatrix () {
         // When convert is true, we are using step pitch, so preserve
         // the form of the previous note.
         if (convert && this.rowLabels.length > 0) {
-            console.log(last(this.rowLabels));
             if (SOLFEGENAMES1.indexOf(last(this.rowLabels)) !== -1) {
                 if (label in SOLFEGECONVERSIONTABLE) {
                     this.rowLabels.push(SOLFEGECONVERSIONTABLE[label]);
