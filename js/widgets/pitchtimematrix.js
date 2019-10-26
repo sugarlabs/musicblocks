@@ -3490,7 +3490,7 @@ function PitchTimeMatrix () {
         var cell = row.cells[colIndex];
 
         // Using the alt attribute to store the note value
-        var noteValue = cell.getAttribute('alt');
+        var noteValue = cell.getAttribute('alt') * this._logo.defaultBPMFactor;
 
         this._notesToPlay[parseInt(colIndex)][0].push(note);
 
