@@ -109,8 +109,7 @@ Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
 
-Performance Tools
------------------
+Music Blocks in Japan
+---------------------
 
-Performance tools used are in-browsers perfomance profiling and jsperf.com (https://jsperf.com/) 
-Note: When running testing code on (https://jsperf.com/) tests should be run more than once 
+[Gakken STEAM](https://gakken-steam.jp/music_blocks/)
