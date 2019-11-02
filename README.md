@@ -54,6 +54,7 @@ See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
 Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+The core code for Music Blocks resides in this directory(https://github.com/sugarlabs/musicblocks/tree/master/js)
 
 Credits
 -------
