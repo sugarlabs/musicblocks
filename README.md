@@ -11,7 +11,7 @@ musical and mathematical concepts in an integrative and fun way.
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
 
 Running Music Blocks
-------------------
+--------------------
 
 Music Blocks is available under the GNU Affero General Public License (AGPL), a free, copyleft license.
 
@@ -54,7 +54,21 @@ See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
 Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
-The core code for Music Blocks resides in this directory(https://github.com/sugarlabs/musicblocks/tree/master/js)
+
+Modifying Music Blocks
+----------------------
+The core code for Music Blocks resides in the [js
+directory](https://github.com/sugarlabs/musicblocks/tree/master/js). Individual
+modules are described in more detail in [js
+README.md](https://github.com/sugarlabs/musicblocks/blob/master/js/README.md)
+
+Note: As with any change, please make your own copy by cloning this
+[respository](https://github.com/sugarlabs/musicblocks.git). Make
+your changes, test them, and then make a pull request.
+
+See [Contributing
+Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
+for more details.
 
 Credits
 -------

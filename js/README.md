@@ -76,10 +76,6 @@ application, you may want to write a plugin. Please see:
 [plugin](http://github.com/sugarlabs/musicblocks/tree/master/plugins)
 instead.
 
-Note: As with any change, please make your own copy by cloning this
-[respository](https://github.com/sugarlabs/musicblocks.git). Make
-your changes, test them, and then make a pull request.
-
 ## How to define a new block in basicblocks.js
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
