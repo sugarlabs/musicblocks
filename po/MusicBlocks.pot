@@ -5279,6 +5279,10 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+#: js/musickeyboard.js:1852
+msgid "New action block generated!"
+msgstr ""
+
 #: js/pitchdrummatrix.js:260
 #: js/musicutils.js:60
 #: js/musicutils.js:69
