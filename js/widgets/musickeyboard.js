@@ -1849,6 +1849,7 @@ function MusicKeyboard() {
             }
         }
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
     };
 
     this.clearBlocks = function() {
