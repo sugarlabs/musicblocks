@@ -3774,5 +3774,6 @@ function PitchTimeMatrix () {
 
         // Create a new stack for the chunk.
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
     };
 };
