@@ -2023,7 +2023,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[1] = 'textin';
     //.TRANS: user-defined
     newblock.defaults.push(_('custom'));
-    if (beginnerMode && !beginnerBlock('setinstrument')) {
+    if (beginnerMode && !beginnerBlock('settimbre')) {
         newblock.hidden = true;
     }
 

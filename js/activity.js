@@ -20,14 +20,13 @@ function Activity() {
     LEADING = 0;
     _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
-    var  _ERRORMSGTIMEOUT_ = 15000;
+    var _ERRORMSGTIMEOUT_ = 15000;
     var cellSize = 55;
-    var  searchSuggestions = [];
-    var    homeButtonContainers = [];
+    var searchSuggestions = [];
+    var homeButtonContainers = [];
 
     var that = this;
 
-    _findBlocks = this._findBlocks;
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
     doHardStopButton = this.doHardStopButton;
@@ -375,7 +374,7 @@ function Activity() {
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
      */
-    this._findBlocks = function () {
+    _findBlocks = function () {
         // _showHideAuxMenu(false);
         if (!blocks.visible)  {
             _changeBlockVisibility();
@@ -394,8 +393,6 @@ function Activity() {
         } else {
             toppos = 90;
         }
-
-
 
         palettes.updatePalettes();
         var x = Math.floor(leftpos * turtleBlocksScale);
@@ -478,6 +475,16 @@ function Activity() {
         // Blocks are all home, so reset go-home-button.
         setHomeContainers(false, true);
         boundary.hide();
+
+        // Return mice to the center of the screen.
+        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+            console.log('bringing turtle ' + turtle + 'home');
+            var savedPenState = turtles.turtleList[turtle].penState;
+            turtles.turtleList[turtle].penState = false;
+            turtles.turtleList[turtle].doSetXY(0, 0);
+            turtles.turtleList[turtle].doSetHeading(0);
+            turtles.turtleList[turtle].penState = savedPenState;
+        }
     };
 
     /*
@@ -1256,50 +1263,40 @@ function Activity() {
             refreshCanvas();
         };
 
+        var myCanvas = docById('myCanvas')
 
-      var myCanvas = docById('myCanvas')
+        var __heightBasedScroll = function (event) {
+            actualReszieHandler(); //check size during init 
+            window.addEventListener("resize",resizeThrottler,false);
+            var resizeTimeout;
 
-      var __heightBasedScroll = function (event) {
-
-          actualReszieHandler(); //check size during init 
-          
-          window.addEventListener("resize",resizeThrottler,false);
-
-          var resizeTimeout;
-
-          function resizeThrottler() {
-            //ignore resize events as long as an actualResizeHandler execution is in queue
-              if(!resizeTimeout) {
-                  resizeTimeout = setTimeout(function () {
-                      resizeTimeout = null;
-                      actualReszieHandler();
-
-                      // The actualResizeHandler will execute at the rate of 15fps
-                  }, 66);
-              }
-            
-          }
-
-      }
-      
-
+            function resizeThrottler() {
+                // Ignore resize events as long as an actualResizeHandler
+                // execution is in queue.
+                if(!resizeTimeout) {
+                    resizeTimeout = setTimeout(function () {
+                        resizeTimeout = null;
+                        actualReszieHandler();
+                        // The actualResizeHandler will execute at the
+                        // rate of 15 FPS.
+                    }, 66);
+                }
+            };
+        };
     
-      function actualReszieHandler () {
+        function actualReszieHandler () {
+            // Handle the resize event
+            var h = window.innerHeight;
 
-        //handle the resize event
+            if (h < 500) { //activate on mobile
+                myCanvas.addEventListener('wheel', __paletteWheelHandler, false);
+            } else {
+                // Cleanup event listeners
+                myCanvas.removeEventListener('wheel', __paletteWheelHandler);
+            }
+        };
 
-         var h = window.innerHeight;
-
-         if (h < 500) { //activate on mobile
-             myCanvas.addEventListener('wheel', __paletteWheelHandler,false)
-         }else {
-             //cleanup event listeners
-            myCanvas.removeEventListener('wheel', __paletteWheelHandler)
-         }
-          
-      }
-      __heightBasedScroll()
-
+        __heightBasedScroll()
 
         var __wheelHandler = function (event) {
             // vertical scroll
@@ -1336,7 +1333,6 @@ function Activity() {
         };
 
         docById('myCanvas').addEventListener('wheel', __wheelHandler, false);
-    
 
         var __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
@@ -2014,7 +2010,8 @@ function Activity() {
                     } else if (palettes.activePalette != null) {
                         palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
                     } else {
-                        this._findBlocks();
+                        // Bring all the blocks "home".
+                        _findBlocks();
                     }
                     stage.update();
                     break;
@@ -3248,10 +3245,10 @@ function Activity() {
 
         homeButtonContainers = [];
         homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [' + _('Home').toUpperCase() + ']', x, y, btnSize, 0));
-        that._loadButtonDragHandler(homeButtonContainers[0], x, y, that._findBlocks, null, null, null, null);
+        that._loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
 
         homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [' + _('Home').toUpperCase() + ']', x, y - btnSize, btnSize, 0));
-        that._loadButtonDragHandler(homeButtonContainers[1], x, y, that._findBlocks, null, null, null, null);
+        that._loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
         homeButtonContainers[1].visible = false;
 
         homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -3860,7 +3857,7 @@ function Activity() {
         createjs.Touch.enable(stage);
 
         createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 30;
+        createjs.Ticker.framerate = 15;
         // createjs.Ticker.addEventListener('tick', stage);
         createjs.Ticker.addEventListener('tick', that.__tick);
 
