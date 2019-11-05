@@ -5283,6 +5283,7 @@ msgstr ""
 #: js/pitchtimematrix.js:3777
 #: js/rhythmruler.js:1175
 #: js/tempo.js:192
+#: js/modewidget.js:644
 msgid "New action block generated!"
 msgstr ""
 
