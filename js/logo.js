@@ -2156,7 +2156,13 @@ function Logo () {
                             that.markup[turtle].push(args[0].toString());
                         } else {
                             if (!that.suppressOutput[turtle]) {
-                                that.textMsg(args[0].toString());
+                                if (args[0] === undefined) {
+                                    that.textMsg('undefined');
+                                } else if (args[0] === null) {
+                                    that.textMsg('null');
+                                } else {
+                                    that.textMsg(args[0].toString());
+                                }
                             }
 
                             if (that.justCounting[turtle].length === 0) {
@@ -8554,7 +8560,8 @@ function Logo () {
                 var thisBlk = last(that.inNoteBlock[turtle]);
 
                 if (that.notePitches[turtle][thisBlk] === undefined) {
-                    console.log('no note found');
+                    // Rest?
+                    // console.log('no note found');
                     return;
                 }
 
@@ -10767,10 +10774,14 @@ function Logo () {
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                         if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = String.fromCharCode(a);
+                            if (a > 47 && a < 58) {
+                                that.blocks.blockList[blk].value = a - 48;
+                            } else {
+                                that.blocks.blockList[blk].value = String.fromCharCode(a);
+                            }
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 'A';
+                            that.blocks.blockList[blk].value = 0;
                         }
                     }
                 }
@@ -11542,7 +11553,10 @@ function Logo () {
                             that.turtleHeaps[turtle] = [];
                         }
 
-                        if (a < 1) {
+                        if (a === -1) {
+                            // -1 to access top of heap
+                            a = that.turtleHeaps[turtle].length - 1;
+                        } else if (a < 1) {
                             a = 1;
                             that.errorMsg(_('Index must be > 0.'))
                         }
