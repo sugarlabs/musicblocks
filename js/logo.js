@@ -11555,7 +11555,7 @@ function Logo () {
 
                         if (a === -1) {
                             // -1 to access top of heap
-                            a = that.turtleHeaps[turtle].length - 1;
+                            a = that.turtleHeaps[turtle].length;
                         } else if (a < 1) {
                             a = 1;
                             that.errorMsg(_('Index must be > 0.'))
