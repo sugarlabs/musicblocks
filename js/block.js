@@ -3060,7 +3060,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
                     break;
                 case 'scaledegree':
-                    this._piemenuScaleDegree([1, 2, 3, 4, 5, 6, 7], this.value);
+                    this._piemenuScaleDegree([7, 6, 5, 4, 3, 2, 1], this.value);
                     break;
                 case 'onbeatdo':
                 case 'meter':
