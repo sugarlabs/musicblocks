@@ -10774,11 +10774,7 @@ function Logo () {
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                         if (typeof(a) === 'number') {
-                            if (a > 47 && a < 58) {
-                                that.blocks.blockList[blk].value = a - 48;
-                            } else {
-                                that.blocks.blockList[blk].value = String.fromCharCode(a);
-                            }
+                            that.blocks.blockList[blk].value = String.fromCharCode(a);
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
