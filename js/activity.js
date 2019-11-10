@@ -906,12 +906,12 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
-        const MSGPrefix = "<a href=\"#\" " +
-        "onClick=\"window.location.reload()\"" + 
-        "onMouseOver=\"this.style.opacity = 0.5\"" +
-        "onMouseOut=\"this.style.opacity = 1\">";
-        const MSGSuffix = "</a>";
-        
+        const MSGPrefix = '<a href=\'#\' ' +
+        'onClick=\'window.location.reload()\'' + 
+        'onMouseOver=\'this.style.opacity = 0.5\'' +
+        'onMouseOut=\'this.style.opacity = 1\'>';
+        const MSGSuffix = '</a>';
+
         if (mode === null || mode === 'true') {
             textMsg(_(MSGPrefix + 'Refresh your browser to change to advanced mode.' + MSGSuffix));
             localStorage.setItem('beginnerMode', false);

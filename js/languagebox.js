@@ -92,11 +92,11 @@ function LanguageBox() {
     };
 
     this.hide = function() {
-        const MSGPrefix = "<a href=\"#\" " +
-        "onClick=\"window.location.reload()\"" + 
-        "onMouseOver=\"this.style.opacity = 0.5\"" +
-        "onMouseOut=\"this.style.opacity = 1\">";
-        const MSGSuffix = "</a>";
+        const MSGPrefix = '<a href=\'#\' ' +
+        'onClick=\'window.location.reload()\'' + 
+        'onMouseOver=\'this.style.opacity = 0.5\'' +
+        'onMouseOut=\'this.style.opacity = 1\'>';
+        const MSGSuffix = '</a>';
         const MSG = {
             'default': _('Refresh your browser to change your language preference.'),
             'enUS': 'Refresh your browser to change your language preference.',
