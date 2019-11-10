@@ -2828,7 +2828,6 @@ function Activity() {
 
 
     textMsg = function (msg) {
-        console.log(msg+"Hello");
         if (msgText == null) {
             // The container may not be ready yet, so do nothing.
             return;
