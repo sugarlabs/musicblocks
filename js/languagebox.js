@@ -92,7 +92,11 @@ function LanguageBox() {
     };
 
     this.hide = function() {
-
+        const MSGPrefix = "<a href=\"#\" " +
+        "onClick=\"window.location.reload()\"" + 
+        "onMouseOver=\"this.style.opacity = 0.5\"" +
+        "onMouseOut=\"this.style.opacity = 1\">";
+        const MSGSuffix = "</a>";
         const MSG = {
             'default': _('Refresh your browser to change your language preference.'),
             'enUS': 'Refresh your browser to change your language preference.',
@@ -100,7 +104,7 @@ function LanguageBox() {
             'ja': '言語を変えるには、ブラウザをこうしんしてください。',
             'kana': 'げんごを かえるには、ブラウザを こうしんしてください。',
             'es': 'Actualice su navegador para cambiar su preferencia de idioma.',
-	    'pt': 'Atualize seu navegador para alterar sua preferência de idioma.',
+	        'pt': 'Atualize seu navegador para alterar sua preferência de idioma.',
             'zhCN': '刷新浏览器以更改您的语言偏好',
             'th': 'รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ',
             'hi': 'अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें',
@@ -114,9 +118,9 @@ function LanguageBox() {
         localStorage.languagePreference = language;
         console.log(language);
         if (language === 'ja' && localStorage.kanaPreference === 'kana') {
-            this._message(MSG['kana']);
+            this._message(MSGPrefix + MSG['kana'] + MSGSuffix);
         } else {
-            this._message(MSG[language]);
+            this._message(MSGPrefix + MSG[language] + MSGSuffix);
         }
     };
 };
