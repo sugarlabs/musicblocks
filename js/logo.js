@@ -3769,9 +3769,7 @@ function Logo () {
             var listenerName = '_musickeyboard_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function (event) {   
-                // that.musicKeyboard.noteNames = that.musicKeyboard.noteNames.reverse()
-                // that.musicKeyboard.octaves = that.musicKeyboard.octaves.reverse()
+            var __listener = function (event) {
                 that.musicKeyboard.init(that);
             };
 
@@ -4763,7 +4761,7 @@ function Logo () {
                     if (that.synth.inTemperament == 'custom' && (that.scalarTransposition[turtle] + that.transposition[turtle]) !== 0) {
                         that.errorMsg(_('Scalar transpositions are equal to Semitone transpositions for custom temperament.'));
                     }
-                    
+
                     note = obj[0];
                     octave = obj[1];
                     cents = 0;
@@ -6986,14 +6984,14 @@ function Logo () {
         case 'settemperament':
             that.synth.inTemperament = args[0];
             that.synth.startingPitch = args[1] + '' + args[2];
-            
+
             that.temperamentSelected.push(args[0]);
             var len = that.temperamentSelected.length;
 
             if (that.temperamentSelected[len - 1] !== that.temperamentSelected[len - 2]) {
                 that.synth.changeInTemperament = true;
             }
-              
+
             break;
         case 'setnotevolume2':
             // master volume in clamp form
@@ -8773,9 +8771,9 @@ function Logo () {
                     var notesInfo = '';
                     /*
                     if (that.synth.inTemperament === 'equal' || that.synth.inTemperament === '1/3 comma meantone') {
-                        notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )'; 
+                        notesInfo = ' ( ' + startingPitch + '*' + OCTAVERATIO + ' ^ ' + '(' + number + ' / ' + pitchNumber + ')' + ' )';
                     } else if (numerator.length !== 0) {
-                        notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )'; 
+                        notesInfo = ' ( ' + startingPitch + ' * ' + numerator + '/' + denominator + ' )';
                     }
                     */
 
@@ -8868,7 +8866,7 @@ function Logo () {
                                         that.errorMsg(last(that.oscList[turtle][thisBlk]) + ': ' +  _('synth cannot play chords.'), blk);
                                     }
 
-                                    if (!that.suppressOutput[turtle]) {    
+                                    if (!that.suppressOutput[turtle]) {
                                         that.synth.trigger(turtle, notes, beatValue, last(that.oscList[turtle][thisBlk]), paramsEffects, null, false);
                                     }
 
@@ -10697,7 +10695,7 @@ function Logo () {
                         } else {
                             var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                         }
-                        
+
                         that.blocks.blockList[blk].value = that._doMinus(a, b);
                     }
                 }
@@ -10763,6 +10761,30 @@ function Logo () {
                     }
                 }
                 break;
+            case 'dectofrac':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'dectofrac']);
+                } else {
+                    var cblk = that.blocks.blockList[blk].connections[1];
+                    if (cblk === null) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                        that.blocks.blockList[blk].value = 0;
+                    } else {
+                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                        if (typeof(a) === 'number') {
+                            if (a < 0) {
+                                a = a * -1;
+                                that.blocks.blockList[blk].value = '-' + mixedNumber(a);
+                            } else {
+                                that.blocks.blockList[blk].value = mixedNumber(a);
+                            }
+                        } else {
+                            that.errorMsg(NANERRORMSG, blk);
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    }
+                }
+                break;
             case 'toascii':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'toascii']);
@@ -10774,7 +10796,11 @@ function Logo () {
                     } else {
                         var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                         if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = String.fromCharCode(a);
+                            if (a < 1) {
+                                that.blocks.blockList[blk].value = 0;
+                            } else {
+                                that.blocks.blockList[blk].value = String.fromCharCode(a);
+                            }
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
@@ -12335,8 +12361,8 @@ function Logo () {
                 for (var i = 0; i < -n; i++) {
                     var value = getStepSizeDown(this.keySignature[turtle], noteObj[0]);
                     noteObj = getNote(noteObj[0], noteObj[1], value, this.keySignature[turtle], this.moveable[turtle], null, this.errorMsg, this.synth.inTemperament);
-                }   
-            } 
+                }
+            }
         } else {
             var noteObj = [note, octave];
         }
@@ -12498,7 +12524,7 @@ function Logo () {
 
         if (split && durationTime > timeLeftInMeasure) {
             var d = durationTime - timeLeftInMeasure;
-            var d2 = timeLeftInMeasure;        
+            var d2 = timeLeftInMeasure;
             var b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.log('splitting note across measure boundary.');
             var obj = rationalToFraction(d);
