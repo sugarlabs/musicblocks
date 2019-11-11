@@ -913,10 +913,10 @@ function Activity() {
         const MSGSuffix = '</a>';
 
         if (mode === null || mode === 'true') {
-            textMsg(_(MSGPrefix + 'Refresh your browser to change to advanced mode.' + MSGSuffix));
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
         } else {
-            textMsg(_(MSGPrefix + 'Refresh your browser to change to beginner mode.' + MSGSuffix));
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', true);
         }
 
