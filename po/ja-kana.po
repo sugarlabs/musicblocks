@@ -60,6 +60,9 @@
 msgid "action"
 msgstr "アクション"
 
+msgid "decimal to fraction"
+msgstr "しょうすうをぶんすうになおす"
+
 #: js/block.js:1168
 #: js/logo.js:1636
 #: js/logo.js:11706
