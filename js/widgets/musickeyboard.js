@@ -1490,7 +1490,8 @@ function MusicKeyboard() {
 
             this._accidentalsWheel.navigateWheel(accidentalsValue)
             this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
-            this._pitchWheel.navigateWheel(noteLabel.indexOf(noteValue))
+	    console.log(noteValue);
+            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
         }
 
         var that = this;
