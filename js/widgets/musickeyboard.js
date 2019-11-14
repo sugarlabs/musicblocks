@@ -1490,7 +1490,7 @@ function MusicKeyboard() {
 
             this._accidentalsWheel.navigateWheel(accidentalsValue)
             this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
-            this._pitchWheel.navigateWheel(noteLabelsI18n.indexOf(noteValue))
+            this._pitchWheel.navigateWheel(noteLabel.indexOf(noteValue))
         }
 
         var that = this;
@@ -1541,7 +1541,8 @@ function MusicKeyboard() {
             if (condition === 'pitchblocks') {
                 var i = noteLabelsI18n.indexOf(label);
                 var labelValue = noteLabels[i];
-
+		console.log(label);
+		console.log(labelValue);
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
