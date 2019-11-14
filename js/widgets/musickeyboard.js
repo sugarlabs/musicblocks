@@ -1372,6 +1372,10 @@ function MusicKeyboard() {
 
         var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
         var noteLabels = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+	var noteLabelsI18n = [];
+	for (var i = 0; i < noteLabels.length; i++) {
+	    noteLabelsI18n.push(i18nSolfege(noteLabels[i]));
+	}
 
         if (condition === 'synthsblocks'){
             var noteLabels = ['261', '294', '327', '348', '392', '436', '490', '523'];
@@ -1407,7 +1411,11 @@ function MusicKeyboard() {
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
         this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(noteLabels);
+        if (condition === 'synthsblocks'){
+            this._pitchWheel.createWheel(noteLabels);
+	} else {
+            this._pitchWheel.createWheel(noteLabelsI18n);
+	}
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1481,8 +1489,7 @@ function MusicKeyboard() {
 
             this._accidentalsWheel.navigateWheel(accidentalsValue)
             this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
-            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
-
+            this._pitchWheel.navigateWheel(noteLabelsI18n.indexOf(noteValue))
         }
 
         var that = this;
@@ -1530,19 +1537,24 @@ function MusicKeyboard() {
 
         var __selectionChanged = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            var i = noteLabels.indexOf(label);
             if (condition === 'pitchblocks') {
+		var i = noteLabelsI18n.indexOf(label);
+		var labelValue = noteLabels[i];
+
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
                     label += attr;
                     flag = true;
                 }
-            }
+            } else {
+		var i = noteLabels.indexOf(label);
+		var labelValue = label;
+	    }
 
             var noteLabelBlock = that._logo.blocks.blockList[block].connections[1];
             that._logo.blocks.blockList[noteLabelBlock].text.text = label;
-            that._logo.blocks.blockList[noteLabelBlock].value = label;
+            that._logo.blocks.blockList[noteLabelBlock].value = labelValue;
 
             var z = that._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
             that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(that._logo.blocks.blockList[noteLabelBlock].text, z);
@@ -1575,13 +1587,16 @@ function MusicKeyboard() {
 
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+	    var i = noteLabelsI18n.indexOf(label);
+	    var labelValue = noteLabels[i];
+
             var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== '♮') {
-                label += attr;
+                labelValue += attr;
             }
 
             var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
-            var obj = getNote(label, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
+            var obj = getNote(labelValue, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
             that._logo.synth.setMasterVolume(PREVIEWVOLUME);
             that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             // that._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
