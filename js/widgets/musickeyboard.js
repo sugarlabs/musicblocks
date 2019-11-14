@@ -607,19 +607,19 @@ function MusicKeyboard() {
 
         if (notes.length > 1) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[1], noteValue[1], instruments[1], null, null);
+                that._logo.synth.trigger(0, notes[1], noteValue[0], instruments[1], null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[2], noteValue[2], instruments[2], null, null);
+                that._logo.synth.trigger(0, notes[2], noteValue[0], instruments[2], null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
             setTimeout(function () {
-                that._logo.synth.trigger(0, notes[3], noteValue[3], instruments[3], null, null);
+                that._logo.synth.trigger(0, notes[3], noteValue[0], instruments[3], null, null);
             }, 1);
         }
     };
@@ -702,12 +702,13 @@ function MusicKeyboard() {
     this._setNoteCell = function(j, colIndex, start, playNote) {
         var n = this.layout.length
         var temp1 = this.layout[n - j - 1].noteName;
+
         if (temp1 === 'hertz') {
             var temp2 = this.layout[n - j - 1].noteOctave;
         } else if (temp1 in FIXEDSOLFEGE1) {
             var temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n - j - 1].noteOctave;
         } else {
-            var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n - j - 1][1];
+            var temp2 = temp1.replace(SHARP, '#').replace(FLAT, 'b') + this.layout[n - j - 1].noteOctave;
         }
 
         var ele = docById(j + ':' + colIndex);
