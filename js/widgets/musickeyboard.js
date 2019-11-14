@@ -837,7 +837,7 @@ function MusicKeyboard() {
                 if (this.layout[i].noteName === 'hertz') {
                 cell.innerHTML = this.layout[i].noteOctave.toString() + 'HZ';
             } else {
-                cell.innerHTML = _(this.layout[i].noteName) + '<sub>' + this.layout[i].noteOctave.toString() + '</sub>';
+                cell.innerHTML = i18nSolfege(this.layout[i].noteName) + '<sub>' + this.layout[i].noteOctave.toString() + '</sub>';
             }
 
             cell.setAttribute('id', 'labelcol' + (n - i - 1));
@@ -1226,7 +1226,7 @@ function MusicKeyboard() {
                     }
                 }
 
-                var rLabel = pitchLabels[(i + 1)%pitchLabels.length];
+                var rLabel = pitchLabels[(i + 1) % pitchLabels.length];
                 var rArg = last(that.layout).noteOctave;
                 if ((i + 1) % pitchLabels.length === 0) {
                     rArg += 1;
