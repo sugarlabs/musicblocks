@@ -906,11 +906,17 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
+        const MSGPrefix = '<a href=\'#\' ' +
+        'onClick=\'window.location.reload()\'' + 
+        'onMouseOver=\'this.style.opacity = 0.5\'' +
+        'onMouseOut=\'this.style.opacity = 1\'>';
+        const MSGSuffix = '</a>';
+
         if (mode === null || mode === 'true') {
-            textMsg(_('Refresh your browser to change to advanced mode.'));
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
         } else {
-            textMsg(_('Refresh your browser to change to beginner mode.'));
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', true);
         }
 

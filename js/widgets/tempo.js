@@ -189,6 +189,7 @@ function Tempo () {
                             [4, ['number', {'value': 4}], 0, 0, [2]],
                             [5, ['vspace', {}], 0, 0, [0, null]]];
             that._logo.blocks.loadNewBlocks(newStack);
+            that._logo.textMsg(_('New action block generated!'))            
         }, 200 * i);
     };
 

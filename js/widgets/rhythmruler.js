@@ -1169,6 +1169,8 @@ function RhythmRuler () {
         }
 
         that._logo.blocks.loadNewBlocks(newStack);
+        that._logo.textMsg(_('New action block generated!'))
+
     };
 
     this._saveMachine = function(selectedRuler) {
@@ -1296,6 +1298,7 @@ function RhythmRuler () {
             }
 
             that._logo.blocks.loadNewBlocks(newStack);
+	    that._logo.textMsg(_('New action block generated!'))
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {

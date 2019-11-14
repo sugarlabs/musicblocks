@@ -657,6 +657,7 @@ function ModeWidget() {
         // Create a new stack for the chunk.
         console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
 
         // And save a stack of pitchnumbers to be used with the define mode
         var newStack = [[0, 'definemode', 150, 120, [null, 1, 3, 2]], [1, ['modename', {'value': modeName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
