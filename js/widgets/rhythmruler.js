@@ -333,8 +333,8 @@ function RhythmRuler () {
                 that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 var cell = that._mouseDownCell;
-                if (cell != null) {
-                      that._rulerSelected = cell.parentNode.id[5];
+		if (cell !== null && cell.parentNode !== null) {
+                    that._rulerSelected = cell.parentNode.id[5];
                     var noteValues = that.Rulers[that._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
                     cell.style.backgroundColor = platformColor.selectorBackground;
@@ -406,7 +406,7 @@ function RhythmRuler () {
     this.__toggleRestState = function (cell, addToUndoList) {
         var that = this;
 
-        if (cell != null) {
+	if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.id[5];
             var noteValues = this.Rulers[this._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
@@ -589,7 +589,7 @@ function RhythmRuler () {
 
         // Does this work if there are more than 10 rulers?
         var cell = event.target;
-        if (cell != null) {
+        if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.id[5];
             this.__tie(true);
         }
