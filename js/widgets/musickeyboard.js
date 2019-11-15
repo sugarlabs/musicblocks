@@ -880,7 +880,7 @@ function MusicKeyboard() {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = 'headcol';  // This cell is fixed horizontally.
-        cell.innerHTML = 'duration';
+        cell.innerHTML = _('duration');
 
         var newCell = mkbTableRow.insertCell();
         newCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';

@@ -60,6 +60,9 @@
 msgid "action"
 msgstr "アクション"
 
+msgid "duration"
+msgstr "おとのながさ"
+
 msgid "decimal to fraction"
 msgstr "しょうすうをぶんすうになおす"
 
