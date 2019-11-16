@@ -200,19 +200,18 @@ function ModeWidget() {
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
-		// modeTableDiv.innerHTML = '<div id="meterWheelDiv"><br>HELLO</div><table id="modeTable"></table>';
 		
 		// PIANOKEY INSERTION
 		//image is above scale identifier
-		//modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"><img src="../../images/piano_base.png" style="width:400px;height:309px;"></table>';
+		//modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"><img src="../../images/piano_keys.png" style="width:400px;height:265px;"></table>';
 		
 		//image is below scale identifier
         //modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
-		//modeTableDiv.innerHTML += '<table><tr><td><img src="../../images/piano_base.png" style="width:400px;height:309px;"></td></tr></table>';
+		//modeTableDiv.innerHTML += '<table><tr><td><img src="../../images/piano_keys.png" style="width:400px;height:265px;"></td></tr></table>';
 		
 		// this is probably better, we can insert our own div easier
 		modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
-		modeTableDiv.innerHTML += '<img src="../../images/piano_base.png" style="width:400px;height:309px;">';
+		modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:400px;height:265px;">';
 		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
 
