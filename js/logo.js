@@ -1402,7 +1402,42 @@ function Logo () {
         this._restoreConnections();
 
         // Save the state before running.
-        this.saveLocally();
+        
+        try {
+            this.saveLocally();
+        } catch(e) {
+            // Tell user if ran out of local storage
+            if(e.name === "QuotaExceededError" && e.message === "The quota has been exceeded.") {
+                console.log("ran out of localstorage");
+                
+                // Error: Ran out of local storage space(file too big)
+                const MSG = {
+                    'enUS': 'Error: Ran out of local storage space(file too big)',
+                    'enUK': 'Error: Ran out of local storage space(file too big)',
+                    'ja': 'エラー：ローカルストレージスペースが不足しています（ファイルが大きすぎます）',
+                    'kana': 'ラン・アウト・オブ・ローカル・ストーリッジ・スペース・ファイル・トゥー・ビグ',
+                    'es': 'Error: se quedó sin espacio de almacenamiento local (archivo demasiado grande)',
+                    'pt': 'Erro: ficou sem espaço de armazenamento local (arquivo muito grande)',
+                    'zhCN': '错误：超出本地存储空间（文件太大)',
+                    'th': 'ข้อผิดพลาด: มีพื้นที่เก็บข้อมูลในเครื่องหมด (ไฟล์ใหญ่เกินไป)',
+                    'hi': 'त्रुटि: स्थानीय संग्रहण स्थान से बाहर भाग गया (फ़ाइल बहुत बड़ी है',
+                    'ibo': 'Njehie: Achọghị oghere nchekwa mpaghara (nnukwu faịlụ)',
+                    'ar': 'خطأ: مساحة التخزين المحلية غير مطلوبة (ملف كبير)',
+                    'he': 'שגיאה: אין צורך באחסון מקומי (קובץ גדול)',
+                    'ayc': 'Error: no se requiere espacio de almacenamiento local (archivo grande)',
+                    'gug': 'Error: no se requiere espacio de almacenamiento local (archivo grande)',
+                };
+                
+                // Set to enUS by default if language preference undefined
+                var lang = localStorage.languagePreference;
+                if(lang === undefined) lang = 'enUS';
+
+                textMsg(MSG[lang]);
+            }
+            
+            // Still throw error in console and also throw error if not a QuotaExceededError
+            throw e;
+        }
 
         for (var arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);

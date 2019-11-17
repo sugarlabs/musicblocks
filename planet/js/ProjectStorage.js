@@ -174,7 +174,11 @@ function ProjectStorage(Planet) {
 
     this.set = function(key, obj) {
         var jsonobj = JSON.stringify(obj);
-        this.LocalStorage.setItem(key, jsonobj);
+        try {
+            this.LocalStorage.setItem(key, jsonobj);
+        } catch(e) {
+            throw e;
+        }
     };
 
     this.get = function(key) {

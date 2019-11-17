@@ -4376,7 +4376,6 @@ function Activity() {
         if (planet != undefined) {
             saveLocally = planet.saveLocally.bind(planet);
         } else {
-
             __saveLocally = function () {
                 console.log('overwriting session data (local)');
                 var data = prepareExport();
