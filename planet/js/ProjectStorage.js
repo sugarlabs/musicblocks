@@ -176,6 +176,7 @@ function ProjectStorage(Planet) {
         var jsonobj = JSON.stringify(obj);
         console.log("saving");
         this.LocalStorage.setItem(key, jsonobj);
+        console.log("saved");
     };
 
     this.get = function(key) {

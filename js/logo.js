@@ -1408,7 +1408,7 @@ function Logo () {
         } catch(e) {
             console.log("ran out of storage");
             // Tell user if ran out of local storage
-            if(e.name === "QuotaExceededError" && e.message === "The quota has been exceeded.") {
+            if(e.name === "QuotaExceededError") {
                 textMsg(_('Error: Ran out of local storage space(file too big)'));
             }
         }
