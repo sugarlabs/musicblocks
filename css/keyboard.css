@@ -55,3 +55,12 @@ select.keySelect {
     width: 50px;
     border: 1px solid black !important;
 }
+#blank-keyboard {
+    width: 400px;
+    height: 265px;
+}
+#highlighted-key {
+    position: absolute;
+    width: 35px;
+    height: 265px;
+}
