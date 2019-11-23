@@ -51,6 +51,12 @@ function MusicKeyboard() {
     this._notesPlayed = [];
 
     this.addRowBlock = function(rowBlock) {
+        // In case there is a repeat block, use a unique block number
+        // for each instance.
+        while (this._rowBlocks.indexOf(rowBlock) !== -1) {
+            rowBlock = rowBlock + 1000000;
+        }
+
         this._rowBlocks.push(rowBlock);
     };
 
@@ -886,6 +892,7 @@ function MusicKeyboard() {
         newCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var cellColor = 'lightgrey';
 
+	console.log(selectedNotes);
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
             var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + 'px';
