@@ -531,7 +531,7 @@ function createHelpContent() {
         'dockblock': [_('The Dock block block connections two blocks.'), 'documentation', ''],
         'runblock': [_('The Run block block runs a block. It accepts two types of arguments: block number or block name.'), 'documentation', ''],
         'moveblock': [_('The Move block block moves a block.'), 'documentation', ''],
-        'deleteblock': [_('The Delete block block removes a block.'), 'documentation', ''],
+        'deleteblock': [_('The Delete block block removes a block.'), 'documentation', '', 'deletehelp'],
         'openpalette': [_('The Open palette block opens a palette.'), 'documentation', ''],
         // Graphics palette
         'setheading': [_('The Set heading block sets the heading of the mouse.'), 'documentation', ''],
