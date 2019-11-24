@@ -912,7 +912,7 @@ function Activity() {
         'onMouseOut=\'this.style.opacity = 1\'>';
         const MSGSuffix = '</a>';
 
-        if (mode === null || mode === 'true') {
+        if (mode === null || mode === undefined || mode === 'true') {
             textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
         } else {
