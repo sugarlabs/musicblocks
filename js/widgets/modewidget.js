@@ -638,17 +638,28 @@ function ModeWidget() {
                 if (this._modeBlock != null) {
                     console.log('setModeName:' + mode);
                     for (var i in this._logo.blocks.blockList) {
+                        console.log("part1");
                         if (this._logo.blocks.blockList[i].name == "modename") {
+                            console.log("part2");
                             this._logo.blocks.blockList[i].value = mode;
                             this._logo.blocks.blockList[i].text.text = _(mode);
                             this._logo.blocks.blockList[i].updateCache();
                         }
                         if (this._logo.blocks.blockList[i].name == "notename") {
+                            console.log("part3");
                             this._logo.blocks.blockList[i].value = currentKey;
                             this._logo.blocks.blockList[i].text.text = _(currentKey);
-                            this._logo.blocks.blockList[i].updateCache();
                         }
                     }
+                    console.log("part4");
+
+                    // this._logo.blocks.blockList[this._modeBlock].value = mode;
+
+                    // this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
+                    this._logo.blocks.blockList[this._modeBlock].updateCache();
+                    console.log("after cache");
+                    console.log(this._modeBlock);
+                    console.log(this._logo.blocks.blockList);
                     this._logo.refreshCanvas();
                 }
 
