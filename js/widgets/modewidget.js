@@ -303,6 +303,7 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
+        console.log(this._selectedNotes);
         this._showPiano();
     };
 
