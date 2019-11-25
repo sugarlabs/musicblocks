@@ -1853,7 +1853,7 @@ function i18nSolfege(note) {
     if (i !== -1) {
         return solfnotes_[i] + obj[1];
     } else {
-        console.log(note + ' not found.');
+	// Wasn't solfege so it doesn't need translation.
         return note;
     }
 };

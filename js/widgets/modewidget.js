@@ -200,33 +200,7 @@ function ModeWidget() {
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
-		
-		// PIANOKEY INSERTION
-		//image is above scale identifier
-		//modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"><img src="../../images/piano_keys.png" style="width:400px;height:265px;"></table>';
-		
-		//image is below scale identifier
-        //modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
-		//modeTableDiv.innerHTML += '<table><tr><td><img src="../../images/piano_keys.png" style="width:400px;height:265px;"></td></tr></table>';
-		
-		// this is probably better, we can insert our own div easier
-		modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:400px;height:265px;" id="modeKeyboard">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="firstkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="secondkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="thirdkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fourthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fifthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="sixthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="seventhkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eighthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="ninthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="tenthkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eleventhkey">';
-        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="twelfthkey">';
-		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
-
-
+        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
 
         this._piemenuMode();
 
@@ -250,7 +224,6 @@ function ModeWidget() {
 
         //.TRANS: A circle of notes represents the musical mode.
         this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
-		
     };
 
     this._playingStatus = function() {
@@ -287,6 +260,8 @@ function ModeWidget() {
         // Add the mode name in the bottom row of the table.
         var table = docById('modeTable');
         var n = table.rows.length - 1;
+
+        console.log(_(currentModeName[1]));
         table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
 
         // Set the notes for this mode.
@@ -303,48 +278,6 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
-        //this._showPiano();
-    };
-
-    this._showPiano = function() {
-        //var highlightImgs = ['../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png', '../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png'];
-        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
-        var letterName = currentModeName[0];
-        var modeName = currentModeName[1];
-        var imgSource = "../../images/" + letterName + modeName;
-        document.getElementById("modeKeyboard").src = imgSource;
-
-        // The code below will be revisted if lines 314-315 proves to be ineffective/incomplete
-        // switch (letterName) {
-        //     case "A":
-        //         document.getElementById('firstkey').src = highlightImgs[0];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "B":
-        //         document.getElementById('firstkey').src = highlightImgs[2];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "C":
-        //         document.getElementById('firstkey').src = highlightImgs[3];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "D":
-        //         document.getElementById('firstkey').src = highlightImgs[5];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "E":
-        //         document.getElementById('firstkey').src = highlightImgs[7];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "F":
-        //         document.getElementById('firstkey').src = highlightImgs[8];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        //     case "G":
-        //         document.getElementById('firstkey').src = highlightImgs[10];
-        //         document.getElementById('firstkey').style = "display:block";
-        //         break;
-        // }
     };
 
     this._invert = function() {
@@ -631,35 +564,18 @@ function ModeWidget() {
         var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
         var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
+
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
                     console.log('setModeName:' + mode);
-                    for (var i in this._logo.blocks.blockList) {
-                        console.log("part1");
-                        if (this._logo.blocks.blockList[i].name == "modename") {
-                            console.log("part2");
-                            this._logo.blocks.blockList[i].value = mode;
-                            this._logo.blocks.blockList[i].text.text = _(mode);
-                            this._logo.blocks.blockList[i].updateCache();
-                        }
-                        if (this._logo.blocks.blockList[i].name == "notename") {
-                            console.log("part3");
-                            this._logo.blocks.blockList[i].value = currentKey;
-                            this._logo.blocks.blockList[i].text.text = _(currentKey);
-                        }
-                    }
-                    console.log("part4");
+                    this._logo.blocks.blockList[this._modeBlock].value = mode;
 
-                    // this._logo.blocks.blockList[this._modeBlock].value = mode;
-
-                    // this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
+                    this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
                     this._logo.blocks.blockList[this._modeBlock].updateCache();
-                    console.log("after cache");
-                    console.log(this._modeBlock);
-                    console.log(this._logo.blocks.blockList);
+
                     this._logo.refreshCanvas();
                 }
 

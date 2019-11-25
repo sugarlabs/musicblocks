@@ -104,6 +104,9 @@
 msgid "action"
 msgstr "アクション"
 
+msgid "duration"
+msgstr "音の長さ"
+
 msgid "decimal to fraction"
 msgstr "小数を分数に直す"
 
