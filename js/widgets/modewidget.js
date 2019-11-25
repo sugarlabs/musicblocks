@@ -212,18 +212,6 @@ function ModeWidget() {
 		// this is probably better, we can insert our own div easier
 		modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
         modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:400px;height:265px;">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="firstkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="secondkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="thirdkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fourthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fifthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="sixthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="seventhkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eighthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="ninthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="tenthkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eleventhkey">';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="twelfthkey">';
 		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
 
@@ -311,7 +299,7 @@ function ModeWidget() {
         var highlightImgs = ['../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png', '../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png'];
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var letterName = currentModeName[0];
-        console.log("updated2");
+        var imgSource = "../../images/" + letterName;
         switch (letterName) {
             case "A":
                 document.getElementById('firstkey').src = highlightImgs[0];
