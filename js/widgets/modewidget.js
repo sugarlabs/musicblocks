@@ -211,7 +211,19 @@ function ModeWidget() {
 		
 		// this is probably better, we can insert our own div easier
 		modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
-        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:400px;height:265px;">';
+        modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:400px;height:265px;" id="modeKeyboard">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="firstkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="secondkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="thirdkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fourthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="fifthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="sixthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="seventhkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eighthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="ninthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="tenthkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="eleventhkey">';
+        // modeTableDiv.innerHTML += '<img src="../../images/piano_keys.png" style="width:34px;height:265px;display:none" id="twelfthkey">';
 		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
 
@@ -296,40 +308,43 @@ function ModeWidget() {
     };
 
     this._showPiano = function() {
-        var highlightImgs = ['../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png', '../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png'];
+        //var highlightImgs = ['../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png', '../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png'];
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var letterName = currentModeName[0];
         var imgSource = "../../images/" + letterName;
-        switch (letterName) {
-            case "A":
-                document.getElementById('firstkey').src = highlightImgs[0];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "B":
-                document.getElementById('firstkey').src = highlightImgs[2];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "C":
-                document.getElementById('firstkey').src = highlightImgs[3];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "D":
-                document.getElementById('firstkey').src = highlightImgs[5];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "E":
-                document.getElementById('firstkey').src = highlightImgs[7];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "F":
-                document.getElementById('firstkey').src = highlightImgs[8];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-            case "G":
-                document.getElementById('firstkey').src = highlightImgs[10];
-                document.getElementById('firstkey').style = "display:block";
-                break;
-        }
+        document.getElementById("modeKeyboard").src = imgSource;
+
+        // The code below will be revisted if lines 314-315 proves to be ineffective/incomplete
+        // switch (letterName) {
+        //     case "A":
+        //         document.getElementById('firstkey').src = highlightImgs[0];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "B":
+        //         document.getElementById('firstkey').src = highlightImgs[2];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "C":
+        //         document.getElementById('firstkey').src = highlightImgs[3];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "D":
+        //         document.getElementById('firstkey').src = highlightImgs[5];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "E":
+        //         document.getElementById('firstkey').src = highlightImgs[7];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "F":
+        //         document.getElementById('firstkey').src = highlightImgs[8];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        //     case "G":
+        //         document.getElementById('firstkey').src = highlightImgs[10];
+        //         document.getElementById('firstkey').style = "display:block";
+        //         break;
+        // }
         modeTableDiv.innerHTML += '<table id="modeTable"></table>';
     };
 
