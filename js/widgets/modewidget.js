@@ -303,8 +303,7 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
-        console.log(this._selectedNotes);
-        this._showPiano();
+        //this._showPiano();
     };
 
     this._showPiano = function() {
@@ -632,18 +631,24 @@ function ModeWidget() {
         var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
         var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
-
         for (var mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
                     console.log('setModeName:' + mode);
-                    this._logo.blocks.blockList[this._modeBlock].value = mode;
-
-                    this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
-                    this._logo.blocks.blockList[this._modeBlock].updateCache();
-
+                    for (var i in this._logo.blocks.blockList) {
+                        if (this._logo.blocks.blockList[i].name == "modename") {
+                            this._logo.blocks.blockList[i].value = mode;
+                            this._logo.blocks.blockList[i].text.text = _(mode);
+                            this._logo.blocks.blockList[i].updateCache();
+                        }
+                        if (this._logo.blocks.blockList[i].name == "notename") {
+                            this._logo.blocks.blockList[i].value = currentKey;
+                            this._logo.blocks.blockList[i].text.text = _(currentKey);
+                            this._logo.blocks.blockList[i].updateCache();
+                        }
+                    }
                     this._logo.refreshCanvas();
                 }
 
