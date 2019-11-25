@@ -857,6 +857,10 @@ msgstr ""
 msgid "synth cannot play chords."
 msgstr ""
 
+#: js/logo.js:8789
+msgid "Note values greater than 2 take a longer time to play"
+msgstr ""
+
 #: js/logo.js:10143
 #: js/logo.js:10188
 #: js/logo.js:10196

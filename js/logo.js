@@ -8785,6 +8785,9 @@ function Logo () {
                                 console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
                             } else {
                                 console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
+                                if(parseInt(obj[0] + '/' + obj[1]) && parseInt(obj[0] + '/' + obj[1]) > 2) {
+                                    this.textMsg(_('Note values greater than 2 take a longer time to play'))
+                                }
                             }
                         } else {
                             if (notes.length === 0) {
