@@ -311,7 +311,8 @@ function ModeWidget() {
         //var highlightImgs = ['../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png', '../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png'];
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var letterName = currentModeName[0];
-        var imgSource = "../../images/" + letterName;
+        var modeName = currentModeName[1];
+        var imgSource = "../../images/" + letterName + modeName;
         document.getElementById("modeKeyboard").src = imgSource;
 
         // The code below will be revisted if lines 314-315 proves to be ineffective/incomplete
