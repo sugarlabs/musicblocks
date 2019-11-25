@@ -345,7 +345,6 @@ function ModeWidget() {
         //         document.getElementById('firstkey').style = "display:block";
         //         break;
         // }
-        modeTableDiv.innerHTML += '<table id="modeTable"></table>';
     };
 
     this._invert = function() {
