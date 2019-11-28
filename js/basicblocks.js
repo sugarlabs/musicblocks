@@ -1255,33 +1255,15 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // macro
     var newblock = new ProtoBlock('chromatic');
-    console.log("HI");
-    console.log(newblock);
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['chromatic'] = newblock;
     newblock.staticLabels.push(_('chromatic'));
     newblock.adjustWidthToLabel();
     newblock.zeroArgBlock();
     if (beginnerMode && !beginnerBlock('chromatic')) {
-        console.log("hiding");
-        newblock.hidden = true;
-    } else {
-        console.log("not hiding");
-        console.log(newblock.hidden);
-    }
-    /*
-        // macro
-    var newblock = new ProtoBlock('matrixcmajor');
-    newblock.palette = palettes.dict['widgets'];
-    blocks.protoBlockDict['matrixcmajor'] = newblock;
-    newblock.staticLabels.push(_('C major scale'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('matrixcmajor')) {
         newblock.hidden = true;
     }
-    */
-
+    
     // macro
     var newblock = new ProtoBlock('meterwidget');
     newblock.palette = palettes.dict['widgets'];

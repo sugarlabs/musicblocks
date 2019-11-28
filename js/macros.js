@@ -597,9 +597,6 @@ function getMacroExpansion (blkname, x, y) {
 
     if (['namedbox', 'nameddo', 'namedcalc', 'namedarg', 'nameddoArg'].indexOf(blkname) === -1 && blkname in BUILTINMACROS) {
         return BUILTINMACROS[blkname];
-        console.log("HI");
-        console.log("returning")
-        console.log(BUILTINMACROS[blkname]);
     } else {
         return null;
     }
