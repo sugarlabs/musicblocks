@@ -158,6 +158,8 @@ macro in `macro.js`:
     ];
   ```
 
+The format of a macro is the same as the format of saved projects: a list of blocks, which each block is defined by a list: [block number, block name, block x position, block y position, [list of block connections]]. Block name can also be a list, where the name of the block is the first item in the list and any special block data, e.g., a value in the case of a number block, is stored in a dectionary, e.g., [block name, {value: 123}]
+
 * Override the default docktype if necessary
 
   Any input: `uniquenameBlock.dockTypes[1] = 'anyin'`;
