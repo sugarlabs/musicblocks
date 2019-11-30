@@ -1254,6 +1254,17 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('chromatic');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['chromatic'] = newblock;
+    newblock.staticLabels.push(_('chromatic'));
+    newblock.adjustWidthToLabel();
+    newblock.zeroArgBlock();
+    if (beginnerMode && !beginnerBlock('chromatic')) {
+        newblock.hidden = true;
+    }
+    
+    // macro
     var newblock = new ProtoBlock('meterwidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['meterwidget'] = newblock;
