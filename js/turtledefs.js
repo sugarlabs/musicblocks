@@ -67,7 +67,7 @@ function beginnerBlock(name) {
            'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
            'action', 'start', 'do', 'dispatch', 'listen',  // action palette
            'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
-           'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet', 'musickeyboard', 'tempo', 'modewidget', 'matrixcmajor', 'matrixgmajor', 'chromatic', // widgets palette
+           'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet', 'musickeyboard', 'tempo', 'modewidget', 'matrixcmajor', 'matrixgmajor', // widgets palette
            'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
             'fill', 'background', 'setpensize', 'penup', 'pendown', 'color', 'setcolor', 'setshade',  // pen palette
            'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide',  // number palette
