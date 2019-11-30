@@ -1322,12 +1322,24 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    if (language !== 'ja') {
+	// macro
+	var newblock = new ProtoBlock('chromatic');
+	newblock.palette = palettes.dict['widgets'];
+	blocks.protoBlockDict['chromatic'] = newblock;
+	newblock.staticLabels.push(_('chromatic keyboard'));
+	newblock.adjustWidthToLabel();
+	newblock.stackClampZeroArgBlock();
+	if (beginnerMode && !beginnerBlock('chromatic')) {
+            newblock.hidden = true;
+	}
+    }
+    
     if (language === 'ja') {
         // macro
         var newblock = new ProtoBlock('musickeyboardja');
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['musickeyboardja'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
         newblock.staticLabels.push(_('music keyboard'));
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
@@ -1340,7 +1352,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         var newblock = new ProtoBlock('musickeyboard2');
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['musickeyboard2'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
         newblock.staticLabels.push(_('music keyboard'));
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
