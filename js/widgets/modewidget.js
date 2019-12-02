@@ -570,12 +570,17 @@ function ModeWidget() {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
-                    console.log('setModeName:' + mode);
-                    this._logo.blocks.blockList[this._modeBlock].value = mode;
-
-                    this._logo.blocks.blockList[this._modeBlock].text.text = _(mode);
-                    this._logo.blocks.blockList[this._modeBlock].updateCache();
-
+                    for (var i in this._logo.blocks.blockList) {
+                        if (this._logo.blocks.blockList[i].name == "modename") {
+                            this._logo.blocks.blockList[i].value = mode;
+                            this._logo.blocks.blockList[i].text.text = _(mode);
+                            this._logo.blocks.blockList[i].updateCache();
+                        }
+                        else if (this._logo.blocks.blockList[i].name == "notename") {
+                            this._logo.blocks.blockList[i].value = currentKey;
+                            this._logo.blocks.blockList[i].text.text = _(currentKey);
+                        }
+                    }
                     this._logo.refreshCanvas();
                 }
 
