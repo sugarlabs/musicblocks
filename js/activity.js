@@ -4264,22 +4264,26 @@ function Activity() {
                 console.log('overwriting session data');
                 var data = prepareExport();
                 var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                if (svgData === null || svgData === '') {
-                    this.planet.ProjectStorage.saveLocally(data, null);
-                } else {
-                    var img = new Image();
-                    var t = this;
-                    img.onload = function () {
-                        var bitmap = new createjs.Bitmap(img);
-                        var bounds = bitmap.getBounds();
-                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        try {
-                            t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    };
-                    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+                try {
+
+                    if (svgData === null || svgData === '') {
+                        this.planet.ProjectStorage.saveLocally(data, null);
+                    } else {
+                        var img = new Image();
+                        var t = this;
+                        img.onload = function () {
+                            var bitmap = new createjs.Bitmap(img);
+                            var bounds = bitmap.getBounds();
+                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                                t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
+                        };
+                        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+                    }
+                } catch (e) {
+                    console.log(e);
+                    if(e.code === DOMException.QUOTA_EXCEEDED_ERR || e.message === "Not enough space to save locally")
+                        textMsg(_("Error: Unable to save because you ran out of local storage. Try deleting some saved projects."));
+                    else throw e;
                 }
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
                 //    sugarizerCompatibility.saveLocally();
