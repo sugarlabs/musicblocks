@@ -4281,8 +4281,8 @@ function Activity() {
                     }
                 } catch (e) {
                     console.log(e);
-                    if(e.name === "QuotaExceededError" || e.message === "Not enough space to save locally")
-                        textMsg(_("Error: ran out of local storage (file too big)."));
+                    if(e.code === DOMException.QUOTA_EXCEEDED_ERR || e.message === "Not enough space to save locally")
+                        textMsg(_("Error: Unable to save because you ran out of local storage. Try deleting some saved projects."));
                     else throw e;
                 }
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
