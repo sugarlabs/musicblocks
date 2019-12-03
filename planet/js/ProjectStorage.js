@@ -175,6 +175,9 @@ function ProjectStorage(Planet) {
     this.set = function(key, obj) {
         var jsonobj = JSON.stringify(obj);
         this.LocalStorage.setItem(key, jsonobj);
+        if(this.LocalStorage.getItem(key) !== jsonobj){
+            throw new Error("Not enough space to save locally");
+        }
     };
 
     this.get = function(key) {
