@@ -4425,7 +4425,6 @@ function Blocks (activity) {
     * return {void}
     */
     this.loadNewBlocks = function (blockObjs) {
-        console.log("banana");
         var playbackQueueStartsHere = null;
 
         // Check for blocks connected to themselves,
