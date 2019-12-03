@@ -4281,7 +4281,9 @@ function Activity() {
                     }
                 } catch (e) {
                     console.log(e);
-                    textMsg(_("Error: ran out of local storage (file too big)."))
+                    if(e.name === "QuotaExceededError" || e.message === "Not enough space to save locally")
+                        textMsg(_("Error: ran out of local storage (file too big)."));
+                    else throw e;
                 }
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
                 //    sugarizerCompatibility.saveLocally();
