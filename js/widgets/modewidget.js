@@ -16,7 +16,7 @@ function ModeWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    this.init = function(logo, modeBlock) {
+    this.init = function (logo, modeBlock) {
         this._logo = logo;
         this._modeBlock = modeBlock;
         this._locked = false;
@@ -56,10 +56,11 @@ function ModeWidget() {
 
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             docById('modeDiv').style.visibility = 'hidden';
             docById('modeButtonsDiv').style.visibility = 'hidden';
             docById('modeTableDiv').style.visibility = 'hidden';
+            docById('modePianoDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
         }
 
@@ -67,7 +68,7 @@ function ModeWidget() {
         var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
         this._playButton = cell;
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._logo.resetSynth(0);
             if (that._playingStatus()) {
                 that._playing = false;
@@ -84,37 +85,37 @@ function ModeWidget() {
 
         var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._save();
         }
 
         var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._clear();
         }
 
         var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('Rotate counter clockwise'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._rotateLeft();
         }
 
         var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('Rotate clockwise'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._rotateRight();
         }
 
         var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('Invert'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._invert();
         }
 
         var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
 
-        cell.onclick=function() {
+        cell.onclick = function () {
             that._undo();
         }
 
@@ -137,25 +138,25 @@ function ModeWidget() {
         this._target = false;
         this._dragCellHTML = dragCell.innerHTML;
 
-        dragCell.onmouseover = function(e) {
+        dragCell.onmouseover = function (e) {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
             dragCell.innerHTML = '';
         };
 
-        dragCell.onmouseout = function(e) {
+        dragCell.onmouseout = function (e) {
             if (!that._dragging) {
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
 
-        canvas.ondragover = function(e) {
+        canvas.ondragover = function (e) {
             that._dragging = true;
             e.preventDefault();
         };
 
-        canvas.ondrop = function(e) {
+        canvas.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
@@ -166,12 +167,12 @@ function ModeWidget() {
             }
         };
 
-        modeDiv.ondragover = function(e) {
+        modeDiv.ondragover = function (e) {
             that._dragging = true;
             e.preventDefault();
         };
 
-        modeDiv.ondrop = function(e) {
+        modeDiv.ondrop = function (e) {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
@@ -182,11 +183,11 @@ function ModeWidget() {
             }
         };
 
-        modeDiv.onmousedown = function(e) {
+        modeDiv.onmousedown = function (e) {
             that._target = e.target;
         };
 
-        modeDiv.ondragstart = function(e) {
+        modeDiv.ondragstart = function (e) {
             if (dragCell.contains(that._target)) {
                 e.dataTransfer.setData('text/plain', '');
             } else {
@@ -200,7 +201,10 @@ function ModeWidget() {
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
-        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
+        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
+        modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
+		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+
 
         this._piemenuMode();
 
@@ -226,11 +230,11 @@ function ModeWidget() {
         this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
     };
 
-    this._playingStatus = function() {
+    this._playingStatus = function () {
         return this._playing;
     };
 
-    this._addButton = function(row, icon, iconSize, label) {
+    this._addButton = function (row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
         cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         cell.style.width = BUTTONSIZE + 'px';
@@ -241,18 +245,18 @@ function ModeWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover=function() {
+        cell.onmouseover = function () {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         }
 
-        cell.onmouseout=function() {
+        cell.onmouseout = function () {
             this.style.backgroundColor = platformColor.selectorBackground;
         }
 
         return cell;
     };
 
-    this._setMode = function() {
+    this._setMode = function () {
         // Read in the current mode to start.
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var currentMode = MUSICALMODES[currentModeName[1]];
@@ -278,9 +282,67 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
+        this._showPiano();
     };
 
-    this._invert = function() {
+    this._showPiano = function () {
+        var modePianoDiv = docById('modePianoDiv');
+        modePianoDiv.style.display = 'inline';
+        modePianoDiv.style.visibility = 'visible';
+        modePianoDiv.style.border = '0px';
+        modePianoDiv.style.top = '0px';
+        modePianoDiv.style.left = '0px';
+        modePianoDiv.innerHTML = '<img src="../../images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+        var highlightImgs = ['../../images/highlights/sel_c.png', '../../images/highlights/sel_c_sharp.png', '../../images/highlights/sel_d.png', '../../images/highlights/sel_d_sharp.png', '../../images/highlights/sel_e.png', '../../images/highlights/sel_f.png', '../../images/highlights/sel_f_sharp.png', '../../images/highlights/sel_g.png', '../../images/highlights/sel_g_sharp.png', '../../images/highlights/sel_a.png', '../../images/highlights/sel_a_sharp.png', '../../images/highlights/sel_b.png'];
+        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+        var letterName = currentModeName[0];
+        var modeName = currentModeName[1];
+
+        var startingposition; // relative to keyboard
+        switch (letterName) { // sharp|flats included
+            case "C♭": startingposition = 11; break;
+            case "C": startingposition = 0; break;
+            case "C♯":
+            case "D♭": startingposition = 1; break;
+            case "D": startingposition = 2; break;
+            case "D♯":
+            case "E♭": startingposition = 3; break;
+            case "E": startingposition = 4; break;
+            case "E♯": startingposition = 5; break;
+            case "F♭": startingposition = 4; break;
+            case "F": startingposition = 5; break;
+            case "F♯":
+            case "G♭": startingposition = 6; break;
+            case "G": startingposition = 7; break;
+            case "G♯":
+            case "A♭": startingposition = 8; break;
+            case "A": startingposition = 9; break;
+            case "A♯":
+            case "A♭": startingposition = 10; break;
+            case "B": startingposition = 11; break;
+            case "B♯": startingposition = 0; break;
+            default: startingposition = 0;
+        }
+        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+
+        for (var i = 0; i < 12; ++i) {
+            if (this._selectedNotes[i])
+                document.getElementById('pkey_' + i).src = highlightImgs[(i + startingposition) % 12];
+        }
+    };
+
+    this._invert = function () {
         if (this._locked) {
             return;
         }
@@ -291,7 +353,7 @@ function ModeWidget() {
         this.__invertOnePair(1);
     };
 
-    this.__invertOnePair = function(i) {
+    this.__invertOnePair = function (i) {
         var tmp = this._selectedNotes[i];
         this._selectedNotes[i] = this._selectedNotes[12 - i];
         if (this._selectedNotes[i]) {
@@ -314,14 +376,14 @@ function ModeWidget() {
             that._setModeName()
             that._locked = false;
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 that.__invertOnePair(i + 1);
             }, ROTATESPEED);
         }
 
     };
 
-    this._resetNotes = function() {
+    this._resetNotes = function () {
         for (var i = 0; i < this._selectedNotes.length; i++) {
             if (this._selectedNotes[i]) {
                 this._noteWheel.navItems[i].navItem.show();
@@ -333,7 +395,7 @@ function ModeWidget() {
         }
     };
 
-    this._rotateRight = function() {
+    this._rotateRight = function () {
         if (this._locked) {
             return;
         }
@@ -351,7 +413,7 @@ function ModeWidget() {
 
     };
 
-    this.__rotateRightOneCell = function(i, cellColors) {
+    this.__rotateRightOneCell = function (i, cellColors) {
         this._selectedNotes[i] = this._newPattern[i];
         if (this._selectedNotes[i]) {
             this._noteWheel.navItems[i].navItem.show()
@@ -362,7 +424,7 @@ function ModeWidget() {
         var that = this;
 
         if (i === 0) {
-            setTimeout(function() {
+            setTimeout(function () {
                 if (that._selectedNotes[0]) {
                     // We are done.
                     that._saveState();
@@ -375,13 +437,13 @@ function ModeWidget() {
                 }
             }, ROTATESPEED);
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 that.__rotateRightOneCell((i + 1) % 12);
             }, ROTATESPEED);
         }
     };
 
-    this._rotateLeft = function() {
+    this._rotateLeft = function () {
         if (this._locked) {
             return;
         }
@@ -399,7 +461,7 @@ function ModeWidget() {
         this.__rotateLeftOneCell(11);
     };
 
-    this.__rotateLeftOneCell = function(i) {
+    this.__rotateLeftOneCell = function (i) {
         this._selectedNotes[i] = this._newPattern[i];
         if (this._selectedNotes[i]) {
             this._noteWheel.navItems[i].navItem.show()
@@ -410,7 +472,7 @@ function ModeWidget() {
         var that = this;
 
         if (i === 0) {
-            setTimeout(function() {
+            setTimeout(function () {
                 if (that._selectedNotes[0]) {
                     // We are done.
                     that._saveState();
@@ -423,13 +485,13 @@ function ModeWidget() {
                 }
             }, ROTATESPEED);
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 that.__rotateLeftOneCell(i - 1);
             }, ROTATESPEED);
         }
     };
 
-    this._playAll = function() {
+    this._playAll = function () {
         // Play all of the notes in the widget.
         if (this._locked) {
             return;
@@ -464,12 +526,12 @@ function ModeWidget() {
         }
     };
 
-    this.__playNextNote = function(i) {
+    this.__playNextNote = function (i) {
         time = this._noteValue + 0.125;
         var that = this;
 
         if (i > this._notesToPlay.length - 1) {
-            setTimeout(function() {
+            setTimeout(function () {
                 // Did we just play the last note?
                 that._playing = false;
 
@@ -481,7 +543,7 @@ function ModeWidget() {
             return;
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             if (that._lastNotePlayed !== null) {
                 that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
             }
@@ -503,21 +565,21 @@ function ModeWidget() {
         }, 1000 * time);
     };
 
-    this._playNote = function(i) {
+    this._playNote = function (i) {
         var ks = this._logo.keySignature[0];
 
         var noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this._logo.errorMsg);
         this._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], this._noteValue, DEFAULTVOICE, null, null);
     };
 
-    this._saveState = function() {
+    this._saveState = function () {
         state = JSON.stringify(this._selectedNotes);
         if (state !== last(this._undoStack)) {
             this._undoStack.push(JSON.stringify(this._selectedNotes));
         }
     };
 
-    this._undo = function() {
+    this._undo = function () {
         if (this._undoStack.length > 0) {
             var prevState = JSON.parse(this._undoStack.pop());
             for (var i = 0; i < 12; i++) {
@@ -529,7 +591,7 @@ function ModeWidget() {
         }
     };
 
-    this._clear = function() {
+    this._clear = function () {
         // "Unclick" every entry in the widget.
 
         this._saveState();
@@ -542,7 +604,7 @@ function ModeWidget() {
         this._setModeName()
     };
 
-    this._calculateMode = function() {
+    this._calculateMode = function () {
         var currentMode = [];
         var table = docById('modeTable');
         var j = 1;
@@ -559,7 +621,7 @@ function ModeWidget() {
         return currentMode;
     };
 
-    this._setModeName = function() {
+    this._setModeName = function () {
         var table = docById('modeTable');
         var n = table.rows.length - 1;
         var currentMode = JSON.stringify(this._calculateMode());
@@ -593,7 +655,7 @@ function ModeWidget() {
         table.rows[n].cells[0].innerHTML = '';
     };
 
-    this._save = function() {
+    this._save = function () {
         var table = docById('modeTable');
         var n = table.rows.length - 1;
 
@@ -610,7 +672,7 @@ function ModeWidget() {
         }
 
         // Save a stack of pitches to be used with the matrix.
-        var newStack = [[0, ['action', {'collapsed': true}], 100, 100, [null, 1, 2, null]], [1, ['text', {'value': modeName}], 0, 0, [0]]];
+        var newStack = [[0, ['action', { 'collapsed': true }], 100, 100, [null, 1, 2, null]], [1, ['text', { 'value': modeName }], 0, 0, [0]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
@@ -638,8 +700,8 @@ function ModeWidget() {
             } else {
                 newStack.push([pitchidx, 'pitch', 0, 0, [previousBlock, notenameidx, octaveidx, pitchidx + 3]]);
             }
-            newStack.push([notenameidx, ['solfege', {'value': pitch}], 0, 0, [pitchidx]]);
-            newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
+            newStack.push([notenameidx, ['solfege', { 'value': pitch }], 0, 0, [pitchidx]]);
+            newStack.push([octaveidx, ['number', { 'value': octave }], 0, 0, [pitchidx]]);
             var previousBlock = pitchidx;
         }
 
@@ -649,7 +711,7 @@ function ModeWidget() {
         this._logo.textMsg(_('New action block generated!'))
 
         // And save a stack of pitchnumbers to be used with the define mode
-        var newStack = [[0, 'definemode', 150, 120, [null, 1, 3, 2]], [1, ['modename', {'value': modeName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        var newStack = [[0, 'definemode', 150, 120, [null, 1, 3, 2]], [1, ['modename', { 'value': modeName }], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         var endOfStackIdx = 0;
         var previousBlock = 0;
 
@@ -670,14 +732,14 @@ function ModeWidget() {
                 newStack.push([idx, 'pitchnumber', 0, 0, [previousBlock, idx + 1, idx + 2]]);
             }
 
-            newStack.push([idx + 1, ['number', {'value': i}], 0, 0, [idx]]);
+            newStack.push([idx + 1, ['number', { 'value': i }], 0, 0, [idx]]);
             var previousBlock = idx;
         }
 
         // Create a new stack for the chunk.
         console.log(newStack);
         var that = this;
-        setTimeout(function() {
+        setTimeout(function () {
             // that._logo.blocks.palettes.hide();
             that._logo.blocks.loadNewBlocks(newStack);
         }, 2000);
@@ -775,6 +837,7 @@ function ModeWidget() {
             that._noteWheel.navItems[i].navItem.show();
             that._playNote(i);
             that._setModeName();
+            that._showPiano();
         };
 
         // If a noteWheel sector is selected, hide it.
@@ -788,6 +851,7 @@ function ModeWidget() {
             that._saveState();
             that._selectedNotes[i] = false;
             that._setModeName();
+            that._showPiano();
         };
 
         for (var i = 0; i < 12; i++) {
