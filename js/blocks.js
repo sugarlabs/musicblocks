@@ -2578,8 +2578,8 @@ function Blocks (activity) {
         myBlock.container = new createjs.Container();
         this.stage.addChild(myBlock.container);
         myBlock.container.snapToPixelEnabled = true;
-        myBlock.container.x = 0;
-        myBlock.container.y = 0;
+        myBlock.container.x = -1e5;
+        myBlock.container.y = -1e5;
 
         // and we need to load the images into the container.
         myBlock.imageLoad();
@@ -4425,6 +4425,7 @@ function Blocks (activity) {
     * return {void}
     */
     this.loadNewBlocks = function (blockObjs) {
+        console.log("banana");
         var playbackQueueStartsHere = null;
 
         // Check for blocks connected to themselves,
