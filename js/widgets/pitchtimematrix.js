@@ -175,18 +175,27 @@ function PitchTimeMatrix () {
 
         var canvas = docById('myCanvas');
 
+
+        var widgetWindow = window.createWidgetWindow("phrase maker");
+
+
+
         // Position the widget and make it visible.
         var ptmDiv = docById('ptmDiv');
+        /*
         ptmDiv.style.visibility = 'visible';
         ptmDiv.setAttribute('draggable', 'true');
         ptmDiv.style.left = '200px';
         ptmDiv.style.top = '150px';
+        */
 
         // The ptm buttons
         var ptmButtonsDiv = docById('ptmButtonsDiv');
+        /*
         ptmButtonsDiv.style.display = 'inline';
         ptmButtonsDiv.style.visibility = 'visible';
         ptmButtonsDiv.style.width = BUTTONDIVWIDTH;
+        */
         ptmButtonsDiv.innerHTML = '<table cellpadding="0px" id="ptmButtonTable"></table>';
 
         var buttonTable = docById('ptmButtonTable');
@@ -204,8 +213,7 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function () {
+        widgetWindow.onClose = function () {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
@@ -219,20 +227,19 @@ function PitchTimeMatrix () {
             ptmDiv.style.visibility = 'hidden';
             that._logo.hideMsgs();
             docById('wheelDivptm').style.display = 'none';
+
+            widgetWindow.destroy();
         }
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-        cell.onclick=function () {
+        widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick=function () {
             that._logo.setTurtleDelay(0);
 
             that._logo.resetSynth(0);
             that.playAll(row);
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         this._save_lock = false;
-
-        cell.onclick = async function () {
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = async function () {
             // Debounce the save button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
@@ -243,32 +250,28 @@ function PitchTimeMatrix () {
             }
         };
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-        cell.onclick = function () {
+        widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function () {
             that._clear();
         };
 
         if (!localStorage.beginnerMode) {
-            var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
-            cell.onclick=function () {
+            widgetWindow.addButton('export-button.svg', ICONSIZE, _('Export')).onclick=function () {
                 that._export();
             };
         }
 
-        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
-        cell.onclick = function () {
+        widgetWindow.addButton('sort.svg', ICONSIZE, _('Sort')).onclick = function () {
             that._sort();
         };
 
-        var cell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add note'));
+        var cell = widgetWindow.addButton('add2.svg', ICONSIZE, _('Add note'));
         cell.setAttribute('id', 'addnotes');
         cell.onclick = function () {
             that._createAddRowPieSubmenu();
         };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
+        var dragCell = widgetWindow.getDragElement();
 
         this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
         this._dy = dragCell.getBoundingClientRect().top - ptmDiv.getBoundingClientRect().top;
@@ -333,7 +336,9 @@ function PitchTimeMatrix () {
             }
         };
 
-        var expandCell = this._addButton(row, 'expand-button.svg', ICONSIZE, _('expand'), '');
+        // TODO: This
+        /*
+        var expandCell = widgetWindow.addButton(row, 'expand-button.svg', ICONSIZE, _('expand'), '');
         
         expandCell.onclick = function () {
             var ptmDiv = docById('ptmDiv');
@@ -352,13 +357,15 @@ function PitchTimeMatrix () {
                 that._expanded = true;
             }
         };
+        */
 
         // The ptm table
-        var ptmTableDiv = docById('ptmTableDiv');
+        /*var ptmTableDiv = docById('ptmTableDiv');
         ptmTableDiv.style.display = 'inline';
         ptmTableDiv.style.visibility = 'visible';
         ptmTableDiv.style.border = '0px';
-        ptmTableDiv.innerHTML = '';
+        ptmTableDiv.innerHTML = '';*/
+        ptmTableDiv = widgetWindow.getWidgetBody();
 
         // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
@@ -1649,28 +1656,6 @@ function PitchTimeMatrix () {
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.refreshCanvas();
     }
-
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover=function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
-
-        cell.onmouseout=function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        }
-
-        return cell;
-    };
 
     this._generateDataURI = function(file) {
         var data = 'data: text/html;charset=utf-8, ' + encodeURIComponent(file);

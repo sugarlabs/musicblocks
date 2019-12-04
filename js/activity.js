@@ -173,6 +173,7 @@ function Activity() {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
             'Tone',
+            'widgets/widgetWindows',
             'widgets/modewidget',
             'widgets/meterwidget',
             'widgets/pitchtimematrix',

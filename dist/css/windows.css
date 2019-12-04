@@ -1,0 +1,81 @@
+#floatingWindows {
+  position: absolute;
+  top: 20%;
+  left: 20%; }
+  #floatingWindows > .windowFrame {
+    border-radius: 8px;
+    border: 2px solid #666;
+    background-color: #ccc;
+    position: absolute;
+    top: 0;
+    left: 0; }
+    #floatingWindows > .windowFrame > .wfTopBar {
+      height: 21px;
+      border-bottom: 1px solid #666;
+      min-width: 400px;
+      display: flex;
+      padding: 4px;
+      position: relative; }
+      #floatingWindows > .windowFrame > .wfTopBar > .wftDrag {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%; }
+      #floatingWindows > .windowFrame > .wfTopBar > .wfHandle {
+        height: 2px;
+        width: 50px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #666; }
+        #floatingWindows > .windowFrame > .wfTopBar > .wfHandle::before, #floatingWindows > .windowFrame > .wfTopBar > .wfHandle::after {
+          content: "";
+          display: block;
+          position: absolute;
+          top: -4px;
+          height: 2px;
+          width: 120%;
+          left: -10%;
+          background-color: #666; }
+        #floatingWindows > .windowFrame > .wfTopBar > .wfHandle::after {
+          top: 4px; }
+      #floatingWindows > .windowFrame > .wfTopBar .wftButton {
+        background-color: #666;
+        border-radius: 2px;
+        width: 21px;
+        height: 21px;
+        margin-right: 4px;
+        border: none;
+        flex-shrink: 0;
+        cursor: pointer; }
+        #floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
+          opacity: .7; }
+        #floatingWindows > .windowFrame > .wfTopBar .wftButton:last-child {
+          margin: 0; }
+      #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+        line-height: 21px;
+        flex-grow: 1;
+        color: #666; }
+    #floatingWindows > .windowFrame > .wfWinBody {
+      min-height: 50px;
+      min-width: 50px;
+      display: flex; }
+      #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {
+        width: 54px;
+        flex-shrink: 0; }
+        #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar > * {
+          width: 50px;
+          height: 50px;
+          margin: 2px;
+          background-color: #8cc6ff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer; }
+      #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
+        flex-grow: 1;
+        padding: 2px;
+        position: relative;
+        overflow: auto; }
