@@ -2267,7 +2267,9 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (window.hasMouse) {
-                moved = true;
+                if (event.stageX / that.blocks.getStageScale() !== that.original.x ||
+                    event.stageY / that.blocks.getStageScale() !== that.original.y)
+                    moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
                 setTimeout(function () {
