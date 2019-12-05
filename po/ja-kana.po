@@ -7198,7 +7198,7 @@ msgstr "ファイルをえらぶひつようがあります"
 #~msgstr "リズムを ほぞん"
 
 #~msgid "floor tom tom"
-#~msgstr "フロアタムタム"
+#~msgstr "フロアタム"
 
 #~msgid "fs"
 #~msgstr "鼯"
