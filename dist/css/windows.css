@@ -1,7 +1,7 @@
 #floatingWindows {
   position: absolute;
-  top: 20%;
-  left: 20%; }
+  top: 0;
+  left: 0; }
   #floatingWindows > .windowFrame {
     border-radius: 8px;
     border: 2px solid #666;
@@ -21,7 +21,8 @@
         left: 0;
         top: 0;
         width: 100%;
-        height: 100%; }
+        height: 100%;
+        cursor: move; }
       #floatingWindows > .windowFrame > .wfTopBar > .wfHandle {
         height: 2px;
         width: 50px;
@@ -49,11 +50,34 @@
         margin-right: 4px;
         border: none;
         flex-shrink: 0;
+        position: relative;
         cursor: pointer; }
         #floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
           opacity: .7; }
         #floatingWindows > .windowFrame > .wfTopBar .wftButton:last-child {
           margin: 0; }
+        #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before {
+          content: "";
+          display: block;
+          height: 2px;
+          width: 60%;
+          left: 50%;
+          top: 50%;
+          position: absolute;
+          background-color: #fff;
+          transform: translate(-50%, -50%); }
+        #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::before, #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after {
+          content: "";
+          display: block;
+          height: 2px;
+          width: 70%;
+          left: 50%;
+          top: 50%;
+          position: absolute;
+          background-color: #fff;
+          transform: translate(-50%, -50%) rotate(45deg); }
+        #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after {
+          transform: translate(-50%, -50%) rotate(-45deg); }
       #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
         line-height: 21px;
         flex-grow: 1;
