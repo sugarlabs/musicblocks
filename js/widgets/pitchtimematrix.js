@@ -181,7 +181,6 @@ function PitchTimeMatrix () {
         this._logo = logo;
 
         this.playingNow = false;
-        this._expanded = false;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -253,45 +252,9 @@ function PitchTimeMatrix () {
             that._createAddRowPieSubmenu();
         };
 
-        // TODO: This
-        /*
-        var expandCell = widgetWindow.addButton(row, 'expand-button.svg', ICONSIZE, _('expand'), '');
-        
-        expandCell.onclick = function () {
-            var ptmDiv = docById('ptmDiv');
-
-            if (that._expanded) {
-                ptmDiv.style.width = that._initial_w;
-                ptmDiv.style.height = that._initial_h;
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-
-                that._expanded = false;
-            } else {
-                ptmDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
-                ptmDiv.style.height = Math.max(400, Math.min(900, window.innerHeight)) + 'px';
-
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collapse') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                that._expanded = true;
-            }
-        };
-        */
-       
         let ptmTable = document.createElement("table");
         ptmTable.setAttribute("cellpadding", "0px")
         widgetWindow.getWidgetBody().append(ptmTable);
-
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-        if (this.rowLabels.length > n) {
-            widgetWindow.requestSize(
-                Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH),
-                this._cellScale * MATRIXSOLFEHEIGHT * (n + 6)
-            )
-        } else {
-            widgetWindow.requestSize(
-                Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH),
-                this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 4)
-            )
-        }
 
         // Each row in the ptm table contains a note label in the
         // first column and a table of buttons in the second column.
@@ -484,6 +447,7 @@ function PitchTimeMatrix () {
         // An extra row for the note and tuplet values
         var ptmTableRow = ptmTable.insertRow();
         var ptmCell = ptmTableRow.insertCell();
+        ptmCell.setAttribute('colspan', '2');
         ptmCell.className = 'headcol';  // This cell is fixed horizontally.
 
         tempTable = document.createElement("table");
@@ -526,9 +490,6 @@ function PitchTimeMatrix () {
         }
 
         this._logo.textMsg(_('Click on the table to add notes.'));
-
-        this._initial_w = ptmDiv.style.width;
-        this._initial_h = ptmDiv.style.height;
 
         this.widgetWindow.sendToCenter();
     };
@@ -1928,10 +1889,6 @@ function PitchTimeMatrix () {
             }
         }
 
-        var rowCount = this.rowLabels.length;
-        var firstRow = this._rows[0];
-        var colCount = firstRow.cells.length;
-
         var noteValue = param[0][1] / param[0][0];
         // The tuplet is note value is calculated as #notes x note value
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
@@ -1946,20 +1903,6 @@ function PitchTimeMatrix () {
 
         // First, ensure that the matrix is set up for tuplets.
         if (!this._matrixHasTuplets) {
-            // Add more room to the windo to hold the extra rows.
-            var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-            if (this.rowLabels.length > n) {
-                this.widgetWindow.requestSize(
-                    Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH),
-                    this._cellScale * MATRIXSOLFEHEIGHT * (n + 6)
-                )
-            } else {
-                this.widgetWindow.requestSize(
-                    Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH),
-                    this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 6)
-                )
-            }
-
             var firstRow = this._rows[0];
 
             // Load the labels
@@ -3014,7 +2957,7 @@ function PitchTimeMatrix () {
                     // If we found a match, mark this cell and add this
                     // note to the play list.
                     var row = this._rows[r];
-                    if (row === null) {
+                    if (row === null || typeof row === 'undefined') {
                         console.log('COULD NOT FIND ROW ' + r);
                     } else {
                         var cell = row.cells[c];

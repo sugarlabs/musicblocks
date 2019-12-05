@@ -1,11 +1,11 @@
-window.widgetWindows = {openWindows: {}};
+window.widgetWindows = { openWindows: {} };
 
 function WidgetWindow(key, title) {
     // Keep a refernce to the object within handlers
     let that = this;
     this._key = key;
 
-    let create = function(base, className, parent) {
+    let create = function (base, className, parent) {
         let el = document.createElement(base);
         if (className)
             el.className = className;
@@ -13,31 +13,35 @@ function WidgetWindow(key, title) {
             parent.append(el);
         return el;
     }
-    
+
     let windows = docById('floatingWindows');
     this._frame = create("div", "windowFrame", windows);
 
     this._drag = create("div", "wfTopBar", this._frame);
     this._handle = create("div", "wfHandle", this._drag);
-    
+
     let closeButton = create("div", "wftButton close", this._drag);
     let rollButton = create("div", "wftButton rollup", this._drag);
-    
+
     let titleEl = create("div", "wftTitle", this._drag);
     titleEl.innerHTML = title;
-    
-    let maxmin = create("div", "wftButton wftMaxmin", this._drag);
+
+    let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
+    this._maxminIcon = create("img", undefined, maxminButton);
+    this._maxminIcon.setAttribute("src", "/header-icons/icon-expand.svg");
 
     this._body = create("div", "wfWinBody", this._frame);
     this._toolbar = create("div", "wfbToolbar", this._body);
     this._widget = create("div", "wfbWidget", this._body);
 
-
     this._visible = true;
     this._rolled = false;
+    this._maximized = false;
+    this._savedPos = null;
+    this._first = true;
 
     this._buttons = [];
-    
+
     // Drag offset for correct positioning
     this._dx = this._dy = 0;
     this._dragging = false;
@@ -45,134 +49,195 @@ function WidgetWindow(key, title) {
     // Needed to keep things canvas-relative
     let canvas = docById("myCanvas");
 
+    // Take focus from any other windows
+    (function (siblings) {
+        for (let i = 0; i < siblings.length; i++) {
+            siblings[i].style.zIndex = "0";
+            siblings[i].style.opacity = ".7";
+        }
+        that._frame.style.zIndex = "1";
+        that._frame.style.opacity = "1";
+    })(windows.children);
+
     // Gloval watcher to track the mouse
-    document.addEventListener("mousemove", function(e) {
+    document.addEventListener("mousemove", function (e) {
         if (!that._dragging) return;
 
         let x = e.clientX - that._dx,
             y = e.clientY - that._dy;
-        
+
         that.setPosition(x, y);
-    })
+    });
+    document.addEventListener("mousedown", function (e) {
+        if (e.target === that._frame || that._frame.contains(e.target))
+            that._frame.style.opacity = "1";
+        else
+            that._frame.style.opacity = ".7";
+    });
 
     // The handle needs the events bound as it's a sibling of the dragging div
     // not a relative in either direciton.
-    this._drag.onmousedown = this._handle.onmousedown = function(e) {
+    this._drag.onmousedown = this._handle.onmousedown = function (e) {
         that._dragging = true;
+        if (that._maximized) {
+            // Perform special repositioning to make the drag feel right when
+            // restoring a window from maximized.
+            let bcr = that._drag.getBoundingClientRect();
+            let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
+            let dy = bcr.top - e.clientY;
+
+            that.restore();
+
+            bcr = that._drag.getBoundingClientRect();
+            dx *= (bcr.right - bcr.left);
+            that.setPosition(e.clientX + dx, e.clientY + dy);
+        }
+
+        let siblings = windows.children;
+        for (let i = 0; i < siblings.length; i++)
+            siblings[i].style.zIndex = "0"
+        that._frame.style.zIndex = "1";
+
         that._dx = e.clientX - that._drag.getBoundingClientRect().left;
         that._dy = e.clientY - that._drag.getBoundingClientRect().top;
         e.preventDefault();
-    };    
-    document.addEventListener("mouseup", function(e) {
-        that._dragging = false;            
-    });
-    
-    // Wrapper to allow overloading
-    closeButton.onclick = function() {
-        that["onclose"]();
     };
-    rollButton.onclick = function() {
+    document.addEventListener("mouseup", function (e) {
+        that._dragging = false;
+    });
+
+    // Wrapper to allow overloading
+    closeButton.onclick = function (e) {
+        that.onclose();
+
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    rollButton.onclick = function (e) {
         if (that._rolled) that.unroll();
         else that.rollup();
+
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    maxminButton.onclick = maxminButton.onmousedown = function (e) {
+        if (that._maximized) that.restore();
+        else that.maximize();
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
     };
 
-    this.addButton = function(icon, iconSize, label) {
+    this.addButton = function (icon, iconSize, label) {
         let el = create("div", "wfbtItem", this._toolbar);
         el.innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         that._buttons.push(el);
         return el;
     };
-    this.modifyButton = function(index, icon, iconSize, label) {
+    
+    this.modifyButton = function (index, icon, iconSize, label) {
         that._buttons[index].innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         return that._buttons[index];
     };
 
-    this.getWidgetBody = function() {
+    this.getWidgetBody = function () {
         return this._widget;
-    }
+    };
 
-    this.getDragElement = function() {
+    this.getDragElement = function () {
         return this._drag;
-    }
+    };
 
-    this.onclose = function() {
+    this.onclose = function () {
         this.destroy();
-    }
+    };
 
-    this.destroy = function() {
+    this.destroy = function () {
         this._frame.remove();
 
         window.widgetWindows.openWindows[this._key] = undefined;
-    }
+    };
 
-    this.setPosition = function(x, y) {
+    this.setPosition = function (x, y) {
         this._frame.style.left = x + "px";
-        this._frame.style.top = y + "px";
+        this._frame.style.top = Math.max(y, 64) + "px";
 
         return this;
-    }
+    };
 
-    this.sendToCenter = function() {
+    this.sendToCenter = function () {
         let rect = this._frame.getBoundingClientRect();
         let width = rect.right - rect.left;
         let height = rect.bottom - rect.top;
-        
+
         rect = canvas.getBoundingClientRect();
         let cw = rect.right - rect.left;
         let ch = rect.bottom - rect.top;
-        
+
         this.setPosition((cw - width) / 2, (ch - height) / 2);
 
         return this;
-    }
+    };
 
-    this.isVisible = function() {
+    this.isVisible = function () {
         return this._visible;
-    }
+    };
 
-    this.clear = function() {
+    this.clear = function () {
         this._widget.innerHTML = "";
         this._toolbar.innerHTML = "";
 
         return this;
-    }
+    };
 
-    this.rollup = function() {
+    this.rollup = function () {
         this._rolled = true;
         this._body.style.display = "none";
         return this;
-    }
-    this.unroll = function() {
+    };
+
+    this.unroll = function () {
         this._rolled = false;
         this._body.style.display = "flex";
         return this;
-    }
+    };
 
-    this.requestSize = function(w, h) {
-        return this;
+    this.maximize = function () {
+        this._maxminIcon.setAttribute("src", "/header-icons/icon-contract.svg");
+        this._maximized = true;
+        this.unroll();
 
-        // TODO: Evaluate how much this is actually needed.
-        this._frame.style.minWidth = w + "px";
-        this._frame.style.minHeight = h + "px";
+        this._savedPos = [
+            this._frame.style.left,
+            this._frame.style.top,
+        ]
+        this._frame.style.width = "100vw";
+        this._frame.style.height = "calc(100vh - 64px)";
+        this._frame.style.left = "0";
+        this._frame.style.top = "64px";
+    };
 
-        return this;
-    }
+    this.restore = function () {
+        this._maxminIcon.setAttribute("src", "/header-icons/icon-expand.svg");
+        this._maximized = false;
+
+        if (this._savedPos) {
+            this._frame.style.left = this._savedPos[0];
+            this._frame.style.top = this._savedPos[1];
+            this._savedPos = null;
+        }
+        this._frame.style.width = "auto";
+        this._frame.style.height = "auto";
+    };
 };
 
-window.widgetWindows.windowFor = function(widget, title) {
+window.widgetWindows.windowFor = function (widget, title) {
     let key = undefined;
     // Check for a blockNo attribute
     if (typeof widget.blockNo !== "undefined")
         key = widget.blockNo;
-    // Fall back on a sligh hope that widgets are persistent
-    else if (typeof widget.___widgetWindowOpenID !== "undefined")
-        key = widget.___widgetWindowOpenID;
-
-    if (typeof key === "undefined") {
-        // This widget (probably) has never been seen before
-        key = Math.random();
-        widget.___widgetWindowOpenID = key;
-    } 
+    // Fall back on the next best thing we have
+    else key = title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
         let win = new WidgetWindow(key, title).sendToCenter();
