@@ -49,16 +49,6 @@ function WidgetWindow(key, title) {
     // Needed to keep things canvas-relative
     let canvas = docById("myCanvas");
 
-    // Take focus from any other windows
-    (function (siblings) {
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = ".7";
-        }
-        that._frame.style.zIndex = "1";
-        that._frame.style.opacity = "1";
-    })(windows.children);
-
     // Global watcher to track the mouse
     document.addEventListener("mousemove", function (e) {
         if (!that._dragging) return;
@@ -96,10 +86,7 @@ function WidgetWindow(key, title) {
             that.setPosition(e.clientX + dx, e.clientY + dy);
         }
 
-        let siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++)
-            siblings[i].style.zIndex = "0"
-        that._frame.style.zIndex = "1";
+        that.takeFocus();
 
         that._dx = e.clientX - that._drag.getBoundingClientRect().left;
         that._dy = e.clientY - that._drag.getBoundingClientRect().top;
@@ -119,7 +106,7 @@ function WidgetWindow(key, title) {
     rollButton.onclick = function (e) {
         if (that._rolled) that.unroll();
         else that.rollup();
-        that._frame.style.opacity = "1";
+        that.takeFocus();
 
         e.preventDefault();
         e.stopPropagation();
@@ -127,11 +114,21 @@ function WidgetWindow(key, title) {
     maxminButton.onclick = maxminButton.onmousedown = function (e) {
         if (that._maximized) that.restore();
         else that.maximize();
-        that._frame.style.opacity = "1";
+        that.takeFocus();
 
         e.preventDefault();
         e.stopImmediatePropagation();
     };
+
+    this.takeFocus = function() {
+        let siblings = windows.children;
+        for (let i = 0; i < siblings.length; i++) {
+            siblings[i].style.zIndex = "0";
+            siblings[i].style.opacity = ".7";
+        }
+        this._frame.style.zIndex = "1";
+        this._frame.style.opacity = "1";
+    }
 
     this.addButton = function (icon, iconSize, label) {
         let el = create("div", "wfbtItem", this._toolbar);
@@ -211,6 +208,7 @@ function WidgetWindow(key, title) {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
+        this.takeFocus();
 
         this._savedPos = [
             this._frame.style.left,
@@ -234,6 +232,8 @@ function WidgetWindow(key, title) {
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
     };
+
+    this.takeFocus();
 };
 
 window.widgetWindows.windowFor = function (widget, title) {
