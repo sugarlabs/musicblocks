@@ -28,7 +28,7 @@ function WidgetWindow(key, title) {
 
     let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
     this._maxminIcon = create("img", undefined, maxminButton);
-    this._maxminIcon.setAttribute("src", "/header-icons/icon-expand.svg");
+    this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
 
     this._body = create("div", "wfWinBody", this._frame);
     this._toolbar = create("div", "wfbToolbar", this._body);
@@ -59,7 +59,7 @@ function WidgetWindow(key, title) {
         that._frame.style.opacity = "1";
     })(windows.children);
 
-    // Gloval watcher to track the mouse
+    // Global watcher to track the mouse
     document.addEventListener("mousemove", function (e) {
         if (!that._dragging) return;
 
@@ -69,10 +69,13 @@ function WidgetWindow(key, title) {
         that.setPosition(x, y);
     });
     document.addEventListener("mousedown", function (e) {
-        if (e.target === that._frame || that._frame.contains(e.target))
+        if (e.target === that._frame || that._frame.contains(e.target)) {
             that._frame.style.opacity = "1";
-        else
+            that._frame.style.zIndex = "1";
+        } else {
             that._frame.style.opacity = ".7";
+            that._frame.style.zIndex = "0";
+        }
     });
 
     // The handle needs the events bound as it's a sibling of the dragging div
@@ -116,6 +119,7 @@ function WidgetWindow(key, title) {
     rollButton.onclick = function (e) {
         if (that._rolled) that.unroll();
         else that.rollup();
+        that._frame.style.opacity = "1";
 
         e.preventDefault();
         e.stopPropagation();
@@ -123,6 +127,7 @@ function WidgetWindow(key, title) {
     maxminButton.onclick = maxminButton.onmousedown = function (e) {
         if (that._maximized) that.restore();
         else that.maximize();
+        that._frame.style.opacity = "1";
 
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -131,13 +136,13 @@ function WidgetWindow(key, title) {
     this.addButton = function (icon, iconSize, label) {
         let el = create("div", "wfbtItem", this._toolbar);
         el.innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
-        that._buttons.push(el);
+        this._buttons.push(el);
         return el;
     };
-    
+
     this.modifyButton = function (index, icon, iconSize, label) {
-        that._buttons[index].innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
-        return that._buttons[index];
+        this._buttons[index].innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
+        return this._buttons[index];
     };
 
     this.getWidgetBody = function () {
@@ -203,7 +208,7 @@ function WidgetWindow(key, title) {
     };
 
     this.maximize = function () {
-        this._maxminIcon.setAttribute("src", "/header-icons/icon-contract.svg");
+        this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
 
@@ -218,7 +223,7 @@ function WidgetWindow(key, title) {
     };
 
     this.restore = function () {
-        this._maxminIcon.setAttribute("src", "/header-icons/icon-expand.svg");
+        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
 
         if (this._savedPos) {
