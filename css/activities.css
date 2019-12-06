@@ -1090,15 +1090,13 @@ input.timbreName {
 }
 
 .headcol {
-    position: absolute;
-    left: 1px;
+    user-select: none;
     text-align: center;
     vertical-align: middle;
 }
 
 .labelcol {
-    position:absolute;
-    top: auto;
+    user-select: none;
     text-align: center;
     vertical-align: middle;
 }
@@ -1348,6 +1346,7 @@ input.timbreName {
     -o-transition: ease 1s;
     -webkit-transition: ease 1s;
     transition: ease 1s;
+    z-index: 10;
 }
 
 .wheelNav > svg {
