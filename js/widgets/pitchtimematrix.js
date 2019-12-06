@@ -21,7 +21,7 @@ function PitchTimeMatrix () {
     const OUTERWINDOWWIDTH = 758;
     const INNERWINDOWWIDTH = 630;
     const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
+    const ICONSIZE = 24;
 
     this._stopOrCloseClicked = false;
     this._instrumentName = DEFAULTVOICE;
@@ -183,7 +183,7 @@ function PitchTimeMatrix () {
         this.playingNow = false;
 
         var w = window.innerWidth;
-        this._cellScale = w / 1200;
+        this._cellScale = Math.max(1, w / 1200);
         var iconSize = ICONSIZE * this._cellScale;
 
         var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
@@ -227,8 +227,9 @@ function PitchTimeMatrix () {
                 that._save_lock = true;
                 that._save();
                 await delayExecution(1000)
-                    that._save_lock = false;
-                
+                    that._save_lock = false;                
+                if (window.innerWidth <= 600)  // Mobile
+                    that.widgetWindow.close()
             }
         };
 

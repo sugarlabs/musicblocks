@@ -98,7 +98,7 @@ function WidgetWindow(key, title) {
 
     // Wrapper to allow overloading
     closeButton.onclick = function (e) {
-        that.onclose();
+        that.close();
 
         e.preventDefault();
         e.stopPropagation();
@@ -232,6 +232,10 @@ function WidgetWindow(key, title) {
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
     };
+
+    this.close = function() {
+        this.onclose();
+    }
 
     this.takeFocus();
 };
