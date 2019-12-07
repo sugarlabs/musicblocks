@@ -106,36 +106,36 @@ function Block(protoblock, blocks, overrideName) {
             var loopCount = 0;
 
             async function checkBounds(counter) {
-        try {
-            if (counter !== undefined) {
-                loopCount = counter;
+                try {
+                    if (counter !== undefined) {
+                        loopCount = counter;
 
-            }
-            if (loopCount > 3) {
-                throw new Error ('COULD NOT CREATE CACHE');
-            }
+                    }
+                    if (loopCount > 3) {
+                        throw new Error ('COULD NOT CREATE CACHE');
+                    }
 
-            that.bounds = that.container.getBounds();
+                    that.bounds = that.container.getBounds();
 
-            if (that.bounds === null) {
-                    console.log('// Try regenerating the artwork');
-                    that.regenerateArtwork(true, []);
-                    checkBounds(loopCount + 1);
-                    await that.pause(100);
-            } else {
-                that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
-                callback(that, args);
-                resolve();
-            }
-        }catch (e) {
-            reject(e)
-        }
+                    if (that.bounds === null) {
+                        console.log('// Try regenerating the artwork');
+                        that.regenerateArtwork(true, []);
+                        checkBounds(loopCount + 1);
+                        await that.pause(100);
+                    } else {
+                        that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+                        callback(that, args);
+                        resolve();
+                    }
+                } catch (e) {
+                    reject(e)
+                }
             }
             checkBounds();
-            })
-        };
+        })
+    };
 
-    // Internal function for creating cache.
+    // Internal function for updating the cache.
     // Includes workaround for a race condition.
     this.updateCache = function (counter) {
         var that = this;
@@ -144,30 +144,29 @@ function Block(protoblock, blocks, overrideName) {
             var loopCount = 0;
 
             async function updateBounds(counter) {
-      try {
-        if (counter !== undefined) {
-            loopCount = counter;
-        }
+                try {
+                    if (counter !== undefined) {
+                        loopCount = counter;
+                    }
 
-        if (loopCount > 3) {
-            throw new Error('COULD NOT UPDATE CACHE');
-        }
+                    if (loopCount > 3) {
+                        throw new Error('COULD NOT UPDATE CACHE');
+                    }
 
-
-        if (that.bounds == null) {
-                console.log('UPDATE CACHE: BOUNDS NOT READY');
-                updateBounds(loopCount + 1);
-             await that.pause(200);
-        } else {
-            that.container.updateCache();
-            that.blocks.refreshCanvas();
-            resolve();
-        }
-    }catch (e) {
-        reject(e)
-    }
-}
-    updateBounds();
+                    if (that.bounds == null) {
+                        console.log('UPDATE CACHE: BOUNDS NOT READY');
+                        updateBounds(loopCount + 1);
+                        await that.pause(200);
+                    } else {
+                        that.container.updateCache();
+                        that.blocks.refreshCanvas();
+                        resolve();
+                    }
+                } catch (e) {
+                    reject(e)
+                }
+            }
+            updateBounds();
         })
     };
 
