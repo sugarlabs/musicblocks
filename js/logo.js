@@ -7941,6 +7941,7 @@ function Logo () {
             }
         } else {
             that.alreadyRunning = false;
+
             if (!that.prematureRestart) {
                 // console.log('Make sure any unissued signals are dispatched.');
                 for (var b in that.endOfClampSignals[turtle]) {
@@ -7961,6 +7962,8 @@ function Logo () {
                 if (!that.turtles.running() && queueStart === 0) {
                     that.onStopTurtle();
                 }
+            } else {
+                that.turtles.turtleList[turtle].running = false;
             }
 
             // Because flow can come from calc blocks, we are not
