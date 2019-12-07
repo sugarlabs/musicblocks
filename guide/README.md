@@ -45,21 +45,22 @@ also available.
  4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
-       1. [Pitch-Time Matrix](#pitch-time) 
+       1. [Phrase Maker](#pitch-time) 
        2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
        3. [Creating Tuplets](#CREATING-TUPLETS)
        4. [What is a Tuplet?](#WHAT-IS-TUPLET)
-       5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
-       6. [Using a Scale of Pitches in the Matrix](#USING-A-SCALE)
+       5. [Using Individual Notes in the Phrase Maker](#INDIVIDUAL-NOTES)
+       6. [Using a Scale of Pitches in the Phrase Maker](#USING-A-SCALE)
     3. [Generating Rhythms](#rhythms)
     4. [Musical Modes](#modes)
-    5. [The Pitch-Drum Matrix](#pitch-drum)
-    6. [Exploring Musical Proportions](#stairs)
-    7. [Generating Arbitrary Pitches](#slider)
-    8. [Changing Tempo](#tempo)
-    9. [Custom Timbres](#timbre)
-    10. [Music Keyboard](#keyboard)
-    11. [Changing Temperament](#temperament)
+    5. [Meters](#meters)
+    6. [The Pitch-Drum Matrix](#pitch-drum)
+    7. [Exploring Musical Proportions](#stairs)
+    8. [Generating Arbitrary Pitches](#slider)
+    9. [Changing Tempo](#tempo)
+    10. [Custom Timbres](#timbre)
+    11. [Music Keyboard](#keyboard)
+    12. [Changing Temperament](#temperament)
  5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
 Many of the examples given in the guide have links to code you can
@@ -226,7 +227,7 @@ with *Pitch* blocks as well.
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
-hand or use the [*Pitch-time Matrix*](#pitch-time) widget to help you
+hand or use the [*Phrase maker*](#pitch-time) widget to help you
 get started.
 
 ### <a name="CHUNKS"></a>3.1 Chunks
@@ -869,18 +870,18 @@ before being displayed.
 
 ### <a name="GENERATION"></a>4.2 Generating Chunks of Notes 
 
-Using the Pitch-Time Matrix, it is possible to generate chunks of
+Using the Phrase Maker, it is possible to generate chunks of
 notes at a much faster speed.
 
-#### <a name="pitch-time"></a>4.2.1 The Pitch-Time Matrix
+#### <a name="pitch-time"></a>4.2.1 The Phrase Maker
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix1.svg "Pitch-time Matrix")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix1.svg "phrase maker")
 
-Music Blocks provides a widget, the *Pitch-time Matrix*, as a scaffold
+Music Blocks provides a widget, the *Phrase maker*, as a scaffold
 for getting started.
 
 Once you've launched Music Blocks in your browser, start by clicking
-on the *Pitch-time Matrix* stack that appears in the middle of the
+on the *Phrase maker* stack that appears in the middle of the
 screen. (For the moment, ignore the *Start* block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
@@ -933,7 +934,7 @@ Don't worry. You can reopen the matrix at anytime (it will remember
 its previous state) and since you can define as many chunks as you
 want, feel free to experiment.
 
-Tip: You can put a chunk inside a *Pitch-time Matrix* block to generate
+Tip: You can put a chunk inside a *Phrase maker* block to generate
 the matrix to corresponds to that chunk.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix4.svg "usage of octave for a pitch")
@@ -959,7 +960,7 @@ action). You should hear the notes play, ordered from top to bottom.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix6.svg "the Rhythm block")
 
 *Rhythm* blocks are used to generate rhythm patterns in the
-*Pitch-time Matrix* block. The top argument to the *Rhythm* block
+*Phrase maker* block. The top argument to the *Rhythm* block
 is the number of notes. The bottom argument is the duration of the
 note. In the top example above, three columns for quarter notes
 would be generated in the matrix. In the middle example, one column
@@ -971,7 +972,7 @@ columns for 16th notes would be generated.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix8.svg "resulting notes in tabular format")
 
 You can use as many *Rhythm* blocks as you'd like inside the
-*Pitch-time Matrix* block. In the above example, two *Rhythm*
+*Phrase maker* block. In the above example, two *Rhythm*
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
@@ -1015,14 +1016,14 @@ defining your matrix.
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TripletChart.svg "triplet chart")
 
-#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Matrix
+#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Phrase Maker
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
 
-#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Matrix
+#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Phrase Maker
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix15.svg)
 
@@ -1037,7 +1038,7 @@ inside the *Repeat*, working our way down to `Sol` in `Octave
 ### <a name="rhythms"></a>4.3 Generating Rhythms
 
 The *Rhythm Maker* block is used to launch a widget similar to the
-*Pitch-time Matrix* block. The widget can be used to generate rhythmic
+*Phrase maker* block. The widget can be used to generate rhythmic
 patterns.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm1.svg "generating rhythms")
@@ -1086,7 +1087,7 @@ The *Save stack* button will export rhythm stacks.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm6.svg "stacks of rhythms" )
 
 These stacks of rhythms can be used to define rhythmic patterns used
-with the *Pitch-time Matrix* block.
+with the *Phrase maker* block.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/rhythm7.svg "save drum machine button")
 
@@ -1134,9 +1135,9 @@ widget launches.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode2.svg "launching widget with Major mode")
 
 In the above example, the widget has been launched with *Major* mode
-(the default). Note that the notes included in the mode are indicated by
-the black boxes, which are arrayed in a circular pattern of tweleve
-half-steps to complete the octave.
+(the default). Note that the notes included in the mode are indicated
+by the protuding sectors with 'X's, which are arrayed in a circular
+pattern of tweleve half-steps to complete the octave.
 
 Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
@@ -1148,8 +1149,7 @@ right are:
 *Play all*, which will play a scale using the current mode;
 
 *Save*, which will save the current mode as the *Custom* mode and save
-a stack of *Pitch* blocks that can be used with the *Pitch-time
-Matrix* block;
+a stack of *Pitch* blocks that can be used with the *Phrase Maker* block;
 
 *Rotate counter-clockwise*, which will rotate the mode
 counter-clockwise (See the example below);
@@ -1185,12 +1185,33 @@ it into *Phrygian*.
 
 Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68).
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode6.svg "Pitch-time Matrix block")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode6.svg "phrase maker block")
 
 The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *Pitch-time Matrix* block.
+can be used inside the *Phrase maker* block.
 
-### <a name="pitch-drum"></a>4.5 The Pitch-Drum Matrix
+### <a name="meters"></a>4.5 Meters
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter1.svg "meter widget block")
+
+The *Meter Widget* block is used to explore strong and weak
+beats. Launch the widget with the meter you want to explore. (In the
+example, the meter is 4 beats per measure, where each beat is one
+quarter note.)
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter2.svg "Meter Widget")
+
+Inside the widget, you can click on a sector to indicate a strong
+beat. (Clicking on the *X* will revert the beat to a weak beat.) In
+the figure, the first and third beats are strong.
+
+The *Play* button will play the beat, using a snare drum for strong beats and a kick drum for weak beats.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter3.svg "on strong beat do blocks")
+
+The *Save* button will export *On strong beat do* blocks for each strong beat.
+
+### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum2.svg "Pitch-drum matrix")
 
@@ -1211,10 +1232,10 @@ As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-### <a name="stairs"></a>4.6 Exploring Musical Proportions
+### <a name="stairs"></a>4.7 Exploring Musical Proportions
 
 The *Pitch Staircase* block is used to launch a widget similar to the
-*Pitch-time Matrix*, which can be used to generate different pitches
+*Phrase maker*, which can be used to generate different pitches
 using a given pitch and musical proportion.
 
 The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
@@ -1250,12 +1271,12 @@ is shown below:
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchstaircase4.svg "Pitch Stair block")
 
-These stacks can be used with the *Pitch-time Matrix* block to define
+These stacks can be used with the *Phrase maker* block to define
 the rows in the matrix.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchstaircase5.svg "Pitch Stair block")
 
-### <a name="slider"></a>4.7 Generating Arbritary Pitches
+### <a name="slider"></a>4.8 Generating Arbritary Pitches
 
 The *Pitch Slider* block is used to launch a widget that is used to
 generate arbitray pitches. It differs from the *Pitch Staircase*
@@ -1289,7 +1310,7 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchslider5.svg " Pitch Slider block")
 
-### <a name="tempo"></a>4.8 Changing Tempo
+### <a name="tempo"></a>4.9 Changing Tempo
 
 The *Tempo* block is used to launch a widget that enables the user to
 visualize Tempo, defined in beats per minute (BPM). When the *Tempo* block
@@ -1314,7 +1335,7 @@ in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
 
-### <a name="timbre"></a>4.9 Custom Timbres
+### <a name="timbre"></a>4.10 Custom Timbres
 
 While Music Blocks comes with many built-in instruments, it is also
 possible to create custom timbres with unique sound qualities.
@@ -1401,7 +1422,7 @@ As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
-### <a name="keyboard"></a>4.10 Music Keyboard
+### <a name="keyboard"></a>4.11 Music Keyboard
 
 The Music Keyboard is used to generate notes by pressing keys of a virtual
 keyboard.
@@ -1421,7 +1442,7 @@ all of the notes played. Click on the Save button to output code (a
 series of *Note* blocks). The Clear button is used to delete all keys
 pressed previously in order to start new.
 
-###  <a name="temperament"></a>4.11 Changing Temperament
+###  <a name="temperament"></a>4.12 Changing Temperament
 
 *Tempering* is the process of altering the size of an interval by
 making it narrower or wider than pure. It is also possible to change

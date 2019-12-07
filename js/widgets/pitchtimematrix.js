@@ -1,5 +1,5 @@
 // Copyright (c) 2015 Yash Khandelwal
-// Copyright (c) 2015-18 Walter Bender
+// Copyright (c) 2015-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,17 +10,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize', 'setheading'];
+const MATRIXGRAPHICS = ['forward', 'back', 'right', 'left', 'setheading', 'setcolor', 'setshade', 'sethue', 'setgrey', 'settranslucency', 'setpensize'];
 const MATRIXGRAPHICS2 = ['arc', 'setxy'];
-// Deprecated
-const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];
+const MATRIXSYNTHS = ['sine', 'triangle', 'sawtooth', 'square', 'hertz'];  // Deprecated
+
 
 function PitchTimeMatrix () {
+    // The phrasemaker widget
     const BUTTONDIVWIDTH = 535;  // 8 buttons 535 = (55 + 4) * 9
-    const OUTERWINDOWWIDTH = 758; // 728;
-    const INNERWINDOWWIDTH = 630; // 600;
+    const OUTERWINDOWWIDTH = 758;
+    const INNERWINDOWWIDTH = 630;
     const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
+    const ICONSIZE = 24;
 
     this._stopOrCloseClicked = false;
     this._instrumentName = DEFAULTVOICE;
@@ -76,13 +77,31 @@ function PitchTimeMatrix () {
     // And offsets due to deleting duplicates.
     this._rowOffset = [];
 
+    // Track a number of DOM elements locally
+    this._rows = [];
+    this._headcols = [];
+    this._labelcols = [];
+    this._tupletNoteLabel = null;
+    this._tupletValueLabel = null;
+    this._tupletNoteValueLabel = null;
+
+    this._tupletNoteValueRow = null;
+    this._tupletValueRow = null;
+    this._noteValueRow = null;
+
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
-
     this._blockMap = [];
 
-    this.clearBlocks = function() {
+    this.blockNo = null;
+    this.notesBlockMap = [];
+    this._blockMapHelper = [];
+    this.columnBlocksMap = [];
+
+    this.clearBlocks = function () {
+        // When creating a new matrix, we want to clear out any old
+        // block references.
         this._rowBlocks = [];
         this._colBlocks = [];
         this._rowMap = [];
@@ -90,13 +109,24 @@ function PitchTimeMatrix () {
     };
 
     this.addRowBlock = function(rowBlock) {
+        // When creating a matrix, we add rows whenever we encounter a
+        // pitch or drum block (and some graphics blocks).
         this._rowMap.push(this._rowBlocks.length);
         this._rowOffset.push(0);
+        // In case there is a repeat block, use a unique block number
+        // for each instance.
+        while (this._rowBlocks.indexOf(rowBlock) !== -1) {
+            rowBlock = rowBlock + 1000000;
+        }
+
         this._rowBlocks.push(rowBlock);
     };
 
     this.addColBlock = function(rhythmBlock, n) {
-        // Search for previous instance of the same block (from a repeat)
+        // When creating a matrix, we add columns when we encounter
+        // rhythm blocks.
+        // Search for previous instance of the same block (from a
+        // repeat).
         var startIdx = 0;
         for (var i = 0; i < this._colBlocks.length; i++) {
             var obj = this._colBlocks[i];
@@ -110,67 +140,57 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.addNode = function(pitchBlock, rhythmBlock, n) {
+    this.addNode = function(rowBlock, rhythmBlock, n) {
+        // A node exists for each cell in the matrix. It is used to
+        // preserve and restore the state of the cell.
         var j = 0;
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 console.log('node is already in the list');
                 j += 1;
             }
         }
 
-        this._blockMap.push([pitchBlock, [rhythmBlock, n], j]);
+        this._blockMap.push([rowBlock, [rhythmBlock, n], j]);
     };
 
-    this.removeNode = function(pitchBlock, rhythmBlock, n) {
+    this.removeNode = function(rowBlock, rhythmBlock, n) {
+        // When the matrix is changed, we may need to remove nodes.
         for (var i = 0; i < this._blockMap.length; i++) {
             var obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
+            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 this._blockMap[i] = [-1, [-1, 1, 0]];  // Mark as removed
             }
         }
     };
 
+    this._get_save_lock = function () {
+        // Debounce the save button.
+        return this._save_lock;
+    };
+
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and them make another one in DOM (document object model)
+        let tempTable;
+
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
         this._logo = logo;
 
         this.playingNow = false;
-        this._expanded = false;
 
         var w = window.innerWidth;
-        this._cellScale = w / 1200;
+        this._cellScale = Math.max(1, w / 1200);
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
+        var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
-        // Position the widget and make it visible.
-        var ptmDiv = docById('ptmDiv');
-        ptmDiv.style.visibility = 'visible';
-        ptmDiv.setAttribute('draggable', 'true');
-        ptmDiv.style.left = '200px';
-        ptmDiv.style.top = '150px';
-
-        // The ptm buttons
-        var ptmButtonsDiv = docById('ptmButtonsDiv');
-        ptmButtonsDiv.style.display = 'inline';
-        ptmButtonsDiv.style.visibility = 'visible';
-        ptmButtonsDiv.style.width = BUTTONDIVWIDTH;
-        ptmButtonsDiv.innerHTML = '<table cellpadding="0px" id="ptmButtonTable"></table>';
-
-        var buttonTable = docById('ptmButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
-
-        // For the button callbacks
-        var that = this;
-
-        console.log('notes ' + this.rowLabels + ' octave ' + this.rowArgs);
+        console.debug('notes ' + this.rowLabels + ' octave ' + this.rowArgs);
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
@@ -178,38 +198,7 @@ function PitchTimeMatrix () {
         // Add the buttons to the top row.
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-        cell.onclick=function() {
-            that._logo.setTurtleDelay(0);
-
-            that._logo.resetSynth(0);
-            that.playAll(row);
-        }
-
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-        cell.onclick=function() {
-            that._save();
-        }
-
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-        cell.onclick=function() {
-            that._clear();
-        }
-
-        if (!localStorage.beginnerMode) {
-            var cell = this._addButton(row, 'export-button.svg', ICONSIZE, _('Export'));
-            cell.onclick=function() {
-                that._export();
-            }
-        }
-
-        var cell = this._addButton(row, 'sort.svg', ICONSIZE, _('Sort'));
-        cell.onclick=function() {
-            that._sort();
-        }
-
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
+        widgetWindow.onclose = function () {
             that._rowOffset = [];
             for (var i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
@@ -218,130 +207,68 @@ function PitchTimeMatrix () {
             that._logo.synth.stopSound(0, that._instrumentName);
             that._logo.synth.stop();
             that._stopOrCloseClicked = true;
-            ptmTableDiv.style.visibility = 'hidden';
-            ptmButtonsDiv.style.visibility = 'hidden';
-            ptmDiv.style.visibility = 'hidden';
             that._logo.hideMsgs();
+            docById('wheelDivptm').style.display = 'none';
+
+            widgetWindow.destroy();
         }
 
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
+        widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick = function () {
+            that._logo.setTurtleDelay(0);
 
-        this._dx = dragCell.getBoundingClientRect().left - ptmDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - ptmDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
+            that._logo.resetSynth(0);
+            that.playAll();
         };
 
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
+        this._save_lock = false;
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = async function () {
+            // Debounce the save button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._save();
+                await delayExecution(1000)
+                    that._save_lock = false;                
+                if (window.innerWidth <= 600)  // Mobile
+                    that.widgetWindow.close()
             }
         };
 
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
+        widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function () {
+            that._clear();
         };
 
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                ptmDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                ptmDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        ptmDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        ptmDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                ptmDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                ptmDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        ptmDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        ptmDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
-        var expandCell = this._addButton(row, 'expand-button.svg', ICONSIZE, _('expand'), '');
-        
-        expandCell.onclick = function () {
-            var ptmDiv = docById('ptmDiv');
-
-            if (that._expanded) {
-                ptmDiv.style.width = that._initial_w;
-                ptmDiv.style.height = that._initial_h;
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-
-                that._expanded = false;
-            } else {
-                ptmDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
-                ptmDiv.style.height = Math.max(400, Math.min(900, window.innerHeight)) + 'px';
-
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collapse') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                that._expanded = true;
-            }
-        };
-
-        // The ptm table
-        var ptmTableDiv = docById('ptmTableDiv');
-        ptmTableDiv.style.display = 'inline';
-        ptmTableDiv.style.visibility = 'visible';
-        ptmTableDiv.style.border = '0px';
-        ptmTableDiv.innerHTML = '';
-
-        // We use an outer div to scroll vertically and an inner div to
-        // scroll horizontally.
-        ptmTableDiv.innerHTML = '<div id="ptmOuterDiv"><div id="ptmInnerDiv"><table cellpadding="0px" id="ptmTable"></table></div></div>';
-
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-        var outerDiv = docById('ptmOuterDiv');
-        if (this.rowLabels.length > n) {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
-        } else {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 3) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
+        if (!localStorage.beginnerMode) {
+            widgetWindow.addButton('export-button.svg', ICONSIZE, _('Export')).onclick=function () {
+                that._export();
+            };
         }
 
-        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        var innerDiv = docById('ptmInnerDiv');
-        innerDiv.style.width = w + 'px';
-        innerDiv.style.marginLeft = (BUTTONSIZE * 2 * this._cellScale) + 'px';
+        widgetWindow.addButton('sort.svg', ICONSIZE, _('Sort')).onclick = function () {
+            that._sort();
+        };
+
+        var cell = widgetWindow.addButton('add2.svg', ICONSIZE, _('Add note'));
+        cell.setAttribute('id', 'addnotes');
+        cell.onclick = function () {
+            that._createAddRowPieSubmenu();
+        };
+
+        let ptmTable = document.createElement("table");
+        ptmTable.setAttribute("cellpadding", "0px")
+        widgetWindow.getWidgetBody().append(ptmTable);
 
         // Each row in the ptm table contains a note label in the
         // first column and a table of buttons in the second column.
-        var ptmTable = docById('ptmTable');
+        if (!this.sorted) {
+            this.columnBlocksMap = this._mapNotesBlocks('all', true);
+            for (i = 0; i < this.columnBlocksMap.length; i++) {
+                if ((MATRIXGRAPHICS.indexOf(this.columnBlocksMap[i][1]) !== -1) || (MATRIXGRAPHICS2.indexOf(this.columnBlocksMap[i][1]) !==-1) || (MATRIXSYNTHS.indexOf(this.columnBlocksMap[i][1]) !==-1) || (['playdrum','pitch'].indexOf(this.columnBlocksMap[i][1]) !==-1)) {
+                    continue;
+                }
+                this.columnBlocksMap = this.columnBlocksMap.slice(0, i).concat(this.columnBlocksMap.slice(i + 1));
+                i--;
+            }
+        }
 
         var j = 0;
         for (var i = 0; i < this.rowLabels.length; i++) {
@@ -352,9 +279,22 @@ function PitchTimeMatrix () {
 
             var ptmTableRow = ptmTable.insertRow();
 
+            var drumName = getDrumName(this.rowLabels[i]);
+
+            // Depending on the row, we choose a different background color.
+            if ((MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) || (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1)) {
+                cellColor = platformColor.graphicsLabelBackground;
+            } else {
+                if (drumName === null) {
+                    cellColor = platformColor.pitchLabelBackground;
+                } else {
+                    cellColor = platformColor.drumLabelBackground;
+                }
+            }
+
             // A cell for the row label graphic
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -362,8 +302,7 @@ function PitchTimeMatrix () {
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'headcol';  // This cell is fixed horizontally.
             cell.innerHTML = '';
-
-            var drumName = getDrumName(this.rowLabels[i]);
+            this._headcols[i] = cell;
 
             if (drumName != null) {
                 cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
@@ -381,14 +320,14 @@ function PitchTimeMatrix () {
                 var noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
-                } else if (noteName === 'C' && this.rowArgs[i] === 5) {
+                } else if (['C', 'do'].indexOf(noteName) !== -1 && this.rowArgs[i] === 5) {
                     cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
                 }
             }
 
             // A cell for the row label
             var cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = cellColor;
             cell.style.fontSize = this._cellScale * 100 + '%';
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + 'px';
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + 'px';
@@ -396,27 +335,79 @@ function PitchTimeMatrix () {
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = 'labelcol';  // This cell is fixed horizontally.
             cell.style.left = (BUTTONSIZE * this._cellScale) + 'px';
+            cell.setAttribute('alt', i);
+            this._labelcols[i] = cell;
 
             if (drumName != null) {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                cell.setAttribute('alt', i+'__'+'drumblocks');
+
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._createColumnPieSubmenu(index, condition);
+                }
+
                 this._noteStored.push(drumName);
             } else if (this.rowLabels[i].slice(0, 4) === 'http') {
                 cell.innerHTML = this.rowLabels[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
-                this._noteStored.push(this.rowLabels[i].replace(/ /g,':'));
+                this._noteStored.push(this.rowLabels[i].replace(/ /g,': '));
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+                cell.setAttribute('alt', i + '__' + 'synthsblocks');
+
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._createMatrixGraphicsPieSubmenu(index, condition, null);
+                }
+
                 this._noteStored.push(this.rowArgs[i]);
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
+                var blockLabel = this._logo.blocks.protoBlockDict[this.rowLabels[i]]['staticLabels'][0];
+                cell.innerHTML = blockLabel + '<br>' + this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                this._noteStored.push(this.rowLabels[i] + ':' + this.rowArgs[i]);
+                cell.setAttribute('alt', i + '__' + 'graphicsblocks')
+
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._createMatrixGraphicsPieSubmenu(index, condition, null);
+                }
+
+                this._noteStored.push(this.rowLabels[i] + ': ' + this.rowArgs[i]);
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                cell.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
+                var blockLabel = this._logo.blocks.protoBlockDict[this.rowLabels[i]]['staticLabels'][0];
+                cell.innerHTML = blockLabel + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
-                this._noteStored.push(this.rowLables[i] + ':' + this.rowArgs[i][0] + ':' + this.rowArgs[i][1]);
+                cell.setAttribute('alt', i + '__' + 'graphicsblocks2')
+
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._createMatrixGraphics2PieSubmenu(index, null);
+                }
+
+                this._noteStored.push(this.rowLabels[i] + ': ' + this.rowArgs[i][0] + ': ' + this.rowArgs[i][1]);
             } else {
                 if (noteIsSolfege(this.rowLabels[i]) && this._logo.synth.inTemperament !== 'custom') {
                     cell.innerHTML = i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
@@ -425,17 +416,31 @@ function PitchTimeMatrix () {
                     cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
                     var noteObj = [this.rowLabels[i], this.rowArgs[i]];
                 }
+                cell.setAttribute('alt', i + '__' + 'pitchblocks')
+
+                cell.onclick = function(event) {
+                    cell = event.target;
+                    if (cell.getAttribute('alt') === null) {
+                        cell = cell.parentNode;
+                    }
+                    var index = cell.getAttribute('alt').split('__')[0]
+                    var condition = cell.getAttribute('alt').split('__')[1]
+                    that._createColumnPieSubmenu(index, condition);
+                }
+
                 this._noteStored.push(noteObj[0] + noteObj[1]);
             }
 
             var ptmCell = ptmTableRow.insertCell();
             // Create tables to store individual notes.
-            ptmCell.innerHTML = '<table cellpadding="0px" id="ptmCellTable' + j + '"></table>';
-            var ptmCellTable = docById('ptmCellTable' + j);
+
+            var ptmCellTable = document.createElement("table");
+            ptmCellTable.setAttribute("cellpadding", "0px");
+            ptmCell.append(ptmCellTable);
 
             // We'll use this element to put the clickable notes for this row.
             var ptmRow = ptmCellTable.insertRow();
-            ptmRow.setAttribute('id', 'ptm' + j);
+            this._rows[j] = ptmRow;
 
             j += 1;
         }
@@ -443,23 +448,38 @@ function PitchTimeMatrix () {
         // An extra row for the note and tuplet values
         var ptmTableRow = ptmTable.insertRow();
         var ptmCell = ptmTableRow.insertCell();
+        ptmCell.setAttribute('colspan', '2');
         ptmCell.className = 'headcol';  // This cell is fixed horizontally.
-        ptmCell.innerHTML = '<table cellpadding="0px"><tr><td id="ptmTupletNoteLabel"></td></tr><tr><td id="ptmTupletValueLabel"></td></tr><tr><td id="ptmNoteValueLabel"></td></tr></table>';
 
-        var labelCell = docById('ptmNoteValueLabel');
-        labelCell.innerHTML = _('note value');
-        labelCell.style.fontSize = this._cellScale * 75 + '%';
-        labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-        labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
-        labelCell.style.minWidth = labelCell.style.width;
-        labelCell.style.maxWidth = labelCell.style.width;
-        labelCell.style.backgroundColor = platformColor.labelColor;
+        tempTable = document.createElement("table");
+        tempTable.setAttribute("cellpadding", "0px");
+        ptmCell.append(tempTable);
 
-        var ptmCell = ptmTableRow.insertCell();
+        this._tupletNoteLabel = null;
+        this._tupletValueLabel = null;
+        this._tupletNoteValueLabel = null;
+
+        this._tupletNoteLabel = tempTable.insertRow().insertCell();
+        this._tupletValueLabel = tempTable.insertRow().insertCell();
+        this._noteValueLabel = tempTable.insertRow().insertCell();
+
+        this._noteValueLabel.innerHTML = _('note value');
+        this._noteValueLabel.style.fontSize = this._cellScale * 75 + '%';
+        this._noteValueLabel.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+        this._noteValueLabel.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + 'px';
+        this._noteValueLabel.style.minWidth = this._noteValueLabel.style.width;
+        this._noteValueLabel.style.maxWidth = this._noteValueLabel.style.width;
+        this._noteValueLabel.style.backgroundColor = platformColor.labelColor;
+
         // Create tables to store individual note values.
-        ptmCell.innerHTML = '<table  class="ptmTable" cellpadding="0px"><tr id="ptmTupletNoteValueRow"></tr><tr id="ptmTupletValueRow"></tr><tr id="ptmNoteValueRow"></tr></table>';
+        tempTable = document.createElement("table");
+        tempTable.setAttribute("cellpadding", "0px");
+        this._tupletNoteValueRow = tempTable.insertRow();
+        this._tupletValueRow = tempTable.insertRow();
+        this._noteValueRow = tempTable.insertRow();
+        ptmTableRow.insertCell().append(tempTable);
 
-        // Sort the if there are note blocks.
+        // Sort them if there are note blocks.
         this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function () {
@@ -472,38 +492,1061 @@ function PitchTimeMatrix () {
 
         this._logo.textMsg(_('Click on the table to add notes.'));
 
-        this._initial_w = ptmDiv.style.width;
-        this._initial_h = ptmDiv.style.height;
+        this.widgetWindow.sendToCenter();
     };
 
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+    this._createAddRowPieSubmenu = function() {
+        // This menu is used to add new rows to the matrix.
+        docById('wheelDivptm').style.display = '';
+        const VALUESLABEL = ['pitch', 'hertz', 'drum', 'graphics', 'pen'];
+        const VALUES = ['imgsrc: images/chime.svg', 'imgsrc: images/synth.svg', 'imgsrc: images/TamTamMini.svg', 'imgsrc: images/mouse.svg', 'imgsrc: images/pen.svg'];
+        var valueLabel = [];
+        for (var i = 0; i < VALUES.length; i++) {
+            var label = _(VALUES[i]);
+            valueLabel.push(label);
         }
 
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
+        var graphicLabels = [];
+        for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
+            graphicLabels.push(MATRIXGRAPHICS[i]);
         }
 
-        return cell;
+        for (var i = 0; i < MATRIXGRAPHICS2.length; i++) {
+            graphicLabels.push(MATRIXGRAPHICS2[i]);
+        }
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 200, 200);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.colors = [platformColor.paletteColors['pitch'][0],
+                                  platformColor.paletteColors['pitch'][1],
+                                  platformColor.paletteColors['drum'][0],
+                                  platformColor.paletteColors['turtle'][0],
+                                  platformColor.paletteColors['turtle'][1]];
+        this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
+        this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
+        
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.clickModeRotate = false;
+
+        this._menuWheel.animatetime = 0; // 300;
+        this._menuWheel.createWheel(valueLabel);
+        this._menuWheel.navItems[0].setTooltip(_('pitch'));
+        this._menuWheel.navItems[1].setTooltip(_('hertz'));
+        this._menuWheel.navItems[2].setTooltip(_('drum'));
+        this._menuWheel.navItems[3].setTooltip(_('graphics'));
+        this._menuWheel.navItems[4].setTooltip(_('pen'));
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        var x = docById('addnotes').getBoundingClientRect().x;
+        var y = docById('addnotes').getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        var __subMenuChanged = function () {
+            __selectionChanged();
+        }
+
+        var __selectionChanged = function () {
+            var label = VALUESLABEL[that._menuWheel.selectedNavItemIndex]; 
+            console.log(label);
+            var rLabel = null;
+            var rArg = null;
+            var blockLabel = '';    
+            var newBlock = that._logo.blocks.blockList.length;
+            switch(label) {
+            case 'pitch':
+                console.log('loading new pitch block');
+                that._logo.blocks.loadNewBlocks([[0, ['pitch', {}], 0, 0, [null, 1, 2, null]], [1, ['solfege', {'value': 'sol'}], 0, 0, [0]], [2, ['number', {'value': 4}], 0, 0, [0]]]);
+                rLabel = 'sol';
+                rArg = 4;
+                break;
+            case 'hertz':
+                console.log('loading new Hertz block');
+                that._logo.blocks.loadNewBlocks([[0, ['hertz', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 392}], 0, 0, [0]]]);
+                rLabel = 'hertz';
+                rArg = 392;
+                break;
+            case 'drum':
+                console.log('loading new playdrum block');
+                that._logo.blocks.loadNewBlocks([[0, ['playdrum', {}], 0, 0, [null, 1, null]], [1, ['drumname', {'value': DEFAULTDRUM}], 0, 0, [0]]]);
+                rLabel = blockLabel;
+                rArg = -1;
+                break;
+            case 'graphics':
+                console.log('loading new forward block');
+                that._logo.blocks.loadNewBlocks([[0, ['forward', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 100}], 0, 0, [0]]]);
+                rLabel = 'forward';
+                rArg = 100;
+                break;
+            case 'pen':
+                console.log('loading new setcolor block');
+                that._logo.blocks.loadNewBlocks([[0, ['setcolor', {}], 0, 0, [null, 1, null]], [1, ['number', {'value': 0}], 0, 0, [0]]]);
+                rLabel = 'setcolor';
+                rArg = 0;
+                break;
+            default:
+                console.log(label + ' not found');
+                break;
+            }
+
+            var blocksNo = null;
+            var aboveBlock = null;
+            
+            switch (label) {
+            case 'graphics': 
+            case 'pen': 
+                for (var i = graphicLabels.length - 1; i >= 0; i--) {
+                    blocksNo = that._mapNotesBlocks(graphicLabels[i]);
+                    if (blocksNo.length >= 1){
+                        aboveBlock = last(blocksNo);
+                        console.log(aboveBlock)
+                        break;
+                    }
+                }
+                break;
+            case 'drum': 
+                blocksNo = that._mapNotesBlocks('playdrum');
+                if (blocksNo.length >= 1) {
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            case 'hertz': 
+                blocksNo = that._mapNotesBlocks('hertz');
+                if (blocksNo.length >= 1) {
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            case 'pitch': 
+                blocksNo = that._mapNotesBlocks('pitch');
+                if (blocksNo.length >= 1) {
+                    aboveBlock = last(blocksNo);
+                }
+                break;
+            }
+
+            if (aboveBlock === null) {
+                console.log('WARNING: aboveBlock is null');
+                // Look for a pitch block.
+                blocksNo = that._mapNotesBlocks('pitch');
+                if (blocksNo.length >= 1) {
+                    aboveBlock = last(blocksNo);
+                }
+
+                // The top?
+                if (aboveBlock === null) {
+                    aboveBlock = that.blockNo;
+                }
+            }
+
+            if (aboveBlock === that.blockNo){
+                setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                that.rowLabels.splice(0, 0, rLabel);
+                that.rowArgs.splice(0, 0, rArg);
+                that._rowBlocks.splice(0, 0, newBlock);
+            } else {
+                setTimeout(that._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                for (var i = 0; i < that.columnBlocksMap.length; i++){
+                    if (that.columnBlocksMap[i][0] === aboveBlock) {
+                        break;
+                    }
+                }
+
+                that.rowLabels.splice(i + 1, 0, rLabel);
+                that.rowArgs.splice(i + 1, 0, rArg);
+                that._rowBlocks.splice(i + 1, 0, newBlock);
+            }
+
+            that.sorted = false;
+            that.init(that._logo);
+            for (var i = 0; i < that._logo.tupletRhythms.length; i++) {
+                switch (that._logo.tupletRhythms[i][0]) {
+                case 'simple': 
+                case 'notes': 
+                    var tupletParam = [that._logo.tupletParams[i]];
+                    tupletParam.push([]);
+                    for (var j = 2; j < that._logo.tupletRhythms[i].length; j++) {
+                        tupletParam[1].push(that._logo.tupletRhythms[i][j]);
+                    }
+    
+                    that.addTuplet(tupletParam);
+                    break;
+                default: 
+                    that.addNotes(that._logo.tupletRhythms[i][1], that._logo.tupletRhythms[i][2]);
+                    break;
+                }
+            }
+
+            that.makeClickable();
+            if (label === 'pitch') {
+                setTimeout(function() {
+                    that.pitchBlockAdded(newBlock)
+                }, 200);
+            }
+        }
+
+        for (var i = 0; i < valueLabel.length; i++) {
+            this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
+        }
+    }
+
+    this.pitchBlockAdded = function(blockN) {
+        for (var i = 0; i < this.columnBlocksMap.length; i++){
+            if (this.columnBlocksMap[i][0] === blockN) {
+                break;
+            }
+        }
+
+        setTimeout(this._createColumnPieSubmenu(i, 'pitchblocks', true) , 500);
+    }
+
+    this._createMatrixGraphics2PieSubmenu = function(blockIndex, blk) {
+        // A wheel for modifying 2-arg graphics blocks
+        docById('wheelDivptm').style.display = '';
+        var arcRadiusLabel = ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        var arcAngleLabel = ['0', '30', '45', '60', '90', '180'];
+        var setxyValueLabel = ['-200', '-100', '0', '100', '200'];
+
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
+        this._blockLabelsWheel2 = new wheelnav('_blockLabelsWheel2', this._pitchWheel.raphael);
+        var _blockNames = MATRIXGRAPHICS2.slice();
+        var _blockLabels = []
+        for (var i = 0; i < _blockNames.length; i++) {
+            _blockLabels.push(this._logo.blocks.protoBlockDict[_blockNames[i]]['staticLabels'][0]);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.475;
+        
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.clickModeRotate = false;
+
+        this._pitchWheel.animatetime = 0;
+
+        this._blockLabelsWheel2.colors = platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel2.slicePathFunction = slicePath().DonutSlice;
+        this._blockLabelsWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.525;
+        this._blockLabelsWheel2.slicePathCustom.maxRadiusPercent = 0.8;
+        this._blockLabelsWheel2.sliceSelectedPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.sliceInitPathCustom = this._blockLabelsWheel2.slicePathCustom;
+        this._blockLabelsWheel2.clickModeRotate = false;
+        this._blockLabelsWheel2.animatetime = 0;
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+
+        this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
+        this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
+        this._blockLabelsWheel.slicePathCustom.maxRadiusPercent = 1;
+        this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
+        this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
+        this._blockLabelsWheel.clickModeRotate = false;
+        this._blockLabelsWheel.titleRotateAngle = 90;
+        this._blockLabelsWheel.animatetime = 0;
+        this._blockLabelsWheel.createWheel(_blockLabels);
+
+        var x = this._labelcols[blockIndex].getBoundingClientRect().x;
+        var y = this._labelcols[blockIndex].getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var thisBlock = this.columnBlocksMap[blockIndex][0];
+        if (blk !== null) {
+            thisBlock = blk;
+        }
+
+        var blockLabel = this._logo.blocks.blockList[thisBlock].name;
+        var xblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[thisBlock].connections[1]].value;
+        var yblockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[thisBlock].connections[2]].value;
+        
+        if (blockLabel === 'arc') {
+            this._blockLabelsWheel2.createWheel(arcAngleLabel);
+            this._pitchWheel.createWheel(arcRadiusLabel);
+        } else if (blockLabel === 'setxy') {
+            this._blockLabelsWheel2.createWheel(setxyValueLabel);
+            this._pitchWheel.createWheel(setxyValueLabel);
+        }
+
+        console.log(_blockNames.indexOf(blockLabel));
+        this._blockLabelsWheel.navigateWheel(_blockNames.indexOf(blockLabel));
+        
+        this.xblockValue = [xblockLabelValue.toString(), 'x'];
+        this.yblockValue = [yblockLabelValue.toString(), 'y'];
+        this._exitWheel.createWheel(['x', '']);
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            that._blockLabelsWheel.removeWheel();
+            that._blockLabelsWheel2.removeWheel();
+        };
+
+        var __enterArgValue1 = function () {
+            that.xblockValue[0] = that._blockLabelsWheel2.navItems[that._blockLabelsWheel2.selectedNavItemIndex].title;
+            __selectionChanged(true);
+        }
+
+        var __enterArgValue2 = function () {
+            that.yblockValue[0] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            __selectionChanged(true);
+        }
+
+        if (blockLabel === 'arc') {
+            for (var i = 0; i < arcAngleLabel.length; i++) {
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterArgValue1;
+            }
+
+            for (var i = 0; i < arcRadiusLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue2;
+            }
+        } else if (blockLabel === 'setxy') {
+            for (var i = 0; i < setxyValueLabel.length; i++) {
+                this._blockLabelsWheel2.navItems[i].navigateFunction = __enterArgValue1;
+                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue2;
+            }
+        }
+
+        var __selectionChanged =  async function (updatingArgs) {
+            var thisBlockName = _blockNames[that._blockLabelsWheel.selectedNavItemIndex];
+            if (updatingArgs === undefined) {
+                // Creating a new block and removing the old one.
+                var newBlock = that._logo.blocks.blockList.length;
+                that._logo.blocks.loadNewBlocks([[0, thisBlockName, 0, 0, [null, 1, 2, null]], [1, ['number', {'value': parseInt(that.xblockValue[0])}], 0, 0, [0]], [2, ['number', {'value': parseInt(that.yblockValue[0])}], 0, 0, [0]]]);
+
+                await delayExecution(500)
+                    that._blockReplace(thisBlock, newBlock);
+                    that.columnBlocksMap[blockIndex][0] = newBlock;
+                    thisBlock = newBlock;
+                    that._createMatrixGraphics2PieSubmenu(blockIndex, newBlock);
+            } else {
+                // Just updating a block arg value
+                var argBlock = that._logo.blocks.blockList[thisBlock].connections[1];
+                that._logo.blocks.blockList[argBlock].text.text = that.xblockValue[0];
+                that._logo.blocks.blockList[argBlock].value = parseInt(that.xblockValue[0]);
+            
+                var z = that._logo.blocks.blockList[argBlock].container.children.length - 1;
+                that._logo.blocks.blockList[argBlock].container.setChildIndex(that._logo.blocks.blockList[argBlock].text, z);
+                that._logo.blocks.blockList[argBlock].updateCache()
+
+                var argBlock = that._logo.blocks.blockList[thisBlock].connections[2];
+                that._logo.blocks.blockList[argBlock].text.text = that.yblockValue[0];
+                that._logo.blocks.blockList[argBlock].value = parseInt(that.yblockValue[0]);
+            
+                var z = that._logo.blocks.blockList[argBlock].container.children.length - 1;
+                that._logo.blocks.blockList[argBlock].container.setChildIndex(that._logo.blocks.blockList[argBlock].text, z);
+                that._logo.blocks.blockList[argBlock].updateCache()
+            }
+
+            // Update the stored values for this node.
+            that.rowLabels[blockIndex] = thisBlockName;
+            that.rowArgs[blockIndex][0] = parseInt(that.xblockValue);
+            that.rowArgs[blockIndex][1] = parseInt(that.yblockValue);
+
+            // Update the cell label.
+            var cell = that._headcols[blockIndex];
+            var iconSize = ICONSIZE * (window.innerWidth / 1200);
+            if (MATRIXGRAPHICS2.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } 
+
+            cell = that._labelcols[blockIndex]; 
+            if (MATRIXGRAPHICS2.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                var blockLabel = that._logo.blocks.protoBlockDict[that.rowLabels[blockIndex]]['staticLabels'][0];
+                cell.innerHTML = blockLabel + '<br>' + that.rowArgs[blockIndex][0] + ' ' + that.rowArgs[blockIndex][1];
+                cell.style.fontSize = Math.floor(that._cellScale * 12) + 'px';
+            }
+
+            noteStored = that.rowLabels[blockIndex] + ': ' + that.rowArgs[blockIndex][0] + ': ' + that.rowArgs[blockIndex][1];
+            for (var i = 0; i < that._notesToPlay.length; i++) {
+                var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[blockIndex]);
+                var cell = that._rows[blockIndex][i];
+
+                if (cell.style.backgroundColor === 'black') {
+                    that._notesToPlay[i][0][noteIndex] = noteStored;
+                }
+            }
+
+            that._noteStored[blockIndex] = noteStored;
+        }
+
+        for (var i = 0; i < _blockLabels.length; i++) {
+            this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+    }
+
+    this._createMatrixGraphicsPieSubmenu = function(blockIndex, condition, blk) {
+        // A wheel for modifying 1-arg blocks (graphics and hertz)
+        console.log(blockIndex);
+        docById('wheelDivptm').style.display = '';
+        // Different blocks get different arg wheel values.
+        if (condition === 'synthsblocks'){
+            var valueLabel = ['261', '294', '327', '348', '392', '436', '490', '523'];
+        } else {
+            var valueLabel = ['50', '90', '100', '150', '180', '200', '250', '270', '300', '350', '360'];
+            var forwardBackLabel = ['1', '5', '10', '25', '50', '100', '200'];
+            var leftRightLabel = ['15', '30', '45', '60', '90', '180'];
+            var setHeadingLabel = ['0', '45', '90', '135', '180', '225', '270', '315'];
+            var setPenSizeLabel = ['1', '5', '10', '25', '50'];
+            var setLabel = ['0', '10', '20', '30', '40', '5n0', '60', '70', '80', '90', '100'];
+        }
+
+        this._pitchWheel = new wheelnav('wheelDivptm', null, 800, 800);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        if (condition === 'graphicsblocks') {
+            this._blockLabelsWheel = new wheelnav('_blockLabelsWheel', this._pitchWheel.raphael);
+            var blockNamesGraphics = [];
+            var blockLabelsGraphics = [];
+            var blockNamesPen = [];
+            var blockLabelsPen = [];
+            for (var i = 0; i < 5; i++) {
+                var name = MATRIXGRAPHICS[i];
+                blockNamesGraphics.push(name);
+                blockLabelsGraphics.push(this._logo.blocks.protoBlockDict[name]['staticLabels'][0]);
+            }
+            for (var i = 5; i < MATRIXGRAPHICS.length; i++) {
+                var name = MATRIXGRAPHICS[i];
+                blockNamesPen.push(name);
+                blockLabelsPen.push(this._logo.blocks.protoBlockDict[name]['staticLabels'][0]);
+            }
+        }
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.525;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.clickModeRotate = false;
+
+        this._pitchWheel.animatetime = 0; // 300;
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        
+        if (condition === 'graphicsblocks') {
+            this._blockLabelsWheel.colors = platformColor.graphicWheelcolors;
+            this._blockLabelsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._blockLabelsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
+            this._blockLabelsWheel.slicePathCustom.maxRadiusPercent = 1;
+            this._blockLabelsWheel.sliceSelectedPathCustom = this._blockLabelsWheel.slicePathCustom;
+            this._blockLabelsWheel.sliceInitPathCustom = this._blockLabelsWheel.slicePathCustom;
+            this._blockLabelsWheel.clickModeRotate = false;
+            this._blockLabelsWheel.titleRotateAngle = 90;
+            this._blockLabelsWheel.animatetime = 0;
+        }
+
+        var x = this._labelcols[blockIndex].getBoundingClientRect().x;
+        var y = this._labelcols[blockIndex].getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var thisBlock = this.columnBlocksMap[blockIndex][0];
+        if (blk !== null) {
+            thisBlock = blk;
+        }
+
+        var blockLabel = this._logo.blocks.blockList[thisBlock].name;
+        var blockLabelValue = this._logo.blocks.blockList[this._logo.blocks.blockList[thisBlock].connections[1]].value;
+
+        if (condition === 'graphicsblocks') {
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                this._pitchWheel.createWheel(forwardBackLabel);
+                this._blockLabelsWheel.createWheel(blockLabelsGraphics);
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                this._pitchWheel.createWheel(leftRightLabel);
+                this._blockLabelsWheel.createWheel(blockLabelsGraphics);
+            } else if (blockLabel === 'setheading') {
+                this._pitchWheel.createWheel(setHeadingLabel);
+                this._blockLabelsWheel.createWheel(blockLabelsGraphics);
+            } else if (blockLabel === 'setpensize') {
+                this._pitchWheel.createWheel(setPenSizeLabel);
+                this._blockLabelsWheel.createWheel(blockLabelsPen);
+            } else{
+                this._pitchWheel.createWheel(setLabel);
+                this._blockLabelsWheel.createWheel(blockLabelsPen);
+            }
+        } else if (condition === 'synthsblocks') {
+            this._pitchWheel.createWheel(valueLabel);
+        }
+
+        this.blockValue = blockLabelValue.toString();
+        this._exitWheel.createWheel(['x', '']);
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            if (condition === 'graphicsblocks') {
+                that._blockLabelsWheel.removeWheel();
+            }
+        };
+
+        var __enterArgValue = function () {
+            that.blockValue = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.blockValue;
+            __selectionChanged(true);
+        }
+
+        if (condition === 'graphicsblocks') {
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < forwardBackLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < leftRightLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < setHeadingLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < setPenSizeLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else{
+                for (var i = 0; i < setLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            }
+        } else if (condition === 'synthsblocks') {
+            for (var i = 0; i < valueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+            }
+        }
+
+        var __selectionChanged = async function (updatingArgs) {
+            var thisBlockName = 'hertz';
+
+            if (condition === 'graphicsblocks') {
+                var label = that._blockLabelsWheel.navItems[that._blockLabelsWheel.selectedNavItemIndex].title;
+                var i = blockLabelsGraphics.indexOf(label);
+                if (i === -1) {
+                    i = blockLabelsPen.indexOf(label);
+                    if (i !== -1) {
+                        var thisBlockName = blockNamesPen[i];
+                    }
+                } else {
+                    var thisBlockName = blockNamesGraphics[i];
+                }
+            }
+
+            if (updatingArgs === undefined) {
+                var newBlock = that._logo.blocks.blockList.length;
+                that._logo.blocks.loadNewBlocks([[0, thisBlockName, 0, 0, [null, 1, null]], [1, ['number', {'value': parseInt(that.blockValue)}], 0, 0, [0]]]);
+
+                await delayExecution(500)
+                    that._blockReplace(thisBlock, newBlock);
+                    that.columnBlocksMap[blockIndex][0] = newBlock;
+                    thisBlock = newBlock;
+                    that._createMatrixGraphicsPieSubmenu(blockIndex, condition, newBlock);
+            } else {
+                // Just updating a block arg value
+                var argBlock = that._logo.blocks.blockList[thisBlock].connections[1];
+                that._logo.blocks.blockList[argBlock].text.text = that.blockValue;
+                that._logo.blocks.blockList[argBlock].value = parseInt(that.blockValue);
+                
+                var z = that._logo.blocks.blockList[argBlock].container.children.length - 1;
+                that._logo.blocks.blockList[argBlock].container.setChildIndex(that._logo.blocks.blockList[argBlock].text, z);
+                that._logo.blocks.blockList[argBlock].updateCache()
+            }
+
+            // Update the stored values for this node.
+            that.rowLabels[blockIndex] = thisBlockName;
+            that.rowArgs[blockIndex] = parseInt(that.blockValue);
+
+            // Update the cell label.
+            var cell = that._headcols[blockIndex];
+            var iconSize = ICONSIZE * (window.innerWidth / 1200);
+            if (MATRIXSYNTHS.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/synth2.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else if (MATRIXGRAPHICS.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + 'images/mouse.svg' + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            }
+
+            cell = that._labelcols[blockIndex]; 
+            if (MATRIXSYNTHS.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                cell.innerHTML = that.rowArgs[blockIndex];
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+            } else if (MATRIXGRAPHICS.indexOf(that.rowLabels[blockIndex]) !== -1) {
+                var blockLabel = that._logo.blocks.protoBlockDict[that.rowLabels[blockIndex]]['staticLabels'][0];
+                cell.innerHTML = blockLabel + '<br>' + that.rowArgs[blockIndex];
+                cell.style.fontSize = Math.floor(that._cellScale * 12) + 'px';
+            }
+
+            var noteStored = null;
+            if (condition === 'graphicsblocks') {
+                noteStored = that.rowLabels[blockIndex] + ': ' + that.rowArgs[blockIndex];
+            } else if (condition === 'synthsblocks') {
+                noteStored = that.rowArgs[blockIndex];
+            }
+
+            for (var i = 0; i < that._notesToPlay.length; i++) {
+                var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[blockIndex]);
+                cell = that._rows[blockIndex][i];
+                if (cell.style.backgroundColor === 'black') {
+                    that._notesToPlay[i][0][noteIndex] = noteStored;
+                }
+            }
+
+            that._noteStored[blockIndex] = that.rowLabels[blockIndex] + ': ' + that.rowArgs[blockIndex];
+        }
+
+        if (condition === 'graphicsblocks') {
+            if (blockLabel === 'forward' || blockLabel === 'back') {
+                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'right' || blockLabel === 'left') {
+                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setheading') {
+                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else if (blockLabel === 'setpensize') {
+                for (var i = 0; i < blockLabelsPen.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            } else{
+                for (var i = 0; i < blockLabelsPen.length; i++) {
+                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
+                }
+            }
+        }
+    }
+
+    this._createColumnPieSubmenu = function(index, condition, sortedClose) {
+        index = parseInt(index);
+        docById('wheelDivptm').style.display = '';
+
+        var accidentals = ['𝄪', '♯', '♮', '♭', '𝄫' ];
+        var noteLabels = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
+        var drumLabels = [];
+        for (var i = 0; i < DRUMS.length; i++) {
+            var label = _(DRUMS[i]);
+            drumLabels.push(label);
+            
+        }
+
+        if (condition === 'drumblocks') {
+            noteLabels = drumLabels;
+            var categories = [ 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
+            const COLORS = platformColor.piemenuVoicesColors;
+            var colors = [];
+
+            for (var i = 0; i < drumLabels.length; i++) {
+                colors.push(COLORS[categories[i] % COLORS.length]);
+            }
+        }
+
+        if (condition === 'drumblocks') {
+            this._pitchWheel = new wheelnav('wheelDivptm', null, 1200, 1200);
+        } else {
+            this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        }
+
+        // this._pitchWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._pitchWheel.raphael);
+        if (condition === 'pitchblocks') {
+            this._accidentalsWheel = new wheelnav('_accidentalsWheel', this._pitchWheel.raphael);
+            this._octavesWheel = new wheelnav('_octavesWheel', this._pitchWheel.raphael);
+        }
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        if (condition === 'pitchblocks') {
+            this._pitchWheel.colors = platformColor.pitchWheelcolors;
+            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        } else if (condition === 'drumblocks') {
+            this._pitchWheel.titleRotateAngle = 0;
+            this._pitchWheel.colors = colors;
+            this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
+        }
+
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(['x', ' ']);
+
+        if (condition === 'pitchblocks') {
+            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.50;
+            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
+            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+
+            var accidentalLabels = [];
+            for (var i = 0; i < accidentals.length; i++) {
+                accidentalLabels.push(accidentals[i]);
+            }
+
+            for (var i = 0; i < 9; i++) {
+                accidentalLabels.push(null);
+                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
+            }
+
+            this._accidentalsWheel.animatetime = 0; // 300;
+            this._accidentalsWheel.createWheel(accidentalLabels);
+            this._accidentalsWheel.setTooltips([_('double sharp'), _('sharp'), _('natural'), _('flat'), _('double flat')]);
+        
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            var octaveLabels = ['8', '7', '6', '5', '4', '3', '2', '1', null, null, null, null, null, null];
+            this._octavesWheel.animatetime = 0; // 300;
+            this._octavesWheel.createWheel(octaveLabels);
+        }
+        
+        var x = this._labelcols[index].getBoundingClientRect().x;
+        var y = this._labelcols[index].getBoundingClientRect().y;
+
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '300px';
+        docById('wheelDivptm').style.width = '300px';
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+        
+        var block = this.columnBlocksMap[index][0];
+        var noteValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[1]].value;
+
+        if (condition === 'pitchblocks') {
+            var octaveValue = this._logo.blocks.blockList[this._logo.blocks.blockList[block].connections[2]].value;
+            var accidentalsValue = 2;
+
+            for (var i = 0; i < accidentals.length; i++) {
+                if (noteValue.indexOf(accidentals[i]) !== -1) {
+                    accidentalsValue = i;
+                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    break;
+                }
+            }
+
+            this._accidentalsWheel.navigateWheel(accidentalsValue)
+            this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
+        }
+        this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
+        
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._pitchWheel.removeWheel();
+            that._exitWheel.removeWheel();
+            if (condition === 'pitchblocks') {
+                that._accidentalsWheel.removeWheel();
+                that._octavesWheel.removeWheel();
+            }
+
+            if (sortedClose === true) {
+                that._sort();
+            }
+        };
+
+        var __selectionChanged = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var i = noteLabels.indexOf(label);
+            if (condition === 'pitchblocks') {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                var flag = false;
+                if (attr !== '♮') {
+                    label += attr;
+                    flag = true;
+                }
+            }
+
+            var noteLabelBlock = that._logo.blocks.blockList[block].connections[1];
+            that._logo.blocks.blockList[noteLabelBlock].text.text = label;
+            that._logo.blocks.blockList[noteLabelBlock].value = label;
+            
+            var z = that._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
+            that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(that._logo.blocks.blockList[noteLabelBlock].text, z);
+            that._logo.blocks.blockList[noteLabelBlock].updateCache();
+            if (condition === 'pitchblocks') {
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                that._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(that._logo.blocks.blockList[noteLabelBlock].connections[0], octave);
+                var noteObj = [label, octave];
+                if (flag) {
+                    noteObj = getNote(label, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
+                }
+                that.rowLabels[index] = noteObj[0];
+                that.rowArgs[index] = noteObj[1];
+            } else if (condition === 'drumblocks') {
+                that.rowLabels[index] = label;
+            }
+            
+            var cell = that._headcols[index];
+            var drumName = getDrumName(that.rowLabels[index]);
+            const BELLSETIDX = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G': 5, 'A': 6, 'B': 7, 'do': 1, 're': 2, 'mi': 3, 'fa': 4, 'sol': 5, 'la': 6, 'ti': 7};
+            var noteName = that.rowLabels[index];
+            var w = window.innerWidth;
+            var iconSize = ICONSIZE * (w/1200);
+            if (drumName != null) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="' + getDrumIcon(drumName) + '" title="' + _(drumName) + '" alt="' + _(drumName) + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+            } else if (noteName in BELLSETIDX && that.rowArgs[index] === 4) {
+                cell.innerHTML = '<img src="' + 'images/8_bellset_key_' + BELLSETIDX[noteName] + '.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
+            } else if (noteName === 'C' && that.rowArgs[index] === 5) {
+                cell.innerHTML = '<img src="' + 'images/8_bellset_key_8.svg' + '" width="' + cell.style.width + '" vertical-align="middle">';
+            }
+
+            cell = that._labelcols[index];
+            if (drumName != null) {
+                cell.innerHTML = _(drumName);
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
+            } else if (noteIsSolfege(that.rowLabels[i]) && that._logo.synth.inTemperament !== 'custom') {
+                cell.innerHTML = i18nSolfege(that.rowLabels[index]) + that.rowArgs[index].toString().sub();
+                var noteObj = getNote(that.rowLabels[index], that.rowArgs[index], 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
+            } else {
+                cell.innerHTML = that.rowLabels[index] + that.rowArgs[index].toString().sub();
+                var noteObj = [that.rowLabels[index], that.rowArgs[index]];
+            }
+
+            var noteStored = null;
+            if (condition === 'pitchblocks') {
+                noteStored= noteObj[0] + noteObj[1];
+            } else if (condition === 'drumblocks') {
+                noteStored= drumName
+            }
+
+            for (var i = 0; i < that._notesToPlay.length; i++) {
+                var noteIndex = that._notesToPlay[i][0].indexOf(that._noteStored[index]);
+                cell = that._rows[index][i];
+                if (cell.style.backgroundColor === 'black') {
+                    that._notesToPlay[i][0][noteIndex] = noteStored;
+                }
+            }
+            that._noteStored[index]= noteStored;
+        };
+
+        var __pitchPreview = function () {
+            var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            var timeout = 0;
+            if (condition === 'pitchblocks') {
+                var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                if (attr !== '♮') {
+                    label += attr;
+                }
+                var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+                var obj = getNote(label, octave, 0, that._logo.keySignature[0], false, null, that._logo.errorMsg, that._logo.synth.inTemperament);
+                that._logo.synth.setMasterVolume(PREVIEWVOLUME);
+                that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+                that._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            } else if (condition === 'drumblocks') {
+                if (that._logo.instrumentNames[0] === undefined || that._logo.instrumentNames[0].indexOf(label) === -1) {
+                    if (that._logo.instrumentNames[0] === undefined) {
+                        that._logo.instrumentNames[0] = [];
+                    }
+    
+                    that._logo.instrumentNames[0].push(label);
+                    if (label === DEFAULTVOICE) {
+                        that._logo.synth.createDefaultSynth(0);
+                    }
+    
+                    that._logo.synth.loadSynth(0, label);
+                    // give the synth time to load
+                    var timeout = 500;
+                }
+
+                setTimeout(function () {
+                    that._logo.synth.setMasterVolume(DEFAULTVOLUME);
+                    that._logo.setSynthVolume(0, label, DEFAULTVOLUME);
+                    that._logo.synth.trigger(0, 'G4', 1 / 4, label, null, null, false);
+                    that._logo.synth.start();
+    
+                }, timeout);
+            }
+            __selectionChanged();
+        }
+
+        for (var i = 0; i < noteLabels.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+        if (condition === 'pitchblocks') {
+            for (var i = 0; i < accidentals.length; i++) {
+                this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+    
+            for (var i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+            }
+        }
+    }
+
+    this._blockReplace = function (oldblk, newblk) {
+        // Find the connections from the old block
+        var c0 = this._logo.blocks.blockList[oldblk].connections[0];
+        var c1 = last(this._logo.blocks.blockList[oldblk].connections);
+
+        // Connect the new block
+        this._logo.blocks.blockList[newblk].connections[0] = c0;
+        this._logo.blocks.blockList[newblk].connections[this._logo.blocks.blockList[newblk].connections.length - 1] = c1;
+
+        if (c0 != null) {
+            for (var i = 0; i < this._logo.blocks.blockList[c0].connections.length; i++) {
+                if (this._logo.blocks.blockList[c0].connections[i] === oldblk) {
+                    this._logo.blocks.blockList[c0].connections[i] = newblk;
+                    break;
+                }
+            }
+
+            // Look for a containing clamp, which may need to be resized.
+            var blockAbove = c0;
+            while (blockAbove !== this.blockNo) {
+                if (this._logo.blocks.blockList[blockAbove].isClampBlock()) {
+                    this._logo.blocks.clampBlocksToCheck.push([blockAbove, 0]);
+                }
+
+                blockAbove = this._logo.blocks.blockList[blockAbove].connections[0];
+            }
+
+            this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        }
+
+        if (c1 != null) {
+            for (var i = 0; i < this._logo.blocks.blockList[c1].connections.length; i++) {
+                if (this._logo.blocks.blockList[c1].connections[i] === oldblk) {
+                    this._logo.blocks.blockList[c1].connections[i] = newblk;
+                    break;
+                }
+            }
+        }
+
+        // Refresh the dock positions
+        this._logo.blocks.adjustDocks(c0, true);
+
+        // Send the old block to the trash
+        this._logo.blocks.blockList[oldblk].connections[0] = null;
+        this._logo.blocks.blockList[oldblk].connections[this._logo.blocks.blockList[oldblk].connections.length - 1] = null;
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[oldblk]);
+
+        this._logo.refreshCanvas();
     };
+
+    this._addNotesBlockBetween = function(aboveBlock, block, topBlock) {
+        if (topBlock) {
+            var belowBlock = this._logo.blocks.blockList[aboveBlock].connections[1];
+            this._logo.blocks.blockList[aboveBlock].connections[1] = block;
+        } else {
+            var belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
+            this._logo.blocks.blockList[aboveBlock].connections[this._logo.blocks.blockList[aboveBlock].connections.length - 1] = block;
+        }
+
+        this._logo.blocks.blockList[belowBlock].connections[0] = block;
+        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        this._logo.blocks.blockList[block].connections[this._logo.blocks.blockList[block].connections.length - 1] = belowBlock;   
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
+
+    this._removePitchBlock = function(blockNo) {
+        var c0 = this._logo.blocks.blockList[blockNo].connections[0];
+        var c1 = last(this._logo.blocks.blockList[blockNo].connections);
+        this._logo.blocks.blockList[c0].connections[this._logo.blocks.blockList[c0].connections.length-1] = c1;
+        this._logo.blocks.blockList[c1].connections[0] = c0;
+
+        this._logo.blocks.blockList[blockNo].connections[this._logo.blocks.blockList[blockNo].connections.length - 1] = null;
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockNo]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.refreshCanvas();
+    }
 
     this._generateDataURI = function(file) {
-        var data = "data:text/html;charset=utf-8," + encodeURIComponent(file);
+        var data = 'data: text/html;charset=utf-8, ' + encodeURIComponent(file);
         return data;
     };
 
-    this._sort = function() {
+    this._sort = function () {
         if (this.sorted) {
             console.log('already sorted');
             return;
@@ -513,7 +1556,7 @@ function PitchTimeMatrix () {
         this._markedColsInRow = [];
         for (var r = 0; r < this.rowLabels.length; r++) {
             var thisRow = [];
-            var row = docById('ptm' + r);
+            var row = this._rows[r];
             var n = row.cells.length;
             for (var i = 0; i < n; i++) {
                 var cell = row.cells[i];
@@ -589,6 +1632,13 @@ function PitchTimeMatrix () {
         for (var i = 0; i < sortedList.length; i++) {
             this._rowMapper.push(sortedList[i][3]);
         }
+        var newColumnBlockMap = [];
+        var oldColumnBlockMap = this.columnBlocksMap;
+        for (var i = 0; i < this._rowMapper.length; i++) {
+            newColumnBlockMap.push(this.columnBlocksMap[this._rowMapper[i]]);
+        }
+        this.columnBlocksMap = newColumnBlockMap;
+        var lastObj = 0;
 
         for (var i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i];
@@ -601,6 +1651,11 @@ function PitchTimeMatrix () {
             } else if (i > 0 && obj[1] === last(this.rowLabels)) {
                 console.log('skipping ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
+                setTimeout(this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]), 500);
+                this.columnBlocksMap = this.columnBlocksMap.filter(function(ele) {
+                    return ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0];
+                })
+                lastObj = i;
                 // skip duplicates
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
@@ -611,7 +1666,9 @@ function PitchTimeMatrix () {
             } else {
                 console.log('pushing ' + obj[1] + ' ' + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
+                lastObj = i;
             }
+            console.log(obj, typeof(obj[2]));
 
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
@@ -624,8 +1681,8 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
-            case 'simple':
-            case 'notes':
+            case 'simple': 
+            case 'notes': 
                 var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                 tupletParam.push([]);
                 for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
@@ -634,7 +1691,7 @@ function PitchTimeMatrix () {
 
                 this.addTuplet(tupletParam);
                 break;
-            default:
+            default: 
                 this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
                 break;
             }
@@ -643,7 +1700,7 @@ function PitchTimeMatrix () {
         this.makeClickable();
     };
 
-    this._export = function() {
+    this._export = function () {
         var exportWindow = window.open('');
         console.log(exportWindow);
         var exportDocument = exportWindow.document;
@@ -671,7 +1728,7 @@ function PitchTimeMatrix () {
 
         var header = exportTable.createTHead();
 
-        for (var i = 0, row; row = docById('ptm' + i); i++) {
+        for (var i = 0, row; row = this._rows[i]; i++) {
             var exportRow = header.insertRow();
             // Add the row label...
             var exportLabel = exportRow.insertCell();
@@ -687,10 +1744,12 @@ function PitchTimeMatrix () {
                 exportLabel.innerHTML = this.rowArgs[i];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + 'px';
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
-                exportLabel.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i];
+                var blockLabel = this._logo.blocks.protoBlockDict[this.rowLabels[i]]['staticLabels'][0];
+                exportLabel.innerHTML = blockLabel + '<br>' + this.rowArgs[i];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
-                exportLabel.innerHTML = _(this.rowLabels[i]) + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
+                var blockLabel = this._logo.blocks.protoBlockDict[this.rowLabels[i]]['staticLabels'][0];
+                exportLabel.innerHTML = blockLabel + '<br>' + this.rowArgs[i][0] + ' ' + this.rowArgs[i][1];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + 'px';
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
@@ -723,7 +1782,7 @@ function PitchTimeMatrix () {
             var exportRow = header.insertRow();
             var exportLabel = exportRow.insertCell();
             exportLabel.innerHTML = _('note value');
-            var noteValueRow = docById('ptmTupletNoteValueRow');
+            var noteValueRow = this._tupletNoteValueRow;
             for (var i = 0; i < noteValueRow.cells.length; i++) {
                 var exportCell = exportRow.insertCell();
                 var col = noteValueRow.cells[i];
@@ -744,7 +1803,7 @@ function PitchTimeMatrix () {
             var exportRow = header.insertRow();
             var exportLabel = exportRow.insertCell();
             exportLabel.innerHTML = _('tuplet value');
-            var noteValueRow = docById('ptmTupletValueRow');
+            var noteValueRow = this._tupletValueRow;
             for (var i = 0; i < noteValueRow.cells.length; i++) {
                 var exportCell = exportRow.insertCell();
                 var col = noteValueRow.cells[i];
@@ -766,7 +1825,7 @@ function PitchTimeMatrix () {
         var exportRow = header.insertRow();
         var exportLabel = exportRow.insertCell();
         exportLabel.innerHTML = _('note value');
-        var noteValueRow = docById('ptmNoteValueRow');
+        var noteValueRow = this._noteValueRow;
         for (var i = 0; i < noteValueRow.cells.length; i++) {
             var exportCell = exportRow.insertCell();
             var col = noteValueRow.cells[i];
@@ -785,9 +1844,9 @@ function PitchTimeMatrix () {
 
         var saveDocument = exportDocument;
         var uriData = saveDocument.documentElement.outerHTML;
-        exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background:#C374E9;' + 'border-radius:5%;' + 'padding:0.3em;' + 'text-decoration:none;' + 'margin:0.5em;' + 'color:white;" ' + 'download>Download Matrix</a>';
-        exportDocument.getElementById("downloadb1").download = "MusicMatrix";
-        exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
+        exportDocument.body.innerHTML+='<br><a id="downloadb1" style="background: #C374E9;' + 'border-radius: 5%;' + 'padding: 0.3em;' + 'text-decoration: none;' + 'margin: 0.5em;' + 'color: white;" ' + 'download>Download Matrix</a>';
+        exportDocument.getElementById('downloadb1').download = 'MusicMatrix';
+        exportDocument.getElementById('downloadb1').href = this._generateDataURI(uriData);
         exportDocument.close();
     };
 
@@ -798,14 +1857,14 @@ function PitchTimeMatrix () {
             var newNote = SOLFEGECONVERSIONTABLE[note[0]];
         } else {
             var octave = note[2];
-            var newNote = SOLFEGECONVERSIONTABLE[note.substr(0,2)];
+            var newNote = SOLFEGECONVERSIONTABLE[note.substr(0, 2)];
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
     };
 
     this.addTuplet = function(param) {
-        // The first two parameters are the interval for the tuplet,
+        // The first two parameters are the interval for the tuplet, 
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
 
@@ -831,15 +1890,11 @@ function PitchTimeMatrix () {
             }
         }
 
-        var rowCount = this.rowLabels.length;
-        var firstRow = docById('ptm' + 0);
-        var colCount = firstRow.cells.length;
-
         var noteValue = param[0][1] / param[0][0];
         // The tuplet is note value is calculated as #notes x note value
         var noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
 
-        // Set the cells to "rest"
+        // Set the cells to 'rest'
         for (var i = 0; i < numberOfNotes; i++) {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
@@ -849,23 +1904,11 @@ function PitchTimeMatrix () {
 
         // First, ensure that the matrix is set up for tuplets.
         if (!this._matrixHasTuplets) {
-            // Add more room to the outerDiv to hold the extra rows.
-            var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-            var outerDiv = docById('ptmOuterDiv');
-            if (this.rowLabels.length > n) {
-                outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 6) + 'px';
-                var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-                outerDiv.style.width = w + 'px';
-            } else {
-                outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.rowLabels.length + 6) + 'px';
-                var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-                outerDiv.style.width = w + 'px';
-            }
-
-            var firstRow = docById('ptm' + 0);
+            var firstRow = this._rows[0];
 
             // Load the labels
-            var labelCell = docById('ptmTupletNoteLabel');
+            let labelCell;
+            labelCell = this._tupletNoteLabel;
             labelCell.innerHTML = _('note value');
             labelCell.style.fontSize = this._cellScale * 75 + '%';
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -874,7 +1917,7 @@ function PitchTimeMatrix () {
             labelCell.style.maxWidth = labelCell.style.width;
             labelCell.style.backgroundColor = platformColor.labelColor;
 
-            var labelCell = docById('ptmTupletValueLabel');
+            labelCell = this._tupletValueLabel;
             labelCell.innerHTML = _('tuplet value');
             labelCell.style.fontSize = this._cellScale * 75 + '%';
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
@@ -885,8 +1928,8 @@ function PitchTimeMatrix () {
 
             // Fill in the columns in the tuplet note value row up to
             // where the tuplet begins.
-            var noteRow = docById('ptmTupletNoteValueRow');
-            var valueRow = docById('ptmTupletValueRow');
+            var noteRow = this._tupletNoteValueRow;
+            var valueRow = this._tupletValueRow;
             for (var i = 0; i < firstRow.cells.length; i++) {
                 var cell = noteRow.insertCell();
                 cell.style.backgroundColor = platformColor.tupletBackground;
@@ -911,7 +1954,7 @@ function PitchTimeMatrix () {
         for (var i = 0; i < numberOfNotes; i++) {
             // Add the notes to the tuplet notes row too.
             // Add cell for tuplet note values
-            var noteRow = docById('ptmTupletNoteValueRow');
+            var noteRow = this._tupletNoteValueRow;
             var cell = noteRow.insertCell(-1);
             var numerator = 32 / param[1][i];
             var thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
@@ -935,30 +1978,47 @@ function PitchTimeMatrix () {
 
             // Add the notes to the matrix a la addNote.
             for (var j = 0; j < this.rowLabels.length; j++) {
-                var ptmRow = docById('ptm' + j);
+                // Depending on the row, we choose a different background color.
+                if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[j]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.drumBackground;
+                    }
+                }
+
+                var ptmRow = this._rows[j];
                 var cell = ptmRow.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / tupletNoteValue);
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
+                cell.style.backgroundColor = cellColor;
+
+                cell.onmouseover=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+
+                cell.onmouseout=function () {
+                    if (this.style.backgroundColor !== 'black') {
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
         }
 
         // Add the tuplet value as a span
-        var valueRow = docById('ptmTupletValueRow');
+        var valueRow = this._tupletValueRow;
         var cell = valueRow.insertCell();
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
@@ -972,7 +2032,7 @@ function PitchTimeMatrix () {
         cell.style.backgroundColor = platformColor.tupletBackground;
 
         // And a span in the note value column too.
-        var noteValueRow = docById('ptmNoteValueRow');
+        var noteValueRow = this._noteValueRow;
         var cell = noteValueRow.insertCell();
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this._cellScale * 75) + '%';
@@ -992,7 +2052,6 @@ function PitchTimeMatrix () {
     };
 
     this.addNotes = function(numBeats, noteValue) {
-        var ptmTable = docById('ptmTable');
         var noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1, this._cellScale);
 
         for (var i = 0; i < numBeats; i++) {
@@ -1004,30 +2063,47 @@ function PitchTimeMatrix () {
 
         for (var j = 0; j < numBeats; j++) {
             for (var i = 0; i < rowCount; i++) {
+                // Depending on the row, we choose a different background color.
+                if ((MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1) || (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1)) {
+                    cellColor = platformColor.graphicsBackground;
+                } else {
+                    var drumName = getDrumName(this.rowLabels[i]);
+                    if (drumName === null) {
+                        cellColor = platformColor.pitchBackground;
+                    } else {
+                        cellColor = platformColor.drumBackground;
+                    }
+                }
+
                 // the buttons get add to the embedded table
-                var row = docById('ptm' + i);
+                var row = this._rows[i];
                 var cell = row.insertCell();
+
+                cell.setAttribute('cellColor', cellColor);
+
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = cellColor;
                 // Using the alt attribute to store the note value
                 cell.setAttribute('alt', 1 / noteValue);
-                cell.onmouseover=function() {
-                    if (this.style.backgroundColor !== 'black'){
+
+                cell.onmouseover=function () {
+                    if (this.style.backgroundColor !== 'black') {
                         this.style.backgroundColor = platformColor.selectorSelected;
                     }
                 }
-                cell.onmouseout=function() {
-                    if (this.style.backgroundColor !== 'black'){
-                        this.style.backgroundColor = platformColor.selectorBackground;
+
+                cell.onmouseout=function () {
+                    if (this.style.backgroundColor !== 'black') {
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                     }
                 }
             }
 
             // Add a note value.
-            var row = docById('ptmNoteValueRow');
+            var row = this._noteValueRow;
             var cell = row.insertCell();
             cell.style.width = this._noteWidth(noteValue) + 'px';
             cell.style.minWidth = cell.style.width;
@@ -1038,11 +2114,12 @@ function PitchTimeMatrix () {
             cell.style.textAlign = 'center';
             cell.innerHTML = noteValueToDisplay;
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
+            cell.setAttribute('alt', noteValue);
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
                 // added by tuplets.
-                var row = docById('ptmTupletNoteValueRow');
+                var row = this._tupletNoteValueRow;
                 var cell = row.insertCell();
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
@@ -1051,7 +2128,7 @@ function PitchTimeMatrix () {
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.backgroundColor = platformColor.tupletBackground;
 
-                var row = docById('ptmTupletValueRow');
+                var row = this._tupletValueRow;
                 var cell = row.insertCell();
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
@@ -1085,17 +2162,678 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.makeClickable = function() {
+    this._syncMarkedBlocks = function () {
+        var newBlockMap = []
+        for (var i = 0; i < this._blockMap.length; i++) {
+            if (this._blockMap[i][0] === -1) {
+                continue;
+            }
+            for (var j = 0; j < this._blockMapHelper.length; j++) {
+                if (JSON.stringify(this._blockMap[i][1]) === JSON.stringify(this._blockMapHelper[j][0])) {
+                    for (var k =0; k < this._blockMapHelper[j][1].length; k++) {
+                        newBlockMap.push([this._blockMap[i][0], this._colBlocks[this._blockMapHelper[j][1][k]], this._blockMap[i][2]])
+                    }
+                }
+            }
+        }
+        this._blockMap = newBlockMap.filter((el, i) => {
+            return i === newBlockMap.findIndex(ele => {
+                return JSON.stringify(ele) === JSON.stringify(el)
+            })
+        });
+    }
+
+    this.blockConnection = function (len, bottomOfClamp) {
+        var n = this._logo.blocks.blockList.length - len;
+        if (bottomOfClamp == null) {
+            this._logo.blocks.blockList[this.blockNo].connections[2] = n;
+            this._logo.blocks.blockList[n].connections[0] = this.blockNo;
+        } else {
+            var c = this._logo.blocks.blockList[bottomOfClamp].connections.length - 1;
+            this._logo.blocks.blockList[bottomOfClamp].connections[c] = n;
+            this._logo.blocks.blockList[n].connections[0] = bottomOfClamp;
+        }
+
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+    };
+
+    this._deleteRhythmBlock = function(blockToDelete) {
+        if (last(this._logo.blocks.blockList[blockToDelete].connections) !== null) {
+            this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[last(this._logo.blocks.blockList[blockToDelete].connections)]);
+        }
+        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockToDelete]);
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.refreshCanvas();
+    }
+
+    this._addRhythmBlock = function(value, times) {
+        var RHYTHMOBJ = [];
+        value = toFraction(value);
+        var topOfClamp = this._logo.blocks.blockList[this.blockNo].connections[1];
+        var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
+        if (this._logo.blocks.blockList[bottomOfClamp].name === 'vspace') {
+            RHYTHMOBJ = [[0, ['rhythm2', {}], 0, 0, [null, 1, 2, 5]], [1, ['number', {'value': times}], 0, 0, [0]], [2, ['divide', {}], 0, 0, [0, 3, 4]], [3, ['number', {'value': value[1]}], 0, 0, [2]], [4, ['number', {'value': value[0]}], 0, 0, [2]], [5, ['vspace', {}], 0, 0, [0, null]]];
+        } else {
+            RHYTHMOBJ = [[0, 'vspace', 0, 0, [null, 1]], [1, ['rhythm2', {}], 0, 0, [0, 2, 3, 6]], [2, ['number', {'value': times}], 0, 0, [1]], [3, ['divide', {}], 0, 0, [1, 4, 5]], [4, ['number', {'value': value[1]}], 0, 0, [3]], [5, ['number', {'value': value[0]}], 0, 0, [3]], [6, ['vspace', {}], 0, 0, [1, null]]];
+        }
+        this._logo.blocks.loadNewBlocks(RHYTHMOBJ);
+        var that = this;
+        if (this._logo.blocks.blockList[bottomOfClamp].name === 'vspace') {
+            setTimeout(that.blockConnection(6, bottomOfClamp), 500);
+        } else {
+            setTimeout(that.blockConnection(7, bottomOfClamp), 500);
+        }
+        this._logo.blocks.refreshCanvas();
+    };
+
+    this._update = function (i, value, k, noteCase) {
+        var updates = [];
+        value = toFraction(value);
+        if (noteCase === 'tupletnote') {
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[1]);
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[1]].connections[2]);
+        }else{
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[1]);
+            updates.push(this._logo.blocks.blockList[this._logo.blocks.blockList[i].connections[2]].connections[2]);
+        }
+        if (noteCase === 'rhythm' || noteCase==='stupletvalue') {
+            updates.push(this._logo.blocks.blockList[i].connections[1]);
+            this._logo.blocks.blockList[updates[2]].value = parseFloat(k);
+            this._logo.blocks.blockList[updates[2]].text.text = k.toString();
+            this._logo.blocks.blockList[updates[2]].updateCache();
+        } 
+        if (noteCase === 'rhythm' || (noteCase === 'stuplet' || noteCase === 'tupletnote' && value!== null)) {
+            this._logo.blocks.blockList[updates[0]].value = parseFloat(value[1]);
+            this._logo.blocks.blockList[updates[0]].text.text = value[1].toString();
+            this._logo.blocks.blockList[updates[0]].updateCache();
+            this._logo.blocks.blockList[updates[1]].value = parseFloat(value[0]);
+            this._logo.blocks.blockList[updates[1]].text.text = value[0].toString();
+            this._logo.blocks.blockList[updates[1]].updateCache();
+            this._logo.refreshCanvas();
+        }
+        saveLocally();
+    }
+
+    this._mapNotesBlocks = function(blockName, withName) {
+        var notesBlockMap = [];
+        var blk = this._logo.blocks.blockList[this.blockNo].connections[1];
+        var myBlock = this._logo.blocks.blockList[blk];
+
+        var bottomBlockLoop = 0;
+        if (myBlock.name === blockName || (blockName === 'all' && myBlock.name!=='hidden' && myBlock.name!=='vspace' && myBlock.name!=='hiddennoflow')) {
+            if (withName) {
+                notesBlockMap.push([blk, myBlock.name]);
+            } else {
+                notesBlockMap.push(blk);
+            }
+        }
+
+        while (last(myBlock.connections) != null) {
+            bottomBlockLoop += 1;
+            if (bottomBlockLoop > 2 * this._logo.blocks.blockList) {
+                // Could happen if the block data is malformed.
+                console.log('infinite loop finding bottomBlock?');
+                break;
+            }
+
+            blk = last(myBlock.connections);
+            myBlock = this._logo.blocks.blockList[blk];
+            if (myBlock.name === blockName || (blockName === 'all' && myBlock.name !== 'hidden' && myBlock.name !== 'vspace' && myBlock.name !== 'hiddennoflow')) {
+                if (withName) {
+                    notesBlockMap.push([blk, myBlock.name]);
+                } else {
+                    notesBlockMap.push(blk);
+                }
+            }
+        }
+
+        return notesBlockMap
+    }
+
+    this.recalculateBlocks = function () {
+        var adjustedNotes = [];
+        adjustedNotes.push([this._logo.tupletRhythms[0][2], 1])
+        var startidx = 1;
+        for (var i = 1; i < this._logo.tupletRhythms.length; i++) {
+            if (this._logo.tupletRhythms[i][2] === last(adjustedNotes)[0]) {
+                startidx  += 1;
+            } else {
+                adjustedNotes[adjustedNotes.length-1][1] = startidx;
+                adjustedNotes.push([this._logo.tupletRhythms[i][2], 1]);
+                startidx = 1;
+            }
+        }
+        if (startidx > 1) {
+            adjustedNotes[adjustedNotes.length-1][1] = startidx;
+        }
+        return adjustedNotes;
+    };
+
+    this._readjustNotesBlocks = function () {
+        var notesBlockMap = this._mapNotesBlocks('rhythm2');
+        var adjustedNotes = this.recalculateBlocks();
+        
+        var colBlocks = [];
+        var n = adjustedNotes.length - notesBlockMap.length;
+        if (n>=0) {
+            for (var i = 0; i < notesBlockMap.length; i++) {
+                this._update(notesBlockMap[i], adjustedNotes[i][0], adjustedNotes[i][1], 'rhythm');
+            }
+        } else {
+            for (var i = 0; i < adjustedNotes.length; i++) {
+                this._update(notesBlockMap[i], adjustedNotes[i][0], adjustedNotes[i][1], 'rhythm');
+            }
+        }
+        
+        for (var i = 0; i < n; i++) {
+            this._addRhythmBlock(adjustedNotes[notesBlockMap.length+i][0], adjustedNotes[notesBlockMap.length+i][1])
+        }
+        for (var i = n; i < 0; i++) {
+            this._deleteRhythmBlock(notesBlockMap[notesBlockMap.length+i]);
+        }
+        notesBlockMap =  this._mapNotesBlocks('rhythm2');
+        for (var i = 0; i < notesBlockMap.length; i++) {
+            for (var j =0 ; j < adjustedNotes[i][1];  j++) {
+                colBlocks.push([notesBlockMap[i], j])
+            }
+        }
+        this._colBlocks = colBlocks;
+    }
+
+    this._restartGrid = function(that) {
+        this._matrixHasTuplets = false;  // Force regeneration of tuplet rows.
+        this.sorted = true;
+        this.init(this._logo);
+        this.sorted = false;
+
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            switch (this._logo.tupletRhythms[i][0]) {
+            case 'simple': 
+            case 'notes': 
+                var tupletParam = [this._logo.tupletParams[i]];
+                tupletParam.push([]);
+                for (var j = 2; j < this._logo.tupletRhythms[i].length; j++) {
+                    tupletParam[1].push(this._logo.tupletRhythms[i][j]);
+                }
+
+                this.addTuplet(tupletParam);
+                break;
+            default: 
+                this.addNotes(this._logo.tupletRhythms[i][1], this._logo.tupletRhythms[i][2]);
+                break;
+            }
+        }
+
+        this.makeClickable();
+        docById('wheelDivptm').style.display = 'none';
+        that._menuWheel.removeWheel();
+        that._exitWheel.removeWheel();
+    };
+
+    this._addNotes = function(that, noteToDivide, notesToAdd) {
+        noteToDivide = parseInt(noteToDivide);
+        this._blockMapHelper = [];
+        for (var i = 0; i <= noteToDivide; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i+parseInt(notesToAdd)]]);
+        }
+        for (var i = 0;i < parseInt(notesToAdd);i++) {
+            this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
+        }
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
+    };
+
+    this._deleteNotes = function(that, noteToDivide) {
+        if (this._logo.tupletRhythms.length === 1) {
+            return;
+        }
+        noteToDivide = parseInt(noteToDivide);
+        this._blockMapHelper = [];
+        for (var i = 0; i < noteToDivide; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i-1]]);
+        }
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
+    };
+
+    this._divideNotes = function(that, noteToDivide, divideNoteBy) {
+        noteToDivide = parseInt(noteToDivide);
+        this._blockMapHelper = [];
+        for (var i = 0; i < noteToDivide; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide).concat([[this._logo.tupletRhythms[noteToDivide][0], this._logo.tupletRhythms[noteToDivide][1], this._logo.tupletRhythms[noteToDivide][2] * divideNoteBy]]).concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
+        this._blockMapHelper.push([this._colBlocks[noteToDivide], []]);
+        var j = 0;
+
+        for (var i = 0; i < divideNoteBy - 1; i++) {
+            this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, noteToDivide + i + 1).concat(this._logo.tupletRhythms.slice(noteToDivide + i));
+            j=noteToDivide+i;
+            this._blockMapHelper[noteToDivide][1].push(j);
+        }
+        j++;
+        this._blockMapHelper[noteToDivide][1].push(j);
+        for (var i = noteToDivide+1; i < this._colBlocks.length; i++) {
+            j++;
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
+        }
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
+    };
+
+    this._tieNotes = function(mouseDownCell, mouseUpCell) {
+        var downCellId = null; 
+        var upCellId = null;
+        if (mouseDownCell.id<mouseUpCell.id) {
+            downCellId = mouseDownCell.id; 
+            upCellId = mouseUpCell.id;
+        } else {
+            downCellId = mouseUpCell.id; 
+            upCellId = mouseDownCell.id;
+        }
+
+        this._blockMapHelper = [];
+        for (var i = 0; i < downCellId; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [i]]);
+        }
+        var j = i;
+        for (var i = downCellId; i <= upCellId; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
+        }
+        j++;
+        for (var i = parseInt(upCellId) + 1; i < this._logo.tupletRhythms.length; i++) {
+            this._blockMapHelper.push([this._colBlocks[i], [j]]);
+            j++;
+        }
+
+        var newNote = 0;
+        for (var i = downCellId; i <= upCellId; i++) {
+            newNote = newNote+(1/parseFloat(this._logo.tupletRhythms[i][2]));
+        }
+        
+        this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
+        
+        this._readjustNotesBlocks();
+        this._syncMarkedBlocks();
+        this._restartGrid(that);
+    }
+
+    this._updateTuplet = function (that, noteToDivide, newNoteValue, condition) {
+        this._logo.tupletParams[noteToDivide][1] = newNoteValue
+        this._restartGrid(that);
+        if (condition === 'simpletupletnote') {
+            var notesBlockMap = this._mapNotesBlocks('stuplet');
+            this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'stuplet');
+        } else {
+            var notesBlockMap =  this._mapNotesBlocks('tuplet4');
+            this._update(notesBlockMap[noteToDivide], newNoteValue, 0, 'tupletnote');
+        }
+    }
+    
+    this._updateTupletValue = function (that, noteToDivide, oldTupletValue, newTupletValue) {
+        noteToDivide = parseInt(noteToDivide);
+        oldTupletValue = parseInt(oldTupletValue);
+        newTupletValue = parseInt(newTupletValue);
+        this._blockMapHelper = [];
+        if (oldTupletValue < newTupletValue) {
+            var k=0;
+            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+                if (i == noteToDivide) {
+                    break;
+                }
+                for (var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                    k++;
+                }
+            }
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
+                this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                k++;
+            }
+            var l = k;
+            k = k + newTupletValue - oldTupletValue;
+            for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+                for (var j = 0; j<this._logo.tupletRhythms[i].length - 2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[l], [k]]);
+                    l++
+                    k++;
+                }
+            }
+
+            for (var i = oldTupletValue; i < newTupletValue; i++) {
+                this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length ).concat(this._logo.tupletRhythms[noteToDivide].slice(this._logo.tupletRhythms[noteToDivide].length - 1));
+            }
+        } else {
+            var k = 0;
+            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+                if (i === noteToDivide) {
+                    break;
+                }
+                for (var j = 0; j < this._logo.tupletRhythms[i].length - 2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                    k++;
+                }
+            }
+            
+            for (var i = oldTupletValue; i > newTupletValue; i--) {
+                this._logo.tupletRhythms[noteToDivide] = this._logo.tupletRhythms[noteToDivide].slice(0, this._logo.tupletRhythms[noteToDivide].length -1);
+            }
+            for (var j =0; j < this._logo.tupletRhythms[noteToDivide].length - 2; j++) {
+                this._blockMapHelper.push([this._colBlocks[k], [k]]);
+                k++;
+            }
+            var l = k+ oldTupletValue - newTupletValue;
+            for (var i = noteToDivide + 1; i < this._logo.tupletRhythms.length; i++) {
+                for (var j =0; j < this._logo.tupletRhythms[i].length - 2; j++) {
+                    this._blockMapHelper.push([this._colBlocks[l], [k]]);
+                    l++
+                    k++;
+                }
+            }
+        }
+        var notesBlockMap =  this._mapNotesBlocks('stuplet');
+        var colBlocks = [];
+        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+            for (var j =0 ; j < this._logo.tupletRhythms[i].length - 2;  j++) {
+                colBlocks.push([notesBlockMap[i], j]);
+            }
+        }
+        this._colBlocks = colBlocks;
+        this._restartGrid(that);
+        this._syncMarkedBlocks();
+        this._update(notesBlockMap[noteToDivide], null, newTupletValue, 'stupletvalue');
+    }
+
+    this._createpiesubmenu = function (noteToDivide, tupletValue, condition) {
+        docById('wheelDivptm').style.display = '';
+
+        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
+
+        if (condition === 'tupletvalue') {
+            var mainTabsLabels = ['1', '2', '3', '-', '4', '5', '6', '7', '8', '+', '9', '10'];
+            this.newNoteValue = String(tupletValue);
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
+            mainTabsLabels = ['<-', 'Enter', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+            this.newNoteValue = '/';
+        } else if (condition === 'rhythmnote') {
+            this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
+            this.newNoteValue = 2;
+            mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
+        }
+
+        wheelnav.cssMode = true;
+        this._menuWheel.keynavigateEnabled = false;
+        this._menuWheel.clickModeRotate = false;
+        this._menuWheel.colors = platformColor.pitchWheelcolors;
+        this._menuWheel.slicePathFunction = slicePath().DonutSlice;
+        this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
+        this._menuWheel.animatetime = 0; // 300;
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.keynavigateEnabled = false;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        var exitTabLabel = [];
+
+        if (condition === 'tupletvalue') {
+            exitTabLabel = ['x', this.newNoteValue];
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.4;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.4;
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
+            exitTabLabel = ['x', this.newNoteValue];
+
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.5;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 1;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.5;
+
+        } else if (condition === 'rhythmnote') {
+            exitTabLabel = ['x', ' '];
+            var tabsLabels = ['', '', '', '', '', '', '', '', '', '', '', '', '1', '2', '3', '4', '5', '6', '7', ''];
+            this._menuWheel.slicePathCustom.minRadiusPercent = 0.2;
+            this._menuWheel.slicePathCustom.maxRadiusPercent = 0.7;
+
+            this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+            this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+
+            this._tabsWheel.colors = platformColor.pitchWheelcolors;
+            this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
+            this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
+            this._tabsWheel.slicePathCustom.maxRadiusPercent = 1;
+            this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
+            this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
+            this._tabsWheel.clickModeRotate = false;
+            this._tabsWheel.createWheel(tabsLabels);
+
+            for (var i = 0; i < tabsLabels.length;i++) {
+                this._tabsWheel.navItems[i].navItem.hide();
+            }
+
+        }
+
+        this._menuWheel.createWheel(mainTabsLabels);
+        this._exitWheel.createWheel(exitTabLabel);
+        
+        docById('wheelDivptm').style.position = 'absolute';
+        docById('wheelDivptm').style.height = '250px';
+        docById('wheelDivptm').style.width = '250px';
+        
+        if (noteToDivide !== null) {
+            var ntd = this._noteValueRow.cells[noteToDivide];
+            var x = ntd.getBoundingClientRect().x;
+            var y = ntd.getBoundingClientRect().y;
+        }
+        
+        docById('wheelDivptm').style.left = Math.min(this._logo.blocks.turtles._canvas.width - 200, Math.max(0, x * this._logo.blocks.getStageScale())) + 'px';
+        docById('wheelDivptm').style.top = Math.min(this._logo.blocks.turtles._canvas.height - 250, Math.max(0, y * this._logo.blocks.getStageScale())) + 'px';
+
+        var that = this;
+        this._exitWheel.navItems[0].navigateFunction = function () {
+            docById('wheelDivptm').style.display = 'none';
+            that._menuWheel.removeWheel();
+            that._exitWheel.removeWheel();
+        };
+
+        if (condition === 'tupletvalue') {
+            var __enterValue = function () {
+                var i = that._menuWheel.selectedNavItemIndex;
+                var value = mainTabsLabels[i];
+                
+                that.newNoteValue = String(value);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
+            };
+
+            this._menuWheel.navItems[3].navigateFunction = function () {
+                if (that.newNoteValue > 1) {
+                that.newNoteValue = String(parseInt(that.newNoteValue) - 1);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);    }       
+            };
+
+            this._menuWheel.navItems[9].navigateFunction = function () {
+                that.newNoteValue = String(parseInt(that.newNoteValue) + 1);
+                docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                that._updateTupletValue(that, noteToDivide, tupletValue, that.newNoteValue);
+            };
+
+            for (var i = 0; i < mainTabsLabels.length; i++) {
+                if (i === 9 || i == 3) {
+                    continue;
+                }
+
+                this._menuWheel.navItems[i].navigateFunction = __enterValue;
+            }
+        } else if (condition === 'simpletupletnote' || condition === 'tupletnote') {
+            var first = false;
+            var second = false;
+            
+            var __enterValue = function () {
+                var i = that._menuWheel.selectedNavItemIndex;
+                var value = mainTabsLabels[i];
+                if (!first) {
+                    that.newNoteValue = String(value) + '/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    first = true;
+                } else{
+                    if (!second) {
+                        that.newNoteValue = that.newNoteValue+String(value);
+                        docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                        second = true;
+                    }
+                }
+            };
+
+            this._menuWheel.navItems[0].navigateFunction = function () {
+                if (second && first) {
+                    var word = that.newNoteValue.split('/');
+                    that.newNoteValue = word[0] + '/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    second = false;
+                } else if (first) {
+                    that.newNoteValue = '/';
+                    docById('wheelnav-_exitWheel-title-1').children[0].textContent = that.newNoteValue;
+                    first = false;
+                }
+            };
+
+            this._menuWheel.navItems[1].navigateFunction = function () {
+                if (second && first) {
+                    var word = that.newNoteValue.split('/');
+                    that._updateTuplet(that, noteToDivide, parseInt(word[1])/parseInt(word[0]), condition);
+                }
+            };
+
+            for (var i = 2; i < mainTabsLabels.length; i++) {
+                this._menuWheel.navItems[i].navigateFunction = __enterValue;
+            }
+
+        } else if (condition === 'rhythmnote') {
+            var flag = 0;
+            this._menuWheel.navItems[0].navigateFunction = function () {
+                that._divideNotes(that, noteToDivide, that.newNoteValue);
+            };
+
+            this._menuWheel.navItems[1].navigateFunction = function () {
+                that._deleteNotes(that, noteToDivide);
+            };
+
+            this._menuWheel.navItems[2].navigateFunction = function () {
+                that._addNotes(that, noteToDivide, that.newNoteValue);
+            };
+
+            this._menuWheel.navItems[3].navigateFunction = function () {
+                if (!flag) {
+                    for (var i = 12; i < 19; i++) {
+                        docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                        that._tabsWheel.navItems[i].navItem.show();
+                    }
+
+                    flag = 1;
+                } else {
+                    for (var i = 12; i < 19; i++) {
+                        docById('wheelnav-wheelDivptm-title-3').children[0].textContent = that.newNoteValue;
+                        that._tabsWheel.navItems[i].navItem.hide();
+                    }
+
+                    flag = 0;
+                }
+            };
+
+            for (var i = 12; i < 19; i++) {
+                this._tabsWheel.navItems[i].navigateFunction = function () {
+                    var j = that._tabsWheel.selectedNavItemIndex;
+                    that.newNoteValue = tabsLabels[j];
+                    docById('wheelnav-wheelDivptm-title-3').children[0].textContent = tabsLabels[j];
+                }
+            }
+        }
+    };
+
+    this.makeClickable = function () {
         // Once the entire matrix is generated, this function makes it
         // clickable.
+        var rowNote = this._noteValueRow;
+        var rowTuplet = this._tupletValueRow;
+        for (var j = 0; j < rowNote.cells.length; j++) {
+            var cell = rowNote.cells[j];
+
+            var cellTuplet = rowTuplet.cells[j];
+            if (cellTuplet !== undefined) {
+                cellTuplet.setAttribute('id',  j);
+            }
+
+            var that = this;
+
+            __mouseDownHandler = function(event) {
+                var cell = event.target;
+                that._mouseDownCell = cell;
+            }
+
+            __mouseUpHandler = function(event) {
+                var cell = event.target;
+                that._mouseUpCell = cell;
+                if (that._mouseDownCell !== that._mouseUpCell) {
+                    that._tieNotes(that._mouseDownCell, that._mouseUpCell);
+                } else {
+                    var nodes = Array.prototype.slice.call(this.parentElement.children);
+                    that._createpiesubmenu(nodes.indexOf(this), this.getAttribute('alt'), 'rhythmnote');
+                }
+            }
+
+            if (cellTuplet !== undefined) {
+                if (this._logo.tupletRhythms[0][0] === 'notes') {
+                    cell.onclick = function () {
+                        that._createpiesubmenu(this.getAttribute('id'), null, 'tupletnote');
+                    }
+                } else {
+                    cell.onclick = function () {
+                        that._createpiesubmenu(this.getAttribute('id'), null, 'simpletupletnote');
+                    }
+
+                    cellTuplet.onclick = function () {
+                        that._createpiesubmenu(this.getAttribute('id'), this.getAttribute('colspan'), 'tupletvalue');
+                    }
+                }
+            } else {
+                cell.removeEventListener('mousedown', __mouseDownHandler);
+                cell.addEventListener('mousedown', __mouseDownHandler);
+
+                cell.removeEventListener('mouseup', __mouseUpHandler);
+                cell.addEventListener('mouseup', __mouseUpHandler);
+            }
+        }
+        
         var rowCount = this.rowLabels.length;
 
         for (var i = 0; i < rowCount; i++) {
-            var row = docById('ptm' + i);
+            var row = this._rows[i];
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._setNotes(j, i, false);
                 }
             }
@@ -1103,22 +2841,22 @@ function PitchTimeMatrix () {
 
         for (var i = 0; i < rowCount; i++) {
             // The buttons get added to the embedded table.
-            var row = docById('ptm' + i);
+            var row = this._rows[i];
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 // Give each clickable cell a unique id
-                cell.setAttribute('id', i + ':' + j);
+                cell.setAttribute('data-i', i)
+                cell.setAttribute('data-j', j);
 
                 var that = this;
                 var isMouseDown = false;
 
-                cell.onmousedown = function() {
+                cell.onmousedown = function () {
                     isMouseDown = true;
-                    var obj = this.id.split(':');
-                    var i = Number(obj[0]);
-                    var j = Number(obj[1]);
+                    var i = Number(this.getAttribute('data-i'));
+                    var j = Number(this.getAttribute('data-j'));
                     if (this.style.backgroundColor === 'black') {
-                        this.style.backgroundColor = platformColor.selectorBackground;
+                        this.style.backgroundColor = this.getAttribute('cellColor');
                         that._notesToPlay[j][0] = ['R'];
                         that._setNotes(j, i, false);
                     } else {
@@ -1127,13 +2865,12 @@ function PitchTimeMatrix () {
                     }
                 }
 
-                cell.onmouseover = function() {
-                    var obj = this.id.split(':');
-                    var i = Number(obj[0]);
-                    var j = Number(obj[1]);
+                cell.onmouseover = function () {
+                    var i = Number(this.getAttribute('data-i'));
+                    var j = Number(this.getAttribute('data-j'));
                     if (isMouseDown) {
                         if (this.style.backgroundColor === 'black') {
-                            this.style.backgroundColor = platformColor.selectorBackground;
+                            this.style.backgroundColor = this.getAttribute('cellColor');
                             that._notesToPlay[j][0] = ['R'];
                             that._setNotes(j, i, false);
                         } else {
@@ -1143,7 +2880,7 @@ function PitchTimeMatrix () {
                     }
                 }
 
-                cell.onmouseup = function() {
+                cell.onmouseup = function () {
                      isMouseDown = false;
                 }
             }
@@ -1160,7 +2897,7 @@ function PitchTimeMatrix () {
             for (var i = 0; i < this._rowMapper.length; i++) {
                 var ii = this._rowMapper[i];
                 var r = this._sortedRowMap[i];
-                var row = docById('ptm' + r);
+                var row = this._rows[r];
                 for (var j = 0; j < this._markedColsInRow[ii].length; j++) {
                     var c = this._markedColsInRow[ii][j];
                     var cell = row.cells[c];
@@ -1220,8 +2957,8 @@ function PitchTimeMatrix () {
 
                     // If we found a match, mark this cell and add this
                     // note to the play list.
-                    var row = docById('ptm' + r);
-                    if (row === null) {
+                    var row = this._rows[r];
+                    if (row === null || typeof row === 'undefined') {
                         console.log('COULD NOT FIND ROW ' + r);
                     } else {
                         var cell = row.cells[c];
@@ -1239,14 +2976,12 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.playAll = function(row) {
+    this.playAll = function() {
         // Play all of the notes in the matrix.
         this.playingNow = !this.playingNow;
 
-        var playButtonCell = row.cells[0];
-
         if (this.playingNow) {
-            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            this.widgetWindow.modifyButton(0, 'stop-button.svg', ICONSIZE, _('stop'))
 
             this._logo.synth.stop();
 
@@ -1281,7 +3016,7 @@ function PitchTimeMatrix () {
                 } else if (note[i].slice(0, 4) === 'http') {
                     drumNotes.push(note[i]);
                 } else {
-                    var obj = note[i].split(':');
+                    var obj = note[i].split(': ');
                     if (obj.length > 1) {
                         // Deprecated
                         if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
@@ -1304,7 +3039,7 @@ function PitchTimeMatrix () {
             this._colIndex = 0;
 
             // We highlight the note-value cells (bottom row).
-            var row = docById('ptmNoteValueRow');
+            var row = this._noteValueRow;
 
             // Highlight first note.
             var cell = row.cells[this._colIndex];
@@ -1314,7 +3049,7 @@ function PitchTimeMatrix () {
             // we've played all of the notes in the column span.
             if (cell.colSpan > 1) {
                 this._spanCounter = 1;
-                var row = docById('ptmTupletNoteValueRow');
+                var row = this._tupletNoteValueRow;
                 var tupletCell = row.cells[this._colIndex];
                 tupletCell.style.backgroundColor = platformColor.selectorBackground;
             } else {
@@ -1335,22 +3070,22 @@ function PitchTimeMatrix () {
                 this._logo.synth.trigger(0, 'C2', this._logo.defaultBPMFactor / noteValue, drumNotes[i], null, null);
             }
 
-            this.__playNote(0, 0, playButtonCell);
+            this.__playNote(0, 0);
         } else {
             this._stopOrCloseClicked = true;
-            playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            this.widgetWindow.modifyButton(0, 'play-button.svg', ICONSIZE, _('Play'))
         }
     };
 
-    this._resetMatrix = function() {
-        var row = docById('ptmNoteValueRow');
+    this._resetMatrix = function () {
+        var row = this._noteValueRow;
         for (var i = 0; i < row.cells.length; i++) {
             var cell = row.cells[i];
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
         if (that._matrixHasTuplets) {
-            var row = docById('ptmTupletNoteValueRow');
+            var row = this._tupletNoteValueRow;
             for (var i = 0; i < row.cells.length; i++) {
                 var cell = row.cells[i];
                 cell.style.backgroundColor = platformColor.tupletBackground;
@@ -1358,9 +3093,9 @@ function PitchTimeMatrix () {
         }
     };
 
-    this.__playNote = function(time, noteCounter, playButtonCell) {
+    this.__playNote = function(time, noteCounter) {
         // If the widget is closed, stop playing.
-        if (docById('ptmDiv').style.visibility === 'hidden') {
+        if (!this.widgetWindow.isVisible()) {
             return;
         }
 
@@ -1368,21 +3103,21 @@ function PitchTimeMatrix () {
         time = 1 / noteValue;
         var that = this;
 
-        setTimeout(function() {
+        setTimeout(function () {
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
                 that._resetMatrix();
 
-                playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                that.widgetWindow.modifyButton(0, 'play-button.svg', ICONSIZE, _('Play'))
                 that.playingNow = false;
             } else {
-                var row = docById('ptmNoteValueRow');
+                var row = that._noteValueRow;
                 var cell = row.cells[that._colIndex];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                     if (cell.colSpan > 1) {
-                        var row = docById('ptmTupletNoteValueRow');
+                        var row = that._tupletNoteValueRow;
                         var tupletCell = row.cells[that._notesCounter];
                         tupletCell.style.backgroundColor = platformColor.selectorBackground;
                     }
@@ -1417,7 +3152,7 @@ function PitchTimeMatrix () {
                         } else if (note[i].slice(0, 4) === 'http') {
                             drumNotes.push(note[i]);
                         } else {
-                            var obj = note[i].split(':');
+                            var obj = note[i].split(': ');
                             // Deprecated
                             if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
                                 synthNotes.push(note[i]);
@@ -1447,7 +3182,7 @@ function PitchTimeMatrix () {
                 }
             }
 
-            var row = docById('ptmNoteValueRow');
+            var row = that._noteValueRow;
             var cell = row.cells[that._colIndex];
             if (cell != undefined) {
                 if (cell.colSpan > 1) {
@@ -1464,10 +3199,10 @@ function PitchTimeMatrix () {
                 noteCounter += 1;
 
                 if (noteCounter < that._notesToPlay.length && that.playingNow) {
-                    that.__playNote(time, noteCounter, playButtonCell);
+                    that.__playNote(time, noteCounter);
                 } else {
                     that._resetMatrix();
-                    playButtonCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'play-button.svg' + '" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                    that.widgetWindow.modifyButton(0, 'play-button.svg', ICONSIZE, _('Play'))
                 }
             }
         }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
@@ -1475,24 +3210,24 @@ function PitchTimeMatrix () {
 
     this._playChord = function (notes, noteValue) {
         var that = this;
-        setTimeout(function() {
+        setTimeout(function () {
             that._logo.synth.trigger(0, notes[0], noteValue, that._instrumentName, null, null);
         }, 1);
 
         if (notes.length > 1) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[1], noteValue, that._instrumentName, null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[2], noteValue, that._instrumentName, null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
-            setTimeout(function() {
+            setTimeout(function () {
                 that._logo.synth.trigger(0, notes[3], noteValue, that._instrumentName, null, null);
             }, 1);
         }
@@ -1500,47 +3235,47 @@ function PitchTimeMatrix () {
 
     this._processGraphics = function (obj) {
         switch(obj[0]) {
-        case 'forward':
+        case 'forward': 
             this._logo.turtles.turtleList[0].doForward(obj[1]);
             break;
-        case 'back':
+        case 'back': 
             this._logo.turtles.turtleList[0].doForward(-obj[1]);
             break;
-        case 'right':
+        case 'right': 
             this._logo.turtles.turtleList[0].doRight(obj[1]);
             break;
-        case 'left':
+        case 'left': 
             this._logo.turtles.turtleList[0].doRight(-obj[1]);
             break;
-        case 'setcolor':
+        case 'setcolor': 
             this._logo.turtles.turtleList[0].doSetColor(obj[1]);
             break;
-        case 'sethue':
+        case 'sethue': 
             this._logo.turtles.turtleList[0].doSetHue(obj[1]);
             break;
-        case 'setshade':
+        case 'setshade': 
             this._logo.turtles.turtleList[0].doSetValue(obj[1]);
             break;
-        case 'setgrey':
+        case 'setgrey': 
             this._logo.turtles.turtleList[0].doSetChroma(obj[1]);
             break;
-        case 'settranslucency':
+        case 'settranslucency': 
             var alpha = 1.0 - (obj[1] / 100);
             this._logo.turtles.turtleList[0].doSetPenAlpha(alpha);
             break;
-        case 'setpensize':
+        case 'setpensize': 
             this._logo.turtles.turtleList[0].doSetPensize(obj[1]);
             break;
-        case 'setheading':
+        case 'setheading': 
             this._logo.turtles.turtleList[0].doSetHeading(obj[1]);
             break;
-        case 'arc':
+        case 'arc': 
             this._logo.turtles.turtleList[0].doArc(obj[1], obj[2]);
             break;
-        case 'setxy':
+        case 'setxy': 
             this._logo.turtles.turtleList[0].doSetXY(obj[1], obj[2]);
             break;
-        default:
+        default: 
             console.log('unknown graphics command ' + obj[0]);
             break;
         }
@@ -1560,7 +3295,7 @@ function PitchTimeMatrix () {
 
         this._notesToPlay[colIndex][0] = [];
         for (var j = 0; j < this.rowLabels.length; j++) {
-            var row = docById('ptm' + j);
+            var row = this._rows[j];
             var cell = row.cells[colIndex];
             if (cell.style.backgroundColor === 'black') {
                 this._setNoteCell(j, colIndex, cell, playNote);
@@ -1577,19 +3312,19 @@ function PitchTimeMatrix () {
         } else {
             var drumName = getDrumName(note);
             var graphicsBlock = false;
-            graphicNote = note.split(':');
+            graphicNote = note.split(': ');
             if (MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 && MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1) {
                 var graphicsBlock = true;
             }
 
-            var obj = note.split(':');
+            var obj = note.split(': ');
         }
 
-        var row = docById('ptm' + j);
+        var row = this._rows[j];
         var cell = row.cells[colIndex];
 
         // Using the alt attribute to store the note value
-        var noteValue = cell.getAttribute('alt');
+        var noteValue = cell.getAttribute('alt') * this._logo.defaultBPMFactor;
 
         this._notesToPlay[parseInt(colIndex)][0].push(note);
 
@@ -1614,14 +3349,14 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._clear = function() {
-        // "Unclick" every entry in the matrix.
+    this._clear = function () {
+        // 'Unclick' every entry in the matrix.
         for (var i = 0; i < this.rowLabels.length; i++) {
-            var row = docById('ptm' + i);
+            var row = this._rows[i];
             for (var j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === 'black') {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = cell.getAttribute('cellColor');
                     this._notesToPlay[j][0] = ['R'];
                     this._setNotes(j, i, false);
                 }
@@ -1629,7 +3364,7 @@ function PitchTimeMatrix () {
         }
     };
 
-    this._save = function() {
+    this._save = function () {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
 
@@ -1737,7 +3472,7 @@ function PitchTimeMatrix () {
                         var obj = null;
                         var drumName = null;
                     } else {
-                       var obj = note[0][j].split(':');
+                       var obj = note[0][j].split(': ');
                        var drumName = getDrumName(note[0][j]);
                     }
 
@@ -1891,5 +3626,6 @@ function PitchTimeMatrix () {
 
         // Create a new stack for the chunk.
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
     };
 };

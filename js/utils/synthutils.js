@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -51,10 +51,16 @@ var VOICENAMES = [
     [_('dulcimer'), 'dulcimer', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('electric guitar'), 'electric guitar', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('bassoon'), 'bassoon', 'images/voices.svg', 'string'],
+    //.TRANS: musical instrument
+    [_('celeste'), 'celeste', 'images/voices.svg', 'string'],
+    //.TRANS: xylophone musical instrument
+    [_('xylophone'), 'xylophone', 'images/8_bellset_key_6.svg', 'precussion'],
     //.TRANS: polytone synthesizer
     [_('electronic synth'), 'electronic synth', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
+    // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
     // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -71,6 +77,8 @@ var VOICENAMES = [
     [_('triangle'), 'triangle', 'images/synth.svg', 'electronic'],
     //.TRANS: customize voice
     [_('custom'), 'custom', 'images/synth.svg', 'electronic'],
+    //.TRANS: vibraphone musical instrument
+    [_('vibraphone'), 'vibraphone', 'images/synth.svg', 'electronic'],
 ];
 
 // drum symbols are from
@@ -83,11 +91,13 @@ var DRUMNAMES = [
     //.TRANS: musical instrument
     [_('tom tom'), 'tom tom', 'images/tom.svg', 'tomml', 'drum'],
     //.TRANS: musical instrument
-    [_('floor tom tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
+    [_('floor tom'), 'floor tom tom', 'images/floortom.svg', 'tomfl', 'drum'],
     //.TRANS: a drum made from an inverted cup
     [_('cup drum'), 'cup drum', 'images/cup.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
     [_('darbuka drum'), 'darbuka drum', 'images/darbuka.svg', 'hh', 'drum'],
+    //.TRANS: musical instrument
+    [_('taiko'), 'japanese drum', 'images/tom.svg', 'hh', 'drum'],
     //.TRANS: musical instrument
     [_('hi hat'), 'hi hat', 'images/hihat.svg', 'hh', 'bell'],
     //.TRANS: a small metal bell
@@ -98,6 +108,8 @@ var DRUMNAMES = [
     [_('triangle bell'), 'triangle bell', 'images/trianglebell.svg', 'tri', 'bell'],
     //.TRANS: musical instrument
     [_('finger cymbals'), 'finger cymbals', 'images/fingercymbals.svg', 'cymca', 'bell'],
+    //.TRANS: musical instrument
+    // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
     [_('chime'), 'chime', 'images/chime.svg', 'cymca', 'bell'],
     //.TRANS: a musical instrument
@@ -116,6 +128,8 @@ var DRUMNAMES = [
     [_('splash'), 'splash', 'images/splash.svg', 'hh', 'effect'],
     //.TRANS: sound effect
     [_('bubbles'), 'bubbles', 'images/bubbles.svg', 'hh', 'effect'],
+    //.TRANS: sound effect
+    [_('raindrop'), 'raindrop', 'images/bubbles.svg', 'hh', 'effect'],
     //.TRANS: animal sound effect
     [_('cat'), 'cat', 'images/cat.svg', 'hh', 'animal'],
     //.TRANS: animal sound effect
@@ -141,8 +155,41 @@ var SOUNDSAMPLESDEFINES = [
     "samples/chime", "samples/cricket", "samples/fingercymbal",
     "samples/slap", "samples/clang", "samples/cup", "samples/floortom",
     "samples/snare", "samples/piano", "samples/acguit", "samples/banjo",
-    "samples/koto", "samples/gong", "samples/dulcimer", "samples/electricguitar"
+    "samples/bassoon", "samples/celeste", "samples/raindrop",
+    "samples/koto", "samples/gong", "samples/dulcimer",
+    "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
+    "samples/japanese_drum", // "samples/japanese_bell",
 ]
+
+
+// Some samples have a default volume other than 50 (See #1697)
+const DEFAULTSYNTHVOLUME = {
+    'flute': 90,
+    'electronic synth': 90,
+    'piano': 100,
+    'banjo': 90,
+    'koto': 70,
+    'kick drum': 100,
+    'tom tom': 100,
+    'floor tom': 100,
+    'cup drum': 100,
+    'darbuka drum': 100,
+    'hi hat': 100,
+    'ride bell': 100,
+    'cow bell': 100,
+    'triangle bell': 60,
+    'finger cymbals': 70,
+    'chime': 90,
+    'gong': 70,
+    'clang': 70,
+    'crash': 90,
+    'clap': 90,
+    'slap': 60,
+    'vibraphone': 100,
+    'xylophone': 100,
+    'japanese drum': 90,
+}
+
 
 // The sample has a pitch which is subsequently transposed.
 // This number is that starting pitch number. Reference function pitchToNumber
@@ -162,6 +209,10 @@ const SAMPLECENTERNO = {
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
     'electric guitar': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'bassoon': ['D4', 41],  // pitchToNumber('C', 5, 'C Major')],
+    'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
+    'vibraphone': ['C5', 51],
+    'xylophone': ['C4', 39],
 };
 
 
@@ -318,7 +369,7 @@ function Synth() {
                 var len = notes.length;
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
-                return pitchToFrequency(note, octave, 0, null);
+                return pitchToFrequency(note, octave, 0, 'c major');
             } else if (typeof(notes) === 'number') {
                 return notes;
             } else {
@@ -328,7 +379,7 @@ function Synth() {
                         var len = notes[i].length;
                         var note = notes[i].substring(0, len - 1);
                         var octave = Number(notes[i].slice(-1));
-                        results.push(pitchToFrequency(note, octave, 0, null));
+                        results.push(pitchToFrequency(note, octave, 0, 'c major'));
                     } else {
                         results.push(notes[i]);
                     }
@@ -435,12 +486,16 @@ function Synth() {
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
-		{'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
+                {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
 		{'name': 'banjo', 'data': BANJO_SAMPLE},
 		{'name': 'koto', 'data': KOTO_SAMPLE},
 		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE}
+		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
+		{'name': 'celeste', 'data': CELESTE_SAMPLE},
+		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
+		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -449,6 +504,7 @@ function Synth() {
                 {'name': 'hi hat', 'data': HIHAT_SAMPLE},
                 {'name': 'splash', 'data': SPLASH_SAMPLE},
                 {'name': 'bubbles', 'data': BUBBLES_SAMPLE},
+                {'name': 'raindrop', 'data': RAINDROP_SAMPLE},
                 {'name': 'cow bell', 'data': COWBELL_SAMPLE},
                 {'name': 'dog', 'data': DOG_SAMPLE},
                 {'name': 'kick drum', 'data': KICK_SAMPLE},
@@ -463,6 +519,8 @@ function Synth() {
                 {'name': 'cricket', 'data': CRICKET_SAMPLE},
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
+                {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
+		// {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
@@ -507,7 +565,11 @@ function Synth() {
         }
     });
 
-    this.recorder = new Recorder(Tone.Master);
+    // Until we fix #1744, disable recorder on FF
+    if (!platform.FF) {
+	// recoder breaks with Tone.js v13.8.25
+        // this.recorder = new Recorder(Tone.Master);
+    }
 
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function (sourceName) {
@@ -710,9 +772,9 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
-	    var noteDict = {};
-	    noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
-	    var tempSynth = new Tone.Sampler(noteDict);
+            var noteDict = {};
+            noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.log(sourceName);
@@ -1032,7 +1094,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-	// console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+        // console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
@@ -1102,14 +1164,18 @@ function Synth() {
         }
     };
 
-    this.stopSound = function (turtle, instrumentName) {
+    this.stopSound = function (turtle, instrumentName, note) {
         var flag = instrumentsSource[instrumentName][0];
         switch(flag) {
         case 1:  // drum
             instruments[turtle][instrumentName].stop();
             break;
         default:
-            instruments[turtle][instrumentName].triggerRelease();
+	    if (note == undefined) {
+		instruments[turtle][instrumentName].triggerRelease();
+	    } else {
+		instruments[turtle][instrumentName].triggerRelease(note);
+	    }
             break;
         }
     };
@@ -1123,15 +1189,29 @@ function Synth() {
     };
 
     this.setVolume = function (turtle, instrumentName, volume) {
-        // volume in decibals
-        var db = Tone.gainToDb(volume / 100);
+        // We pass in volume as a number from 0 to 100.
+        // As per #1697, we adjust the volume of some instruments.
+        if (instrumentName in DEFAULTSYNTHVOLUME) {
+            var sv = DEFAULTSYNTHVOLUME[instrumentName];
+            if (volume > 50) {
+                var d = 100 - sv;
+                var nv = ((volume - 50) / 50) * d + sv;
+            } else {
+                var nv = (volume / 50) * sv;
+            }
+        } else {
+            var nv = volume;
+        }
+
+        // Convert volume to decibals
+        var db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
     };
 
+    // Unused and it is not clear that the return value is correct.
     this.getVolume = function (turtle, instrumentName) {
-        // volume in decibals
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {

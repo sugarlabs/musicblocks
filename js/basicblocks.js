@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -167,7 +167,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('change in pitch'));
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
-    if (beginnerMode && !beginnerBlock('deltapitch')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('deltapitch')) {
         newblock.hidden = true;
     }
 
@@ -178,7 +178,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('scalar change in pitch'));
     newblock.parameterBlock();
     newblock.adjustWidthToLabel();
-    if (beginnerMode && !beginnerBlock('deltapitch2')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('deltapitch2')) {
         newblock.hidden = true;
     }
 
@@ -1253,6 +1253,21 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    // macro
+    var newblock = new ProtoBlock('meterwidget');
+    newblock.palette = palettes.dict['widgets'];
+    blocks.protoBlockDict['meterwidget'] = newblock;
+    //.TRANS: musical meter, e.g., 4:4
+    newblock.staticLabels.push(_('meter'));
+    newblock.extraWidth = 20;
+    newblock.adjustWidthToLabel();
+    newblock.labelOffset = 15;
+    newblock.stackClampZeroArgBlock();
+    if (beginnerMode && !beginnerBlock('meterwidget')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('modewidget');
     newblock.palette = palettes.dict['widgets'];
     blocks.protoBlockDict['modewidget'] = newblock;
@@ -1307,12 +1322,24 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    if (language !== 'ja') {
+	// macro
+	var newblock = new ProtoBlock('chromatic');
+	newblock.palette = palettes.dict['widgets'];
+	blocks.protoBlockDict['chromatic'] = newblock;
+	newblock.staticLabels.push(_('chromatic keyboard'));
+	newblock.adjustWidthToLabel();
+	newblock.stackClampZeroArgBlock();
+	if (beginnerMode && !beginnerBlock('chromatic')) {
+            newblock.hidden = true;
+	}
+    }
+    
     if (language === 'ja') {
         // macro
         var newblock = new ProtoBlock('musickeyboardja');
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['musickeyboardja'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
         newblock.staticLabels.push(_('music keyboard'));
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
@@ -1325,7 +1352,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         var newblock = new ProtoBlock('musickeyboard2');
         newblock.palette = palettes.dict['widgets'];
         blocks.protoBlockDict['musickeyboard2'] = newblock;
-        //.TRANS: widget to generate pitches using a slider
         newblock.staticLabels.push(_('music keyboard'));
         newblock.adjustWidthToLabel();
         newblock.labelOffset = 15;
@@ -1541,18 +1567,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['offbeatdo'] = newblock;
     // #TRANS: on musical 'offbeat' do some action
-    if (language === 'ja') {
-        newblock.staticLabels.push(_('on weak beat'), _('beat'));
-        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do1'));
-    } else {
-        // #TRANS: 'on' musical 'beat' 'do' some action
-        newblock.staticLabels.push(_('on weak beat'), _('beat'), _('do'));
-    }
-    newblock.twoArgBlock();
+    newblock.staticLabels.push(_('on weak beat do'));
+    newblock.oneArgBlock();
     newblock.defaults.push(_('action'));
-    newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'textin';
+    newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('offbeatdo')) {
         newblock.hidden = true;
     }
@@ -2009,7 +2028,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['tone'];
     blocks.protoBlockDict['settimbre'] = newblock;
     //.TRANS: set the characteristics of a custom instrument
-    newblock.staticLabels.push(_('set timbre'));
+    newblock.staticLabels.push(_('set instrument'));
     newblock.adjustWidthToLabel();
     newblock.flowClampOneArgBlock();
     newblock.dockTypes[1] = 'textin';
@@ -2986,7 +3005,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('floortom');
     newblock.palette = palettes.dict['drum'];
     blocks.protoBlockDict['floortom'] = newblock;
-    newblock.staticLabels.push(_('floor tom tom'));
+    newblock.staticLabels.push(_('floor tom'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('floortom')) {
@@ -3023,6 +3042,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     if (beginnerMode && !beginnerBlock('snare')) {
+        newblock.hidden = true;
+    }
+
+    // macro
+    var newblock = new ProtoBlock('mapdrum');
+    newblock.palette = palettes.dict['drum'];
+    blocks.protoBlockDict['mapdrum'] = newblock;
+    //.TRANS: map a pitch to a drum sound
+    newblock.staticLabels.push(_('map pitch to drum'));
+    newblock.adjustWidthToLabel();
+    newblock.flowClampOneArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('mapdrum')) {
         newblock.hidden = true;
     }
 
@@ -3738,7 +3770,11 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['divide'] = newblock;
     newblock.fontsize = 9;
-    newblock.staticLabels.push('➗');
+    if (language === 'ja') {
+        newblock.staticLabels.push('➗');
+    } else {
+        newblock.staticLabels.push('/');
+    }
     newblock.twoArgMathBlock();
     newblock.defaults.push(1, 4)
     if (beginnerMode && !beginnerBlock('divide')) {
@@ -3818,6 +3854,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('random'), _('min'), _('max'));
     newblock.adjustWidthToLabel();
     newblock.twoArgMathBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
     newblock.defaults.push(0, 12);
     if (beginnerMode && !beginnerBlock('random')) {
         newblock.hidden = true;
@@ -3977,25 +4015,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // ACTIONS PALETTE
 
-    var newblock = new ProtoBlock('do');
-    newblock.palette = palettes.dict['action'];
-    blocks.protoBlockDict['do'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do1'));
-    } else {
-        //.TRANS: do (take) an action
-        newblock.staticLabels.push(_('do'));
-    }
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    //.TRANS: a stack of blocks to run (an action to take)
-    newblock.defaults.push(_('action'));
-    newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('do')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('return');
     newblock.palette = palettes.dict['action'];
     blocks.protoBlockDict['return'] = newblock;
@@ -4129,6 +4148,25 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('namedarg')) {
+        newblock.hidden = true;
+    }
+
+    var newblock = new ProtoBlock('do');
+    newblock.palette = palettes.dict['action'];
+    blocks.protoBlockDict['do'] = newblock;
+    if (language === 'ja') {
+        //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
+        newblock.staticLabels.push(_('do1'));
+    } else {
+        //.TRANS: do (take) an action
+        newblock.staticLabels.push(_('do'));
+    }
+    newblock.adjustWidthToLabel();
+    newblock.oneArgBlock();
+    //.TRANS: a stack of blocks to run (an action to take)
+    newblock.defaults.push(_('action'));
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('do')) {
         newblock.hidden = true;
     }
 
@@ -4398,13 +4436,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('rightpos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['rightpos'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: right2 is right as in right side of the screen
-        newblock.staticLabels.push(_('right2'));
-    } else {
-        //.TRANS: right side of the screen
-        newblock.staticLabels.push(_('right (screen)'));
-    }
+    //.TRANS: right side of the screen
+    newblock.staticLabels.push(_('right (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('rightpos')) {
@@ -4414,13 +4447,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     var newblock = new ProtoBlock('leftpos');
     newblock.palette = palettes.dict['media'];
     blocks.protoBlockDict['leftpos'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: left2 is left as in left side of the screen
-        newblock.staticLabels.push(_('left2'));
-    } else {
-        //.TRANS: left side of the screen
-        newblock.staticLabels.push(_('left (screen)'));
-    }
+    //.TRANS: left side of the screen
+    newblock.staticLabels.push(_('left (screen)'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
     if (beginnerMode && !beginnerBlock('leftpos')) {
@@ -4587,7 +4615,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(55);
     newblock.defaults.push(null);
     newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'mediain';
+    newblock.dockTypes[2] = 'anyin';
     if (beginnerMode && !beginnerBlock('turtleshell')) {
         newblock.hidden = true;
     }
@@ -4930,6 +4958,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     //.TRANS: Move the position of a block on the screen.
     newblock.staticLabels.push(_('move block'), _('block number'), _('x'), _('y'));
     newblock.adjustWidthToLabel();
+
     newblock.threeArgBlock();
     newblock.dockTypes[1] = 'numberin';
     newblock.dockTypes[2] = 'numberin';
@@ -4945,7 +4974,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('run block'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
+    newblock.dockTypes[1] = 'anyin';
+    newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('runblock')) {
         newblock.hidden = true;
     }
@@ -5133,7 +5163,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.staticLabels.push(_('loudness'));
     newblock.adjustWidthToLabel();
     newblock.parameterBlock();
-    if (beginnerMode && !beginnerBlock('loudness')) {
+    if (language === 'ja' && beginnerMode && !beginnerBlock('loudness')) {
         newblock.hidden = true;
     }
 
@@ -5252,6 +5282,22 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // Mice palette (blocks for interacting between ensemble)
+
+    var newblock = new ProtoBlock('turtleheap');
+    newblock.palette = palettes.dict['ensemble'];
+    blocks.protoBlockDict['turtleheap'] = newblock;
+    newblock.staticLabels.push(_('mouse index heap'));
+    newblock.staticLabels.push(_('mouse name'));
+    newblock.staticLabels.push(_('index'));
+    newblock.twoArgMathBlock();
+    newblock.adjustWidthToLabel();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'numberin';
+    newblock.defaults.push(_('Mr. Mouse'));
+    newblock.defaults.push(1);
+    if (beginnerMode && !beginnerBlock('turtleheap')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('stopTurtle');
     newblock.palette = palettes.dict['ensemble'];
@@ -5394,7 +5440,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgMathBlock();
     newblock.adjustWidthToLabel();
     newblock.dockTypes[1] = 'anyin';
-    newblock.hidden = true;
     newblock.defaults.push(_('Mr. Mouse'));
     newblock.hidden = true;
 
