@@ -7212,7 +7212,7 @@ msgstr "ファイルを選ぶ必要があります"
 #~msgstr "リズムだけをほぞん"
 
 #~msgid "floor tom tom"
-#~msgstr "フロアタムタム"
+#~msgstr "フロアタム"
 
 #~msgid "fs"
 #~msgstr "鼯"

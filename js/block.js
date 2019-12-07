@@ -17,7 +17,7 @@ const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ['newnote', 'interval', 'osctime'];
 const COLLAPSIBLES = ['drum', 'start', 'action', 'matrix', 'pitchdrummatrix', 'rhythmruler2', 'timbre', 'status', 'pitchstaircase', 'tempo', 'pitchslider', 'modewidget', 'newnote', 'musickeyboard', 'temperament', 'interval', 'osctime'];
 const NOHIT = ['hidden', 'hiddennoflow'];
-const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', 'effectsname', 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
+const SPECIALINPUTS = ['text', 'number', 'solfege', 'eastindiansolfege', 'notename', 'voicename', 'modename', 'drumname', "effectsname", 'filtertype', 'oscillatortype', 'boolean', 'intervalname', 'invertmode', 'accidentalname', 'temperamentname', 'noisename', 'customNote'];
 const WIDENAMES = ['intervalname', 'accidentalname', 'drumname', 'effectsname', 'voicename', 'modename', 'temperamentname', 'modename', 'noisename'];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drumname', 'effectsname', 'accidentalname', 'invertmode', 'boolean', 'filtertype', 'oscillatortype', 'intervalname', 'modename', 'temperamentname', 'noisename', 'customNote'];
@@ -88,7 +88,7 @@ function Block(protoblock, blocks, overrideName) {
 
     // Don't trigger notes on top of each other.
     this._triggerLock = false;
-    
+
     // If we update the parameters of a meter block, we have extra
     // actions to attend to.
     this._check_meter_block = null;
@@ -102,63 +102,72 @@ function Block(protoblock, blocks, overrideName) {
     this._createCache = function (callback, args) {
         var that = this;
         return new Promise(function (resolve, reject) {
-    
+
             var loopCount = 0;
-    
+
             async function checkBounds(counter) {
-        try {
-            if (counter !== undefined) {
-                loopCount = counter;
-        
-            } 
-            if (loopCount > 3) {
-                throw new Error ('COULD NOT CREATE CACHE');
-            }
-    
-            that.bounds = that.container.getBounds();
-    
-            if (that.bounds === null) {
-                    console.log('// Try regenerating the artwork');
-                    that.regenerateArtwork(true, []);
-                    checkBounds(loopCount + 1);
-                    await that.pause(100);
-            } else {
-                that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
-                callback(that, args);
-                resolve();
-            }
-        }catch (e) {
-            reject(e)
-        }
+                try {
+                    if (counter !== undefined) {
+                        loopCount = counter;
+
+                    }
+                    if (loopCount > 3) {
+                        throw new Error ('COULD NOT CREATE CACHE');
+                    }
+
+                    that.bounds = that.container.getBounds();
+
+                    if (that.bounds === null) {
+                        console.log('// Try regenerating the artwork');
+                        that.regenerateArtwork(true, []);
+                        checkBounds(loopCount + 1);
+                        await that.pause(100);
+                    } else {
+                        that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+                        callback(that, args);
+                        resolve();
+                    }
+                } catch (e) {
+                    reject(e)
+                }
             }
             checkBounds();
-            })
-        };
+        })
+    };
 
-    // Internal function for creating cache.
+    // Internal function for updating the cache.
     // Includes workaround for a race condition.
-    this.updateCache = async function (counter) {
-        if (counter === undefined) {
-            var loopCount = 0;
-        } else {
-            var loopCount = counter;
-        }
-
-        if (loopCount > 3) {
-            console.log('COULD NOT UPDATE CACHE');
-            return;
-        }
-
+    this.updateCache = function (counter) {
         var that = this;
+        return new Promise(function (resolve, reject) {
 
-        if (this.bounds == null) {
-         await delayExecution(200);
-                console.log('UPDATE CACHE: BOUNDS NOT READY');
-                that.updateCache(loopCount + 1);
-        } else {
-            this.container.updateCache();
-            this.blocks.refreshCanvas();
-        }
+            var loopCount = 0;
+
+            async function updateBounds(counter) {
+                try {
+                    if (counter !== undefined) {
+                        loopCount = counter;
+                    }
+
+                    if (loopCount > 3) {
+                        throw new Error('COULD NOT UPDATE CACHE');
+                    }
+
+                    if (that.bounds == null) {
+                        console.log('UPDATE CACHE: BOUNDS NOT READY');
+                        updateBounds(loopCount + 1);
+                        await that.pause(200);
+                    } else {
+                        that.container.updateCache();
+                        that.blocks.refreshCanvas();
+                        resolve();
+                    }
+                } catch (e) {
+                    reject(e)
+                }
+            }
+            updateBounds();
+        })
     };
 
     this.ignore = function () {
@@ -445,7 +454,7 @@ function Block(protoblock, blocks, overrideName) {
         this.postProcess = function (that) {
             if (that.imageBitmap !== null) {
                 that._positionMedia(that.imageBitmap, that.imageBitmap.image.width, that.imageBitmap.image.height, scale);
-               var z = that.container.children.length - 1;
+                z = that.container.children.length - 1;
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
@@ -795,7 +804,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
-               var artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
@@ -825,7 +834,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
-               var artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
+                artwork = artwork.replace('arg_label_' + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
@@ -898,7 +907,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
-            var artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
+            artwork = artwork.replace('arg_label_' + i, this.protoblock.staticLabels[i]);
         }
 
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
@@ -1870,8 +1879,6 @@ function Block(protoblock, blocks, overrideName) {
                 } else if (this.blocks.blockList[c1].name === 'notename') {
                     return this.blocks.blockList[c1].value + ' ' + this.blocks.blockList[c2].value;
                 }
-
-                return '?';
             }
             break;
         case 'scaledegree':
@@ -1890,7 +1897,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             break;
         case 'hertz':
-            var c1 = this.blocks.blockList[c].connections[1];
+            var c1 = this.blocks.blockList[c].connections[0];
             if (this.blocks.blockList[c1].name === 'number') {
                 return this.blocks.blockList[c1].value + 'HZ';
             }
@@ -2076,7 +2083,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Ensure text is on top.
-        var z = this.container.children.length - 1;
+        z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
     };
 
@@ -2426,7 +2433,6 @@ function Block(protoblock, blocks, overrideName) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
-                    console.log('MOUSE OUT EVENT');
                     this._labelChanged(true, true);
                     hideDOMLabel();
                 }
@@ -2497,7 +2503,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo', 'hertz'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2619,7 +2625,7 @@ function Block(protoblock, blocks, overrideName) {
         var labelElem = docById('labelDiv');
 
         if (this.name === 'text') {
-            labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" tabindex="-1" value="' + labelValue + '" />';
+            labelElem.innerHTML = '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' + labelValue + '" />';
             labelElem.classList.add('hasKeyboard');
             this.label = docById('textLabel');
         } else if (this.name === 'solfege') {
@@ -2632,6 +2638,8 @@ function Block(protoblock, blocks, overrideName) {
             if (this.piemenuOKtoLaunch()) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
+
+            console.log("hello");
         } else if (this.name === 'customNote') {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -2912,7 +2920,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (beginnerMode && TEMPERAMENTS[i][1] === 'custom') {
                     continue;
                 }
-                
+
                 if (TEMPERAMENTS[i][0].length === 0) {
                     temperamentLabels.push(TEMPERAMENTS[i][2]);
                 } else {
@@ -2934,6 +2942,7 @@ function Block(protoblock, blocks, overrideName) {
             var booleanValues = [true, false];
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
+
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
@@ -3010,7 +3019,8 @@ function Block(protoblock, blocks, overrideName) {
                 case 'arc':
                     this._piemenuNumber([25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300], this.value);
                     break;
-                }
+              }
+
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
                 case 'setpensize':
@@ -3060,7 +3070,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
                     break;
                 case 'scaledegree':
-                    this._piemenuScaleDegree([7, 6, 5, 4, 3, 2, 1], this.value);
+                    this._piemenuScaleDegree([1, 2, 3, 4, 5, 6, 7], this.value);
                     break;
                 case 'onbeatdo':
                 case 'meter':
@@ -3119,10 +3129,14 @@ function Block(protoblock, blocks, overrideName) {
                 case 'articulation':
                     this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
                     break;
+                case 'hertz':
+                    this._piemenuNumber([220, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
+                    break;
                 }
+
             } else {
                 console.log('NUMBER LABEL');
-                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + labelValue + '" />';
+                labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
             }
@@ -3155,39 +3169,27 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
 
-            /*
+
             var __input = function (event) {
-                console.log('__INPUT EVENT');
                 that._labelChanged(false, true);
             };
-            */
 
             if (this.name === 'text' || this.name === 'number') {
                 this.label.addEventListener('blur', __blur);
-                // this.label.addEventListener('input', __input);
+                this.label.addEventListener('input', __input);
             }
 
             var __keypress = function (event) {
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
-                    // Make sure that we close the input form on Enter.
-                    that.label.style.display = 'none';
-                    if (that.labelattr != null) {
-                        that.labelattr.style.display = 'none';
-                    }
-
-                    docById('wheelDiv').style.display = 'none';
                 }
             };
 
             this.label.addEventListener('keypress', __keypress);
 
-            /*
             this.label.addEventListener('change', function () {
-                console.log('CHANGE EVENT');
                 that._labelChanged(false, true);
             });
-            */
 
             this.label.style.left = Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) + 'px';
             this.label.style.top = Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) + 'px';
@@ -3268,7 +3270,6 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     case 'meter':
                         this._check_meter_block = cblk;
-                    case 'setbpm3':
                     case 'setbpm2':
                     case 'setmasterbpm2':
                     case 'stuplet':
@@ -3300,7 +3301,7 @@ function Block(protoblock, blocks, overrideName) {
         var dblk = this.connections[0];
         // We are connected to a divide block.
         // Is the divide block connected to a note value block?
-       var cblk = this.blocks.blockList[dblk].connections[0];
+        cblk = this.blocks.blockList[dblk].connections[0];
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blocks.blockList[cblk].name) {
@@ -3319,7 +3320,6 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             case 'meter':
                 this._check_meter_block = cblk;
-            case 'setbpm3':
             case 'setbpm2':
             case 'setmasterbpm2':
             case 'stuplet':
@@ -4017,11 +4017,6 @@ function Block(protoblock, blocks, overrideName) {
         this._noteValueWheel.clickModeRotate = false;
         this._noteValueWheel.createWheel(noteValueLabels);
 
-        this._noteValueWheel.navItems[0].setTooltip(_('triple'));
-        this._noteValueWheel.navItems[1].setTooltip(_('duple'));
-        this._noteValueWheel.navItems[2].setTooltip(_('septuple'));
-        this._noteValueWheel.navItems[3].setTooltip(_('quintuple'));
-
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -4085,7 +4080,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + noteValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + noteValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
@@ -4169,11 +4164,11 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.display = '';
         this.label.focus();
 
+        // Hide the widget when the selection is made.
         for (var i = 0; i < tabsLabels.length; i++) {
             this._tabsWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
-		// Hide the widget when the selection is made.
-                // __exitMenu();
+                __exitMenu();
             };
         }
 
@@ -4233,8 +4228,8 @@ function Block(protoblock, blocks, overrideName) {
         if (this._numberWheel.navItems.length > 20) {
             console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
             for (var i = 0; i < this._numberWheel.navItems.length; i++) {
-                this._numberWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
-                this._numberWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
+                this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
             }
         }
 
@@ -4274,7 +4269,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + selectedValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
@@ -4327,7 +4322,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < wheelLabels.length; i++) {
             this._numberWheel.navItems[i].navigateFunction = function () {
                 __selectionChanged();
-                // __exitMenu();
+                __exitMenu();
             };
         }
 
@@ -4457,7 +4452,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         var labelElem = docById('labelDiv');
-        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" tabindex="-1" value="' + selectedValue + '" />';
+        labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + selectedValue + '" />';
         labelElem.classList.add('hasKeyboard');
         this.label = docById('numberLabel');
 
@@ -4746,8 +4741,8 @@ function Block(protoblock, blocks, overrideName) {
         var language = localStorage.languagePreference;
         // if (language === 'ja') {
             for (var i = 0; i < this._voiceWheel.navItems.length; i++) {
-                this._voiceWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
-                this._voiceWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
+                this._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                this._voiceWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
             }
         // }
 
@@ -5258,8 +5253,8 @@ function Block(protoblock, blocks, overrideName) {
             var language = localStorage.languagePreference;
             if (language === 'ja') {
                 for (var i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                    that._modeNameWheel.navItems[i].titleAttr.font = '30 30px sans-serif';
-                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = '30 30px sans-serif';
+                    that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+                    that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
                 }
             }
 
@@ -5428,7 +5423,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
-        console.log('LABEL CHANGED: ' + this.name + ' close input: ' + closeInput + ' notPieMenu: ' + notPieMenu);
+        console.log('LABEL CHANGED ' + this.name);
 
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -5442,7 +5437,6 @@ function Block(protoblock, blocks, overrideName) {
             if (this.labelattr != null) {
                 this.labelattr.style.display = 'none';
             }
-
             docById('wheelDiv').style.display = 'none';
         }
 
@@ -5487,12 +5481,8 @@ function Block(protoblock, blocks, overrideName) {
 
                 that.blocks.palettes.removeActionPrototype(oldValue);
 
-                if (newValue === '') {
-                    newValue = 'action';
-                }
-
                 // Ensure new name is unique.
-                var uniqueValue = this.blocks.findUniqueActionName(newValue, c);
+                var uniqueValue = this.blocks.findUniqueActionName(newValue);
                 if (uniqueValue !== newValue) {
                     newValue = uniqueValue;
                     this.value = newValue;
@@ -5525,18 +5515,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.label.value = newValue;
                 this.updateCache();
                 break;
-            case 'storein':
-                if (newValue === '') {
-                    newValue = 'box';
-                    this.value = newValue;
-                    var label = this.value.toString();
-                    if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + '...';
-                    }
-                    this.text.text = label;
-                    this.label.value = newValue;
-                    this.updateCache();
-                }
             default:
                 break;
             }
@@ -5653,7 +5631,7 @@ function Block(protoblock, blocks, overrideName) {
                 // cblock.  We only do something if blk is attached to
                 // the name connection (1).
                 blk = this.blocks.blockList.indexOf(this);
-                if (cblock.connections[1] === blk) {
+                if (cblock.connections[1] === blk && closeInput) {
                     // If the label was the name of a storein, update the
                     // associated box this.blocks and the palette buttons.
                     if (this.value !== 'box') {

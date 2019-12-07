@@ -60,6 +60,7 @@ function ModeWidget() {
             docById('modeDiv').style.visibility = 'hidden';
             docById('modeButtonsDiv').style.visibility = 'hidden';
             docById('modeTableDiv').style.visibility = 'hidden';
+            docById('modePianoDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
         }
 
@@ -200,7 +201,9 @@ function ModeWidget() {
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
-        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div><table id="modeTable"></table>';
+        modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
+        modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
+		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
         this._piemenuMode();
 
@@ -278,6 +281,64 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
+        this._showPiano();
+    };
+
+    this._showPiano = function() {
+		var modePianoDiv = docById('modePianoDiv');
+		modePianoDiv.style.display = 'inline';
+        modePianoDiv.style.visibility = 'visible';
+        modePianoDiv.style.border = '0px';
+		modePianoDiv.style.top = '0px';
+		modePianoDiv.style.left = '0px';
+		modePianoDiv.innerHTML = '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+        var highlightImgs = ['images/highlights/sel_c.png', 'images/highlights/sel_c_sharp.png', 'images/highlights/sel_d.png', 'images/highlights/sel_d_sharp.png', 'images/highlights/sel_e.png', 'images/highlights/sel_f.png', 'images/highlights/sel_f_sharp.png', 'images/highlights/sel_g.png', 'images/highlights/sel_g_sharp.png', 'images/highlights/sel_a.png', 'images/highlights/sel_a_sharp.png', 'images/highlights/sel_b.png'];	
+        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);	
+        var letterName = currentModeName[0];	
+        var modeName = currentModeName[1];	
+
+		var startingposition; // relative to keyboard
+		switch(letterName) { // sharp|flats included
+			case "C♭": startingposition = 11; break;
+			case "C": startingposition = 0; break;
+			case "C♯":
+			case "D♭": startingposition = 1; break;
+			case "D": startingposition = 2; break;
+			case "D♯":
+			case "E♭": startingposition = 3; break;
+			case "E": startingposition = 4; break;
+			case "E♯": startingposition = 5; break;
+			case "F♭": startingposition = 4; break;
+			case "F": startingposition = 5; break;
+			case "F♯":
+			case "G♭": startingposition = 6; break;
+			case "G": startingposition = 7; break;
+			case "G♯":
+			case "A♭": startingposition = 8; break;
+			case "A": startingposition = 9; break;
+			case "A♯":
+			case "A♭": startingposition = 10; break;
+			case "B": startingposition = 11; break;
+			case "B♯": startingposition = 0; break;
+			default: startingposition = 0;
+		}
+		modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+		modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+
+		for(var i = 0; i < 12; ++i) {
+			if(this._selectedNotes[i])
+				document.getElementById('pkey_'+i).src = highlightImgs[(i+startingposition)%12];
+		}
     };
 
     this._invert = function() {
@@ -289,6 +350,7 @@ function ModeWidget() {
 
         this._saveState();
         this.__invertOnePair(1);
+        this._showPiano();
     };
 
     this.__invertOnePair = function(i) {
@@ -311,7 +373,8 @@ function ModeWidget() {
 
         if (i === 5) {
             that._saveState();
-            that._setModeName()
+            that._setModeName();
+            that._showPiano();
             that._locked = false;
         } else {
             setTimeout(function() {
@@ -367,6 +430,7 @@ function ModeWidget() {
                     // We are done.
                     that._saveState();
                     that._setModeName();
+                    that._showPiano();
                     that._locked = false;
                 } else {
                     // Keep going until first note is selected.
@@ -415,6 +479,7 @@ function ModeWidget() {
                     // We are done.
                     that._saveState();
                     that._setModeName();
+                    that._showPiano();
                     that._locked = false;
                 } else {
                     // Keep going until first note is selected.
@@ -526,6 +591,7 @@ function ModeWidget() {
 
             this._resetNotes();
             this._setModeName()
+            this._showPiano();
         }
     };
 
@@ -539,7 +605,8 @@ function ModeWidget() {
         }
 
         this._resetNotes();
-        this._setModeName()
+        this._setModeName();
+        this._showPiano();
     };
 
     this._calculateMode = function() {
@@ -775,6 +842,7 @@ function ModeWidget() {
             that._noteWheel.navItems[i].navItem.show();
             that._playNote(i);
             that._setModeName();
+            that._showPiano();
         };
 
         // If a noteWheel sector is selected, hide it.
@@ -788,6 +856,7 @@ function ModeWidget() {
             that._saveState();
             that._selectedNotes[i] = false;
             that._setModeName();
+            that._showPiano();
         };
 
         for (var i = 0; i < 12; i++) {
