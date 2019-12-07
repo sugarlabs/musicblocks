@@ -834,7 +834,7 @@ function Activity() {
             logo.synth.resume();
         }
 
-        if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
+        if (false) { // _THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
             logo.pitchTimeMatrix.playAll();
         } else if (!turtles.running()) {
             logo.runLogoCommands();
@@ -4021,7 +4021,7 @@ function Activity() {
             this.hideMusicBlocks = function () {
                 hideSearchWidget();
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
+                    // storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                     storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
                     storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
@@ -4033,6 +4033,7 @@ function Activity() {
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
+		    /* 
                     if (docById('ptmDiv').style.visibility !== 'hidden') {
                         docById('ptmDiv').style.visibility = 'hidden';
                         docById('ptmTableDiv').style.visibility = 'hidden';
@@ -4044,7 +4045,7 @@ function Activity() {
                         docById('pdmButtonsDiv').style.visibility = 'hidden';
                         docById('pdmTableDiv').style.visibility = 'hidden';
                     }
-
+                    */
                     if (docById('mkbDiv').style.visibility !== 'hidden') {
                         docById('mkbDiv').style.visibility = 'hidden';
                         docById('mkbButtonsDiv').style.visibility = 'hidden';
@@ -4121,9 +4122,9 @@ function Activity() {
                 docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
                     docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
