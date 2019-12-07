@@ -6,16 +6,21 @@
   <title>Music Blocks is a collection of tools for exploring musical concepts.</title>
 
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
-  <link rel="stylesheet" href="css/activity.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/keyboard.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	rel="stylesheet">
+  <link rel="stylesheet" href="css/activities.css">
+  <link rel="stylesheet" href="dist/css/style.css">
+  <link rel="stylesheet" href="dist/css/keyboard.css">
+  <link rel="stylesheet" href="dist/css/windows.css">
 
   <noscript>
   JavaScript is required to view this page.
   </noscript>
-
-  <script src="js/utils/detectIE.js">
+  <script src="dist/app.min.js/?cb=1566155195010" defer>
   </script>
+
+  <!-- <script src="js/utils/detectIE.js">
+  </script> -->
 
   <!--
   <script src="sounds/samples/manifest.js">
@@ -27,42 +32,42 @@
   </script>
   -->
 
-  <script src="lib/reqwest.js">
+  <script src="lib/reqwest.js" defer>
   </script>
 
 
-  <script src="lib/jquery-2.1.4.js"></script>
+  <script src="lib/jquery-2.1.4.js" defer></script>
 
-  <script src="lib/jquery-ui.js"></script>
+  <script src="lib/jquery-ui.js" defer></script>
 
-  <script src="lib/materialize.min.js">
+  <script src="lib/materialize.min.js" defer>
 
   </script>
 
-  <script src="lib/webL10n.js">
+  <script src="lib/webL10n.js" defer>
   </script>
 
-  <script src="lib/Tone.min.js">
+  <script src="lib/Tone.js" defer>
   </script>
 
-  <script src="lib/jquery.ruler.js">
+  <script src="lib/jquery.ruler.js" defer>
   </script>
 
-  <script src="lib/modernizr-2.6.2.min.js">
+  <script src="lib/modernizr-2.6.2.min.js" defer>
   </script>
 
-  <script src="lib/recorder.js">
+  <script src="lib/recorder.js" defer>
   </script>
 
-  <script src="lib/raphael.min.js">
+  <script src="lib/raphael.min.js" defer>
   </script>
 
-  <script src="lib/wheelnav.js">
+  <script src="lib/wheelnav.js" defer>
   </script>
 
   <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
-  <script data-main="js/loader" src="lib/require.js">
+  <script data-main="js/loader" src="lib/require.js" defer>
   </script>
 
   <link rel="manifest" href="android_chrome_manifest.json">
@@ -73,14 +78,14 @@
   <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="lib/materialize-iso.css">
 
-  <script src="lib/easeljs.min.js">
+  <script src="lib/easeljs.min.js" defer>
   </script>
 
-  <script src="lib/tweenjs.min.js">
+  <script src="lib/tweenjs.min.js" defer>
   </script>
 
-  <script src="js/widgets/musickeyboard.js">
-  </script>
+  <!-- <script src="js/widgets/musickeyboard.js">
+  </script> -->
 
   <!--
     <script src="lib/movieclip-0.7.1.min.js">
@@ -98,19 +103,21 @@
     </script>
 
   <script>
-    if ('serviceWorker' in navigator) {
-          window.addEventListener('load', function() {
-              navigator.serviceWorker.register('sw.js').then(function(registration) {
-                  // Registration was successful
-                  console.log('ServiceWorker registration successful with scope: ', registration.scope);
-              }).catch(function(err) {
-                  // registration failed :(
-                  console.log('ServiceWorker registration failed: ', err);
-              });
-          });
-      }
-    </script>
+ if ("serviceWorker" in navigator) {
+  if (navigator.serviceWorker.controller) {
+    console.log("[PWA Builder] active service worker found, no need to register");
+  } else {
+    // Register the service worker
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then(function (reg) {
+        console.log("[PWA Builder] Service worker has been registered for scope: " + reg.scope);
+      });
+  }
+}
 
+</script>
+ 
 </head>
 
 <!-- #96D3F3-->
@@ -179,7 +186,7 @@
                 init();
             });
         };
-      })(jQuery);
+        (jQuery)
 
       $(document).ready(function() {
         $("solfa").fixMe();
@@ -190,6 +197,7 @@
         });
 
       });
+    })
 
       var isDragging = false;
     </script>
@@ -199,48 +207,72 @@
   </canvas>
 
   <!--hidden at the beginning whilst everything loads-->
-  <div id="hideContents" style="display: none;">
+  <div id="hideContents" style="display: none;" tabindex="-1">
 
     <div class="canvasHolder" id="canvasHolder">
+
+      <div class="popupMsg" id="printText" onclick="hidePrintText()" tabindex="-1">
+        <span id="printTextContent"></span>
+        <img class="msgCloseIcon" src="images/close.svg" alt="Close">
+      </div>
+
+      <div class="popupMsg" id="errorText" onclick="hideErrorText()" tabindex="-1">
+        <span id="errorTextContent"></span>
+        <img class="msgCloseIcon" src="images/close.svg" alt="Close">
+      </div>
+
+      <script>
+        function hidePrintText() {
+          var printText = document.getElementById("printText");
+          printText.classList.remove("show");
+        }
+
+        function hideErrorText() {
+          var errorText = document.getElementById("errorText");
+          errorText.classList.remove("show");
+          hideArrows(); // This function is declared in js/activity.js
+        }
+      </script>
+
       <canvas id="myCanvas" width="1200" height="900">
       </canvas>
 
       <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute; pointer-events:none; left:0; top:0; z-index:-100; visibility:hidden;">
       </canvas>
 
-      <canvas id="myChart" width="600" height="600">
+      <canvas id="myChart" width="600" height="600" tabindex="-1" tabindex="-1">
       </canvas>
 
-      <video id="camVideo" style="visibility:hidden;">
+      <video id="camVideo" style="visibility:hidden;" tabindex="-1" tabindex="-1">
       </video>
 
-      <canvas id="camCanvas" style="visibility:hidden;">
+      <canvas id="camCanvas" style="visibility:hidden;" tabindex="-1">
       </canvas>
 
-      <div id="languageDiv">
+      <div id="languageDiv" tabindex="-1">
       </div>
 
-      <div id="labelDiv">
+      <div id="labelDiv" tabindex="-1">
       </div>
 
-      <div id="textLabel">
+      <div id="textLabel" tabindex="-1">
       </div>
 
-      <div id="ioDiv" style="display:none">
-        <input tabindex="-1" class="file" type="file" id="myMedia" accept="image/*">
-        <input tabindex="-1" class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html">
-        <input tabindex="-1" class="file" type="file" id="myOpenPlugin" accept=".json">
-        <input tabindex="-1" class="file" type="file" id="myOpenAll">
+      <div id="ioDiv" style="display:none" tabindex="-1">
+        <input class="file" type="file" id="myMedia" accept="image/*" tabindex="-1">
+        <input class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html" tabindex="-1">
+        <input class="file" type="file" id="myOpenPlugin" accept=".json" tabindex="-1">
+        <input class="file" type="file" id="myOpenAll" tabindex="-1">
       </div>
     </div> <!-- canvasHolder -->
 
-    <div id="audio">
+    <div id="audio" tabindex="-1">
     </div>
 
-    <div id="tourData">
+    <div id="tourData" tabindex="-1">
     </div>
 
-    <div id="popdown-palette">
+    <div id="popdown-palette" tabindex="-1">
     </div>
 
     <!-- <div id="main-toolbar" class="toolbar">
@@ -256,52 +288,57 @@
     <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
 
 
-    <div id="modeDiv" draggable="false">
-      <div id="modeButtonsDiv">
+    <div id="meterDiv" draggable="false" tabindex="-1">
+      <div id="meterButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="modeTableDiv">
-      </div>
-    </div>
-
-    <div id="statusDiv" draggable="false">
-      <div id="statusButtonsDiv">
-      </div>
-
-      <div id="statusTableDiv">
+      <div id="meterTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="playbackDiv" draggable="false">
-      <div id="playbackButtonsDiv">
+    <div id="modeDiv" draggable="false" tabindex="-1">
+      <div id="modeButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="playbackTableDiv">
-      </div>
-    </div>
-
-    <div id="ptmDiv" draggable="false">
-      <div id="ptmButtonsDiv">
-      </div>
-
-      <div id="ptmTableDiv">
+      <div id="modeTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="pdmDiv" draggable="false">
-      <div id="pdmButtonsDiv">
+    <div id="statusDiv" draggable="false" tabindex="-1">
+      <div id="statusButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="pdmTableDiv">
+      <div id="statusTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="mkbDiv" draggable="false">
-      <div id="mkbButtonsDiv">
+    <div id="playbackDiv" draggable="false" tabindex="-1">
+      <div id="playbackButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="mkbTableDiv">
-        <div id="keyboardHolder" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:155px; width: 100%; background-color: white;">
+      <div id="playbackTableDiv" tabindex="-1">
+      </div>
+    </div>
+
+    <div id="floatingWindows"></div>
+
+    <div id="pdmDiv" draggable="false" tabindex="-1">
+      <div id="pdmButtonsDiv" tabindex="-1">
+      </div>
+
+      <div id="pdmTableDiv" tabindex="-1">
+      </div>
+    </div>
+
+    <div id="mkbDiv" draggable="false" tabindex="-1">
+      <div id="mkbButtonsDiv" tabindex="-1">
+      </div>
+
+      <div id="mkbKeyboardDiv" tabindex="-1">
+      </div>
+
+      <div id="mkbTableDiv" tabindex="-1">
+        <!-- <div id="keyboardHolder" onload="setupKeyboard ()" style="display:none; bottom: 10px; left: 0px; height:155px; width: 100%; background-color: white;">
           <select id="firstNote" class="keySelect" style="display: none;" onchange="changeKeys()">
             <option value="D">D</option>
             <option value="E">E</option>
@@ -364,130 +401,139 @@
               </tbody>
             </table>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
-    <div id="pscDiv" draggable="false">
-      <div id="pscButtonsDiv">
+    <div id="pscDiv" draggable="false" tabindex="-1">
+      <div id="pscButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="pscTableDiv">
-      </div>
-    </div>
-
-    <div id="timbreDiv" draggable="false">
-      <div id="timbreButtonsDiv">
-      </div>
-
-      <div id="timbreTableDiv">
+      <div id="pscTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="tempoDiv" draggable="false">
-      <div id="tempoButtonsDiv">
+    <div id="timbreDiv" draggable="false" tabindex="-1">
+      <div id="timbreButtonsDiv" tabindex="-1">
+      </div>
+
+      <div id="timbreTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="helpDiv" draggable="false" style="visibility:hidden">
-      <div id="helpButtonsDiv">
-      </div>
-      <div id="helpBodyDiv">
+    <div id="tempoDiv" draggable="false" tabindex="-1">
+      <div id="tempoButtonsDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="temperamentDiv" draggable="false">
-      <div id="temperamentButtonsDiv">
+    <div id="helpDiv" draggable="false"  tabindex="-1" style="visibility:hidden">
+      <div id="right-arrow" class="hover" tabindex="-1"></div>
+      <div id="left-arrow" class="hover" tabindex="-1"></div>
+      
+      <div id="helpButtonsDiv" tabindex="-1">
       </div>
-
-      <div id="temperamentTableDiv">
-      </div>
-    </div>
-
-    <div id="rulerDiv" draggable="false">
-      <div id="rulerButtonsDiv">
-      </div>
-
-      <div id="rulerTableDiv">
+      <div id="helpBodyDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="sliderDiv" draggable="false">
-      <div id="sliderButtonsDiv">
+    <div id="temperamentDiv" draggable="false" tabindex="-1">
+      <div id="temperamentButtonsDiv" tabindex="-1">
       </div>
 
-      <div id="sliderTableDiv">
+      <div id="temperamentTableDiv" tabindex="-1">
       </div>
     </div>
 
-    <div id="playPitch" style="visibility:hidden">
+    <div id="rulerDiv" draggable="false" tabindex="-1">
+      <div id="rulerButtonsDiv" tabindex="-1">
+      </div>
+
+      <div id="rulerTableDiv" tabindex="-1">
+      </div>
     </div>
 
-    <div id="sliderInCell">
+    <div id="sliderDiv" draggable="false" tabindex="-1">
+      <div id="sliderButtonsDiv" tabindex="-1">
+      </div>
+
+      <div id="sliderTableDiv" tabindex="-1">
+      </div>
     </div>
 
-    <div id="BPMInput">
+    <div id="playPitch" style="visibility:hidden" tabindex="-1">
     </div>
 
-    <div id="musicratio1">
+    <div id="sliderInCell" tabindex="-1">
     </div>
 
-    <div id="musicratio2">
+    <div id="BPMInput" tabindex="-1">
     </div>
 
-    <div id="dissectNumber">
+    <div id="musicratio1" tabindex="-1">
     </div>
 
-    <div id="helpElem">
+    <div id="musicratio2" tabindex="-1">
     </div>
 
-    <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)">
+    <div id="dissectNumber" tabindex="-1">
     </div>
 
-    <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden">
+    <div id="helpElem" tabindex="-1">
     </div>
 
-    <div id="contextWheelDiv" class="wheelNav">
+    <div id="wheelDiv" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg)" tabindex="-1">
     </div>
 
-    <div id="submenuWheelDiv" class="wheelNav">
+    <div id="wheelDiv2" class="wheelNav" style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden" tabindex="-1">
     </div>
 
-    <div id="searchBar">
-      <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks">
+    <div id="meterWheelDiv" class="wheelNav" tabindex="-1">
+    </div>
+
+    <div id="contextWheelDiv" class="wheelNav" tabindex="-1">
+    </div>
+
+    <div id="submenuWheelDiv" class="wheelNav" tabindex="-1">
+    </div>
+
+    <div id="wheelDivptm" class="wheelNav" style="background-size: contain; background-image: url(./images/gray.svg); display: none; left: 400px; top: 400px;" tabindex="-1">
+    </div>
+    
+    <div id="searchBar" tabindex="-1">
+      <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks" tabindex="-1">
       <ul class="matches" id="searchResults"></ul>
     </div>
 
-    <div id="pastecode">
+    <div id="pastecode" tabindex="-1">
       <input type="text" name="paste" id="paste" class="ui-autocomplete" placeholder="Paste Music Blocks code here"
-        style="visibility: false">
+        style="visibility: false" tabindex="-1">
       <ul class="matches"></ul>
-      <input onkeypress="doPaste()" type="submit" value="">
+      <input onkeypress="doPaste()" type="submit" value="" tabindex="-1">
     </div>
 
-    <div id="myProgress">
-      <div id="myBar"></div>
+    <div id="myProgress" tabindex="-1">
+      <div id="myBar" tabindex="-1"></div>
     </div>
 
-    <div id="lilypondModal" class="modal">
+    <div id="lilypondModal" class="modal" tabindex="-1">
 
       <!-- Modal content for Lilypond save dialog -->
-      <div class="modal-content">
+      <div class="modal-content" tabindex="-1">
         <span class="close">&times;</span>
         <p>
-          <div id="fileNameText"></div><input type="text" id="fileName"></input>
+         <div id="fileNameText"></div><input type="text" id="fileName" tabindex="-1">
         </p>
         <p>
-          <div id="titleText"></div><input type="text" id="title"></input>
+        <div id="titleText"></div><input type="text" id="title" tabindex="-1">
         </p>
         <p>
-          <div id="authorText"></div><input type="text" id="author"></input>
+         <div id="authorText"></div><input type="text" id="author" tabindex="-1">
         </p>
         <p>
-          <div id="MIDIText"></div><input type="checkbox" id="MIDICheck"></input>
+          <div id="MIDIText"></div><input type="checkbox" id="MIDICheck" tabindex="-1">
         </p>
         <p>
-          <div id="guitarText"></div><input type="checkbox" id="guitarCheck"></input>
+          <div id="guitarText"></div><input type="checkbox" id="guitarCheck" tabindex="-1">
         </p>
         <p><button id="submitLilypond"></button> </p>
           <!-- <button id="submitPDF"></button></p> -->
@@ -495,10 +541,10 @@
 
     </div>
 
-    <div class="materialize-iso">
+    <div class="materialize-iso" tabindex="-1">
       <nav id="toolbars" class="nav-wrapper" role="navigation">
-        <div class="blue nav-wrapper">
-          <a id="mb-logo" class="logo left tooltipped" data-position="bottom"><img style="width: 100%;" src="images/logo.svg"></a>
+        <div class="blue nav-wrapper" tabindex="-1">
+          <div id="mb-logo" class="logo left tooltipped" style="line-height: 0; height: 100%" data-position="bottom"><img style="width: 100%;" src="images/logo.svg"></div>
           <ul class="main left">
             <li><a id="play" class="left tooltipped"><i class="material-icons main">play_circle_filled</i></a></li>
             <li><a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a></li>
@@ -518,8 +564,8 @@
           </ul>
 
         </div>
-        <div class="nav-wrapper" id="aux-toolbar" style="display: none;">
-          <div class="blue darken-1 nav-wrapper">
+        <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
+          <div class="blue darken-1 nav-wrapper" tabindex="-1">
             <ul class="aux left">
               <li><a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">play_circle_outline</i></a></li>
               <li><a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"><i class="material-icons md-48">video_library</i></a></li>
@@ -573,6 +619,7 @@
       <ul id="newdropdown" class="dropdown-content">
         <li><a id="new-project"></a></li>
       </ul>
+
     </div>
 
   </div> <!-- hideContents -->

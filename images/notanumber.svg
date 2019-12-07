@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -8,10 +6,10 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
-   version="1.0"
-   width="300"
+   id="svg2"
    height="42"
-   id="svg2">
+   width="300"
+   version="1.0">
   <metadata
      id="metadata73">
     <rdf:RDF>
@@ -27,588 +25,610 @@
   <defs
      id="defs32">
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2540"
-       xlink:href="#linearGradient3166"
+       gradientTransform="translate(34.404412,58.027574)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(34.404412,58.027574)" />
+       xlink:href="#linearGradient3166"
+       id="linearGradient2540"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2504">
       <stop
-         id="stop2506"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2506" />
       <stop
-         id="stop2508"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2508" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2510"
-       xlink:href="#linearGradient3166"
+       gradientTransform="translate(0,4.96875)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3166"
+       id="linearGradient2510"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2512"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3886"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2512"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
        id="linearGradient2514">
       <stop
-         id="stop2516"
+         offset="0"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="0" />
+         id="stop2516" />
       <stop
-         id="stop2518"
+         offset="1"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="1" />
+         id="stop2518" />
     </linearGradient>
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2520"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3886"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2520"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166"
        id="linearGradient2522"
-       xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
-    <linearGradient
-       x1="0"
+       y2="0"
+       x2="64"
        y1="0"
-       x2="104"
-       y2="21"
-       id="linearGradient2524"
-       xlink:href="#linearGradient3166"
+       x1="0" />
+    <linearGradient
+       gradientTransform="translate(0,5.4999997)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,5.4999997)" />
+       xlink:href="#linearGradient3166"
+       id="linearGradient2524"
+       y2="21"
+       x2="104"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2492">
       <stop
-         id="stop2494"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2494" />
       <stop
-         id="stop2496"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2496" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="104"
-       y2="21"
-       id="linearGradient2493"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2493"
+       y2="21"
+       x2="104"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2486">
       <stop
-         id="stop2488"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2488" />
       <stop
-         id="stop2490"
+         offset="1"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="1" />
+         id="stop2490" />
     </linearGradient>
     <linearGradient
        id="linearGradient2509">
       <stop
-         id="stop2511"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2511" />
       <stop
-         id="stop2513"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2513" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="74"
-       y2="22"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166"
        id="linearGradient2515"
-       xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
        y2="22"
-       id="linearGradient2608"
+       x2="74"
+       y1="22"
+       x1="0" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2608"
+       y2="22"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient2595">
       <stop
-         id="stop2597"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2597" />
       <stop
-         id="stop2599"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2599" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="74"
-       y2="22"
-       id="linearGradient2601"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2601"
+       y2="22"
+       x2="74"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient2473">
       <stop
-         id="stop2475"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2475" />
       <stop
-         id="stop2477"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2477" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient4238"
-       xlink:href="#linearGradient3166"
+       gradientTransform="translate(0,4.96875)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3166"
+       id="linearGradient4238"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient4211"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3886"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient4211"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
        id="linearGradient3886">
       <stop
-         id="stop3888"
+         offset="0"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="0" />
+         id="stop3888" />
       <stop
-         id="stop3890"
+         offset="1"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="1" />
+         id="stop3890" />
     </linearGradient>
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2496"
-       xlink:href="#linearGradient3886"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2501"
-       xlink:href="#linearGradient3166"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3886"
+       id="linearGradient2496"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
-       y2="22"
-       id="linearGradient3172"
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2501"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166"
+       id="linearGradient3172"
+       y2="22"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient3166">
       <stop
-         id="stop3168"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop3168" />
       <stop
-         id="stop3170"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop3170" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="104"
-       y2="21"
-       id="linearGradient2539"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2539"
+       y2="21"
+       x2="104"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2533">
       <stop
-         id="stop2535"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2535" />
       <stop
-         id="stop2537"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2537" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
-       y2="22"
-       id="linearGradient2543"
+       gradientTransform="matrix(0.75,0,0,0.75,160.75,11.125)"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.75,0,0,0.75,160.75,11.125)" />
-    <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
+       id="linearGradient2543"
        y2="22"
-       id="linearGradient3833"
-       xlink:href="#linearGradient3166-4"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
+    <linearGradient
+       gradientTransform="matrix(0.75,0,0,0.75,207.68104,11.125001)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.75,0,0,0.75,207.68104,11.125001)" />
+       xlink:href="#linearGradient3166-4"
+       id="linearGradient3833"
+       y2="22"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient3166-4">
       <stop
-         id="stop3168-3"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop3168-3" />
       <stop
-         id="stop3170-0"
+         offset="1"
          style="stop-color:#ff0000;stop-opacity:1"
-         offset="1" />
+         id="stop3170-0" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
-       y2="22"
-       id="linearGradient2543-4"
+       gradientTransform="matrix(0.75,0,0,0.75,160.75,11.125)"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166-4"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.75,0,0,0.75,160.75,11.125)" />
-    <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
+       id="linearGradient2543-4"
        y2="22"
-       id="linearGradient2543-7"
-       xlink:href="#linearGradient3166-7"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
+    <linearGradient
+       gradientTransform="matrix(0.75,0,0,0.75,79.98708,11.125)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.75,0,0,0.75,79.98708,11.125)" />
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient2543-7"
+       y2="22"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient2533-3">
       <stop
-         id="stop2535-5"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2535-5" />
       <stop
-         id="stop2537-1"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2537-1" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="104"
-       y2="21"
-       id="linearGradient2539-8"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2539-8"
+       y2="21"
+       x2="104"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient3166-7">
       <stop
-         id="stop3168-6"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop3168-6" />
       <stop
-         id="stop3170-08"
+         offset="1"
          style="stop-color:#ff0000;stop-opacity:1"
-         offset="1" />
+         id="stop3170-08" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
-       y2="22"
-       id="linearGradient3172-3"
-       xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2501-4"
-       xlink:href="#linearGradient3166-7"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient3172-3"
+       y2="22"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2496-6"
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient2501-4"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3886-9"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2496-6"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
        id="linearGradient3886-9">
       <stop
-         id="stop3888-5"
+         offset="0"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="0" />
+         id="stop3888-5" />
       <stop
-         id="stop3890-8"
+         offset="1"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="1" />
+         id="stop3890-8" />
     </linearGradient>
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient4211-5"
-       xlink:href="#linearGradient3886-9"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient4238-4"
-       xlink:href="#linearGradient3166-7"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3886-9"
+       id="linearGradient4211-5"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
+    <linearGradient
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient4238-4"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2473-3">
       <stop
-         id="stop2475-8"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2475-8" />
       <stop
-         id="stop2477-4"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2477-4" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="74"
-       y2="22"
-       id="linearGradient2601-6"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2601-6"
+       y2="22"
+       x2="74"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient2595-8">
       <stop
-         id="stop2597-4"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2597-4" />
       <stop
-         id="stop2599-6"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2599-6" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="22"
-       x2="128.68382"
-       y2="22"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
        id="linearGradient2608-3"
-       xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="22"
-       x2="74"
        y2="22"
-       id="linearGradient2515-6"
+       x2="128.68382"
+       y1="22"
+       x1="0" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2515-6"
+       y2="22"
+       x2="74"
+       y1="22"
+       x1="0" />
     <linearGradient
        id="linearGradient2509-9">
       <stop
-         id="stop2511-7"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2511-7" />
       <stop
-         id="stop2513-6"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2513-6" />
     </linearGradient>
     <linearGradient
        id="linearGradient2486-1">
       <stop
-         id="stop2488-4"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2488-4" />
       <stop
-         id="stop2490-2"
+         offset="1"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="1" />
+         id="stop2490-2" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="104"
-       y2="21"
-       id="linearGradient2493-1"
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2493-1"
+       y2="21"
+       x2="104"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2492-2">
       <stop
-         id="stop2494-3"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2494-3" />
       <stop
-         id="stop2496-4"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2496-4" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="104"
-       y2="21"
+       gradientTransform="translate(0,5.4999997)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
        id="linearGradient2524-1"
-       xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,5.4999997)" />
-    <linearGradient
-       x1="0"
+       y2="21"
+       x2="104"
        y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2522-6"
-       xlink:href="#linearGradient3166-7"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       x1="0" />
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2520-2"
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient2522-6"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
        xlink:href="#linearGradient3886-9"
-       gradientUnits="userSpaceOnUse" />
+       id="linearGradient2520-2"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
     <linearGradient
        id="linearGradient2514-6">
       <stop
-         id="stop2516-3"
+         offset="0"
          style="stop-color:#0000ff;stop-opacity:1"
-         offset="0" />
+         id="stop2516-3" />
       <stop
-         id="stop2518-9"
+         offset="1"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="1" />
+         id="stop2518-9" />
     </linearGradient>
     <linearGradient
-       x1="210"
-       y1="10.5"
-       x2="0"
-       y2="10.5"
-       id="linearGradient2512-7"
-       xlink:href="#linearGradient3886-9"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2510-3"
-       xlink:href="#linearGradient3166-7"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,4.96875)" />
+       xlink:href="#linearGradient3886-9"
+       id="linearGradient2512-7"
+       y2="10.5"
+       x2="0"
+       y1="10.5"
+       x1="210" />
+    <linearGradient
+       gradientTransform="translate(0,4.96875)"
+       gradientUnits="userSpaceOnUse"
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient2510-3"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
     <linearGradient
        id="linearGradient2504-4">
       <stop
-         id="stop2506-3"
+         offset="0"
          style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
+         id="stop2506-3" />
       <stop
-         id="stop2508-1"
+         offset="1"
          style="stop-color:#ffff00;stop-opacity:1"
-         offset="1" />
+         id="stop2508-1" />
     </linearGradient>
     <linearGradient
-       x1="0"
-       y1="0"
-       x2="64"
-       y2="0"
-       id="linearGradient2540-1"
-       xlink:href="#linearGradient3166-7"
+       gradientTransform="translate(34.404412,58.027574)"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(34.404412,58.027574)" />
+       xlink:href="#linearGradient3166-7"
+       id="linearGradient2540-1"
+       y2="0"
+       x2="64"
+       y1="0"
+       x1="0" />
   </defs>
   <rect
-     width="297.90176"
-     height="39.901779"
-     rx="2.979018"
-     ry="3.3251483"
-     x="1.0491095"
-     y="1.0491099"
+     style="fill:#ffd5d5;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:2.09821892;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
      id="rect3818"
-     style="fill:#ffd5d5;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:2.09821892;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+     y="1.0491099"
+     x="1.0491095"
+     ry="3.3251483"
+     rx="2.979018"
+     height="39.901779"
+     width="297.90176" />
   <g
-     transform="translate(6,2)"
-     id="g17">
+     id="g17"
+     transform="translate(6,2)">
     <path
-       d="M 44,15 10.5,15 27.5,-14 44,15 z"
-       transform="translate(-4,20)"
+       style="fill:#404040;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path19"
-       style="fill:#404040;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+       transform="translate(-4,20)"
+       d="M 44,15 10.5,15 27.5,-14 44,15 z" />
     <path
-       d="M 44,15 10.5,15 27.5,-14 44,15 z"
-       transform="translate(1,17)"
+       style="fill:#e0e0e0;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path21"
-       style="fill:#e0e0e0;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+       transform="translate(1,17)"
+       d="M 44,15 10.5,15 27.5,-14 44,15 z" />
     <path
-       d="M 44,15 10.5,15 27.5,-14 44,15 z"
-       transform="translate(-1,18)"
+       style="fill:#ffe000;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path23"
-       style="fill:#ffe000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+       transform="translate(-1,18)"
+       d="M 44,15 10.5,15 27.5,-14 44,15 z" />
   </g>
   <text
-     x="6"
-     y="2"
+     style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
      id="text25"
-     style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans">
+     y="2"
+     x="6">
     <tspan
-       x="27"
-       y="31"
+       style="font-size:24px"
        id="tspan27"
-       style="font-size:24px">!</tspan>
+       y="31"
+       x="27">!</tspan>
   </text>
   <text
-     x="147.64453"
-     y="31"
-     id="text2618"
+     style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
      xml:space="preserve"
-     style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
-       x="147.64453"
-       y="31"
+     id="text2618"
+     y="31"
+     x="147.64453"><tspan
+       style="font-size:24px;fill:#ff0000;fill-opacity:1"
        id="tspan2620"
-       style="font-size:24px;fill:#ff0000;fill-opacity:1">NAN</tspan></text>
+       y="31"
+       x="147.64453">NAN</tspan></text>
+  <g
+     id="g929">
+    <rect
+       style="opacity:1;fill:#b0b0b0;fill-opacity:1;stroke:none;stroke-width:13.86169147;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect920"
+       width="25"
+       height="25"
+       x="260"
+       y="8.5"
+       rx="1.7934784"
+       ry="1.875" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.66666603px;line-height:27px;font-family:'Noto Emoji';-inkscape-font-specification:'Noto Emoji';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="263.09375"
+       y="29.75"
+       id="text924"><tspan
+         id="tspan922"
+         x="263.09375"
+         y="29.75"
+         style="font-size:32px">x</tspan></text>
+  </g>
 </svg>

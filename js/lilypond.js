@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 Walter Bender
+// Copyright (c) 2014-2019 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -731,6 +731,12 @@ saveLilypondOutput = function(logo) {
                         } else if (tNumber in logo.turtles.turtleList) {
                             var instrumentName = logo.turtles.turtleList[tNumber].name;
                         } else {
+                            var instrumentName = _('mouse');
+                        }
+
+			console.log(instrumentName);
+
+			if (instrumentName === '') {
                             var instrumentName = _('mouse');
                         }
 

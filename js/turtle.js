@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 Walter Bender
+// Copyright (c) 2014-2019 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -108,6 +108,8 @@ function Turtle (name, turtles, drum) {
                 ctx.closePath();
             }
         }
+
+        this.turtles.refreshCanvas();
     };
 
     /**
@@ -1308,14 +1310,14 @@ function Turtle (name, turtles, drum) {
      * Includes workaround for a race condition. 
      * 
      */
-    this.updateCache = function () {
+   
+    this.updateCache = async function () {
         var that = this;
 
         if (that.bounds == null) {
             console.log('Block container for ' + that.name + ' not yet ready.');
-            setTimeout(function () {
+            await delayExecution(300)
                 that.updateCache();
-            }, 300);
         } else {
             that.container.updateCache();
             that.turtles.refreshCanvas();
@@ -1323,9 +1325,9 @@ function Turtle (name, turtles, drum) {
     };
 
     /** 
-     * Stops blinking of turtle if not already finished.
-     * Sets timeout to null and blinkFinished boolean to true (if they have not been already changed)
-     * 
+     * Stops blinking of turtle if not already finished.  Sets timeout
+     * to null and blinkFinished boolean to true (if they have not
+     * been already changed)
      */
     this.stopBlink = function () {
         if (this._blinkTimeout != null || !this.blinkFinished) {
@@ -1355,24 +1357,25 @@ function Turtle (name, turtles, drum) {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    this.blink = function (duration, volume) {
+    this.blink =  async function (duration, volume) {
         var that = this;
-        this._sizeInUse = that.bitmap.scaleX;
+        // this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
 
-        //
+        // No time to blick for really short notes. (t = 1 / duration)
         if (duration > 16) {
             return;
         }
 
         this.stopBlink();
+        this.blinkFinished = false;
 
         this.container.visible = false;
-        this._blinkTimeout = setTimeout(function () {
+        this.turtles.refreshCanvas();
+        this._blinkTimeout = await delayExecution(100)
+            this.blinkFinished = true;
             that.container.visible = true;
             that.turtles.refreshCanvas();
-        }, 100);
-        this.turtles.refreshCanvas();
 
         /*
 
@@ -2108,18 +2111,28 @@ function Turtles () {
         var blkInfoAvailable = false;
 
         if (typeof (infoDict) === 'object') {
-            if (Object.keys(infoDict).length === 8) {
+            if (Object.keys(infoDict).length > 0) {
                 blkInfoAvailable = true;
             }
         }
 
         var i = this.turtleList.length;
-        var turtleName = i.toString();
+        if (blkInfoAvailable && 'name' in infoDict) {
+            turtleName = infoDict['name'];
+        } else {
+            var turtleName = _('start'); // i.toString();
+        }
+
         var newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
-            newTurtle.x = infoDict['xcor'];
-            newTurtle.y = infoDict['ycor'];
+            if ('xcor' in infoDict) {
+                newTurtle.x = infoDict['xcor'];
+            }
+
+            if ('ycor' in infoDict) {
+                newTurtle.y = infoDict['ycor'];
+            }
         }
 
         this.turtleList.push(newTurtle);
@@ -2254,13 +2267,31 @@ function Turtles () {
 
         setTimeout(function () {
             if (blkInfoAvailable) {
-                newTurtle.doSetHeading(infoDict['heading']);
-                newTurtle.doSetPensize(infoDict['pensize']);
-                newTurtle.doSetChroma(infoDict['grey']);
-                newTurtle.doSetValue(infoDict['shade']);
-                newTurtle.doSetColor(infoDict['color']);
+                if ('heading' in infoDict) {
+                    newTurtle.doSetHeading(infoDict['heading']);
+                }
+
+                if ('pensize' in infoDict) {
+                    newTurtle.doSetPensize(infoDict['pensize']);
+                }
+
+                if ('grey' in infoDict) {
+                    newTurtle.doSetChroma(infoDict['grey']);
+                }
+
+                if ('shade' in infoDict) {
+                    newTurtle.doSetValue(infoDict['shade']);
+                }
+
+                if ('color' in infoDict) {
+                    newTurtle.doSetColor(infoDict['color']);
+                }
+
+                if ('name' in infoDict) {
+                    newTurtle.rename(infoDict['name'])
+                }
             }
-        }, 1000);
+        }, 6000);
 
         this.refreshCanvas();
     };

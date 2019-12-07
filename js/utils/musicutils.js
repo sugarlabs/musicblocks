@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -71,11 +71,13 @@ const NOTESTEP = {'C': 1, 'D': 3, 'E': 5, 'F': 6, 'G': 8, 'A': 10, 'B': 12};
 
 // Preference for sharps or flats
 const SHARPPREFERENCE = ['g major', 'd major', 'a major', 'e major', 'b major', 'f# major', 'c# major', 'e minor', 'b minor', 'f# minor', 'c# minor', 'g# minor', 'd# minor'];
-const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor'];
+const FLATPREFERENCE = ['f major', 'bb major', 'eb major', 'ab major', 'db major', 'gb major', 'cb major', 'd minor', 'g minor', 'c minor', 'f minor', 'bb minor', 'eb minor', 'd harmonic minor', 'g harmonic minor', 'c harmonic minor', 'f harmonic minor', 'bb harmonic minor', 'eb harmonic minor'];
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
 const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa']
+const DRUMS = [ "snare drum", "kick drum", "tom tom", "floor tom tom", "cup drum", "darbuka drum", "japanese drum", "hi hat", "ride bell", "cow bell", "triangle bell", "finger cymbals", "chime", "gong", "clang", "crash", "clap", "slap"];
+const GRAPHICS = ['forward', 'back', 'right', 'left', 'set heading', 'set color', 'set shade', 'set hue', 'set grey', 'set translucency', 'set pen size'];
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut']; //the "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha']; //https://en.wikipedia.org/wiki/Iroha
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
@@ -258,6 +260,8 @@ const SELECTORSTRINGS = [
     _('scalar'),
     _('piano'),
     _('violin'),
+    _('xylophone'),
+    _('vibraphone'),
     _('cello'),
     _('bass'),
     _('guitar'),
@@ -285,6 +289,8 @@ const SELECTORSTRINGS = [
     _('hi hat'),
     _('ride bell'),
     _('cow bell'),
+    _('japanese drum'),
+    // _('japanese bell'),
     _('triangle bell'),
     _('finger cymbals'),
     _('chime'),
@@ -296,6 +302,7 @@ const SELECTORSTRINGS = [
     _('slap'),
     _('splash'),
     _('bubbles'),
+    _('raindrop'),
     _('cat'),
     _('cricket'),
     _('dog'),
@@ -304,6 +311,8 @@ const SELECTORSTRINGS = [
     _('koto'),
     _('dulcimer'),
     _('electric guitar'),
+    _('bassoon'),
+    _('celeste'),
     //.TRANS: musical temperament
     _('equal'),
     //.TRANS: musical temperament
@@ -476,12 +485,12 @@ var OSCTYPES = [
 ];
 
 var TEMPERAMENTS = [
-    [_('equal'), 'equal'],
-    [_('just intonation'), 'just intonation'],
-    [_('Pythagorean'), 'Pythagorean'],
-    [_('meantone') +  ' (1/3)', '1/3 comma meantone'],
-    [_('meantone') + ' (1/4)', '1/4 comma meantone'],
-    [_('custom'), 'custom'],
+  [_('equal'), 'equal', 'equal'],
+  [_('just intonation'), 'just intonation', 'just intonation'],
+  [_('Pythagorean'), 'Pythagorean', 'Pythagorean'],
+  [_('meantone') +  ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+  [_('meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
+  [_('custom'), 'custom', 'custom'],
 
 ];
 
@@ -985,7 +994,7 @@ function getTemperamentName(name) {
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === '') {
+    if (keySignature === '' || keySignature == null) {
         console.log('No key signature provided; reverting to C major.');
        return ['C', 'major'];
     }
@@ -1241,6 +1250,9 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
 };
 
 
+// Approximate mapping of mode to solfege (Used by modes where the length !== 7).
+const SOLFMAPPER = ['do', 'do', 're', 're', 'mi', 'fa', 'fa', 'sol', 'sol', 'la', 'la', 'ti'];
+
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     var obj = keySignatureToMode(keySignature);
@@ -1252,10 +1264,43 @@ function getScaleAndHalfSteps(keySignature) {
     }
 
     var solfege = [];
-    for (var i = 0; i < halfSteps.length; i++) {
-        solfege.push(SOLFEGENAMES[i]);
-        for (var j = 1; j < halfSteps[i]; j++) {
-            solfege.push('');
+
+    if (halfSteps.length === 7) {
+        for (var i = 0; i < halfSteps.length; i++) {
+            solfege.push(SOLFEGENAMES[i]);
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
+        }
+    } else if (halfSteps.length > 7) {
+        // If there are more than 7 notes, we need to add accidentals.
+        for (var i = 0; i < halfSteps.length; i++) {
+            if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
+                solfege.push(SOLFMAPPER[i]);
+            } else {
+                solfege.push(SOLFMAPPER[i] + SHARP);
+            }
+
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
+        }
+    } else {
+        // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
+        for (var i = 0; i < halfSteps.length; i++) {
+            var n = 0;
+            var solf = SOLFMAPPER[solfege.length];
+            // Ensure there are no duplicates.
+            while (solfege.indexOf(solf) !== -1) {
+                n += 1;
+                solf = SOLFMAPPER[solfege.length + n];
+            }
+
+            solfege.push(solf);
+
+            for (var j = 1; j < halfSteps[i]; j++) {
+                solfege.push('');
+            }
         }
     }
 
@@ -1513,11 +1558,13 @@ function calcNoteValueToDisplay(a, b, scale) {
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt((noteValue * 1.5))
         if (noteValueToDisplay in NSYMBOLS) {
-            noteValueToDisplay = '1.5<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
+            var value =  b / a * noteValueToDisplay;
+            noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.';
         } else {
             noteValueToDisplay = parseInt((noteValue * 1.75))
             if (noteValueToDisplay in NSYMBOLS) {
-                noteValueToDisplay = '1.75<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '.,';
+                var value = b / a * noteValueToDisplay;
+                noteValueToDisplay = value.toFixed(2)+'<br>&mdash;<br>' + noteValueToDisplay.toString() + '<br>' + NSYMBOLS[noteValueToDisplay] + '..';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
@@ -1806,7 +1853,7 @@ function i18nSolfege(note) {
     if (i !== -1) {
         return solfnotes_[i] + obj[1];
     } else {
-        console.log(note + ' not found.');
+	// Wasn't solfege so it doesn't need translation.
         return note;
     }
 };
@@ -2316,6 +2363,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                     if (i > 6) {
                         i -= 7;
                     }
+
                     solfegePart = SOLFEGENAMES[i];
                     break;
                 case 'major':

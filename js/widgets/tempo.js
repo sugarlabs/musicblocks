@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -177,6 +177,34 @@ function Tempo () {
         }
     };
 
+    this.__save = function (i) {
+        var that = this;
+        setTimeout(function () {
+            console.log('saving a BPM block for ' + that.BPMs[i]);
+            var delta = i * 42;
+            var newStack = [[0, ['setbpm3', {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
+                            [1, ['number', {'value': that.BPMs[i]}], 0, 0, [0]],
+                            [2, ['divide', {}], 0, 0, [0, 3, 4]],
+                            [3, ['number', {'value': 1}], 0, 0, [2]],
+                            [4, ['number', {'value': 4}], 0, 0, [2]],
+                            [5, ['vspace', {}], 0, 0, [0, null]]];
+            that._logo.blocks.loadNewBlocks(newStack);
+            that._logo.textMsg(_('New action block generated!'))            
+        }, 200 * i);
+    };
+
+    this._saveTempo = function() {
+        // Save a BPM block for each tempo.
+
+        for (var i = 0; i < this.BPMs.length; i++) {
+            this.__save(i);
+        }
+    };
+
+    this._get_save_lock = function() {
+        return this._save_lock;
+    };
+
     this.init = function (logo) {
         this._logo = logo;
         this._directions = [];
@@ -223,6 +251,13 @@ function Tempo () {
         // For the button callbacks
         var that = this;
 
+        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+
+        cell.onclick=function() {
+            that.hide();
+            that._logo.hideMsgs();
+        };
+
         var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('Pause'));
 
         cell.onclick=function() {
@@ -245,11 +280,19 @@ function Tempo () {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save tempo'), '');
 
-        cell.onclick=function() {
-            that.hide();
-            that._logo.hideMsgs();
+        this._save_lock = false;
+
+        cell.onclick = function () {
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveTempo();
+                setTimeout(function () {
+                    that._save_lock = false;
+                }, 1000);
+            }
         };
 
         cell.onmouseover=function() {
@@ -333,6 +376,10 @@ function Tempo () {
         for (var i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
             this._widgetFirstTimes.push(this._logo.firstNoteTime);
+            if (this.BPMs[i] <= 0) {
+                this.BPMs[i] = 30;
+            }
+
             this._intervals.push((60 / this.BPMs[i]) * 1000);
             this._widgetNextTimes.push(this._widgetFirstTimes[i] - this._intervals[i]);
 

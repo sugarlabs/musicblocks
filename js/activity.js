@@ -1,4 +1,4 @@
-// Copyright (c) 2014-18 Walter Bender
+// Copyright (c) 2014-19 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -16,18 +16,17 @@
 // scratch. -- Walter Bender, October 2014.
 
 function Activity() {
-
     _THIS_IS_MUSIC_BLOCKS_ = true;
-    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
-    _ERRORMSGTIMEOUT_ = 15000;
     LEADING = 0;
-    cellSize = 55;
-    searchSuggestions = [];
-    homeButtonContainers = [];
+    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+
+    var _ERRORMSGTIMEOUT_ = 15000;
+    var cellSize = 55;
+    var searchSuggestions = [];
+    var homeButtonContainers = [];
 
     var that = this;
 
-    _findBlocks = this._findBlocks;
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
     doHardStopButton = this.doHardStopButton;
@@ -74,7 +73,7 @@ function Activity() {
         } catch (e) {};
     }
 
-    firstTimeUser = false;
+    var firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
         beginnerMode = true;
         try {
@@ -173,8 +172,10 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
-            'Tone.min',
+            'Tone',
+            'widgets/widgetWindows',
             'widgets/modewidget',
+            'widgets/meterwidget',
             'widgets/pitchtimematrix',
             'widgets/pitchdrummatrix',
             'widgets/rhythmruler',
@@ -251,6 +252,7 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
+        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -262,6 +264,7 @@ function Activity() {
         largerContainer = null;
         smallerOffContainer = null;
         largerOffContainer = null;
+        resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
 
@@ -338,7 +341,7 @@ function Activity() {
         const TURTLESTEP = -1; // Run in step-by-step mode
 
         BLOCKSCALES = [1, 1.5, 2, 3, 4];
-        blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+       blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
         }
@@ -372,7 +375,7 @@ function Activity() {
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
      */
-    this._findBlocks = function () {
+    _findBlocks = function () {
         // _showHideAuxMenu(false);
         if (!blocks.visible)  {
             _changeBlockVisibility();
@@ -391,8 +394,6 @@ function Activity() {
         } else {
             toppos = 90;
         }
-
-
 
         palettes.updatePalettes();
         var x = Math.floor(leftpos * turtleBlocksScale);
@@ -475,6 +476,16 @@ function Activity() {
         // Blocks are all home, so reset go-home-button.
         setHomeContainers(false, true);
         boundary.hide();
+
+        // Return mice to the center of the screen.
+        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+            console.log('bringing turtle ' + turtle + 'home');
+            var savedPenState = turtles.turtleList[turtle].penState;
+            turtles.turtleList[turtle].penState = false;
+            turtles.turtleList[turtle].doSetXY(0, 0);
+            turtles.turtleList[turtle].doSetHeading(0);
+            turtles.turtleList[turtle].penState = savedPenState;
+        }
     };
 
     /*
@@ -488,6 +499,65 @@ function Activity() {
 
         homeButtonContainers[0].visible = zero;
         homeButtonContainers[1].visible = one;
+    };
+
+
+    __saveHelpBlock = function (name, delay) {
+        // Save the artwork for an individual help block.
+        // (1) clear the block list
+        // (2) generate the help blocks
+        // (3) save the blocks as svg
+        setTimeout(function () {
+            sendAllToTrash(false, true);
+            setTimeout(function () {
+                if (BLOCKHELP[name].length < 4) {
+                    // If there is nothing specified, just
+                    // load the block.
+                    console.log('CLICK: ' + name);
+                    var obj = blocks.palettes.getProtoNameAndPalette
+(name);
+                    var protoblk = obj[0];
+                    var paletteName = obj[1];
+                    var protoName = obj[2];
+
+                    var protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                    if (protoResult) {
+                        blocks.palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
+                            blocks.moveBlock(newBlock, 0, 0);
+                        });
+                    }
+                } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                    // If it is a string, load the macro
+                    // assocuated with this block
+                    var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 0, 0);
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                } else {
+                    // Load the blocks.
+                    var blocksToLoad = BLOCKHELP[name][3];
+                    console.log('CLICK: ' + blocksToLoad);
+                    blocks.loadNewBlocks(blocksToLoad);
+                }
+
+                setTimeout(function () {
+                    // save.saveBlockArtwork(BLOCKHELP[name][3]);
+                    save.saveBlockArtwork(name + '_block.svg');
+                }, 500);
+
+            }, 500);
+        }, delay + 1000);
+    };
+
+    _saveHelpBlocks = function () {
+        // Save the artwork for every help block.
+        var i = 0;
+        for(var name in BLOCKHELP) {
+            console.log(name);
+            __saveHelpBlock(name, i * 2000);
+            i += 1;
+        }
+
+        sendAllToTrash(true, true);
     };
 
     /*
@@ -534,7 +604,11 @@ function Activity() {
                         svg += parts[p].replace('filter:url(#dropshadow);', '') + '><';
                     } else if (p === 5) {
                         // Add block value to SVG between tspans
-                        svg += parts[p] + '>' + blocks.blockList[i].value + '<';
+                        if (typeof(blocks.blockList[i].value) === 'string') {
+                            console.log(_(blocks.blockList[i].value));
+                            svg += parts[p] + '>' + _(blocks.blockList[i].value) + '<';
+                        } else {
+                            svg += parts[p] + '>' + blocks.blockList[i].value + '<';                        }
                     } else if (p === parts.length - 2) {
                         svg += parts[p] + '>';
                     } else if (p === parts.length - 1) {
@@ -617,13 +691,13 @@ function Activity() {
     /*
      * Clears "canvas"
      */
-    _allClear = function () {
+    _allClear = function (noErase) {
         blocks.activeBlock = null;
         hideDOMLabel();
 
         if (chartBitmap != null) {
             stage.removeChild(chartBitmap);
-            chartBitmap = null;
+           var chartBitmap = null;
         }
 
         logo.boxes = {};
@@ -635,7 +709,9 @@ function Activity() {
             logo.turtleHeaps[turtle] = [];
             logo.notationStaging[turtle] = [];
             logo.notationDrumStaging[turtle] = [];
-            turtles.turtleList[turtle].doClear(true, true, true);
+            if (noErase == undefined || !noErase) {
+                turtles.turtleList[turtle].doClear(true, true, true);
+            }
         }
 
         blocksContainer.x = 0;
@@ -831,11 +907,17 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
-        if (mode === null || mode === 'true') {
-            textMsg(_('Refresh your browser to change to advanced mode.'));
+        const MSGPrefix = '<a href=\'#\' ' +
+        'onClick=\'window.location.reload()\'' + 
+        'onMouseOver=\'this.style.opacity = 0.5\'' +
+        'onMouseOut=\'this.style.opacity = 1\'>';
+        const MSGSuffix = '</a>';
+
+        if (mode === null || mode === undefined || mode === 'true') {
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
         } else {
-            textMsg(_('Refresh your browser to change to beginner mode.'));
+            textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', true);
         }
 
@@ -864,7 +946,17 @@ function Activity() {
      */
     function setScroller() {
         blocks.activeBlock = null;
-        scrollBlockContainer = !scrollBlockContainer;
+       var scrollBlockContainer = !scrollBlockContainer;
+        var scrollPaletteContainer = !scrollPaletteContainer;
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
+        if (scrollBlockContainer && !beginnerMode){
+          enableHorizScrollIcon.style.display = 'none';
+          disableHorizScrollIcon.style.display = 'block';
+        }else{
+          enableHorizScrollIcon.style.display = 'block';
+          disableHorizScrollIcon.style.display = 'none';
+        }
     };
 
     /*
@@ -905,7 +997,7 @@ function Activity() {
      * Renders and carries out analysis
      * of the MB project
      */
-    closeAnalytics = this.closeAnalytics;
+     closeAnalytics = this.closeAnalytics;
     var th = this;
     doAnalytics = function () {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
@@ -916,14 +1008,14 @@ function Activity() {
             return;
         }
 
-        ctx = myChart.getContext('2d');
+      var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
-        myRadarChart = null;
-        scores = analyzeProject(blocks);
-        data = scoreToChartData(scores);
-        Analytics = this;
-        Analytics.close = th.closeAnalytics;
+      var myRadarChart = null;
+      var  scores = analyzeProject(blocks);
+      var data = scoreToChartData(scores);
+      var  Analytics = this;
+      Analytics.close = th.closeAnalytics;
 
         __callback = function () {
             imageData = myRadarChart.toBase64Image();
@@ -958,14 +1050,21 @@ function Activity() {
      */
     doLargerBlocks = function () {
         blocks.activeBlock = null;
+     
         // hideDOMLabel();
 
-        if (blockscale < BLOCKSCALES.length - 1) {
-            blockscale += 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale < BLOCKSCALES.length - 1) {
+               var resizeDebounce = true;
+                blockscale += 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
-        setSmallerLargerStatus();
+            setSmallerLargerStatus();
+        }
     };
 
     /*
@@ -973,12 +1072,19 @@ function Activity() {
      */
     doSmallerBlocks = function () {
         blocks.activeBlock = null;
+      
         // hideDOMLabel();
 
-        if (blockscale > 0) {
-            blockscale -= 1;
-            blocks.setBlockScale(BLOCKSCALES[blockscale]);
-        }
+        if (!resizeDebounce) {
+            if (blockscale > 0) {
+              var resizeDebounce = true;
+                blockscale -= 1;
+                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+            }
+                setTimeout(function () {
+                    resizeDebounce = false;
+                }, 3000);
+            }
 
         setSmallerLargerStatus();
     };
@@ -1130,6 +1236,75 @@ function Activity() {
             delta: 0
         };
 
+        var __paletteWheelHandler = function (event) {
+            // vertical scroll
+            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+                if (palettes.paletteVisible) {
+                    if (event.clientX > cellSize + MENUWIDTH) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                } else {
+                    if (event.clientX > cellSize) {
+                        palettesContainer.y -= event.deltaY;
+                    }
+                }
+            }
+
+            // horizontal scroll
+            if (scrollPaletteContainer) {
+                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    if (palettes.paletteVisible) {
+                        if (event.clientX > cellSize + MENUWIDTH) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    } else {
+                        if (event.clientX > cellSize) {
+                            palettesContainer.x -= event.deltaX;
+                        }
+                    }
+                }
+            } else {
+                event.preventDefault();
+            }
+
+            refreshCanvas();
+        };
+
+        var myCanvas = docById('myCanvas')
+
+        var __heightBasedScroll = function (event) {
+            actualReszieHandler(); //check size during init 
+            window.addEventListener("resize",resizeThrottler,false);
+            var resizeTimeout;
+
+            function resizeThrottler() {
+                // Ignore resize events as long as an actualResizeHandler
+                // execution is in queue.
+                if(!resizeTimeout) {
+                    resizeTimeout = setTimeout(function () {
+                        resizeTimeout = null;
+                        actualReszieHandler();
+                        // The actualResizeHandler will execute at the
+                        // rate of 15 FPS.
+                    }, 66);
+                }
+            };
+        };
+    
+        function actualReszieHandler () {
+            // Handle the resize event
+            var h = window.innerHeight;
+
+            if (h < 500) { //activate on mobile
+                myCanvas.addEventListener('wheel', __paletteWheelHandler, false);
+            } else {
+                // Cleanup event listeners
+                myCanvas.removeEventListener('wheel', __paletteWheelHandler);
+            }
+        };
+
+        __heightBasedScroll()
+
         var __wheelHandler = function (event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
@@ -1244,7 +1419,7 @@ function Activity() {
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-            palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+           var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
             if (palette) {
                 // if we are moving the palettes, deselect the active block.
                 blocks.activeBlock = null;
@@ -1263,7 +1438,7 @@ function Activity() {
     };
 
     function getStageY() {
-        return turtles.screenY2turtleY(stageY / turtleBlocksScale);
+        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
     };
 
     function getStageMouseDown() {
@@ -1372,7 +1547,7 @@ function Activity() {
         var container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
-        container.y = 110;
+        container.y = 80;
         errorArtwork[name] = container;
         errorArtwork[name].name = name;
         errorArtwork[name].visible = false;
@@ -1410,13 +1585,9 @@ function Activity() {
     };
 
     /*
-     * @param  searchWidget      {searchWidget element}
-     * @param  blocks            {all blocks}
-     * @param  searchSuggestions {suggestions from user input}
-     * @param  doSearch          {search function callback}
+      Prepare a list of blocks for the search bar autocompletion.
      */
-    this.prepSearchWidget = function (searchWidget, blocks, searchSuggestions, doSearch) {
-        var that = this;
+    prepSearchWidget = function () {
         searchWidget.style.visibility = 'hidden';
         searchBlockPosition = [100, 100];
 
@@ -1436,9 +1607,10 @@ function Activity() {
 
         searchSuggestions = searchSuggestions.reverse();
 
-        searchWidget.onclick = function () {
-            doSearch();
-        };
+        // searchWidget.onclick = function () {
+        //     console.log('DO SEARCH');
+        //     doSearch();
+        // };
     }
 
     /*
@@ -1477,6 +1649,7 @@ function Activity() {
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function () {
+                console.log('DO SEARCH!!!');
                 searchWidget.focus();
                 doSearch();
             }, 500);
@@ -1614,12 +1787,11 @@ function Activity() {
         const BACKSPACE = 8;
         const TAB = 9;
 
-        /*
-        if (event.keyCode === TAB || event.keyCode === BACKSPACE) {
+        if (event.keyCode === TAB) { // || event.keyCode === BACKSPACE) {
             // Prevent browser from grabbing TAB key
             event.preventDefault();
+            return false;
         }
-        */
 
         const ESC = 27;
         const ALT = 18;
@@ -1663,33 +1835,44 @@ function Activity() {
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
             case 66: // 'B'
+                textMsg('Alt-B ' + _('Saving block artwork'));
                 save.saveBlockArtwork();
                 break;
             case 67: // 'C'
+                textMsg('Alt-C ' + _('Copy'));
                 blocks.prepareStackForCopy();
                 break;
             case 68: // 'D'
                 palettes.dict['myblocks'].promptMacrosDelete()
                 break;
             case 69: // 'E'
-                _allClear();
+                textMsg('Alt-E ' + _('Erase'));
+                _allClear(false);
                 break;
             case 80: // 'P'
                 // logo.playback(-1);
                 break;
             case 82: // 'R'
+                textMsg('Alt-R ' + _('Play'));
                 that._doFastButton();
                 break;
             case 83: // 'S'
+                textMsg('Alt-S ' + _('Stop'));
                 logo.doStopTurtle();
                 break;
             case 86: // 'V'
+                textMsg('Alt-V ' + _('Paste'));
                 blocks.pasteStack();
+                break;
+            case 72:  // 'H' save block help
+                textMsg('Alt-H ' + _('Save block help'));
+                _saveHelpBlocks();
                 break;
             }
         } else if (event.ctrlKey) {
             switch (event.keyCode) {
             case V:
+                textMsg('Ctl-V ' + _('Paste'));
                 pasteBox.createBox(turtleBlocksScale, 200, 200);
                 pasteBox.show();
                 docById('paste').style.left = (pasteBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
@@ -1700,39 +1883,47 @@ function Activity() {
                 break;
             }
         } else if (event.shiftKey && !disableKeys) {
+            var solfnotes_ = _('ti la sol fa mi re do').split(' ');
             switch (event.keyCode) {
             case KEYCODE_D:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('D ' + solfnotes_[6]);
                     __makeNewNote(5, 'do');
                 }
                 break;
             case KEYCODE_R:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('R ' + solfnotes_[5]);
                     __makeNewNote(5, 're');
                 }
                 break;
             case KEYCODE_M:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('M ' + solfnotes_[4]);
                     __makeNewNote(5, 'mi');
                 }
                 break;
             case KEYCODE_F:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('F ' + solfnotes_[3]);
                     __makeNewNote(5, 'fa');
                 }
                 break;
             case KEYCODE_S:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('S ' + solfnotes_[2]);
                     __makeNewNote(5, 'sol');
                 }
                 break;
             case KEYCODE_L:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('L ' + solfnotes_[1]);
                     __makeNewNote(5, 'la');
                 }
                 break;
             case KEYCODE_T:
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    textMsg('T ' + solfnotes_[0]);
                     __makeNewNote(5, 'ti');
                 }
                 break;
@@ -1743,22 +1934,28 @@ function Activity() {
                     pasted();
                 }
             } else if (!disableKeys) {
+                var solfnotes_ = _('ti la sol fa mi re do').split(' ');
                 switch (event.keyCode) {
                 case END:
+                    textMsg('END ' + _('Jumping to the bottom of the page.'));
                     blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
                     break;
                 case PAGE_UP:
+                    textMsg('PAGE_UP ' + _('Scrolling up.'));
                     blocksContainer.y += logo.canvas.height / 2;
                     stage.update();
                     break;
                 case PAGE_DOWN:
+                    textMsg('PAGE_DOWN ' + _('Scrolling down.'));
                     blocksContainer.y -= logo.canvas.height / 2;
                     stage.update();
                     break;
                 case DEL:
+                    textMsg('DEL ' + _('Extracting block'));
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
+                    textMsg('UP ARROW ' + _('Moving block up.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1774,6 +1971,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_DOWN:
+                    textMsg('UP ARROW ' + _('Moving block down.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1789,6 +1987,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_LEFT:
+                    textMsg('LEFT ARROW ' + _('Moving block left.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1799,6 +1998,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_RIGHT:
+                    textMsg('RIGHT ARROW ' + _('Moving block right.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
                         blocks.blockMoved(blocks.activeBlock);
@@ -1809,6 +2009,7 @@ function Activity() {
                     stage.update();
                     break;
                 case HOME:
+                    textMsg('HOME ' + _('Jump to home position.'));
                     if (palettes.mouseOver) {
                         var dy = Math.max(55 - palettes.buttons['rhythm'].y, 0);
                         palettes.menuScrollEvent(1, dy);
@@ -1816,7 +2017,8 @@ function Activity() {
                     } else if (palettes.activePalette != null) {
                         palettes.activePalette.scrollEvent(-palettes.activePalette.scrollDiff, 1);
                     } else {
-                        this._findBlocks();
+                        // Bring all the blocks "home".
+                        _findBlocks();
                     }
                     stage.update();
                     break;
@@ -1831,6 +2033,7 @@ function Activity() {
                     break;
                 case ESC:
                     if (searchWidget.style.visibility === 'visible') {
+                        textMsg('ESC ' + _('Hide blocks.'));
                         searchWidget.style.visibility = 'hidden';
                     } else {
                         // toggle full screen
@@ -1841,6 +2044,7 @@ function Activity() {
                     if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
                         doSearch();
                     } else {
+                        textMsg('Return ' + _('Play'));
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
                         }
@@ -1848,36 +2052,43 @@ function Activity() {
                     break;
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('d ' + solfnotes_[6]);
                         __makeNewNote(4, 'do');
                     }
                     break;
                 case KEYCODE_R:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('r ' + solfnotes_[5]);
                         __makeNewNote(4, 're');
                     }
                     break;
                 case KEYCODE_M:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('m ' + solfnotes_[4]);
                         __makeNewNote(4, 'mi');
                     }
                     break;
                 case KEYCODE_F:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('f ' + solfnotes_[3]);
                         __makeNewNote(4, 'fa');
                     }
                     break;
                 case KEYCODE_S:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('s ' + solfnotes_[2]);
                         __makeNewNote(4, 'sol');
                     }
                     break;
                 case KEYCODE_L:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('l ' + solfnotes_[1]);
                         __makeNewNote(4, 'la');
                     }
                     break;
                 case KEYCODE_T:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
+                        textMsg('t ' + solfnotes_[0]);
                         __makeNewNote(4, 'ti');
                     }
                     break;
@@ -1919,7 +2130,6 @@ function Activity() {
 
         console.log('window inner/outer width/height: ' + window.innerWidth + ', ' + window.innerHeight + ' ' + window.outerWidth + ', ' + window.outerHeight);
 
-
         if (!platform.androidWebkit) {
             var w = window.innerWidth;
             var h = window.innerHeight;
@@ -1931,8 +2141,8 @@ function Activity() {
         // If the clientWidth hasn't changed, don't resize (except
         // on init).
         if (!force && this._clientWidth === document.body.clientWidth) {
-            console.log('NO WIDTH CHANGE');
-            return;
+            // console.log('NO WIDTH CHANGE');
+            // return;
         }
 
         this._clientWidth = document.body.clientWidth;
@@ -2008,8 +2218,6 @@ function Activity() {
         polarBitmap.x = (canvas.width / (2 * turtleBlocksScale)) - (600);
         polarBitmap.y = (canvas.height / (2 * turtleBlocksScale)) - (450);
         update = true;
-
-
 
         // Hide tooltips on mobile
         if (platform.mobile) {
@@ -2220,9 +2428,11 @@ function Activity() {
         }
 
         if (addStartBlock) {
+            console.log('ADDING START BLOCK');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
             setPlaybackStatus();
+            _allClear(false);
         } else if (!doNotSave) {
             // Overwrite session data too.
             saveLocally();
@@ -2374,7 +2584,6 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-        console.log('DO LOAD ' + merge);
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -2393,7 +2602,8 @@ function Activity() {
         document.querySelector('#myOpenFile').click();
         window.scroll(0, 0);
         that.doHardStopButton();
-        _allClear();
+        console.log('Calling all clear from doLoad');
+        _allClear(true);
     };
 
     window.prepareExport = prepareExport;
@@ -2532,7 +2742,7 @@ function Activity() {
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
-            console.log('Loading start and a matrix');
+            console.log('Loading start');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
             setPlaybackStatus();
@@ -2551,7 +2761,7 @@ function Activity() {
         var __afterLoad = function () {
             if (!turtles.running()) {
                 setTimeout(function () {
-                    console.log('reset turtles ' + turtles.turtleList.length);
+                    console.log('reset turtles after load: ' + turtles.turtleList.length);
 
                     for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                         logo.turtleHeaps[turtle] = [];
@@ -2601,16 +2811,12 @@ function Activity() {
         update = true;
     };
 
-
     /*
      * Hides all message containers
      */
     hideMsgs = function () {
         errorMsgText.parent.visible = false;
-        if (errorMsgArrow != null) {
-            errorMsgArrow.removeAllChildren();
-            refreshCanvas();
-        }
+        hideArrows();
 
         msgText.parent.visible = false;
         for (var i in errorArtwork) {
@@ -2620,6 +2826,13 @@ function Activity() {
         refreshCanvas();
     };
 
+    hideArrows = function() {
+        if (errorMsgArrow != null) {
+            errorMsgArrow.removeAllChildren();
+            refreshCanvas();
+        }
+    }
+
 
     textMsg = function (msg) {
         if (msgText == null) {
@@ -2627,12 +2840,13 @@ function Activity() {
             return;
         }
 
-        var msgContainer = msgText.parent;
-        msgContainer.visible = true;
-        msgText.text = msg;
-        msgContainer.updateCache();
-        stage.setChildIndex(msgContainer, stage.children.length - 1);
-        refreshCanvas();
+        // Show and populate printText div
+        var printText = document.getElementById("printText");
+        printText.classList.add("show");
+
+        var printTextContent = document.getElementById("printTextContent");
+        printTextContent.innerHTML = msg;
+
     };
 
     errorMsg = function (msg, blk, text, timeout) {
@@ -2729,11 +2943,11 @@ function Activity() {
                 stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
                 break;
             default:
-                var errorMsgContainer = errorMsgText.parent;
-                errorMsgContainer.visible = true;
-                errorMsgText.text = msg;
-                stage.setChildIndex(errorMsgContainer, stage.children.length - 1);
-                errorMsgContainer.updateCache();
+                // Show and populate errorText div
+                var errorText = document.getElementById("errorText");
+                errorText.classList.add("show");
+                var errorTextContent = document.getElementById("errorTextContent");
+                errorTextContent.innerHTML = msg;
                 break;
         }
 
@@ -2853,7 +3067,8 @@ function Activity() {
                                 'color': turtle.color,
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
-                                'grey': turtle.chroma
+                                'grey': turtle.chroma,
+                                'name': turtle.name
                             };
                         }
                         break;
@@ -2879,6 +3094,7 @@ function Activity() {
                     case 'pitchslider':
                     case 'musickeyboard':
                     case 'modewidget':
+                    case 'meterwidget':
                     case 'status':
                         var args = {
                             'collapsed': myBlock.collapsed
@@ -3016,7 +3232,8 @@ function Activity() {
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
             stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer);
+            stage.removeChild(hideBlocksContainer[0]);
+            stage.removeChild(hideBlocksContainer[1]);
             stage.removeChild(collapseBlocksContainer);
             stage.removeChild(smallerContainer);
             stage.removeChild(smallerOffContainer);
@@ -3035,10 +3252,10 @@ function Activity() {
 
         homeButtonContainers = [];
         homeButtonContainers.push(_makeButton(GOHOMEBUTTON, _('Home') + ' [' + _('Home').toUpperCase() + ']', x, y, btnSize, 0));
-        that._loadButtonDragHandler(homeButtonContainers[0], x, y, that._findBlocks, null, null, null, null);
+        that._loadButtonDragHandler(homeButtonContainers[0], x, y, _findBlocks, null, null, null, null);
 
         homeButtonContainers.push(_makeButton(GOHOMEFADEDBUTTON, _('Home') + ' [' + _('Home').toUpperCase() + ']', x, y - btnSize, btnSize, 0));
-        that._loadButtonDragHandler(homeButtonContainers[1], x, y, that._findBlocks, null, null, null, null);
+        that._loadButtonDragHandler(homeButtonContainers[1], x, y, _findBlocks, null, null, null, null);
         homeButtonContainers[1].visible = false;
 
         homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -3647,7 +3864,7 @@ function Activity() {
         createjs.Touch.enable(stage);
 
         createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 30;
+        createjs.Ticker.framerate = 15;
         // createjs.Ticker.addEventListener('tick', stage);
         createjs.Ticker.addEventListener('tick', that.__tick);
 
@@ -3809,6 +4026,7 @@ function Activity() {
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                     storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
+                    storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
                     storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
@@ -3928,6 +4146,9 @@ function Activity() {
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
+                    docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
+                    docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
                     // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
                     // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
                     // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
@@ -3966,6 +4187,7 @@ function Activity() {
             };
 
             this.loadProjectFromData = function (data, merge) {
+                console.log('LOAD PROJECT FROM DATA');
                 if (merge === undefined) {
                     merge = false;
                 }
@@ -3984,7 +4206,7 @@ function Activity() {
                 console.log('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
-                _allClear();
+                _allClear(false);
 
                 // First, hide the palettes as they will need updating.
                 for (var name in blocks.palettes.dict) {
@@ -4043,22 +4265,26 @@ function Activity() {
                 console.log('overwriting session data');
                 var data = prepareExport();
                 var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                if (svgData === null || svgData === '') {
-                    this.planet.ProjectStorage.saveLocally(data, null);
-                } else {
-                    var img = new Image();
-                    var t = this;
-                    img.onload = function () {
-                        var bitmap = new createjs.Bitmap(img);
-                        var bounds = bitmap.getBounds();
-                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        try {
-                            t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    };
-                    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+                try {
+
+                    if (svgData === null || svgData === '') {
+                        this.planet.ProjectStorage.saveLocally(data, null);
+                    } else {
+                        var img = new Image();
+                        var t = this;
+                        img.onload = function () {
+                            var bitmap = new createjs.Bitmap(img);
+                            var bounds = bitmap.getBounds();
+                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                                t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
+                        };
+                        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgData)));
+                    }
+                } catch (e) {
+                    console.log(e);
+                    if(e.code === DOMException.QUOTA_EXCEEDED_ERR || e.message === "Not enough space to save locally")
+                        textMsg(_("Error: Unable to save because you ran out of local storage. Try deleting some saved projects."));
+                    else throw e;
                 }
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
                 //    sugarizerCompatibility.saveLocally();
@@ -4145,7 +4371,7 @@ function Activity() {
         toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin);
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin,setScroller, that._setupBlocksContainerEvents);
         // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
         //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
         toolbar.renderMergeIcon(_doMergeLoad);
@@ -4294,6 +4520,8 @@ function Activity() {
 
                                 stage.addEventListener('trashsignal', __listener, false);
                                 sendAllToTrash(false, false);
+                                console.log('clearing on load...');
+                                _allClear(false);
                                 if (planet) {
                                     planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
                                 }
@@ -4564,6 +4792,8 @@ function Activity() {
                 that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
         }
+
+        prepSearchWidget();
 
         document.addEventListener('mousewheel', scrollEvent, false);
         document.addEventListener('DOMMouseScroll', scrollEvent, false);

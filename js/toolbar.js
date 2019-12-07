@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Austin George
+// Copyright (c) 2018,19 Austin George
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -85,6 +85,7 @@ function Toolbar() {
                 html_onclick();
             };
         } else {
+	    console.log('ADVANCED MODE BUTTONS')
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
@@ -93,6 +94,7 @@ function Toolbar() {
                 saveHTML.onclick = function () {
                     html_onclick();
                 };
+
                 var saveSVG = docById('save-svg');
                 var savePNG = docById('save-png');
                 var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
@@ -108,10 +110,10 @@ function Toolbar() {
                     savePNG.disabled = false;
                     saveSVG.className = '';
                     savePNG.className = '';
+
                     saveSVG.onclick = function () {
                         svg_onclick();
                     };
-
 
                     savePNG.onclick = function () {
                         png_onclick();
@@ -121,9 +123,15 @@ function Toolbar() {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     var saveWAV = docById('save-wav');
 
-                    saveWAV.onclick = function () {
-                        wave_onclick();
-                    };
+                    // Until we fix #1744, disable recorder on FF
+                    // if (platform.FF) {
+                        saveWAV.disabled = true;
+                        saveWAV.className = 'grey-text inactiveLink';
+                    // } else {
+                    //    saveWAV.onclick = function () {
+                    //        wave_onclick();
+                    //    };
+                    // }
 
                     var saveLY = docById('save-ly');
 
@@ -233,11 +241,12 @@ function Toolbar() {
         };
     };
 
-    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick) {
+    this.renderAdvancedIcons = function (analytics_onclick, openPlugin_onclick, delPlugin_onclick,setScroller,_setupBlocksContainerEvents) {
         var displayStatsIcon = docById('displayStatsIcon');
         var loadPluginIcon = docById('loadPluginIcon');
         var delPluginIcon = docById('delPluginIcon');
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
             displayStatsIcon.onclick = function () {
@@ -251,6 +260,16 @@ function Toolbar() {
             delPluginIcon.onclick = function () {
                 delPlugin_onclick();
             };
+
+            enableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
+
+            disableHorizScrollIcon.onclick = function () {
+              setScroller();
+              _setupBlocksContainerEvents();
+            }
         } else {
             displayStatsIcon.style.display = 'none';
             loadPluginIcon.style.display = 'none';

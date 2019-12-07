@@ -1,4 +1,4 @@
-// Copyright (c) 2016-18 Walter Bender
+// Copyright (c) 2016-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -89,6 +89,10 @@ function PitchDrumMatrix() {
         }
     };
 
+    this._get_save_lock = function() {
+	return this._save_lock;
+    };
+
     this.init = function(logo) {
         // Initializes the pitch/drum matrix. First removes the
         // previous matrix and them make another one in DOM (document
@@ -122,24 +126,6 @@ function PitchDrumMatrix() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-
-        cell.onclick=function() {
-            that._logo.setTurtleDelay(0);
-            that._playAll();
-        }
-
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-
-        cell.onclick=function() {
-            that._save();
-        }
-
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-
-        cell.onclick=function() {
-            that._clear();
-        }
 
         var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
@@ -149,6 +135,43 @@ function PitchDrumMatrix() {
             pdmTableDiv.style.visibility = 'hidden';
             that._logo.hideMsgs();
         }
+
+
+        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
+
+        cell.onclick=function() {
+            that._logo.setTurtleDelay(0);
+            that._playAll();
+        }
+
+        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
+        this._save_lock = false;
+
+        cell.onclick = function () {
+	    // Debounce button
+	    if (!that._get_save_lock()) {
+		that._save_lock = true;
+		that._save();
+		setTimeout(function () {
+		    that._save_lock = false;
+		}, 1000);
+	    }
+        };
+
+        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
+
+        cell.onclick=function() {
+            that._clear();
+        }
+
+        // var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
+
+        // cell.onclick=function() {
+        //     pdmDiv.style.visibility = 'hidden';
+        //     pdmButtonsDiv.style.visibility = 'hidden';
+        //     pdmTableDiv.style.visibility = 'hidden';
+        //     that._logo.hideMsgs();
+        // }
 
         // We use this cell as a handle for dragging.
         var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
@@ -670,23 +693,23 @@ function PitchDrumMatrix() {
             var octave = noteObj[1];
 
             // Add the set drum block and its value
-            var setdrumidx = newStack.length;
-            var drumnameidx = setdrumidx + 1;
-            var pitchidx = setdrumidx + 2;
-            var notenameidx = setdrumidx + 3;
-            var octaveidx = setdrumidx + 4;
-            var hiddenidx = setdrumidx + 5;
+            var mapdrumidx = newStack.length;
+            var drumnameidx = mapdrumidx + 1;
+            var pitchidx = mapdrumidx + 2;
+            var notenameidx = mapdrumidx + 3;
+            var octaveidx = mapdrumidx + 4;
+            var hiddenidx = mapdrumidx + 5;
 
-            newStack.push([setdrumidx, 'setdrum', 0, 0, [previousBlock, drumnameidx, pitchidx, hiddenidx]]);
-            newStack.push([drumnameidx, ['drumname', {'value': drumName}], 0, 0, [setdrumidx]]);
-            newStack.push([pitchidx, 'pitch', 0, 0, [setdrumidx, notenameidx, octaveidx, null]]);
+            newStack.push([mapdrumidx, 'mapdrum', 0, 0, [previousBlock, drumnameidx, pitchidx, hiddenidx]]);
+            newStack.push([drumnameidx, ['drumname', {'value': drumName}], 0, 0, [mapdrumidx]]);
+            newStack.push([pitchidx, 'pitch', 0, 0, [mapdrumidx, notenameidx, octaveidx, null]]);
             newStack.push([notenameidx, ['solfege', {'value': SOLFEGECONVERSIONTABLE[pitch]}], 0, 0, [pitchidx]]);
             newStack.push([octaveidx, ['number', {'value': octave}], 0, 0, [pitchidx]]);
 
             if (i === pairs.length - 1) {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, null]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [mapdrumidx, null]]);
             } else {
-                newStack.push([hiddenidx, 'hidden', 0, 0, [setdrumidx, hiddenidx + 1]]);
+                newStack.push([hiddenidx, 'hidden', 0, 0, [mapdrumidx, hiddenidx + 1]]);
             }
 
             var previousBlock = hiddenidx;

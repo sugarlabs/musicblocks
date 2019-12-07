@@ -3131,7 +3131,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
                     break;
                 case 'hertz':
-                    this._piemenuNumber([246, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
+                    this._piemenuNumber([220, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
                     break;
                 }
 
