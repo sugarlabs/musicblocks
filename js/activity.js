@@ -751,6 +751,7 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
 
+	    /*
             if (docById('ptmDiv').style.visibility === 'visible') {
                 playingWidget = true;
                 logo.pitchTimeMatrix.playAll();
@@ -782,7 +783,6 @@ function Activity() {
                 return;
             }
 
-            // Restart tempo widget and run blocks.
             if (docById('tempoDiv').style.visibility === 'visible') {
                 if (logo.tempo.isMoving) {
                     logo.tempo.pause();
@@ -790,6 +790,8 @@ function Activity() {
 
                 logo.tempo.resume();
             }
+            */
+
         }
 
         if (!turtles.running()) {
