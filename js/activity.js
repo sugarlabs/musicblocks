@@ -4116,8 +4116,8 @@ function Activity() {
                     docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
-                    docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                    // docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                    // docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
