@@ -2739,78 +2739,81 @@ function Activity() {
     };
 
     this._loadStart = function () {
-        console.log('LOAD START');
+        setTimeout(()=>{
+            console.log('LOAD START');
 
-        // where to put this?
-        // palettes.updatePalettes();
-        justLoadStart = function () {
-            console.log('Loading start');
-            logo.playbackQueue = {};
-            blocks.loadNewBlocks(DATAOBJS);
-            setPlaybackStatus();
-        };
+            // where to put this?
+            // palettes.updatePalettes();
+            justLoadStart = function () {
+                console.log('Loading start');
+                logo.playbackQueue = {};
+                blocks.loadNewBlocks(DATAOBJS);
+                setPlaybackStatus();
+            };
 
-        sessionData = null;
+            sessionData = null;
 
-        // Try restarting where we were when we hit save.
-        if (planet) {
-            sessionData = planet.openCurrentProject();
-        } else {
-            var currentProject = storage.currentProject;
-            sessionData = storage['SESSION' + currentProject];
-        }
-
-        var __afterLoad = function () {
-            if (!turtles.running()) {
-                setTimeout(function () {
-                    console.log('reset turtles after load: ' + turtles.turtleList.length);
-
-                    for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                        logo.turtleHeaps[turtle] = [];
-                        logo.notationStaging[turtle] = [];
-                        logo.notationDrumStaging[turtle] = [];
-                        turtles.turtleList[turtle].doClear(true, true, false);
-                    }
-
-                    // playbackOnLoad();
-                }, 1000);
+            // Try restarting where we were when we hit save.
+            if (planet) {
+                sessionData = planet.openCurrentProject();
+            } else {
+                var currentProject = storage.currentProject;
+                sessionData = storage['SESSION' + currentProject];
             }
 
-            document.removeEventListener('finishedLoading', __afterLoad);
-        };
+            var __afterLoad = function () {
+                if (!turtles.running()) {
+                    setTimeout(function () {
+                        console.log('reset turtles after load: ' + turtles.turtleList.length);
 
-        // After we have finished loading the project, clear all
-        // to ensure a clean start.
-        if (document.addEventListener) {
-            document.addEventListener('finishedLoading', __afterLoad);
-        } else {
-            document.attachEvent('finishedLoading', __afterLoad);
-        }
+                        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+                            logo.turtleHeaps[turtle] = [];
+                            logo.notationStaging[turtle] = [];
+                            logo.notationDrumStaging[turtle] = [];
+                            turtles.turtleList[turtle].doClear(true, true, false);
+                        }
 
-        if (sessionData) {
-            try {
-                if (sessionData === 'undefined' || sessionData === '[]') {
-                    console.log('empty session found: loading start');
-                    justLoadStart();
-                } else {
-                    console.log('restoring session: ' + sessionData);
-                    // First, hide the palettes as they will need updating.
-                    for (var name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
-
-                    logo.playbackQueue = {};
-                    blocks.loadNewBlocks(JSON.parse(sessionData));
-                    setPlaybackStatus();
+                        // playbackOnLoad();
+                    }, 1000);
                 }
-            } catch (e) {
-                console.log(e);
-            }
-        } else {
-            justLoadStart();
-        }
 
-        update = true;
+                document.removeEventListener('finishedLoading', __afterLoad);
+            };
+
+            // After we have finished loading the project, clear all
+            // to ensure a clean start.
+            if (document.addEventListener) {
+                document.addEventListener('finishedLoading', __afterLoad);
+            } else {
+                document.attachEvent('finishedLoading', __afterLoad);
+            }
+
+            if (sessionData) {
+                try {
+                    if (sessionData === 'undefined' || sessionData === '[]') {
+                        console.log('empty session found: loading start');
+                        justLoadStart();
+                    } else {
+                        console.log('restoring session: ' + sessionData);
+                        // First, hide the palettes as they will need updating.
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
+
+                        logo.playbackQueue = {};
+                        blocks.loadNewBlocks(JSON.parse(sessionData));
+                        setPlaybackStatus();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            } else {
+                justLoadStart();
+            }
+
+            update = true;
+
+        }, 1000)
     };
 
     /*
