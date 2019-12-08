@@ -49,6 +49,7 @@ function ProjectStorage(Planet) {
     };
 
     this.getCurrentProjectData = function() {
+        if(!this.data) return null;
         var c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             return null;
