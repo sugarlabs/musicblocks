@@ -184,7 +184,7 @@ function ProjectStorage(Planet) {
     this.get = function(key, callback) {
         this.LocalStorage.getItem(key, obj=>{
             if (obj === null || obj === '') {
-                return null;
+                callback(null);
             }
             callback(obj);
         });
@@ -200,6 +200,7 @@ function ProjectStorage(Planet) {
             this.get(this.LocalStorageKey, (data)=>{
                 console.log("PROJECT DATA RESTORED");
                 this.data = data;
+                this.save();
                 resolve();
             });
         })
@@ -225,6 +226,7 @@ function ProjectStorage(Planet) {
         if (this.data.DefaultCreatorName === null || this.data.DefaultCreatorName === undefined) {
             this.data.DefaultCreatorName = _('anonymous');
         }
+        this.save();
     };
 
     this.getDefaultCreatorName = function() {
