@@ -94,7 +94,9 @@ function ProjectStorage(Planet) {
         }
 
         if (data === undefined) {
-            data = null;
+            data = {
+                Projects: []
+            };
         }
 
         if (image === undefined) {
