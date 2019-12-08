@@ -70,12 +70,17 @@ function CustomStorage(options) {
                 if (callback) callback(false);
             } else {
                 this.log(`Key ${key} not ported to ${this.version}. Porting now...`);
-                this.setItem(key, JSON.parse(localStorage[key]), () => {
-                    this.setItem(`${key}_storage_version`, "v2", () => {
-                        this.log(`Ported ${key} to ${this.version}`);
-                        if (callback) callback(true);
-                    });
-                })
+                if(localStorage[key]){
+                    this.setItem(key, JSON.parse(localStorage[key]), () => {
+                        this.setItem(`${key}_storage_version`, "v2", () => {
+                            this.log(`Ported ${key} to ${this.version}`);
+                            if (callback) callback(true);
+                        });
+                    })
+                } else {
+                    this.log(`Tried to port ${key}, but there was nothing there.`);
+                    callback(false);
+                }
             }
         })
     };
