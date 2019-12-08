@@ -137,6 +137,13 @@ function WidgetWindow(key, title) {
         return el;
     };
 
+    this.addInputButton = function (initial) {
+        let el = create("div", "wfbtItem", this._toolbar);
+        el.innerHTML = '<input value="' + initial + '" />';
+        this._buttons.push(el);
+        return el.querySelector("input");
+    };
+
     this.modifyButton = function (index, icon, iconSize, label) {
         this._buttons[index].innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         return this._buttons[index];

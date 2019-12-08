@@ -411,18 +411,6 @@ input.number {
     width: 100px;
 }
 
-input.dissectNumber {
-    background-color: #8CC6FF !important;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
 input.musicratio1, input.musicratio2   {
     background-color: #8CC6FF !important;
     text-align: center;
@@ -1128,7 +1116,7 @@ input.timbreName {
     position: absolute;
 }
 
-#progressBar {
+.progressBar {
   width: 1%;
   height: 70px;
   background-color: #4CAF50;
