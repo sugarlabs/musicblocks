@@ -2739,7 +2739,7 @@ function Activity() {
     };
 
     this._loadStart = function () {
-        setTimeout(()=>{
+        window.onPlanetLoad = ()=>{
             console.log('LOAD START');
 
             // where to put this?
@@ -2813,7 +2813,7 @@ function Activity() {
 
             update = true;
 
-        }, 1000)
+        };
     };
 
     /*

@@ -196,9 +196,13 @@ function ProjectStorage(Planet) {
     };
 
     this.restore = function() {
-        this.get(this.LocalStorageKey, (data)=>{
-            this.data = data;
-        });
+        return new Promise((resolve, reject)=>{
+            this.get(this.LocalStorageKey, (data)=>{
+                console.log("PROJECT DATA RESTORED");
+                this.data = data;
+                resolve();
+            });
+        })
     };
 
     this.initialiseStorage = function() {
@@ -221,7 +225,6 @@ function ProjectStorage(Planet) {
         if (this.data.DefaultCreatorName === null || this.data.DefaultCreatorName === undefined) {
             this.data.DefaultCreatorName = _('anonymous');
         }
-        this.save();
     };
 
     this.getDefaultCreatorName = function() {
@@ -230,14 +233,14 @@ function ProjectStorage(Planet) {
 
     this.init = function() {
         // this allows us to store more than 5mb of ProjectData if the browser supports it.
-        console.log("Initializing :)");
+        console.log("Initializing Project Storage");
         return new Promise((resolve, reject)=>{
             this.LocalStorage = new CustomStorage();
             this.LocalStorage.portKey(this.LocalStorageKey, ()=>{
-                this.restore();
-                this.initialiseStorage();
-                console.log("RESOLVING");
-                resolve();
+                this.restore().then(()=>{
+                    this.initialiseStorage();
+                    resolve();
+                })
             })
         });
     };

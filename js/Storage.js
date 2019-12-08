@@ -14,13 +14,15 @@ function CustomStorage(options) {
     this._forage = localforage.createInstance(this.config);
     this.driver = localforage.driver();
     this.version = "v2";
-    this.log = logItem => console.log(`[${this.driver}] ${typeof logItem === "object" ? JSON.stringify(logItem) : logItem}`);
+    this.log = logItem => {
+        console.log(`[${this.driver}] ${logItem}`)
+    };
 
     this.setItem = (key, value, callback) => {
         this._forage.setItem(key, value, (err) => {
-            this.log(`Saved ${key} as ${value}`);
             if (err) throw err;
-            if (callback) callback(err);
+            this.log(`Saved ${key} as ${typeof value === "object" ? JSON.stringify(value) : value}`);
+            if (callback) callback();
         });
     };
 
