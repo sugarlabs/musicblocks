@@ -120,6 +120,15 @@
 #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar > .wfbtItem:hover {
     background-color: #7bb5ee;
 }
+#floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar > .wfbtItem > input {
+    border: none;
+    width: 100%;
+    height: 100%;
+    font-size: 24px;
+    font-weight: bold;
+    background: transparent;
+    text-align: center;
+}
 #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
     flex-grow: 1;
     padding: 2px;

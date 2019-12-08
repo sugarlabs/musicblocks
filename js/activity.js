@@ -752,29 +752,9 @@ function Activity() {
             logo.synth.resume();
 
 	    /*
-            if (docById('ptmDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                logo.pitchTimeMatrix.playAll();
-            }
-
             if (docById('pscDiv').style.visibility === 'visible') {
                 playingWidget = true;
                 logo.pitchStaircase.playUpAndDown();
-            }
-
-            if (docById('rulerDiv').style.visibility === 'visible') {
-                // If the tempo widget is open, sync it up with the
-                // rhythm ruler.
-                if (docById('tempoDiv').style.visibility === 'visible') {
-                    if (logo.tempo.isMoving) {
-                        logo.tempo.pause();
-                    }
-
-                    logo.tempo.resume();
-                }
-
-                playingWidget = true;
-                logo.rhythmRuler.playAll();
             }
 
             // We were using the run button to play a widget, not
@@ -4026,7 +4006,6 @@ function Activity() {
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
                     storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
-                    storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                     storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
                     storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
@@ -4050,12 +4029,6 @@ function Activity() {
                         docById('mkbDiv').style.visibility = 'hidden';
                         docById('mkbButtonsDiv').style.visibility = 'hidden';
                         docById('mkbTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('rulerDiv').style.visibility !== 'hidden') {
-                        docById('rulerDiv').style.visibility = 'hidden';
-                        docById('rulerTableDiv').style.visibility = 'hidden';
-                        docById('rulerButtonsDiv').style.visibility = 'hidden';
                     }
 
                     if (docById('pscDiv').style.visibility !== 'hidden') {
@@ -4143,7 +4116,6 @@ function Activity() {
                     docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('rulerDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
