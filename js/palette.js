@@ -88,9 +88,9 @@ function Palettes () {
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
-        storage = localStorage;
+        storage = new CustomStorage();
     }
-    
+
     // The collection of palettes.
     this.dict = {};
     this.selectorButtonsOff = [];  // Select between palettes
@@ -415,7 +415,7 @@ function Palettes () {
 
                     if (i === MULTIPALETTES.length) {
                         // Put plugins in last multipalette selector
-                        i = MULTIPALETTES.length - 1; 
+                        i = MULTIPALETTES.length - 1;
                         console.log("We didn't find a multipalette for " + name);
                         this.buttons[name].x = this.x[i];
                         this.buttons[name].y = this.y[i] + this.scrollDiff;
@@ -665,14 +665,14 @@ function Palettes () {
 
 
         this.buttons[name].on('click', function (event) {
-            var clickOutside = function(event) {                
+            var clickOutside = function(event) {
                 setTimeout(function () {
                     searchlocked = false;
                 }, 500);
 
                 if (!that.dict['search'].visible && searchlocked) {
                     that.showPalette('search');
-                } else { 
+                } else {
                     document.removeEventListener('click', clickOutside);
                     that.dict['search'].hide();
                 }

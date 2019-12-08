@@ -16,8 +16,32 @@
   <noscript>
   JavaScript is required to view this page.
   </noscript>
+
+   <script>
+    if(!Proxy){ // compatibility for IE
+        window.syncStorage = localStorage;
+    } else {
+        window.syncStorage = new Proxy(localStorage, {
+            get: function(target, name){
+                return target[name];
+            },
+            set: function(target, name, receiver){
+                target[name] = receiver;
+            }
+        });
+        const localStorageFunctions = ["key", "getItem", "setItem", "removeItem", "clear"];
+        localStorageFunctions.forEach(func=>{
+            syncStorage[func] = localStorage[func].bind(localStorage);
+        })
+    }
+  </script>
   <script src="dist/app.min.js/?cb=1566155195010" defer>
   </script>
+
+   <script src="lib/localforage.min.js" defer>
+   </script>
+   <script src="js/Storage.js">
+   </script>
 
   <!-- <script src="js/utils/detectIE.js">
   </script> -->
