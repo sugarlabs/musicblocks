@@ -240,7 +240,8 @@ function ProjectStorage(Planet) {
         console.log("Initializing Project Storage");
         return new Promise((resolve, reject)=>{
             this.LocalStorage = new CustomStorage();
-            this.LocalStorage.portKey(this.LocalStorageKey, ()=>{
+            this.LocalStorage.portKey(this.LocalStorageKey, (didPort)=>{
+                console.log("Ported key? ", didPort);
                 this.restore().then(()=>{
                     this.initialiseStorage();
                     resolve();
