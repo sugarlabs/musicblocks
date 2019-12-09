@@ -9,8 +9,7 @@
   },
   "scripts": {
     "serve": "python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('python -m http.server 3000');\"",
-    "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000');\"",
-
+    "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000');\""
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
