@@ -8,7 +8,7 @@
     }
   },
   "scripts": {
-    "serve": "python -c \"import os, sys; os.system('python -m SimpleHTTPServer'.format(sys.version_info.major)) if sys.version_info.major==2 else os.system('python{} -m http.server 5000'.format(sys.version_info.major));\""
+    "serve": "python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000'.format(sys.version_info.major)) if sys.version_info.major==2 else os.system('python{} -m http.server 3000'.format(sys.version_info.major));\""
 
   },
   "devDependencies": {
