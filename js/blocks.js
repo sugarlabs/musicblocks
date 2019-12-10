@@ -1642,10 +1642,16 @@ function Blocks (activity) {
                             }, 50); // 500
                          }
                     }
+                } else if (myBlock.protoblock.style === 'argclamparg') {
+                    // We don't need to do anything special with
+                    // argclamparg blocks.
+                    console.log('connecting to argclamparg');
                 } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
                     var bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
+                } else {
+                    console.log('HOW DID WE GET HERE?');
                 }
             }
 
