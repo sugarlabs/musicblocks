@@ -343,6 +343,12 @@ function SaveInterface(PlanetInterface) {
         });
     }
 
+    this.saveMxml = function() {
+        console.log(this.PlanetInterface.getCurrentProjectData());
+        var data = 'placeholder123';
+        this.download('musicxml', 'data:text;utf8,'+data);
+    }
+
     this.init = function(){
         var unloadTimer;
         this.timeLastSaved = -100;
