@@ -1,7 +1,14 @@
 processMxmlNotes = function(data) {
-    console.log("HI");
-    console.log(data);
+    data = JSON.parse(data);
+    var res = '';
+    
+    newln = function() {
+        res += '\n';
+    }
+    // Header
+    res += '<?xml version=\'1.0\' encoding=\'UTF-8\'?>'
+    newln();
+    res += '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">';
 
-    console.log("returning 2");
-    return 2;
+    return res;
 }
