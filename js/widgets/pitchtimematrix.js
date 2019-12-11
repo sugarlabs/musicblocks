@@ -926,7 +926,6 @@ function PitchTimeMatrix () {
 
     this._createMatrixGraphicsPieSubmenu = function(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
-        console.log(blockIndex);
         docById('wheelDivptm').style.display = '';
         // Different blocks get different arg wheel values.
         if (condition === 'synthsblocks'){
@@ -1434,7 +1433,9 @@ function PitchTimeMatrix () {
                     that._logo.synth.loadSynth(0, label);
                     // give the synth time to load
                     var timeout = 500;
-                }
+                } else {
+		    var timeout = 0;
+		}
 
                 setTimeout(function () {
                     that._logo.synth.setMasterVolume(DEFAULTVOLUME);
@@ -2144,16 +2145,20 @@ function PitchTimeMatrix () {
         this._noteBlocks = false;
         for (var i = 0; i < this._blockMap.length; i++) {
             var blk = this._blockMap[i][1][0];
+            if (blk === -1) {
+                continue;
+            }
+
             if (this._logo.blocks.blockList[blk] === null) {
                 continue;
             }
+
 
             if (this._logo.blocks.blockList[blk] === undefined) {
                 console.log('block ' + blk + ' is undefined');
                 continue;
             }
 
-            // console.log(this._logo.blocks.blockList[blk].name);
             if (this._logo.blocks.blockList[blk].name === 'newnote') {
                 console.log('FOUND A NOTE BLOCK.');
                 this._noteBlocks = true;
@@ -2168,14 +2173,16 @@ function PitchTimeMatrix () {
             if (this._blockMap[i][0] === -1) {
                 continue;
             }
+
             for (var j = 0; j < this._blockMapHelper.length; j++) {
                 if (JSON.stringify(this._blockMap[i][1]) === JSON.stringify(this._blockMapHelper[j][0])) {
-                    for (var k =0; k < this._blockMapHelper[j][1].length; k++) {
+                    for (var k = 0; k < this._blockMapHelper[j][1].length; k++) {
                         newBlockMap.push([this._blockMap[i][0], this._colBlocks[this._blockMapHelper[j][1][k]], this._blockMap[i][2]])
                     }
                 }
             }
         }
+
         this._blockMap = newBlockMap.filter((el, i) => {
             return i === newBlockMap.findIndex(ele => {
                 return JSON.stringify(ele) === JSON.stringify(el)
@@ -2910,7 +2917,7 @@ function PitchTimeMatrix () {
                 }
             }
         } else {
-            // otherwise, we need to look at the blockMap.
+            // Otherwise, we need to look at the blockMap.
             for (var i = 0; i < this._blockMap.length; i++) {
                 var obj = this._blockMap[i];
                 if (obj[0] !== -1) {
@@ -2931,6 +2938,7 @@ function PitchTimeMatrix () {
 
                     if (rIdx === null) {
                         console.log('Could not find a row match.');
+                        console.log(obj[0]);
                         continue;
                     }
 
@@ -2951,7 +2959,7 @@ function PitchTimeMatrix () {
                         }
                     }
 
-                    if (c == -1) {
+                    if (c === -1) {
                         continue;
                     }
 

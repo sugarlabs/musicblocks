@@ -4886,25 +4886,24 @@ function Logo () {
                 }
             }
 
-            if (that.inNeighbor[turtle].length > 0) {
-                var noteObj = getNote(note, octave, that.scalarTransposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
-                that.neighborArgNote1[turtle].push(noteObj[0] + noteObj[1]);
-                if (that.blocks.blockList[last(that.inNeighbor[turtle])].name === 'neighbor2') {
-                    var noteObj2 = that._addScalarTransposition(turtle, note, octave, parseInt(that.neighborStepPitch[turtle]));
-                    if (that.scalarTransposition[turtle] !== 0) {
-                        noteObj2 = getNote(noteObj2[0], noteObj2[1], that.scalarTransposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
-                    }
-                } else {
-                    var noteObj2 = getNote(note, octave, that.scalarTransposition[turtle] + parseInt(that.neighborStepPitch[turtle]), that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
-                }
-
-                that.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
-            }
-
             var noteObj = that._addScalarTransposition(turtle, note, octave, that.scalarTransposition[turtle]);
             note = noteObj[0];
             that.currentNote = note;
             octave = noteObj[1];
+
+            if (that.inNeighbor[turtle].length > 0) {
+                var noteObj = getNote(note, octave, that.transposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
+                that.neighborArgNote1[turtle].push(noteObj[0] + noteObj[1]);
+                if (that.blocks.blockList[last(that.inNeighbor[turtle])].name === 'neighbor2') {
+                    var noteObj2 = that._addScalarTransposition(turtle, note, octave, parseInt(that.neighborStepPitch[turtle]));
+                    if (that.transposition[turtle] !== 0) {
+                        noteObj2 = getNote(noteObj2[0], noteObj2[1], that.transposition[turtle], that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
+                    }
+                } else {
+                    var noteObj2 = getNote(note, octave, that.transposition[turtle] + parseInt(that.neighborStepPitch[turtle]), that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
+                }
+                that.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
+            }
 
             var delta = 0;
 
@@ -7941,6 +7940,7 @@ function Logo () {
             }
         } else {
             that.alreadyRunning = false;
+
             if (!that.prematureRestart) {
                 // console.log('Make sure any unissued signals are dispatched.');
                 for (var b in that.endOfClampSignals[turtle]) {
@@ -7961,6 +7961,8 @@ function Logo () {
                 if (!that.turtles.running() && queueStart === 0) {
                     that.onStopTurtle();
                 }
+            } else {
+                that.turtles.turtleList[turtle].running = false;
             }
 
             // Because flow can come from calc blocks, we are not
