@@ -344,7 +344,9 @@ function SaveInterface(PlanetInterface) {
     }
 
     this.saveMxml = function() {
-        console.log(this.PlanetInterface.getCurrentProjectData());
+        console.log(JSON.parse(prepareExport()))
+        console.log(prepareExport())
+        console.log(processMxmlNotes(prepareExport()));
         var data = 'placeholder123';
         this.download('musicxml', 'data:text;utf8,'+data);
     }

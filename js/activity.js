@@ -185,7 +185,7 @@ function Activity() {
             'widgets/musickeyboard',
             'widgets/timbre',
             'activity/lilypond',
-            'activity/abc'
+            'activity/mxml'
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
