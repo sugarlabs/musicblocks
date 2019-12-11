@@ -103,7 +103,6 @@
     display: flex;
 }
 #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {
-    width: 54px;
     flex-shrink: 0;
 }
 #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar > .wfbtItem {

@@ -23,6 +23,7 @@ function PitchSlider() {
     this._focusedCellIndex = 0;
     this._isKeyPressed = 0;
     this._delta = 0;
+    this._slider = null;
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
@@ -55,8 +56,7 @@ function PitchSlider() {
 
     this._moveSlider = function (cell, upDown) {
         var cellIndex = cell.cellIndex;
-        var sliderrow = docById('slider');
-        var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
+        var cellDiv = this._slider.cells[cellIndex].childNodes[0];
         var frequencyDiv = cellDiv.childNodes[0];
         var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale)) / 3;
         var nextOctave = 2 * this.Sliders[cellIndex][0];
@@ -168,8 +168,7 @@ function PitchSlider() {
         }
 
         cell.blur();
-        var sliderrow = docById('slider');
-        var newCell = sliderrow.cells[toBeFocused];
+        var newCell = this._slider.cells[toBeFocused];
         this._addKeyboardInput(newCell);
     }
 
@@ -186,143 +185,24 @@ function PitchSlider() {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var sliderDiv = docById('sliderDiv');
-
-        sliderDiv.style.visibility = 'visible';
-        sliderDiv.setAttribute('draggable', 'true');
-        sliderDiv.style.left = '200px';
-        sliderDiv.style.top = '150px';
-
-        // The widget buttons
-        var widgetButtonsDiv = docById('sliderButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table id="sliderButtonTable"></table>';
-
-        var buttonTable = docById('sliderButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "pitch slider");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'));
-
-        cell.onclick = function() {
-            sliderDiv.style.visibility = 'hidden';
-            widgetButtonsDiv.style.visibility = 'hidden';
-            sliderTableDiv.style.visibility = 'hidden';
-            that._logo.hideMsgs();
-        };
-
-        cell.onmouseover = function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        // We use this cell as a handle for dragging.
-        var cell = this._addButton(row, 'grab.svg', iconSize, _('Drag'));
-
-        cell.style.cursor = 'move';
-
-        this._dx = cell.getBoundingClientRect().left - sliderDiv.getBoundingClientRect().left;
-        this._dy = cell.getBoundingClientRect().top - sliderDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = cell.innerHTML;
-
-        cell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            cell.innerHTML = '';
-        };
-
-        cell.onmouseout = function(e) {
-            if (!that._dragging) {
-                cell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                sliderDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                sliderDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        sliderDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        sliderDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                sliderDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                sliderDiv.style.top = y + 'px';
-                cell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        sliderDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        sliderDiv.ondragstart = function(e) {
-            if (cell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
-        // The slider table
-        var sliderTableDiv = docById('sliderTableDiv');
-        sliderTableDiv.style.display = 'inline';
-        sliderTableDiv.style.visibility = 'visible';
-        sliderTableDiv.style.border = '2px';
-        sliderTableDiv.innerHTML = '';
-
-        // We use an outer div to scroll vertically and an inner div to
-        // scroll horizontally.
-        sliderTableDiv.innerHTML = '<div id="sliderOuterDiv"><div id="sliderInnerDiv"><table id="sliderSliderTable"></table></div></div>';
-
-        var sliderOuterDiv = docById('sliderOuterDiv');
-        sliderOuterDiv.style.width = Math.min((11 + this.Sliders.length * SLIDERWIDTH), w / 2) + 'px';
-        sliderOuterDiv.style.height = (11 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
-
-        var sliderInnerDiv = docById('sliderInnerDiv');
-        sliderInnerDiv.style.width = (10 + this.Sliders.length * SLIDERWIDTH)+ 'px';
-        sliderInnerDiv.style.height = (10 + SLIDERHEIGHT + 3 * BUTTONSIZE) + 'px';
+        var sliderTable = document.createElement("table");
+        widgetWindow.getWidgetBody().append(sliderTable);
 
         // Each column in the table has a slider row, and up row, and a down row.
-        var sliderTable = docById('sliderSliderTable');
-        var sliderRow = sliderTable.insertRow();
-        sliderRow.setAttribute('id', 'slider');
+        this._slider = sliderTable.insertRow();
+
         var upRow = sliderTable.insertRow();
         var downRow = sliderTable.insertRow();
 
         for (var i = 0; i < this.Sliders.length; i++) {
-            var sliderCell = sliderRow.insertCell();
+            var sliderCell = this._slider.insertCell();
 
             sliderCell.style.width = SLIDERWIDTH * this._cellScale + 'px';
             sliderCell.style.minWidth = sliderCell.style.width;
@@ -333,8 +213,7 @@ function PitchSlider() {
 
             // Add a div to hold the slider.
             var cellDiv = document.createElement('div');
-            cellDiv.setAttribute('id', 'sliderInCell');
-            cellDiv.setAttribute('position', 'absolute');
+            cellDiv.style.position = 'absolute';
             cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
             cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
             cellDiv.style.top = SLIDERHEIGHT + 'px';
@@ -366,8 +245,7 @@ function PitchSlider() {
                 }
 
                 var cellIndex = this.cellIndex;
-                var sliderrow = docById('slider');
-                var cellDiv = sliderrow.cells[cellIndex].childNodes[0];
+                var cellDiv = that._slider.cells[cellIndex].childNodes[0];
                 cellDiv.style.top = offset + 'px';
 
                 var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
