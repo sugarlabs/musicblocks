@@ -25,6 +25,8 @@ var VOICENAMES = [
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
+    //.TRANS: viola musical instrument
+    [_('viola'), 'viola', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
@@ -158,7 +160,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/bassoon", "samples/celeste", "samples/raindrop",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", // "samples/japanese_bell",
+    "samples/japanese_drum", "samples/viola", // "samples/japanese_bell",
 ]
 
 
@@ -167,6 +169,7 @@ const DEFAULTSYNTHVOLUME = {
     'flute': 90,
     'electronic synth': 90,
     'piano': 100,
+    'viola': 100,
     'banjo': 90,
     'koto': 70,
     'kick drum': 100,
@@ -213,6 +216,7 @@ const SAMPLECENTERNO = {
     'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
+    'viola': ['C4', 51]
 };
 
 
@@ -479,6 +483,7 @@ function Synth() {
             'voice': [
                 {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
+		{'name': 'viola', 'data': VIOLA_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
                 {'name': 'clarinet', 'data': CLARINET_SAMPLE},
