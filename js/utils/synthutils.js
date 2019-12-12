@@ -25,6 +25,8 @@ var VOICENAMES = [
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
+    //.TRANS: viola musical instrument
+    [_('viola'), 'viola', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
@@ -158,7 +160,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/bassoon", "samples/celeste", "samples/raindrop",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", // "samples/japanese_bell",
+    "samples/japanese_drum", "samples/viola", // "samples/japanese_bell",
 ]
 
 
@@ -167,6 +169,7 @@ const DEFAULTSYNTHVOLUME = {
     'flute': 90,
     'electronic synth': 90,
     'piano': 100,
+    'viola': 100,
     'banjo': 90,
     'koto': 70,
     'kick drum': 100,
@@ -213,6 +216,7 @@ const SAMPLECENTERNO = {
     'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
+    'viola': ['C4', 51]
 };
 
 
@@ -305,7 +309,7 @@ function Synth() {
         } else if (startPitch.substring(1, len - 1) === SHARP || startPitch.substring(1, len - 1) === '#' ) {
             startPitch = startPitch.replace(SHARP, '#');
         }
-        
+
         var frequency = Tone.Frequency(startPitch).toFrequency();
 
         this.noteFrequencies = {
@@ -338,11 +342,11 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
                 var note = key.substring(0, 1) + '' + 'b';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
                 var note = key.substring(0, 1) + '' + '#';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             }
         }
 
@@ -361,7 +365,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
-            
+
         }
 
         if (this.inTemperament === 'equal') {
@@ -369,7 +373,7 @@ function Synth() {
                 var len = notes.length;
                 var note = notes.substring(0, len - 1);
                 var octave = Number(notes.slice(-1));
-                return pitchToFrequency(note, octave, 0, 'c major');
+                return pitchToFrequency(note, octave, 0, null);
             } else if (typeof(notes) === 'number') {
                 return notes;
             } else {
@@ -379,7 +383,7 @@ function Synth() {
                         var len = notes[i].length;
                         var note = notes[i].substring(0, len - 1);
                         var octave = Number(notes[i].slice(-1));
-                        results.push(pitchToFrequency(note, octave, 0, 'c major'));
+                        results.push(pitchToFrequency(note, octave, 0, null));
                     } else {
                         results.push(notes[i]);
                     }
@@ -394,11 +398,11 @@ function Synth() {
             var len = oneNote.length;
 
             for (var note in that.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) { 
+                if (note === oneNote.substring(0, len - 1)) {
                     if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
                         //Note to be played is in the same octave.
                         return that.noteFrequencies[note][1];
-                    } else { 
+                    } else {
                         //Note to be played is not in the same octave.
                         var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
                         return that.noteFrequencies[note][1] * Math.pow(2, power);
@@ -444,7 +448,7 @@ function Synth() {
                             var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
                             return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
                         }
-                    }   
+                    }
                 }
             }
 
@@ -479,6 +483,7 @@ function Synth() {
             'voice': [
                 {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
+                {'name': 'viola', 'data': VIOLA_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
                 {'name': 'clarinet', 'data': CLARINET_SAMPLE},
@@ -567,8 +572,7 @@ function Synth() {
 
     // Until we fix #1744, disable recorder on FF
     if (!platform.FF) {
-	// recoder breaks with Tone.js v13.8.25
-        // this.recorder = new Recorder(Tone.Master);
+        this.recorder = new Recorder(Tone.Master);
     }
 
     // Function that provides default parameters for various synths
@@ -936,12 +940,12 @@ function Synth() {
         }
 
         if (this.inTemperament == 'custom') {
-            var notes1 = notes;    
+            var notes1 = notes;
             notes = this.getCustomFrequency(notes);
             if (notes === undefined) {
                 notes = notes1;
-            } 
-            console.log(notes);   
+            }
+            console.log(notes);
         }
 
         if (paramsEffects === null && paramsFilters === null) {
@@ -1164,18 +1168,14 @@ function Synth() {
         }
     };
 
-    this.stopSound = function (turtle, instrumentName, note) {
+    this.stopSound = function (turtle, instrumentName) {
         var flag = instrumentsSource[instrumentName][0];
         switch(flag) {
         case 1:  // drum
             instruments[turtle][instrumentName].stop();
             break;
         default:
-	    if (note == undefined) {
-		instruments[turtle][instrumentName].triggerRelease();
-	    } else {
-		instruments[turtle][instrumentName].triggerRelease(note);
-	    }
+            instruments[turtle][instrumentName].triggerRelease();
             break;
         }
     };
