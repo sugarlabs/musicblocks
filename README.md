@@ -37,14 +37,33 @@ which you can connect to Music Blocks.
 Blocks (e.g., <code>cd /musicblocks</code>)
 
 (2) If you do not have Python installed, you'll need to install
-it. You can test for Python in a terminal: <code>python</code>. Type
-<code>exit()</code> to exit Python.
+it. (Get it from https://www.python.org) You can test for Python in a
+terminal: <code>python</code>. Type <code>exit()</code> to exit
+Python.
  
-(3) Run <code>npm run serve</code>. You will see a message:
-<code>Serving HTTP on 0.0.0.0 port 3000 ...</code> since the
-HTTPServer is set to start listening on Port 3000.
+(3) After cloning the musicblocks repository, run the command:
 
-(4) Open your favorite browser and run <code>localhost:3000</code> or
+```
+$ npm run serve
+```
+
+This works on all Operating Systems with Python.
+
+On Windows sytems with multiple Python installations, it is
+recommended to use this command instead:
+
+```
+$ npm run winserve
+```
+
+NOTE: Make sure you can run either <code>python</code> or
+<code>py</code> from your terminal.
+
+(4) You should see a message: <code>Serving HTTP on 0.0.0.0 port 3000
+...</code> since the HTTPServer is set to start listening on Port
+3000.
+
+(5) Open your favorite browser and run <code>localhost:3000</code> or
 <code>127.0.0.1:3000</code>.
 
 Using Music Blocks

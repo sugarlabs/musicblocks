@@ -751,29 +751,10 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
 
-            if (docById('ptmDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                logo.pitchTimeMatrix.playAll();
-            }
-
+	    /*
             if (docById('pscDiv').style.visibility === 'visible') {
                 playingWidget = true;
                 logo.pitchStaircase.playUpAndDown();
-            }
-
-            if (docById('rulerDiv').style.visibility === 'visible') {
-                // If the tempo widget is open, sync it up with the
-                // rhythm ruler.
-                if (docById('tempoDiv').style.visibility === 'visible') {
-                    if (logo.tempo.isMoving) {
-                        logo.tempo.pause();
-                    }
-
-                    logo.tempo.resume();
-                }
-
-                playingWidget = true;
-                logo.rhythmRuler.playAll();
             }
 
             // We were using the run button to play a widget, not
@@ -782,7 +763,6 @@ function Activity() {
                 return;
             }
 
-            // Restart tempo widget and run blocks.
             if (docById('tempoDiv').style.visibility === 'visible') {
                 if (logo.tempo.isMoving) {
                     logo.tempo.pause();
@@ -790,6 +770,8 @@ function Activity() {
 
                 logo.tempo.resume();
             }
+            */
+
         }
 
         if (!turtles.running()) {
@@ -832,7 +814,7 @@ function Activity() {
             logo.synth.resume();
         }
 
-        if (_THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
+        if (false) { // _THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
             logo.pitchTimeMatrix.playAll();
         } else if (!turtles.running()) {
             logo.runLogoCommands();
@@ -4019,18 +4001,18 @@ function Activity() {
             this.hideMusicBlocks = function () {
                 hideSearchWidget();
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
+                    // storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
                     storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
                     storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
-                    storage.setItem('isRhythmRulerHidden', docById('rulerDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                     storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
-                    storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                    // storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
+		    /* 
                     if (docById('ptmDiv').style.visibility !== 'hidden') {
                         docById('ptmDiv').style.visibility = 'hidden';
                         docById('ptmTableDiv').style.visibility = 'hidden';
@@ -4042,17 +4024,11 @@ function Activity() {
                         docById('pdmButtonsDiv').style.visibility = 'hidden';
                         docById('pdmTableDiv').style.visibility = 'hidden';
                     }
-
+                    */
                     if (docById('mkbDiv').style.visibility !== 'hidden') {
                         docById('mkbDiv').style.visibility = 'hidden';
                         docById('mkbButtonsDiv').style.visibility = 'hidden';
                         docById('mkbTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('rulerDiv').style.visibility !== 'hidden') {
-                        docById('rulerDiv').style.visibility = 'hidden';
-                        docById('rulerTableDiv').style.visibility = 'hidden';
-                        docById('rulerButtonsDiv').style.visibility = 'hidden';
                     }
 
                     if (docById('pscDiv').style.visibility !== 'hidden') {
@@ -4079,12 +4055,13 @@ function Activity() {
                         docById('statusTableDiv').style.visibility = 'hidden';
                     }
 
+		    /*
                     if (docById('sliderDiv').style.visibility !== 'hidden') {
                         docById('sliderDiv').style.visibility = 'hidden';
                         docById('sliderButtonsDiv').style.visibility = 'hidden';
                         docById('sliderTableDiv').style.visibility = 'hidden';
                     }
-
+		    */
                     if (docById('modeDiv').style.visibility !== 'hidden') {
                         docById('modeDiv').style.visibility = 'hidden';
                         docById('modeButtonsDiv').style.visibility = 'hidden';
@@ -4119,9 +4096,9 @@ function Activity() {
                 docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
+                    // docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
                     docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
@@ -4131,18 +4108,17 @@ function Activity() {
                     docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
-                    docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
-                    docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
                     docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('rulerDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
-                    docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
-                    docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                    // docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
+                    // docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
