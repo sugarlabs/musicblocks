@@ -4008,7 +4008,7 @@ function Activity() {
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                     storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
-                    storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
+                    // storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
@@ -4055,12 +4055,13 @@ function Activity() {
                         docById('statusTableDiv').style.visibility = 'hidden';
                     }
 
+		    /*
                     if (docById('sliderDiv').style.visibility !== 'hidden') {
                         docById('sliderDiv').style.visibility = 'hidden';
                         docById('sliderButtonsDiv').style.visibility = 'hidden';
                         docById('sliderTableDiv').style.visibility = 'hidden';
                     }
-
+		    */
                     if (docById('modeDiv').style.visibility !== 'hidden') {
                         docById('modeDiv').style.visibility = 'hidden';
                         docById('modeButtonsDiv').style.visibility = 'hidden';
@@ -4107,9 +4108,9 @@ function Activity() {
                     docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
-                    docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
-                    docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
+                    // docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
                     docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');

@@ -260,6 +260,7 @@ const SELECTORSTRINGS = [
     _('scalar'),
     _('piano'),
     _('violin'),
+    _('viola'),
     _('xylophone'),
     _('vibraphone'),
     _('cello'),

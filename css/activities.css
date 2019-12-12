@@ -1112,10 +1112,6 @@ input.timbreName {
     overflow-y: scroll !important;
 }
 
-#sliderInCell {
-    position: absolute;
-}
-
 .progressBar {
   width: 1%;
   height: 70px;
