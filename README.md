@@ -3,15 +3,24 @@ MUSIC BLOCKS
 
 “All musicians are subconsciously mathematicians” – Monk
 
-Music Blocks is a programming language and collection of manipulative tools for exploring
-musical and mathematical concepts in an integrative and fun way.
+Music Blocks is a programming language and collection of manipulative
+tools for exploring musical and mathematical concepts in an
+integrative and fun way.
+
+* [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
+* [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
+* [Using Music Blocks](#USING_MUSIC_BLOCKS)
+* [Modifying Music Blocks](#MODIFYING_MUSIC_BLOCKS)
+* [Credits](#CREDITS)
+* [Reporting Bugs](#REPORTING_BUGS)
+* [Contributing](#CONTRIBUTING)
+* [Music Blocks in Japan](#MUSIC_BLOCKS_IN_JAPAN)
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
 
-Running Music Blocks
---------------------
+## <a name="RUNNING_MUSIC_BLOCKS"></a>Running Music Blocks
 
 Music Blocks is available under the GNU Affero General Public License (AGPL), a free, copyleft license.
 
@@ -26,8 +35,8 @@ If you want to run Music Blocks offline,
 or [git clone](https://github.com/sugarlabs/musicblocks.git) this repo
 and run through a local server.
 
-How to set up a local server
-----------------------------
+## <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a local server
+
 Some web browsers (e.g., Firefox v68) have restrictions that prevent
 Music Blocks from running from the file://. To circumvent this, we
 provide instructions for launching a web server on your computer to
@@ -66,16 +75,16 @@ NOTE: Make sure you can run either <code>python</code> or
 (5) Open your favorite browser and run <code>localhost:3000</code> or
 <code>127.0.0.1:3000</code>.
 
-Using Music Blocks
-------------------
+## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
+
 Once Music Blocks is running, you'll want suggestions on how to use it.
 See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
 Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
 
-Modifying Music Blocks
-----------------------
+## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
+
 The core code for Music Blocks resides in the [js
 directory](https://github.com/sugarlabs/musicblocks/tree/master/js). Individual
 modules are described in more detail in [js
@@ -89,8 +98,8 @@ See [Contributing
 Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 for more details.
 
-Credits
--------
+## <a name="CREDITS"></a>Credits
+
 Music Blocks is a fork of
 [TurtleBlocksJS](https://github.com/sugarlabs/turtleblocksjs)
 created by Walter Bender.
@@ -126,15 +135,13 @@ A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
 is available.
 
-Reporting Bugs
---------------
+## <a name="REPORTING_BUGS"></a>Reporting Bugs
 
 Bugs can be reported in the
 [issues section](https://github.com/sugarlabs/musicblocks/issues)
 of this repository.
 
-Contributing
-------------
+## <a name="CONTRIBUTING"></a>Contributing
 
 Please consider contributing to the project, with your ideas, your
 music, your lesson plans, your artwork, and your code.
@@ -142,8 +149,6 @@ music, your lesson plans, your artwork, and your code.
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
-
-Music Blocks in Japan
----------------------
+## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
