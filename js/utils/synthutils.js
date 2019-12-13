@@ -199,7 +199,7 @@ const DEFAULTSYNTHVOLUME = {
 const SAMPLECENTERNO = {
     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
-    'cello': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
+    'cello': ['C4', 27], // pitchToNumber('C', 4, 'C Major')],
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acoustic guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
