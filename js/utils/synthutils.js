@@ -199,7 +199,7 @@ const DEFAULTSYNTHVOLUME = {
 const SAMPLECENTERNO = {
     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'violin': ['C5', 51], // pitchToNumber('C', 5, 'C Major')],
-    'cello': ['C4', 27], // pitchToNumber('C', 4, 'C Major')],
+    'cello': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'bass': ['C2', 15], // pitchToNumber('C', 2, 'C Major')],
     'guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'acoustic guitar': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
@@ -309,7 +309,7 @@ function Synth() {
         } else if (startPitch.substring(1, len - 1) === SHARP || startPitch.substring(1, len - 1) === '#' ) {
             startPitch = startPitch.replace(SHARP, '#');
         }
-        
+
         var frequency = Tone.Frequency(startPitch).toFrequency();
 
         this.noteFrequencies = {
@@ -342,11 +342,11 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
                 var note = key.substring(0, 1) + '' + 'b';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
                 var note = key.substring(0, 1) + '' + '#';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             }
         }
 
@@ -365,7 +365,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
-            
+
         }
 
         if (this.inTemperament === 'equal') {
@@ -398,11 +398,11 @@ function Synth() {
             var len = oneNote.length;
 
             for (var note in that.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) { 
+                if (note === oneNote.substring(0, len - 1)) {
                     if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
                         //Note to be played is in the same octave.
                         return that.noteFrequencies[note][1];
-                    } else { 
+                    } else {
                         //Note to be played is not in the same octave.
                         var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
                         return that.noteFrequencies[note][1] * Math.pow(2, power);
@@ -448,7 +448,7 @@ function Synth() {
                             var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
                             return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
                         }
-                    }   
+                    }
                 }
             }
 
@@ -941,12 +941,12 @@ function Synth() {
         }
 
         if (this.inTemperament == 'custom') {
-            var notes1 = notes;    
+            var notes1 = notes;
             notes = this.getCustomFrequency(notes);
             if (notes === undefined) {
                 notes = notes1;
-            } 
-            console.log(notes);   
+            }
+            console.log(notes);
         }
 
         if (paramsEffects === null && paramsFilters === null) {
