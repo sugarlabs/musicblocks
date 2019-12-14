@@ -140,8 +140,12 @@ function WidgetWindow(key, title) {
     this.addInputButton = function (initial) {
         let el = create("div", "wfbtItem", this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
-        this._buttons.push(el);
         return el.querySelector("input");
+    };
+
+    this.addDivider = function() {
+        let el = create("div", "wfbtHR", this._toolbar);
+        return el;
     };
 
     this.modifyButton = function (index, icon, iconSize, label) {
