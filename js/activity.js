@@ -1812,7 +1812,7 @@ function Activity() {
             var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
         }
 
-        var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('sliderDiv').style.visibility === 'visible' || docById('tempoDiv').style.visibility === 'visible');
+        var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('tempoDiv').style.visibility === 'visible');
 
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
