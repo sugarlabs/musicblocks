@@ -32,43 +32,31 @@
   </script>
   -->
 
-  <script src="lib/reqwest.js" defer>
-  </script>
-
+  <script src="lib/reqwest.js" defer></script>
 
   <script src="lib/jquery-2.1.4.js" defer></script>
 
   <script src="lib/jquery-ui.js" defer></script>
 
-  <script src="lib/materialize.min.js" defer>
+  <script src="lib/materialize.min.js" defer></script>
 
-  </script>
+  <script src="lib/webL10n.js" defer></script>
 
-  <script src="lib/webL10n.js" defer>
-  </script>
+  <script src="lib/Tone.js" defer></script>
 
-  <script src="lib/Tone.js" defer>
-  </script>
+  <script src="lib/jquery.ruler.js" defer></script>
 
-  <script src="lib/jquery.ruler.js" defer>
-  </script>
+  <script src="lib/modernizr-2.6.2.min.js" defer></script>
 
-  <script src="lib/modernizr-2.6.2.min.js" defer>
-  </script>
+  <script src="lib/recorder.js" defer></script>
 
-  <script src="lib/recorder.js" defer>
-  </script>
+  <script src="lib/raphael.min.js" defer></script>
 
-  <script src="lib/raphael.min.js" defer>
-  </script>
-
-  <script src="lib/wheelnav.js" defer>
-  </script>
+  <script src="lib/wheelnav.js" defer></script>
 
   <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
-  <script data-main="js/loader" src="lib/require.js" defer>
-  </script>
+  <script data-main="js/loader" src="lib/require.js" defer></script>
 
   <link rel="manifest" href="android_chrome_manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -78,46 +66,39 @@
   <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="lib/materialize-iso.css">
 
-  <script src="lib/easeljs.min.js" defer>
-  </script>
+  <script src="lib/easeljs.min.js" defer></script>
 
-  <script src="lib/tweenjs.min.js" defer>
-  </script>
+  <script src="lib/tweenjs.min.js" defer></script>
 
-  <!-- <script src="js/widgets/musickeyboard.js">
-  </script> -->
+  <!-- <script src="js/widgets/musickeyboard.js"></script> -->
 
-  <!--
-    <script src="lib/movieclip-0.7.1.min.js">
-    </script>
-    -->
+  <!-- <script src="lib/movieclip-0.7.1.min.js"></script> -->
 
   <script>
     var canvas, stage;
-      function init() {
+    function init() {
         canvas = document.getElementById("canvas");
         stage = new createjs.Stage(canvas);
         stage.update();
         createjs.Ticker.addEventListener("tick", stage);
-      };
-    </script>
+    };
+  </script>
 
   <script>
- if ("serviceWorker" in navigator) {
-  if (navigator.serviceWorker.controller) {
-    console.log("[PWA Builder] active service worker found, no need to register");
-  } else {
-    // Register the service worker
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then(function (reg) {
-        console.log("[PWA Builder] Service worker has been registered for scope: " + reg.scope);
-      });
-  }
-}
+    if ("serviceWorker" in navigator) {
+	if (navigator.serviceWorker.controller) {
+	    console.log("[PWA Builder] active service worker found, no need to register");
+	} else {
+	    // Register the service worker
+	    navigator.serviceWorker
+		.register("/sw.js")
+		.then(function (reg) {
+		    console.log("[PWA Builder] Service worker has been registered for scope: " + reg.scope);
+		});
+	}
+    }
+  </script>
 
-</script>
- 
 </head>
 
 <!-- #96D3F3-->

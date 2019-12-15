@@ -41,7 +41,6 @@ const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
 
 function Logo () {
-
     this.canvas = null;
     this.blocks = null;
     this.turtles = null;
@@ -12426,6 +12425,8 @@ function Logo () {
      * @returns {void}
      */
     this._prepSynths = function () {
+        this.synth.newTone();
+
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};

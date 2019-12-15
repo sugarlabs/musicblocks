@@ -256,6 +256,7 @@ var instrumentsFilters = {0: {}};
 
 
 function Synth() {
+    console.log('SYNTH');
     // Isolate synth functions here.
 
     const BUILTIN_SYNTHS = {
@@ -282,7 +283,8 @@ function Synth() {
     };
 
     // Using Tone.js
-    this.tone = new Tone();
+    // this.tone = new Tone();
+    this.tone = null;
 
     Tone.Buffer.onload = function () {
         console.log('sample loaded');
@@ -295,6 +297,10 @@ function Synth() {
     this.inTemperament = 'equal';
     this.startingPitch = 'C4';
     this.noteFrequencies = {};
+
+    this.newTone = function() {
+        this.tone = new Tone();
+    };
 
     this.temperamentChanged = function(temperament, startingPitch) {
         var startPitch = startingPitch;
@@ -475,6 +481,10 @@ function Synth() {
     }
 
     this.resume = function () {
+        if (this.tone === null) {
+            this.newTone();
+        }
+
         this.tone.context.resume();
     };
 
@@ -483,7 +493,7 @@ function Synth() {
             'voice': [
                 {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
-		{'name': 'viola', 'data': VIOLA_SAMPLE},
+                {'name': 'viola', 'data': VIOLA_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
                 {'name': 'clarinet', 'data': CLARINET_SAMPLE},
@@ -493,14 +503,14 @@ function Synth() {
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE},
-		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
-		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
-		{'name': 'celeste', 'data': CELESTE_SAMPLE},
-		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
-		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
+                {'name': 'banjo', 'data': BANJO_SAMPLE},
+                {'name': 'koto', 'data': KOTO_SAMPLE},
+                {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+                {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+                {'name': 'bassoon', 'data': BASSOON_SAMPLE},
+                {'name': 'celeste', 'data': CELESTE_SAMPLE},
+                {'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
+                {'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -525,7 +535,7 @@ function Synth() {
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
                 {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
-		// {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
+                // {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
@@ -572,7 +582,7 @@ function Synth() {
 
     // Until we fix #1744, disable recorder on FF
     if (!platform.FF) {
-	// recoder breaks with Tone.js v13.8.25
+        // recoder breaks with Tone.js v13.8.25
         // this.recorder = new Recorder(Tone.Master);
     }
 
@@ -1176,11 +1186,11 @@ function Synth() {
             instruments[turtle][instrumentName].stop();
             break;
         default:
-	    if (note == undefined) {
-		instruments[turtle][instrumentName].triggerRelease();
-	    } else {
-		instruments[turtle][instrumentName].triggerRelease(note);
-	    }
+            if (note == undefined) {
+                instruments[turtle][instrumentName].triggerRelease();
+            } else {
+                instruments[turtle][instrumentName].triggerRelease(note);
+            }
             break;
         }
     };

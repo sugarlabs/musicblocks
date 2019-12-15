@@ -341,7 +341,7 @@ function Activity() {
         const TURTLESTEP = -1; // Run in step-by-step mode
 
         BLOCKSCALES = [1, 1.5, 2, 3, 4];
-       blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+        blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
         if (blockscale === -1) {
             blockscale = 1;
         }
@@ -751,7 +751,7 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
 
-	    /*
+            /*
             if (docById('pscDiv').style.visibility === 'visible') {
                 playingWidget = true;
                 logo.pitchStaircase.playUpAndDown();
@@ -4002,7 +4002,7 @@ function Activity() {
                 hideSearchWidget();
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
-                    storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
+                    // storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
                     storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
@@ -4012,7 +4012,7 @@ function Activity() {
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
-		    /* 
+                    /* 
                     if (docById('ptmDiv').style.visibility !== 'hidden') {
                         docById('ptmDiv').style.visibility = 'hidden';
                         docById('ptmTableDiv').style.visibility = 'hidden';
@@ -4055,13 +4055,13 @@ function Activity() {
                         docById('statusTableDiv').style.visibility = 'hidden';
                     }
 
-		    /*
+                    /*
                     if (docById('sliderDiv').style.visibility !== 'hidden') {
                         docById('sliderDiv').style.visibility = 'hidden';
                         docById('sliderButtonsDiv').style.visibility = 'hidden';
                         docById('sliderTableDiv').style.visibility = 'hidden';
                     }
-		    */
+                    */
                     if (docById('modeDiv').style.visibility !== 'hidden') {
                         docById('modeDiv').style.visibility = 'hidden';
                         docById('modeButtonsDiv').style.visibility = 'hidden';
@@ -4099,9 +4099,9 @@ function Activity() {
                     // docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
                     // docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
                     // docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
-                    docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
-                    docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                    // docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                    // docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
+                    // docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
                     docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
                     docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
