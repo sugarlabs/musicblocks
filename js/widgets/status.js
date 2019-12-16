@@ -21,150 +21,36 @@ function StatusMatrix() {
     const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
     var x, y;  //Drop coordinates of statusDiv
 
-    docById('statusDiv').style.visibility = 'hidden';
-
     this.init = function(logo) {
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
         this._logo = logo;
+        this.isOpen = true;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var statusDiv = docById('statusDiv');
-        statusDiv.style.visibility = 'visible';
-        statusDiv.setAttribute('draggable', 'true');
-
-        // The status buttons
-        var statusButtonsDiv = docById('statusButtonsDiv');
-        statusButtonsDiv.style.display = 'inline';
-        statusButtonsDiv.style.visibility = 'visible';
-        statusButtonsDiv.style.width = BUTTONDIVWIDTH;
-        statusButtonsDiv.innerHTML = '<table cellpadding="0px" id="statusButtonTable"></table>';
-
-        var buttonTable = docById('statusButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, 'status', 'status');
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-
-        cell.onclick=function() {
-            statusTableDiv.style.visibility = 'hidden';
-            statusButtonsDiv.style.visibility = 'hidden';
-            statusDiv.style.visibility = 'hidden';
-        }
-
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - statusDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - statusDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                x = e.clientX - that._dx;
-                statusDiv.style.left = x + 'px';
-                y = e.clientY - that._dy;
-                statusDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        statusDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        statusDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                x = e.clientX - that._dx;
-                statusDiv.style.left = x + 'px';
-                y = e.clientY - that._dy;
-                statusDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        statusDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        statusDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
         // The status table
-        var statusTableDiv = docById('statusTableDiv');
-        statusTableDiv.style.display = 'inline';
-        statusTableDiv.style.visibility = 'visible';
-        statusTableDiv.style.border = '0px';
+        this._statusTable = document.createElement('table');
+        widgetWindow.getWidgetBody().append(this._statusTable);
+        widgetWindow.onclose = function() {
+            that.isOpen = false;
 
-        // We use an outer div to scroll vertically and an inner div to
-        // scroll horizontally.
-        statusTableDiv.innerHTML = '<div id="statusOuterDiv"><div id="statusInnerDiv"><table cellpadding="0px" id="statusTable"></table></div></div>';
-
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-        var outerDiv = docById('statusOuterDiv');
-        if (this._logo.turtles.turtleList.length > n) {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 2) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
-        } else {
-            if (this._logo.statusFields.length > 4) { // Assume we need a horizontal slider
-                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT2 + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 30 + 'px';
-            } else {
-                outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT2 + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 'px';
-            }
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
+            this.destroy();
         }
-
-        var w = Math.max(Math.min(window.innerWidth, this._cellScale * INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        var innerDiv = docById('statusInnerDiv');
-        innerDiv.style.width = w + 'px';
-        innerDiv.style.marginLeft = (BUTTONSIZE * this._cellScale) + 'px';
 
         // Each row in the status table contains a note label in the
         // first column and a table of buttons in the second column.
-        var statusTable = docById('statusTable');
-
-        var header = statusTable.createTHead();
+        var header = this._statusTable.createTHead();
         var row = header.insertRow();
 
         var iconSize = Math.floor(this._cellScale * 24);
@@ -213,7 +99,7 @@ function StatusMatrix() {
                 break;
             }
 
-            cell.innerHTML = '&nbsp;<b>' + label + '</b>&nbsp;'
+            cell.innerHTML = '<b>' + label + '</b>'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = platformColor.selectorBackground;
         }
@@ -221,7 +107,7 @@ function StatusMatrix() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             var cell = row.insertCell();
             cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
-            cell.innerHTML = '&nbsp;<b>' + _('note') + '</b>&nbsp;'
+            cell.innerHTML = '<b>' + _('note') + '</b>'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = platformColor.selectorBackground;
         }
@@ -272,10 +158,6 @@ function StatusMatrix() {
 
     this.updateAll = function() {
         // Update status of all of the voices in the matrix.
-        var table = docById('statusTable');
-        statusDiv.style.top = y + 'px';
-        statusDiv.style.left = x + 'px';
-
         this._logo.updatingStatusMatrix = true;
 
         var activeTurtles = 0;
@@ -346,7 +228,7 @@ function StatusMatrix() {
 
                 this._logo.inStatusMatrix = saveStatus;
 
-                var cell = table.rows[activeTurtles + 1].cells[i + 1];
+                var cell = this._statusTable.rows[activeTurtles + 1].cells[i + 1];
                 if (cell != null) {
                     cell.innerHTML = innerHTML;
                 }
@@ -372,7 +254,7 @@ function StatusMatrix() {
                     note += obj[1] + '/' + obj[0];
                 }
 
-                var cell = table.rows[activeTurtles + 1].cells[i + 1];
+                var cell = this._statusTable.rows[activeTurtles + 1].cells[i + 1];
                 if (cell != null) {
                     cell.innerHTML = note.replace(/#/g, '♯').replace(/b/g, '♭');
                 }

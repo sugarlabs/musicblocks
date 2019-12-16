@@ -185,7 +185,7 @@ function PitchSlider() {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "pitch slider");
+        var widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
