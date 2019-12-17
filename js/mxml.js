@@ -24,11 +24,13 @@
 
         add('<part id="P1">')
 
+            var currentMeasure = 1;
             // assume 4/4 time, 32 divisions bc smallest note is 1/32
             // key is C by default
             add('<measure number="1"> <attributes> <divisions>32</divisions> <key> <fifths>0</fifths> </key> <time> <beats>4</beats> <beat-type>4</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
-            var remainDiv = 4*32;
+            var currentMeasureLen = 0;
             var divPerBeat = 32;
+            var divPerMeasure = divPerBeat*4;
             for(var i = 0; i < data.length; i++) {
                 var type = data[i][1][0];
                 if(ignore.indexOf(type) !== -1) {
@@ -37,11 +39,23 @@
                 // todo: fill with rests, support more than one measure
                 // Parse note
                 if(type === 'newnote') {
-                    add('<note>')
-                    
                     var num = data[i+2][1][1].value;
                     var denom = data[i+3][1][1].value;
                     
+                    var num4 = num*(4/denom);
+                    var denom4 = 4;
+
+                    if(currentMeasureLen+(num4*divPerBeat) > divPerMeasure) {
+                        currentMeasureLen = 0;
+                        add('</measure>')
+                        currentMeasure++;
+                        add('<measure number=\"' + currentMeasure + '\">')
+                    } else {
+                        currentMeasureLen += num4*divPerBeat;
+                    }
+
+
+                    add('<note>')
                     var pitch = data[i+6][1][1].value;
                     var octave = data[i+7][1][1].value;
 
@@ -78,20 +92,14 @@
                     
 
                     // convert to 4/4 time
-                    var num4 = num*(4/denom);
-                    var denom4 = 4;
-                    add('<duration>' + num4*divPerBeat + '</duration>')
-                    
-                    remainDiv -= num4*divPerBeat;
-                    
+
+                    add('<duration>' + num4*divPerBeat + '</duration>')                    
                     add('</note>')
                 }
-                
-                
-                // Add rests
-                console.log("we have "+remainDiv+ " left.")
             }
+
             add('</measure>')
+            
         add('</part>')
     add('</score-partwise>')
 
