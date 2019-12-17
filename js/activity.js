@@ -2657,7 +2657,8 @@ function Activity() {
                         turtles.turtleList[turtle].doClear(true, true, false);
                     }
 
-                    that.runProject(env);
+                    textMsg(_('Click the run button to run the project.'));
+                    // that.runProject(env);
 
                     if (show) {
                         _changeBlockVisibility();
@@ -4049,19 +4050,9 @@ function Activity() {
                         docById('temperamentButtonsDiv').style.visibility = 'hidden';
                     }
 
-                    if (docById('statusDiv').style.visibility !== 'hidden') {
-                        docById('statusDiv').style.visibility = 'hidden';
-                        docById('statusButtonsDiv').style.visibility = 'hidden';
-                        docById('statusTableDiv').style.visibility = 'hidden';
-                    }
+                    window.widgetWindows.clear('status');
+                    window.widgetWindows.clear('slider');
 
-                    /*
-                    if (docById('sliderDiv').style.visibility !== 'hidden') {
-                        docById('sliderDiv').style.visibility = 'hidden';
-                        docById('sliderButtonsDiv').style.visibility = 'hidden';
-                        docById('sliderTableDiv').style.visibility = 'hidden';
-                    }
-                    */
                     if (docById('modeDiv').style.visibility !== 'hidden') {
                         docById('modeDiv').style.visibility = 'hidden';
                         docById('modeButtonsDiv').style.visibility = 'hidden';
@@ -4075,7 +4066,7 @@ function Activity() {
                     }
                 }
 
-                storage.setItem('isStatusHidden', docById('statusDiv').style.visibility);
+                storage.setItem('isStatusHidden', window.widgetWindows.isOpen('status'));
                 logo.doStopTurtle();
                 docById('helpElem').style.visibility = 'hidden';
                 document.querySelector('.canvasHolder').classList.add('hide');
@@ -4091,9 +4082,10 @@ function Activity() {
             this.showMusicBlocks = function () {
                 document.getElementById('toolbars').style.display = "block";
 
-                docById('statusDiv').style.visibility = storage.getItem('isStatusHidden');
-                docById('statusButtonsDiv').style.visibility = storage.getItem('isStatusHidden');
-                docById('statusTableDiv').style.visibility = storage.getItem('isStatusHidden');
+                if (storage.getItem('isStatusHidden')) {
+                    logo.statusMatrix = new StatusMatrix();
+                    logo.statusMatrix.init(logo);
+                }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');

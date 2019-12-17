@@ -1481,7 +1481,7 @@ function Logo () {
         }
 
         // Set up status block
-        if (docById('statusDiv').style.visibility === 'visible') {
+        if (window.widgetWindows.isOpen('status')) {
             // Ensure widget has been created before trying to
             // initialize it.
             if (this.statusMatrix === null) {
@@ -7837,10 +7837,8 @@ function Logo () {
             console.log('Ignoring block on overlapped start.');
         }
 
-        if (docById('statusDiv').style.visibility === 'visible') {
-            if (!that.inStatusMatrix) {
-                that.statusMatrix.updateAll();
-            }
+        if (that.statusMatrix && that.statusMatrix.isOpen && !that.inStatusMatrix) {
+            that.statusMatrix.updateAll();
         }
 
         // If there is a child flow, queue it.
