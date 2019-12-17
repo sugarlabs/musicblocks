@@ -83,7 +83,7 @@ also available.</p>
 <p>Many of the examples given in the guide have links to code you can
 run. Look for <code>RUN LIVE</code> links.</p>
 <h2 id="-a-name-getting-started-a-1-getting-started"><a name="GETTING-STARTED"></a>1. Getting Started</h2>
-<p><a href="#TOC">Back to Table of Contents</a> | <a href="#NOTES">Next Section (2. Making Sounds)</a></p>
+<p><a href="#TOC">Back to Table of Contents</a> | <a href="#BLOCK-TABLE">Next Section (2. Block Table)</a></p>
 <p>Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox, Opera,
 and some versions of Safari. You can run it from
@@ -100,14 +100,522 @@ which reviews many programming features common to both projects.</p>
 Blocks</a>.
 For more details on how to use Turtle Blocks, see <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation">Using Turtle Blocks
 JS</a>.</p>
-<h2 id="-a-name-notes-a-2-making-sounds"><a name="NOTES"></a>2. Making Sounds</h2>
+
+
+
+<h2 id="-a-name-block-table-a-2-block-table"><a name="BLOCK-TABLE"></a>2. Block Table</h2>
 <p><a href="#GETTING-STARTED">Previous Section (1. Getting Started)</a> | <a href="#TOC">Back to
-Table of Contents</a> | <a href="#PROGRAMMING-WITH-MUSIC">Next Section (3. Programming with
+  Table of Contents</a> | <a href="#NOTES">Next Section (2. Making Sounds)</a></p>
+  <table border = "1", cellspacing = "0", bordercolor = "#b2dfdb">
+    <caption align = "center">
+        Beginner mode
+    </caption>
+    <colgroup>
+        <col width="80">
+        <col width="200">
+    </colgroup>
+    <thead>
+        <tr>
+            <th align = "center", height = 30> Palette </th>
+            <th align = "center"> Blocks </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> Rhythm </td>
+            <td> note </td>
+        </tr> 
+        <tr bgcolor = "#e3f2fd"> 
+            <td >  </td>
+            <td> note value drum </td>
+        </tr>
+        <tr> 
+            <td>   </td>
+            <td>  silence </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> tie </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> note value </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Meter </td>
+            <td> meter </td>
+        </tr> 
+        <tr> 
+            <td> </td>
+            <td> beats per second </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> master beats per second </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> on every note do </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> notes played </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> beat count </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Pitch </td>
+            <td> pitch </td>
+        </tr> 
+        <tr> 
+            <td> </td>
+            <td> pitch G4 </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> scalar step(+/-) </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> pitch number </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> hertz </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> fourth </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> fifth </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> pitch in hertz </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> pitch number </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> scalar change in pitch </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> change in pitch </td>
+        </tr>
+        <tr>
+            <td> Interval </td>
+            <td> set key </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> mode length </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> movable do </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> thirth </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> sixth </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> chord I </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> chord IV </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> chord V </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> set temperament</td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Tone </td>
+            <td> set instrument </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> vibrato </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> chorus </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> termolo </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Ornament </td>
+            <td> staccato </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> slur </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> neighbor(+/-) </td>
+        </tr>
+        <tr>
+            <td> Volume </td>
+            <td> crescendo </td>
+        </tr> 
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> decrescendo </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> set master volume </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> set synth volume </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> set drum volume </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Drum </td>
+            <td> drum  </td>
+        </tr> 
+        <tr> 
+            <td> </td>
+            <td> sound effect </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> set drum  </td>
+        </tr>
+        <tr>
+            <td> Widget </td>
+            <td> status </td>
+        </tr> 
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> phrase maker </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> C major scale </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> G major scale </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> rhythm maker </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> music keyboard </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> pitch slider </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd" >
+            <td> </td>
+            <td> tempo </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> custom mode </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td > </td>
+            <td> rhythm </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> simple tuplet </td>
+        </tr> 
+        <tr bgcolor = "#e3f2fd">
+            <td> Flow </td>
+            <td> repeat  </td>
+        </tr> 
+        <tr> 
+            <td> </td>
+            <td> forever </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> if then </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> if then else </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> backward </td>
+        </tr>
+        <tr>
+            <td> Action </td>
+            <td> action </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> start </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> broadcast </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> on </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> do </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Boxes </td>
+            <td> store in box 1  </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> box 1  </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> store in box 2 </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> box 2  </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> store in </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> box </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td > </td>
+            <td> add </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> add 1 to </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Number </td>
+            <td> 4 </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> random </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> one of </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> + </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> - </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> x </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> / </td>
+        </tr>
+        <tr>
+            <td> Boolean </td>
+            <td> = </td>
+            </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> < </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> > </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td > Graphics </td>
+            <td> forward </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> back </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> left </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> right </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> set xy </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> set heading </td>
+        </tr>
+        <tr  bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> arc </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> scroll xy </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </height = 30 = 30d>
+            <td> x </td>
+        </tr>
+        <tr>
+            <td > </td>
+            <td> y </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> heading </td>
+        </tr>
+        <tr>
+            <td> Pen </td>
+            <td> set color </td>
+        </tr> 
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> set shade </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> set pen size </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> pen down </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> pen up </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> fill </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> background </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> color </td>
+        </tr>
+        <tr>
+            <td> Media </td>
+            <td> print </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> text </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> show </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> avatar </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> height </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> width </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> bottom(screen) </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> top(screen) </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> left(screen) </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td > </td>
+            <td> right(screen) </td>
+        </tr>
+        <tr>
+            <td> Sensors </td>
+            <td> mouse button </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd"> 
+            <td> </td>
+            <td> cursor x </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> cursor y </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> </td>
+            <td> click </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> loudness </td>
+        </tr>
+        <tr bgcolor = "#e3f2fd">
+            <td> Ensemble </td>
+            <td> set name </td>
+        </tr>
+        <tr> 
+            <td> </td>
+            <td> mouse name </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 id="-a-name-notes-a-3-making-sounds"><a name="NOTES"></a>3. Making Sounds</h2>
+<p><a href="#BLOCK-TABLE">Previous Section (2. Block Table)</a> | <a href="#TOC">Back to
+Table of Contents</a> | <a href="#PROGRAMMING-WITH-MUSIC">Next Section (4. Programming with
 Music)</a></p>
 <p>Music Blocks incorporates many common elements of music, such as
 <a href="#PITCH">pitch</a>, <a href="#rhythms">rhythm</a>, <a href="#MORE-TRANSFORMATIONS">volume</a>,
 and, to some degree, <a href="#VOICES">timbre and texture</a>.</p>
-<h3 id="-a-name-note-value-a-2-1-note-value-blocks"><a name="NOTE-VALUE"></a>2.1 Note Value Blocks</h3>
+<h3 id="-a-name-note-value-a-2-1-note-value-blocks"><a name="NOTE-VALUE"></a>3.1 Note Value Blocks</h3>
 <p>At the heart of Music Blocks is the <em>Note value</em> block. The <em>Note
 value</em> block is a container for a <a href="#PITCH"><em>Pitch</em> block</a> that
 specifies the duration (note value) of the pitch.</p>
