@@ -54,10 +54,41 @@
                     var octave = data[i+7][1][1].value;
 
                     console.log("pitch is "+pitch);
+                    console.log("pitch 3 is "+pitch[3]);
                     console.log("octave is "+octave);
+
+                    var alter;
+                    
+                    console.log(pitch[pitch.length-1] === '\ud834');
+
+                    if(pitch[pitch.length-1] === '\u266d') {
+                        alter = -1; // flat
+                    } else if(pitch[pitch.length-1] === '\u266F') {
+                        alter = 1; // sharp
+                    } else if(pitch[pitch.length-2] + pitch[pitch.length-1] === '\uD834\uDD2B') {
+                        alter = -2; // double flat
+                    } else if(pitch[pitch.length-2] + pitch[pitch.length-1] === '\uD834\uDD2A') {
+                        alter = 2; // double sharp
+                    } else {
+                        alter = 0; // no accidental
+                    }
+                    
+                    
+                    console.log("alter is "+alter);
+                    if(alter !== 0) {
+                        var newPitch = '';
+                        alphabet = 'abcdefghijklmnopqrstuvwxyz';
+                        for(var j = 0; j < pitch.length; j++) {
+                            if(alphabet.includes(pitch[j])) newPitch += pitch[j];
+                        }
+                        pitch = newPitch;
+                        console.log("changing pitch to "+newPitch);
+                    }
+
                     add('<pitch>')
                         add('<step>' + letters[pitches.indexOf(pitch)] + '</step>')
                         add('<octave>' + octave + '</octave>');
+                        add('<alter> ' + alter + ' </alter>');
                     add('</pitch>')
                     
 
