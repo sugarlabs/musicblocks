@@ -1,9 +1,10 @@
 window.widgetWindows = { openWindows: {} };
 
-function WidgetWindow(key, title) {
-    // Keep a refernce to the object within handlers
+function WidgetWindow(key, title, widget) {
+    // Keep a reference to the object within handlers
     let that = this;
     this._key = key;
+    this._widgetInstance = widget;
 
     let create = function (base, className, parent) {
         let el = document.createElement(base);
@@ -12,7 +13,7 @@ function WidgetWindow(key, title) {
         if (parent)
             parent.append(el);
         return el;
-    }
+    };
 
     let windows = docById('floatingWindows');
     this._frame = create("div", "windowFrame", windows);
@@ -25,6 +26,10 @@ function WidgetWindow(key, title) {
 
     let titleEl = create("div", "wftTitle", this._drag);
     titleEl.innerHTML = title;
+
+    let refreshButton = create("div", "wftButton wftRefresh", this._drag);
+    this._refreshIcon = create("img", undefined, refreshButton);
+    this._refreshIcon.setAttribute("src", "header-icons/refresh.svg");
 
     let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
     this._maxminIcon = create("img", undefined, maxminButton);
@@ -69,7 +74,7 @@ function WidgetWindow(key, title) {
     });
 
     // The handle needs the events bound as it's a sibling of the dragging div
-    // not a relative in either direciton.
+    // not a relative in either direction.
     this._drag.onmousedown = this._handle.onmousedown = function (e) {
         that._dragging = true;
         if (that._maximized) {
@@ -107,6 +112,12 @@ function WidgetWindow(key, title) {
         if (that._rolled) that.unroll();
         else that.rollup();
         that.takeFocus();
+
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    refreshButton.onclick = function (e) {
+        that._widgetInstance.init(that._widgetInstance._logo);
 
         e.preventDefault();
         e.stopPropagation();
@@ -246,10 +257,10 @@ function WidgetWindow(key, title) {
 
     this.close = function() {
         this.onclose();
-    }
+    };
 
     this.takeFocus();
-};
+}
 
 window.widgetWindows.windowFor = function (widget, title) {
     let key = undefined;
@@ -260,8 +271,7 @@ window.widgetWindows.windowFor = function (widget, title) {
     else key = title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        let win = new WidgetWindow(key, title).sendToCenter();
-        window.widgetWindows.openWindows[key] = win;
+        window.widgetWindows.openWindows[key] = new WidgetWindow(key, title, widget).sendToCenter();
     }
 
     return window.widgetWindows.openWindows[key].unroll();
