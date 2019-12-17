@@ -2657,7 +2657,8 @@ function Activity() {
                         turtles.turtleList[turtle].doClear(true, true, false);
                     }
 
-                    that.runProject(env);
+                    textMsg(_('Click the run button to run the project.'));
+                    // that.runProject(env);
 
                     if (show) {
                         _changeBlockVisibility();
