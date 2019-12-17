@@ -29,33 +29,21 @@
             add('<measure number="1"> <attributes> <divisions>32</divisions> <key> <fifths>0</fifths> </key> <time> <beats>4</beats> <beat-type>4</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
             var remainDiv = 4*32;
             var divPerBeat = 32;
-            console.log('remainDiv is initially '+remainDiv);
             for(var i = 0; i < data.length; i++) {
                 var type = data[i][1][0];
-                console.log("type is "+type);
                 if(ignore.indexOf(type) !== -1) {
-                    console.log("continuing");
                     continue;
                 }
                 // todo: fill with rests, support more than one measure
                 // Parse note
                 if(type === 'newnote') {
-                    console.log("found newnote at pos i");
                     add('<note>')
                     
                     var num = data[i+2][1][1].value;
                     var denom = data[i+3][1][1].value;
-
-                    console.log("num is "+num);
-                    console.log('denom is '+denom);
-
                     
                     var pitch = data[i+6][1][1].value;
                     var octave = data[i+7][1][1].value;
-
-                    console.log("pitch is "+pitch);
-                    console.log("pitch 3 is "+pitch[3]);
-                    console.log("octave is "+octave);
 
                     var alter;
                     
@@ -73,8 +61,6 @@
                         alter = 0; // no accidental
                     }
                     
-                    
-                    console.log("alter is "+alter);
                     if(alter !== 0) {
                         var newPitch = '';
                         alphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -82,7 +68,6 @@
                             if(alphabet.includes(pitch[j])) newPitch += pitch[j];
                         }
                         pitch = newPitch;
-                        console.log("changing pitch to "+newPitch);
                     }
 
                     add('<pitch>')
@@ -94,18 +79,16 @@
 
                     // convert to 4/4 time
                     var num4 = num*(4/denom);
-                    console.log("num4 is "+num4);
                     var denom4 = 4;
                     add('<duration>' + num4*divPerBeat + '</duration>')
                     
                     remainDiv -= num4*divPerBeat;
-                    console.log("subtracting  "+num4*divPerBeat);
                     
                     add('</note>')
                 }
                 
                 
-
+                // Add rests
                 console.log("we have "+remainDiv+ " left.")
             }
             add('</measure>')
