@@ -106,7 +106,7 @@ JS</a>.</p>
 
 <h2 id="-a-name-block-table-a-2-block-table"><a name="BLOCK-TABLE"></a>2. Block Table</h2>
 <p><a href="#GETTING-STARTED">Previous Section (1. Getting Started)</a> | <a href="#TOC">Back to
-  Table of Contents</a> | <a href="#NOTES">Next Section (2. Making Sounds)</a></p>
+  Table of Contents</a> | <a href="#NOTES">Next Section (3. Making Sounds)</a></p>
   <table border = "1", cellspacing = "0", bordercolor = "#b2dfdb">
     <caption align = "center">
         Beginner mode
@@ -609,7 +609,7 @@ JS</a>.</p>
     </tbody>
 </table>
 
-<h2 id="-a-name-notes-a-3-making-sounds"><a name="NOTES"></a>3. Making Sounds</h2>
+<h2 id="-a-name-notes-a-2-making-sounds"><a name="NOTES"></a>3. Making Sounds</h2>
 <p><a href="#BLOCK-TABLE">Previous Section (2. Block Table)</a> | <a href="#TOC">Back to
 Table of Contents</a> | <a href="#PROGRAMMING-WITH-MUSIC">Next Section (4. Programming with
 Music)</a></p>
@@ -637,7 +637,7 @@ they are: <code>1/4</code> for an quarter note, <code>1/16</code> for a sixteent
  tag" title="A chart of note values and their corresponding note value blocks" width="100%"></p>
 <p>Please refer to the above picture for a visual representation of note
 values.</p>
-<h3 id="-a-name-pitch-a-2-2-pitch-blocks"><a name="PITCH"></a>2.2 Pitch Blocks</h3>
+<h3 id="-a-name-pitch-a-2-2-pitch-blocks"><a name="PITCH"></a>3.2 Pitch Blocks</h3>
 <p>As we have seen, <em>Pitch</em> blocks are used inside the
 <a href="#NOTE-VALUE"><em>Note value</em></a> blocks. The <em>Pitch</em> block specifies the
 pitch name and pitch octave of a note that in combination determines
@@ -668,16 +668,16 @@ frequency, the octave is ignored.The octave argument can also be specified using
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg" alt="alt tag" title="Note layout chart for mallet" width="100%"></p>
 <p>Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.</p>
-<h3 id="-a-name-chords-a-2-3-chords"><a name="CHORDS"></a>2.3 Chords</h3>
+<h3 id="-a-name-chords-a-2-3-chords"><a name="CHORDS"></a>3.3 Chords</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/note4.svg" alt="alt tag" title="Forming a chord"></p>
 <p>A chord (multiple, simultaneous pitches) can be specified by adding
 multiple <em>Pitch</em> blocks into a single <em>Note value</em> block, like the
 above example.</p>
-<h3 id="-a-name-rests-a-2-4-rests"><a name="RESTS"></a>2.4 Rests</h3>
+<h3 id="-a-name-rests-a-2-4-rests"><a name="RESTS"></a>3.4 Rests</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/silence.svg" alt="alt tag" title="Silence blocks create rests"></p>
 <p>A rest of the specified note value duration can be constructed using a
 <em>Silence</em> block in place of a <em>Pitch</em> block.</p>
-<h3 id="-a-name-drums-a-2-5-drums"><a name="DRUMS"></a>2.5 Drums</h3>
+<h3 id="-a-name-drums-a-2-5-drums"><a name="DRUMS"></a>3.5 Drums</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum1.svg" alt="alt tag" title="Using Drum Sample block"></p>
 <p>Anywhere a <em>Pitch</em> block can be used&mdash;e.g., inside of the matrix
 or a <em>Note value</em> block&mdash;a <em>Drum Sample</em> block can also be used
@@ -687,13 +687,13 @@ to choose. The default drum is a kick drum.</p>
 <p>Just as in the <a href="#CHORD">chord</a> example above, you can use multiple
 <em>Drum</em> blocks within a single <em>Note value</em> blocks, and combine them
 with <em>Pitch</em> blocks as well.</p>
-<h2 id="-a-name-programming-with-music-a-3-programming-with-music"><a name="PROGRAMMING-WITH-MUSIC"></a>3. Programming with Music</h2>
-<p><a href="#NOTES">Previous Section (2. Making Sounds)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#WIDGETS">Next Section (4. Widgets)</a></p>
+<h2 id="-a-name-programming-with-music-a-3-programming-with-music"><a name="PROGRAMMING-WITH-MUSIC"></a>4. Programming with Music</h2>
+<p><a href="#NOTES">Previous Section (3. Making Sounds)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#WIDGETS">Next Section (5. Widgets)</a></p>
 <p>This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
 hand or use the <a href="#pitch-time"><em>Pitch-time Matrix</em></a> widget to help you
 get started.</p>
-<h3 id="-a-name-chunks-a-3-1-chunks"><a name="CHUNKS"></a>3.1 Chunks</h3>
+<h3 id="-a-name-chunks-a-3-1-chunks"><a name="CHUNKS"></a>4.1 Chunks</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix4.svg" alt="alt tag" title="working of action stack"></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk1.svg" alt="alt tag" title="using chunk inside Start block"></p>
 <p>Every time you create a new <em>Action</em> stack, Music Blocks creates a new
@@ -735,9 +735,9 @@ name <code>chunk0</code>, followed by <code>chunk1</code> twice, and then <code>
 <p>A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)</p>
-<h3 id="-a-name-transformation-a-3-2-musical-transformations"><a name="TRANSFORMATION"></a>3.2 Musical Transformations</h3>
+<h3 id="-a-name-transformation-a-3-2-musical-transformations"><a name="TRANSFORMATION"></a>4.2 Musical Transformations</h3>
 <p>There are many ways to transform pitch, rhythm, and other sonic qualities.</p>
-<h4 id="-a-name-step-pitch-a-3-2-1-step-pitch-block"><a name="STEP-PITCH"></a>3.2.1 Step Pitch Block</h4>
+<h4 id="-a-name-step-pitch-a-3-2-1-step-pitch-block"><a name="STEP-PITCH"></a>4.2.1 Step Pitch Block</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform0.svg" alt="alt tag" title="Using the Step Pitch block"></p>
 <p>The <em>Step Pitch</em> block will move up or down notes in a scale from the
 last played note. In the example above, <em>Step Pitch</em> blocks are used
@@ -754,7 +754,7 @@ played.</p>
 <p>In this example, we are using the <em>Mode length</em> block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
 modes).</p>
-<h4 id="-a-name-sharps-and-flats-a-3-2-2-sharps-and-flats"><a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats</h4>
+<h4 id="-a-name-sharps-and-flats-a-3-2-2-sharps-and-flats"><a name="SHARPS-AND-FLATS"></a>4.2.2 Sharps And Flats</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform1.svg" alt="alt tag" title="Using Sharp and Flat blocks"></p>
 <p>The <em>Accidental</em> block can be wrapped around <em>Pitch</em> blocks, <em>Note
 value</em> blocks, or <a href="#CHUNKS">chunks</a>. A sharp will raise the pitch by
@@ -762,7 +762,7 @@ one half step. A flat will lower by one half step. In the example, on
 the left, just the <em>Pitch</em> block <code>Mi</code> is lowered by one half step; on
 the right, both <em>Pitch</em> blocks are raised by one half step. (You can
 also use a double-sharp or double-flat accidental.)</p>
-<h4 id="-a-name-adjust-transposition-a-3-2-3-adjusting-transposition"><a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition</h4>
+<h4 id="-a-name-adjust-transposition-a-3-2-3-adjusting-transposition"><a name="ADJUST-TRANSPOSITION"></a>4.2.3 Adjusting Transposition</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform2.svg" alt="alt tag" title="Adjusting transpositions"></p>
 <p>There are several ways to transpose a pitch: by semi-tone or scalar
 steps. The <em>Semi-tone-transposition</em> block (above left) can be used to
@@ -788,7 +788,7 @@ raise it by one octave.</p>
 (octave) of the notes that follow it. In the example above it is first
 used to bump the <code>Mi 4</code> note up by one octave and then to bump the
 <code>Sol 4</code> note down by one octave.</p>
-<h4 id="-a-name-dotted-a-3-2-4-dotted-notes"><a name="DOTTED"></a>3.2.4 Dotted Notes</h4>
+<h4 id="-a-name-dotted-a-3-2-4-dotted-notes"><a name="DOTTED"></a>4.2.4 Dotted Notes</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform4.svg" alt="alt tag" title="Creating dotted notes using the Dot block"></p>
 <p>You can &quot;dot&quot; notes using the <em>Dot</em> block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
@@ -819,7 +819,7 @@ will result in the equivalent of a <code>1/4</code> note.</p>
 <p>In the above example, the sequence of <a href="#DRUMS">drum</a> note values is
 decreased over time, at each repetition.</p>
 <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&amp;run=True">RUN LIVE</a></p>
-<h4 id="-a-name-repetition-a-3-2-6-repeating-notes"><a name="REPETITION"></a>3.2.6 Repeating Notes</h4>
+<h4 id="-a-name-repetition-a-3-2-6-repeating-notes"><a name="REPETITION"></a>4.2.6 Repeating Notes</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg" alt="alt tag" title="repeating notes"></p>
 <p>There are several ways to repeat notes. The <em>Repeat</em> block will play a
 sequence of notes multiple times; the <em>Duplicate</em> block will repeat each
@@ -827,7 +827,7 @@ note in a sequence.</p>
 <p>In the example, on the left, the result would be <code>Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol</code>; on the right the result would be
 <code>Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol</code>.</p>
-<h4 id="-a-name-swinging-a-3-2-7-swinging-notes-and-tied-notes"><a name="SWINGING"></a>3.2.7 Swinging Notes and Tied Notes</h4>
+<h4 id="-a-name-swinging-a-3-2-7-swinging-notes-and-tied-notes"><a name="SWINGING"></a>4.2.7 Swinging Notes and Tied Notes</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform7.svg" alt="alt tag" title="swinging notes and tied notes"></p>
 <p>The <em>Swing</em> block works on pairs of notes (specified by note value),
 adding some duration (specified by swing value) to the first note and
@@ -840,7 +840,7 @@ unchanged.</p>
 <p>Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)</p>
 <p><img src="https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg" alt="alt tag" title="using notes with ties"></p>
-<h4 id="-a-name-more-transformations-a-3-2-8-set-volume-crescendo-staccato-and-slur"><a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur</h4>
+<h4 id="-a-name-more-transformations-a-3-2-8-set-volume-crescendo-staccato-and-slur"><a name="MORE-TRANSFORMATIONS"></a>4.2.8 Set Volume, Crescendo, Staccato, and Slur</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg" alt="alt tag" title="Set master volume, set synth volume, set relative volume, crescendo"></p>
 <p>The <em>Set master volume</em> block will change the master volume. The
 default is <code>50</code>; the range is <code>0</code> (silence) to <code>100</code> (full volume).</p>
@@ -869,7 +869,7 @@ specified rhythmic value of the notes.</p>
 <p>The <em>Slur</em> block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.</p>
-<h4 id="-a-name-intervals-a-3-2-9-intervals"><a name="INTERVALS"></a>3.2.9 Intervals</h4>
+<h4 id="-a-name-intervals-a-3-2-9-intervals"><a name="INTERVALS"></a>4.2.9 Intervals</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform9.svg" alt="alt tag" title="Scalar interval block"></p>
 <p>The <em>Scalar interval</em> block calculates a relative interval based on
 the current mode, skipping all notes outside of the mode. For example,
@@ -899,7 +899,7 @@ on the <em>Intervals</em> palette: <em>Major 2</em>, <em>Minor 3</em>, <em>Perfe
 double diminishment.</p>
 <p>The <em>Semi-tone interval measure</em> block can be used to measure the
 number of half-steps between two pitched.</p>
-<h4 id="-a-name-inversion-a-3-2-11-inversion"><a name= "INVERSION"></a>3.2.11 Inversion</h4>
+<h4 id="-a-name-inversion-a-3-2-11-inversion"><a name= "INVERSION"></a>4.2.11 Inversion</h4>
 <p>The <em>Invert</em> block will rotate a series of notes around a target
 note. There are three different modes of the <em>Invert</em> block: <em>even</em>,
 <em>odd</em>, and <em>scalar</em>. In <em>even</em> and <em>odd</em> modes, the rotation is based
@@ -995,7 +995,7 @@ In the <em>invert (odd)</em> example, notes are inverted around a point
 midway between <code>C5</code> and  <code>C♯5</code>.  In the <em>invert (scalar)</em> example,
 notes are inverted around <code>C5</code>, by scalar steps rather than
 half-steps.</p>
-<h4 id="-a-name-backwards-a-3-2-12-backwards"><a name="BACKWARDS"></a>3.2.12 Backwards</h4>
+<h4 id="-a-name-backwards-a-3-2-12-backwards"><a name="BACKWARDS"></a>4.2.12 Backwards</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform11.svg" alt="alt tag" title="Backward block"></p>
 <p>The <em>Backward</em> block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in <code>chunk</code> are played as
@@ -1006,7 +1006,7 @@ LIVE</a></p>
 <p>Note that all of the blocks inside a <em>Backward</em> block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.</p>
-<h4 id="-a-name-setting-a-3-2-13-setting-voice-and-keys"><a name= "SETTING"></a>3.2.13 Setting Voice and Keys</h4>
+<h4 id="-a-name-setting-a-3-2-13-setting-voice-and-keys"><a name= "SETTING"></a>4.2.13 Setting Voice and Keys</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform12.svg" alt="alt tag" title="setting voice and keys using Set Voice block"></p>
 <p>The <em>Set Voice</em> block selects a <a href="#VOICES">voice</a> for the synthesizer for any
 contained blocks, e.g., violin or cello.</p>
@@ -1022,7 +1022,7 @@ depending on the user&#39;s specified tonality.</p>
 <p>The <em>Define mode</em> block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the <em>Set key</em> block.</p>
-<h4 id="-a-name-vibrato-a-3-2-14-vibrato-tremelo-et-al-"><a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.</h4>
+<h4 id="-a-name-vibrato-a-3-2-14-vibrato-tremelo-et-al-"><a name="VIBRATO"></a>4.2.14 Vibrato, Tremelo, et al.</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform15.svg" alt="alt tag" title="Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks"></p>
 <p>The <em>Vibrato</em> Block adds a rapid variation in pitch to any contained
 notes. The intensity of the variation ranges from <code>1</code> to <code>100</code> (cents),
@@ -1054,7 +1054,7 @@ down a drum track. Any <em>Pitch</em> blocks encounted while starting from a
 drum will be played as <code>C2</code> with the default drum sample. In the
 example above, all of the notes in <code>chunk</code> will be played with a kick
 drum.</p>
-<h3 id="-a-name-graphics-a-3-4-adding-graphics"><a name="GRAPHICS"></a>3.4 Adding graphics</h3>
+<h3 id="-a-name-graphics-a-3-4-adding-graphics"><a name="GRAPHICS"></a>4.4 Adding graphics</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics1.svg" alt="alt tag" title="adding graphics"></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics2.svg" alt="alt tag" title="color range"></p>
 <p>Turtle graphics can be combined with the music blocks. By placing
@@ -1080,7 +1080,7 @@ actions over the specified rhythm.</p>
 tree drawing, where the pitch goes up as the branches assend.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/tree.svg" alt="alt tag" title="tree graphic"></p>
 <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&amp;run=True">RUN LIVE</a></p>
-<h3 id="-a-name-beat-a-3-5-beat"><a name="BEAT"></a>3.5 Beat</h3>
+<h3 id="-a-name-beat-a-3-5-beat"><a name="BEAT"></a>4.5 Beat</h3>
 <p>The beat of the music is determined by the <em>Meter</em> block (by default,
 it is set to 4:4).</p>
 <p>The <em>Pickup</em> block can be used to accommodate any notes that come in
@@ -1103,7 +1103,7 @@ size is set to <code>50</code> and the volume to <code>75</code>. On Beat <code>
 to <code>25</code> and the volume to <code>50</code>. On off beats, the pen size is set to <code>5</code> and
 the volumne to <code>5</code>. The resultant graphic is shown below.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/graphics6.svg" alt="alt tag" title="graphics modulated by beat"></p>
-<h3 id="-a-name-interactions-a-3-6-interactions"><a name="INTERACTIONS"></a>3.6 Interactions</h3>
+<h3 id="-a-name-interactions-a-3-6-interactions"><a name="INTERACTIONS"></a>4.6 Interactions</h3>
 <p>There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/interactive.svg" alt="alt tag" title="interactions"></p>
@@ -1169,7 +1169,7 @@ the link below, takes musical paint in a novel direction.</p>
 <p><a href="https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True">RUN LIVE</a></p>
 
 <h2 id="-a-name-widgets-a-widgets"><a name="WIDGETS"></a>Widgets</h2>
-<p><a href="#PROGRAMMING-WITH-MUSIC">Previous Section (3. Programming with Music)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#BEYOND-MUSIC-BLOCKS">Next Section (5. Beyond Music Blocks)</a></p>
+<p><a href="#PROGRAMMING-WITH-MUSIC">Previous Section (4. Programming with Music)</a> | <a href="#TOC">Back to Table of Contents</a> | <a href="#BEYOND-MUSIC-BLOCKS">Next Section (6. Beyond Music Blocks)</a></p>
 <p>This section of the guide will talk about the various Widgets that can
 be used within Music Blocks to enhance your experience.</p>
 <p>Every widget has a menu with at least two buttons.</p>
@@ -1177,7 +1177,7 @@ be used within Music Blocks to enhance your experience.</p>
 <p>You can hide the widget by clicking on the <em>Close</em> button.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/grab-handle.svg" alt="alt tag" title="drag handle"></p>
 <p>You can move the widget by dragging it by the <em>Drag</em> handle.</p>
-<h3 id="-a-name-status-a-4-1-status"><a name="status"></a>4.1 Status</h3>
+<h3 id="-a-name-status-a-4-1-status"><a name="status"></a>5.1 Status</h3>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/status1.svg" alt="alt tag" title="given Music block"></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/status2.svg" alt="alt tag" title="status in tabular form"></p>
 <p>The <em>Status widget</em> is a tool for inspecting the status of Music
