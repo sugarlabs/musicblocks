@@ -1,4 +1,4 @@
-processMxmlNotes = function(data) {
+    processMxmlNotes = function(data) {
     data = JSON.parse(data);
     var res = '';
 
@@ -27,6 +27,9 @@ processMxmlNotes = function(data) {
             // assume 4/4 time, 32 divisions bc smallest note is 1/32
             // key is C by default
             add('<measure number="1"> <attributes> <divisions>32</divisions> <key> <fifths>0</fifths> </key> <time> <beats>4</beats> <beat-type>4</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
+            var remainDiv = 4*32;
+            var divPerBeat = 32;
+            console.log('remainDiv is initially '+remainDiv);
             for(var i = 0; i < data.length; i++) {
                 var type = data[i][1][0];
                 console.log("type is "+type);
@@ -45,6 +48,7 @@ processMxmlNotes = function(data) {
 
                     console.log("num is "+num);
                     console.log('denom is '+denom);
+
                     
                     var pitch = data[i+6][1][1].value;
                     var octave = data[i+7][1][1].value;
@@ -55,14 +59,23 @@ processMxmlNotes = function(data) {
                         add('<step>' + letters[pitches.indexOf(pitch)] + '</step>')
                         add('<octave>' + octave + '</octave>');
                     add('</pitch>')
+                    
 
-                    add('<duration>' + (32/denom) * num + '</duration>')
+                    // convert to 4/4 time
+                    var num4 = num*(4/denom);
+                    console.log("num4 is "+num4);
+                    var denom4 = 4;
+                    add('<duration>' + num4*divPerBeat + '</duration>')
+                    
+                    remainDiv -= num4*divPerBeat;
+                    console.log("subtracting  "+num4*divPerBeat);
                     
                     add('</note>')
                 }
-
-
                 
+                
+
+                console.log("we have "+remainDiv+ " left.")
             }
             add('</measure>')
         add('</part>')
