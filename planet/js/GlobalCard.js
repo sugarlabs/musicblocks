@@ -35,7 +35,7 @@ function GlobalCard(Planet) {
                                         <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> \
                                                 <div class="card-content shareurltext"> \
                                                         <div class="shareurltitle">'+_('Share')+'</div> \
-                                                        <input id="shareurlselect" type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
+                                                        <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
                                                         <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="'+_('Copy link to clipboard')+'"><i class="material-icons"alt="Copy!">file_copy</i></a>\
                                                         <div class="shareurl-advanced" id="global-advanced-{ID}"> \
                                                                 <div class="shareurltitle">'+_('Flags')+'</div> \
@@ -58,7 +58,7 @@ function GlobalCard(Planet) {
         //TODO: Have a TB placeholder image specific to TB projects
         var html = this.renderData.replace(new RegExp('\{ID\}', 'g'), this.id);
         var frag = document.createRange().createContextualFragment(html);
-        
+
         // set image
         if (this.ProjectData.ProjectImage !== null && this.ProjectData.ProjectImage !== ''){
             frag.getElementById('global-project-image-' + this.id).src = this.ProjectData.ProjectImage;
@@ -67,7 +67,7 @@ function GlobalCard(Planet) {
         } else {
             frag.getElementById('global-project-image-' + this.id).src = this.PlaceholderTBImage;
         }
-        
+
         // set tags
         var tagcontainer = frag.getElementById('global-project-tags-' + this.id);
         for (var i = 0; i < this.ProjectData.ProjectTags.length; i++){
@@ -76,25 +76,25 @@ function GlobalCard(Planet) {
             chip.textContent = _(Planet.TagsManifest[this.ProjectData.ProjectTags[i]].TagName);
             tagcontainer.appendChild(chip);
         }
-        
+
         // set title text
         frag.getElementById('global-project-title-' + this.id).textContent = this.ProjectData.ProjectName;
-        
+
         // set number of likes
         frag.getElementById('global-project-likes-' + this.id).textContent = this.ProjectData.ProjectLikes.toString();
-        
+
         var that = this;
 
         // set view button listener
         frag.getElementById('global-project-more-details-' + this.id).addEventListener('click', function (evt) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
         });
-        
+
         // set image listener
         frag.getElementById('global-project-image-' + this.id).addEventListener('click', function (evt) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
         });
-        
+
         // set share button listener
         frag.getElementById('global-project-share-' + this.id).addEventListener('click', function (evt) {
             var s = document.getElementById('global-sharebox-' + that.id);
@@ -105,7 +105,7 @@ function GlobalCard(Planet) {
                 s.style.display = 'none';
             }
         });
-        
+
         // set share checkbox listener
         frag.getElementById('global-checkboxrun-' + this.id).addEventListener('click', function (evt) {
             updateCheckboxes('global-sharebox-' + that.id);
@@ -116,18 +116,18 @@ function GlobalCard(Planet) {
         frag.getElementById('global-checkboxcollapse-' + this.id).addEventListener('click', function (evt) {
             updateCheckboxes('global-sharebox-' + that.id);
         });
-        
+
         // set like icon
         if (Planet.ProjectStorage.isLiked(this.id)){
             frag.getElementById('global-like-icon-' + this.id).textContent = 'favorite';
         } else {
             frag.getElementById('global-like-icon-' + this.id).textContent = 'favorite_border';
         }
-        
+
         frag.getElementById('global-like-icon-' + this.id).addEventListener('click', function (evt) {
             that.like();
         });
-        
+
         document.getElementById('global-projects').appendChild(frag);
         updateCheckboxes('global-sharebox-' + that.id);
     };
