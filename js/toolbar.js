@@ -85,7 +85,7 @@ function Toolbar() {
                 html_onclick();
             };
         } else {
-	    console.log('ADVANCED MODE BUTTONS')
+	    console.debug('ADVANCED MODE BUTTONS')
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {

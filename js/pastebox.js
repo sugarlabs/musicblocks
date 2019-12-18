@@ -98,7 +98,7 @@ function PasteBox () {
         this._container.on('click', function(event) {
             // We need a lock to "debouce" the click.
             if (locked) {
-                console.log('debouncing click');
+                console.debug('debouncing click');
                 return;
             }
 

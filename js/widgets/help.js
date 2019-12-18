@@ -224,7 +224,7 @@ function HelpWidget () {
                             if (BLOCKHELP[name].length < 4) {
                                 // If there is nothing specified, just
                                 // load the block.
-                                console.log('CLICK: ' + name);
+                                console.debug('CLICK: ' + name);
                                 var obj = blocks.palettes.getProtoNameAndPalette
 (name);
                                 var protoblk = obj[0];
@@ -241,12 +241,12 @@ function HelpWidget () {
                                 // If it is a string, load the macro
                                 // assocuated with this block
                                 var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 100, 100);
-                                console.log('CLICK: ' + blocksToLoad);
+                                console.debug('CLICK: ' + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
                                 var blocksToLoad = BLOCKHELP[name][3];
-                                console.log('CLICK: ' + blocksToLoad);
+                                console.debug('CLICK: ' + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
@@ -268,13 +268,13 @@ function HelpWidget () {
         }
         body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
         body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
-        
+
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
-            console.log(page + ' ' + link);
+            console.debug(page + ' ' + link);
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
-        
+
         helpBody.style.color = "#505050";
         helpBody.innerHTML = body;
     };

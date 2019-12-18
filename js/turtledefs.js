@@ -87,7 +87,7 @@ function createDefaultStack() {
         language = navigator.language;
     }
 
-    console.log('language setting is ' + language);
+    console.debug('language setting is ' + language);
     if (language === 'ja') {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
@@ -192,7 +192,7 @@ function createHelpContent() {
 
     var TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
     if (beginnerMode) {
-	console.log(TITLESTRING);
+	console.debug(TITLESTRING);
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))],

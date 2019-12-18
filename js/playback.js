@@ -38,7 +38,7 @@ function PlaybackWidget() {
         // Initializes the playback matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        console.log('INITIALIZING PLAYBACK WIDGET');
+        console.debug('INITIALIZING PLAYBACK WIDGET');
         this._logo = logo;
 
         var w = window.innerWidth;

@@ -256,7 +256,7 @@ var instrumentsFilters = {0: {}};
 
 
 function Synth() {
-    console.log('SYNTH');
+    console.debug('SYNTH');
     // Isolate synth functions here.
 
     const BUILTIN_SYNTHS = {
@@ -287,7 +287,7 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = function () {
-        console.log('sample loaded');
+        console.debug('sample loaded');
     };
 
     this.samples = null;
@@ -773,7 +773,7 @@ function Synth() {
 
     // Poly synth will be loaded as the default synth.
     this.createDefaultSynth = function (turtle) {
-        console.log('create default poly/default/custom synth for turtle ' + turtle);
+        console.debug('create default poly/default/custom synth for turtle ' + turtle);
         var default_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth).toMaster();
         instruments[turtle]['electronic synth'] = default_synth;
         instrumentsSource['electronic synth'] = [0, 'electronic synth'];
@@ -786,18 +786,18 @@ function Synth() {
     this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
+            console.debug(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
             var noteDict = {};
             noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
             var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
-            console.log(DEFAULTDRUM);
+            console.debug(DEFAULTDRUM);
             var tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
@@ -817,7 +817,7 @@ function Synth() {
         case 'simple 3':
         case 'simple 4':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
         case 'sine':
@@ -825,29 +825,29 @@ function Synth() {
         case 'square':
         case 'sawtooth':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
         case 'pluck':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.PluckSynth(synthOptions);
             break;
         case 'poly':
             instrumentsSource[instrumentName] = [0, 'poly'];
-            console.log('poly');
+            console.debug('poly');
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
             break;
         case 'noise1':
         case 'noise2':
         case 'noise3':
             instrumentsSource[instrumentName] = [4, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
         default:
             instrumentsSource[instrumentName] = [0, 'poly'];
-            console.log('poly (default)');
+            console.debug('poly (default)');
             var builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
             break;
         }
@@ -918,9 +918,9 @@ function Synth() {
 
     this.loadSynth = function (turtle, sourceName) {
         if (sourceName in instruments[turtle]) {
-            console.log(sourceName + ' already loaded');
+            console.debug(sourceName + ' already loaded');
         } else {
-            console.log('loading ' + sourceName);
+            console.debug('loading ' + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
 
@@ -956,7 +956,7 @@ function Synth() {
             if (notes === undefined) {
                 notes = notes1;
             }
-            console.log(notes);
+            console.debug(notes);
         }
 
         if (paramsEffects === null && paramsFilters === null) {
@@ -1109,7 +1109,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-        // console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+        // console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
@@ -1230,7 +1230,7 @@ function Synth() {
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {
-            console.log('instrument not found');
+            console.debug('instrument not found');
             return 50;
         }
     };

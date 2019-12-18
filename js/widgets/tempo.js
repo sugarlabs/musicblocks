@@ -180,7 +180,7 @@ function Tempo () {
     this.__save = function (i) {
         var that = this;
         setTimeout(function () {
-            console.log('saving a BPM block for ' + that.BPMs[i]);
+            console.debug('saving a BPM block for ' + that.BPMs[i]);
             var delta = i * 42;
             var newStack = [[0, ['setbpm3', {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
                             [1, ['number', {'value': that.BPMs[i]}], 0, 0, [0]],
@@ -189,7 +189,7 @@ function Tempo () {
                             [4, ['number', {'value': 4}], 0, 0, [2]],
                             [5, ['vspace', {}], 0, 0, [0, null]]];
             that._logo.blocks.loadNewBlocks(newStack);
-            that._logo.textMsg(_('New action block generated!'))            
+            that._logo.textMsg(_('New action block generated!'))
         }, 200 * i);
     };
 
@@ -470,7 +470,7 @@ function Tempo () {
             BPMInput.addEventListener('keyup', function(e) {
                 if (e.keyCode === 13) {
                     id = Number(this.getAttribute('id').replace('BPMInput', ''));
-                    console.log(id);
+                    console.debug(id);
                     that._useBPM(id);
                 }
             });

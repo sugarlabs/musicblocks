@@ -553,7 +553,7 @@ function RhythmRuler () {
 
             // var noteValue = noteValues[newCellIndex];
             var newNoteValue = 0;
-            
+
             newNoteValue = inputNum * noteValue;
 
             var tempwidth = this._noteWidth(newNoteValue);
@@ -970,7 +970,7 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                // console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
+                // console.debug(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
                 if (foundVoice) {
                     that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
                 } else if (foundDrum) {
@@ -1103,7 +1103,7 @@ function RhythmRuler () {
                         newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                         newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
                     }
-                    
+
                     if (i == ruler.cells.length - 1) {
                         newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
                     } else {
@@ -1151,7 +1151,7 @@ function RhythmRuler () {
                 newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
-                    
+
                 if (i == noteValues.length - 1) {
                     newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
                 } else {
@@ -1554,7 +1554,7 @@ function RhythmRuler () {
 
                 // Save a merged version of the rulers.
                 that._saveTupletsMerged(that._mergeRulers());
-                
+
                 // Rather than each ruler individually.
                 // that._saveTuplets(0);
                 await delayExecution(1000)
@@ -1582,7 +1582,7 @@ function RhythmRuler () {
         this._dissectNumber.onkeydown = function (event) {
             if (event.keyCode === DEL) {
                 that._dissectNumber.value = that._dissectNumber.value.substring(0, that._dissectNumber.value.length - 1);
-            }   
+            }
         };
 
         this._dissectNumber.oninput = function (event) {
@@ -1833,7 +1833,7 @@ function RhythmRuler () {
             this._wheel.removeWheel();
         }
 
-        console.log(this.Rulers[selectedRuler]);
+        console.debug(this.Rulers[selectedRuler]);
         this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
         this._wheel.wheelRadius = 200;
         this._wheel.maxPercent = 1.6;
@@ -1854,7 +1854,7 @@ function RhythmRuler () {
             }
         }
 
-        console.log(labels);
+        console.debug(labels);
         this._wheel.initWheel(labels);
 
         for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
@@ -1964,7 +1964,7 @@ function RhythmRuler () {
         var y = this._top;
         var selectorWidth = 150;
 
-        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';        
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';
         if (y - 300 < 0) {
             docById('wheelDiv').style.top = (y + 60) + 'px';
         } else {
