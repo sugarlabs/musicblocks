@@ -141,6 +141,11 @@ Bugs can be reported in the
 [issues section](https://github.com/sugarlabs/musicblocks/issues)
 of this repository.
 
+If possible, please include the browser console log output when
+reporting bugs. To access the console, type ```Ctrl-Shift-J``` on most
+browsers. You may need to set the "Default level" for the console to
+"Verbose" in order to see all of the output.
+
 ## <a name="CONTRIBUTING"></a>Contributing
 
 Please consider contributing to the project, with your ideas, your
