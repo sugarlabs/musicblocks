@@ -31,6 +31,13 @@
             var currentMeasureLen = 0;
             var divPerBeat = 32;
             var divPerMeasure = divPerBeat*4;
+            var prevNote = {
+                step: -1e5,
+                oct: -1e5,
+                alter: -1e5, 
+                duration:-1e5
+            };
+
             for(var i = 0; i < data.length; i++) {
                 var type = data[i][1][0];
                 if(ignore.indexOf(type) !== -1) {
@@ -87,7 +94,7 @@
                     add('<pitch>')
                         add('<step>' + letters[pitches.indexOf(pitch)] + '</step>')
                         add('<octave>' + octave + '</octave>');
-                        add('<alter> ' + alter + ' </alter>');
+                        add('<alter>' + alter + ' </alter>');
                     add('</pitch>')
                     
 
@@ -95,6 +102,30 @@
 
                     add('<duration>' + num4*divPerBeat + '</duration>')                    
                     add('</note>')
+
+                    prevNote = {
+                        step: letters[pitches.indexOf(pitch)],
+                        oct: octave,
+                        alter: alter,
+                        duration: num4*divPerBeat
+                    }
+
+                    console.log("setting prevNote to:");
+                    console.log(prevNote);
+                } else if(type === 'interval') {
+                    var change = data[i+1][1][1].value;
+                    console.log("change is "+change)
+                    add('<note>');
+                        add('<chord/>')
+                        add('<pitch>')
+                            add('<step>' + prevNote.step + '</step>');
+                            add('<octave>' + prevNote.oct + '</octave>');
+                            var newAlter = (parseInt(change)*2)+parseInt(prevNote.alter);
+                            add('<alter>' + newAlter + '</alter>');
+                        add('</pitch>');
+                        add('<duration>'+ prevNote.duration + '</duration>');
+
+                    add('</note>');
                 }
             }
 
