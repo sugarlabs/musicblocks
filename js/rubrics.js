@@ -556,7 +556,7 @@ function analyzeProject(blocks) {
                 cats.push(TACAT[blockList[b]]);
             }
         } else {
-           console.log(blockList[b] + ' not in catalog');
+           console.debug(blockList[b] + ' not in catalog');
         }
     }
     for (var c = 0; c < cats.length; c++) {

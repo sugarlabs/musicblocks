@@ -60,7 +60,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         language = navigator.language;
     }
 
-    console.log('language setting is ' + language);
+    console.debug('language setting is ' + language);
 
     // PITCH PALETTE
 

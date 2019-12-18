@@ -25,7 +25,7 @@ const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drum
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
     if (protoblock === null) {
-        console.log('null protoblock sent to Block');
+        console.debug('null protoblock sent to Block');
         return;
     }
 
@@ -118,7 +118,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        console.log('// Try regenerating the artwork');
+                        console.debug('// Try regenerating the artwork');
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                         await that.pause(100);
@@ -154,7 +154,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     if (that.bounds == null) {
-                        console.log('UPDATE CACHE: BOUNDS NOT READY');
+                        console.debug('UPDATE CACHE: BOUNDS NOT READY');
                         updateBounds(loopCount + 1);
                         await that.pause(200);
                     } else {
@@ -343,7 +343,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.bitmap === null) {
-            console.log('bitmap not ready');
+            console.debug('bitmap not ready');
             return;
         }
 
@@ -1576,7 +1576,7 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
-            console.log('collapse bitmap not ready');
+            console.debug('collapse bitmap not ready');
             return;
         }
 
@@ -1606,7 +1606,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._oscTimeLabel();
                 break;
             default:
-                console.log('What do we do with a collapsed ' + this.name + ' block?');
+                console.debug('What do we do with a collapsed ' + this.name + ' block?');
                 break;
             }
         }
@@ -1700,7 +1700,7 @@ function Block(protoblock, blocks, overrideName) {
 
             i += 1;
             if (i > 5) {
-                console.log('loop?');
+                console.debug('loop?');
                 break;
             }
 
@@ -2132,7 +2132,7 @@ function Block(protoblock, blocks, overrideName) {
             if ('nativeEvent' in event) {
                 if ('button' in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
-                    console.log('loading context menu');
+                    console.debug('loading context menu');
                     docById('wheelDiv').style.display = 'none';
                     that.piemenuBlockContext(thisBlock);
                     return;
@@ -2191,7 +2191,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
-                        console.log('running from ' + that.blocks.blockList[topBlock].name);
+                        console.debug('running from ' + that.blocks.blockList[topBlock].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
@@ -2210,7 +2210,7 @@ function Block(protoblock, blocks, overrideName) {
             } else if (!moved) {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     var topBlock = that.blocks.findTopBlock(thisBlock);
-                    console.log('running from ' + that.blocks.blockList[topBlock].name);
+                    console.debug('running from ' + that.blocks.blockList[topBlock].name);
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.blocks.logo.synth.resume();
                     }
@@ -2639,7 +2639,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
 
-            console.log("hello");
+            console.debug("hello");
         } else if (this.name === 'customNote') {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -2846,7 +2846,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvoice = DEFAULTVOICE;
             }
 
-            console.log(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
+            console.debug(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
 
             var voiceLabels = [];
             var voiceValues = [];
@@ -2882,7 +2882,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectednoise = DEFAULTNOISE;
             }
 
-            console.log(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
+            console.debug(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
 
             var noiseLabels = [];
             var noiseValues = [];
@@ -3135,7 +3135,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
             } else {
-                console.log('NUMBER LABEL');
+                console.debug('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -3358,7 +3358,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3644,7 +3644,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
-                // console.log(obj[0] + obj[1] + ' 1 / 8 ' + DEFAULTVOICE);
+                // console.debug(obj[0] + obj[1] + ' 1 / 8 ' + DEFAULTVOICE);
                 that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
             }
 
@@ -3692,7 +3692,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3850,7 +3850,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for accidental selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3961,7 +3961,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for note value selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4182,7 +4182,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for number selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4226,7 +4226,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.createWheel(wheelLabels);
 
         if (this._numberWheel.navItems.length > 20) {
-            console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
+            console.debug('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
             for (var i = 0; i < this._numberWheel.navItems.length; i++) {
                 this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
                 this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
@@ -4360,7 +4360,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for setcolor selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4519,7 +4519,7 @@ function Block(protoblock, blocks, overrideName) {
         // basic wheelNav pie menu
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4607,7 +4607,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for boolean selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4694,7 +4694,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for voice selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4851,7 +4851,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for interval selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -5037,7 +5037,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for mode selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -5423,7 +5423,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
-        console.log('LABEL CHANGED ' + this.name);
+        console.debug('LABEL CHANGED ' + this.name);
 
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -5688,7 +5688,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        console.log('Showing context menu for ' + this.name);
+        console.debug('Showing context menu for ' + this.name);
 
         // Position the widget centered over the active block.
         docById('contextWheelDiv').style.position = 'absolute';
@@ -5781,7 +5781,7 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.name === 'action') {
             wheel.navItems[5].navigateFunction = function () {
-                console.log('CALLING saveStack');
+                console.debug('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
                 that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
@@ -5798,7 +5798,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         setTimeout(function () {
-            console.log('Setting stage click to false.');
+            console.debug('Setting stage click to false.');
             that.blocks.stageClick = false;
         }, 500);
     };

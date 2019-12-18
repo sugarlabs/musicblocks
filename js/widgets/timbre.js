@@ -285,7 +285,7 @@ function TimbreWidget () {
         if (this.instrumentName in instrumentsFilters[0]) {
             this._logo.synth.trigger(0, note, this._logo.defaultBPMFactor * duration, this.instrumentName, paramsEffects, instrumentsFilters[0][this.instrumentName]);
         } else {
-            console.log(paramsEffects.vibratoIntensity + ' ' + paramsEffects.vibratoFrequency);
+            console.debug(paramsEffects.vibratoIntensity + ' ' + paramsEffects.vibratoFrequency);
             this._logo.synth.trigger(0, note, this._logo.defaultBPMFactor * duration, this.instrumentName, paramsEffects, null);
        }
     };
@@ -552,7 +552,7 @@ function TimbreWidget () {
             effectsButtonCell.style.backgroundColor = platformColor.selectorBackground;
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
-         
+
         var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
         cell.onclick = function () {
@@ -575,7 +575,7 @@ function TimbreWidget () {
             that._save();
         };
 
-       
+
 
         var cell = row.insertCell();
         cell.innerHTML = '<input id="timbreName" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="timbreName" type="text" value="' + this.instrumentName + '" />';
@@ -607,7 +607,7 @@ function TimbreWidget () {
 
         synthButtonCell.onclick = function () {
             _unhighlightButtons();
-            //console.log('synth button cell');
+            //console.debug('synth button cell');
             for (var i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
             }
@@ -873,15 +873,15 @@ function TimbreWidget () {
         if (this.AMSynthesizer.length !== 0 && synthChosen !== 'AMSynth') {
             lastBlk = this.AMSynthesizer.pop();
             setTimeout(this._blockReplace(lastBlk, newblk), 500);
-              
+
         } else if (this.FMSynthesizer.length !== 0 && synthChosen !== 'FMSynth') {
             lastBlk = this.FMSynthesizer.pop();
             setTimeout(this._blockReplace(lastBlk, newblk), 500);
-              
+
         } else if (this.duoSynthesizer.length !== 0 && synthChosen !== 'DuoSynth') {
             lastBlk = this.duoSynthesizer.pop();
             setTimeout(this._blockReplace(lastBlk, newblk), 500);
-              
+
         } else if (synthChosen === 'FMSynth' || synthChosen === 'AMSynth') {
             setTimeout(this.blockConnection(2, bottomOfClamp), 500);
         } else {
@@ -971,7 +971,7 @@ function TimbreWidget () {
     };
 
     this._synth = function () {
-        //  console.log('heysynth');
+        //  console.debug('heysynth');
         var that = this;
         var blockValue = 0;
 
@@ -1035,7 +1035,7 @@ function TimbreWidget () {
 
                             that._changeBlock(last(that.AMSynthesizer),synthChosen,bottomOfClamp);
 
-                            console.log('CREATING AM SYNTH!!!');
+                            console.debug('CREATING AM SYNTH!!!');
                             that.amSynthParamvals['harmonicity'] = parseFloat(that.AMSynthParams[0]);
                             that._logo.synth.createSynth(0, that.instrumentName, 'amsynth', that.amSynthParamvals);
                         }
@@ -1082,7 +1082,7 @@ function TimbreWidget () {
 
                             that._changeBlock(last(that.FMSynthesizer),synthChosen,bottomOfClamp);
 
-                            console.log('CREATING FM SYNTH!!!');
+                            console.debug('CREATING FM SYNTH!!!');
                             that.fmSynthParamvals['modulationIndex'] = parseFloat(that.FMSynthParams[0]);
                             that._logo.synth.createSynth(0, that.instrumentName, 'fmsynth', that.fmSynthParamvals);
                         }
@@ -1129,7 +1129,7 @@ function TimbreWidget () {
 
                             that._changeBlock(last(that.NoiseSynthesizer),synthChosen,bottomOfClamp);
 
-                            console.log('CREATING NOISE SYNTH!!!');
+                            console.debug('CREATING NOISE SYNTH!!!');
                             that.noiseSynthParamvals['noise.type'] = that.NoiseSynthParams[0];
                             that._logo.synth.createSynth(0, that.instrumentName, 'noisesynth', that.noiseSynthParamvals);
                         }
@@ -1175,7 +1175,7 @@ function TimbreWidget () {
 
                             that._changeBlock(last(that.duoSynthesizer),synthChosen,bottomOfClamp);
 
-                            console.log('CREATING DUO SYNTH!!!');
+                            console.debug('CREATING DUO SYNTH!!!');
                             that.duoSynthParamVals['vibratoRate'] = parseFloat(that.duoSynthParams[0]);
                             that.duoSynthParamVals['vibratoAmount'] = parseFloat(that.duoSynthParams[1]);
                             that._logo.synth.createSynth(0, that.instrumentName, 'duosynth', that.duoSynthParamVals);
@@ -1302,7 +1302,7 @@ function TimbreWidget () {
         this.synthVals['oscillator']['source'] = this.oscParams[0];
 
         if (newOscillator) {
-            console.log('CREATING OSCILLATOR SYNTH!!!');
+            console.debug('CREATING OSCILLATOR SYNTH!!!');
             this._logo.synth.createSynth(0, this.instrumentName, this.oscParams[0], this.synthVals);
         }
     };
@@ -1362,7 +1362,7 @@ function TimbreWidget () {
         }
 
         if (newEnvelope) {
-            console.log('CREATING ENVELOPE SYNTH!!!');
+            console.debug('CREATING ENVELOPE SYNTH!!!');
             this._logo.synth.createSynth(0, this.instrumentName, this.synthVals['oscillator']['source'], this.synthVals);
         }
     };
@@ -1392,7 +1392,7 @@ function TimbreWidget () {
     };
 
     this._createFilter = function (f, env) {
-        console.log('adding filter ' + f);
+        console.debug('adding filter ' + f);
 
         var blockValue = f;
         var wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];

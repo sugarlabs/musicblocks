@@ -264,7 +264,7 @@ function ModeWidget() {
         var table = docById('modeTable');
         var n = table.rows.length - 1;
 
-        console.log(_(currentModeName[1]));
+        console.debug(_(currentModeName[1]));
         table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
 
         // Set the notes for this mode.
@@ -292,10 +292,10 @@ function ModeWidget() {
 		modePianoDiv.style.top = '0px';
 		modePianoDiv.style.left = '0px';
 		modePianoDiv.innerHTML = '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
-        var highlightImgs = ['images/highlights/sel_c.png', 'images/highlights/sel_c_sharp.png', 'images/highlights/sel_d.png', 'images/highlights/sel_d_sharp.png', 'images/highlights/sel_e.png', 'images/highlights/sel_f.png', 'images/highlights/sel_f_sharp.png', 'images/highlights/sel_g.png', 'images/highlights/sel_g_sharp.png', 'images/highlights/sel_a.png', 'images/highlights/sel_a_sharp.png', 'images/highlights/sel_b.png'];	
-        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);	
-        var letterName = currentModeName[0];	
-        var modeName = currentModeName[1];	
+        var highlightImgs = ['images/highlights/sel_c.png', 'images/highlights/sel_c_sharp.png', 'images/highlights/sel_d.png', 'images/highlights/sel_d_sharp.png', 'images/highlights/sel_e.png', 'images/highlights/sel_f.png', 'images/highlights/sel_f_sharp.png', 'images/highlights/sel_g.png', 'images/highlights/sel_g_sharp.png', 'images/highlights/sel_a.png', 'images/highlights/sel_a_sharp.png', 'images/highlights/sel_b.png'];
+        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+        var letterName = currentModeName[0];
+        var modeName = currentModeName[1];
 
 		var startingposition; // relative to keyboard
 		switch(letterName) { // sharp|flats included
@@ -515,7 +515,7 @@ function ModeWidget() {
         // Include the octave above the starting note.
         this._notesToPlay.push(12);
 
-        // And then play the mode descending. 
+        // And then play the mode descending.
         this._notesToPlay.push(12);
         for (var i = 11; i > -1; i--) {
             if (this._selectedNotes[i]) {
@@ -656,7 +656,7 @@ function ModeWidget() {
             }
         }
 
-        // console.log('setModeName:' + 'not found');
+        // console.debug('setModeName:' + 'not found');
         table.rows[n].cells[0].innerHTML = '';
     };
 
@@ -667,7 +667,7 @@ function ModeWidget() {
         // If the mode is not in the list, save it as the new custom mode.
         if (table.rows[n].cells[0].innerHTML === '') {
             customMode = this._calculateMode();
-            console.log('custom mode: ' + customMode);
+            console.debug('custom mode: ' + customMode);
             storage.custommode = JSON.stringify(customMode);
         }
 
@@ -694,7 +694,7 @@ function ModeWidget() {
             p += 1;
             var pitch = NOTESTABLE[(j + 1) % 12];
             var octave = 4;
-            console.log(pitch + ' ' + octave);
+            console.debug(pitch + ' ' + octave);
 
             var pitchidx = newStack.length;
             var notenameidx = pitchidx + 1;
@@ -711,7 +711,7 @@ function ModeWidget() {
         }
 
         // Create a new stack for the chunk.
-        console.log(newStack);
+        console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
         this._logo.textMsg(_('New action block generated!'))
 
@@ -742,7 +742,7 @@ function ModeWidget() {
         }
 
         // Create a new stack for the chunk.
-        console.log(newStack);
+        console.debug(newStack);
         var that = this;
         setTimeout(function() {
             // that._logo.blocks.palettes.hide();

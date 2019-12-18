@@ -23,7 +23,7 @@ function PitchStaircase () {
     // A list of stair steps.
     this.Stairs = [];
     this.stairPitchBlocks = [];
-    
+
     this._stepTables = [];
     this._musicRatio1 = null;
     this._musicRatio2  = null;
@@ -119,7 +119,7 @@ function PitchStaircase () {
 
     this._undo = function () {
         if (this._history.length === 0) {
-            console.log('nothing for undo to undo');
+            console.debug('nothing for undo to undo');
             return false;
         }
 
@@ -129,7 +129,7 @@ function PitchStaircase () {
 
         // Remove the last block added to the tempo widget
         var blk = this.stairPitchBlocks.pop();
-        console.log('removing block ' + blk);
+        console.debug('removing block ' + blk);
         // Find the block above
         var c0 = this._logo.blocks.blockList[blk].connections[0];
         // And the block below, if any
@@ -204,7 +204,7 @@ function PitchStaircase () {
         }
 
         if (n === this.Stairs.length) {
-            console.log('DID NOT FIND A MATCH ' + frequency);
+            console.debug('DID NOT FIND A MATCH ' + frequency);
             return;
         }
 
@@ -254,7 +254,7 @@ function PitchStaircase () {
         }
 
         var blk = this._logo.blocks.blockList.length;
-        console.log(newStack);
+        console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
 
         // Make the connections
@@ -370,8 +370,8 @@ function PitchStaircase () {
         var previousBlock = 0;
 
         for (var i = 0; i < this.Stairs.length; i++) {
-            // console.log(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
-            console.log(this.Stairs[i][5] + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
+            // console.debug(this._initialFrequency + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
+            console.debug(this.Stairs[i][5] + 'x' + this.Stairs[i][4] + '/' + this.Stairs[i][3]);
             var noteobj = frequencyToPitch(this.Stairs[i][2]);
             var note  = this.Stairs[i][0];
             var octave = this.Stairs[i][1];
@@ -503,7 +503,7 @@ function PitchStaircase () {
                 }, 1000);
             }
         };
-       
+
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");

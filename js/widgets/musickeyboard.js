@@ -97,11 +97,11 @@ function MusicKeyboard() {
         // grouped together. It is built from notesPlayed.
 
         selectedNotes = [{
-            'noteOctave': [this._notesPlayed[0].noteOctave], 
-            'objId': [this._notesPlayed[0].objId], 
-            'duration': [this._notesPlayed[0].duration], 
-            'voice': [this._notesPlayed[0].voice], 
-            'blockNumber': [this._notesPlayed[0].blockNumber], 
+            'noteOctave': [this._notesPlayed[0].noteOctave],
+            'objId': [this._notesPlayed[0].objId],
+            'duration': [this._notesPlayed[0].duration],
+            'voice': [this._notesPlayed[0].voice],
+            'blockNumber': [this._notesPlayed[0].blockNumber],
             'startTime': this._notesPlayed[0].startTime
         }];
 
@@ -119,11 +119,11 @@ function MusicKeyboard() {
             j++;
             if (i < this._notesPlayed.length) {
                 selectedNotes.push({
-                    'noteOctave': [this._notesPlayed[i].noteOctave], 
-                    'objId': [this._notesPlayed[i].objId], 
-                    'duration': [this._notesPlayed[i].duration], 
-                    'voice': [this._notesPlayed[i].voice], 
-                    'blockNumber': [this._notesPlayed[i].blockNumber], 
+                    'noteOctave': [this._notesPlayed[i].noteOctave],
+                    'objId': [this._notesPlayed[i].objId],
+                    'duration': [this._notesPlayed[i].duration],
+                    'voice': [this._notesPlayed[i].voice],
+                    'blockNumber': [this._notesPlayed[i].blockNumber],
                     'startTime': this._notesPlayed[i].startTime
                 });
             }
@@ -892,7 +892,7 @@ function MusicKeyboard() {
         newCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var cellColor = 'lightgrey';
 
-	console.log(selectedNotes);
+	console.debug(selectedNotes);
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
             var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + 'px';
@@ -1094,7 +1094,7 @@ function MusicKeyboard() {
         var cell = docById(cellId);
         var dur = cell.getAttribute('dur');
 
-        console.log(start + ' ' + dur);
+        console.debug(start + ' ' + dur);
 
         this._notesPlayed = this._notesPlayed.reduce(function(prevValue, curValue) {
             if (parseInt(curValue.startTime) === start) {
@@ -1116,7 +1116,7 @@ function MusicKeyboard() {
             return prevValue.concat([curValue]);
         }, []);
 
-        this._createTable(); 
+        this._createTable();
     };
 
     this._deleteNotes = function(start) {
@@ -1497,7 +1497,7 @@ function MusicKeyboard() {
 
             this._accidentalsWheel.navigateWheel(accidentalsValue)
             this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
-	    console.log(noteValue);
+	    console.debug(noteValue);
             this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
         }
 
@@ -1549,8 +1549,8 @@ function MusicKeyboard() {
             if (condition === 'pitchblocks') {
                 var i = noteLabelsI18n.indexOf(label);
                 var labelValue = noteLabels[i];
-		console.log(label);
-		console.log(labelValue);
+		console.debug(label);
+		console.debug(labelValue);
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
@@ -1819,7 +1819,7 @@ function MusicKeyboard() {
 
     this._save = function() {
         this.processSelected();
-        console.log('Generating action stack for: ' + selectedNotes);
+        console.debug('Generating action stack for: ' + selectedNotes);
         var newStack = [[0, ['action', {'collapsed':false}], 100, 100, [null, 1, null, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]]];
         var endOfStackIdx = 0;
 

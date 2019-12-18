@@ -44,7 +44,7 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
             try {
                 var rawData = httpGet();
                 var obj = JSON.parse(rawData);
-                // console.log('json parse: ' + obj);
+                // console.debug('json parse: ' + obj);
                 // Look for svg
                 for (var file in obj) {
                     if (fileExt(obj[file]) === 'svg') {
@@ -62,14 +62,14 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
                     }
                 }
             } catch (e) {
-                console.log(e);
+                console.debug(e);
                 return false;
             }
         } else {
             // FIXME: grab files from a local server?
             this.pluginFiles = SAMPLEPLUGINS;
         }
-        console.log('found these projects: ' + this.pluginFiles.sort());
+        console.debug('found these projects: ' + this.pluginFiles.sort());
 
         if (this.container === null) {
             this.container = new createjs.Container();
@@ -116,7 +116,7 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
     this.downloadImage = function(p, prepareNextImage) {
         var header = 'data:image/svg+xml;utf8,';
         var name = this.pluginFiles[p] + '.svg';
-        // console.log('getting ' + name + ' from samples');
+        // console.debug('getting ' + name + ' from samples');
         if (this.server) {
             var data = header + httpGet(name);
         } else {
@@ -264,7 +264,7 @@ function loadThumbnailContainerHandler(viewer) {
     viewer.container.on('click', function(event) {
         // We need a lock to "debouce" the click.
         if (locked) {
-            console.log('debouncing click');
+            console.debug('debouncing click');
             return;
         }
         locked = true;

@@ -66,7 +66,7 @@ define(["sugar-web/env", "sugar-web/activity/activity", "sugar-web/datastore"], 
 	},
 
         setup: function () {
-            console.log('insideSugarizer? ' + this.isInsideSugarizer());
+            console.debug('insideSugarizer? ' + this.isInsideSugarizer());
             if (this.isInsideSugarizer() === false) {
                 return;
             }
