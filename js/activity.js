@@ -44,6 +44,9 @@ function Activity() {
     _setupAndroidToolbar = this._setupAndroidToolbar;;
     _loadButtonDragHandler = this._loadButtonDragHandler;
 
+    scrollBlockContainer = false;
+    scrollPaletteContainer = false;
+
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
             window.fbAsyncInit = function () {
@@ -929,16 +932,16 @@ function Activity() {
      */
     function setScroller() {
         blocks.activeBlock = null;
-       var scrollBlockContainer = !scrollBlockContainer;
-        var scrollPaletteContainer = !scrollPaletteContainer;
+        scrollBlockContainer = !scrollBlockContainer;
+        scrollPaletteContainer = !scrollPaletteContainer;
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
         var disableHorizScrollIcon = docById('disableHorizScrollIcon');
-        if (scrollBlockContainer && !beginnerMode){
-          enableHorizScrollIcon.style.display = 'none';
-          disableHorizScrollIcon.style.display = 'block';
-        }else{
-          enableHorizScrollIcon.style.display = 'block';
-          disableHorizScrollIcon.style.display = 'none';
+        if (scrollBlockContainer && !beginnerMode) {
+            enableHorizScrollIcon.style.display = 'none';
+            disableHorizScrollIcon.style.display = 'block';
+        } else {
+            enableHorizScrollIcon.style.display = 'block';
+            disableHorizScrollIcon.style.display = 'none';
         }
     };
 
@@ -1256,8 +1259,8 @@ function Activity() {
         var myCanvas = docById('myCanvas')
 
         var __heightBasedScroll = function (event) {
-            actualReszieHandler(); //check size during init 
-            window.addEventListener("resize",resizeThrottler,false);
+            actualReszieHandler(); // check size during init 
+            window.addEventListener("resize", resizeThrottler, false);
             var resizeTimeout;
 
             function resizeThrottler() {
@@ -1289,7 +1292,6 @@ function Activity() {
         __heightBasedScroll()
 
         var __wheelHandler = function (event) {
-            // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
@@ -4344,9 +4346,7 @@ function Activity() {
         toolbar.renderModeSelectIcon(doSwitchMode);
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin,setScroller, that._setupBlocksContainerEvents);
-        // toolbar.renderEnableHorizScrollIcon(setScroller, that._setupBlocksContainerEvents);
-        //  NOTE: This icon is handled directly in activity.js before the definition of 'scrollOnContainer'
+        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller, that._setupBlocksContainerEvents);
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
