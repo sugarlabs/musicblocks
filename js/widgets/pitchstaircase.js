@@ -127,44 +127,6 @@ function PitchStaircase () {
         var i = this._history.pop();
         this.Stairs.splice(i, 1);
 
-        // Remove the last block added to the tempo widget
-        var blk = this.stairPitchBlocks.pop();
-        console.debug('removing block ' + blk);
-        // Find the block above
-        var c0 = this._logo.blocks.blockList[blk].connections[0];
-        // And the block below, if any
-        var c1 = last(this._logo.blocks.blockList[blk].connections);
-
-        // Check for vspaces below the hertz block
-        if (c1 !== null) {
-            if (this._logo.blocks.blockList[c1].name === 'vspace') {
-		var c2 = last(this._logo.blocks.blockList[c1].connections);
-		if (this._logo.blocks.blockList[c2].name === 'vspace') {
-		    var c = last(this._logo.blocks.blockList[c2].connections);
-		    this._logo.blocks.blockList[c2].connections[1] = null;
-		} else {
-		    var c = last(this._logo.blocks.blockList[c1].connections);
-		    this._logo.blocks.blockList[c1].connections[1] = null;
-		}
-	    }
-	} else {
-	    var c = c1;
-	}
-
-        // Disconnect from the block above
-        var i = this._logo.blocks.blockList[c0].connections.indexOf(blk);
-        this._logo.blocks.blockList[c0].connections[i] = c;
-        this._logo.blocks.blockList[blk].connections[0] = null;
-
-        // And send the blocks to the trash
-        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blk]);
-
-        // Force the clamp to adjust.
-        this._logo.blocks.blockMoved(c0);
-        this._logo.blocks.adjustDocks(this._logo.blocks.findTopBlock(c0));
-        this._logo.blocks.clampThisToCheck = [[this._logo.blocks.findTopBlock(c0), 0]];
-        this._logo.blocks.adjustExpandableClampBlock();
-
         // And rebuild the stairs.
         this._refresh();
 
@@ -235,35 +197,6 @@ function PitchStaircase () {
         } else {
             this._history.push(i);
         }
-
-        // Add a new block to the tempo widget
-        var note  = this.Stairs[i][0];
-        var octave = this.Stairs[i][1];
-        var frequency = this.Stairs[i][2];
-        var pitch = frequencyToPitch(frequency);
-
-        var bb = last(this.stairPitchBlocks);
-        var b = this._logo.blocks.findBottomBlock(bb);
-        var c = last(this._logo.blocks.blockList[b].connections);
-
-        if (pitch[2] === 0) {  // 0 cents means we have an exact match to a named pitch
-            var newStack = [[0, 'pitch', 0, 0, [null, 1, 2, c]], [1, ['notename', {'value': pitch[1]}], 0, 0, [0]], [2, ['number', {'value': pitch[1]}], 0, 0, [0]]];
-        } else {
-            // var newStack = [[0, 'hertz', 0, 0, [null, 1, c]], [1, ['number', {'value': frequency.toFixed(2)}], 0, 0, [0]]];
-            var newStack = [[0, 'hertz', 0, 0, [null, 1, 6]], [1, 'multiply', 0, 0, [0, 2, 3]], [2, ['number', {'value': this.Stairs[n][5].toFixed(2)}], 0, 0, [1]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': this.Stairs[n][4]}], 0, 0, [3]], [5, ['number', {'value': this.Stairs[n][3]}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, 7]], [7, 'vspace', 0, 0, [6, c]]];
-        }
-
-        var blk = this._logo.blocks.blockList.length;
-        console.debug(newStack);
-        this._logo.blocks.loadNewBlocks(newStack);
-
-        // Make the connections
-        var i = this._logo.blocks.blockList[b].connections.length - 1;
-        this._logo.blocks.blockList[b].connections[i] = blk;
-        this._logo.blocks.blockList[blk].connections[0] = b;
-        this._logo.blocks.adjustDocks(b, true);
-
-        this.stairPitchBlocks.push(blk);
 
         this._makeStairs(i, isStepDeleted);
     };
