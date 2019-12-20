@@ -362,7 +362,7 @@ function SaveInterface(PlanetInterface) {
                         }
                     }.bind(this);
                     xhr.send();
-                }.bind(this), 500);
+                }.bind(this));
 
                 e.preventDefault();
                 e.returnValue = '';
