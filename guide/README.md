@@ -63,7 +63,7 @@ also available.
     12. [Changing Temperament](#temperament)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
-[APPENDIX: Palette Table](#APPENDIX_1)
+[APPENDIX: Palette Tables](#APPENDIX_1)
 
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
@@ -1582,60 +1582,64 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
 
-## <a name="APPENDIX_1"></a>Appendix: Palette Table
+## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 
-Beginner mode
--------------
+[Previous Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS) | [Back to Table of Contents](#TOC)
 
-| Palette | Blocks |
-| :---: | :---: |
-| Rhythm | note |
-| | note value drum | 
-| | silence |
-| | tie |
-| | note value |
-| Meter | meter |
-| | beats per second |
-| | master beats per second |
-| | on every note do |
-| | notes played |
-| | beat count |
-| Pitch | pitch |
-| | pitch G4 |
-| | scalar step (+/-) |
-| | pitch number |
-| | hertz |
-| | fourth |
-| | fifth |
-| | pitch in hertz |
-| | pitch number |
-| | scalar change in pitch |
-| | change in pitch |
-| Interval | set key |
-| | mode length |
-| | movable do |
-| | thirth |
-| | sixth |
-| | chord I |
-| | chord IV |
-| | chord V |
-| | set temperament |
-| Tone | set instrument |
-| | vibrato |
-| | chorus |
-| | termolo |
-| Ornament | staccato |
-| | slur |
-| | neighbor (+/-) |
-| Volume | crescendo |
-| | decrescendo |
-| | set master volume |
-| | set synth volume |
-| | set drum volume |
-| Drum | drum |
-| | sound effect |
-| | set drum |
-| Widget | status |
+Looking for a block? The tables below (one for beginner mode and one for advanced mode) list the blocks by the palette where they are found.
+
+### Beginner mode
+
+| Music | | | Programming | | | Graphics | |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ |
+| Rhythm | note | | Flow | repeat | | Graphics | forward |
+| | note value drum | | | forever | | | back |
+| | silence | | | if then | | | left 
+| | tie | | | if then else | | | right |
+| | note value | | | backward | | | set xy |
+| Meter | meter | | Action | action | | | set heading |
+| | beats per second | | | start | | | arc |
+| | master beats per second | | | broadcast | | | scroll xy |
+| | on every note do | | | on event do | | | x |
+| | notes played | | | do | | | y |
+| | beat count | | Boxes | store in box 1 | | | heading |
+| Pitch | pitch | | | box 1 | | Pen | set color |
+| | pitch G4 | | | store in box 2 | | | set shade |
+| | scalar step (+/-) | | | box 2 | | | set pen size |
+| | pitch number | | | store in | | | pen down |
+| | hertz | | | box | | | pen up |
+| | fourth | | | add | | | fill |
+| | fifth | | | add 1 to | | | background |
+| | pitch in hertz | | Number | number | | | color |
+| | pitch number | | | random | | Media | print |
+| | scalar change in pitch | | | one of this or that | | | text |
+| | change in pitch | | | + | | | show |
+| Interval | set key | | | - | | | avatar |
+| | mode length | | | x | | | height |
+| | movable do | | | / | | | width |
+| | third | | Boolean | = | | | bottom (screen) |
+| | sixth | | | < | | | top (screen) |
+| | chord I | | | > | | | left (screen) |
+| | chord IV | | | | | | right (screen) |
+| | chord V | | | | | Sensors | mouse button |
+| | set temperament | | | | | | cursor x |
+| Tone | set instrument | | | | | | cursor y |
+| | vibrato | | | | | | click |
+| | chorus | | | | | | loudness |
+| | termolo | | | | | Ensemble | set name |
+| Ornament | staccato | | | | | | mouse name |
+| | slur | | | | 
+| | neighbor (+/-) | | | | 
+| Volume | crescendo | | | | 
+| | decrescendo | | | | 
+| | set master volume | | | | 
+| | set synth volume | | | | 
+| | set drum volume | | | | 
+| Drum | drum | | | | 
+| | sound effect | | | | 
+| | set drum | | | | 
+| Widget | status | | | | 
 | | phrase maker |
 | | C major scale |
 | | G major scale |
@@ -1646,73 +1650,8 @@ Beginner mode
 | | custom mode |
 | | rhythm |
 | | simple tuplet |
-| Flow | repeat |
-| | forever |
-| | if |
-| | if |
-| | backward |
-| Action | action |
-| | start |
-| | broadcast |
-| | on |
-| | do |
-| Boxes | store in box 1 |
-| | box 1 |
-| | store in box 2 |
-| | box 2 |
-| | store in |
-| | box |
-| | add |
-| | add 1 to |
-| Number | 4 |
-| | random |
-| | one of |
-| | + |
-| | - |
-| | x |
-| | / |
-| Boolean | = |
-| | < |
-| | > |
-| Graphics | forward |
-| | back |
-| | left 
-| | right |
-| | set xy |
-| | set heading |
-| | arc |
-| | scroll xy |
-| | x |
-| | y |
-| | heading |
-| Pen | set color |
-| | set shade |
-| | set pen size |
-| | pen down |
-| | pen up |
-| | fill |
-| | background |
-| | color |
-| Media | print |
-| | text |
-| | show |
-| | avatar |
-| | height |
-| | width |
-| | bottom (screen) |
-| | top (screen) |
-| | left (screen) |
-| | right (screen) |
-| Sensors | mouse button |
-| | cursor x |
-| | cursor y |
-| | click |
-| | loudness |
-| Ensemble | set name |
-| | mouse name |
 
-Advanced mode
--------------
+### Advanced mode
 
 | Palette | Blocks |
 | :---: | :---: |
@@ -2060,3 +1999,5 @@ Advanced mode
 | | start mouse |
 | | stop mouse |
 | | mouse index heap |
+
+[Back to Table of Contents](#TOC)
