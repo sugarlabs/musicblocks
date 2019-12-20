@@ -42,7 +42,7 @@ also available.
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
- 4. [Widgets](#WIDGETS)
+4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
        1. [Phrase Maker](#pitch-time) 
@@ -61,7 +61,9 @@ also available.
     10. [Custom Timbres](#timbre)
     11. [Music Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
- 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
+5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
+
+[APPENDIX: Palette Table](#APPENDIX_1)
 
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
@@ -1579,3 +1581,482 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/hotdog.png "sheet music")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
+
+## <a name="APPENDIX_1"></a>Appendix: Palette Table
+
+Beginner mode
+-------------
+
+| Palette | Blocks |
+| :---: | :---: |
+| Rhythm | note |
+| | note value drum | 
+| | silence |
+| | tie |
+| | note value |
+| Meter | meter |
+| | beats per second |
+| | master beats per second |
+| | on every note do |
+| | notes played |
+| | beat count |
+| Pitch | pitch |
+| | pitch G4 |
+| | scalar step (+/-) |
+| | pitch number |
+| | hertz |
+| | fourth |
+| | fifth |
+| | pitch in hertz |
+| | pitch number |
+| | scalar change in pitch |
+| | change in pitch |
+| Interval | set key |
+| | mode length |
+| | movable do |
+| | thirth |
+| | sixth |
+| | chord I |
+| | chord IV |
+| | chord V |
+| | set temperament |
+| Tone | set instrument |
+| | vibrato |
+| | chorus |
+| | termolo |
+| Ornament | staccato |
+| | slur |
+| | neighbor (+/-) |
+| Volume | crescendo |
+| | decrescendo |
+| | set master volume |
+| | set synth volume |
+| | set drum volume |
+| Drum | drum |
+| | sound effect |
+| | set drum |
+| Widget | status |
+| | phrase maker |
+| | C major scale |
+| | G major scale |
+| | rhythm maker |
+| | music keyboard |
+| | pitch slider |
+| | tempo |
+| | custom mode |
+| | rhythm |
+| | simple tuplet |
+| Flow | repeat |
+| | forever |
+| | if |
+| | if |
+| | backward |
+| Action | action |
+| | start |
+| | broadcast |
+| | on |
+| | do |
+| Boxes | store in box 1 |
+| | box 1 |
+| | store in box 2 |
+| | box 2 |
+| | store in |
+| | box |
+| | add |
+| | add 1 to |
+| Number | 4 |
+| | random |
+| | one of |
+| | + |
+| | - |
+| | x |
+| | / |
+| Boolean | = |
+| | < |
+| | > |
+| Graphics | forward |
+| | back |
+| | left 
+| | right |
+| | set xy |
+| | set heading |
+| | arc |
+| | scroll xy |
+| | x |
+| | y |
+| | heading |
+| Pen | set color |
+| | set shade |
+| | set pen size |
+| | pen down |
+| | pen up |
+| | fill |
+| | background |
+| | color |
+| Media | print |
+| | text |
+| | show |
+| | avatar |
+| | height |
+| | width |
+| | bottom (screen) |
+| | top (screen) |
+| | left (screen) |
+| | right (screen) |
+| Sensors | mouse button |
+| | cursor x |
+| | cursor y |
+| | click |
+| | loudness |
+| Ensemble | set name |
+| | mouse name |
+
+Advanced mode
+-------------
+
+| Palette | Blocks |
+| :---: | :---: |
+| Rhythm | note value sol4 |
+| | note value G4 |
+| | note value +1 |
+| | note value 5 4 |
+| | note value 7 |
+| | note value 392 hertz |
+| | dot |
+| | multiplicity note value |
+| | skipnotes |
+| | swings |
+| | milliseconds |
+| Meter | pickup |
+| | on strong beat |
+| | on weak beat do |
+| | no clock |
+| | whole notes played |
+| | note counter |
+| | measure count |
+| | beat factor |
+| | current meter |
+| Pitch | scale degree |
+| | sharp flat |
+| | accidental |
+| | unison |
+| | second |
+| | thirth |
+| | sixth |
+| | seventh |
+| | down third |
+| | down sixth |
+| | octave |
+| | semi-tone transpose |
+| | register |
+| | invert |
+| | sol |
+| | G |
+| | sargam |
+| | accidental |
+| | number of octave |
+| | number of pitch |
+| | set pitch number offset |
+| | MIDI |
+| Intervals | current key |
+| | current mode |
+| | define mode |
+| | scalar interval (+/-) |
+| | unison |
+| | second |
+| | fourth |
+| | fifth |
+| | seventh |
+| | down third |
+| | down sixth |
+| | semi tone interval (+/-) |
+| | major 2 |
+| | major 3 |
+| | major 6 |
+| | major 7 |
+| | down major 3 |
+| | down major 6 |
+| | minor 2 |
+| | minor 3 |
+| | minor 6 |
+| | minor 7 |
+| | down minor 3 |
+| | down minor 6 |
+| | perfect 4 |
+| | perfect 5 |
+| | perfect 8 |
+| | augmented 1 |
+| | augmented 2 |
+| | augmented 3 |
+| | augmented 4 |
+| | augmented 5 |
+| | augmented 6 |
+| | augmented 7 |
+| | augmented 8 |
+| | diminished 2 |
+| | diminished 3 |
+| | diminished 4 |
+| | diminished 5 |
+| | diminished 6 |
+| | diminished 7 |
+| | diminished 8 |
+| | scalar interval measure |
+| | semi-tone interval measure |
+| | interval name |
+| | doubly |
+| | set temperament |
+| Tone | set instrument |
+| | voice name |
+| | vibrato |
+| | chorus |
+| | phaser |
+| | tremolo |
+| | distrotion |
+| | harmonic |
+| | weighted partials |
+| | partial |
+| | FM synth |
+| | AM synth |
+| | duo synth |
+| Ornament | staccato |
+| | slur |
+| | neighbor (+/-) |
+| | neighbor (+/-) |
+| Volume | crescendo |
+| | decrescendo |
+| | set relative volume |
+| | set master volume |
+| | set synth volume |
+| | set drum volume |
+| | fff |
+| | ff |
+| | f |
+| | mf |
+| | mp |
+| | p |
+| | pp |
+| | ppp |
+| | master volume |
+| Drum | drum |
+| | sound effect |
+| | set drum |
+| | map pitch to drum |
+| | snare drum |
+| | kick drum |
+| | floor tom |
+| | cup drum |
+| | darbuka drum |
+| | hi hat |
+| | triangle drum |
+| | finger cymbals |
+| | ride bell |
+| | cow bell |
+| | crash |
+| | slap |
+| | clap |
+| | clang |
+| | chime |
+| | bubbles |
+| | bottle |
+| | dog |
+| | cricket |
+| | cat |
+| | duck |
+| | noise |
+| | effect |
+| | drum |
+| | noisename |
+| | tom tom |
+| Widget | status |
+| | phrase maker |
+| | C major scale |
+| | G major scale |
+| | rhythm maker |
+| | pitch staircase |
+| | music keyboard |
+| | chromatic keyboard |
+| | pitch slider |
+| | pitch-drum maker |
+| | tempo |
+| | meter |
+| | timbre |
+| | temperament |
+| | rhythm |
+| | simple tuplet |
+| | triplet |
+| | quintuplet |
+| | septuplet |
+| | tuplet |
+| | whole note |
+| | half note |
+| | quarter note |
+| | eighth note |
+| | 1/16 note |
+| | 1/32 note | 
+| | 1/64 note |
+| | custom mode |
+| Flow | repeat |
+| | forever |
+| | if |
+| | if |
+| | while |
+| | until |
+| | wait for |
+| | stop |
+| | switch |
+| | case |
+| | default |
+| | duplicate |
+| | backward |
+| Action | action |
+| | start |
+| | start drum |
+| | broadcast |
+| | on |
+| | do |
+| | arg1 |
+| | arg |
+| | calculate |
+| | do |
+| | calculate |
+| | do |
+| | action |
+| | calculate |
+| | return to URL |
+| | return |
+| Boxes | store in box 1 |
+| | box 1 |
+| | store in box 2 |
+| | box 2 |
+| | store in |
+| | store in box |
+| | box |
+| | box |
+| | add |
+| | add 1 to |
+| Number | 4 |
+| | random |
+| | one of |
+| | + |
+| | - |
+| | - |
+| | x |
+| | / |
+| | abs |
+| | sqrt |
+| | ^ |
+| | mod |
+| | int |
+| Boolean | true |
+| | = |
+| | < |
+| | > |
+| | or |
+| | and |
+| | not |
+| Heap | push |
+| | pop |
+| | set heap |
+| | index heap |
+| | reverse heap |
+| | load heap |
+| | save heap |
+| | empty heap |
+| | heap empty? |
+| | heap length |
+| | show heap |
+| | save heap to App |
+| | load heap from App |
+| Extras | print |
+| | comment |
+| | wait |
+| | open project |
+| | hide blocks |
+| | show blocks |
+| | no background |
+| | make block |
+| | connect blocks |
+| | run blocks |
+| | move block |
+| | delete block |
+| | open palette |
+| Graphics | forward |
+| | back |
+| | left |
+| | right |
+| | set xy |
+| | set heading |
+| | arc |
+| | bezier |
+| | control point 1 |
+| | control point 2 |
+| | clear |
+| | scroll xy |
+| | x |
+| | y |
+| | heading |
+| Pen | set color |
+| | set grey |
+| | set shade |
+| | set hue |
+| | set translucency |
+| | set pen size |
+| | pen down |
+| | pen up |
+| | fill |
+| | hollow line |
+| | background |
+| | set font |
+| | pen size |
+| | color |
+| | shade |
+| | grey |
+| | black |
+| | white |
+| | red |
+| | orange |
+| | yellow |
+| | green |
+| | blue |
+| | purple |
+| Media	| text |
+| | show |
+| | avatar |
+| | note to frequency |
+| | hertz |
+| | stop media |
+| | open file |
+| | height |
+| | width |
+| | bottom (screen) |
+| | top (screen) |
+| | left (screen) |
+| | right (screen) |
+| Sensors | keyboard |
+| | to ASCII |
+| | mouse bottom |
+| | cursor x |
+| | cursor y |
+| | time |
+| | pixel color |
+| | red |
+| | green |
+| | blue |
+| | click |
+| | loudness |
+| Ensemble | set name |
+| | mouse name |
+| | new mouse |
+| | found mouse |
+| | mouse sync |
+| | mouse note value |
+| | mouse pitch number |
+| | mouse notes played |
+| | mouse x |
+| | mouse y |
+| | set mouse |
+| | mouse heading |
+| | mouse color |
+| | start mouse |
+| | stop mouse |
+| | mouse index heap |
