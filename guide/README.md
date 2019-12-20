@@ -1653,94 +1653,95 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 
 ### Advanced mode
 
-| Palette | Blocks |
-| :---: | :---: |
-| Rhythm | note value sol4 |
-| | note value G4 |
-| | note value +1 |
-| | note value 5 4 |
-| | note value 7 |
-| | note value 392 hertz |
-| | dot |
-| | multiplicity note value |
-| | skipnotes |
-| | swings |
-| | milliseconds |
-| Meter | pickup |
-| | on strong beat |
-| | on weak beat do |
-| | no clock |
-| | whole notes played |
-| | note counter |
-| | measure count |
-| | beat factor |
-| | current meter |
-| Pitch | scale degree |
-| | sharp flat |
-| | accidental |
-| | unison |
-| | second |
-| | thirth |
-| | sixth |
-| | seventh |
-| | down third |
-| | down sixth |
-| | octave |
-| | semi-tone transpose |
-| | register |
-| | invert |
-| | sol |
-| | G |
-| | sargam |
-| | accidental |
-| | number of octave |
-| | number of pitch |
-| | set pitch number offset |
-| | MIDI |
-| Intervals | current key |
-| | current mode |
-| | define mode |
-| | scalar interval (+/-) |
-| | unison |
-| | second |
-| | fourth |
-| | fifth |
-| | seventh |
-| | down third |
-| | down sixth |
-| | semi tone interval (+/-) |
-| | major 2 |
-| | major 3 |
-| | major 6 |
-| | major 7 |
-| | down major 3 |
-| | down major 6 |
-| | minor 2 |
-| | minor 3 |
-| | minor 6 |
-| | minor 7 |
-| | down minor 3 |
-| | down minor 6 |
-| | perfect 4 |
-| | perfect 5 |
-| | perfect 8 |
-| | augmented 1 |
-| | augmented 2 |
-| | augmented 3 |
-| | augmented 4 |
-| | augmented 5 |
-| | augmented 6 |
-| | augmented 7 |
-| | augmented 8 |
-| | diminished 2 |
-| | diminished 3 |
-| | diminished 4 |
-| | diminished 5 |
-| | diminished 6 |
-| | diminished 7 |
-| | diminished 8 |
-| | scalar interval measure |
-| | semi-tone interval measure |
+| Music | | | Programming | | | Graphics | |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ |
+| Rhythm | note value sol4 | | Flow | repeat | | Graphics | forward |
+| | note value G4 | | | forever | | | back |
+| | note value +1 | | | if then | | | left |
+| | note value 5 4 | | | if then else | | | right |
+| | note value 7 | | | while | | | set xy |
+| | note value 392 hertz | | | until | | | set heading |
+| | dot | | | wait for | | | arc |
+| | multiplicity note value | | | stop | | | bezier |
+| | skipnotes | | | switch | | | control point 1 |
+| | swings | | | case | | | control point 2 |
+| | milliseconds | | | default | | | clear |
+| Meter | pickup | | | duplicate | | | scroll xy |
+| | on strong beat | | | backward | | | x |
+| | on weak beat do | | Action | action | | | y |
+| | no clock | | | start | | | heading |
+| | whole notes played | | | start drum | | Pen | set color |
+| | note counter | | | broadcast | | | set grey |
+| | measure count | | | on event do | | | set shade |
+| | beat factor | | | do | | | set hue |
+| | current meter | | | arg1 | | | set translucency |
+| Pitch | scale degree | | | arg | | | set pen size |
+| | sharp flat | | | calculate | | | pen down |
+| | accidental | | | do | | | pen up |
+| | unison | | | calculate | | | fill |
+| | second | | | do | | | hollow line |
+| | thirth | | | action | | | background |
+| | sixth | | | calculate | | | set font |
+| | seventh | | | return to URL | | | pen size |
+| | down third | | | return | | | color |
+| | down sixth | | Boxes | store in box 1 | | | shade |
+| | octave | | | box 1 | | | grey |
+| | semi-tone transpose | | | store in box 2 | | | black |
+| | register | | | box 2 | | | white |
+| | invert | | | store in | | | red |
+| | sol | | | store in box | | | orange |
+| | G | | | box | | | yellow |
+| | sargam | | | box | | | green |
+| | accidental | | | add | | | blue |
+| | number of octave | | | add 1 to | | | purple |
+| | number of pitch | | Number | number | | Media | text |
+| | set pitch number offset | | | random | | | show |
+| | MIDI | | | one of this or that | | | avatar |
+| Intervals | current key | | | + | | | note to frequency |
+| | current mode | | | - | | | hertz |
+| | define mode | | | - | | | stop media |
+| | scalar interval (+/-) | | | x | | | open file |
+| | unison | | | / | | | height |
+| | second | | | abs | | | width |
+| | fourth | | | sqrt | | | bottom (screen) |
+| | fifth | | | ^ | | | top (screen) |
+| | seventh | | | mod | | | left (screen) |
+| | down third | | | int | | | right (screen) |
+| | down sixth | | Boolean | true | | Sensors | keyboard |
+| | semi tone interval (+/-) | | | = | | | to ASCII |
+| | major 2 | | | < | | | mouse bottom |
+| | major 3 | | | > | | | cursor x |
+| | major 6 | | | or | | | cursor y |
+| | major 7 | | | and | | | time |
+| | down major 3 | | | not | | | pixel color |
+| | down major 6 | | Heap | push | | | red |
+| | minor 2 | | | pop | | | green |
+| | minor 3 | | | set heap | | | blue |
+| | minor 6 | | | index heap | | | click |
+| | minor 7 | | | reverse heap | | | loudness |
+| | down minor 3 | | | load heap | | Ensemble | set name |
+| | down minor 6 | | | save heap | | | mouse name |
+| | perfect 4 | | | empty heap | | | new mouse |
+| | perfect 5 | | | heap empty? | | | found mouse |
+| | perfect 8 | | | heap length | | | mouse sync |
+| | augmented 1 | | | show heap | | | mouse note value |
+| | augmented 2 | | | save heap to App | | | mouse pitch number |
+| | augmented 3 | | | load heap from App | | | mouse notes played |
+| | augmented 4 | | Extras | print | | | mouse x |
+| | augmented 5 | | | comment | | | mouse y |
+| | augmented 6 | | | wait | | | set mouse |
+| | augmented 7 | | | open project | | | mouse heading |
+| | augmented 8 | | | hide blocks | | | mouse color |
+| | diminished 2 | | | show blocks | | | start mouse |
+| | diminished 3 | | | no background | | | stop mouse |
+| | diminished 4 | | | make block | | | mouse index heap |
+| | diminished 5 | | | connect blocks | 
+| | diminished 6 | | | run blocks |
+| | diminished 7 | | | move block |
+| | diminished 8 | | | delete block |
+| | scalar interval measure | | | open palette |
+| | semi-tone interval measure | 
 | | interval name |
 | | doubly |
 | | set temperament |
@@ -1834,170 +1835,5 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | 1/32 note | 
 | | 1/64 note |
 | | custom mode |
-| Flow | repeat |
-| | forever |
-| | if |
-| | if |
-| | while |
-| | until |
-| | wait for |
-| | stop |
-| | switch |
-| | case |
-| | default |
-| | duplicate |
-| | backward |
-| Action | action |
-| | start |
-| | start drum |
-| | broadcast |
-| | on |
-| | do |
-| | arg1 |
-| | arg |
-| | calculate |
-| | do |
-| | calculate |
-| | do |
-| | action |
-| | calculate |
-| | return to URL |
-| | return |
-| Boxes | store in box 1 |
-| | box 1 |
-| | store in box 2 |
-| | box 2 |
-| | store in |
-| | store in box |
-| | box |
-| | box |
-| | add |
-| | add 1 to |
-| Number | 4 |
-| | random |
-| | one of |
-| | + |
-| | - |
-| | - |
-| | x |
-| | / |
-| | abs |
-| | sqrt |
-| | ^ |
-| | mod |
-| | int |
-| Boolean | true |
-| | = |
-| | < |
-| | > |
-| | or |
-| | and |
-| | not |
-| Heap | push |
-| | pop |
-| | set heap |
-| | index heap |
-| | reverse heap |
-| | load heap |
-| | save heap |
-| | empty heap |
-| | heap empty? |
-| | heap length |
-| | show heap |
-| | save heap to App |
-| | load heap from App |
-| Extras | print |
-| | comment |
-| | wait |
-| | open project |
-| | hide blocks |
-| | show blocks |
-| | no background |
-| | make block |
-| | connect blocks |
-| | run blocks |
-| | move block |
-| | delete block |
-| | open palette |
-| Graphics | forward |
-| | back |
-| | left |
-| | right |
-| | set xy |
-| | set heading |
-| | arc |
-| | bezier |
-| | control point 1 |
-| | control point 2 |
-| | clear |
-| | scroll xy |
-| | x |
-| | y |
-| | heading |
-| Pen | set color |
-| | set grey |
-| | set shade |
-| | set hue |
-| | set translucency |
-| | set pen size |
-| | pen down |
-| | pen up |
-| | fill |
-| | hollow line |
-| | background |
-| | set font |
-| | pen size |
-| | color |
-| | shade |
-| | grey |
-| | black |
-| | white |
-| | red |
-| | orange |
-| | yellow |
-| | green |
-| | blue |
-| | purple |
-| Media	| text |
-| | show |
-| | avatar |
-| | note to frequency |
-| | hertz |
-| | stop media |
-| | open file |
-| | height |
-| | width |
-| | bottom (screen) |
-| | top (screen) |
-| | left (screen) |
-| | right (screen) |
-| Sensors | keyboard |
-| | to ASCII |
-| | mouse bottom |
-| | cursor x |
-| | cursor y |
-| | time |
-| | pixel color |
-| | red |
-| | green |
-| | blue |
-| | click |
-| | loudness |
-| Ensemble | set name |
-| | mouse name |
-| | new mouse |
-| | found mouse |
-| | mouse sync |
-| | mouse note value |
-| | mouse pitch number |
-| | mouse notes played |
-| | mouse x |
-| | mouse y |
-| | set mouse |
-| | mouse heading |
-| | mouse color |
-| | start mouse |
-| | stop mouse |
-| | mouse index heap |
 
 [Back to Table of Contents](#TOC)
