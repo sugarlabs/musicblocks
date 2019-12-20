@@ -130,7 +130,7 @@ function PitchStaircase () {
         // And rebuild the stairs.
         this._refresh();
 
-	return true;
+        return true;
     };
 
     this._dissectStair = function (event) {
@@ -178,13 +178,13 @@ function PitchStaircase () {
 
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
+                this.Stairs.splice(i, 0, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2], this.Stairs[n][6]]);
                 foundStep = true;
                 break;
             }
 
             if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
+                this.Stairs.splice(i, 1, [obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2], this.Stairs[n][6]]);
                 foundStep = true;
                 isStepDeleted = false;
                 break;
@@ -192,7 +192,7 @@ function PitchStaircase () {
         }
 
         if (!foundStep) {
-            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2]]);
+            this.Stairs.push([obj[0], obj[1], parseFloat(frequency) / inputNum, this.Stairs[n][3] * parseFloat(inputNum2), this.Stairs[n][4] * parseFloat(inputNum1), this.Stairs[n][2], this.Stairs[n][6]]);
             this._history.push(this.Stairs.length - 1);
         } else {
             this._history.push(i);
@@ -338,7 +338,8 @@ function PitchStaircase () {
                 newStack.push([hertzBlockIdx, 'hertz', 0, 0, [previousBlock, multiplyIdx, vspaceIdx]]);
                 newStack.push([multiplyIdx, 'multiply', 0, 0, [hertzBlockIdx, frequencyIdx, divideIdx]]);
                 // newStack.push([frequencyIdx, ['number', {'value': this._initialFrequency.toFixed(2)}], 0, 0, [multiplyIdx]]);
-                newStack.push([frequencyIdx, ['number', {'value': this.Stairs[i][5].toFixed(2)}], 0, 0, [multiplyIdx]]);
+                // newStack.push([frequencyIdx, ['number', {'value': this.Stairs[i][5].toFixed(2)}], 0, 0, [multiplyIdx]]);
+                newStack.push([frequencyIdx, ['number', {'value': this.Stairs[i][6].toFixed(2)}], 0, 0, [multiplyIdx]]);
                 newStack.push([divideIdx, 'divide', 0, 0, [multiplyIdx, numeratorIdx, denominatorIdx]]);
                 newStack.push([numeratorIdx, ['number', {'value': this.Stairs[i][4]}], 0, 0, [divideIdx]]);
                 newStack.push([denominatorIdx, ['number', {'value': this.Stairs[i][3]}], 0, 0, [divideIdx]]);
@@ -359,15 +360,14 @@ function PitchStaircase () {
     };
 
     this._get_save_lock = function() {
-	return this._save_lock;
+        return this._save_lock;
     };
 
     this.init = function (logo) {
         this._logo = logo;
         for (var i = 0; i < this.Stairs.length; i++) {
-            this.Stairs[i].push(1);  // denominator
-            this.Stairs[i].push(1);  // numerator
             this.Stairs[i].push(this.Stairs[i][2]);  // initial frequency
+            this.Stairs[i].push(this.Stairs[i][2]);  // parent frequency
         }
 
         // this._initialFrequency = this.Stairs[0][2];
