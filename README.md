@@ -81,7 +81,10 @@ Once Music Blocks is running, you'll want suggestions on how to use it.
 See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
-Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+
+Looking for a block? Find it in the [Palette
+Tables](https://github.com/sugarlabs/musicblocks/blob/master/guide/README.md#APPENDIX_1).
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
