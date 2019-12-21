@@ -209,7 +209,12 @@ function ProjectStorage(Planet) {
     };
 
     this.restore = async function() {
-        this.data = JSON.parse(await this.get(this.LocalStorageKey));
+        let currentData = await this.get(this.LocalStorageKey);
+        if(typeof currentData === "string"){
+            this.data = JSON.parse(currentData);
+        } else {
+            this.data = currentData;
+        }
     };
 
     this.initialiseStorage = async function() {
