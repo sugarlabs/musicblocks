@@ -26,17 +26,18 @@ saveMxmlOutput = function(logo) {
                 voiceNum = parseInt(voice) + 1;
                 add('<score-part id=\"P' + voiceNum + '\">');
                 indent++;
-                    add('<part-name> Voice #'+ voiceNum +'</part-name>');
+                    add('<part-name> Voice #'+ voiceNum +' </part-name>');
                     indent--;
                 add('</score-part>');
-                indent--;
             })
-                
+            indent--;
         add('</part-list>');
+        indent--;
         
         Object.keys(logo.notationStaging).forEach((voice) => {
             voiceNum = parseInt(voice) + 1;
             console.log("hello");
+            indent++;
             add('<part id=\"P' + voiceNum +'\">');
             indent++;
     
