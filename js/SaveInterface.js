@@ -32,7 +32,7 @@ function SaveInterface(PlanetInterface) {
                 defaultfilename = this.PlanetInterface.getCurrentProjectName();
             }
 
-            console.log(defaultfilename);
+            console.debug(defaultfilename);
 
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += '.' + extension;
@@ -50,9 +50,9 @@ function SaveInterface(PlanetInterface) {
             filename = defaultfilename;
         }
 
-        console.log(filename);
+        console.debug(filename);
         if (filename === null) {
-            console.log('save cancelled');
+            console.debug('save cancelled');
             return;
         }
 
@@ -114,7 +114,7 @@ function SaveInterface(PlanetInterface) {
 
     this.saveHTML = function(filename){
         var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
-        console.log(filename);
+        console.debug(filename);
         this.download('html', html, filename);
     }
 
@@ -151,12 +151,12 @@ function SaveInterface(PlanetInterface) {
         this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
-        console.log('DURING SAVE WAV');
+        console.debug('DURING SAVE WAV');
         this.logo.runLogoCommands();
     }
 
     this.afterSaveWAV = function(blob){
-        console.log('AFTER SAVE WAV');
+        console.debug('AFTER SAVE WAV');
         //don't reset cursor
         this.download('wav',URL.createObjectURL(blob));
     }
@@ -164,7 +164,7 @@ function SaveInterface(PlanetInterface) {
     this.saveAbc = function(filename){
         document.body.style.cursor = 'wait';
         this.filename = filename;
-        console.log('Saving .abc file');
+        console.debug('Saving .abc file');
         //Suppress music and turtle output when generating
         // Abc output.
         this.logo.runningAbc = true;
@@ -196,7 +196,7 @@ function SaveInterface(PlanetInterface) {
             filename += '.' + lyext;
         }
 
-        console.log('Saving .ly file');
+        console.debug('Saving .ly file');
         docById('lilypondModal').style.display = 'block';
         var projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
@@ -213,7 +213,7 @@ function SaveInterface(PlanetInterface) {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById('submitLilypond').textContent = _('Save as Lilypond');
         //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
-       
+
        // docById('submitPDF').textContent = _('Save as PDF');
 
         //TRANS: default file name when saving as Lilypond
@@ -335,7 +335,7 @@ function SaveInterface(PlanetInterface) {
         window.Converter.ly2pdf(lydata,function(success,dataurl){
             document.body.style.cursor = 'default';
             if (!success){
-                console.log('Error: '+dataurl);
+                console.debug('Error: '+dataurl);
                 //TODO: Error message box
             } else {
                 save.download('pdf', dataurl, filename);
@@ -344,20 +344,29 @@ function SaveInterface(PlanetInterface) {
     }
 
     this.init = function(){
-        var unloadTimer;
         this.timeLastSaved = -100;
-        window.onbeforeunload = function() {
-            if (this.PlanetInterface !== undefined && this.PlanetInterface.getTimeLastSaved() != this.timeLastSaved){
-                this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                unloadTimer2 = null;
-                unloadTimer = window.requestAnimationFrame(function(){unloadTimer2=window.requestAnimationFrame(this.saveHTMLNoPrompt.bind(this),1000)}.bind(this), 500);
-                return _('Do you want to save your project?');
+        window.onbeforeunload = function(e) {
+            if (this.PlanetInterface !== undefined && this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved) {
+                // The following section of code is a bit of a hack. In order to detect the user selecting
+                // "Cancel", we attempt to perform an action that would otherwise be blocked. That is, if the
+                // user does not cancel the navigation, the HTTP request will fail, and the prompt never shown.
+                setTimeout(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", document.location.href, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === xhr.DONE) {
+                            if (confirm(_('Do you want to save your project?'))) {
+                                this.saveHTMLNoPrompt();
+                                this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
+                            }
+                        }
+                    }.bind(this);
+                    xhr.send();
+                }.bind(this));
+
+                e.preventDefault();
+                e.returnValue = '';
             }
         }.bind(this);
-
-        window.onunload = function(){
-            cancelAnimationFrame(unloadTimer);
-            cancelAnimationFrame(unloadTimer2);
-        }
     }
 }

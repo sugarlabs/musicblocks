@@ -18,34 +18,25 @@ import sys
 import json
 
 HELP = '''Usage:
-
     python pluginify.py (file)
-
 or
-
     python pluginify.py (file) > plugin.json
-
 Converts an RTP (readable TurtleBlocks plugin) file into a JSON file
 to load into Turtle Blocks JS.  For more information, run
 `python pluginify.py syntax`
 '''
 
 SYNTAX = '''
-
 In an RST file, new blocks are not defined with braces (as is typical of
 Javascript); rather they start whenever you add //* *// and their scope is
 until the next block starts (or the end of file in the case that it is
 the last block).
-
 To add a comment, just type //* comment *// followed by your multi-
 line comment. pluginify ignores comments, i.e., they are not added in
 the JSON plugin.
-
 Example:
 //* comment *// Your single or multi line comment here...
-
 Global variables are defined in a section //* globals *//.
-
 Example:
 //* globals *//
 var calories = 0;
@@ -53,31 +44,24 @@ var protein = 0;
 var carbohydrate = 0;
 var fiber = 0;
 var fat = 0;
-
 Define all the global variables under the section
 //* block-globals *//.
-
 These definitions will be added to all the code blocks in the created
 JSON output. Note that these "globals" included in each block but are
 local in context to each block.
-
 Example: You can define a common API Key to be used by all blocks.
 //* block-globals *//
 var mashapeKey = '(keycode)'; in globals.
-
 You can also declare global variables specific to argument blocks that
 get applied to a set of similar blocks, e.g., the variables under
 //* arg-globals *// will be added to all the arg blocks.
-
 Example:
 //* arg-globals *//
 var block = blocks.blockList[blk];
 var connections = block.connections;
-
 You can declare functions for parameter blocks to be evaluated when
 the block labels are updated with the //* parameter:(blockname) *//
 tag.
-
 Example:
 //* parameter:loudness *//
 if (mic == null) {errorMsg("The microphone is not available.");
@@ -85,9 +69,7 @@ if (mic == null) {errorMsg("The microphone is not available.");
 } else {
     value = Math.round(mic.getLevel() * 1000);
 }
-
 To define a block you need to type: //* block:(blockname) *//
-
 Example:
 //* block:power *//
 var block = new ProtoBlock('power');
@@ -96,43 +78,30 @@ blocks.protoBlockDict['power'] = block;
 block.twoArgMathBlock();
 block.defaults.push(10, 2);
 block.staticLabels.push('power', 'base', 'exp.');
-
 You should also define a setter for a parameter block (if appropriate).
 You can do this using the setter setion:
-
 //* setter:myValue *//
 myValue = value;
 updateDisplayOfMyValue();
-
 Macros are defined in in //* macro:(blockname) *//
-
 Example:
 //* macro: black *//
 [[0, "setshade", 0, 0, [null, 1, null]], [1, ["number", {"value": 0}], 0, 0, [0]]]
-
 Note the use of double quotes in the JSON-encoded object.
-
 Graphical elements (icons, colors) are defined in the own sections:
-
 Palette icons are defined as //* palette-icon:(palette name) *//
-
 Example:
 //* palette-icon:food *//
 <svg ...> ... </svg>
-
 Similarly for block colors:
-
 Example:
 //* palette-fill:food *// #FFFFFF
 //* palette-stroke:food *// #A0A0A0
 //* palette-highlight:food *// #D5D5D5
-
 Plugins can specify code to be executed on load, on start, and on stop.
 Example:
-
 //* onload:foo *//
 your code here...
-
 NOTE: name of on load, on start, and on stop sections must match the
 name of one of the plugin blocks.
 '''
@@ -211,12 +180,12 @@ def pluginify(data):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print HELP
+        print(HELP)
     elif sys.argv[1] in ('help', '-h', '--help'):
-        print HELP
+        print(HELP)
     elif sys.argv[1] == 'syntax':
-        print SYNTAX
+        print(SYNTAX)
     else:
         with open(sys.argv[1]) as f:
             data = f.read()
-        print pluginify(data)
+        print(pluginify(data))

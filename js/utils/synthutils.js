@@ -25,6 +25,8 @@ var VOICENAMES = [
     [_('piano'), 'piano', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('violin'), 'violin', 'images/voices.svg', 'string'],
+    //.TRANS: viola musical instrument
+    [_('viola'), 'viola', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
@@ -158,7 +160,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/bassoon", "samples/celeste", "samples/raindrop",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", // "samples/japanese_bell",
+    "samples/japanese_drum", "samples/viola", // "samples/japanese_bell",
 ]
 
 
@@ -167,6 +169,7 @@ const DEFAULTSYNTHVOLUME = {
     'flute': 90,
     'electronic synth': 90,
     'piano': 100,
+    'viola': 100,
     'banjo': 90,
     'koto': 70,
     'kick drum': 100,
@@ -213,6 +216,7 @@ const SAMPLECENTERNO = {
     'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
+    'viola': ['C4', 51]
 };
 
 
@@ -252,6 +256,7 @@ var instrumentsFilters = {0: {}};
 
 
 function Synth() {
+    console.debug('SYNTH');
     // Isolate synth functions here.
 
     const BUILTIN_SYNTHS = {
@@ -278,10 +283,11 @@ function Synth() {
     };
 
     // Using Tone.js
-    this.tone = new Tone();
+    // this.tone = new Tone();
+    this.tone = null;
 
     Tone.Buffer.onload = function () {
-        console.log('sample loaded');
+        console.debug('sample loaded');
     };
 
     this.samples = null;
@@ -291,6 +297,10 @@ function Synth() {
     this.inTemperament = 'equal';
     this.startingPitch = 'C4';
     this.noteFrequencies = {};
+
+    this.newTone = function() {
+        this.tone = new Tone();
+    };
 
     this.temperamentChanged = function(temperament, startingPitch) {
         var startPitch = startingPitch;
@@ -305,7 +315,7 @@ function Synth() {
         } else if (startPitch.substring(1, len - 1) === SHARP || startPitch.substring(1, len - 1) === '#' ) {
             startPitch = startPitch.replace(SHARP, '#');
         }
-        
+
         var frequency = Tone.Frequency(startPitch).toFrequency();
 
         this.noteFrequencies = {
@@ -338,11 +348,11 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === 'b' ) {
                 var note = key.substring(0, 1) + '' + 'b';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             } else if (key.substring(1, key.length) === SHARP || key.substring(1, key.length) === '#' ) {
                 var note = key.substring(0, 1) + '' + '#';
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                delete this.noteFrequencies[key]; 
+                delete this.noteFrequencies[key];
             }
         }
 
@@ -361,7 +371,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
-            
+
         }
 
         if (this.inTemperament === 'equal') {
@@ -394,11 +404,11 @@ function Synth() {
             var len = oneNote.length;
 
             for (var note in that.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) { 
+                if (note === oneNote.substring(0, len - 1)) {
                     if (that.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
                         //Note to be played is in the same octave.
                         return that.noteFrequencies[note][1];
-                    } else { 
+                    } else {
                         //Note to be played is not in the same octave.
                         var power = Number(oneNote.slice(-1)) - that.noteFrequencies[note][0];
                         return that.noteFrequencies[note][1] * Math.pow(2, power);
@@ -444,7 +454,7 @@ function Synth() {
                             var octaveDiff = octave - TEMPERAMENT['custom'][pitchNumber][2]
                             return Number(TEMPERAMENT['custom'][pitchNumber][0] * startPitchFrequency * Math.pow(OCTAVERATIO, octaveDiff));
                         }
-                    }   
+                    }
                 }
             }
 
@@ -471,6 +481,10 @@ function Synth() {
     }
 
     this.resume = function () {
+        if (this.tone === null) {
+            this.newTone();
+        }
+
         this.tone.context.resume();
     };
 
@@ -479,6 +493,7 @@ function Synth() {
             'voice': [
                 {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
+                {'name': 'viola', 'data': VIOLA_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
                 {'name': 'clarinet', 'data': CLARINET_SAMPLE},
@@ -488,14 +503,14 @@ function Synth() {
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
                 {'name': 'bass', 'data': BASS_SAMPLE},
-		{'name': 'banjo', 'data': BANJO_SAMPLE},
-		{'name': 'koto', 'data': KOTO_SAMPLE},
-		{'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
-		{'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
-		{'name': 'bassoon', 'data': BASSOON_SAMPLE},
-		{'name': 'celeste', 'data': CELESTE_SAMPLE},
-		{'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
-		{'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
+                {'name': 'banjo', 'data': BANJO_SAMPLE},
+                {'name': 'koto', 'data': KOTO_SAMPLE},
+                {'name': 'dulcimer', 'data': DULCIMER_SAMPLE},
+                {'name': 'electric guitar', 'data': ELECTRICGUITAR_SAMPLE},
+                {'name': 'bassoon', 'data': BASSOON_SAMPLE},
+                {'name': 'celeste', 'data': CELESTE_SAMPLE},
+                {'name': 'vibraphone', 'data': VIBRAPHONE_SAMPLE},
+                {'name': 'xylophone', 'data': XYLOPHONE_SAMPLE},
             ],
             'drum': [
                 {'name': 'bottle', 'data': BOTTLE_SAMPLE},
@@ -520,7 +535,7 @@ function Synth() {
                 {'name': 'finger cymbals', 'data': FINGERCYMBAL_SAMPLE},
                 {'name': 'slap', 'data': SLAP_SAMPLE},
                 {'name': 'japanese drum', 'data': JAPANESE_DRUM_SAMPLE},
-		// {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
+                // {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 {'name': 'clang', 'data': CLANG_SAMPLE},
                 {'name': 'cup drum', 'data': CUP_SAMPLE},
                 {'name': 'floor tom tom', 'data': FLOORTOM_SAMPLE},
@@ -567,7 +582,7 @@ function Synth() {
 
     // Until we fix #1744, disable recorder on FF
     if (!platform.FF) {
-	// recoder breaks with Tone.js v13.8.25
+        // recoder breaks with Tone.js v13.8.25
         // this.recorder = new Recorder(Tone.Master);
     }
 
@@ -758,7 +773,7 @@ function Synth() {
 
     // Poly synth will be loaded as the default synth.
     this.createDefaultSynth = function (turtle) {
-        console.log('create default poly/default/custom synth for turtle ' + turtle);
+        console.debug('create default poly/default/custom synth for turtle ' + turtle);
         var default_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth).toMaster();
         instruments[turtle]['electronic synth'] = default_synth;
         instrumentsSource['electronic synth'] = [0, 'electronic synth'];
@@ -771,18 +786,18 @@ function Synth() {
     this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.log(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
+            console.debug(sourceName + ' ' + SAMPLECENTERNO[sourceName][0]);
             var noteDict = {};
             noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
             var tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, 'drum'];
-            console.log(DEFAULTDRUM);
+            console.debug(DEFAULTDRUM);
             var tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
@@ -802,7 +817,7 @@ function Synth() {
         case 'simple 3':
         case 'simple 4':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
         case 'sine':
@@ -810,29 +825,29 @@ function Synth() {
         case 'square':
         case 'sawtooth':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.Synth(synthOptions);
             break;
         case 'pluck':
             instrumentsSource[instrumentName] = [3, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.PluckSynth(synthOptions);
             break;
         case 'poly':
             instrumentsSource[instrumentName] = [0, 'poly'];
-            console.log('poly');
+            console.debug('poly');
             var builtin_synth = new Tone.PolySynth(synthOptions.polyphony, Tone.AMSynth);
             break;
         case 'noise1':
         case 'noise2':
         case 'noise3':
             instrumentsSource[instrumentName] = [4, sourceName];
-            console.log(sourceName);
+            console.debug(sourceName);
             var builtin_synth = new Tone.NoiseSynth(synthOptions);
             break;
         default:
             instrumentsSource[instrumentName] = [0, 'poly'];
-            console.log('poly (default)');
+            console.debug('poly (default)');
             var builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
             break;
         }
@@ -903,9 +918,9 @@ function Synth() {
 
     this.loadSynth = function (turtle, sourceName) {
         if (sourceName in instruments[turtle]) {
-            console.log(sourceName + ' already loaded');
+            console.debug(sourceName + ' already loaded');
         } else {
-            console.log('loading ' + sourceName);
+            console.debug('loading ' + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
 
@@ -936,12 +951,12 @@ function Synth() {
         }
 
         if (this.inTemperament == 'custom') {
-            var notes1 = notes;    
+            var notes1 = notes;
             notes = this.getCustomFrequency(notes);
             if (notes === undefined) {
                 notes = notes1;
-            } 
-            console.log(notes);   
+            }
+            console.debug(notes);
         }
 
         if (paramsEffects === null && paramsFilters === null) {
@@ -1094,7 +1109,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-        // console.log(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+        // console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
         if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
@@ -1171,11 +1186,11 @@ function Synth() {
             instruments[turtle][instrumentName].stop();
             break;
         default:
-	    if (note == undefined) {
-		instruments[turtle][instrumentName].triggerRelease();
-	    } else {
-		instruments[turtle][instrumentName].triggerRelease(note);
-	    }
+            if (note == undefined) {
+                instruments[turtle][instrumentName].triggerRelease();
+            } else {
+                instruments[turtle][instrumentName].triggerRelease(note);
+            }
             break;
         }
     };
@@ -1215,7 +1230,7 @@ function Synth() {
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {
-            console.log('instrument not found');
+            console.debug('instrument not found');
             return 50;
         }
     };

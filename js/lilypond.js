@@ -170,7 +170,7 @@ processLilypondNotes = function (lilypond, logo, turtle) {
 			}
 
                         modeDef += ')\n';
-                        console.log(modeDef);
+                        console.debug(modeDef);
 			lilypond.freygish += modeDef;
 			logo.notationNotes[turtle] += ' \\key ' + key + ' \\' + mode.replace(/ /g,'_') + '\n';
 		    } else {
@@ -279,7 +279,7 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                     }
 
                     if (logo.notationStaging[turtle][i + j] === 'tie') {
-                        console.log('saw a tie');
+                        console.debug('saw a tie');
                         k++;  // Increment notes in tuplet.
                         j++;
                     } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(totalTupletDuration) !== -1) {
@@ -348,12 +348,12 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     } else if (logo.notationStaging[turtle][i + j] === 'tie') {
-                        console.log('adding a tie');
+                        console.debug('adding a tie');
                         logo.notationNotes[turtle] += '~';
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     } else {
-                        console.log('ignoring ' + notes);
+                        console.debug('ignoring ' + notes);
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -482,7 +482,7 @@ saveLilypondOutput = function(logo) {
     for (var t in logo.notationStaging) {
         turtleCount += 1;
     }
-  
+
     var startDrums = turtleCount;
     for (var t in logo.notationDrumStaging) {
         // Check to see if there are any notes in the drum staging.
@@ -502,14 +502,14 @@ saveLilypondOutput = function(logo) {
         turtleCount += 1;
     }
 
-    console.log('saving as lilypond: ' + turtleCount);
+    console.debug('saving as lilypond: ' + turtleCount);
 
     logo.notationOutput += '% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n';
 
     var c = 0;
     var occupiedShortNames = [];
     for (var t in logo.notationStaging) {
-            console.log('value of t: ' + t);
+            console.debug('value of t: ' + t);
         if (typeof(t) === 'string') {
             var tNumber = Number(t);
         } else {
@@ -540,7 +540,7 @@ saveLilypondOutput = function(logo) {
             if (tNumber > startDrums - 1) {
                 clef.push('percussion');
             } else if (noteCount > 0) {
-                console.log(octaveTotal + ' ' + noteCount + ' ' + Math.floor(0.5 + (octaveTotal / noteCount)));
+                console.debug(octaveTotal + ' ' + noteCount + ' ' + Math.floor(0.5 + (octaveTotal / noteCount)));
                 switch (Math.floor(0.5 + (octaveTotal / noteCount))) {
                 case 0:
                 case 1:
@@ -677,10 +677,10 @@ saveLilypondOutput = function(logo) {
                     }
                 }
 
-                console.log('instrumentName: ' + instrumentName);
-                console.log('shortInstrumentName: ' + shortInstrumentName);
+                console.debug('instrumentName: ' + instrumentName);
+                console.debug('shortInstrumentName: ' + shortInstrumentName);
             }
-            
+
             logo.notationOutput += instrumentName.replace(/ /g, '_').replace('.', '') + 'Voice = ';
             if (tNumber > startDrums - 1) {
                 logo.notationOutput += '\\new DrumStaff \\with {\n';
@@ -734,7 +734,7 @@ saveLilypondOutput = function(logo) {
                             var instrumentName = _('mouse');
                         }
 
-			console.log(instrumentName);
+			console.debug(instrumentName);
 
 			if (instrumentName === '') {
                             var instrumentName = _('mouse');

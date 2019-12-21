@@ -260,6 +260,7 @@ const SELECTORSTRINGS = [
     _('scalar'),
     _('piano'),
     _('violin'),
+    _('viola'),
     _('xylophone'),
     _('vibraphone'),
     _('cello'),
@@ -595,7 +596,7 @@ const TEMPERAMENT = {
         'major 7': 1.859266,
         'augmented 7': 1.92835,
         'diminished 8': 1.92835,
-        'perfect 8': (2/1), 
+        'perfect 8': (2/1),
         'pitchNumber': 19,
         'interval': ['perfect 1', 'augmented 1', 'minor 2', 'major 2', 'augmented 2', 'minor 3', 'major 3', 'diminished 4', 'perfect 4', 'augmented 4', 'diminished 5', 'perfect 5', 'augmented 5', 'minor 6', 'major 6', 'augmented 6', 'minor 7', 'major 7', 'diminished 8', 'perfect 8']
     },
@@ -664,14 +665,14 @@ function getInvertMode(name) {
             if (INVERTMODES[interval][0] != '') {
                 return INVERTMODES[interval][0];
             } else {
-                console.log('I18n for invert mode is misbehaving.');
-                console.log(name + ' ' + name.toLowerCase() + ' ' + INVERTMODES[interval][0].toLowerCase() + ' ' + INVERTMODES[interval][1].toLowerCase());
+                console.debug('I18n for invert mode is misbehaving.');
+                console.debug(name + ' ' + name.toLowerCase() + ' ' + INVERTMODES[interval][0].toLowerCase() + ' ' + INVERTMODES[interval][1].toLowerCase());
                 return INVERTMODES[interval][1];
             }
         }
     }
 
-    console.log(name + ' not found in INVERTMODES');
+    console.debug(name + ' not found in INVERTMODES');
     return name;
 };
 
@@ -708,14 +709,14 @@ function getModeNumbers(name) {
         }
     }
 
-    console.log(name + ' not found in MUSICALMODES');
+    console.debug(name + ' not found in MUSICALMODES');
     return '';
 };
 
 
 function getDrumIndex(name) {
     if (name === '') {
-        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
+        console.debug('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === 'http') {
         name = DEFAULTDRUM;
@@ -729,14 +730,14 @@ function getDrumIndex(name) {
         }
     }
 
-    // console.log(name + ' not found in DRUMNAMES');
+    // console.debug(name + ' not found in DRUMNAMES');
     return -1;
 };
 
 
 function getDrumName(name) {
     if (name === '') {
-        console.log('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
+        console.debug('getDrumName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === 'http') {
         return null;
@@ -750,13 +751,13 @@ function getDrumName(name) {
         }
     }
 
-    // console.log(name + ' not found in DRUMNAMES');
+    // console.debug(name + ' not found in DRUMNAMES');
     return null;
 };
 
 function getDrumSymbol(name) {
     if (name === '') {
-        console.log('getDrumName passed blank name. Returning ' + 'hh');
+        console.debug('getDrumName passed blank name. Returning ' + 'hh');
         return 'hh';
     }
 
@@ -768,13 +769,13 @@ function getDrumSymbol(name) {
         }
     }
 
-    console.log(name + ' not found in DRUMNAMES');
+    console.debug(name + ' not found in DRUMNAMES');
     return 'hh';
 };
 
 function getFilterTypes(name) {
     if (name === '') {
-        console.log('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
+        console.debug('getFiterType passed blank name. Returning ' + DEFAULTFILTERTYPE);
         name = DEFAULTFILTERTYPE;
     }
 
@@ -786,14 +787,14 @@ function getFilterTypes(name) {
         }
     }
 
-    console.log(name + ' not found in FILTERTYPES');
+    console.debug(name + ' not found in FILTERTYPES');
     return DEFAULTFILTERTYPE;
 };
 
 
 function getOscillatorTypes(name) {
     if (name === '') {
-        console.log('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
+        console.debug('getOscillatorType passed blank name. Returning ' + DEFAULTOSCILLATORTYPE);
         name = null;  // DEFAULTOSCILLATORTYPE;
     }
 
@@ -811,7 +812,7 @@ function getOscillatorTypes(name) {
 
 function getDrumIcon(name) {
     if (name === '') {
-        console.log('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
+        console.debug('getDrumIcon passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === 'http') {
         return 'images/drum.svg';
@@ -823,17 +824,17 @@ function getDrumIcon(name) {
         }
     }
 
-    console.log(name + ' not found in DRUMNAMES');
+    console.debug(name + ' not found in DRUMNAMES');
     return 'images/drum.svg';
 };
 
 
 function getDrumSynthName(name) {
     if (name === null || name === undefined) {
-        console.log('getDrumSynthName passed null name. Returning null');
+        console.debug('getDrumSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
-        console.log('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
+        console.debug('getDrumSynthName passed blank name. Returning ' + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === 'http') {
         return name;
@@ -845,14 +846,14 @@ function getDrumSynthName(name) {
         }
     }
 
-    console.log(name + ' not found in DRUMNAMES');
+    console.debug(name + ' not found in DRUMNAMES');
     return DEFAULTDRUM;
 };
 
 
 function getNoiseName(name) {
     if (name === '') {
-        console.log('getNoiseName passed blank name. Returning ' + DEFAULTNOISE);
+        console.debug('getNoiseName passed blank name. Returning ' + DEFAULTNOISE);
         name = DEFAULTNOISE;
     }
 
@@ -866,14 +867,14 @@ function getNoiseName(name) {
         }
     }
 
-    console.log(name + ' not found in NOISENAMES');
+    console.debug(name + ' not found in NOISENAMES');
     return DEFAULTNOISE;
 };
 
 
 function getNoiseIcon(name) {
     if (name === '') {
-        console.log('getNoiseIcon passed blank name. Returning ' + DEFAULTNOISE);
+        console.debug('getNoiseIcon passed blank name. Returning ' + DEFAULTNOISE);
         name = DEFAULTNOISE;
     } else if (name.slice(0, 4) === 'http') {
         return 'images/noises.svg';
@@ -885,17 +886,17 @@ function getNoiseIcon(name) {
         }
     }
 
-    console.log(name + ' not found in NOISENAMES');
+    console.debug(name + ' not found in NOISENAMES');
     return 'images/synth.svg';
 };
 
 
 function getNoiseSynthName(name) {
     if (name === null || name === undefined) {
-        console.log('getNoiseSynthName passed null name. Returning null');
+        console.debug('getNoiseSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
-        console.log('getNoiseSynthName passed blank name. Returning ' + DEFAULTNOISE);
+        console.debug('getNoiseSynthName passed blank name. Returning ' + DEFAULTNOISE);
         name = DEFAULTNOISE;
     }
 
@@ -905,14 +906,14 @@ function getNoiseSynthName(name) {
         }
     }
 
-    console.log(name + ' not found in NOISENAMES');
+    console.debug(name + ' not found in NOISENAMES');
     return DEFAULTNOISE;
 };
 
 
 function getVoiceName(name) {
     if (name === '') {
-        console.log('getVoiceName passed blank name. Returning ' + DEFAULTVOICE);
+        console.debug('getVoiceName passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) === 'http') {
         return null;
@@ -928,14 +929,14 @@ function getVoiceName(name) {
         }
     }
 
-    console.log(name + ' not found in VOICENAMES');
+    console.debug(name + ' not found in VOICENAMES');
     return DEFAULTVOICE;
 };
 
 
 function getVoiceIcon(name) {
     if (name === '') {
-        console.log('getVoiceIcon passed blank name. Returning ' + DEFAULTVOICE);
+        console.debug('getVoiceIcon passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) === 'http') {
         return 'images/voices.svg';
@@ -947,17 +948,17 @@ function getVoiceIcon(name) {
         }
     }
 
-    console.log(name + ' not found in VOICENAMES');
+    console.debug(name + ' not found in VOICENAMES');
     return 'images/voices.svg';
 };
 
 
 function getVoiceSynthName(name) {
     if (name === null || name === undefined) {
-        console.log('getVoiceSynthName passed null name. Returning null');
+        console.debug('getVoiceSynthName passed null name. Returning null');
         return null;
     } else if (name === '') {
-        console.log('getVoiceSynthName passed blank name. Returning ' + DEFAULTVOICE);
+        console.debug('getVoiceSynthName passed blank name. Returning ' + DEFAULTVOICE);
         name = DEFAULTVOICE;
     } else if (name.slice(0, 4) === 'http') {
         return name;
@@ -969,14 +970,14 @@ function getVoiceSynthName(name) {
         }
     }
 
-    console.log(name + ' not found in VOICENAMES');
+    console.debug(name + ' not found in VOICENAMES');
     return DEFAULTVOICE;
 };
 
 
 function getTemperamentName(name) {
     if (name === '') {
-        console.log('getTemperamentName passed blank name. Returning ' + DEFAULTTEMPERAMENT);
+        console.debug('getTemperamentName passed blank name. Returning ' + DEFAULTTEMPERAMENT);
         name = DEFAULTTEMPERAMENT;
     }
 
@@ -988,14 +989,14 @@ function getTemperamentName(name) {
         }
     }
 
-    console.log(name + ' not found in TEMPERAMENTS');
+    console.debug(name + ' not found in TEMPERAMENTS');
     return DEFAULTTEMPERAMENT;
 };
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
     if (keySignature === '' || keySignature == null) {
-        console.log('No key signature provided; reverting to C major.');
+        console.debug('No key signature provided; reverting to C major.');
        return ['C', 'major'];
     }
 
@@ -1022,7 +1023,7 @@ function keySignatureToMode(keySignature) {
     }
 
     if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        console.log('Invalid key or missing name; reverting to C.');
+        console.debug('Invalid key or missing name; reverting to C.');
         // Is is possible that the key was left out?
         var keySignature = 'C ' + keySignature;
         var parts = keySignature.split(' ');
@@ -1054,7 +1055,7 @@ function keySignatureToMode(keySignature) {
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        console.log('Invalid mode name: ' + mode + ' reverting to major.');
+        console.debug('Invalid mode name: ' + mode + ' reverting to major.');
         return [key, 'major'];
     }
 };
@@ -1196,7 +1197,7 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
     }
 
     // Should never get here, but just in case.
-    console.log(thisPitch + ' not found');
+    console.debug(thisPitch + ' not found');
     return 0;
 };
 
@@ -1405,7 +1406,7 @@ function getInterval (interval, keySignature, pitch) {
                     ii = scale.indexOf(pitch);
                 } else {
                     // Should never happen.
-                    console.log(pitch + ' not found');
+                    console.debug(pitch + ' not found');
                     return 0;
                 }
             }
@@ -1492,8 +1493,8 @@ function getNoteFromInterval (pitch, interval) {
             if (index1 === 0) {
                 accidental = priorAttrs[index1] + FLAT;
             } else {
-                accidental = priorAttrs[index1 - 1];   
-            }    
+                accidental = priorAttrs[index1 - 1];
+            }
         }
         if (interval === 'diminished 4' || interval === 'diminished 5' || interval === 'diminished 8') {
             //Perfect intervals lowered by a half step are called diminished.
@@ -1503,7 +1504,7 @@ function getNoteFromInterval (pitch, interval) {
             if (index1 === 0) {
                 accidental = priorAttrs[index1] + FLAT;
             } else {
-                accidental = priorAttrs[index1 - 1];   
+                accidental = priorAttrs[index1 - 1];
             }
         }
         if (interval === 'augmented 2' || interval === 'augmented 3' || interval === 'augmented 6' || interval === 'augmented 7') {
@@ -1514,7 +1515,7 @@ function getNoteFromInterval (pitch, interval) {
             if (index1 === 4) {
                 accidental = priorAttrs[index1] + SHARP;
             } else {
-                accidental = priorAttrs[index1 + 1];   
+                accidental = priorAttrs[index1 + 1];
             }
         }
         if (interval === 'augmented 1' || interval === 'augmented 4' || interval === 'augmented 5' || interval === 'augmented 8') {
@@ -1525,13 +1526,13 @@ function getNoteFromInterval (pitch, interval) {
             if (index1 === 4) {
                 accidental = priorAttrs[index1] + SHARP;
             } else {
-                accidental = priorAttrs[index1 + 1];   
+                accidental = priorAttrs[index1 + 1];
             }
         }
 
         var Note = majorNote[0].substring(0, 1) + accidental + '';
         var octave = majorNote[1];
-        return [Note, octave];  
+        return [Note, octave];
     }
     if (interval === 'major 2' || interval === 'major 3' || interval === 'major 6' || interval === 'major 7'|| interval === 'perfect 4'|| interval === 'perfect 5' || interval === 'perfect 8' || interval === 'perfect 1') {
         return findMajorInterval(interval);
@@ -1672,7 +1673,7 @@ function frequencyToPitch(hz) {
         }
     }
 
-    console.log('Could not find note/octave/cents for ' + hz);
+    console.debug('Could not find note/octave/cents for ' + hz);
     return ['?', -1, 0];
 };
 
@@ -1695,7 +1696,7 @@ function numberToPitch(i, temperament, startPitch, offset) {
         } else {
             var pitchNumber = Math.floor(i - offset);
         }
-        
+
     } else {
         if (temperament === 'equal') {
             return [PITCHES[(i + PITCHES.indexOf('A')) % 12], Math.floor((i + PITCHES.indexOf('A')) / 12)];
@@ -1724,12 +1725,12 @@ function numberToPitch(i, temperament, startPitch, offset) {
 
 function numberToPitchSharp(i) {
     // numbertoPitch return only flats
-    // This function will return sharps.    
+    // This function will return sharps.
     if (i < 0) {
         var n = 0;
         while (i < 0) {
             i += 12;
-            n += 1;  
+            n += 1;
         }
 
         return [PITCHES2[(i + PITCHES2.indexOf('A')) % 12], Math.floor((i + PITCHES2.indexOf('A')) / 12) - n];
@@ -1815,7 +1816,7 @@ function pitchToNumber(pitch, octave, keySignature) {
         if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            console.log('pitch ' + pitch + ' not found.');
+            console.debug('pitch ' + pitch + ' not found.');
             pitchNumber = 0;
         }
     }
@@ -1965,7 +1966,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
         note = FIXEDSOLFEGE1[currentNote];
     } else {
         note = currentNote;
-    } 
+    }
 
     stepCurrentNote = getNumber(note, currentOctave);
     stepUpCurrentNote = getNumber(note, currentOctave + 1);
@@ -1979,7 +1980,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
         lastNotePlated = 'G';
     }
 
-    stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);    
+    stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
 
     var halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
     var halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
@@ -1987,7 +1988,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
 
     if (halfSteps <= 5 || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
-    } 
+    }
 
     if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
         changedCurrent = Math.max(currentOctave - 1, 1);
@@ -1995,12 +1996,12 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
 
     if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
         changedCurrent = Math.min(currentOctave + 1, 9);
-    } 
+    }
 
     if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
         changedCurrent = currentOctave;
     }
-    
+
     switch(arg) {
     case _('current'):
     case 'current':
@@ -2015,7 +2016,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
         try {
             return Math.floor(Number(arg));
         } catch (e) {
-            console.log('cannot convert ' + arg + ' to a number');
+            console.debug('cannot convert ' + arg + ' to a number');
             return (currentOctave);
         }
     }
@@ -2048,7 +2049,7 @@ calcOctaveInterval = function (arg) {
         value = -2;
         break;
     default:
-        console.log('Interval octave must be between -2 and 2.');
+        console.debug('Interval octave must be between -2 and 2.');
         value = 0;
         break;
     }
@@ -2129,7 +2130,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
 
     var sharpFlat = false;
     var rememberFlat = false;
-    var rememberSharp = false;    
+    var rememberSharp = false;
     if (typeof(noteArg) !== 'number') {
         if (noteArg.toLowerCase().substr(0, 4) === 'rest' || noteArg.toLowerCase().substr(0, 4) === 'r') {
             return ['R', ''];
@@ -2231,7 +2232,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                 // Ensure it is a valid key signature.
                 var offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
-                    console.log('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
+                    console.debug('WARNING: Key ' + myKeySignature + ' not found in ' + thisScale + '. Using default of C');
                     offset = 0;
                     thisScale = NOTESSHARP;
                 }
@@ -2385,9 +2386,9 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
 
                 var note = thisScale[index];
             } else {
-                console.log(solfegePart);
-                console.log(halfSteps.indexOf(noteArg));
-                console.log('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
+                console.debug(solfegePart);
+                console.debug(halfSteps.indexOf(noteArg));
+                console.debug('WARNING: Note [' + noteArg + '] not found in ' + halfSteps + '. Returning REST');
                 if (errorMsg != undefined) {
                     errorMsg(INVALIDPITCH, null);
                 }
@@ -2438,7 +2439,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
 
                 note = NOTESFLAT[i];
             } else {
-                console.log('note not found? ' + note);
+                console.debug('note not found? ' + note);
             }
         } else if (deltaNote < 0) {
                 if (NOTESFLAT.indexOf(note) !== -1) {
@@ -2466,7 +2467,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
 
                     note = NOTESSHARP[i];
                 } else {
-                    console.log('note not found? ' + note);
+                    console.debug('note not found? ' + note);
                 }
             }
         }
@@ -2527,7 +2528,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
                     var pitchNumber = Number(number);
                     break;
                 }
-            }   
+            }
         }
         if (pitchNumber === undefined) {
             return getNote(noteArg, octave, transposition, keySignature, movable, direction, errorMsg);
@@ -2602,7 +2603,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable, directio
             }
 
             octave += deltaOctave;
-            
+
             if (deltaNote > 0) {
                 var pitch = note + '' + octave;
                 for (var interval in INTERVALVALUES) {
@@ -2685,7 +2686,7 @@ convertFactor = function (factor) {
 
 modeMapper = function (key, mode) {
     // map common modes into their major/minor equivalent
-    // console.log(key + ' ' + mode + ' >>');
+    // console.debug(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
     mode = mode.toLowerCase();
 
@@ -3065,6 +3066,6 @@ modeMapper = function (key, mode) {
         break;
     }
 
-    // console.log('>> ' + key + ' ' + mode);
+    // console.debug('>> ' + key + ' ' + mode);
     return [key, mode];
 };

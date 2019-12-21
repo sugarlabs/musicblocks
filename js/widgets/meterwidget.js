@@ -74,17 +74,17 @@ function MeterWidget() {
 
         cell.onclick=function() {
             if (that._get_click_lock()) {
-                console.log('click lock');
+                console.debug('click lock');
                 return;
             } else {
-                console.log('CLICK PLAY/PAUSE');
+                console.debug('CLICK PLAY/PAUSE');
                 that._click_lock = true;
                 if (that.__getPlayingStatus()) {
-                    console.log('PAUSING');
+                    console.debug('PAUSING');
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                     that._playing = false;
                 } else {
-                    console.log('PLAYING');
+                    console.debug('PLAYING');
                     this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
                     that._playing = true;
                     that._logo.setTurtleDelay(0);
@@ -218,7 +218,7 @@ function MeterWidget() {
 
     this.__playOneBeat = function(i, ms) {
         if (this.__getPauseStatus()) {
-            console.log('PAUSING');
+            console.debug('PAUSING');
             for (var i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
             }
@@ -321,7 +321,7 @@ function MeterWidget() {
             n += 3;
         }
 
-        console.log(newStack);
+        console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
@@ -369,13 +369,13 @@ function MeterWidget() {
         }
 
         // Always make the meter a complete circle.
-        /* 
+        /*
         var n = (1 - (numberOfBeats * beatValue)) / beatValue;
         for (var i = 0; i < n; i++) {
             beatList.push(null);
         }
         */
-        
+
         this._meterWheel.createWheel(beatList);
 
         this._beatWheel.colors = platformColor.modeWheelcolors;

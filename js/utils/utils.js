@@ -14,7 +14,7 @@ function format (str, data) {
         x = data;
         name.split('.').forEach(function (v) {
             if (x === undefined) {
-                console.log('Undefined value in template string', str, name, x, v);
+                console.debug('Undefined value in template string', str, name, x, v);
             }
 
             x = x[v];
@@ -111,7 +111,7 @@ function HttpRequest (url, loadCallback, userCallback) {
         req.send('');
     } catch(e) {
         if (self.console) {
-            console.log('Failed to load resource from ' + url + ': Network error.');
+            console.debug('Failed to load resource from ' + url + ': Network error.');
         }
 
         if (typeof userCallback === 'function') {
@@ -249,7 +249,7 @@ function _ (text) {
         };
         return translation;
     } catch (e) {
-        console.log('i18n error: ' + text);
+        console.debug('i18n error: ' + text);
         return text;
     }
 };
@@ -266,7 +266,7 @@ function toTitleCase (str) {
 
 
 function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
-    // console.log(rawData);
+    // console.debug(rawData);
     var lineData = rawData.split('\n');
     var cleanData = '';
 
@@ -299,7 +299,7 @@ function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict
 
 function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
     // Plugins are JSON-encoded dictionaries.
-    // console.log(pluginData);
+    // console.debug(pluginData);
     var obj = JSON.parse(pluginData);
 
     // Create a palette entry.
@@ -311,7 +311,7 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             if ('PALETTEFILLCOLORS' in obj) {
                 if (name in obj['PALETTEFILLCOLORS']) {
                     var fillColor = obj['PALETTEFILLCOLORS'][name];
-                    // console.log(fillColor);
+                    // console.debug(fillColor);
                 }
             }
 
@@ -321,7 +321,7 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             if ('PALETTESTROKECOLORS' in obj) {
                 if (name in obj['PALETTESTROKECOLORS']) {
                     var strokeColor = obj['PALETTESTROKECOLORS'][name];
-                    // console.log(strokeColor);
+                    // console.debug(strokeColor);
                 }
             }
 
@@ -331,7 +331,7 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             if ('PALETTEHIGHLIGHTCOLORS' in obj) {
                 if (name in obj['PALETTEHIGHLIGHTCOLORS']) {
                     var highlightColor = obj['PALETTEHIGHLIGHTCOLORS'][name];
-                    // console.log(highlightColor);
+                    // console.debug(highlightColor);
                 }
             }
 
@@ -341,7 +341,7 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             if ('HIGHLIGHTSTROKECOLORS' in obj) {
                 if (name in obj['HIGHLIGHTSTROKECOLORS']) {
                     var strokeHighlightColor = obj['HIGHLIGHTSTROKECOLORS'][name];
-                    // console.log(highlightColor);
+                    // console.debug(highlightColor);
                 }
             }
 
@@ -350,9 +350,9 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             platformColor.paletteColors[name] = [fillColor, strokeColor, highlightColor, strokeHighlightColor];
 
             if (name in palettes.buttons) {
-                console.log('palette ' + name + ' already exists');
+                console.debug('palette ' + name + ' already exists');
             } else {
-                console.log('adding palette ' + name);
+                console.debug('adding palette ' + name);
                 palettes.add(name);
                 newPalette = true;
             }
@@ -361,10 +361,10 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
     if (newPalette) {
         try {
-            console.log('CALLING makePalettes');
+            console.debug('CALLING makePalettes');
             palettes.makePalettes();
         } catch (e) {
-            console.log('makePalettes: ' + e);
+            console.debug('makePalettes: ' + e);
         }
     }
 
@@ -398,8 +398,8 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
             try {
                 evalMacroDict[macro] = JSON.parse(obj['MACROPLUGINS'][macro]);
             } catch (e) {
-                console.log('could not parse macro ' + macro);
-                console.log(obj['MACROPLUGINS'][macro]);
+                console.debug('could not parse macro ' + macro);
+                console.debug(obj['MACROPLUGINS'][macro]);
             }
         }
     }
@@ -420,11 +420,11 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
     if ('BLOCKPLUGINS' in obj) {
         for (var block in obj['BLOCKPLUGINS']) {
-            console.log('adding plugin block ' + block);
+            console.debug('adding plugin block ' + block);
             try {
                 eval(obj['BLOCKPLUGINS'][block]);
             } catch (e) {
-                console.log('Failed to load plugin for ' + block + ': ' + e);
+                console.debug('Failed to load plugin for ' + block + ': ' + e);
             }
         }
     }
@@ -465,18 +465,18 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
         try {
         // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
-                console.log('Cannot find palette for protoblock ' + protoblock);
+                console.debug('Cannot find palette for protoblock ' + protoblock);
             } else if (blocks.protoBlockDict[protoblock].palette === null) {
-                console.log('Cannot find palette for protoblock ' + protoblock);
+                console.debug('Cannot find palette for protoblock ' + protoblock);
             } else {
                 blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
             }
         } catch (e) {
-            console.log(e);
+            console.debug(e);
         }
     }
 
-    console.log('updating palette ' + name);
+    console.debug('updating palette ' + name);
     palettes.updatePalettes(name);
 
     setTimeout(function () {
@@ -564,7 +564,7 @@ function processMacroData (macroData, palettes, blocks, macroDict) {
         palettes.add('myblocks', 'black', '#a0a0a0');
 
         for (var name in obj) {
-            console.log('adding ' + name + ' to macroDict');
+            console.debug('adding ' + name + ' to macroDict');
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
         }
@@ -587,10 +587,10 @@ function prepareMacroExports (name, stack, macroDict) {
 // Publish to FB
 function doPublish (desc) {
     var url = doSave();
-    console.log('push ' + url + ' to FB');
+    console.debug('push ' + url + ' to FB');
     var descElem = docById("description");
     var msg = desc + ' ' + descElem.value + ' ' + url;
-    console.log('comment: ' + msg);
+    console.debug('comment: ' + msg);
     var post_cb = function() {
         FB.api('/me/feed', 'post', {
             message: msg
@@ -635,7 +635,7 @@ function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, err
                 hasSetupCamera = true;
             }, function (error) {
                 errorMsg('Could not connect to camera');
-                console.log('Could not connect to camera', error);
+                console.debug('Could not connect to camera', error);
         });
     } else {
         streaming = true;
@@ -649,7 +649,7 @@ function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, err
     }
 
     video.addEventListener('canplay', function (event) {
-        console.log('canplay', streaming, hasSetupCamera);
+        console.debug('canplay', streaming, hasSetupCamera);
         if (!streaming) {
             video.setAttribute('width', w);
             video.setAttribute('height', h);
@@ -797,7 +797,7 @@ function GCD (a, b) {
 
 function rationalSum (a, b) {
     if (a === 0 || b === 0) {
-        console.log('divide by zero?');
+        console.debug('divide by zero?');
         return [0, 1];
     }
 

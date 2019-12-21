@@ -26,7 +26,7 @@ platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF
             && (platform.mobile || platform.tablet)
             && !platform.android;
-console.log('On platform: ', platform);
+console.debug('On platform: ', platform);
 
 
 window.platformColor = {

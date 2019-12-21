@@ -118,6 +118,9 @@ Block Palettes
 The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
 
+Looking for a block? Find it in the [Palette
+Tables](https://github.com/sugarlabs/musicblocks/blob/master/guide/README.md#APPENDIX_1).
+
 See the
 [Turtle Blocks Programming Guide](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
 for general details on how to use the blocks.

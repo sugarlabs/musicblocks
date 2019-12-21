@@ -716,7 +716,7 @@ function PitchDrumMatrix() {
         }
 
         // Create a new stack for the chunk.
-        console.log(newStack);
+        console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
     };
 };

@@ -62,12 +62,17 @@ function RhythmRuler () {
 
     this._wheel = null;
 
+    // Element references
+    this._dissectNumber = null;
+    this._progressBar = null;
+    this._rulers = [];
+
     this._noteWidth = function (noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
     };
 
     this._calculateZebraStripes = function(rulerno) {
-        var ruler = docById('ruler' + rulerno);
+        var ruler = this._rulers[rulerno];
         if (this._rulerSelected % 2 === 0) {
             var evenColor = platformColor.selectorBackground;
         } else {
@@ -94,7 +99,7 @@ function RhythmRuler () {
         }
     };
 
-    this._dissectRuler = function (event) {
+    this._dissectRuler = function (event, ruler) {
         var cell = event.target;
         if (cell == null) {
             return;
@@ -111,13 +116,13 @@ function RhythmRuler () {
             return;
         }
 
-        this._rulerSelected = cellParent.id[5];
+        this._rulerSelected = ruler;
         if (this._rulerSelected == undefined) {
             return;
         }
 
         if (this._playing) {
-            console.log('You cannot dissect while widget is playing.');
+            console.warn('You cannot dissect while widget is playing.');
             return;
         } else if (this._tapMode) {
             // Tap a rhythm by clicking in a cell.
@@ -131,7 +136,7 @@ function RhythmRuler () {
                     this._tapTimes = [];
                     this._tapEndTime = null;
                     var iconSize = ICONSIZE;
-                    this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+                    this._tapButton.innerHTML = '<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
                     return;
                 }
 
@@ -161,17 +166,16 @@ function RhythmRuler () {
             }
         } else {
             var noteValues = this.Rulers[this._rulerSelected][0];
-            var inputNum = docById('dissectNumber').value;
+            var inputNum = this._dissectNumber.value;
             if (inputNum === '' || isNaN(inputNum)) {
                 inputNum = 2;
             } else {
                 inputNum = Math.abs(Math.floor(inputNum));
             }
 
-            docById('dissectNumber').value = inputNum;
+            this._dissectNumber.value = inputNum;
 
-            // Does this work if there are more than 10 rulers?
-            this._rulerSelected = cell.parentNode.id[5];
+            this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__dissectByNumber(cell, inputNum, true);
         }
 
@@ -191,7 +195,6 @@ function RhythmRuler () {
 
         // Display a progress bar.
         function __move(tick, stepSize) {
-            var elem = docById("progressBar");
             var width = 1;
             var id = setInterval(frame, tick);
 
@@ -200,19 +203,22 @@ function RhythmRuler () {
                     clearInterval(id);
                 } else {
                     width += stepSize;
-                    elem.style.width = width + '%';
+                    that._progressBar.style.width = width + '%';
                 }
             };
         };
 
-        this._tapCell.innerHTML = '<div id="progressBar"></div>';
+        this._tapCell.innerHTML = "<div class='progressBar'></div>";
+        this._progressBar = this._tapCell.querySelector(".progressBar");
         // Progress once per 8th note.
         __move(interval / 8, 100 / 8);
     };
 
     this.__endTapping = function () {
-        this._rulerSelected = this._tapCell.parentNode.id[5];
+        this._rulerSelected = cell.parentNode.getAttribute("data-row");
+        if (this._progressBar) this._progressBar.remove();
         this._tapCell.innerHTML = '';
+
         var d = new Date();
         this._tapTimes.push(d.getTime());
 
@@ -225,7 +231,7 @@ function RhythmRuler () {
             }
 
             // convert times into cells here.
-            var inputNum = docById('dissectNumber').value;
+            var inputNum = this._dissectNumber.value;
             if (inputNum === '' || isNaN(inputNum)) {
                 inputNum = 2;
             } else {
@@ -292,7 +298,7 @@ function RhythmRuler () {
         this._tapCell = null;
         this._tapEndTime = null;
         var iconSize = ICONSIZE;
-        this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._tapButton.innerHTML = '<img src="header-icons/tap-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
     };
 
     this.__addCellEventHandlers = function (cell, cellWidth, noteValue) {
@@ -304,7 +310,7 @@ function RhythmRuler () {
                 return;
             }
 
-            that._rulerSelected = cell.parentNode.id[5];
+            that._rulerSelected = cell.parentNode.getAttribute("data-row");
             var noteValues = that.Rulers[that._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
             if (noteValue < 0) {
@@ -333,8 +339,8 @@ function RhythmRuler () {
                 that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 var cell = that._mouseDownCell;
-		if (cell !== null && cell.parentNode !== null) {
-                    that._rulerSelected = cell.parentNode.id[5];
+		        if (cell !== null && cell.parentNode !== null) {
+                    that._rulerSelected = cell.parentNode.getAttribute("data-row");
                     var noteValues = that.Rulers[that._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
                     cell.style.backgroundColor = platformColor.selectorBackground;
@@ -347,7 +353,7 @@ function RhythmRuler () {
             var cell = event.target;
             that._mouseUpCell = cell;
             if (that._mouseDownCell !== that._mouseUpCell) {
-                that._tieRuler(event);
+                that._tieRuler(event, cell.parentNode.getAttribute("data-row"));
             } else if (that._longPressStartTime != null && !that._tapMode) {
                 var d = new Date();
                 var elapseTime = d.getTime() - that._longPressStartTime;
@@ -367,9 +373,9 @@ function RhythmRuler () {
             if (!that.__getLongPressStatus()) {
                 var cell = event.target;
                 if (cell != null) {
-                    that._dissectRuler(event);
+                    that._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
                 } else {
-                    console.log('Rhythm Ruler: null cell found on click');
+                    console.error('Rhythm Ruler: null cell found on click');
                 }
             }
 
@@ -406,8 +412,8 @@ function RhythmRuler () {
     this.__toggleRestState = function (cell, addToUndoList) {
         var that = this;
 
-	if (cell !== null && cell.parentNode !== null) {
-            this._rulerSelected = cell.parentNode.id[5];
+	    if (cell !== null && cell.parentNode !== null) {
+            this._rulerSelected = cell.parentNode.getAttribute("data-row");
             var noteValues = this.Rulers[this._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
 
@@ -417,7 +423,7 @@ function RhythmRuler () {
                     return;
                 }
 
-                that._rulerSelected = cell.parentNode.id[5];
+                that._rulerSelected = cell.parentNode.getAttribute("data-row");
                 var noteValues = that.Rulers[that._rulerSelected][0];
                 var noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
@@ -473,7 +479,7 @@ function RhythmRuler () {
             return;
         }
 
-        var ruler = docById('ruler' + this._rulerSelected);
+        var ruler = this._rulers[this._rulerSelected];
         var newCellIndex = cell.cellIndex;
 
         if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
@@ -500,7 +506,6 @@ function RhythmRuler () {
 
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
-                newCell.style.maxWidth = newCell.style.width;
                 newCell.style.height = RULERHEIGHT + 'px';
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
@@ -523,7 +528,7 @@ function RhythmRuler () {
             return;
         }
 
-        var ruler = docById('ruler' + this._rulerSelected);
+        var ruler = this._rulers[this._rulerSelected];
         var newCellIndex = cell.cellIndex;
 
         if (typeof(this._rulerSelected) === 'string' || typeof(this._rulerSelected) === 'number') {
@@ -548,7 +553,7 @@ function RhythmRuler () {
 
             // var noteValue = noteValues[newCellIndex];
             var newNoteValue = 0;
-            
+
             newNoteValue = inputNum * noteValue;
 
             var tempwidth = this._noteWidth(newNoteValue);
@@ -563,7 +568,6 @@ function RhythmRuler () {
 
                 newCell.style.width = newCellWidth + 'px';
                 newCell.style.minWidth = newCell.style.width;
-                newCell.style.maxWidth = newCell.style.width;
                 newCell.style.height = RULERHEIGHT + 'px';
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
@@ -577,20 +581,20 @@ function RhythmRuler () {
         // this._piemenuRuler(this._rulerSelected);
     };
 
-    this._tieRuler = function (event) {
+    this._tieRuler = function (event, ruler) {
         if (this._playing) {
-            console.log('You cannot tie while widget is playing.');
+            console.warn('You cannot tie while widget is playing.');
             return;
         } else if (this._tapMode) {
             // If we are tapping, then treat a tie as a tap.
-            this._dissectRuler(event);
+            this._dissectRuler(event, ruler);
             return;
         }
 
         // Does this work if there are more than 10 rulers?
         var cell = event.target;
         if (cell !== null && cell.parentNode !== null) {
-            this._rulerSelected = cell.parentNode.id[5];
+            this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__tie(true);
         }
 
@@ -598,7 +602,7 @@ function RhythmRuler () {
     };
 
     this.__tie = function (addToUndoList) {
-        var ruler = docById('ruler' + this._rulerSelected);
+        var ruler = this._rulers[this._rulerSelected];
 
         if (this._mouseDownCell === null || this._mouseUpCell === null) {
             return;
@@ -662,7 +666,6 @@ function RhythmRuler () {
 
             this._mouseDownCell.style.width = newCellWidth + 'px';
             this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
-            this._mouseDownCell.style.maxWidth = this._mouseDownCell.style.width;
             this._mouseDownCell.style.height = RULERHEIGHT + 'px';
             this._mouseDownCell.style.minHeight = this._mouseDownCell.style.height;
             this._mouseDownCell.style.maxHeight = this._mouseDownCell.style.height;
@@ -694,7 +697,7 @@ function RhythmRuler () {
             return;
         }
 
-        var ruler = docById('ruler' + lastRuler);
+        var ruler = this._rulers[lastRuler];
         var noteValues = this.Rulers[lastRuler][0];
 
         if (obj[0] === 'dissect') {
@@ -708,7 +711,6 @@ function RhythmRuler () {
             var newCell = ruler.insertCell(newCellIndex);
             newCell.style.width = this._noteWidth(newNoteValue) + 'px';
             newCell.style.minWidth = newCell.style.width;
-            newCell.style.maxWidth = newCell.style.width;
             newCell.style.height = RULERHEIGHT + 'px';
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
@@ -742,7 +744,6 @@ function RhythmRuler () {
             var newCell = ruler.insertCell(newCellIndex);
             newCell.style.width =  newCellWidth + 'px';
             newCell.style.minWidth = newCell.style.width;
-            newCell.style.maxWidth = newCell.style.width;
             newCell.style.height = RULERHEIGHT + 'px';
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
@@ -770,7 +771,6 @@ function RhythmRuler () {
                 var oldCellWidth = this._noteWidth(history[0][1]);
                 oldCell.style.width = oldCellWidth + 'px';
                 oldCell.style.minWidth = oldCell.style.width;
-                oldCell.style.maxWidth = oldCell.style.width;
                 oldCell.style.height = RULERHEIGHT + 'px';
                 oldCell.style.minHeight = oldCell.style.height;
                 oldCell.style.maxHeight = oldCell.style.height;
@@ -783,7 +783,6 @@ function RhythmRuler () {
                     var newCellWidth = this._noteWidth(history[i][1]);
                     newCell.style.width = newCellWidth + 'px';
                     newCell.style.minWidth = newCell.style.width;
-                    newCell.style.maxWidth = newCell.style.width;
                     newCell.style.height = RULERHEIGHT + 'px';
                     newCell.style.minHeight = newCell.style.height;
                     newCell.style.maxHeight = newCell.style.height;
@@ -796,7 +795,7 @@ function RhythmRuler () {
 
                 this.Rulers[lastRuler][0] = noteValues;
             } else {
-                console.log('empty history encountered... skipping undo');
+                console.warn('empty history encountered... skipping undo');
             }
         } else if (obj[0] === 'rest') {
             var newCellIndex = last(divisionHistory);
@@ -814,7 +813,7 @@ function RhythmRuler () {
     this._tap = function () {
         this._tapMode = true;
         var iconSize = ICONSIZE;
-        this._tapButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/tap-active-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._tapButton.innerHTML = '<img src="header-icons/tap-active-button.svg" title="' + _('tap a rhythm') + '" alt="' + _('tap a rhythm') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
     };
 
     this._clear = function () {
@@ -826,7 +825,7 @@ function RhythmRuler () {
         this._rulerPlaying = -1;
         this._startingTime = null;
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while(this.Rulers[r][1].length > 0) {
@@ -839,7 +838,7 @@ function RhythmRuler () {
 
     this.__pause = function () {
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -869,7 +868,7 @@ function RhythmRuler () {
 
     this.__resume = function () {
         var iconSize = ICONSIZE;
-        this._playAllCell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
+        this._playAllCell.innerHTML = '<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
         this._logo.setTurtleDelay(0);
         this._playingAll = true;
         this._playing = true;
@@ -910,19 +909,15 @@ function RhythmRuler () {
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
-        console.log("this._rulerSelected " +this._rulerSelected);
+        console.debug("this._rulerSelected " +this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     };
 
     this.__loop = function(noteTime, rulerNo, colIndex) {
-        if (docById('rulerDiv').style.visibility === 'hidden' || docById('rulerButtonsDiv').style.visibility === 'hidden' || docById('rulerTableDiv').style.visibility === 'hidden') {
-            return;
-        }
-
-        var ruler = docById('ruler' + rulerNo);
+        var ruler = this._rulers[rulerNo];
         if (ruler == null) {
-            console.log('Cannot find ruler ' + rulerNo + '. Widget closed?');
+            console.warn('Cannot find ruler ' + rulerNo + '. Widget closed?');
             return;
         }
 
@@ -975,7 +970,7 @@ function RhythmRuler () {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                // console.log(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
+                // console.debug(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
                 if (foundVoice) {
                     that._logo.synth.trigger(0, 'C4', that._logo.defaultBPMFactor / noteValue, drum, null, null, false);
                 } else if (foundDrum) {
@@ -1015,7 +1010,7 @@ function RhythmRuler () {
         this._logo.refreshCanvas();
 
         setTimeout(function () {
-            var ruler = docById('ruler' + selectedRuler);
+            var ruler = that._rulers[selectedRuler];
             var noteValues = that.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
@@ -1073,7 +1068,7 @@ function RhythmRuler () {
         this._logo.refreshCanvas();
 
         setTimeout( function() {
-            var ruler = docById('ruler' + selectedRuler);
+            var ruler = that._rulers[selectedRuler];
             var noteValues = that.Rulers[selectedRuler][0];
             if (that.Drums[selectedRuler] === null) {
                 var stack_value = _('rhythm');
@@ -1108,7 +1103,7 @@ function RhythmRuler () {
                         newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                         newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
                     }
-                    
+
                     if (i == ruler.cells.length - 1) {
                         newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
                     } else {
@@ -1156,7 +1151,7 @@ function RhythmRuler () {
                 newStack.push([idx + 3, ['number', {'value': obj[0]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 4, ['number', {'value': obj[1]}], 0, 0, [idx + 2]]);
                 newStack.push([idx + 5, 'vspace', 0, 0, [idx, idx + 6]]);
-                    
+
                 if (i == noteValues.length - 1) {
                     newStack.push([idx + 6, 'hidden', 0, 0, [idx + 5, null]]);
                 } else {
@@ -1211,7 +1206,7 @@ function RhythmRuler () {
         this._logo.refreshCanvas();
 
         setTimeout(function () {
-            var ruler = docById('ruler' + selectedRuler);
+            var ruler = that._rulers[selectedRuler];
             var noteValues = that.Rulers[selectedRuler][0];
             var delta = selectedRuler * 42;
 
@@ -1316,7 +1311,7 @@ function RhythmRuler () {
         this._logo.refreshCanvas();
 
         setTimeout(function () {
-            var ruler = docById('ruler' + selectedRuler);
+            var ruler = that._rulers[selectedRuler];
             var noteValues = that.Rulers[selectedRuler][0];
             var delta = selectedRuler * 42;
 
@@ -1461,7 +1456,7 @@ function RhythmRuler () {
     };
 
     this.init = function (logo) {
-        console.log('init RhythmRuler');
+        console.debug('init RhythmRuler');
         this._logo = logo;
 
         this._bpmFactor = 1000 * TONEBPM / this._logo._masterBPM;
@@ -1490,36 +1485,15 @@ function RhythmRuler () {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var rulerDiv = docById('rulerDiv');
-        rulerDiv.style.visibility = 'visible';
-        rulerDiv.setAttribute('draggable', 'true');
-        this._left = 200;
-        this._top = 150;
-        rulerDiv.style.left = this._left + 'px';
-        rulerDiv.style.top = this._top + 'px';
-
-        // The widget buttons
-        var widgetButtonsDiv = docById('rulerButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table id="widgetButtonTable"></table>';
-
-        var buttonTable = docById('widgetButtonTable');
-        // buttonTable.style.
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
 
-        var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
-
-        cell.onclick = function () {
+        widgetWindow.onclose = function () {
             // If the piemenu was open, close it.
             // docById('wheelDiv').style.display = 'none';
             // docById('contextWheelDiv').style.display = 'none';
@@ -1537,7 +1511,7 @@ function RhythmRuler () {
                     history.push(that.Rulers[i][1][j]);
                 }
 
-                docById('dissectNumber').classList.add('hasKeyboard');
+                that._dissectNumber.classList.add('hasKeyboard');
                 dissectHistory.push([history, that.Drums[i]]);
                 drums.push(that.Drums[i]);
             }
@@ -1553,18 +1527,15 @@ function RhythmRuler () {
 
             that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
 
-            rulerTableDiv.style.visibility = 'hidden';
-            widgetButtonsDiv.style.visibility = 'hidden';
-            rulerDiv.style.visibility = 'hidden';
-
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
             that._logo.hideMsgs();
+
+            that.widgetWindow.destroy();
         };
 
-        this._playAllCell = this._addButton(row, 'play-button.svg', iconSize, _('Play all'), '');
-
+        this._playAllCell = widgetWindow.addButton('play-button.svg', iconSize, _('Play all'));
         this._playAllCell.onclick = function () {
             if (that._playing) {
                 that.__pause();
@@ -1574,11 +1545,8 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save rhythms'), '');
-
         this._save_lock = false;
-
-        cell.onclick = async function () {
+        widgetWindow.addButton('export-chunk.svg', iconSize, _('Save rhythms')).onclick = async function () {
             // that._save(0);
             // Debounce button
             if (!that._get_save_lock()) {
@@ -1586,7 +1554,7 @@ function RhythmRuler () {
 
                 // Save a merged version of the rulers.
                 that._saveTupletsMerged(that._mergeRulers());
-                
+
                 // Rather than each ruler individually.
                 // that._saveTuplets(0);
                 await delayExecution(1000)
@@ -1594,8 +1562,7 @@ function RhythmRuler () {
             }
         };
 
-        var cell = this._addButton(row, 'export-drums.svg', iconSize, _('Save drum machine'), '');
-        cell.onclick = async function () {
+        widgetWindow.addButton('export-drums.svg', iconSize, _('Save drum machine')).onclick = async function () {
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
@@ -1606,53 +1573,39 @@ function RhythmRuler () {
         };
 
         // An input for setting the dissect number
-        var cell = row.insertCell();
-        cell.innerHTML = '<input id="dissectNumber" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="dissectNumber" type="dissectNumber" value="' + 2 + '" />';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT) + 'px';
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        this._dissectNumber = widgetWindow.addInputButton("2");
 
-        var numberInput = docById('dissectNumber');
-
-        numberInput.onfocus = function (event) {
+        this._dissectNumber.onfocus = function (event) {
             // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
         };
 
-        numberInput.onkeydown = function (event) {
+        this._dissectNumber.onkeydown = function (event) {
             if (event.keyCode === DEL) {
-                numberInput.value = numberInput.value.substring(0, numberInput.value.length - 1);
-            }   
-        };
-
-        numberInput.oninput = function (event) {
-            // Put a limit on the size (2 <--> 128).
-            numberInput.onmouseout = function(){
-                if (numberInput.value < 2) {
-                    numberInput.value = 2;
-                } 
-            };
-
-            if (numberInput.value > 128) {
-                numberInput.value = 128;
+                that._dissectNumber.value = that._dissectNumber.value.substring(0, that._dissectNumber.value.length - 1);
             }
         };
 
-        var cell = this._addButton(row, 'restore-button.svg', iconSize, _('Undo'), '');
-        cell.onclick = function () {
+        this._dissectNumber.oninput = function (event) {
+            // Put a limit on the size (2 <--> 128).
+            that._dissectNumber.onmouseout = function() {
+                that._dissectNumber.value = Math.max(that._dissectNumber.value, 2);
+            };
+
+            that._dissectNumber.value = Math.max(Math.min(that._dissectNumber.value, 128), 2);
+        };
+
+        widgetWindow.addButton('restore-button.svg', iconSize, _('Undo')).onclick = function () {
             that._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = this._addButton(row, 'tap-button.svg', iconSize, _('Tap a rhythm'), '');
+        this._tapButton = widgetWindow.addButton('tap-button.svg', iconSize, _('Tap a rhythm'));
         this._tapButton.onclick = function () {
             that._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
-        var cell = this._addButton(row, 'erase-button.svg', iconSize, _('Clear'), '');
-        cell.onclick = function () {
+        widgetWindow.addButton('erase-button.svg', iconSize, _('Clear')).onclick = function () {
             that._clear();
         };
 
@@ -1676,7 +1629,7 @@ function RhythmRuler () {
         //             history.push(that.Rulers[i][1][j]);
         //         }
 
-        //         docById('dissectNumber').classList.add('hasKeyboard');
+        //         this._dissectNumber.classList.add('hasKeyboard');
         //         dissectHistory.push([history, that.Drums[i]]);
         //         drums.push(that.Drums[i]);
         //     }
@@ -1702,173 +1655,53 @@ function RhythmRuler () {
         //     that._logo.hideMsgs();
         // };
 
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', iconSize, _('Drag'), '');
-
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - rulerDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - rulerDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function (e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function (e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                that._left = e.clientX - that._dx;
-                that._top = e.clientY - that._dy;
-                rulerDiv.style.left = that._left + 'px';
-                rulerDiv.style.top = that._top + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-
-                // that._positionWheel();
-            }
-        };
-
-        rulerDiv.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        rulerDiv.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                that._left = e.clientX - that._dx;
-                that._top = e.clientY - that._dy;
-                rulerDiv.style.left = that._left + 'px';
-                rulerDiv.style.top = that._top + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-
-                // that._positionWheel();
-            }
-        };
-
-        rulerDiv.onmousedown = function (e) {
-            that._target = e.target;
-        };
-
-        rulerDiv.ondragstart = function (e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
-        var expandCell = this._addButton(row, 'expand-button.svg', iconSize, _('expand'), '');
-        
-        expandCell.onclick = function () {
-            var rulerDiv = docById('rulerDiv');
-
-            if (that._expanded) {
-                rulerDiv.style.width = that._initial_w;
-                rulerDiv.style.height = that._initial_h;
-
-                var n = Math.min(Math.floor((window.innerHeight * 0.5) / 100), 2);
-                var outerDiv = docById('rulerOuterDiv');
-                outerDiv.style.height = ROWHEIGHT * n + 'px';
-
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/expand-button.svg" title="' + _('expand') + '" alt="' + _('expand') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-
-                that._expanded = false;
-            } else {
-                rulerDiv.style.width = Math.max(OUTERWINDOWWIDTH, Math.min(1200, window.innerWidth)) + 'px';
-                rulerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900, window.innerHeight)) + 'px';
-
-                var outerDiv = docById('rulerOuterDiv');
-                outerDiv.style.height = Math.max(100 + ROWHEIGHT * that.Rulers.length, Math.min(900 - 20, window.innerHeight - 20)) + 'px';
-
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/collapse-button.svg" title="' + _('collapse') + '" alt="' + _('collapse') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                that._expanded = true;
-            }
-        };
-
-        // The ruler table
-        var rulerTableDiv = docById('rulerTableDiv');
-        rulerTableDiv.style.display = 'inline';
-        rulerTableDiv.style.visibility = 'visible';
-        rulerTableDiv.style.border = '2px';
-        rulerTableDiv.innerHTML = '';
-
         // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
-        rulerTableDiv.innerHTML = '<div id="rulerOuterDiv"><div id="rulerInnerDiv"><table id="rhythmRulerTable"></table></div></div>';
-
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 2);
-        var outerDiv = docById('rulerOuterDiv');
-        if (this.Rulers.length > n) {
-            outerDiv.style.height = ROWHEIGHT * n + 'px';
-            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
-        } else {
-            outerDiv.style.height = ROWHEIGHT * this.Rulers.length + 'px';
-            var w = Math.max(Math.min(window.innerWidth, OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 25 + 'px';  // Add a bit of extra space for the horizontal slider.
-        }
-
-        var w = Math.max(Math.min(window.innerWidth, INNERWINDOWWIDTH), BUTTONDIVWIDTH - BUTTONSIZE);
-        docById('rulerInnerDiv').style.width = w + 'px';
+        var rhythmRulerTable = document.createElement("table");
+        widgetWindow.getWidgetBody().append(rhythmRulerTable);
 
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
-        var rhythmRulerTable = docById('rhythmRulerTable');
         for (var i = 0; i < this.Rulers.length; i++) {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
-            var drumcell = this._addButton(rhythmRulerTableRow, 'play-button.svg', iconSize, _('Play'), '<br>');
-            drumcell.setAttribute('id', i);
+
+            var drumcell = rhythmRulerTableRow.insertCell();
+            drumcell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" />';
             drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
 
-            drumcell.onclick = function () {
-                var id = Number(this.getAttribute('id'));
-                if (that._playing) {
-                    if (that._rulerPlaying === id) {
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        that._playing = false;
-                        that._playingOne = false;
-                        that._playingAll = false;
-                        that._rulerPlaying = -1;
-                        that._startingTime = null;
-                        that._elapsedTimes[id] = 0;
-                        that._offsets[id] = 0;
-                        setTimeout(that._calculateZebraStripes(id), 1000);
+            drumcell.onclick = (function(id) {
+                return function () {
+                    if (that._playing) {
+                        if (that._rulerPlaying === id) {
+                            this.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
+                            that._playing = false;
+                            that._playingOne = false;
+                            that._playingAll = false;
+                            that._rulerPlaying = -1;
+                            that._startingTime = null;
+                            that._elapsedTimes[id] = 0;
+                            that._offsets[id] = 0;
+                            setTimeout(that._calculateZebraStripes(id), 1000);
+                        }
+                    }
+                    else {
+                        if (that._playingOne === false) {
+                            that._rulerSelected = id;
+                            that._logo.setTurtleDelay(0);
+                            that._playing = true;
+                            that._playingOne = true;
+                            that._playingAll = false;
+                            that._cellCounter = 0;
+                            that._startingTime = null;
+                            that._rulerPlaying = id;
+                            this.innerHTML = '<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
+                            that._elapsedTimes[id] = 0;
+                            that._offsets[id] = 0;
+                            that._playOne();
+                        }
                     }
                 }
-                else {
-                    if (that._playingOne === false) {
-                        that._rulerSelected = id;
-                        that._logo.setTurtleDelay(0);
-                        that._playing = true;
-                        that._playingOne = true;
-                        that._playingAll = false;
-                        that._cellCounter = 0;
-                        that._startingTime = null;
-                        that._rulerPlaying = id;
-                        this.innerHTML = '<br>&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">&nbsp;&nbsp;';
-                        that._elapsedTimes[id] = 0;
-                        that._offsets[id] = 0;
-                        that._playOne();
-                    }
-                }
-            };
+            })(i);
 
             var rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
@@ -1881,7 +1714,9 @@ function RhythmRuler () {
             rulerCellTable.cellSpacing = '0px';
             rulerCellTable.cellPadding = '0px';
             var rulerRow = rulerCellTable.insertRow();
-            rulerRow.setAttribute('id', 'ruler' + i);
+            this._rulers[i] = rulerRow;
+            rulerRow.setAttribute("data-row", i);
+
             for (var j = 0; j < this.Rulers[i][0].length; j++) {
                 var noteValue = this.Rulers[i][0][j];
                 var rulerSubCell = rulerRow.insertCell(-1);
@@ -1891,7 +1726,6 @@ function RhythmRuler () {
                 rulerSubCell.style.maxHeight = rulerSubCell.style.height;
                 rulerSubCell.style.width = this._noteWidth(noteValue) + 'px';
                 rulerSubCell.style.minWidth = rulerSubCell.style.width;
-                rulerSubCell.style.maxWidth = rulerSubCell.style.width;
                 rulerSubCell.style.border = '0px';
                 rulerSubCell.border = '0px';
                 rulerSubCell.padding = '0px';
@@ -1935,7 +1769,7 @@ function RhythmRuler () {
                     continue;
                 }
 
-                var rhythmRulerTableRow = docById('ruler' + drum);
+                var rhythmRulerTableRow = this._rulers[drum];
                 for (var j = 0; j < this._dissectHistory[i][0].length; j++) {
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
@@ -1953,7 +1787,7 @@ function RhythmRuler () {
                             if (cell != undefined) {
                                 this.__dissectByNumber(cell, this._dissectHistory[i][0][j][1], false);
                             } else {
-                                console.log('Could not find cell to divide. Did the order of the rhythm blocks change?');
+                                console.warn('Could not find cell to divide. Did the order of the rhythm blocks change?');
                             }
                         } else {
                             // divide is [cell, [values]]
@@ -1979,32 +1813,7 @@ function RhythmRuler () {
         }
 
         this._logo.textMsg(_('Click on the ruler to divide it.'));
-
-        this._initial_w = rulerDiv.style.width;
-        this._initial_h = rulerDiv.style.height;
         // this._piemenuRuler(this._rulerSelected);
-    };
-
-    this._addButton = function(row, icon, iconSize, label, extras) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = extras + '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
-
-        cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        }
-
-        return cell;
     };
 
     this._piemenuRuler = function (selectedRuler) {
@@ -2024,7 +1833,7 @@ function RhythmRuler () {
             this._wheel.removeWheel();
         }
 
-        console.log(this.Rulers[selectedRuler]);
+        console.debug(this.Rulers[selectedRuler]);
         this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
         this._wheel.wheelRadius = 200;
         this._wheel.maxPercent = 1.6;
@@ -2045,7 +1854,7 @@ function RhythmRuler () {
             }
         }
 
-        console.log(labels);
+        console.debug(labels);
         this._wheel.initWheel(labels);
 
         for (var i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
@@ -2106,8 +1915,7 @@ function RhythmRuler () {
         var that = this;
 
         var __selectionChanged = function () {
-            var numberInput = docById('dissectNumber');
-            numberInput.value = wheelValues[that._numberWheel.selectedNavItemIndex];
+            this._dissectNumber.value = wheelValues[that._numberWheel.selectedNavItemIndex];
         };
 
         var __exitMenu = function () {
@@ -2117,8 +1925,6 @@ function RhythmRuler () {
             that._numberWheel.removeWheel();
             that._exitWheel.removeWheel();
         };
-
-        var numberInput = docById('dissectNumber');
 
         this._positionWheel();
 
@@ -2158,7 +1964,7 @@ function RhythmRuler () {
         var y = this._top;
         var selectorWidth = 150;
 
-        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';        
+        docById('wheelDiv').style.left = Math.min(Math.max((x - (300 - selectorWidth) / 2), 0), this._logo.blocks.turtles._canvas.width - 300)  + 'px';
         if (y - 300 < 0) {
             docById('wheelDiv').style.top = (y + 60) + 'px';
         } else {
