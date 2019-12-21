@@ -41,42 +41,48 @@ saveMxmlOutput = function(logo) {
 
                 console.log(notes);
                 for(var obj of notes) {
-                    console.log(obj)
-                    var p = obj[0][0]; // pitch
-                    console.log("pitch is " + obj[0][0]);
-                    console.log("type of duration note is "+obj[1]);
-                    console.log("number of dots is "+obj[2]);
+                    console.log(obj);
 
-                    var alter;
-
-                    if(p[1] === '\u266d') {
-                        alter = -1; // flat
-                    } else if(p[1] === '\u266F') {
-                        alter = 1; // sharp
-                    } else {
-                        alter = 0; // no accidental
-                    }
-
-                    console.log("alter is "+alter)
-                    
-                    add('<note>');
-                    indent++;
-                        add('<pitch>')
+                    // We only add </chord> tag to the non-first elements in a chord
+                    var isChordNote = false;
+                    for(var p of obj[0]) {
+                        console.log("pitch is " + obj[0][0]);
+                        console.log("type of duration note is "+obj[1]);
+                        console.log("number of dots is "+obj[2]);
+    
+                        var alter;
+    
+                        if(p[1] === '\u266d') {
+                            alter = -1; // flat
+                        } else if(p[1] === '\u266F') {
+                            alter = 1; // sharp
+                        } else {
+                            alter = 0; // no accidental
+                        }
+    
+                        console.log("alter is "+alter)
+                        
+                        add('<note>');
                         indent++;
-                            add('<step>' + p[0] + '</step>');
-                            add('<octave>' + p[p.length-1] + '</octave>');
-                            if(alter != 0)
-                                add('<alter>' + alter + '</alter>');
-                            indent--;
-                        add('</pitch>');
-                
+                            if(isChordNote) add('<chord/>');
+                            add('<pitch>')
+                            indent++;
+                                add('<step>' + p[0] + '</step>');
+                                add('<octave>' + p[p.length-1] + '</octave>');
+                                if(alter != 0)
+                                    add('<alter>' + alter + '</alter>');
+                                indent--;
+                            add('</pitch>');
                     
-                        var dur = 32/obj[1];
-                        for(var i = 0; i < obj[2]; i++) dur += dur/2;
-
-                        add('<duration>'+ dur + '</duration>');
-                        indent--;
-                    add('</note>')
+                        
+                            var dur = 32/obj[1];
+                            for(var i = 0; i < obj[2]; i++) dur += dur/2;
+    
+                            add('<duration>'+ dur + '</duration>');
+                            indent--;
+                        add('</note>')
+                        isChordNote = true;
+                    }
                 }
 
                 indent--;
