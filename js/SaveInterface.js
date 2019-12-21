@@ -343,6 +343,25 @@ function SaveInterface(PlanetInterface) {
         });
     }
 
+    this.saveMxml = function(filename) {
+        this.logo.runningMxml = true;
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            this.logo.notationStaging[turtle] = [];
+            this.logo.notationDrumStaging[turtle] = [];
+            this.turtles.turtleList[turtle].doClear(true, true, true);
+        }
+        this.logo.runLogoCommands();
+
+        // this.download('musicxml', 'data:text;utf8,'+data);
+    }
+
+    this.afterSaveMxml = function(filename) {
+        var data = saveMxmlOutput(this.logo);
+        console.log("data is:");
+        console.log(data);
+        this.download('musicxml', 'data:text;utf8,' + encodeURIComponent(data), filename);
+    }
+
     this.init = function(){
         this.timeLastSaved = -100;
         window.onbeforeunload = function(e) {
