@@ -30,11 +30,12 @@ saveMxmlOutput = function(logo) {
         add('<part id="P1">');
         indent++;
 
-        // assume 4/4 time, 32 divisions bc smallest note is 1/32
-        // key is C by default
+            // assume 4/4 time, 32 divisions bc smallest note is 1/32
+            // key is C by default
+            var currMeasure = 1;
             add('<measure number="1"> <attributes> <divisions>32</divisions> <key> <fifths>0</fifths> </key> <time> <beats>4</beats> <beat-type>4</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
             indent++;
-                var divisionLeft = 32;
+                var divisionsLeft = 32;
                 console.log("logo notation staging is");
                 console.log(logo.notationStaging);
                 var notes = logo.notationStaging[0];
@@ -49,6 +50,18 @@ saveMxmlOutput = function(logo) {
                         console.log("pitch is " + obj[0][0]);
                         console.log("type of duration note is "+obj[1]);
                         console.log("number of dots is "+obj[2]);
+
+                        var dur = 32/obj[1];
+                        for(var i = 0; i < obj[2]; i++) dur += dur/2;
+
+                        if(divisionsLeft < dur && !isChordNote) {
+                            add('</measure>')
+                            currMeasure++;
+                            add('<measure number=\"' + currMeasure + '\"> ');
+                            divisionsLeft = 32;
+                        } else if(!isChordNote){
+                            divisionsLeft -= dur;
+                        }
     
                         var alter;
     
@@ -73,10 +86,6 @@ saveMxmlOutput = function(logo) {
                                     add('<alter>' + alter + '</alter>');
                                 indent--;
                             add('</pitch>');
-                    
-                        
-                            var dur = 32/obj[1];
-                            for(var i = 0; i < obj[2]; i++) dur += dur/2;
     
                             add('<duration>'+ dur + '</duration>');
                             indent--;
