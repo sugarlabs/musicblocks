@@ -47,7 +47,7 @@ saveMxmlOutput = function(logo) {
                 for(var i = 0; i < notes.length; i += 1) {
                     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
                     var obj = notes[i];
-                    if(obj === 'tie') {
+                    if(['tie', 'begin slur', 'end slur'].includes(obj)) {
                         continue;
                     }
                     // cnter++;
@@ -90,18 +90,28 @@ saveMxmlOutput = function(logo) {
                         add('<note>');
                         indent++;
                             if(isChordNote) add('<chord/>');
-                            if(obj[6]) {
-                                add('<notations>')
+                            add('<notations>')
+                            indent++;
+                                add('<articulations>');
                                 indent++;
-                                    add('<articulations>');
-                                    indent++;
+                                    if(obj[6]) {
                                         add('<staccato placement=\"below\"/>');
-                                        indent--;
-                                    add('</articulations>');
+                                    }
                                     indent--;
-                                add('</notations>');
+                                add('</articulations>');
                                 indent--;
+                            if(notes[i-1] === 'begin slur') {
+                                indent++;
+                                    add('<slur type=\"start\"/>');
+                                    indent--;
                             }
+                            if(notes[i+1] === 'end slur') {
+                                indent++;
+                                    add('<slur type="\stop\"/>')
+                                    indent--;
+                            }
+                            add('</notations>');
+
                             add('<pitch>')
                             indent++;
                                 add('<step>' + p[0] + '</step>');
