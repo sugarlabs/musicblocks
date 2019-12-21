@@ -41,10 +41,21 @@ saveMxmlOutput = function(logo) {
                 var notes = logo.notationStaging[0];
 
                 console.log(notes);
-                for(var obj of notes) {
+                var cnter = 0;
+                console.log(notes.length);
+
+                for(var i = 0; i < notes.length; i += 1) {
+                    var obj = notes[i];
+                    if(obj === 'tie') {
+                        continue;
+                    }
+                    // cnter++;
+                    // if(cnter > 10) break;
                     console.log(obj);
 
-                    // We only add </chord> tag to the non-first elements in a chord
+                    console.log("i is "+i)
+
+                    // // We only add </chord> tag to the non-first elements in a chord
                     var isChordNote = false;
                     for(var p of obj[0]) {
                         console.log("pitch is " + obj[0][0]);
@@ -52,7 +63,7 @@ saveMxmlOutput = function(logo) {
                         console.log("number of dots is "+obj[2]);
 
                         var dur = 32/obj[1];
-                        for(var i = 0; i < obj[2]; i++) dur += dur/2;
+                        for(var j = 0; j < obj[2]; j++) dur += dur/2;
 
                         if(divisionsLeft < dur && !isChordNote) {
                             add('</measure>')
@@ -88,6 +99,11 @@ saveMxmlOutput = function(logo) {
                             add('</pitch>');
     
                             add('<duration>'+ dur + '</duration>');
+                            if(notes[i+1] === 'tie') {
+                                add('<tie type=\"start\"/>');
+                            } else if(notes[i-1] === 'tie') {
+                                add('<tie type=\"end\"/>');
+                            }
                             indent--;
                         add('</note>')
                         isChordNote = true;
