@@ -2616,6 +2616,11 @@ function Activity() {
      */
     this.loadProject = function (projectID, flags, env) {
         console.debug('LOAD PROJECT');
+        if (planet === undefined) {
+            console.debug('CANNOT ACCESS PLANET');
+            return;
+        }
+
         //set default value of run
         flags = typeof flags !== 'undefined' ? flags : {
             run: false,
@@ -2643,7 +2648,7 @@ function Activity() {
 
             document.body.style.cursor = 'default';
             update = true;
-        }, 200);
+        }, 2500);
 
         var run = flags.run;
         var show = flags.show;
@@ -4305,6 +4310,7 @@ function Activity() {
                     this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
                     this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
                 } catch (e) {
+                    console.debug(e);
                     console.debug('Planet not available');
                     this.planet = null;
                 }
@@ -4315,6 +4321,7 @@ function Activity() {
         };
 
         try {
+            console.debug('TRYING TO OPEN PLANET');
             planet = new PlanetInterface(storage);
             planet.init();
         } catch (e) {
