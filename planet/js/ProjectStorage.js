@@ -172,16 +172,17 @@ function ProjectStorage(Planet) {
 
     // Ancillary Functions
 
-    this.set = function(key, obj) {
+    this.set = async function(key, obj) {
         var jsonobj = JSON.stringify(obj);
-        this.LocalStorage.setItem(key, jsonobj);
-        if(this.LocalStorage.getItem(key) !== jsonobj){
+        await this.LocalStorage.setItem(key, jsonobj);
+        let savedjsonobj = await this.LocalStorage.getItem(key);
+        if(savedjsonobj !== jsonobj){
             throw new Error("Not enough space to save locally");
         }
     };
 
-    this.get = function(key) {
-        var jsonobj = this.LocalStorage.getItem(key);
+    this.get = async function(key) {
+        let jsonobj = await this.LocalStorage.getItem(key);
         if (jsonobj === null || jsonobj === '') {
             return null;
         }
@@ -199,8 +200,8 @@ function ProjectStorage(Planet) {
         this.set(this.LocalStorageKey, this.data);
     };
 
-    this.restore = function() {
-        this.data = this.get(this.LocalStorageKey);
+    this.restore = async function() {
+        this.data = await this.get(this.LocalStorageKey);
     };
 
     this.initialiseStorage = function() {
@@ -230,9 +231,10 @@ function ProjectStorage(Planet) {
         return this.data.DefaultCreatorName;
     };
 
-    this.init = function() {
-        this.LocalStorage = Planet.LocalStorage;
-        this.restore();
+    this.init = async function() {
+        // don't use Planet's localStorage, use IndexedDB if available to allow bigger projects.
+        this.LocalStorage = localforage;
+        await this.restore();
         this.initialiseStorage();
     };
 };

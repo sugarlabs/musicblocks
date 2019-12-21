@@ -894,7 +894,7 @@ function Activity() {
         var mode = localStorage.beginnerMode;
 
         const MSGPrefix = '<a href=\'#\' ' +
-        'onClick=\'window.location.reload()\'' + 
+        'onClick=\'window.location.reload()\'' +
         'onMouseOver=\'this.style.opacity = 0.5\'' +
         'onMouseOut=\'this.style.opacity = 1\'>';
         const MSGSuffix = '</a>';
@@ -1036,7 +1036,7 @@ function Activity() {
      */
     doLargerBlocks = function () {
         blocks.activeBlock = null;
-     
+
         // hideDOMLabel();
 
         if (!resizeDebounce) {
@@ -1058,7 +1058,7 @@ function Activity() {
      */
     doSmallerBlocks = function () {
         blocks.activeBlock = null;
-      
+
         // hideDOMLabel();
 
         if (!resizeDebounce) {
@@ -1259,7 +1259,7 @@ function Activity() {
         var myCanvas = docById('myCanvas')
 
         var __heightBasedScroll = function (event) {
-            actualReszieHandler(); // check size during init 
+            actualReszieHandler(); // check size during init
             window.addEventListener("resize", resizeThrottler, false);
             var resizeTimeout;
 
@@ -1276,7 +1276,7 @@ function Activity() {
                 }
             };
         };
-    
+
         function actualReszieHandler () {
             // Handle the resize event
             var h = window.innerHeight;
@@ -2786,7 +2786,8 @@ function Activity() {
                     console.debug('empty session found: loading start');
                     justLoadStart();
                 } else {
-                    console.debug('restoring session: ' + sessionData);
+                    window.loadedSession = sessionData;
+                    console.debug(`restoring session: (in variable loadedSession) ${sessionData.substring(0,50)}...`);
                     // First, hide the palettes as they will need updating.
                     for (var name in blocks.palettes.dict) {
                         blocks.palettes.dict[name].hideMenu(true);
@@ -3262,7 +3263,7 @@ function Activity() {
         hideBlocksContainer = [];
         hideBlocksContainer.push(_makeButton(HIDEBLOCKSBUTTON, _('Show/hide block'), x, y, btnSize, 0));
         that._loadButtonDragHandler(hideBlocksContainer[0], x, y, _changeBlockVisibility, null, null, null, null);
-        
+
         hideBlocksContainer.push(_makeButton(HIDEBLOCKSFADEDBUTTON, _('Show/hide block'), x, y - btnSize, btnSize, 0));
         that._loadButtonDragHandler(hideBlocksContainer[1], x, y, _changeBlockVisibility, null, null, null, null);
         hideBlocksContainer[1].visible = false;
@@ -3800,7 +3801,7 @@ function Activity() {
      * Ran once dom is ready and editable
      * Sets up dependencies and vars
      */
-    this.domReady = function (doc) {
+    this.domReady = async function (doc) {
         // _onResize = _onResize;
         // var that = this;
         // window.onblur = functionf () {
@@ -3828,13 +3829,13 @@ function Activity() {
         ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
         // Get things started
-        this.init();
+        await this.init();
     };
 
     /*
      * Inits everything. The main function.
      */
-    this.init = function () {
+    this.init = async function () {
         console.debug('document.body.clientWidth and clientHeight: ' + document.body.clientWidth + ' ' + document.body.clientHeight);
         this._clientWidth = document.body.clientWidth;
         this._clientHeight = document.body.clientHeight;
@@ -4025,7 +4026,7 @@ function Activity() {
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
                     storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
-                    /* 
+                    /*
                     if (docById('ptmDiv').style.visibility !== 'hidden') {
                         docById('ptmDiv').style.visibility = 'hidden';
                         docById('ptmTableDiv').style.visibility = 'hidden';
@@ -4299,10 +4300,10 @@ function Activity() {
                 return this.planet.ProjectStorage.TimeLastSaved;
             };
 
-            this.init = function () {
+            this.init = async function () {
                 this.iframe = document.getElementById('planet-iframe');
                 try {
-                    this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage, window._);
+                    await this.iframe.contentWindow.makePlanet(_THIS_IS_MUSIC_BLOCKS_, storage, window._);
                     this.planet = this.iframe.contentWindow.p;
                     this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
                     this.planet.setPlanetClose(this.closePlanet.bind(this));
@@ -4323,7 +4324,7 @@ function Activity() {
         try {
             console.debug('TRYING TO OPEN PLANET');
             planet = new PlanetInterface(storage);
-            planet.init();
+            await planet.init();
         } catch (e) {
             planet = undefined;
         }
