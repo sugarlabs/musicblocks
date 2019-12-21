@@ -521,6 +521,8 @@ saveLilypondOutput = function(logo) {
             var noteCount = 0;
             for (var i = 0; i < logo.notationStaging[t].length; i++) {
                 var obj = logo.notationStaging[t][i];
+                console.log("obj is ");
+                console.log(obj);
                 if (typeof(obj) === 'object') {
                     for (var ii = 0; ii < obj[0].length; ii++) {
                         if (obj[0][ii] === 'R') {

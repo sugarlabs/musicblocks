@@ -304,6 +304,7 @@ function Logo () {
     this.pickupPoint = {};
     this.runningLilypond = false;
     this.runningAbc = false;
+    this.runningMxml = false;
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
@@ -734,7 +735,7 @@ function Logo () {
      * @returns {boolean}
      */
     this.recordingStatus = function () {
-        return this.recording || this.runningLilypond || this.runningAbc;
+        return this.recording || this.runningLilypond || this.runningAbc || this.runningMxml;
     };
 
     /**
@@ -1346,7 +1347,7 @@ function Logo () {
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
         this.pitchNumberOffset[turtle] = 39; // C4
-        this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
+        this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.moveable[turtle] = false;
         this.inNeighbor[turtle] = [];
         this.neighborStepPitch[turtle] = [];
@@ -7976,6 +7977,10 @@ function Logo () {
                         console.log('saving abc output:');
                         save.afterSaveAbc();
                         that.runningAbc = false;
+                    } else if (that.runningMxml) {
+                        console.log('saving mxml output');
+                        save.afterSaveMxml();
+                        that.runningMxml = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.log('finishing compiling');
                         if (!that.recording) {
@@ -8739,7 +8744,7 @@ function Logo () {
                                 var d = that.tieCarryOver[turtle];
                             }
 
-                            if (that.runningLilypond) {
+                            if (that.runningLilypond || that.runningMxml) {
                                 that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
