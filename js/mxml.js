@@ -45,6 +45,7 @@ saveMxmlOutput = function(logo) {
                 console.log(notes.length);
 
                 for(var i = 0; i < notes.length; i += 1) {
+                    // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
                     var obj = notes[i];
                     if(obj === 'tie') {
                         continue;
@@ -89,6 +90,18 @@ saveMxmlOutput = function(logo) {
                         add('<note>');
                         indent++;
                             if(isChordNote) add('<chord/>');
+                            if(obj[6]) {
+                                add('<notations>')
+                                indent++;
+                                    add('<articulations>');
+                                    indent++;
+                                        add('<staccato placement=\"below\"/>');
+                                        indent--;
+                                    add('</articulations>');
+                                    indent--;
+                                add('</notations>');
+                                indent--;
+                            }
                             add('<pitch>')
                             indent++;
                                 add('<step>' + p[0] + '</step>');
