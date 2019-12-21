@@ -2698,9 +2698,9 @@ function Activity() {
      *
      * @param loadProject all params are from load project function
      */
-    this.loadStartWrapper = function (func, arg1, arg2, arg3) {
+    this.loadStartWrapper = async function (func, arg1, arg2, arg3) {
         var time1 = new Date();
-        func(arg1, arg2, arg3);
+        await func(arg1, arg2, arg3);
 
         var time2 = new Date();
         var elapsedTime = time2.getTime() - time1.getTime();
@@ -2727,7 +2727,7 @@ function Activity() {
         */
     };
 
-    this._loadStart = function () {
+    this._loadStart = async function () {
         console.debug('LOAD START');
 
         // where to put this?
@@ -2743,7 +2743,7 @@ function Activity() {
 
         // Try restarting where we were when we hit save.
         if (planet) {
-            sessionData = planet.openCurrentProject();
+            sessionData = await planet.openCurrentProject();
         } else {
             var currentProject = storage.currentProject;
             sessionData = storage['SESSION' + currentProject];
@@ -4272,8 +4272,8 @@ function Activity() {
                 //}
             };
 
-            this.openCurrentProject = function () {
-                return this.planet.ProjectStorage.getCurrentProjectData();
+            this.openCurrentProject = async function () {
+                return await this.planet.ProjectStorage.getCurrentProjectData();
             };
 
             this.openProjectFromPlanet = function (id, error) {
