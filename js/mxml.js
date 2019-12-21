@@ -46,13 +46,27 @@ saveMxmlOutput = function(logo) {
                     console.log("pitch is " + obj[0][0]);
                     console.log("type of duration note is "+obj[1]);
                     console.log("number of dots is "+obj[2]);
+
+                    var alter;
+
+                    if(p[1] === '\u266d') {
+                        alter = -1; // flat
+                    } else if(p[1] === '\u266F') {
+                        alter = 1; // sharp
+                    } else {
+                        alter = 0; // no accidental
+                    }
+
+                    console.log("alter is "+alter)
                     
                     add('<note>');
                     indent++;
                         add('<pitch>')
                         indent++;
                             add('<step>' + p[0] + '</step>');
-                            add('<octave>' + p[1] + '</octave>');
+                            add('<octave>' + p[p.length-1] + '</octave>');
+                            if(alter != 0)
+                                add('<alter>' + alter + '</alter>');
                             indent--;
                         add('</pitch>');
                 
