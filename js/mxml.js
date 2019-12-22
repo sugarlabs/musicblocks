@@ -5,6 +5,8 @@ saveMxmlOutput = function(logo) {
     console.log("notationStaging is")
     console.log(logo.notationStaging);
 
+    // temporary until I get more things sorted out
+    const ignore = ['voice two', 'voice one', 'one voice'];
     var res = "";
     var indent = 0;
     add = function(str) {
@@ -57,6 +59,10 @@ saveMxmlOutput = function(logo) {
                         // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
                         var obj = notes[i];
                         if(['tie', 'begin slur', 'end slur'].includes(obj)) {
+                            continue;
+                        }
+
+                        if(ignore.includes(obj)) {
                             continue;
                         }
 
@@ -130,15 +136,19 @@ saveMxmlOutput = function(logo) {
                                         indent--;
                                 }
                                 add('</notations>');
-    
-                                add('<pitch>')
-                                indent++;
-                                    add('<step>' + p[0] + '</step>');
-                                    add('<octave>' + p[p.length-1] + '</octave>');
-                                    if(alter != 0)
-                                        add('<alter>' + alter + '</alter>');
-                                    indent--;
-                                add('</pitch>');
+                                
+                                if(p[0] === 'R') {
+                                    add('<rest/>')
+                                } else {
+                                    add('<pitch>')
+                                    indent++;
+                                        add('<step>' + p[0] + '</step>');
+                                        add('<octave>' + p[p.length-1] + '</octave>');
+                                        if(alter != 0)
+                                            add('<alter>' + alter + '</alter>');
+                                        indent--;
+                                    add('</pitch>');
+                                }
         
                                 add('<duration>'+ dur + '</duration>');
                                 if(notes[i+1] === 'tie') {
