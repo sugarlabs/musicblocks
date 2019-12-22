@@ -59,6 +59,16 @@ saveMxmlOutput = function(logo) {
                         if(['tie', 'begin slur', 'end slur'].includes(obj)) {
                             continue;
                         }
+
+                        if(obj === 'tempo') {
+                            var bpm = notes[i+1];
+                            var beatMeasure = notes[i+2];
+                            var bpmAdjusted = Math.floor(bpm*(4/beatMeasure));
+                            
+                            add('<sound tempo=\"'+bpmAdjusted+'\"/>');
+                            i += 2;
+                            continue;
+                        }
                         // cnter++;
                         // if(cnter > 10) break;
                         console.log(obj);
