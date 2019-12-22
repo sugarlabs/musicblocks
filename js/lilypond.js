@@ -474,6 +474,9 @@ processLilypondNotes = function (lilypond, logo, turtle) {
 
 
 saveLilypondOutput = function(logo) {
+    console.log("one function call");
+    console.log('logo notation staging is');
+    console.log(logo.notationStaging);
     const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
