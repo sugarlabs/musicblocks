@@ -333,7 +333,7 @@ function SaveInterface(PlanetInterface) {
         tmp[0].setSelectionRange(0, lydata.length);
         document.execCommand("copy");
         tmp.remove();
-        textMsg("Copied Lilypond code to clipboard. You can play it at <a href='http://lilybin.com' target='_blank'>http://lilybin.com</a>.");
+        textMsg(_('The Lilypond code is copied to clipboard. You can paste it here: ')  + "<a href='http://lilybin.com' target='_blank'>http://lilybin.com</a>.");
         this.download('ly', 'data:text;utf8,' + encodeURIComponent(lydata), filename);
     }
 
