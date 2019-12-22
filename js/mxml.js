@@ -66,6 +66,47 @@ saveMxmlOutput = function(logo) {
                             continue;
                         }
 
+                        if(obj === 'begin crescendo') {
+                            add('<direction placement=\"above\">');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"crescendo\"/>');
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+                        if(obj === 'begin decrescendo') {
+                            add('<direction placement=\"above\">');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"diminuendo\"/>');
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+                        if(obj === 'end crescendo' || obj === 'end decrescendo') {
+                            add('<direction>');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"stop\"/>')
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+
+
                         if(obj === 'tempo') {
                             var bpm = notes[i+1];
                             var beatMeasure = notes[i+2];
