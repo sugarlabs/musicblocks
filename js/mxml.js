@@ -66,6 +66,12 @@ saveMxmlOutput = function(logo) {
                             continue;
                         }
 
+                        // ignore key
+                        if(obj === 'key') {
+                            i += 2;
+                            continue;
+                        }
+
                         if(obj === 'begin crescendo') {
                             add('<direction placement=\"above\">');
                             indent++;
