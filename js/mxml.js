@@ -5,6 +5,8 @@ saveMxmlOutput = function(logo) {
     console.log("notationStaging is")
     console.log(logo.notationStaging);
 
+    // temporary until I get more things sorted out
+    const ignore = ['voice two', 'voice one', 'one voice'];
     var res = "";
     var indent = 0;
     add = function(str) {
@@ -44,9 +46,17 @@ saveMxmlOutput = function(logo) {
                 // assume 4/4 time, 32 divisions bc smallest note is 1/32
                 // key is C by default
                 var currMeasure = 1;
-                add('<measure number="1"> <attributes> <divisions>32</divisions> <key> <fifths>0</fifths> </key> <time> <beats>4</beats> <beat-type>4</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
+                var divisions = 32;
+                var beats = 4;
+                var beatType = 4;
+                var beatsChanged = false;
+                var newDivisions = -1;
+                var newBeats = -1;
+                var newBeats = -1;
+                var newBeatType = -1;
+                var openedMeasureTag = false;
                 indent++;
-                    var divisionsLeft = 32;
+                    var divisionsLeft = divisions;
                     var notes = logo.notationStaging[voice];
     
                     console.log(notes);
@@ -60,6 +70,57 @@ saveMxmlOutput = function(logo) {
                             continue;
                         }
 
+                        if(ignore.includes(obj)) {
+                            continue;
+                        }
+
+                        // ignore key
+                        if(obj === 'key') {
+                            i += 2;
+                            continue;
+                        }
+
+                        if(obj === 'begin crescendo') {
+                            add('<direction placement=\"above\">');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"crescendo\"/>');
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+                        if(obj === 'begin decrescendo') {
+                            add('<direction placement=\"above\">');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"diminuendo\"/>');
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+                        if(obj === 'end crescendo' || obj === 'end decrescendo') {
+                            add('<direction>');
+                            indent++;
+                                add('<direction-type>');
+                                indent++;
+                                    add('<wedge type=\"stop\"/>')
+                                    indent--;
+                                add('</direction-type>');
+                                indent--;
+                            add('</direction>');
+                            continue;
+                        }
+
+
+
                         if(obj === 'tempo') {
                             var bpm = notes[i+1];
                             var beatMeasure = notes[i+2];
@@ -67,6 +128,19 @@ saveMxmlOutput = function(logo) {
                             
                             add('<sound tempo=\"'+bpmAdjusted+'\"/>');
                             i += 2;
+                            continue;
+                        }
+
+                        if(obj === 'meter') {
+                            newBeats = notes[i+1];
+                            newBeatType = notes[i+2];
+                            
+                            
+                            // divisions per beat == how many 1/32 notes fit in one beat?
+                            newDivisions = newBeats * ((1/newBeatType) / (1/32));
+                            console.log("newDivisions is "+newDivisions)
+                            i += 2;
+                            beatsChanged = true;
                             continue;
                         }
                         // cnter++;
@@ -85,12 +159,28 @@ saveMxmlOutput = function(logo) {
                             var dur = 32/obj[1];
                             for(var j = 0; j < obj[2]; j++) dur += dur/2;
     
-                            if(divisionsLeft < dur && !isChordNote) {
+                            if(divisionsLeft < dur && !isChordNote && openedMeasureTag) {
                                 add('</measure>')
                                 currMeasure++;
-                                add('<measure number=\"' + currMeasure + '\"> ');
-                                divisionsLeft = 32;
-                            } else if(!isChordNote){
+                                divisionsLeft = divisions;
+                                openedMeasureTag = false;
+                            } 
+                            
+                            if(!isChordNote) {
+                                if(divisionsLeft === divisions) {
+                                    if(beatsChanged) {
+                                        beats = newBeats;
+                                        beatType = newBeatType;
+                                        divisions = newDivisions;
+                                        divisionsLeft = divisions;
+                                        console.log("newdivisions is nows "+newDivisions)
+                                        add('<measure number=\"'+ currMeasure +'\"> <attributes> <divisions>'+newDivisions+'</divisions> <key> <fifths>0</fifths> </key> <time> <beats>'+newBeats+'</beats> <beat-type>'+newBeatType+'</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
+                                        beatsChanged = false;
+                                    } else {
+                                        add('<measure number=\"'+ currMeasure +'\">');
+                                    }
+                                    openedMeasureTag = true;
+                                }
                                 divisionsLeft -= dur;
                             }
         
@@ -106,6 +196,7 @@ saveMxmlOutput = function(logo) {
         
                             console.log("alter is "+alter)
                             
+
                             add('<note>');
                             indent++;
                                 if(isChordNote) add('<chord/>');
@@ -130,15 +221,19 @@ saveMxmlOutput = function(logo) {
                                         indent--;
                                 }
                                 add('</notations>');
-    
-                                add('<pitch>')
-                                indent++;
-                                    add('<step>' + p[0] + '</step>');
-                                    add('<octave>' + p[p.length-1] + '</octave>');
-                                    if(alter != 0)
-                                        add('<alter>' + alter + '</alter>');
-                                    indent--;
-                                add('</pitch>');
+                                
+                                if(p[0] === 'R') {
+                                    add('<rest/>')
+                                } else {
+                                    add('<pitch>')
+                                    indent++;
+                                        add('<step>' + p[0] + '</step>');
+                                        add('<octave>' + p[p.length-1] + '</octave>');
+                                        if(alter != 0)
+                                            add('<alter>' + alter + '</alter>');
+                                        indent--;
+                                    add('</pitch>');
+                                }
         
                                 add('<duration>'+ dur + '</duration>');
                                 if(notes[i+1] === 'tie') {
