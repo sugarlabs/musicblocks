@@ -154,7 +154,7 @@ saveMxmlOutput = function(logo) {
     
                         console.log("i is "+i)
     
-                        // // We only add </chord> tag to the non-first elements in a chord
+                        // We only add </chord> tag to the non-first elements in a chord
                         var isChordNote = false;
                         for(var p of obj[0]) {
                             console.log("pitch is " + obj[0][0]);
@@ -164,11 +164,13 @@ saveMxmlOutput = function(logo) {
                             var dur = 32/obj[1];
                             for(var j = 0; j < obj[2]; j++) dur += dur/2;
     
-                            if(divisionsLeft < dur && !isChordNote && openedMeasureTag) {
-                                add('</measure>')
-                                currMeasure++;
-                                divisionsLeft = divisions;
-                                openedMeasureTag = false;
+                            if(divisionsLeft < dur && !isChordNote) {
+                                if(openedMeasureTag) {
+                                    add('</measure>')
+                                    currMeasure++;
+                                    divisionsLeft = divisions;
+                                    openedMeasureTag = false;
+                                }
                             } 
                             
                             if(!isChordNote) {
