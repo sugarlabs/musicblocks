@@ -280,5 +280,21 @@ saveMxmlOutput = function(logo) {
         })
     add('</score-partwise>');
 
+    // Filter voices
+    var mi = 1e5;
+    for(var i = 0; i < res.length-1; i++) {
+        if((res[i] === 'P' || res[i] === '#') && '123456789'.includes(res[i+1])) {
+            mi = Math.min(mi, parseInt(res[i+1]));
+        }
+    }
+
+    console.log("mi is "+mi);
+    for(var i = 0; i < res.length-1; i++) {
+        if((res[i] === 'P' || res[i] === '#') && '123456789'.includes(res[i+1])) {
+            console.log("replacing");
+            res[i+1] = parseInt(res[i+1]) - mi;
+        }
+    }
+
     return res;
 }
