@@ -289,12 +289,14 @@ saveMxmlOutput = function(logo) {
     }
 
     console.log("mi is "+mi);
+    res = res.split('');
     for(var i = 0; i < res.length-1; i++) {
         if((res[i] === 'P' || res[i] === '#') && '123456789'.includes(res[i+1])) {
             console.log("replacing");
-            res[i+1] = parseInt(res[i+1]) - mi;
+            res[i+1] = parseInt(res[i+1]) - mi+1;
         }
     }
+    res = res.join('');
 
     return res;
 }
