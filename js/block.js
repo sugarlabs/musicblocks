@@ -2503,7 +2503,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo', 'hertz'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo', 'hertz', 'right', 'left'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -3131,6 +3131,12 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case 'hertz':
                     this._piemenuNumber([220, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
+                    break;
+                case 'right':
+                    this._piemenuNumber([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330], this.value);
+                    break;
+                case 'left':
+                    this._piemenuNumber([330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0], this.value);
                     break;
                 }
 
