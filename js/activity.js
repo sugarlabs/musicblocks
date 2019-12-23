@@ -189,7 +189,8 @@ function Activity() {
             'widgets/musickeyboard',
             'widgets/timbre',
             'activity/lilypond',
-            'activity/abc'
+            'activity/abc',
+            'activity/mxml'
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
@@ -4347,7 +4348,7 @@ function Activity() {
         toolbar.renderStopIcon(that.doHardStopButton);
         toolbar.renderNewProjectIcon(_afterDelete);
         toolbar.renderLoadIcon(doLoad);
-        toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
+        toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveMxml.bind(save), save.saveBlockArtwork.bind(save));
         toolbar.renderPlanetIcon(planet, _doOpenSamples);
         toolbar.renderMenuIcon(_showHideAuxMenu);
         toolbar.renderHelpIcon(_showHelp);
