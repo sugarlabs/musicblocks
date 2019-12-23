@@ -359,7 +359,7 @@ function SaveInterface(PlanetInterface) {
         var data = saveMxmlOutput(this.logo);
         console.log("data is:");
         console.log(data);
-        this.download('musicxml', 'data:text;utf8,' + encodeURIComponent(data), filename);
+        this.download('xml', 'data:text;utf8,' + encodeURIComponent(data), filename);
         this.logo.runningMxml = false;
     }
 
