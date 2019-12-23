@@ -24,6 +24,9 @@ saveMxmlOutput = function(logo) {
         indent++;
             // Why is logo.notationStaging an object and not an array?
             Object.keys(logo.notationStaging).forEach((voice) => {
+                if(logo.notationStaging[voice].length === 0) {
+                    return;
+                }
                 console.log("voice is "+voice);
                 voiceNum = parseInt(voice) + 1;
                 add('<score-part id=\"P' + voiceNum + '\">');
@@ -37,6 +40,9 @@ saveMxmlOutput = function(logo) {
         indent--;
         
         Object.keys(logo.notationStaging).forEach((voice) => {
+            if(logo.notationStaging[voice].length === 0) {
+                return;
+            }
             voiceNum = parseInt(voice) + 1;
             console.log("hello");
             indent++;
@@ -166,6 +172,10 @@ saveMxmlOutput = function(logo) {
     
                             if(divisionsLeft < dur && !isChordNote) {
                                 if(openedMeasureTag) {
+                                    console.log("adding closing measure tag to voice "+voiceNum);
+                                    console.log('data is now')
+                                    console.log(res);
+                                    // throw "big chungus";
                                     add('</measure>')
                                     currMeasure++;
                                     divisionsLeft = divisions;
@@ -261,12 +271,32 @@ saveMxmlOutput = function(logo) {
                     }
     
                     indent--;
-                add('</measure>');
+                if(openedMeasureTag) {
+                    add('</measure>');
+                }
                 indent--;
             add('</part>');
             indent--;
         })
     add('</score-partwise>');
+
+    // Filter voices
+    var mi = 1e5;
+    for(var i = 0; i < res.length-1; i++) {
+        if((res[i] === 'P' || res[i] === '#') && '123456789'.includes(res[i+1])) {
+            mi = Math.min(mi, parseInt(res[i+1]));
+        }
+    }
+
+    console.log("mi is "+mi);
+    res = res.split('');
+    for(var i = 0; i < res.length-1; i++) {
+        if((res[i] === 'P' || res[i] === '#') && '123456789'.includes(res[i+1])) {
+            console.log("replacing");
+            res[i+1] = parseInt(res[i+1]) - mi+1;
+        }
+    }
+    res = res.join('');
 
     return res;
 }
