@@ -166,6 +166,10 @@ saveMxmlOutput = function(logo) {
     
                             if(divisionsLeft < dur && !isChordNote) {
                                 if(openedMeasureTag) {
+                                    console.log("adding closing measure tag to voice "+voiceNum);
+                                    console.log('data is now')
+                                    console.log(res);
+                                    // throw "big chungus";
                                     add('</measure>')
                                     currMeasure++;
                                     divisionsLeft = divisions;
@@ -261,7 +265,9 @@ saveMxmlOutput = function(logo) {
                     }
     
                     indent--;
-                add('</measure>');
+                if(openedMeasureTag) {
+                    add('</measure>');
+                }
                 indent--;
             add('</part>');
             indent--;

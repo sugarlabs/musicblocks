@@ -350,13 +350,18 @@ function SaveInterface(PlanetInterface) {
             this.logo.notationDrumStaging[turtle] = [];
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
+        
         this.logo.runLogoCommands();
+
+
 
         // this.download('musicxml', 'data:text;utf8,'+data);
     }
 
     this.afterSaveMxml = function(filename) {
         var data = saveMxmlOutput(this.logo);
+        data = saveMxmlOutput(this.logo);
+
         console.log("data is:");
         console.log(data);
         this.download('xml', 'data:text;utf8,' + encodeURIComponent(data), filename);
