@@ -62,6 +62,7 @@ saveMxmlOutput = function(logo) {
                 var newBeatType = -1;
                 var openedMeasureTag = false;
                 var queuedTempo = null;
+                var firstMeasure = true;
                 indent++;
                     var divisionsLeft = divisions;
                     var notes = logo.notationStaging[voice];
@@ -185,7 +186,10 @@ saveMxmlOutput = function(logo) {
                             
                             if(!isChordNote) {
                                 if(divisionsLeft === divisions) {
-                                    if(beatsChanged) {
+                                    if(firstMeasure) {
+                                        add('<measure number=\"'+ currMeasure +'\"> <attributes> <divisions>'+divisions+'</divisions> <key> <fifths>0</fifths> </key> <time> <beats>'+beats+'</beats> <beat-type>'+beatType+'</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>')
+                                        firstMeasure = false;
+                                    } else if(beatsChanged) {
                                         beats = newBeats;
                                         beatType = newBeatType;
                                         divisions = newDivisions;
