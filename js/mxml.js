@@ -24,6 +24,9 @@ saveMxmlOutput = function(logo) {
         indent++;
             // Why is logo.notationStaging an object and not an array?
             Object.keys(logo.notationStaging).forEach((voice) => {
+                if(logo.notationStaging[voice].length === 0) {
+                    return;
+                }
                 console.log("voice is "+voice);
                 voiceNum = parseInt(voice) + 1;
                 add('<score-part id=\"P' + voiceNum + '\">');
@@ -37,6 +40,9 @@ saveMxmlOutput = function(logo) {
         indent--;
         
         Object.keys(logo.notationStaging).forEach((voice) => {
+            if(logo.notationStaging[voice].length === 0) {
+                return;
+            }
             voiceNum = parseInt(voice) + 1;
             console.log("hello");
             indent++;
