@@ -216,9 +216,10 @@ saveMxmlOutput = function(logo) {
                                     add('<pitch>')
                                     indent++;
                                         add('<step>' + p[0] + '</step>');
-                                        add('<octave>' + p[p.length-1] + '</octave>');
-                                        if(alter != 0)
+                                        if(alter != 0) {
                                             add('<alter>' + alter + '</alter>');
+                                        }
+                                        add('<octave>' + p[p.length-1] + '</octave>');
                                         indent--;
                                     add('</pitch>');
                                 }
