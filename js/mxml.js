@@ -55,6 +55,7 @@ saveMxmlOutput = function(logo) {
                 var newBeats = -1;
                 var newBeatType = -1;
                 var openedMeasureTag = false;
+                var queuedTempo = null;
                 indent++;
                     var divisionsLeft = divisions;
                     var notes = logo.notationStaging[voice];
@@ -126,7 +127,11 @@ saveMxmlOutput = function(logo) {
                             var beatMeasure = notes[i+2];
                             var bpmAdjusted = Math.floor(bpm*(4/beatMeasure));
                             
-                            add('<sound tempo=\"'+bpmAdjusted+'\"/>');
+                            if(openedMeasureTag) {
+                                add('<sound tempo=\"'+bpmAdjusted+'\"/>');
+                            } else {
+                                queuedTempo = '<sound tempo=\"'+bpmAdjusted+'\"/>';
+                            }
                             i += 2;
                             continue;
                         }
@@ -180,6 +185,10 @@ saveMxmlOutput = function(logo) {
                                         add('<measure number=\"'+ currMeasure +'\">');
                                     }
                                     openedMeasureTag = true;
+                                    if(queuedTempo !== null) {
+                                        add(queuedTempo);
+                                        queuedTempo = null;
+                                    }
                                 }
                                 divisionsLeft -= dur;
                             }
@@ -200,6 +209,28 @@ saveMxmlOutput = function(logo) {
                             add('<note>');
                             indent++;
                                 if(isChordNote) add('<chord/>');
+                                
+                                if(p[0] === 'R') {
+                                    add('<rest/>')
+                                } else {
+                                    add('<pitch>')
+                                    indent++;
+                                        add('<step>' + p[0] + '</step>');
+                                        add('<octave>' + p[p.length-1] + '</octave>');
+                                        if(alter != 0)
+                                            add('<alter>' + alter + '</alter>');
+                                        indent--;
+                                    add('</pitch>');
+                                }
+
+                                add('<duration>'+ dur + '</duration>');
+                                if(notes[i+1] === 'tie') {
+                                    add('<tie type=\"start\"/>');
+                                } else if(notes[i-1] === 'tie') {
+                                    add('<tie type=\"end\"/>');
+                                }
+                                indent--;
+
                                 add('<notations>')
                                 indent++;
                                     add('<articulations>');
@@ -221,27 +252,6 @@ saveMxmlOutput = function(logo) {
                                         indent--;
                                 }
                                 add('</notations>');
-                                
-                                if(p[0] === 'R') {
-                                    add('<rest/>')
-                                } else {
-                                    add('<pitch>')
-                                    indent++;
-                                        add('<step>' + p[0] + '</step>');
-                                        add('<octave>' + p[p.length-1] + '</octave>');
-                                        if(alter != 0)
-                                            add('<alter>' + alter + '</alter>');
-                                        indent--;
-                                    add('</pitch>');
-                                }
-        
-                                add('<duration>'+ dur + '</duration>');
-                                if(notes[i+1] === 'tie') {
-                                    add('<tie type=\"start\"/>');
-                                } else if(notes[i-1] === 'tie') {
-                                    add('<tie type=\"end\"/>');
-                                }
-                                indent--;
                             add('</note>')
                             isChordNote = true;
                         }
