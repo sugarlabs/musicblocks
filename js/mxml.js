@@ -227,7 +227,7 @@ saveMxmlOutput = function(logo) {
                                 if(notes[i+1] === 'tie') {
                                     add('<tie type=\"start\"/>');
                                 } else if(notes[i-1] === 'tie') {
-                                    add('<tie type=\"end\"/>');
+                                    add('<tie type=\"stop\"/>');
                                 }
                                 indent--;
 
