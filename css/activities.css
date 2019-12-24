@@ -117,6 +117,31 @@
   line-height: 30px;
 }
 
+/*CSS for load animation*/
+#load-container {
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   position: fixed;
+   display: block;
+   background-color: #fff;
+   opacity: 0.7;
+   z-index: 99;
+   text-align: center;
+}
+
+#messageText{
+  margin-top: 200px;
+  font-size: 30px;
+  z-index: 100;
+}
+
+
+#loading-image{
+  z-index: 100;
+}
+
 #popdown-palette {
     display: none;
     position: absolute;
