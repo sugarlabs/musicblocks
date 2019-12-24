@@ -238,10 +238,12 @@ function Tempo () {
         // For the button callbacks
         var that = this;
 
-        widgetWindow.addButton('close-button.svg', ICONSIZE, _('Close')).onclick = function() {
-            that.hide();
-            that._logo.hideMsgs();
-        };
+        widgetWindow.onclose = function() {
+            if (that._intervalID != null) {
+                clearInterval(that._intervalID);
+            }
+            this.destroy();
+        }
 
         widgetWindow.addButton('pause-button.svg', ICONSIZE, _('Pause')).onclick = function() {
             if (that.isMoving) {
@@ -331,16 +333,7 @@ function Tempo () {
 
         this._logo.textMsg(_('Adjust the tempo with the buttons.'));
         this.resume();
+
+        widgetWindow.sendToCenter();
     };
-
-    this.hide = function () {
-        for (var i = 0; i < this.BPMs.length; i++) {
-            this.tempoCanvases[i].style.visibility = 'hidden';
-        }
-
-        if (this._intervalID != null) {
-            clearInterval(this._intervalID);
-        }
-    }
 };
-
