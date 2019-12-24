@@ -130,15 +130,15 @@ function WidgetWindow(key, title) {
         this._frame.style.opacity = "1";
     }
 
-    this.addButton = function (icon, iconSize, label) {
-        let el = create("div", "wfbtItem", this._toolbar);
+    this.addButton = function (icon, iconSize, label, parent) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         this._buttons.push(el);
         return el;
     };
 
-    this.addInputButton = function (initial) {
-        let el = create("div", "wfbtItem", this._toolbar);
+    this.addInputButton = function (initial, parent) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
         return el.querySelector("input");
     };
