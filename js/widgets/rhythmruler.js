@@ -372,7 +372,7 @@ function RhythmRuler () {
             if (event == undefined) return;
             if (!that.__getLongPressStatus()) {
                 var cell = event.target;
-                if (cell != null) {
+                if (cell !== null && cell.parentNode !== null) {
                     that._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
                 } else {
                     console.error('Rhythm Ruler: null cell found on click');
