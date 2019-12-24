@@ -59,7 +59,7 @@ also available.
     8. [Generating Arbitrary Pitches](#slider)
     9. [Changing Tempo](#tempo)
     10. [Custom Timbres](#timbre)
-    11. [Music Keyboard](#keyboard)
+    11. [Musical Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
 
@@ -1424,9 +1424,9 @@ As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
-### <a name="keyboard"></a>4.11 Music Keyboard
+### <a name="keyboard"></a>4.11 Musical Keyboard
 
-The Music Keyboard is used to generate notes by pressing keys of a virtual
+The Musical Keyboard is used to generate notes by pressing keys of a virtual
 keyboard.
 
 When there are no *Pitch* blocks inside the widget clamp, a keyboard with
@@ -1813,7 +1813,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | G major scale |
 | | rhythm maker |
 | | pitch staircase |
-| | music keyboard |
+| | musical keyboard |
 | | chromatic keyboard |
 | | pitch slider |
 | | pitch-drum maker |
