@@ -216,7 +216,7 @@ const SAMPLECENTERNO = {
     'celeste': ['C3', 27],  // pitchToNumber('C', 3, 'C Major')],
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
-    'viola': ['C4', 51]
+    'viola': ['D4', 55]
 };
 
 
