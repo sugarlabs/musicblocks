@@ -5537,7 +5537,7 @@ function Blocks (activity) {
 
         console.debug("Finished block loading");
         document.body.style.cursor = 'default';
-
+        document.getElementById("load-container").style.display = "none";
         var myCustomEvent = new Event('finishedLoading');
         document.dispatchEvent(myCustomEvent);
     };

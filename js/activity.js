@@ -945,6 +945,24 @@ function Activity() {
             disableHorizScrollIcon.style.display = 'none';
         }
     };
+    
+    
+    //Load Animation handler
+    doLoadAnimation = function(){
+      document.getElementById("load-container").style.display = "block";
+      var counter = 0;
+      setInterval(changeText, 2000);
+
+      function changeText() {
+        var randomLoadMessage = messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
+        document.getElementById("messageText").innerHTML = _(randomLoadMessage) + "...";
+        counter++;
+        if (counter >= messages.load_messages.length) {
+          counter = 0;
+        }
+      }
+    };
+    
 
     /*
      * @param chartBitmap bitmap of analysis charts
@@ -998,6 +1016,7 @@ function Activity() {
       var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
+        doLoadAnimation();
       var myRadarChart = null;
       var  scores = analyzeProject(blocks);
       var data = scoreToChartData(scores);
@@ -2630,6 +2649,7 @@ function Activity() {
         };
         loading = true;
         document.body.style.cursor = 'wait';
+        doLoadAnimation();
 
         // palettes.updatePalettes();
         setTimeout(function () {
@@ -2782,6 +2802,7 @@ function Activity() {
         }
 
         if (sessionData) {
+            doLoadAnimation();
             try {
                 if (sessionData === 'undefined' || sessionData === '[]') {
                     console.debug('empty session found: loading start');
@@ -4188,6 +4209,7 @@ function Activity() {
                 console.debug('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
+                doLoadAnimation();
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
@@ -4469,6 +4491,7 @@ function Activity() {
             reader.onload = (function (theFile) {
                 loading = true;
                 document.body.style.cursor = 'wait';
+                doLoadAnimation();
 
                 setTimeout(function () {
                     var rawData = reader.result;
@@ -4539,6 +4562,7 @@ function Activity() {
             reader.onload = (function (theFile) {
                 loading = true;
                 document.body.style.cursor = 'wait';
+                doLoadAnimation();
 
                 setTimeout(function () {
                     var rawData = reader.result;
@@ -4633,6 +4657,7 @@ function Activity() {
             reader.onload = (function (theFile) {
                 loading = true;
                 document.body.style.cursor = 'wait';
+                doLoadAnimation();
 
                 setTimeout(function () {
                     obj = processRawPluginData(reader.result, palettes, blocks, errorMsg, logo.evalFlowDict, logo.evalArgDict, logo.evalParameterDict, logo.evalSetterDict, logo.evalOnStartList, logo.evalOnStopList, palettes.pluginMacros);

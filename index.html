@@ -18,6 +18,8 @@
   </noscript>
   <script src="dist/app.min.js/?cb=1566155195010" defer>
   </script>
+	
+  <script type="text/javascript" src="js/loadmessages.json"></script>
 
   <!-- <script src="js/utils/detectIE.js">
   </script> -->
@@ -217,6 +219,16 @@
 
       <canvas id="myCanvas" width="1200" height="900">
       </canvas>
+	    
+     <!--Load Animation Container-->	    
+      <center>
+        <div id = "load-container">
+          <div id = "load-content">
+            <p id="messageText"></p>
+            <img id="loading-image" src="images/loading.gif" alt="Loading..." />
+          </div>
+        </div>
+      </center>
 
       <canvas id="overlayCanvas" width="1200" height="900" style="position:absolute; pointer-events:none; left:0; top:0; z-index:-100; visibility:hidden;">
       </canvas>
