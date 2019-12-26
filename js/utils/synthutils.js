@@ -169,7 +169,6 @@ const DEFAULTSYNTHVOLUME = {
     'flute': 90,
     'electronic synth': 90,
     'piano': 100,
-    // 'viola': 100,
     'viola': 20,
     'violin': 20,
     'banjo': 90,
