@@ -62,6 +62,9 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     console.debug('language setting is ' + language);
 
+    setupFlowBlocks();
+    setupNumberBlocks();
+
     // PITCH PALETTE
 
     var newblock = new ProtoBlock('rest');
@@ -3618,18 +3621,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     // NUMBERS PALETTE
 
-    var newblock = new ProtoBlock('int');
-    newblock.palette = palettes.dict['number'];
-    blocks.protoBlockDict['int'] = newblock;
-    //.TRANS: convert a real number to an integer
-    newblock.staticLabels.push(_('int'));
-    newblock.adjustWidthToLabel();
-    newblock.oneArgMathBlock();
-    newblock.defaults.push(100)
-    if (beginnerMode && !beginnerBlock('int')) {
-        newblock.hidden = true;
-    }
-
     var newblock = new ProtoBlock('not');
     newblock.palette = palettes.dict['boolean'];
     blocks.protoBlockDict['not'] = newblock;
@@ -4693,170 +4684,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     blocks.protoBlockDict['hidden'] = newblock;
     newblock.hiddenBlockFlow();
     newblock.hidden = true;
-
-    var newblock = new ProtoBlock('backward');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['backward'] = newblock;
-    //.TRANS: play music backward
-    newblock.staticLabels.push(_('backward'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('backward')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('duplicatenotes');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['duplicatenotes'] = newblock;
-    //.TRANS: play each note more than once
-    newblock.staticLabels.push(_('duplicate'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(2);
-    if (beginnerMode && !beginnerBlock('duplicatenotes')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('defaultcase');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['defaultcase'] = newblock;
-    //.TRANS: the default case used in a switch statement in programming
-    newblock.staticLabels.push(_('default'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampBlock();
-    if (beginnerMode && !beginnerBlock('defaultcase')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('case');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['case'] = newblock;
-    //.TRANS: the case statement used in a switch statement in programming
-    newblock.staticLabels.push(_('case'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('case')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('switch');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['switch'] = newblock;
-    //.TRANS: the switch statement used in programming
-    newblock.staticLabels.push(_('switch'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    if (beginnerMode && !beginnerBlock('switch')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('clamp');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['clamp'] = newblock;
-    newblock.flowClampBlock();
-    newblock.hidden = true;
-    if (beginnerMode && !beginnerBlock('clamp')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('break');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['break'] = newblock;
-    newblock.staticLabels.push(_('stop'));
-    newblock.adjustWidthToLabel();
-    newblock.basicBlockNoFlow();
-    if (beginnerMode && !beginnerBlock('break')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('waitFor');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['waitFor'] = newblock;
-    newblock.staticLabels.push(_('wait for'));
-    newblock.adjustWidthToLabel();
-    newblock.oneBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('waitFor')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('until');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['until'] = newblock;
-    if (language === 'ja') {
-        newblock.staticLabels.push(_('until'));
-        //.TRANS: do2 is do something until some condition is met (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do2'));
-    } else {
-        newblock.staticLabels.push(_('until'), _('do'));
-    }
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('until')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('while');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['while'] = newblock;
-    if (language === 'ja') {
-        newblock.staticLabels.push(_('while'));
-        //.TRANS: do2 is do something while some condition is true (JAPANESE ONLY)
-        newblock.staticLabels.push(_('do2'));
-    } else {
-        newblock.staticLabels.push(_('while'), _('do'));
-    }
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('while')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('ifthenelse');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['ifthenelse'] = newblock;
-    newblock.staticLabels.push(_('if'), _('then'), _('else'));
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.doubleFlowClampBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('ifthenelse')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('if');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['if'] = newblock;
-    newblock.staticLabels.push(_('if'), _('then'));
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('if')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('forever');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['forever'] = newblock;
-    newblock.staticLabels.push(_('forever'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('forever')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('repeat');
-    newblock.palette = palettes.dict['flow'];
-    blocks.protoBlockDict['repeat'] = newblock;
-    newblock.staticLabels.push(_('repeat'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(4);
-    if (beginnerMode && !beginnerBlock('repeat')) {
-        newblock.hidden = true;
-    }
 
     // EXTRAS PALETTE
 

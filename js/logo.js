@@ -2096,33 +2096,31 @@ function Logo () {
                 }
             }
             break;
+        
+        // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'backward':
+        case 'duplicatenotes':
+        case 'defaultcase':
+        case 'case':
+        case 'switch':
+        case 'clamp':
+        case 'break':
+        case 'waitFor':
+        case 'until':
+        case 'while':
+        case 'ifthenelse':
+        case 'if':
+        case 'repeat':
         case 'forever':
-            if (args.length === 1) {
-                childFlow = args[0];
-                // If we are running in non-interactive mode, we
-                // need to put a bounds on "forever".
-                if (that.suppressOutput[turtle]) {
-                    childFlowCount = 20;
-                } else {
-                    childFlowCount = -1;
-                }
-            }
+            let [cf, cfc] = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
+            if (cf !== undefined) childFlow = cf;
+            if (cfc !== undefined) childFlowCount = cfc;
             break;
+
         case 'hidden':
         case 'hiddennoflow':
             // Hidden block is used at end of clamps and actions to
             // trigger listeners.
-            break;
-        case 'break':
-            that._doBreak(turtle);
-            // Since we pop the queue, we need to unhighlight our
-            // parent.
-            var parentBlk = that.blocks.blockList[blk].connections[0];
-            if (parentBlk != null) {
-                if (!that.suppressOutput[turtle] && that.justCounting[turtle].length === 0) {
-                    that.unhighlightQueue[turtle].push(parentBlk);
-                }
-            }
             break;
         case 'wait':
             if (args.length === 1) {
@@ -2239,163 +2237,9 @@ function Logo () {
                 }
             }
             break;
-        case 'repeat':
-            if (args[1] === undefined) {
-                // nothing to do
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1;
-            } else {
-                var arg = args[0];
-            }
-
-            childFlow = args[1];
-            childFlowCount = Math.floor(arg);
-            break;
-        case 'clamp':
-            if (args.length === 1) {
-                childFlow = args[0];
-                childFlowCount = 1;
-            }
-            break;
-        case 'until':
-            // Similar to 'while'
-            if (args.length === 2) {
-                // Queue the child flow.
-                childFlow = args[1];
-                childFlowCount = 1;
-                if (!args[0]) {
-                    // We will add the outflow of the until block
-                    // each time through, so we pop it off so as
-                    // to not accumulate multiple copies.
-                    var queueLength = that.turtles.turtleList[turtle].queue.length;
-                    if (queueLength > 0) {
-                        if (that.turtles.turtleList[turtle].queue[queueLength - 1].parentBlk === blk) {
-                            that.turtles.turtleList[turtle].queue.pop();
-                        }
-                    }
-                    // Requeue.
-                    var parentBlk = that.blocks.blockList[blk].connections[0];
-                    var queueBlock = new Queue(blk, 1, parentBlk);
-                    that.parentFlowQueue[turtle].push(parentBlk);
-                    that.turtles.turtleList[turtle].queue.push(queueBlock);
-                } else {
-                    // Since an until block was requeued each
-                    // time, we need to flush the queue of all but
-                    // the last one, otherwise the child of the
-                    // until block is executed multiple times.
-                    var queueLength = that.turtles.turtleList[turtle].queue.length;
-                    for (var i = queueLength - 1; i > 0; i--) {
-                        if (that.turtles.turtleList[turtle].queue[i].parentBlk === blk) {
-                            that.turtles.turtleList[turtle].queue.pop();
-                        }
-                    }
-                }
-            }
-            break;
         case 'movable':  // legacy typo
             if (args.length === 1) {
                 that.moveable[turtle] = args[0];
-            }
-            break;
-        case 'waitFor':
-            if (args.length === 1) {
-                if (!args[0]) {
-                    // Requeue.
-                    var parentBlk = that.blocks.blockList[blk].connections[0];
-                    var queueBlock = new Queue(blk, 1, parentBlk);
-                    that.parentFlowQueue[turtle].push(parentBlk);
-                    that.turtles.turtleList[turtle].queue.push(queueBlock);
-                    that._doWait(0.05);
-                } else {
-                    // Since a wait for block was requeued each
-                    // time, we need to flush the queue of all but
-                    // the last one, otherwise the child of the
-                    // while block is executed multiple times.
-                    var queueLength = that.turtles.turtleList[turtle].queue.length;
-                    var kept_one = false;
-                    for (var i = queueLength - 1; i > 0; i--) {
-                        if (that.turtles.turtleList[turtle].queue[i].parentBlk === blk) {
-                            if (kept_one) {
-                                that.turtles.turtleList[turtle].queue.pop();
-                            } else {
-                                kept_one = true;
-                            }
-                        }
-                    }
-
-                    // We need to reset the turtle time.
-                    if (that.firstNoteTime == null) {
-                        var d = new Date();
-                        that.firstNoteTime = d.getTime();
-                    }
-
-                    var d = new Date();
-                    var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
-                    that.turtleTime[turtle] = elapsedTime;
-                    that.previousTurtleTime[turtle] = elapsedTime;
-                }
-            }
-            break;
-        case 'if':
-            if (args.length === 2) {
-                if (args[0]) {
-                    childFlow = args[1];
-                    childFlowCount = 1;
-                }
-            }
-            break;
-        case 'ifthenelse':
-            if (args.length === 3) {
-                if (args[0]) {
-                    childFlow = args[1];
-                    childFlowCount = 1;
-                } else {
-                    childFlow = args[2];
-                    childFlowCount = 1;
-                }
-            }
-            break;
-        case 'while':
-            // While is tricky because we need to recalculate
-            // args[0] each time, so we requeue the While block
-            // itself.
-            if (args.length === 2) {
-                if (args[0]) {
-                    // We will add the outflow of the while block
-                    // each time through, so we pop it off so as
-                    // to not accumulate multiple copies.
-                    var queueLength = that.turtles.turtleList[turtle].queue.length;
-                    if (queueLength > 0) {
-                        if (that.turtles.turtleList[turtle].queue[queueLength - 1].parentBlk === blk) {
-                            that.turtles.turtleList[turtle].queue.pop();
-                        }
-                    }
-
-                    var parentBlk = that.blocks.blockList[blk].connections[0];
-                    var queueBlock = new Queue(blk, 1, parentBlk);
-                    that.parentFlowQueue[turtle].push(parentBlk);
-                    that.turtles.turtleList[turtle].queue.push(queueBlock);
-
-                    // and queue the interior child flow.
-                    childFlow = args[1];
-                    childFlowCount = 1;
-                } else {
-                    // Since a while block was requeued each time,
-                    // we need to flush the queue of all but the
-                    // last one, otherwise the child of the while
-                    // block is executed multiple times.
-                    var queueLength = that.turtles.turtleList[turtle].queue.length;
-                    for (var i = queueLength - 1; i > 0; i--) {
-                        if (that.turtles.turtleList[turtle].queue[i].parentBlk === blk) {
-                            // if (that.turtles.turtleList[turtle].queue[i].blk === blk) {
-                            that.turtles.turtleList[turtle].queue.pop();
-                        }
-                    }
-                }
             }
             break;
         case 'storein2':
@@ -4324,64 +4168,6 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
-        case 'switch':
-            that.switchBlocks[turtle].push(blk);
-            that.switchCases[turtle][blk] = [];
-
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_switch_' + blk + '_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                var switchBlk = last(that.switchBlocks[turtle]);
-                // Run the cases here.
-                var argBlk = that.blocks.blockList[switchBlk].connections[1];
-                if (argBlk == null) {
-                    var switchCase = '__default__';
-                } else {
-                    var switchCase = that.parseArg(that, turtle, argBlk, that.receievedArg);
-                }
-
-                var caseFlow = null;
-                for (var i = 0; i < that.switchCases[turtle][switchBlk].length; i++) {
-                    if (that.switchCases[turtle][switchBlk][i][0] === switchCase) {
-                        caseFlow = that.switchCases[turtle][switchBlk][i][1];
-                        break;
-                    } else if (that.switchCases[turtle][switchBlk][i][0] === '__default__') {
-                        caseFlow = that.switchCases[turtle][switchBlk][i][1];
-                    }
-                }
-
-                if (caseFlow != null) {
-                    var queueBlock = new Queue(caseFlow, 1, switchBlk, null);
-                    that.parentFlowQueue[turtle].push(switchBlk);
-                    that.turtles.turtleList[turtle].queue.push(queueBlock);
-                }
-
-                // Clean up afterward.
-                that.switchCases[turtle][switchBlk] = [];
-                that.switchBlocks[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'defaultcase':
-        case 'case':
-            var switchBlk = last(that.switchBlocks[turtle]);
-            if (switchBlk === null) {
-                that.errorMsg(_('The Case Block must be used inside of a Switch Block.'), blk);
-                that.stopTurtle = true;
-                break;
-            }
-
-            if (that.blocks.blockList[blk].name === 'defaultcase') {
-                that.switchCases[turtle][switchBlk].push(['__default__', args[0]]);
-            } else {
-                that.switchCases[turtle][switchBlk].push([args[0], args[1]]);
-            }
-            break;
         case 'invert2':
         case 'invert':
             // Deprecated
@@ -4398,32 +4184,6 @@ function Logo () {
 
             var __listener = function (event) {
                 that.invertList[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'backward':
-            that.backward[turtle].push(blk);
-            // Set child to bottom block inside clamp
-            childFlow = that.blocks.findBottomBlock(args[0]);
-            childFlowCount = 1;
-
-            var listenerName = '_backward_' + turtle + '_' + blk;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var nextBlock = that.blocks.blockList[blk].connections[2];
-            if (nextBlock == null) {
-                that.backward[turtle].pop();
-            } else {
-                if (nextBlock in that.endOfClampSignals[turtle]) {
-                    that.endOfClampSignals[turtle][nextBlock].push(listenerName);
-                } else {
-                    that.endOfClampSignals[turtle][nextBlock] = [listenerName];
-                }
-            }
-
-            var __listener = function (event) {
-                that.backward[turtle].pop();
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -6506,172 +6266,6 @@ function Logo () {
                 }
 
                 that.swingCarryOver[turtle] = 0;
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'duplicatenotes':
-            if (args[1] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 2;
-            } else {
-                var arg0 = args[0];
-            }
-
-            var factor = Math.floor(arg0);
-            if (factor < 1) {
-                that.errorMsg(ZERODIVIDEERRORMSG, blk);
-                that.stopTurtle = true;
-            } else {
-                that.duplicateFactor[turtle] *= factor;
-
-                // Queue each block in the clamp.
-                var listenerName = '_duplicate_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __lookForOtherTurtles = function (blk, turtle) {
-                    for (var t in that.connectionStore) {
-                        if (t !== turtle.toString()) {
-                            for (var b in that.connectionStore[t]) {
-                                if (b === blk.toString()) {
-                                    return t;
-                                }
-                            }
-                        }
-                    }
-
-                    return null;
-                }
-
-                that.inDuplicate[turtle] = true;
-
-                var __listener = function (event) {
-                    that.inDuplicate[turtle] = false;
-                    that.duplicateFactor[turtle] /= factor;
-
-                    // Check for a race condition.
-                    // FIXME: Do something about the race condition.
-                    if (that.connectionStoreLock) {
-                        console.debug('LOCKED');
-                    }
-
-                    that.connectionStoreLock = true;
-
-                    // The last turtle should restore the broken connections.
-                    if (__lookForOtherTurtles(blk, turtle) == null) {
-                        var n = that.connectionStore[turtle][blk].length;
-                        for (var i = 0; i < n; i++) {
-                            var obj = that.connectionStore[turtle][blk].pop();
-                            that.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
-                                that.blocks.blockList[obj[2]].connections[0] = obj[0];
-                            }
-                        }
-                    } else {
-                        delete that.connectionStore[turtle][blk];
-                    }
-
-                    that.connectionStoreLock = false;
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-
-                // Test for race condition.
-                // FIXME: Do something about the race condition.
-                if (that.connectionStoreLock) {
-                    console.debug('LOCKED');
-                }
-
-                that.connectionStoreLock = true;
-
-                // Check to see if another turtle has already disconnected
-                // these blocks.
-                var otherTurtle = __lookForOtherTurtles(blk, turtle);
-                if (otherTurtle != null) {
-                    // Copy the connections and queue the blocks.
-                    that.connectionStore[turtle][blk] = [];
-                    for (var i = that.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                        var obj = [that.connectionStore[otherTurtle][blk][i - 1][0], that.connectionStore[otherTurtle][blk][i - 1][1], that.connectionStore[otherTurtle][blk][i - 1][2]];
-                        that.connectionStore[turtle][blk].push(obj);
-                        var child = obj[0];
-                        if (that.blocks.blockList[child].name === 'hidden') {
-                            child = that.blocks.blockList[child].connections[0];
-                        }
-
-                        var queueBlock = new Queue(child, factor, blk, receivedArg);
-                        that.parentFlowQueue[turtle].push(blk);
-                        that.turtles.turtleList[turtle].queue.push(queueBlock);
-                    }
-                } else {
-                    var child = that.blocks.findBottomBlock(args[1]);
-                    while (child != blk) {
-                        if (that.blocks.blockList[child].name !== 'hidden') {
-                            var queueBlock = new Queue(child, factor, blk, receivedArg);
-                            that.parentFlowQueue[turtle].push(blk);
-                            that.turtles.turtleList[turtle].queue.push(queueBlock);
-                        }
-
-                        child = that.blocks.blockList[child].connections[0];
-                    }
-
-                    // Break the connections between blocks in the clamp so
-                    // that when we run the queues, only the individual blocks
-                    // run.
-                    that.connectionStore[turtle][blk] = [];
-                    var child = args[1];
-                    while (child != null) {
-                        var lastConnection = that.blocks.blockList[child].connections.length - 1;
-                        var nextBlk = that.blocks.blockList[child].connections[lastConnection];
-                        // Don't disconnect a hidden block from its parent.
-                        if (nextBlk != null && that.blocks.blockList[nextBlk].name === 'hidden') {
-                            that.connectionStore[turtle][blk].push([nextBlk, 1, that.blocks.blockList[nextBlk].connections[1]]);
-                            child = that.blocks.blockList[nextBlk].connections[1];
-                            that.blocks.blockList[nextBlk].connections[1] = null;
-                        } else {
-                            that.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
-                            that.blocks.blockList[child].connections[lastConnection] = null;
-                            child = nextBlk;
-                        }
-
-                        if (child != null) {
-                            that.blocks.blockList[child].connections[0] = null;
-                        }
-                    }
-                }
-
-                that.connectionStoreLock = false;
-            }
-            break;
-        case 'skipnotes':
-            if (args[1] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var factor = 2;
-            } else {
-                var factor = args[0];
-            }
-
-            that.skipFactor[turtle] *= factor;
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_skip_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.skipFactor[turtle] /= factor;
-                if (that.skipFactor[turtle] === 1) {
-                    that.skipIndex[turtle] = 0;
-                }
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -10358,30 +9952,13 @@ function Logo () {
                     }
                 }
                 break;
+            
+            // ----- ADD SMART BLOCK CLASSES HERE -----
             case 'int':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'int']);
-                } else {
-                    var cblk = that.blocks.blockList[blk].connections[1];
-                    if (cblk === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                        if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = Math.floor(a);
-                        } else {
-                            try {
-                                that.blocks.blockList[blk].value = Math.floor(Number(a));
-                            } catch (e) {
-                                console.debug(e);
-                                that.errorMsg(NANERRORMSG, blk);
-                                that.blocks.blockList[blk].value = 0;
-                            }
-                        }
-                    }
-                }
+                that.blocks.blockList[blk].protoblock.arg(that);
                 break;
+            
+            
             case 'mod':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'mod']);
