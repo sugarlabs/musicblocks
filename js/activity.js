@@ -955,7 +955,7 @@ function Activity() {
 
       function changeText() {
         var randomLoadMessage = messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
-        document.getElementById("messageText").innerHTML = randomLoadMessage;
+        document.getElementById("messageText").innerHTML = _(randomLoadMessage) + "...";
         counter++;
         if (counter >= messages.load_messages.length) {
           counter = 0;
@@ -2802,6 +2802,7 @@ function Activity() {
         }
 
         if (sessionData) {
+            doLoadAnimation();
             try {
                 if (sessionData === 'undefined' || sessionData === '[]') {
                     console.debug('empty session found: loading start');
