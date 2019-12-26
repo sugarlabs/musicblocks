@@ -169,7 +169,9 @@ const DEFAULTSYNTHVOLUME = {
     'flute': 90,
     'electronic synth': 90,
     'piano': 100,
-    'viola': 100,
+    // 'viola': 100,
+    'viola': 20,
+    'violin': 20,
     'banjo': 90,
     'koto': 70,
     'kick drum': 100,
@@ -921,6 +923,7 @@ function Synth() {
             console.debug(sourceName + ' already loaded');
         } else {
             console.debug('loading ' + sourceName);
+	    this.setVolume(turtle, sourceName, DEFAULTVOLUME);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
 
@@ -1206,6 +1209,7 @@ function Synth() {
     this.setVolume = function (turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
+	console.log(instrumentName);
         if (instrumentName in DEFAULTSYNTHVOLUME) {
             var sv = DEFAULTSYNTHVOLUME[instrumentName];
             if (volume > 50) {
@@ -1222,6 +1226,7 @@ function Synth() {
         var db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
+	    console.log(db);
         }
     };
 
