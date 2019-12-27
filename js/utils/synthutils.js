@@ -215,7 +215,7 @@ const SAMPLECENTERNO = {
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tuba': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
-    'oboe': ['C4', 27], // pitchToNumber('C', 3, 'C Major')],
+    'oboe': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
     'trombone': ['C4', 27], // pitchToNumber('C', 3, 'C Major')],
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
@@ -226,7 +226,7 @@ const SAMPLECENTERNO = {
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
     'viola': ['C4', 51],
-    'double bass': ['C4', 51]
+    'double bass': ['C5', 51]
 };
 
 
