@@ -369,14 +369,23 @@ function Blocks (activity) {
             }
 
             blkObj.connections[0] = null;
-            blkObj.connections[blkObj.connections.length - 1] = null;
+
+            if (lastConnection != null) {
+                // Is it a hidden block? Keep it attached.
+                if (this.blockList[lastConnection].name === 'hidden') {
+                    lastConnection = last(this.blockList[lastConnection].connections);
+                    this.blockList[last(blkObj.connections)].connections[this.blockList[last(blkObj.connections)].connections.length - 1] = null;
+                } else {
+                    blkObj.connections[blkObj.connections.length - 1] = null;
+                }
+                
+                if (lastConnection != null) {
+                    this.blockList[lastConnection].connections[0] = firstConnection;
+                }
+            }
 
             if (firstConnection != null) {
                 this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
-            }
-
-            if (lastConnection != null) {
-                this.blockList[lastConnection].connections[0] = firstConnection;
             }
 
             this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
