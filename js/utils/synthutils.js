@@ -1123,8 +1123,11 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-        // console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
-        if (paramsEffects !== null && paramsEffects !== undefined) {
+        console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+	// Effects don't work with sine, sawtooth, et al.
+        if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(instrumentName) !== -1) {
+            paramsEffects = null;
+        } else if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects['vibratoIntensity'] !== 0) {
                 paramsEffects.doVibrato = true;
             }
@@ -1148,7 +1151,6 @@ function Synth() {
             if (paramsEffects['neighborSynth']) {
                 paramsEffects.doNeighbor = true;
             }
-
         }
 
         var tempNotes = notes;
@@ -1220,7 +1222,6 @@ function Synth() {
     this.setVolume = function (turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
-	console.log(instrumentName);
         if (instrumentName in DEFAULTSYNTHVOLUME) {
             var sv = DEFAULTSYNTHVOLUME[instrumentName];
             if (volume > 50) {
@@ -1237,7 +1238,6 @@ function Synth() {
         var db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
-	    console.log(db);
         }
     };
 
