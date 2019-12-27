@@ -952,7 +952,7 @@ function Activity() {
         var messages = {'load_messages': [
             _('Catching mice'),
             _('Cleaning the instruments'),
-            _('Testing keypieces'),
+            _('Testing key pieces'),
             _('Sight-reading'),
             _('Combining math and music'),
             _('Generating more blocks'),
