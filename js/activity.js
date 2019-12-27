@@ -948,21 +948,33 @@ function Activity() {
     
     
     //Load Animation handler
-    doLoadAnimation = function(){
-      document.getElementById("load-container").style.display = "block";
-      var counter = 0;
-      setInterval(changeText, 2000);
+    doLoadAnimation = function() {
+        var messages = {'load_messages': [
+            _('Catching mice'),
+            _('Cleaning the instruments'),
+            _('Testing keypieces'),
+            _('Sight-reading'),
+            _('Combining math and music'),
+            _('Generating more blocks'),
+            _('Do Re Mi Fa Sol La Ti Do'),
+            _('Tuning string instruments'),
+            _('Pressing random keys'),
+        ]};
 
-      function changeText() {
-        var randomLoadMessage = messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
-        document.getElementById("messageText").innerHTML = _(randomLoadMessage) + "...";
-        counter++;
-        if (counter >= messages.load_messages.length) {
-          counter = 0;
+        document.getElementById('load-container').style.display = 'block';
+        var counter = 0;
+        setInterval(changeText, 2000);
+
+        function changeText() {
+            var randomLoadMessage = messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
+            document.getElementById('messageText').innerHTML = randomLoadMessage + '...';
+            counter++;
+            if (counter >= messages.load_messages.length) {
+                counter = 0;
+            }
         }
-      }
     };
-    
+
 
     /*
      * @param chartBitmap bitmap of analysis charts
