@@ -2329,12 +2329,10 @@ function initPalettes (palettes) {
     // Give the palettes time to load.
     // We are in no hurry since we are waiting on the splash screen.
     // await delayExecution(1000)
-    setTimeout(function () {
-	console.debug('Palettes.show');
-        palettes.show();
-        palettes.bringToTop();
-        palettes.showSelection(0);
-    }, 6000);
+    console.debug('Palettes.show');
+    palettes.show();
+    palettes.bringToTop();
+    palettes.showSelection(0);
 };
 
 const MODEUNSURE = 0;
