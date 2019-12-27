@@ -31,8 +31,6 @@ var VOICENAMES = [
     [_('cello'), 'cello', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('bass'), 'bass', 'images/voices.svg', 'string'],
-    //.TRANS: viola musical instrument
-    [_('double bass'), 'double bass', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
     [_('guitar'), 'guitar', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
@@ -47,10 +45,6 @@ var VOICENAMES = [
     [_('tuba'), 'tuba', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('trumpet'), 'trumpet', 'images/voices.svg', 'wind'],
-    //.TRANS: musical instrument
-    [_('oboe'), 'oboe', 'images/voices.svg', 'wind'],
-    //.TRANS: musical instrument
-    [_('trombone'), 'trombone', 'images/voices.svg', 'wind'],
     //.TRANS: musical instrument
     [_('banjo'), 'banjo', 'images/voices.svg', 'string'],
     //.TRANS: musical instrument
@@ -166,7 +160,7 @@ var SOUNDSAMPLESDEFINES = [
     "samples/bassoon", "samples/celeste", "samples/raindrop",
     "samples/koto", "samples/gong", "samples/dulcimer",
     "samples/electricguitar", "samples/xylophone", "samples/vibraphone",
-    "samples/japanese_drum", "samples/viola", "samples/oboe", "samples/trombone", "samples/doublebass", // "samples/japanese_bell",
+    "samples/japanese_drum", "samples/viola", // "samples/japanese_bell",
 ]
 
 
@@ -215,8 +209,6 @@ const SAMPLECENTERNO = {
     'clarinet': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'tuba': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
     'trumpet': ['C3', 27], // pitchToNumber('C', 3, 'C Major')],
-    'oboe': ['C4', 27], // pitchToNumber('C', 3, 'C Major')],
-    'trombone': ['C4', 27], // pitchToNumber('C', 3, 'C Major')],
     'banjo': ['C6', 63],  // pitchToNumber('C', 6, 'C Major')],
     'koto': ['C5', 51],  // pitchToNumber('C', 5, 'C Major')],
     'dulcimer': ['C4', 39],  // pitchToNumber('C', 4, 'C Major')],
@@ -226,7 +218,6 @@ const SAMPLECENTERNO = {
     'vibraphone': ['C5', 51],
     'xylophone': ['C4', 39],
     'viola': ['C4', 51],
-    'double bass': ['C4', 51]
 };
 
 
@@ -504,14 +495,11 @@ function Synth() {
                 {'name': 'piano', 'data': PIANO_SAMPLE},
                 {'name': 'violin', 'data': VIOLIN_SAMPLE},
                 {'name': 'viola', 'data': VIOLA_SAMPLE},
-		{'name': 'double bass', 'data': DOUBLEBASS_SAMPLE},
                 {'name': 'cello', 'data': CELLO_SAMPLE},
                 {'name': 'flute', 'data': FLUTE_SAMPLE},
                 {'name': 'clarinet', 'data': CLARINET_SAMPLE},
                 {'name': 'saxophone', 'data': SAXOPHONE_SAMPLE},
                 {'name': 'trumpet', 'data': TRUMPET_SAMPLE},
-		{'name': 'oboe', 'data': OBOE_SAMPLE},
-                {'name': 'trombone', 'data': TROMBONE_SAMPLE},
                 {'name': 'tuba', 'data': TUBA_SAMPLE},
                 {'name': 'guitar', 'data': GUITAR_SAMPLE},
                 {'name': 'acoustic guitar', 'data': ACOUSTIC_GUITAR_SAMPLE},
@@ -1123,7 +1111,7 @@ function Synth() {
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     this.trigger = function (turtle, notes, beatValue, instrumentName, paramsEffects, paramsFilters, setNote) {
-        // console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
+        console.debug(turtle + ' ' + notes + ' ' + beatValue + ' ' + instrumentName + ' ' + paramsEffects + ' ' + paramsFilters + ' ' + setNote);
 	// Effects don't work with sine, sawtooth, et al.
         if (['sine', 'sawtooth', 'triangle', 'square'].indexOf(instrumentName) !== -1) {
             paramsEffects = null;
