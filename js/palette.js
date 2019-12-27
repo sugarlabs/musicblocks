@@ -2326,13 +2326,15 @@ function initPalettes (palettes) {
 
     palettes.makePalettes(true);
 
-    // Give the palettes time to load.
-    // We are in no hurry since we are waiting on the splash screen.
-    // await delayExecution(1000)
-    console.debug('Palettes.show');
-    palettes.show();
-    palettes.bringToTop();
-    palettes.showSelection(0);
+    setTimeout(function () {
+        // Give the palettes time to load.
+        // We are in no hurry since we are waiting on the splash screen.
+        // await delayExecution(1000)
+        console.debug('Time to show the palettes.');
+        palettes.show();
+        palettes.bringToTop();
+        palettes.showSelection(0);
+    }, 3000);
 };
 
 const MODEUNSURE = 0;
