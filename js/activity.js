@@ -3986,7 +3986,7 @@ function Activity() {
             .setBlocks(blocks)
             .init();
 
-        initPalettes(palettes);
+        // initPalettes(palettes);
 
         logo = new Logo();
         logo
@@ -4453,6 +4453,8 @@ function Activity() {
 
         window.saveLocally = saveLocally;
         logo.setSaveLocally(saveLocally);
+
+        initPalettes(palettes);
 
         var __clearFunction = function () {
             sendAllToTrash(true, false);
