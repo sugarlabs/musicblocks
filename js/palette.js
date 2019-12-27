@@ -2330,10 +2330,11 @@ function initPalettes (palettes) {
     // We are in no hurry since we are waiting on the splash screen.
     // await delayExecution(1000)
     setTimeout(function () {
+	console.debug('Palettes.show');
         palettes.show();
         palettes.bringToTop();
         palettes.showSelection(0);
-    }, 3000);
+    }, 6000);
 };
 
 const MODEUNSURE = 0;
