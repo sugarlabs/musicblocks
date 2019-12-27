@@ -1,13 +1,16 @@
 class IntBlock extends BaseBlock {
     constructor() {
         super('int');
-
         this.setPalette('number');
-        this.staticLabels.push(_('int'));
 
-        this.adjustWidthToLabel();
-        this.oneArgMathBlock();
-        this.defaults.push(100);
+        this.formBlock({
+            name: _('int'),
+            flows: {
+                left: true, type: null
+            },
+            args: 1,
+            argDefaults: [100]
+        });
     }
 
     arg(logo) {
@@ -36,7 +39,22 @@ class IntBlock extends BaseBlock {
     }
 }
 
+class NumberBlock extends BaseBlock {
+    constructor() {
+        super('number');
+        this.setPalette('number');
+
+        this.formBlock({
+            name: '',
+            flows: {
+                left: true, type: 'value'
+            }
+        }, false);
+    }
+}
+
 
 function setupNumberBlocks() {
     new IntBlock();
+    new NumberBlock();
 }

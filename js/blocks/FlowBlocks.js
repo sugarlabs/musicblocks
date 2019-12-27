@@ -1,12 +1,15 @@
 class BackwardBlock extends BaseBlock {
     constructor() {
         super('backward');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('backward'));
 
-        this.adjustWidthToLabel();
-        this.flowClampZeroArgBlock();
+        this.formBlock({
+            name: _('backward'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            }
+        });
     }
 
     flow(args, logo, turtle, blk) {
@@ -42,13 +45,17 @@ class BackwardBlock extends BaseBlock {
 class DuplicateBlock extends BaseBlock {
     constructor() {
         super('duplicatenotes');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('duplicate'));
 
-        this.adjustWidthToLabel();
-        this.flowClampOneArgBlock();
-        this.defaults.push(2);
+        this.formBlock({
+            name: _('duplicate'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            },
+            args: 1,
+            argDefaults: [2]
+        });
     }
 
     flow(args, logo, turtle, blk, receivedArg) {
@@ -192,12 +199,15 @@ class DuplicateBlock extends BaseBlock {
 class DefaultCaseBlock extends BaseBlock {
     constructor() {
         super('defaultcase');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('default'));
 
-        this.adjustWidthToLabel();
-        this.flowClampBlock();
+        this.formBlock({
+            name: _('default'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            }
+        });
     }
 
     flow(args, logo, turtle) {
@@ -216,13 +226,17 @@ class DefaultCaseBlock extends BaseBlock {
 class CaseBlock extends BaseBlock {
     constructor() {
         super('case');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('case'));
 
-        this.adjustWidthToLabel();
-        this.flowClampOneArgBlock();
-        this.dockTypes[1] = 'anyin';
+        this.formBlock({
+            name: _('case'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            },
+            args: 1,
+            argTypes: ['anyin']
+        });
     }
 
     flow(args, logo, turtle) {
@@ -241,13 +255,17 @@ class CaseBlock extends BaseBlock {
 class SwitchBlock extends BaseBlock {
     constructor() {
         super('switch');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('switch'));
-
-        this.adjustWidthToLabel();
-        this.flowClampOneArgBlock();
-        this.dockTypes[1] = 'anyin';
+        
+        this.formBlock({
+            name: _('switch'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            },
+            args: 1,
+            argTypes: ['anyin']
+        });
 
         this.makeMacro((x, y) => [
             [0, 'switch', x, y, [null, 1, 2, 5]],
@@ -306,12 +324,17 @@ class SwitchBlock extends BaseBlock {
 class ClampBlock extends BaseBlock {
     constructor() {
         super('clamp');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('clamp'));
 
-        this.flowClampBlock();
         this.hidden = true;
+
+        this.formBlock({
+            name: '',
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            }
+        }, false);
     }
 
     flow(args) {
@@ -324,12 +347,19 @@ class ClampBlock extends BaseBlock {
 class BreakBlock extends BaseBlock {
     constructor() {
         super('break');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('stop'));
+        //this.staticLabels.push(_('stop'));
 
-        this.adjustWidthToLabel();
-        this.basicBlockNoFlow();
+        //this.adjustWidthToLabel();
+        //this.basicBlockNoFlow();
+
+        this.formBlock({
+            name: _('stop'),
+            flows: {
+                top: true, bottom: 'tail',
+                type: ''
+            }
+        });
     }
 
     flow(_, logo, turtle, blk) {
@@ -350,12 +380,16 @@ class BreakBlock extends BaseBlock {
 class WaitForBlock extends BaseBlock {
     constructor() {
         super('waitFor');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('wait for'));
 
-        this.adjustWidthToLabel();
-        this.oneBooleanArgBlock();
+        this.formBlock({
+            name: _('wait for'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            },
+            args: 'onebool',
+        });
     }
 
     flow(args, logo, turtle, blk) {
@@ -404,21 +438,18 @@ class WaitForBlock extends BaseBlock {
 class UntilBlock extends BaseBlock {
     constructor() {
         super('until');
-
         this.setPalette('flow');
 
         let language = localStorage.languagePreference || navigator.language;
 
-        if (language === 'ja') {
-            this.staticLabels.push(_('until'));
-            //.TRANS: do2 is do something until some condition is met (JAPANESE ONLY)
-            this.staticLabels.push(_('do2'));
-        } else {
-            this.staticLabels.push(_('until'), _('do'));
-        }
-        this.extraWidth = 15;
-        this.adjustWidthToLabel();
-        this.flowClampBooleanArgBlock();
+        this.formBlock({
+            name: _('until'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: [language === 'js' ? _('do2') : _('do')]
+            },
+            args: 'onebool',
+        });
     }
 
     flow(args, logo, turtle, blk) {
@@ -460,23 +491,18 @@ class UntilBlock extends BaseBlock {
 class WhileBlock extends BaseBlock {
     constructor() {
         super('while');
-
         this.setPalette('flow');
 
         let language = localStorage.languagePreference || navigator.language;
 
-
-
-        if (language === 'ja') {
-            this.staticLabels.push(_('while'));
-            //.TRANS: do2 is do something while some condition is true (JAPANESE ONLY)
-            this.staticLabels.push(_('do2'));
-        } else {
-            this.staticLabels.push(_('while'), _('do'));
-        }
-        this.extraWidth = 15;
-        this.adjustWidthToLabel();
-        this.flowClampBooleanArgBlock();
+        this.formBlock({
+            name: _('while'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: [language === 'js' ? _('do2') : _('do')]
+            },
+            args: 'onebool',
+        });
     }
 
     flow(args, logo, turtle, blk) {
@@ -522,13 +548,16 @@ class WhileBlock extends BaseBlock {
 class IfThenElseBlock extends BaseBlock {
     constructor() {
         super('ifthenelse');
-
         this.setPalette('flow');
 
-        this.staticLabels.push(_('if'), _('then'), _('else'));
-        this.extraWidth = 15;
-        this.adjustWidthToLabel();
-        this.doubleFlowClampBooleanArgBlock();
+        this.formBlock({
+            name: _('if'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: [_('then'), _('else')]
+            },
+            args: 'onebool',
+        });
     }
 
     flow(args) {
@@ -541,14 +570,17 @@ class IfThenElseBlock extends BaseBlock {
 
 class IfBlock extends BaseBlock {
     constructor() {
-        super('if');
-
+        super('iff');
         this.setPalette('flow');
 
-        this.staticLabels.push(_('if'), _('then'));
-        this.extraWidth = 15;
-        this.adjustWidthToLabel();
-        this.flowClampBooleanArgBlock();
+        this.formBlock({
+            name: _('if'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: [_('then')]
+            },
+            args: 'onebool',
+        });
     }
 
     flow(args) {
@@ -562,12 +594,15 @@ class IfBlock extends BaseBlock {
 class ForeverBlock extends BaseBlock {
     constructor() {
         super('forever');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('forever'));
 
-        this.adjustWidthToLabel();
-        this.flowClampZeroArgBlock();
+        this.formBlock({
+            name: _('forever'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            }
+        });
     }
 
     flow(args, logo, turtle) {
@@ -580,13 +615,18 @@ class ForeverBlock extends BaseBlock {
 class RepeatBlock extends BaseBlock {
     constructor() {
         super('repeat');
-
         this.setPalette('flow');
-        this.staticLabels.push(_('repeat'));
 
-        this.adjustWidthToLabel();
-        this.flowClampOneArgBlock();
-        this.defaults.push(4);
+        this.formBlock({
+            name: _('repeat'),
+            flows: {
+                top: true, bottom: true,
+                type: 'flow', labels: ['']
+            },
+            args: 1,
+            argLabels: [''],
+            argDefaults: [4]
+        });
     }
 
     flow(args, logo) {

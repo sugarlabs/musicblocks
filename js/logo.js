@@ -9954,6 +9954,7 @@ function Logo () {
                 break;
             
             // ----- ADD SMART BLOCK CLASSES HERE -----
+            case 'number':
             case 'int':
                 that.blocks.blockList[blk].protoblock.arg(that);
                 break;

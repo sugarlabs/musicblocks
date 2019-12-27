@@ -3852,14 +3852,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('number');
-    newblock.palette = palettes.dict['number'];
-    blocks.protoBlockDict['number'] = newblock;
-    newblock.valueBlock();
-    if (beginnerMode && !beginnerBlock('number')) {
-        newblock.hidden = true;
-    }
-
     // BLOCKS PALETTE
 
     var newblock = new ProtoBlock('incrementOne');
