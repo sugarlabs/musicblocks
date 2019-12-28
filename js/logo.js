@@ -12270,7 +12270,7 @@ function Logo () {
         x1 = Math.pow(a-b, 2);
         y1 = Math.pow(c-d, 2);
 
-        return(Math.sqrt(x1 + y1);  
+        return(Math.sqrt(x1 + y1));  
     };
 
     /**
