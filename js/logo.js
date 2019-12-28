@@ -8783,6 +8783,8 @@ function Logo () {
 
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
+                        if(obj[0]/obj[1]>2)
+                          that.errorMsg(_('Note value greater than 2'), blk);
                         // console.debug('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
                         if (that.justCounting[turtle].length === 0) {
                             if (notes.length === 0) {
