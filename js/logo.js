@@ -12263,7 +12263,7 @@ function Logo () {
             return 0;
         }
 
-        if(a===b and c===d)
+        if(a===b && c===d)
             return(0);
 
         var x1, x2 ;
