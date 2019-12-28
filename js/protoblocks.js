@@ -376,7 +376,7 @@ function ProtoBlock(name) {
         return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     };
 
-    // E.g., plus, minus, multiply, divide, power. These are also expandable.
+    // E.g., plus, minus, multiply, divide, power,distance. These are also expandable.
     this.twoArgMathBlock = function () {
         this.expandable = true;
         this.style = 'arg';
@@ -432,6 +432,44 @@ function ProtoBlock(name) {
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setInnies([true, true, true]);
+        svg.setOutie(true);
+        svg.setTab(false);
+
+        if (expandY) {
+            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+        } else {
+            svg.setExpand(30 + this.extraWidth, 0, 0, 0);
+        }
+
+        if (this.fontsize) {
+            svg.setFontSize(this.fontsize);
+        }
+
+        var artwork = svg.basicBlock();
+        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+    };
+    // E.g., distance . Distance block will calculate geometrical distance between two pointa
+    // by default (cursor x ,cursor y ) and x and y
+    this.fourArgMathBlock = function () {
+        this.expandable = true;
+        this.style = 'arg';
+        this.size = 4;
+        this.args = 4;
+        this.parameter = true;
+        this.dockTypes.push('numberout');
+        this.dockTypes.push('numberin');
+        this.dockTypes.push('numberin');
+        this.dockTypes.push('numberin');
+        this.dockTypes.push('numberin');
+        this.generator = this.fourArgMathBlockGenerator;
+    };
+
+    this.fourArgMathBlockGenerator = function (expandY) {
+        var svg = new SVG();
+        svg.init();
+        svg.setScale(this.scale);
+        svg.setSlot(false);
+        svg.setInnies([true, true, true, true]);
         svg.setOutie(true);
         svg.setTab(false);
 
