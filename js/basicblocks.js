@@ -3743,6 +3743,23 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
+    var newblock = new ProtoBlock('distance');
+    newblock.palette = palettes.dict['number'];
+    blocks.protoBlockDict['plus'] = newblock;
+    newblock.fontsize = 28;
+    newblock.staticLabels.push('||');
+    newblock.fourArgMathBlock();
+    newblock.dockTypes[0] = 'anyout';
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    newblock.dockTypes[3] = 'anyin';
+    newblock.dockTypes[4] = 'anyin';
+    //newblock.defaults.push(0,0)
+    if (beginnerMode && !beginnerBlock('distance')) {
+        newblock.hidden = true;
+    }
+
+
     var newblock = new ProtoBlock('sqrt');
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['sqrt'] = newblock;
