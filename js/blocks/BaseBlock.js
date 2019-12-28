@@ -23,7 +23,9 @@ class BaseBlock extends ProtoBlock {
         style.flows = style.flows || {}
         style.flows.labels = style.flows.labels || [];
 
+        let that = this;
         const debugLog = function () {
+            return;  // Silence logging
             console.log(...arguments);
         };
 
@@ -37,6 +39,11 @@ class BaseBlock extends ProtoBlock {
             else
                 this.style = 'clamp';
             this.expandable = true;
+        } else {
+            if (style.args === 1)
+                this.style = 'arg';
+            else if (style.args === 2)
+                this.style = 'twoarg';
         }
         this.args = (
             style.args === 'onebool' ? 1
@@ -67,8 +74,8 @@ class BaseBlock extends ProtoBlock {
                 this.defaults.push(style.argDefaults[i]);
             }
         if (style.flows.type === 'arg')
-            for (let _ in style.flows.labels)
-                this.dockTypes.push('numberin');
+            for (let i = 0; i < style.flows.labels.length; i++)
+                this.dockTypes.push(style.flows.types[i] || 'numberin');
         for (let i = 0; i < style.flows.labels.length; i++)
             this.dockTypes.push('in');
         if (style.flows.bottom)
@@ -79,6 +86,7 @@ class BaseBlock extends ProtoBlock {
             debugLog('dockTypes:', this.dockTypes);
             debugLog('args:', this.args);
             debugLog('size:', this.size);
+            debugLog('style:', this.style);
 
             var svg = new SVG();
             svg.init();
@@ -106,13 +114,13 @@ class BaseBlock extends ProtoBlock {
 
             let pad = (style.args === 'onebool' || style.args === 'twobool') ? 15 :
                     (style.flows.type === 'value') ? 60 : 20;
-            if (style.flows.type === null) pad += 10;
+            if (!style.flows.type) pad += 20;
             svg.setExpand(pad + this.extraWidth, 0, 0, 0);
             debugLog('setExpand', pad + this.extraWidth, 0, 0, 0);
 
             for (let i = 0; i < arguments.length; i++)
                 svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
-            for (let i = arguments.length; i < style.flows.length; i++)
+            for (let i = arguments.length; i < style.flows.labels.length; i++)
                 svg.setClampSlots(i, 1);
             svg.setClampCount(style.flows.labels.length);
 
@@ -123,6 +131,10 @@ class BaseBlock extends ProtoBlock {
                 svg.setInnies(Array(style.args).fill(true));
                 debugLog('setInnies', Array(style.args).fill(true))
             }
+
+            // Make space for the expand icon
+            if (style.canCollapse)
+                svg.setLabelOffset(15);
 
             if (this.fontsize)
                 svg.setFontSize(this.fontsize);
@@ -159,6 +171,10 @@ class BaseBlock extends ProtoBlock {
 
     makeMacro(macroFunc) {
         this.macroFunc = macroFunc;
+    }
+
+    changeName(blockName) {
+        this.staticLabels[0] = blockName;
     }
 
     flow() {

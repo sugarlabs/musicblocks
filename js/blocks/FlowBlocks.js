@@ -59,7 +59,7 @@ class DuplicateBlock extends BaseBlock {
     }
 
     flow(args, logo, turtle, blk, receivedArg) {
-        if (args[1] === undefined) return [];
+        if (args[1] === undefined) return;
 
         if (args[0] === null || typeof (args[0]) !== 'number' || args[0] < 1) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -191,8 +191,6 @@ class DuplicateBlock extends BaseBlock {
 
             logo.connectionStoreLock = false;
         }
-
-        return [];
     }
 }
 
@@ -215,11 +213,10 @@ class DefaultCaseBlock extends BaseBlock {
         if (switchBlk === null) {
             logo.errorMsg(_('The Case Block must be used inside of a Switch Block.'), blk);
             logo.stopTurtle = true;
-            return [];
+            return;
         }
 
         logo.switchCases[turtle][switchBlk].push(['__default__', args[0]]);
-        return [];
     }
 }
 
@@ -244,11 +241,10 @@ class CaseBlock extends BaseBlock {
         if (switchBlk === null) {
             logo.errorMsg(_('The Case Block must be used inside of a Switch Block.'), blk);
             logo.stopTurtle = true;
-            return [];
+            return;
         }
 
         logo.switchCases[turtle][switchBlk].push([args[0], args[1]]);
-        return [];
     }
 }
 
@@ -340,7 +336,6 @@ class ClampBlock extends BaseBlock {
     flow(args) {
         if (args.length === 1)
             return [args[0], 1];
-        return [];
     }
 }
 
@@ -372,8 +367,6 @@ class BreakBlock extends BaseBlock {
                 logo.unhighlightQueue[turtle].push(parentBlk);
             }
         }
-
-        return [];
     }
 }
 
@@ -386,14 +379,13 @@ class WaitForBlock extends BaseBlock {
             name: _('wait for'),
             flows: {
                 top: true, bottom: true,
-                type: 'flow', labels: ['']
             },
             args: 'onebool',
         });
     }
 
     flow(args, logo, turtle, blk) {
-        if (args.length !== 1) return [];
+        if (args.length !== 1) return;
 
         if (!args[0]) {
             // Requeue.
@@ -430,8 +422,6 @@ class WaitForBlock extends BaseBlock {
             logo.turtleTime[turtle] = elapsedTime;
             logo.previousTurtleTime[turtle] = elapsedTime;
         }
-
-        return [];
     }
 }
 
@@ -453,7 +443,7 @@ class UntilBlock extends BaseBlock {
     }
 
     flow(args, logo, turtle, blk) {
-        if (args.length !== 2) return [];
+        if (args.length !== 2) return;
 
         if (!args[0]) {
             // We will add the outflow of the until block
@@ -509,7 +499,7 @@ class WhileBlock extends BaseBlock {
         // While is tricky because we need to recalculate
         // args[0] each time, so we requeue the While block
         // itself.
-        if (args.length !== 2) return [];
+        if (args.length !== 2) return;
 
         if (args[0]) {
             // We will add the outflow of the while block
@@ -561,7 +551,7 @@ class IfThenElseBlock extends BaseBlock {
     }
 
     flow(args) {
-        if (args.length !== 3) return [];
+        if (args.length !== 3) return;
         if (args[0])
             return [args[1], 1];
         return [args[2], 1];
@@ -584,10 +574,8 @@ class IfBlock extends BaseBlock {
     }
 
     flow(args) {
-        if (args.length !== 2) return [];
-        if (args[0])
+        if (args.length === 2 && args[0])
             return [args[1], 1];
-        return [];
     }
 }
 
@@ -606,7 +594,7 @@ class ForeverBlock extends BaseBlock {
     }
 
     flow(args, logo, turtle) {
-        if (args.length !== 1) return [];
+        if (args.length !== 1) return;
 
         return [args[0], logo.suppressOutput[turtle] ? 20 : -1];
     }
@@ -630,7 +618,7 @@ class RepeatBlock extends BaseBlock {
     }
 
     flow(args, logo) {
-        if (args[1] === undefined) return [];
+        if (args[1] === undefined) return;
 
         let arg;
         if (args[0] === null || typeof (args[0]) !== 'number' || args[0] < 1) {

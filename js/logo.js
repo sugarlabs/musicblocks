@@ -1908,110 +1908,16 @@ function Logo () {
 
         switch (that.blocks.blockList[blk].name) {
         case 'dispatch':
-            // Dispatch an event.
-            if (args.length === 1) {
-                // If the event is not in the event list, add it.
-                if (!(args[0] in that.eventList)) {
-                    var event = new Event(args[0]);
-                    that.eventList[args[0]] = event;
-                }
-                that.stage.dispatchEvent(args[0]);
-            }
+            
             break;
-        case 'listen':
-            if (args.length === 2) {
-                if (!(args[1] in that.actions)) {
-                    that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
-                } else {
-                    var __listener = function (event) {
-                        if (that.turtles.turtleList[turtle].running) {
-                            var queueBlock = new Queue(that.actions[args[1]], 1, blk);
-                            that.parentFlowQueue[turtle].push(blk);
-                            that.turtles.turtleList[turtle].queue.push(queueBlock);
-                        } else {
-                            // Since the turtle has stopped
-                            // running, we must run the stack
-                            // from here.
-                            if (isflow) {
-                                that._runFromBlockNow(that, turtle, that.actions[args[1]], isflow, receivedArg);
-                            } else {
-                                that._runFromBlock(that, turtle, that.actions[args[1]], isflow, receivedArg);
-                            }
-                        }
-                    };
-
-                    // If there is already a listener, remove it
-                    // before adding the new one.
-                    that._setListener(turtle, args[0], __listener);
-                }
-            }
-            break;
-        case 'start':
         case 'drum':
             if (args.length === 1) {
                 childFlow = args[0];
                 childFlowCount = 1;
             }
             break;
-        case 'nameddo':
-            var name = that.blocks.blockList[blk].privateData;
-            if (name in that.actions) {
-                if (that.justCounting[turtle].length === 0) {
-                    that.notationLineBreak(turtle);
-                }
-
-                if (that.backward[turtle].length > 0) {
-                    childFlow = that.blocks.findBottomBlock(that.actions[name]);
-                    var actionBlk = that.blocks.findTopBlock(that.actions[name]);
-                    that.backward[turtle].push(actionBlk);
-
-                    var listenerName = '_backward_action_' + turtle + '_' + blk;
-                    that._setDispatchBlock(blk, turtle, listenerName);
-
-                    var nextBlock = that.blocks.blockList[actionBlk].connections[2];
-                    if (nextBlock == null) {
-                        that.backward[turtle].pop();
-                    } else {
-                        if (nextBlock in that.endOfClampSignals[turtle]) {
-                            that.endOfClampSignals[turtle][nextBlock].push(listenerName);
-                        } else {
-                            that.endOfClampSignals[turtle][nextBlock] = [listenerName];
-                        }
-                    }
-
-                    var __listener = function (event) {
-                        that.backward[turtle].pop();
-                    };
-
-                    that._setListener(turtle, listenerName, __listener);
-                } else {
-                    childFlow = that.actions[name];
-                }
-
-                childFlowCount = 1;
-            } else {
-                that.errorMsg(NOACTIONERRORMSG, blk, name);
-            }
-            break;
             // If we clicked on an action block, treat it like a do
             // block.
-        case 'action':
-        case 'do':
-            if (args.length > 0) {
-                if (args[0] in that.actions) {
-                    if (that.justCounting[turtle].length === 0) {
-                        that.notationLineBreak(turtle);
-                    }
-
-                    console.debug('action: ' + args[0]);
-                    childFlow = that.actions[args[0]];
-                    childFlowCount = 1;
-                } else {
-                    console.debug('action ' + args[0] + ' not found');
-                    that.errorMsg(NOACTIONERRORMSG, blk, args[0]);
-                }
-            }
-            break;
         case 'nameddoArg':
             var name = that.blocks.blockList[blk].privateData;
             while(actionArgs.length > 0) {
@@ -2098,6 +2004,21 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'return':
+        case 'returnToUrl':
+        case 'namedcalc':
+        case 'nameddoArg':
+        case 'namedcalcArg':
+        case 'calcArg':
+        case 'namedarg':
+        case 'listen':
+        case 'arg':
+        case 'doArg':
+        case 'calc':
+        case 'start':
+        case 'nameddo':
+        case 'action':
+        case 'do':
         case 'backward':
         case 'duplicatenotes':
         case 'defaultcase':
@@ -2112,9 +2033,13 @@ function Logo () {
         case 'if':
         case 'repeat':
         case 'forever':
-            let [cf, cfc] = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
-            if (cf !== undefined) childFlow = cf;
-            if (cfc !== undefined) childFlowCount = cfc;
+            let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
+            if (res) {
+                let [cf, cfc, ret] = res;
+                if (cf !== undefined) childFlow = cf;
+                if (cfc !== undefined) childFlowCount = cfc;
+                if (ret) return ret
+            }
             break;
 
         case 'hidden':
@@ -2438,48 +2363,6 @@ function Logo () {
                     }
                 }
             }
-            break;
-        case 'return':
-            if (args.length === 1) {
-                that.returns.push(args[0]);
-            }
-            break;
-        case 'returnToUrl':
-            var URL = window.location.href;
-            var urlParts;
-            var outurl;
-            if (URL.indexOf('?') > 0) {
-                var urlParts = URL.split('?');
-                if (urlParts[1].indexOf('&') >0) {
-                    var newUrlParts = urlParts[1].split('&');
-                    for (var i = 0; i < newUrlParts.length; i++) {
-                        if (newUrlParts[i].indexOf('=') > 0) {
-                            var tempargs = newUrlParts[i].split('=');
-                            switch (tempargs[0].toLowerCase()) {
-                            case 'outurl':
-                                outurl = tempargs[1];
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if (args.length === 1) {
-                var jsonRet = {};
-                jsonRet['result'] = args[0];
-                var json= JSON.stringify(jsonRet);
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open('POST',outurl, true);
-                // Call a function when the state changes.
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                        alert(xmlHttp.responseText);
-                    }
-                };
-
-                xmlHttp.send(json);
-            }
-            break;
         case 'forward':
             if (args.length === 1) {
                 if (typeof(args[0]) === 'string') {
@@ -9838,25 +9721,6 @@ function Logo () {
                 that.blocks.blockList[blk].value = Number(eval('Math.' + a.replace(/x/g, b.toString())));
                 break;
             */
-            case 'arg':
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    var action_args = receivedArg
-                    if (action_args && action_args.length >= Number(name)) {
-                        var value = action_args[Number(name) - 1];
-                        that.blocks.blockList[blk].value = value;
-                    } else {
-                        that.errorMsg(_('Invalid argument'), blk);
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                }
-
-                // return that.blocks.blockList[blk].value;
-                break;
             case 'box':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 if (cblk === null) {
@@ -9887,27 +9751,6 @@ function Logo () {
                         that.blocks.blockList[blk].value = 0;
                     }
                 }
-                break;
-            case 'namedarg':
-                var name = that.blocks.blockList[blk].privateData;
-                var actionArgs = receivedArg;
-
-                // If an action block with an arg is clicked,
-                // the arg will have no value.
-                if (actionArgs == null) {
-                    that.errorMsg(_('Invalid argument'), blk);
-                    that.blocks.blockList[blk].value = 0
-                }
-
-                if (actionArgs.length >= Number(name)) {
-                    var value = actionArgs[Number(name) - 1];
-                    that.blocks.blockList[blk].value = value;
-                } else {
-                    that.errorMsg(_('Invalid argument'), blk);
-                    that.blocks.blockList[blk].value = 0
-                }
-
-                // return that.blocks.blockList[blk].value;
                 break;
             case 'sqrt':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
@@ -11348,92 +11191,6 @@ function Logo () {
                     // FIXME: we need to handle cascading.
                     that.butNotThese[turtle] = {};
                 }
-                break;
-            case 'calc':
-                var actionArgs = [];
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    actionArgs = receivedArg;
-                    // that.getBlockAtStartOfArg(blk);
-                    if (name in that.actions) {
-                        that.turtles.turtleList[turtle].running = true;
-                        that._runFromBlockNow(that, turtle, that.actions[name], true, actionArgs, that.turtles.turtleList[turtle].queue.length);
-                        that.blocks.blockList[blk].value = that.returns.shift();
-                    } else {
-                        that.errorMsg(NOACTIONERRORMSG, blk, name);
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                }
-                break;
-            case 'namedcalc':
-                var name = that.blocks.blockList[blk].privateData;
-                var actionArgs = [];
-
-                actionArgs = receivedArg;
-                // that.getBlockAtStartOfArg(blk);
-                if (name in that.actions) {
-                    that.turtles.turtleList[turtle].running = true;
-                    that._runFromBlockNow(that, turtle, that.actions[name], true, actionArgs, that.turtles.turtleList[turtle].queue.length);
-                    that.blocks.blockList[blk].value = that.returns.shift();
-                } else {
-                    that.errorMsg(NOACTIONERRORMSG, blk, name);
-                    that.blocks.blockList[blk].value = 0;
-                }
-                break;
-            case 'calcArg':
-                var actionArgs = [];
-                // that.getBlockAtStartOfArg(blk);
-                if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
-                        actionArgs.push(t);
-                    }
-                }
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    if (name in that.actions) {
-                        that.turtles.turtleList[turtle].running = true;
-                        that._runFromBlockNow(that, turtle, that.actions[name], true, actionArgs, that.turtles.turtleList[turtle].queue.length);
-                        that.blocks.blockList[blk].value = that.returns.pop();
-                    } else {
-                        that.errorMsg(NOACTIONERRORMSG, blk, name);
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                }
-                break;
-            case 'namedcalcArg':
-                var name = that.blocks.blockList[blk].privateData;
-                var actionArgs = [];
-                // that.getBlockAtStartOfArg(blk);
-                if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
-                        actionArgs.push(t);
-                    }
-                }
-                if (name in that.actions) {
-                    // Just run the stack.
-                    that.turtles.turtleList[turtle].running = true;
-                    that._runFromBlockNow(that, turtle, that.actions[name], true, actionArgs, that.turtles.turtleList[turtle].queue.length);
-                    that.blocks.blockList[blk].value = that.returns.pop();
-                } else {
-                    that.errorMsg(NOACTIONERRORMSG, blk, name);
-                    that.blocks.blockList[blk].value = 0;
-                }
-                break;
-            case 'doArg':
-                return blk;
-                break;
-            case 'nameddoArg':
-                return blk;
                 break;
             case 'returnValue':
                 if (that.returns.length > 0) {

@@ -192,6 +192,7 @@ function Activity() {
             'activity/abc',
 
             'activity/blocks/BaseBlock',
+            'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',
         ];
