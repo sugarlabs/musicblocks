@@ -3754,7 +3754,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.dockTypes[3] = 'anyin';
     newblock.dockTypes[4] = 'anyin';
     newblock.defaults.push(0 ,0, 100, 100)
-    //newblock.defaults.push(0,0)
     if (beginnerMode && !beginnerBlock('distance')) {
         newblock.hidden = true;
     }

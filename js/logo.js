@@ -10673,7 +10673,7 @@ function Logo () {
                         var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                         var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
                         var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
-                        if (typeof(a) === 'number' && typeof(b) === 'number' && typeof(c) === 'number' && typeof(d) === 'number') {
+                        if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
 
                             that.blocks.blockList[blk].value = that._docalculatedistance(x1,y1,x2,y2);
                         } else {
