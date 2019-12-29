@@ -1,13 +1,10 @@
-class ReturnBlock extends BaseBlock {
+class ReturnBlock extends FlowBlock {
     constructor() {
         super('return');
         this.setPalette('action');
 
         this.formBlock({
             name: _('return'),
-            flows: {
-                top: true, bottom: true
-            },
             args: 1,
             argDefaults: [100],
             argTypes: ['anyin'],
@@ -21,7 +18,7 @@ class ReturnBlock extends BaseBlock {
     }
 }
 
-class ReturnToURLBlock extends BaseBlock {
+class ReturnToURLBlock extends FlowBlock {
     constructor() {
         super('returnToUrl');
         this.setPalette('action');
@@ -29,9 +26,6 @@ class ReturnToURLBlock extends BaseBlock {
         //.TRANS: return value from a function to a URL
         this.formBlock({
             name: _('return to URL'),
-            flows: {
-                top: true, bottom: true
-            },
             args: 1,
             argDefaults: [100],
             argTypes: ['anyin'],
@@ -145,7 +139,7 @@ class NamedCalcBlock extends BaseBlock {
     }
 }
 
-class NamedDoArgBlock extends BaseBlock {
+class NamedDoArgBlock extends FlowClampBlock {
     constructor() {
         super('nameddoArg');
         this.setPalette('action');
@@ -156,8 +150,7 @@ class NamedDoArgBlock extends BaseBlock {
         this.formBlock({
             name: language === 'ja' ? _('do1') : _('do'),
             flows: {
-                top: true, bottom: true, type: 'arg',
-                types: ['anyin'], labels: ['']
+                type: 'arg', types: ['anyin'],
             }
         });
     }
@@ -203,7 +196,7 @@ class NamedCalcArgBlock extends BaseBlock {
     }
 }
 
-class DoArgBlock extends BaseBlock {
+class DoArgBlock extends FlowClampBlock {
     constructor() {
         super('doArg');
         this.setPalette('action');
@@ -212,8 +205,7 @@ class DoArgBlock extends BaseBlock {
         this.formBlock({
             name: language === 'ja' ? _('do1') : _('do'),
             flows: {
-                top: true, bottom: true, type: 'arg',
-                types: ['anyin'], labels: ['']
+                type: 'arg', types: ['anyin'],
             },
             args: 1,
             argTypes: ['anyin'],
@@ -343,7 +335,7 @@ class NamedArgBlock extends BaseBlock {
     }
 }
 
-class DoBlock extends BaseBlock {
+class DoBlock extends FlowBlock {
     constructor() {
         super('do');
         this.setPalette('action');
@@ -351,9 +343,6 @@ class DoBlock extends BaseBlock {
         let language = localStorage.languagePreference || navigator.language;
         this.formBlock({
             name: language === 'ja' ? _('do1') : _('do'),
-            flows: {
-                top: true, bottom: true
-            },
             args: 1,
             argDefaults: [_('action')],
             argTypes: ['anyin'],
@@ -377,7 +366,7 @@ class DoBlock extends BaseBlock {
     }
 }
 
-class ListenBlock extends BaseBlock {
+class ListenBlock extends FlowBlock {
     constructor() {
         super('listen');
         this.setPalette('action');
@@ -388,9 +377,6 @@ class ListenBlock extends BaseBlock {
         this.formBlock({
             //.TRANS: an event, such as user actions (mouse clicks, key presses)
             name: _('on'),
-            flows: {
-                top: true, bottom: true
-            },
             args: 2,
             argTypes: ['textin', 'textin'],
             //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
@@ -429,7 +415,7 @@ class ListenBlock extends BaseBlock {
     }
 }
 
-class DispatchBlock extends BaseBlock {
+class DispatchBlock extends FlowBlock {
     constructor() {
         super('dispatch');
         this.setPalette('action');
@@ -437,9 +423,6 @@ class DispatchBlock extends BaseBlock {
         //.TRANS: dispatch an event to trigger a listener
         this.formBlock({
             name: _('broadcast'),
-            flows: {
-                top: true, bottom: true
-            },
             args: 1,
             argDefaults: [_('event')],
             argTypes: ['textin'],
@@ -459,20 +442,12 @@ class DispatchBlock extends BaseBlock {
     }
 }
 
-class StartBlock extends BaseBlock {
-    constructor(name) {
-        super(name || 'start');
+class StartBlock extends StackClampBlock {
+    constructor() {
+        super('start');
         this.setPalette('action');
-
-        this.extraWidth = 40;
-        this.formBlock({
-            canCollapse: true,
-            name: _('start'),
-            flows: {
-                top: 'cap', bottom: 'tail',
-                type: 'flow', labels: ['']
-            }
-        });
+        
+        this.formBlock({ name: _('start'), canCollapse: true });
     }
 
     flow(args) {
@@ -483,9 +458,10 @@ class StartBlock extends BaseBlock {
 
 class StartDrumBlock extends StartBlock {
     constructor() {
-        super('startdrum');
-        this.extraWidth = 35;
-        this.changeName(_('start drum'));
+        super();
+        this.changeName('startdrum');
+
+        this.formBlock({ name: _('start drum') });
 
         this.makeMacro((x, y) => [
             [0, 'start', x, y, [null, 1, null]],
@@ -496,19 +472,12 @@ class StartDrumBlock extends StartBlock {
     }
 }
 
-class ActionBlock extends BaseBlock {
+class ActionBlock extends StackClampBlock {
     constructor() {
         super('action');
         this.setPalette('action');
-
-        this.extraWidth = 40;
         this.formBlock({
-            canCollapse: true,
             name: _('action'),
-            flows: {
-                top: 'cap', bottom: 'tail',
-                type: 'flow', labels: ['']
-            },
             args: 1,
             argLabels: [''],
             argDefaults: [_('action')]
@@ -532,19 +501,13 @@ class ActionBlock extends BaseBlock {
     }
 }
 
-class NamedDoBlock extends BaseBlock {
+class NamedDoBlock extends FlowBlock {
     constructor() {
         super('nameddo');
         this.setPalette('action');
 
         this.extraWidth = 30;
-        this.formBlock({
-            name: _('action'),
-            flows: {
-                top: true, bottom: true
-            }
-        });
-
+        this.formBlock({ name: _('action') });
         this.hidden = true;
     }
 
@@ -592,21 +555,21 @@ class NamedDoBlock extends BaseBlock {
 
 
 function setupActionBlocks() {
-    new ReturnBlock();
-    new ReturnToURLBlock();
-    new CalcBlock();
-    new NamedCalcBlock();
-    new NamedDoArgBlock();
-    new NamedCalcArgBlock();
-    new DoArgBlock();
-    new CalcArgBlock();
-    new ArgBlock();
-    new NamedArgBlock();
-    new DoBlock();
-    new ListenBlock();
-    new DispatchBlock();
-    new StartDrumBlock();
-    new StartBlock();
-    new ActionBlock();
-    new NamedDoBlock();    
+    new ReturnBlock().setup();
+    new ReturnToURLBlock().setup();
+    new CalcBlock().setup();
+    new NamedCalcBlock().setup();
+    new NamedDoArgBlock().setup();
+    new NamedCalcArgBlock().setup();
+    new DoArgBlock().setup();
+    new CalcArgBlock().setup();
+    new ArgBlock().setup();
+    new NamedArgBlock().setup();
+    new DoBlock().setup();
+    new ListenBlock().setup();
+    new DispatchBlock().setup();
+    new StartDrumBlock().setup();
+    new StartBlock().setup();
+    new ActionBlock().setup();
+    new NamedDoBlock().setup();
 }

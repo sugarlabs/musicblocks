@@ -1,14 +1,10 @@
-class BackwardBlock extends BaseBlock {
+class BackwardBlock extends FlowClampBlock {
     constructor() {
         super('backward');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('backward'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            }
         });
     }
 
@@ -42,17 +38,13 @@ class BackwardBlock extends BaseBlock {
     }
 }
 
-class DuplicateBlock extends BaseBlock {
+class DuplicateBlock extends FlowClampBlock {
     constructor() {
         super('duplicatenotes');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('duplicate'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            },
             args: 1,
             argDefaults: [2]
         });
@@ -194,17 +186,13 @@ class DuplicateBlock extends BaseBlock {
     }
 }
 
-class DefaultCaseBlock extends BaseBlock {
+class DefaultCaseBlock extends FlowClampBlock {
     constructor() {
         super('defaultcase');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('default'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            }
         });
     }
 
@@ -220,17 +208,13 @@ class DefaultCaseBlock extends BaseBlock {
     }
 }
 
-class CaseBlock extends BaseBlock {
+class CaseBlock extends FlowClampBlock {
     constructor() {
         super('case');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('case'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            },
             args: 1,
             argTypes: ['anyin']
         });
@@ -248,17 +232,13 @@ class CaseBlock extends BaseBlock {
     }
 }
 
-class SwitchBlock extends BaseBlock {
+class SwitchBlock extends FlowClampBlock {
     constructor() {
         super('switch');
         this.setPalette('flow');
         
         this.formBlock({
             name: _('switch'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            },
             args: 1,
             argTypes: ['anyin']
         });
@@ -317,7 +297,7 @@ class SwitchBlock extends BaseBlock {
     }
 }
 
-class ClampBlock extends BaseBlock {
+class ClampBlock extends FlowClampBlock {
     constructor() {
         super('clamp');
         this.setPalette('flow');
@@ -325,11 +305,7 @@ class ClampBlock extends BaseBlock {
         this.hidden = true;
 
         this.formBlock({
-            name: '',
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            }
+            name: ''
         }, false);
     }
 
@@ -370,16 +346,13 @@ class BreakBlock extends BaseBlock {
     }
 }
 
-class WaitForBlock extends BaseBlock {
+class WaitForBlock extends FlowBlock {
     constructor() {
         super('waitFor');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('wait for'),
-            flows: {
-                top: true, bottom: true,
-            },
             args: 'onebool',
         });
     }
@@ -425,7 +398,7 @@ class WaitForBlock extends BaseBlock {
     }
 }
 
-class UntilBlock extends BaseBlock {
+class UntilBlock extends FlowClampBlock {
     constructor() {
         super('until');
         this.setPalette('flow');
@@ -435,8 +408,7 @@ class UntilBlock extends BaseBlock {
         this.formBlock({
             name: _('until'),
             flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: [language === 'js' ? _('do2') : _('do')]
+                labels: [language === 'js' ? _('do2') : _('do')]
             },
             args: 'onebool',
         });
@@ -478,7 +450,7 @@ class UntilBlock extends BaseBlock {
     }
 }
 
-class WhileBlock extends BaseBlock {
+class WhileBlock extends FlowClampBlock {
     constructor() {
         super('while');
         this.setPalette('flow');
@@ -488,8 +460,7 @@ class WhileBlock extends BaseBlock {
         this.formBlock({
             name: _('while'),
             flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: [language === 'js' ? _('do2') : _('do')]
+                labels: [language === 'js' ? _('do2') : _('do')]
             },
             args: 'onebool',
         });
@@ -535,7 +506,7 @@ class WhileBlock extends BaseBlock {
     }
 }
 
-class IfThenElseBlock extends BaseBlock {
+class IfThenElseBlock extends FlowClampBlock {
     constructor() {
         super('ifthenelse');
         this.setPalette('flow');
@@ -543,8 +514,7 @@ class IfThenElseBlock extends BaseBlock {
         this.formBlock({
             name: _('if'),
             flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: [_('then'), _('else')]
+                labels: [_('then'), _('else')]
             },
             args: 'onebool',
         });
@@ -558,7 +528,7 @@ class IfThenElseBlock extends BaseBlock {
     }
 }
 
-class IfBlock extends BaseBlock {
+class IfBlock extends FlowClampBlock {
     constructor() {
         super('iff');
         this.setPalette('flow');
@@ -566,8 +536,7 @@ class IfBlock extends BaseBlock {
         this.formBlock({
             name: _('if'),
             flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: [_('then')]
+                labels: [_('then')]
             },
             args: 'onebool',
         });
@@ -579,17 +548,13 @@ class IfBlock extends BaseBlock {
     }
 }
 
-class ForeverBlock extends BaseBlock {
+class ForeverBlock extends FlowClampBlock {
     constructor() {
         super('forever');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('forever'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            }
         });
     }
 
@@ -600,17 +565,13 @@ class ForeverBlock extends BaseBlock {
     }
 }
 
-class RepeatBlock extends BaseBlock {
+class RepeatBlock extends FlowClampBlock {
     constructor() {
         super('repeat');
         this.setPalette('flow');
 
         this.formBlock({
             name: _('repeat'),
-            flows: {
-                top: true, bottom: true,
-                type: 'flow', labels: ['']
-            },
             args: 1,
             argLabels: [''],
             argDefaults: [4]
@@ -634,18 +595,18 @@ class RepeatBlock extends BaseBlock {
 
 
 function setupFlowBlocks() {
-    new BackwardBlock();
-    new DuplicateBlock();
-    new DefaultCaseBlock();
-    new CaseBlock();
-    new SwitchBlock();
-    new ClampBlock();
-    new BreakBlock();
-    new WaitForBlock();
-    new UntilBlock();
-    new WhileBlock();
-    new IfThenElseBlock();
-    new IfBlock();
-    new ForeverBlock();
-    new RepeatBlock();
+    new BackwardBlock().setup();
+    new DuplicateBlock().setup();
+    new DefaultCaseBlock().setup();
+    new CaseBlock().setup();
+    new SwitchBlock().setup();
+    new ClampBlock().setup();
+    new BreakBlock().setup();
+    new WaitForBlock().setup();
+    new UntilBlock().setup();
+    new WhileBlock().setup();
+    new IfThenElseBlock().setup();
+    new IfBlock().setup();
+    new ForeverBlock().setup();
+    new RepeatBlock().setup();
 }

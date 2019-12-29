@@ -55,6 +55,6 @@ class NumberBlock extends BaseBlock {
 
 
 function setupNumberBlocks() {
-    new IntBlock();
-    new NumberBlock();
+    new IntBlock().setup();
+    new NumberBlock().setup();
 }
