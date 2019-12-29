@@ -101,7 +101,7 @@ function RhythmRuler () {
 
     this._dissectRuler = function (event, ruler) {
         var cell = event.target;
-        if (cell == null) {
+        if (cell === null) {
             return;
         }
 
@@ -112,7 +112,7 @@ function RhythmRuler () {
         }
 
         var cellParent = cell.parentNode;
-        if (cellParent == null) {
+        if (cellParent === null) {
             return;
         }
 
@@ -175,7 +175,7 @@ function RhythmRuler () {
 
             this._dissectNumber.value = inputNum;
 
-            this._rulerSelected = cell.parentNode.getAttribute("data-row");
+            this._rulerSelected = cell.parentNode.getAttribute('data-row');
             this.__dissectByNumber(cell, inputNum, true);
         }
 
@@ -215,7 +215,12 @@ function RhythmRuler () {
     };
 
     this.__endTapping = function () {
-        this._rulerSelected = cell.parentNode.getAttribute("data-row");
+        if (cell.parentNode === null) {
+            console.debug('Null parent node in endTapping');
+            return;
+        }
+
+        this._rulerSelected = cell.parentNode.getAttribute('data-row');
         if (this._progressBar) this._progressBar.remove();
         this._tapCell.innerHTML = '';
 
@@ -306,11 +311,11 @@ function RhythmRuler () {
 
         __mouseOverHandler = function (event) {
             var cell = event.target;
-            if (cell == null) {
+            if (cell === null || cell.parentNode === null) {
                 return;
             }
 
-            that._rulerSelected = cell.parentNode.getAttribute("data-row");
+            that._rulerSelected = cell.parentNode.getAttribute('data-row');
             var noteValues = that.Rulers[that._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
             if (noteValue < 0) {
@@ -339,8 +344,8 @@ function RhythmRuler () {
                 that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 var cell = that._mouseDownCell;
-		        if (cell !== null && cell.parentNode !== null) {
-                    that._rulerSelected = cell.parentNode.getAttribute("data-row");
+                if (cell !== null && cell.parentNode !== null) {
+                    that._rulerSelected = cell.parentNode.getAttribute('data-row');
                     var noteValues = that.Rulers[that._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
                     cell.style.backgroundColor = platformColor.selectorBackground;
@@ -353,8 +358,8 @@ function RhythmRuler () {
             var cell = event.target;
             that._mouseUpCell = cell;
             if (that._mouseDownCell !== that._mouseUpCell) {
-                that._tieRuler(event, cell.parentNode.getAttribute("data-row"));
-            } else if (that._longPressStartTime != null && !that._tapMode) {
+                that._tieRuler(event, cell.parentNode.getAttribute('data-row'));
+            } else if (that._longPressStartTime !== null && !that._tapMode) {
                 var d = new Date();
                 var elapseTime = d.getTime() - that._longPressStartTime;
                 if (elapseTime > 1500) {
@@ -372,8 +377,8 @@ function RhythmRuler () {
             if (event == undefined) return;
             if (!that.__getLongPressStatus()) {
                 var cell = event.target;
-                if (cell != null) {
-                    that._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
+                if (cell !== null && cell.parentNode !== null) {
+                    that._dissectRuler(event, cell.parentNode.getAttribute('data-row'));
                 } else {
                     console.error('Rhythm Ruler: null cell found on click');
                 }
@@ -412,18 +417,18 @@ function RhythmRuler () {
     this.__toggleRestState = function (cell, addToUndoList) {
         var that = this;
 
-	    if (cell !== null && cell.parentNode !== null) {
-            this._rulerSelected = cell.parentNode.getAttribute("data-row");
+            if (cell !== null && cell.parentNode !== null) {
+            this._rulerSelected = cell.parentNode.getAttribute('data-row');
             var noteValues = this.Rulers[this._rulerSelected][0];
             var noteValue = noteValues[cell.cellIndex];
 
             __mouseOverHandler = function (event) {
                 var cell = event.target;
-                if (cell == null) {
+                if (cell === null) {
                     return;
                 }
 
-                that._rulerSelected = cell.parentNode.getAttribute("data-row");
+                that._rulerSelected = cell.parentNode.getAttribute('data-row');
                 var noteValues = that.Rulers[that._rulerSelected][0];
                 var noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
@@ -594,7 +599,7 @@ function RhythmRuler () {
         // Does this work if there are more than 10 rulers?
         var cell = event.target;
         if (cell !== null && cell.parentNode !== null) {
-            this._rulerSelected = cell.parentNode.getAttribute("data-row");
+            this._rulerSelected = cell.parentNode.getAttribute('data-row');
             this.__tie(true);
         }
 
@@ -886,7 +891,7 @@ function RhythmRuler () {
     this._playAll = function () {
         this._logo.synth.stop();
         this._logo.resetSynth(0);
-        if (this._startingTime == null) {
+        if (this._startingTime === null) {
             var d = new Date();
             this._startingTime = d.getTime();
             for (var i = 0; i < this.Rulers.length; i++) {
@@ -903,7 +908,7 @@ function RhythmRuler () {
     this._playOne = function () {
         this._logo.synth.stop();
         this._logo.resetSynth(0);
-        if (this._startingTime == null) {
+        if (this._startingTime === null) {
             var d = new Date();
             this._startingTime = d.getTime();
             this._elapsedTimes[this._rulerSelected] = 0;
@@ -916,7 +921,7 @@ function RhythmRuler () {
 
     this.__loop = function(noteTime, rulerNo, colIndex) {
         var ruler = this._rulers[rulerNo];
-        if (ruler == null) {
+        if (ruler === null) {
             console.warn('Cannot find ruler ' + rulerNo + '. Widget closed?');
             return;
         }
@@ -1293,7 +1298,7 @@ function RhythmRuler () {
             }
 
             that._logo.blocks.loadNewBlocks(newStack);
-	    that._logo.textMsg(_('New action block generated!'))
+            that._logo.textMsg(_('New action block generated!'))
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
@@ -1715,7 +1720,7 @@ function RhythmRuler () {
             rulerCellTable.cellPadding = '0px';
             var rulerRow = rulerCellTable.insertRow();
             this._rulers[i] = rulerRow;
-            rulerRow.setAttribute("data-row", i);
+            rulerRow.setAttribute('data-row', i);
 
             for (var j = 0; j < this.Rulers[i][0].length; j++) {
                 var noteValue = this.Rulers[i][0][j];

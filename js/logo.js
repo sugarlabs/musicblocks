@@ -5133,7 +5133,12 @@ function Logo () {
 
                     if (that.blocks.blockList[blk].name == 'scaledegree') {
                         var noteObj = getNote(that.currentNote, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], that.currentNote), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-                    } else {
+                    } else if (that.blocks.blockList[blk].name == 'pitchnumber'){
+                        //For pitch number, need to translate number value to pitch
+                        var getNumberToPitch = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
+                        var noteObj = getNote(getNumberToPitch[0], calcOctave(that.currentCalculatedOctave[turtle], getNumberToPitch[1], that.lastPitchPlayed[turtle], getNumberToPitch[0]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    }
+                    else {
                         var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     }
 
@@ -8783,6 +8788,9 @@ function Logo () {
 
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
+                        if (obj[0] / obj[1] > 2) {
+                            that.errorMsg(_('Warning: Note value is greater than 2.'), blk);
+                        }
                         // console.debug('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
                         if (that.justCounting[turtle].length === 0) {
                             if (notes.length === 0) {

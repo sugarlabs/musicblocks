@@ -26,7 +26,9 @@ function Tempo () {
     this._xradius = YRADIUS / 3;
 
     this.BPMs = [];
+    this.BPMInputs = [];
     this.BPMBlocks = [];
+    this.tempoCanvases = [];
 
     this._updateBPM = function (i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
@@ -69,7 +71,7 @@ function Tempo () {
     };
 
     this._useBPM = function (i) {
-        this.BPMs[i] = docById('BPMInput' + i).value
+        this.BPMs[i] = this.BPMInputs[i].value
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
             this._logo.errorMsg(_('The beats per minute must be between 30 and 1000.'));
@@ -79,7 +81,7 @@ function Tempo () {
         }
 
         this._updateBPM(i);
-        docById('BPMInput' + i).value = this.BPMs[i];
+        this.BPMInputs[i].value = this.BPMs[i];
     };
 
     this._speedUp = function (i) {
@@ -90,7 +92,7 @@ function Tempo () {
         }
 
         this._updateBPM(i);
-        docById('BPMInput' + i).value = this.BPMs[i];
+        this.BPMInputs[i].value = this.BPMs[i];
     };
 
     this._slowDown = function (i) {
@@ -100,7 +102,7 @@ function Tempo () {
         }
 
         this._updateBPM(i);
-        docById('BPMInput' + i).value = this.BPMs[i];
+        this.BPMInputs[i].value = this.BPMs[i];
     };
 
     this._draw = function() {
@@ -109,7 +111,8 @@ function Tempo () {
         var d = new Date();
 
         for (var i = 0; i < this.BPMs.length; i++) {
-            var tempoCanvas = docById('tempoCanvas' + i);
+            var tempoCanvas = this.tempoCanvases[i];
+            if (!tempoCanvas) continue;
 
             // We start the music clock as the first note is being
             // played.
@@ -228,63 +231,35 @@ function Tempo () {
         var w = window.innerWidth;
         var iconSize = ICONSIZE;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var tempoDiv = docById('tempoDiv');
-        tempoDiv.style.visibility = 'visible';
-        tempoDiv.setAttribute('draggable', 'true');
-        tempoDiv.style.left = '200px';
-        tempoDiv.style.top = '150px';
-
-        // The widget buttons
-        var widgetButtonsDiv = docById('tempoButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="tempoButtonTable"></table>';
-
-        var buttonTable = docById('tempoButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        widgetWindow.onclose = function() {
+            if (that._intervalID != null) {
+                clearInterval(that._intervalID);
+            }
+            this.destroy();
+        }
 
-        cell.onclick=function() {
-            that.hide();
-            that._logo.hideMsgs();
-        };
-
-        var cell = this._addButton(row, 'pause-button.svg', ICONSIZE, _('Pause'));
-
-        cell.onclick=function() {
+        widgetWindow.addButton('pause-button.svg', ICONSIZE, _('Pause')).onclick = function() {
             if (that.isMoving) {
                 that.pause();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">';
                 that.isMoving = false;
             } else {
                 that.resume();
-                this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                this.innerHTML = '<img src="header-icons/pause-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">';
                 that.isMoving = true;
             }
         };
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        var cell = this._addButton(row, 'export-chunk.svg', iconSize, _('Save tempo'), '');
+        
 
         this._save_lock = false;
-
-        cell.onclick = function () {
+        widgetWindow.addButton('export-chunk.svg', iconSize, _('Save tempo'), '').onclick = function () {
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
@@ -295,83 +270,8 @@ function Tempo () {
             }
         };
 
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - tempoDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - tempoDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                tempoDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                tempoDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        tempoDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        tempoDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                tempoDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                tempoDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        tempoDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        tempoDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
-        var canvasCells = [];
-        var tempoCanvases = [];
+        this.bodyTable = document.createElement('table');
+        this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
         for (var i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
@@ -383,71 +283,30 @@ function Tempo () {
             this._intervals.push((60 / this.BPMs[i]) * 1000);
             this._widgetNextTimes.push(this._widgetFirstTimes[i] - this._intervals[i]);
 
-            var row = buttonTable.insertRow();
-            var cell = this._addButton(row, 'up.svg', ICONSIZE, _('speed up'));
-            cell.setAttribute('id', i);
+            var r1 = this.bodyTable.insertRow();
+            var r2 = this.bodyTable.insertRow();
+            var r3 = this.bodyTable.insertRow();
 
-            cell.onclick=function() {
-                var id = Number(this.getAttribute('id'));
-                that._speedUp(id);
-            };
+            widgetWindow.addButton('up.svg', ICONSIZE, _('speed up'), r1.insertCell()).onclick = ((i) => () => {
+                that._speedUp(i);
+            })(i);
+            widgetWindow.addButton('down.svg', ICONSIZE, _('slow down'), r2.insertCell()).onclick = ((i) => () => {
+                that._slowDown(i);
+            })(i);
 
-            cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-            };
-
-            cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            var cell = this._addButton(row, 'down.svg', ICONSIZE, _('slow down'));
-            cell.setAttribute('id', i);
-
-            cell.onclick=function() {
-                var id = Number(this.getAttribute('id'));
-                that._slowDown(id);
-            };
-
-            cell.onmouseover=function() {
-                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-            };
-
-            cell.onmouseout=function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            var cell = row.insertCell();
-            cell.innerHTML = '<input id="BPMInput' + i + '" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="BPMInput" type="BPMInput" value="' + this.BPMs[i] + '" />';
-            cell.setAttribute('id', i);
-            cell.style.width = BUTTONSIZE + 'px';
-            cell.style.minWidth = cell.style.width;
-            cell.style.maxWidth = cell.style.width;
-            cell.style.height = BUTTONSIZE + 'px';
-            cell.style.minHeight = cell.style.height;
-            cell.style.maxHeight = cell.style.height;
-            cell.style.backgroundColor = platformColor.selectorBackground;
-
-            var row = buttonTable.insertRow();
-            canvasCells.push(row.insertCell());
-            canvasCells[i].style.height = TEMPOHEIGHT - 2 + 'px';
-
-            tempoCanvases.push(document.createElement('canvas'));
-            tempoCanvases[i].setAttribute('id', 'tempoCanvas' + i);
-            tempoCanvases[i].style.width = TEMPOWIDTH + 'px'
-            tempoCanvases[i].style.height = TEMPOHEIGHT + 'px';
-            tempoCanvases[i].style.position = 'absolute';
-            tempoCanvases[i].style.border = '1px';
-            tempoCanvases[i].style.background = 'rgba(255, 255, 255, 1)';
-
-            canvasCells[i].appendChild(tempoCanvases[i]);
-
-            tempoCanvases[i].style.visibility = 'visible';
-            tempoCanvases[i].style.top = canvasCells[i].getBoundingClientRect().top - TEMPOHEIGHT + 1 - BUTTONSIZE + 'px';
+            this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
+            this.tempoCanvases[i] = document.createElement('canvas');
+            this.tempoCanvases[i].style.width = TEMPOWIDTH + 'px'
+            this.tempoCanvases[i].style.height = TEMPOHEIGHT + 'px';
+            this.tempoCanvases[i].style.margin = '1px';
+            this.tempoCanvases[i].style.background = 'rgba(255, 255, 255, 1)';
+            var tcCell = r1.insertCell();
+            tcCell.appendChild(this.tempoCanvases[i]);
+            tcCell.setAttribute('rowspan', '3');
 
             // The tempo can be set from the interval between
             // successive clicks on the canvas.
-            tempoCanvases[i].addEventListener('click', function() {
-                id = Number(this.getAttribute('id').replace('tempoCanvas', ''));
+            this.tempoCanvases[i].onclick = ((id) => () => {
                 var d = new Date();
                 if (that._firstClickTime == null) {
                     that._firstClickTime = d.getTime();
@@ -456,63 +315,25 @@ function Tempo () {
                     if (newBPM > 29 && newBPM < 1001) {
                         that.BPMs[id] = newBPM;
                         that._updateBPM(id);
-                        var BPMInput = docById('BPMInput' + id);
+                        var BPMInput = that.BPMInputs[id];
                         BPMInput.value = that.BPMs[id];
                         that._firstClickTime = null;
                     } else {
                         that._firstClickTime = d.getTime();
                     }
                 }
-            });
+            })(i);
 
-            var BPMInput = docById('BPMInput' + i);
-            BPMInput.classList.add('hasKeyboard');
-            BPMInput.addEventListener('keyup', function(e) {
+            this.BPMInputs[i].addEventListener('keyup', ((id) => (e) => {
                 if (e.keyCode === 13) {
-                    id = Number(this.getAttribute('id').replace('BPMInput', ''));
-                    console.debug(id);
                     that._useBPM(id);
                 }
-            });
+            })(i));
         }
 
         this._logo.textMsg(_('Adjust the tempo with the buttons.'));
         this.resume();
+
+        widgetWindow.sendToCenter();
     };
-
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        }
-
-        return cell;
-    };
-
-    this.hide = function () {
-        docById('tempoDiv').style.visibility = 'hidden';
-        docById('tempoButtonsDiv').style.visibility = 'hidden';
-
-        for (var i = 0; i < this.BPMs.length; i++) {
-            docById('tempoCanvas' + i).style.visibility = 'hidden';
-        }
-
-        if (this._intervalID != null) {
-            clearInterval(this._intervalID);
-        }
-    }
 };
-
