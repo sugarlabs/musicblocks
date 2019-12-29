@@ -11,6 +11,7 @@
 
 
 function Toolbar() {
+    console.log("in toolbar!");
     var $j = jQuery.noConflict();
     var stopIconColorWhenPlaying = '#ea174c';
     var language = localStorage.languagePreference;
@@ -78,12 +79,35 @@ function Toolbar() {
         var saveButton = docById('saveButton');
         var saveButtonAdvanced = docById('saveButtonAdvanced');
         if (beginnerMode) {
-            saveButtonAdvanced.style.display = 'block';
+            saveButton.style.display = 'block';
             saveButtonAdvanced.style.display = 'none';
+            
+            // saveButton.onclick = function () {
+            //     html_onclick();
+            // };
+            saveButton.onclick = function() {
 
-            saveButton.onclick = function () {
-                html_onclick();
-            };
+                
+                var saveHTML = docById('save-html');
+
+                saveHTML.onclick = function () {
+                    html_onclick();
+                };
+
+                var savePNG = docById('save-png');
+                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+
+                if (svgData == '') {
+                    savePNG.disabled = true;
+                    savePNG.className = 'grey-text inactiveLink';
+                } else {
+                    savePNG.disabled = false;
+                    savePNG.className = '';
+                    savePNG.onclick = function () {
+                        png_onclick();
+                    };
+                }                
+            }
         } else {
 	    console.log('ADVANCED MODE BUTTONS')
             saveButton.style.display = 'none';
