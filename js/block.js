@@ -5711,16 +5711,15 @@ function Block(protoblock, blocks, overrideName) {
         docById('contextWheelDiv').style.display = '';
 
         labels = ['imgsrc:header-icons/copy-button.svg',
-                  'imgsrc:header-icons/paste-disabled-button.svg',
                   'imgsrc:header-icons/extract-button.svg',
                   'imgsrc:header-icons/empty-trash-button.svg',
                   'imgsrc:header-icons/cancel-button.svg'
                  ];
 
         var topBlock = this.blocks.findTopBlock(thisBlock);
-        if (this.name === 'action') {
-            labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        }
+        // if (this.name === 'action') {
+        //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        // }
 
         if (this.name in BLOCKHELP) {
             labels.push('imgsrc:header-icons/help-button.svg');
@@ -5741,13 +5740,12 @@ function Block(protoblock, blocks, overrideName) {
         wheel.initWheel(labels);
         wheel.createWheel();
 
-        wheel.navItems[0].setTooltip(_('Copy'));
-        wheel.navItems[1].setTooltip(_('Paste'));
-        wheel.navItems[2].setTooltip(_('Extract'));
-        wheel.navItems[3].setTooltip(_('Move to trash'));
-        wheel.navItems[4].setTooltip(_('Close'));
+        wheel.navItems[0].setTooltip(_('Duplicate'));
+        wheel.navItems[1].setTooltip(_('Extract'));
+        wheel.navItems[2].setTooltip(_('Move to trash'));
+        wheel.navItems[3].setTooltip(_('Close'));
         if (this.blocks.blockList[topBlock].name === 'action') {
-            wheel.navItems[5].setTooltip(_('Save stack'));
+            wheel.navItems[4].setTooltip(_('Save stack'));
         }
 
         if (helpButton !== null) {
@@ -5759,34 +5757,29 @@ function Block(protoblock, blocks, overrideName) {
         wheel.navItems[0].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.prepareStackForCopy();
-            wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
-            wheel.navItems[1].refreshNavItem(true);
+            that.blocks.pasteStack();
             wheel.refreshWheel();
         };
 
         wheel.navItems[1].navigateFunction = function () {
-            that.blocks.pasteStack();
-        };
-
-        wheel.navItems[2].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.extract();
             docById('contextWheelDiv').style.display = 'none';
         };
 
-        wheel.navItems[3].navigateFunction = function () {
+        wheel.navItems[2].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.extract();
             that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
             docById('contextWheelDiv').style.display = 'none';
         };
 
-        wheel.navItems[4].navigateFunction = function () {
+        wheel.navItems[3].navigateFunction = function () {
             docById('contextWheelDiv').style.display = 'none';
         };
 
         if (this.name === 'action') {
-            wheel.navItems[5].navigateFunction = function () {
+            wheel.navItems[4].navigateFunction = function () {
                 console.debug('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
                 that.blocks.prepareStackForCopy();
