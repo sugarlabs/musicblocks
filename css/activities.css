@@ -12,6 +12,10 @@
 }
 */
  
+*:focus {
+    outline: none;
+}
+
 .modal {
    display: none;
    position: fixed;
