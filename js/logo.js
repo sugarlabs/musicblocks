@@ -10675,7 +10675,7 @@ function Logo () {
                             var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
                             that.blocks.blockList[blk].value = y2;
                         } 
-                        if(cblk1 === null && cblk2 === null && cblk3 === null && cblk4 === null ){
+                        if (cblk1 === null && cblk2 === null && cblk3 === null && cblk4 === null ) {
                             that.blocks.blockList[blk].value = 0;
                         }
                     } else {
@@ -10685,7 +10685,7 @@ function Logo () {
                         var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
                         if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
 
-                            that.blocks.blockList[blk].value = that._docalculatedistance(x1,y1,x2,y2);
+                            that.blocks.blockList[blk].value = that._docalculatedistance(x1, y1, x2, y2);
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
