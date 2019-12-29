@@ -6901,7 +6901,7 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'number')) {
+	    if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg = 0;
             } else {
