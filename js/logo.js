@@ -12041,7 +12041,9 @@ function Logo () {
             this.notesPlayed[turtle] = saveNoteCount;
 
             // Restore previous state
+            console.debug(saveBoxes);
             this.boxes = JSON.parse(saveBoxes);
+            console.debug(saveTurtleHeaps);
             this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
             this.turtles.turtleList[turtle].doPenUp();
@@ -12065,7 +12067,7 @@ function Logo () {
             this.butNotThese[turtle] = {};
         }
 
-        return returnValue;
+        return returnValue[0] / returnValue[1];
     };
 
     /**
