@@ -12267,8 +12267,8 @@ function Logo () {
             return(0);
 
         var x_diff, y_diff ;
-        x_diff = Math.pow(a-b, 2);
-        y_diff = Math.pow(c-d, 2);
+        x_diff = Math.pow(x1-x2, 2);
+        y_diff = Math.pow(y1-y2, 2);
 
         return(Math.sqrt(x_diff + y_diff));  
     };
