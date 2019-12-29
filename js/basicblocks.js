@@ -3747,7 +3747,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['number'];
     blocks.protoBlockDict['distance'] = newblock;
     newblock.staticLabels.push(_('distance'), _('x1'), _('y1'), _('x2'), _('y2'));
-    //newblock.fontsize = 28;
     newblock.fourArgMathBlock();
     newblock.dockTypes[0] = 'numberout';
     newblock.dockTypes[1] = 'anyin';
