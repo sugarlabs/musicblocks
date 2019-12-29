@@ -108,7 +108,7 @@ class CalcBlock extends BaseBlock {
     }
 }
 
-class NamedCalcBlock extends BaseBlock {
+class NamedCalcBlock extends ValueBlock {
     constructor() {
         super('namedcalc');
         this.setPalette('action');
@@ -116,9 +116,6 @@ class NamedCalcBlock extends BaseBlock {
         this.extraWidth = 20;
         this.formBlock({
             name: _('action'),
-            flows: {
-                left: true, type: 'value'
-            }
         });
     }
 
@@ -476,6 +473,7 @@ class ActionBlock extends StackClampBlock {
     constructor() {
         super('action');
         this.setPalette('action');
+
         this.formBlock({
             name: _('action'),
             args: 1,

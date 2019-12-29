@@ -74,7 +74,7 @@ class BaseBlock extends ProtoBlock {
         if (this._style.args === 'onebool' || this._style.args === 'twobool') this.size++;
         else this.size += Math.max(0, this._style.args - 1);
 
-        this.staticLabels = [this._style.name];
+        this.staticLabels = [this._style.name || ''];
         this.dockTypes = [];
         this.defaults = [];
         this._style.flows.labels.forEach(i => this.staticLabels.push(i));
@@ -91,7 +91,8 @@ class BaseBlock extends ProtoBlock {
         if (typeof this._style.args === 'number')
             for (let i = 0; i < this._style.args; i++) {
                 this.dockTypes.push(this._style.argTypes[i] || 'numberin');
-                this.defaults.push(this._style.argDefaults[i]);
+                if (i < this._style.argDefaults.length)
+                    this.defaults.push(this._style.argDefaults[i]);
             }
         if (this._style.flows.type === 'arg')
             for (let i = 0; i < this._style.flows.labels.length; i++)
@@ -215,6 +216,19 @@ class BaseBlock extends ProtoBlock {
 }
 
 
+class ValueBlock extends BaseBlock {
+    constructor(name) {
+        super(name);
+
+        this.formBlock({
+            flows: {
+                left: true, type: 'value'
+            }
+        }, false);
+    }
+}
+
+
 class FlowBlock extends BaseBlock {
     constructor(name) {
         super(name);
@@ -245,6 +259,7 @@ class StackClampBlock extends BaseBlock {
     constructor(name) {
         super(name);
 
+        this.extraWidth = 40;
         this.formBlock({
             flows: {
                 top: 'cap', bottom: 'tail',

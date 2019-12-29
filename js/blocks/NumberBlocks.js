@@ -39,17 +39,10 @@ class IntBlock extends BaseBlock {
     }
 }
 
-class NumberBlock extends BaseBlock {
+class NumberBlock extends ValueBlock {
     constructor() {
         super('number');
         this.setPalette('number');
-
-        this.formBlock({
-            name: '',
-            flows: {
-                left: true, type: 'value'
-            }
-        }, false);
     }
 }
 
