@@ -10650,32 +10650,32 @@ function Logo () {
                     if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null ) {
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         if (cblk1 !== null ) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
+                            var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x1;
                         }
                         if (cblk2 !== null) {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                            that.blocks.blockList[blk].value = b;
+                            var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y1;
                         } 
                         if (cblk3 !== null) {
-                            var c = that.parseArg(that, turtle, cblk3, blk, receivedArg);
-                            that.blocks.blockList[blk].value = c;
+                            var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x2;
                         } 
                         if (cblk4 !== null) {
-                            var d = that.parseArg(that, turtle, cblk4, blk, receivedArg);
-                            that.blocks.blockList[blk].value = d;
+                            var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y2;
                         } 
                         if(cblk1 === null && cblk2 === null && cblk3 === null && cblk4 === null ){
                             that.blocks.blockList[blk].value = 0;
                         }
                     } else {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        var c = that.parseArg(that, turtle, cblk3, blk, receivedArg);
-                        var d = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                        var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                        var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                        var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
                         if (typeof(a) === 'number' && typeof(b) === 'number' && typeof(c) === 'number' && typeof(d) === 'number') {
 
-                            that.blocks.blockList[blk].value = that._docalculatedistance(a, b,c,d);
+                            that.blocks.blockList[blk].value = that._docalculatedistance(x1,y1,x2,y2);
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
@@ -12256,21 +12256,21 @@ function Logo () {
      * @param   d
      * @returns {number}
      */
-    this._docalculatedistance = function (a,b,c,d) {
-        if (typeof(a) === 'string' || typeof(b) === 'string' || typeof(c) === 'string' || typeof(d) === 'string') {
+    this._docalculatedistance = function (x1,y1,x2,y2) {
+        if (typeof(x1) === 'string' || typeof(y1) === 'string' || typeof(x2) === 'string' || typeof(y2) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
 
-        if(a===b && c===d)
+        if(x1===x2 && y1===y2)
             return(0);
 
-        var x1, x2 ;
-        x1 = Math.pow(a-b, 2);
-        y1 = Math.pow(c-d, 2);
+        var x_diff, y_diff ;
+        x_diff = Math.pow(a-b, 2);
+        y_diff = Math.pow(c-d, 2);
 
-        return(Math.sqrt(x1 + y1));  
+        return(Math.sqrt(x_diff + y_diff));  
     };
 
     /**
