@@ -828,6 +828,7 @@ function Logo () {
             case 'minus':
             case 'multiply':
             case 'power':
+            case 'distance':
             case 'divide':
             case 'namedbox':
             case 'box':
@@ -912,6 +913,7 @@ function Logo () {
             case 'minus':
             case 'multiply':
             case 'power':
+            case 'distance':
                 value = toFixed2(this.blocks.blockList[blk].value);
                 break;
             case 'divide':
@@ -10647,6 +10649,50 @@ function Logo () {
                     }
                 }
                 break;
+            case 'distance':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'distance']);
+                } else {
+                    var cblk1 = that.blocks.blockList[blk].connections[1];
+                    var cblk2 = that.blocks.blockList[blk].connections[2];
+                    var cblk3 = that.blocks.blockList[blk].connections[3];
+                    var cblk4 = that.blocks.blockList[blk].connections[4];
+                    if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null ) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                        if (cblk1 !== null ) {
+                            var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x1;
+                        }
+                        if (cblk2 !== null) {
+                            var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y1;
+                        } 
+                        if (cblk3 !== null) {
+                            var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x2;
+                        } 
+                        if (cblk4 !== null) {
+                            var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y2;
+                        } 
+                        if(cblk1 === null && cblk2 === null && cblk3 === null && cblk4 === null ){
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    } else {
+                        var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                        var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                        var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                        if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
+
+                            that.blocks.blockList[blk].value = that._docalculatedistance(x1,y1,x2,y2);
+                        } else {
+                            that.errorMsg(NANERRORMSG, blk);
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    }
+                }
+                break;
             case 'divide':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'divide']);
@@ -12213,6 +12259,28 @@ function Logo () {
 
         return Number(a) * Number(b);
     };
+    /** 
+     * calculate euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y')
+     * @privileged
+     * @param   a
+     * @param   b
+     * @param   c
+     * @param   d
+     * @returns {number}
+     */
+    this._docalculatedistance = function (x1, y1, x2, y2) {
+        if (typeof(x1) === 'string' || typeof(y1) === 'string' || typeof(x2) === 'string' || typeof(y2) === 'string') {
+            this.errorMsg(NANERRORMSG);
+            this.stopTurtle = true;
+            return 0;
+        }
+
+        if (x1 === x2 && y1 === y2) {
+            return(0);
+	}
+
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    };
 
     /**
      * Returns a to the power of b.
@@ -12230,6 +12298,7 @@ function Logo () {
 
         return Math.pow(a, b);
     };
+
 
     /**
      * Divides a by b.
