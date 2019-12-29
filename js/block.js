@@ -965,7 +965,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'voicename':
                     this.value = DEFAULTVOICE;
                     break;
-                case 'noiseename':
+                case 'noisename':
                     this.value = DEFAULTNOISE;
                     break;
                 case 'drumname':
@@ -1002,6 +1002,10 @@ function Block(protoblock, blocks, overrideName) {
                 if (attr !== '♮') {
                     label += attr;
                 }
+            } else if (this.name === 'drumname') {
+                var label = getDrumName(this.value);
+            } else if (this.name === 'noisename') {
+                var label = getNoiseName(this.value);
             } else {
                 if (this.value !== null) {
                     var label = this.value.toString();
@@ -2877,7 +2881,7 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
         } else if (this.name === 'noisename') {
             if (this.value != null) {
-                var selectednoisee = this.value;
+                var selectednoise = this.value;
             } else {
                 var selectednoise = DEFAULTNOISE;
             }
