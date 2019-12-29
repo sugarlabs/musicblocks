@@ -10643,7 +10643,7 @@ function Logo () {
                 break;
             case 'distance':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'plus']);
+                    that.statusFields.push([blk, 'distance']);
                 } else {
                     var cblk1 = that.blocks.blockList[blk].connections[1];
                     var cblk2 = that.blocks.blockList[blk].connections[2];
@@ -10675,7 +10675,7 @@ function Logo () {
                         var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                         var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
                         var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
-                        if (typeof(a) === 'number' && typeof(b) === 'number' && typeof(c) === 'number' && typeof(d) === 'number') {
+                        if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
 
                             that.blocks.blockList[blk].value = that._docalculatedistance(x1,y1,x2,y2);
                         } else {
@@ -12258,21 +12258,18 @@ function Logo () {
      * @param   d
      * @returns {number}
      */
-    this._docalculatedistance = function (x1,y1,x2,y2) {
+    this._docalculatedistance = function (x1, y1, x2, y2) {
         if (typeof(x1) === 'string' || typeof(y1) === 'string' || typeof(x2) === 'string' || typeof(y2) === 'string') {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
 
-        if(x1===x2 && y1===y2)
+        if (x1 === x2 && y1 === y2) {
             return(0);
+	}
 
-        var x_diff, y_diff ;
-        x_diff = Math.pow(a-b, 2);
-        y_diff = Math.pow(c-d, 2);
-
-        return(Math.sqrt(x_diff + y_diff));  
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     };
 
     /**
