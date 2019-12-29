@@ -46,7 +46,7 @@ class DuplicateBlock extends FlowClampBlock {
         this.formBlock({
             name: _('duplicate'),
             args: 1,
-            argDefaults: [2]
+            defaults: [2]
         });
     }
 
@@ -403,12 +403,10 @@ class UntilBlock extends FlowClampBlock {
         super('until');
         this.setPalette('flow');
 
-        let language = localStorage.languagePreference || navigator.language;
-
         this.formBlock({
             name: _('until'),
             flows: {
-                labels: [language === 'js' ? _('do2') : _('do')]
+                labels: [this.lang === 'js' ? _('do2') : _('do')]
             },
             args: 'onebool',
         });
@@ -455,12 +453,10 @@ class WhileBlock extends FlowClampBlock {
         super('while');
         this.setPalette('flow');
 
-        let language = localStorage.languagePreference || navigator.language;
-
         this.formBlock({
             name: _('while'),
             flows: {
-                labels: [language === 'js' ? _('do2') : _('do')]
+                labels: [this.lang === 'js' ? _('do2') : _('do')]
             },
             args: 'onebool',
         });
@@ -574,7 +570,7 @@ class RepeatBlock extends FlowClampBlock {
             name: _('repeat'),
             args: 1,
             argLabels: [''],
-            argDefaults: [4]
+            defaults: [4]
         });
     }
 

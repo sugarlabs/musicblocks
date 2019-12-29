@@ -2004,6 +2004,8 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'increment':
+        case 'incrementOne':
         case 'return':
         case 'returnToUrl':
         case 'namedcalc':
@@ -2165,42 +2167,6 @@ function Logo () {
         case 'movable':  // legacy typo
             if (args.length === 1) {
                 that.moveable[turtle] = args[0];
-            }
-            break;
-        case 'storein2':
-            if (args.length === 1) {
-                that.boxes[that.blocks.blockList[blk].privateData] = args[0];
-            }
-            break;
-        case 'storein':
-            if (args.length === 2) {
-                that.boxes[args[0]] = args[1];
-            }
-            break;
-        case 'incrementOne':
-            var i = 1;
-        case 'increment':
-            // If the 2nd arg is not set, default to 1.
-            if (args.length === 2) {
-                var i = args[1];
-            } else {
-                var i = 1;
-            }
-
-            if (args.length > 0) {
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (that.blocks.blockList[cblk].name === 'text') {
-                    // Work-around to #1302
-                    // Look for a namedbox with this text value.
-                    var name = this.blocks.blockList[cblk].value;
-                    if (name in this.boxes) {
-                        this.boxes[name] = this.boxes[name] + i;
-                        break;
-                    }
-                }
-
-                var settingBlk = that.blocks.blockList[blk].connections[1];
-                that._blockSetter(settingBlk, args[0] + i, turtle);
             }
             break;
         case 'clear':
@@ -9711,118 +9677,29 @@ function Logo () {
                     that.blocks.blockList[blk].value = Math.round(rms * 100);
                 }
                 break;
-            /*
-            case 'eval':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                // Restricted to math methods
-                that.blocks.blockList[blk].value = Number(eval('Math.' + a.replace(/x/g, b.toString())));
-                break;
-            */
-            case 'box':
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                }
-
-                var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                if (name in that.boxes) {
-                    that.blocks.blockList[blk].value = that.boxes[name];
-                } else {
-                    that.errorMsg(NOBOXERRORMSG, blk, name);
-                    that.blocks.blockList[blk].value = 0;
-                }
-                break;
             case 'turtlename':
                 that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].name;
-                break;
-            case 'namedbox':
-                var name = that.blocks.blockList[blk].privateData;
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, that.blocks.blockList[blk].name]);
-                } else if (!that.updatingStatusMatrix) {
-                    if (name in that.boxes) {
-                        that.blocks.blockList[blk].value = that.boxes[name];
-                    } else {
-                        that.errorMsg(NOBOXERRORMSG, blk, name);
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                }
-                break;
-            case 'sqrt':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, that.blocks.blockList[blk].name]);
-                } else {
-                    var cblk = that.blocks.blockList[blk].connections[1];
-                    if (cblk === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                        if (typeof(a) === 'number') {
-                            if (a < 0) {
-                                that.errorMsg(NOSQRTERRORMSG, blk);
-                                a = -a;
-                            }
-
-                            that.blocks.blockList[blk].value = that._doSqrt(a);
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
-                break;
-            case 'abs':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, that.blocks.blockList[blk].name]);
-                } else {
-                    var cblk = that.blocks.blockList[blk].connections[1];
-                    if (cblk === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                        if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = Math.abs(a);
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
                 break;
             
             // ----- ADD SMART BLOCK CLASSES HERE -----
             case 'number':
+            case 'box':
+            case 'storein':
+            case 'storein2':
+            case 'namedbox':
             case 'int':
-                that.blocks.blockList[blk].protoblock.arg(that);
-                break;
-            
-            
+            case 'divide':
+            case 'minus':
+            case 'multiply':
+            case 'neg':
+            case 'sqrt':
             case 'mod':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'mod']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        if (typeof(a) === 'number' && typeof(b) === 'number') {
-                            that.blocks.blockList[blk].value = that._doMod(a, b);
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
+            case 'abs':
+            case 'plus':
+            case 'random':
+            case 'oneOf':
+            case 'power':
+                that.blocks.blockList[blk].protoblock.arg(that);
                 break;
             case 'not':
                 var cblk = that.blocks.blockList[blk].connections[1];
@@ -9894,232 +9771,6 @@ function Logo () {
                     }
                 }
                 break;
-            case 'random':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    if (typeof(a) === 'number' && typeof(b) === 'number') {
-                        that.blocks.blockList[blk].value = that._doRandom(a, b);
-                    } else if (typeof(a) === 'string' && typeof(b) === 'string' && SOLFEGENAMES.indexOf(a) != -1 && SOLFEGENAMES.indexOf(b) != -1) {
-                        var ai = SOLFEGENAMES.indexOf(a);
-                        var bi = SOLFEGENAMES.indexOf(b);
-                        if (ai > bi) {
-                            ai = SOLFEGENAMES.indexOf(b);
-                            bi = SOLFEGENAMES.indexOf(a);
-                        }
-
-                        var ii = that._doRandom(ai, bi);
-                        that.blocks.blockList[blk].value = SOLFEGENAMES[ii];
-                    } else {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = false
-                    }
-                }
-                break;
-            case 'oneOf':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    if (cblk1 !== null) {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        that.blocks.blockList[blk].value = a;
-                    } else if (cblk2 !== null) {
-                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        that.blocks.blockList[blk].value = b;
-                    } else {
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                } else {
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    that.blocks.blockList[blk].value = that._doOneOf(a, b);
-                }
-                break;
-            case 'plus':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'plus']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        if (cblk1 !== null) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
-                        } else if (cblk2 !== null) {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                            that.blocks.blockList[blk].value = b;
-                        } else {
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    } else {
-                        // We have a special case for certain keywords
-                        // associated with octaves: current, next, and
-                        // previous. In the case of plus, since we use it
-                        // for string concatenation as well, we check to
-                        // see if the block is connected to a pitch block
-                        // before assuming octave.
-
-                        var cblk0 = that.blocks.blockList[blk].connections[0];
-                        if (cblk0 !== null && that.blocks.blockList[cblk0].name === 'pitch') {
-                            var noteBlock = that.blocks.blockList[cblk0].connections[1];
-                            if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                                var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
-                            } else {
-                                var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            }
-
-                            if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                                var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
-                            } else {
-                                var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                            }
-                        } else {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        }
-
-                        that.blocks.blockList[blk].value = that._doPlus(a, b);
-                    }
-                }
-                break;
-            case 'multiply':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'multiply']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var cblk0 = that.blocks.blockList[blk].connections[0];
-                    var noteBlock = that.blocks.blockList[cblk0].connections[1];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        if (cblk1 !== null) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
-                        } else if (cblk2 !== null) {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                            that.blocks.blockList[blk].value = b;
-                        } else {
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    } else {
-                        // We have a special case for certain keywords
-                        // associated with octaves: current, next, and
-                        // previous.
-                        if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
-                        } else {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        }
-
-                        if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle], that.blocks.blockList[noteBlock].value);
-                        } else {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        }
-
-                        that.blocks.blockList[blk].value = that._doMultiply(a, b);
-                    }
-                }
-                break;
-            case 'power':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'power']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        if (cblk1 !== null) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
-                        } else {
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        if (typeof(a) === 'number' && typeof(b) === 'number') {
-
-                            that.blocks.blockList[blk].value = that._doPower(a, b);
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
-                break;
-            case 'divide':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'divide']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        if (cblk1 !== null) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
-                        } else {
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        if (typeof(a) === 'number' && typeof(b) === 'number') {
-                            that.blocks.blockList[blk].value = that._doDivide(a, b);
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
-                break;
-            case 'minus':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'minus']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    var cblk0 = that.blocks.blockList[blk].connections[0];
-                    var noteBlock = that.blocks.blockList[cblk0].connections[1];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        if (cblk1 !== null) {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                            that.blocks.blockList[blk].value = a;
-                        } else if (cblk2 !== null) {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                            that.blocks.blockList[blk].value = -b;
-                        } else {
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    } else {
-                        // We have a special case for certain keywords
-                        // associated with octaves: current, next, and
-                        // previous.
-                        if (typeof(that.blocks.blockList[cblk1].value) === 'string') {
-                            var a = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk1].value, that.lastNotePlayed[turtle],  that.blocks.blockList[noteBlock].value);
-                        } else {
-                            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        }
-
-                        if (typeof(that.blocks.blockList[cblk2].value) === 'string') {
-                            var b = calcOctave(that.currentOctave[turtle], that.blocks.blockList[cblk2].value, that.lastNotePlayed[turtle],  that.blocks.blockList[noteBlock].value);
-                        } else {
-                            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                        }
-
-                        that.blocks.blockList[blk].value = that._doMinus(a, b);
-                    }
-                }
-                break;
             case 'doubly':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 //find block at end of chain
@@ -10157,27 +9808,6 @@ function Logo () {
                             that.blocks.blockList[blk].value = 0;
                             break;
                         }
-                    }
-                }
-                break;
-            case 'neg':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'neg']);
-                } else {
-                    var cblk = that.blocks.blockList[blk].connections[1];
-                    if (cblk !== null) {
-                        var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                        if (typeof(a) === 'number') {
-                            that.blocks.blockList[blk].value = that._doMinus(0, a);
-                        } else if (typeof(a) === 'string') {
-                            var obj = a.split('');
-                            that.blocks.blockList[blk].value = obj.reverse().join('');
-                        } else {
-                            that.blocks.blockList[blk].value = a;
-                        }
-                    } else {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
                     }
                 }
                 break;

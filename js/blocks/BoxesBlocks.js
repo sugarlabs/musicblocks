@@ -3,11 +3,10 @@ class IncrementBlock extends FlowBlock {
         super(name || 'increment');
         this.setPalette('boxes');
 
-        let language = localStorage.languagePreference || navigator.language;
         this.formBlock({
             name: _('add'),
             args: 2,
-            argLabels: [_('to'), language === 'ja' ? _('value1') : _('value')],
+            argLabels: [_('to'), this.lang === 'ja' ? _('value1') : _('value')],
             argTypes: ['anyin', 'anyin']
         });
     }
@@ -48,7 +47,7 @@ class IncrementOneBlock extends IncrementBlock {
     }
 }
 
-class BoxBlock extends BaseBlock {
+class BoxBlock extends LeftBlock {
     constructor() {
         super('box');
         this.setPalette('boxes');
@@ -56,9 +55,8 @@ class BoxBlock extends BaseBlock {
         this.formBlock({
             //.TRANS: a container into which to put something
             name: _('box'),
-            flows: { left: true, type: null },
             outType: 'anyout',
-            args: 1, argDefaults: [_('box')],
+            args: 1, defaults: [_('box')],
             argTypes: ['anyin'],
         })
         this.parameter = true;
@@ -116,7 +114,7 @@ class StoreIn2Block extends FlowBlock {
         this.formBlock({
             name: _('store in box'),
             args: 1, argTypes: ['anyin'],
-            argDefaults: [4],
+            defaults: [4],
         });
     }
 
@@ -130,15 +128,14 @@ class StoreInBlock extends FlowBlock {
     constructor() {
         super('storein');
         this.setPalette('boxes');
-
-        let language = localStorage.languagePreference || navigator.language;
+        
         this.formBlock({
             //.TRANS: put something into a container for later reference
             name: _('store in'),
             args: 2, argTypes: ['anyin', 'anyin'],
-            argDefaults: [_('box'), 4],
+            defaults: [_('box'), 4],
             //.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
-            argLabels: (language === 'ja' ? [_('name1'), _('value1')]
+            argLabels: (this.lang === 'ja' ? [_('name1'), _('value1')]
                                           : [_('name'), _('name')])
         })
     }
@@ -166,7 +163,7 @@ class StoreBox2Block extends FlowBlock {
         super('storebox2');
         this.setPalette('boxes');
 
-        this.formBlock({ name: _('store in box 2'), args: 1, argDefaults: [4] });
+        this.formBlock({ name: _('store in box 2'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [
             [0, ['storein2', {'value': _('box2')}], x, y, [null, 1, null]],
             [1, ['number', {'value': 4}], x, y, [0]]
@@ -191,7 +188,7 @@ class StoreBox1Block extends FlowBlock {
         super('storebox1');
         this.setPalette('boxes');
 
-        this.formBlock({ name: _('store in box 1'), args: 1, argDefaults: [4] });
+        this.formBlock({ name: _('store in box 1'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [
             [0, ['storein2', {'value': _('box1')}], x, y, [null, 1, null]],
             [1, ['number', {'value': 4}], x, y, [0]]

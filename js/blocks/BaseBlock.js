@@ -28,6 +28,9 @@ class BaseBlock extends ProtoBlock {
 
         this.macroFunc = null;
         this._style = {}
+
+        // Just for brevity
+        this.lang = localStorage.languagePreference || navigator.language;
     }
 
     setPalette(palette) {
@@ -39,7 +42,7 @@ class BaseBlock extends ProtoBlock {
         this._style.args = this._style.args || 0;
         this._style.argTypes = this._style.argTypes || [];
         this._style.argLabels = this._style.argLabels || [];
-        this._style.argDefaults = this._style.argDefaults || [];
+        this._style.defaults = this._style.defaults || [];
         this._style.flows = this._style.flows || {}
         this._style.flows.labels = this._style.flows.labels || [];
 
@@ -91,8 +94,8 @@ class BaseBlock extends ProtoBlock {
         if (typeof this._style.args === 'number')
             for (let i = 0; i < this._style.args; i++) {
                 this.dockTypes.push(this._style.argTypes[i] || 'numberin');
-                if (i < this._style.argDefaults.length)
-                    this.defaults.push(this._style.argDefaults[i]);
+                if (i < this._style.defaults.length)
+                    this.defaults.push(this._style.defaults[i]);
             }
         if (this._style.flows.type === 'arg')
             for (let i = 0; i < this._style.flows.labels.length; i++)
@@ -135,7 +138,7 @@ class BaseBlock extends ProtoBlock {
 
             let pad = (this._style.args === 'onebool' || this._style.args === 'twobool') ? 15 :
                     (this._style.flows.type === 'value') ? 60 : 20;
-            if (!this._style.flows.type) pad += 20;
+            if (!this._style.flows.type) pad += 10;
             svg.setExpand(pad + this.extraWidth, 0, 0, 0);
             debugLog('setExpand', pad + this.extraWidth, 0, 0, 0);
 
@@ -236,6 +239,19 @@ class FlowBlock extends BaseBlock {
         this.formBlock({
             flows: {
                 top: true, bottom: true
+            }
+        }, false);
+    }
+}
+
+
+class LeftBlock extends BaseBlock {
+    constructor(name) {
+        super(name);
+
+        this.formBlock({
+            flows: {
+                left: true, type: null
             }
         }, false);
     }

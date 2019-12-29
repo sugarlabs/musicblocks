@@ -6,7 +6,7 @@ class ReturnBlock extends FlowBlock {
         this.formBlock({
             name: _('return'),
             args: 1,
-            argDefaults: [100],
+            defaults: [100],
             argTypes: ['anyin'],
         });
     }
@@ -27,7 +27,7 @@ class ReturnToURLBlock extends FlowBlock {
         this.formBlock({
             name: _('return to URL'),
             args: 1,
-            argDefaults: [100],
+            defaults: [100],
             argTypes: ['anyin'],
         });
     }
@@ -70,7 +70,7 @@ class ReturnToURLBlock extends FlowBlock {
     }
 }
 
-class CalcBlock extends BaseBlock {
+class CalcBlock extends LeftBlock {
     constructor() {
         super('calc');
         this.setPalette('action');
@@ -78,10 +78,10 @@ class CalcBlock extends BaseBlock {
         this.formBlock({
             name: _('calculate'),
             flows: {
-                left: true, outType: 'anyout'
+                outType: 'anyout'
             },
             args: 1,
-            argDefaults: [_('action')],
+            defaults: [_('action')],
             argTypes: ['anyin'],
         });
     }
@@ -141,11 +141,10 @@ class NamedDoArgBlock extends FlowClampBlock {
         super('nameddoArg');
         this.setPalette('action');
 
-        let language = localStorage.languagePreference || navigator.language;
         //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
         //.TRANS: take (do) some action
         this.formBlock({
-            name: language === 'ja' ? _('do1') : _('do'),
+            name: this.lang === 'ja' ? _('do1') : _('do'),
             flows: {
                 type: 'arg', types: ['anyin'],
             }
@@ -157,7 +156,7 @@ class NamedDoArgBlock extends FlowClampBlock {
     }
 }
 
-class NamedCalcArgBlock extends BaseBlock {
+class NamedCalcArgBlock extends LeftBlock {
     constructor() {
         super('namedcalcArg');
         this.setPalette('action');
@@ -165,7 +164,7 @@ class NamedCalcArgBlock extends BaseBlock {
         this.formBlock({
             name: _('calculate'),
             flows: {
-                left: true, outType: 'anyout', type: 'arg',
+                outType: 'anyout', type: 'arg',
                 types: ['anyin'], labels: ['']
             }
         });
@@ -198,15 +197,14 @@ class DoArgBlock extends FlowClampBlock {
         super('doArg');
         this.setPalette('action');
 
-        let language = localStorage.languagePreference || navigator.language;
         this.formBlock({
-            name: language === 'ja' ? _('do1') : _('do'),
+            name: this.lang === 'ja' ? _('do1') : _('do'),
             flows: {
                 type: 'arg', types: ['anyin'],
             },
             args: 1,
             argTypes: ['anyin'],
-            argDefaults: [_('action')]
+            defaults: [_('action')]
         });
     }
 
@@ -215,7 +213,7 @@ class DoArgBlock extends FlowClampBlock {
     }
 }
 
-class CalcArgBlock extends BaseBlock {
+class CalcArgBlock extends LeftBlock {
     constructor() {
         super('calcArg');
         this.setPalette('action');
@@ -223,12 +221,12 @@ class CalcArgBlock extends BaseBlock {
         this.formBlock({
             name: _('calculate'),
             flows: {
-                left: true, outType: 'anyout', type: 'arg',
+                outType: 'anyout', type: 'arg',
                 types: ['anyin'], labels: ['']
             },
             args: 1,
             argTypes: ['anyin'],
-            argDefaults: [_('action')]
+            defaults: [_('action')]
         });
     }
 
@@ -259,7 +257,7 @@ class CalcArgBlock extends BaseBlock {
     }
 }
 
-class ArgBlock extends BaseBlock {
+class ArgBlock extends LeftBlock {
     constructor() {
         super('arg');
         this.setPalette('action');
@@ -267,10 +265,10 @@ class ArgBlock extends BaseBlock {
         this.formBlock({
             name: _('arg'),
             flows: {
-                left: true, outType: 'anyout'
+                outType: 'anyout'
             },
             args: 1,
-            argDefaults: [1],
+            defaults: [1],
             argTypes: ['numberin'],
         });
     }
@@ -296,7 +294,7 @@ class ArgBlock extends BaseBlock {
     }
 }
 
-class NamedArgBlock extends BaseBlock {
+class NamedArgBlock extends LeftBlock {
     constructor() {
         super('namedarg');
         this.setPalette('action');
@@ -304,7 +302,7 @@ class NamedArgBlock extends BaseBlock {
         this.formBlock({
             name: _('arg') + 1,
             flows: {
-                left: true, type: 'value'
+                type: 'value'
             }
         });
     }
@@ -337,11 +335,10 @@ class DoBlock extends FlowBlock {
         super('do');
         this.setPalette('action');
 
-        let language = localStorage.languagePreference || navigator.language;
         this.formBlock({
-            name: language === 'ja' ? _('do1') : _('do'),
+            name: this.lang === 'ja' ? _('do1') : _('do'),
             args: 1,
-            argDefaults: [_('action')],
+            defaults: [_('action')],
             argTypes: ['anyin'],
         });
     }
@@ -368,8 +365,7 @@ class ListenBlock extends FlowBlock {
         super('listen');
         this.setPalette('action');
 
-        let language = localStorage.languagePreference || navigator.language;
-        if (language === 'ja')
+        if (this.lang === 'ja')
             this.extraWidth = 15;
         this.formBlock({
             //.TRANS: an event, such as user actions (mouse clicks, key presses)
@@ -377,8 +373,8 @@ class ListenBlock extends FlowBlock {
             args: 2,
             argTypes: ['textin', 'textin'],
             //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-            argLabels: [_('event'), language === 'ja' ? _('do1') : _('do')],
-            argDefaults: [_('event'), _('action')]
+            argLabels: [_('event'), this.lang === 'ja' ? _('do1') : _('do')],
+            defaults: [_('event'), _('action')]
         });
     }
 
@@ -421,7 +417,7 @@ class DispatchBlock extends FlowBlock {
         this.formBlock({
             name: _('broadcast'),
             args: 1,
-            argDefaults: [_('event')],
+            defaults: [_('event')],
             argTypes: ['textin'],
         });
     }
@@ -478,7 +474,7 @@ class ActionBlock extends StackClampBlock {
             name: _('action'),
             args: 1,
             argLabels: [''],
-            argDefaults: [_('action')]
+            defaults: [_('action')]
         });
     }
 
