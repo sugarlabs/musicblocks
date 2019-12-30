@@ -4364,6 +4364,43 @@ function Block(protoblock, blocks, overrideName) {
 
             that.label.value = that.value;
         };
+        
+        
+        var __pitchPreviewForNum = function () {
+            var label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
+            var i = wheelLabels.indexOf(label);
+            var actualPitch = numberToPitch(wheelValues[i] + 3);
+
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+
+            actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
+            that.blocks.logo.synth.trigger(0, actualPitch[0] + (actualPitch[1] + 3), 1 / 8, DEFAULTVOICE, null, null);
+
+
+            __selectionChanged();
+        };
+
+
+        // Handler for pitchnumber preview. This is to ensure that
+        //only pitchnumber block's pie menu gets a sound preview
+        if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'pitchnumber'){
+          for (var i = 0; i < wheelValues.length; i++) {
+              this._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
+          }
+        }
     };
 
     this._piemenuColor = function (wheelValues, selectedValue, mode) {
