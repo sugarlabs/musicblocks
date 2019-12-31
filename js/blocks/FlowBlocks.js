@@ -353,7 +353,7 @@ class WaitForBlock extends FlowBlock {
 
         this.formBlock({
             name: _('wait for'),
-            args: 'onebool',
+            args: 1, argTypes: ['booleanin'],
         });
     }
 
@@ -408,7 +408,7 @@ class UntilBlock extends FlowClampBlock {
             flows: {
                 labels: [this.lang === 'js' ? _('do2') : _('do')]
             },
-            args: 'onebool',
+            args: 1, argTypes: ['booleanin'],
         });
     }
 
@@ -458,7 +458,7 @@ class WhileBlock extends FlowClampBlock {
             flows: {
                 labels: [this.lang === 'js' ? _('do2') : _('do')]
             },
-            args: 'onebool',
+            args: 1, argTypes: ['booleanin'],
         });
     }
 
@@ -512,7 +512,7 @@ class IfThenElseBlock extends FlowClampBlock {
             flows: {
                 labels: [_('then'), _('else')]
             },
-            args: 'onebool',
+            args: 1, argTypes: ['booleanin']
         });
     }
 
@@ -526,7 +526,7 @@ class IfThenElseBlock extends FlowClampBlock {
 
 class IfBlock extends FlowClampBlock {
     constructor() {
-        super('iff');
+        super('if');
         this.setPalette('flow');
 
         this.formBlock({
@@ -534,7 +534,7 @@ class IfBlock extends FlowClampBlock {
             flows: {
                 labels: [_('then')]
             },
-            args: 'onebool',
+            args: 1, argTypes: ['booleanin'],
         });
     }
 

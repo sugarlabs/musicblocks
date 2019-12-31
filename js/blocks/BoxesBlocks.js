@@ -59,22 +59,21 @@ class BoxBlock extends LeftBlock {
             args: 1, defaults: [_('box')],
             argTypes: ['anyin'],
         })
-        this.parameter = true;
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         var cblk = logo.blocks.blockList[blk].connections[1];
         if (cblk === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         }
 
         var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         if (name in logo.boxes) {
-            logo.blocks.blockList[blk].value = logo.boxes[name];
+            return logo.boxes[name];
         } else {
             logo.errorMsg(NOBOXERRORMSG, blk, name);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         }
     }
 }
@@ -91,16 +90,16 @@ class NamedBoxBlock extends ValueBlock {
         })
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         var name = logo.blocks.blockList[blk].privateData;
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
         } else if (!logo.updatingStatusMatrix) {
             if (name in logo.boxes) {
-                logo.blocks.blockList[blk].value = logo.boxes[name];
+                return logo.boxes[name];
             } else {
                 logo.errorMsg(NOBOXERRORMSG, blk, name);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         }
     }
@@ -118,7 +117,7 @@ class StoreIn2Block extends FlowBlock {
         });
     }
 
-    args(logo) {
+    args(logo, turtle, blk, receivedArg) {
         if (args.length !== 1) return;
         logo.boxes[logo.blocks.blockList[blk].privateData] = args[0];
     }

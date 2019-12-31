@@ -63,18 +63,18 @@ class BaseBlock extends ProtoBlock {
                 this.style = 'clamp';
             this.expandable = true;
         } else {
-            if (this._style.args === 1)
+            if (this._style.flows.type === 'value')
+                this.style = 'value';
+            else if (this._style.args === 1 || this._style.flows.left) {
                 this.style = 'arg';
-            else if (this._style.args === 2)
+                this.parameter = true;
+            } else if (this._style.args === 2)
                 this.style = 'twoarg';
         }
-        this.args = (
-            this._style.args === 'onebool' ? 1
-                : this._style.args === 'twobool' ? 2
-                    : this._style.args
-        ) + this._style.flows.labels.length;
+        this.args = this._style.flows.labels.length + this._style.args;
         this.size = this._style.flows.labels.length + 1;
-        if (this._style.args === 'onebool' || this._style.args === 'twobool') this.size++;
+        if (this._style.argTypes[0] === 'booleanin') this.size++;
+        if (this._style.argTypes[1] === 'booleanin') this.size++;
         else this.size += Math.max(0, this._style.args - 1);
 
         this.staticLabels = [this._style.name || ''];
@@ -87,10 +87,6 @@ class BaseBlock extends ProtoBlock {
             this.dockTypes.push(this._style.outType || 'numberout');
         if (this._style.flows.top)
             this.dockTypes.push(this._style.flows.top === 'cap' ? 'unavailable' : 'out');
-        if (this._style.args === 'onebool' || this._style.args === 'twobool')
-            this.dockTypes.push('booleanin');
-        if (this._style.args === 'twobool')
-            this.dockTypes.push('booleanin');
         if (typeof this._style.args === 'number')
             for (let i = 0; i < this._style.args; i++) {
                 this.dockTypes.push(this._style.argTypes[i] || 'numberin');
@@ -136,10 +132,12 @@ class BaseBlock extends ProtoBlock {
                 debugLog('setOutie true')
             }
 
-            let pad = (this._style.args === 'onebool' || this._style.args === 'twobool') ? 15 :
-                    (this._style.flows.type === 'value') ? 60 : 20;
+            let pad = (this._style.flows.type === 'value') ? 60 : 20;
             if (!this._style.flows.type) pad += 10;
-            svg.setExpand(pad + this.extraWidth, 0, 0, 0);
+            if (this._style.outType === 'booleanout' && this._style.args === 2) pad -= 30;
+            else if (this._style.argTypes[0] === 'booleanin') pad -= 5;
+            svg.setExpand(pad + this.extraWidth, 0, 0,
+                this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
             debugLog('setExpand', pad + this.extraWidth, 0, 0, 0);
 
             for (let i = 0; i < arguments.length; i++)
@@ -148,7 +146,7 @@ class BaseBlock extends ProtoBlock {
                 svg.setClampSlots(i, 1);
             svg.setClampCount(this._style.flows.labels.length);
 
-            if (this._style.args === 'onebool') {
+            if (this._style.argTypes[0] === 'booleanin') {
                 svg.setBoolean(true)
                 debugLog('setBoolean', true);
             } else if (typeof this._style.args === 'number') {
@@ -170,9 +168,17 @@ class BaseBlock extends ProtoBlock {
             } else if (this._style.flows.type === 'flow') {
                 artwork = svg.basicClamp();
                 debugLog('artwork = basicClamp');
-            } else if (this._style.args === 'twobool') {
-                artwork = svg.booleanAndOr();
-                debugLog('artwork = booleanAndOr');
+            } else if (this._style.outType === 'booleanout') {
+                if (this._style.args === 1 || !this._style.args) {
+                    debugLog('artwork = booleanNot', !this._style.args);
+                    artwork = svg.booleanNot(!this._style.args);
+                } else if (this._style.argTypes[0] === 'booleanin') {
+                    debugLog('artwork = booleanAndOr');
+                    artwork = svg.booleanAndOr();
+                } else {
+                    debugLog('artwork = booleanCompare');
+                    artwork = svg.booleanCompare();
+                }
             } else if (this._style.flows.type === 'value') {
                 artwork = svg.basicBox();
                 debugLog('artwork = basicBox');
@@ -227,6 +233,20 @@ class ValueBlock extends BaseBlock {
             flows: {
                 left: true, type: 'value'
             }
+        }, false);
+    }
+}
+
+
+class BooleanBlock extends BaseBlock {
+    constructor(name) {
+        super(name);
+
+        this.formBlock({
+            flows: {
+                left: true, type: 'value'
+            },
+            outType: 'booleanout'
         }, false);
     }
 }

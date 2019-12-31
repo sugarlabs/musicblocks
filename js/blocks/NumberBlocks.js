@@ -10,25 +10,25 @@ class IntBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'int']);
         } else {
             var cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             } else {
                 var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof(a) === 'number') {
-                    logo.blocks.blockList[blk].value = Math.floor(a);
+                    return Math.floor(a);
                 } else {
                     try {
-                        logo.blocks.blockList[blk].value = Math.floor(Number(a));
+                        return Math.floor(Number(a));
                     } catch (e) {
                         console.debug(e);
                         logo.errorMsg(NANERRORMSG, blk);
-                        logo.blocks.blockList[blk].value = 0;
+                        return 0;
                     }
                 }
             }
@@ -47,7 +47,7 @@ class ModBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'mod']);
         } else {
@@ -55,15 +55,15 @@ class ModBlock extends LeftBlock {
             var cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             } else {
                 var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 if (typeof(a) === 'number' && typeof(b) === 'number') {
-                    logo.blocks.blockList[blk].value = logo._doMod(a, b);
+                    return logo._doMod(a, b);
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             }
         }
@@ -81,7 +81,7 @@ class PowerBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'power']);
         } else {
@@ -91,19 +91,19 @@ class PowerBlock extends LeftBlock {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 } else {
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             } else {
                 var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 if (typeof(a) === 'number' && typeof(b) === 'number') {
 
-                    logo.blocks.blockList[blk].value = logo._doPower(a, b);
+                    return logo._doPower(a, b);
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             }
         }
@@ -120,14 +120,14 @@ class SqrtBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
         } else {
             var cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             } else {
                 var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof(a) === 'number') {
@@ -136,10 +136,10 @@ class SqrtBlock extends LeftBlock {
                         a = -a;
                     }
 
-                    logo.blocks.blockList[blk].value = logo._doSqrt(a);
+                    return logo._doSqrt(a);
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             }
         }
@@ -156,21 +156,21 @@ class AbsBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
         } else {
             var cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             } else {
                 var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof(a) === 'number') {
-                    logo.blocks.blockList[blk].value = Math.abs(a);
+                    return Math.abs(a);
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             }
         }
@@ -189,7 +189,7 @@ class DivideBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'divide']);
         } else {
@@ -199,18 +199,18 @@ class DivideBlock extends LeftBlock {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 } else {
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             } else {
                 var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 if (typeof(a) === 'number' && typeof(b) === 'number') {
-                    logo.blocks.blockList[blk].value = logo._doDivide(a, b);
+                    return logo._doDivide(a, b);
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             }
         }
@@ -230,7 +230,7 @@ class MultiplyBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'multiply']);
         } else {
@@ -242,12 +242,12 @@ class MultiplyBlock extends LeftBlock {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 } else if (cblk2 !== null) {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = b;
+                    return b;
                 } else {
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             } else {
                 // We have a special case for certain keywords
@@ -265,7 +265,7 @@ class MultiplyBlock extends LeftBlock {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 }
 
-                logo.blocks.blockList[blk].value = logo._doMultiply(a, b);
+                return logo._doMultiply(a, b);
             }
         }
     }
@@ -283,7 +283,7 @@ class NegBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'neg']);
         } else {
@@ -291,16 +291,16 @@ class NegBlock extends LeftBlock {
             if (cblk !== null) {
                 var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof(a) === 'number') {
-                    logo.blocks.blockList[blk].value = logo._doMinus(0, a);
+                    return logo._doMinus(0, a);
                 } else if (typeof(a) === 'string') {
                     var obj = a.split('');
-                    logo.blocks.blockList[blk].value = obj.reverse().join('');
+                    return obj.reverse().join('');
                 } else {
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 }
             } else {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         }
     }
@@ -318,7 +318,7 @@ class MinusBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'minus']);
         } else {
@@ -330,12 +330,12 @@ class MinusBlock extends LeftBlock {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 } else if (cblk2 !== null) {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = -b;
+                    return -b;
                 } else {
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             } else {
                 // We have a special case for certain keywords
@@ -353,7 +353,7 @@ class MinusBlock extends LeftBlock {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 }
 
-                logo.blocks.blockList[blk].value = logo._doMinus(a, b);
+                return logo._doMinus(a, b);
             }
         }
     }
@@ -371,7 +371,7 @@ class PlusBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'plus']);
         } else {
@@ -381,12 +381,12 @@ class PlusBlock extends LeftBlock {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = a;
+                    return a;
                 } else if (cblk2 !== null) {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    logo.blocks.blockList[blk].value = b;
+                    return b;
                 } else {
-                    logo.blocks.blockList[blk].value = 0;
+                    return 0;
                 }
             } else {
                 // We have a special case for certain keywords
@@ -415,7 +415,7 @@ class PlusBlock extends LeftBlock {
                     var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 }
 
-                logo.blocks.blockList[blk].value = logo._doPlus(a, b);
+                return logo._doPlus(a, b);
             }
         }
     }
@@ -440,24 +440,24 @@ class OneOfBlock extends LeftBlock {
         ]);
     }
 
-    arg(logo) {
+    arg(logo, turtle, blk, receivedArg) {
         var cblk1 = logo.blocks.blockList[blk].connections[1];
         var cblk2 = logo.blocks.blockList[blk].connections[2];
         if (cblk1 === null || cblk2 === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             if (cblk1 !== null) {
                 var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                logo.blocks.blockList[blk].value = a;
+                return a;
             } else if (cblk2 !== null) {
                 var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                logo.blocks.blockList[blk].value = b;
+                return b;
             } else {
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         } else {
             var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            logo.blocks.blockList[blk].value = logo._doOneOf(a, b);
+            return logo._doOneOf(a, b);
         }
     }
 }
@@ -474,32 +474,30 @@ class RandomBlock extends LeftBlock {
         });
     }
 
-    arg(logo) {
-        var cblk1 = that.blocks.blockList[blk].connections[1];
-        var cblk2 = that.blocks.blockList[blk].connections[2];
+    arg(logo, turtle, blk, receivedArg) {
+        var cblk1 = logo.blocks.blockList[blk].connections[1];
+        var cblk2 = logo.blocks.blockList[blk].connections[2];
         if (cblk1 === null || cblk2 === null) {
-            that.errorMsg(NOINPUTERRORMSG, blk);
-            that.blocks.blockList[blk].value = 0;
-        } else {
-            var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-            var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-            if (typeof(a) === 'number' && typeof(b) === 'number') {
-                that.blocks.blockList[blk].value = that._doRandom(a, b);
-            } else if (typeof(a) === 'string' && typeof(b) === 'string' && SOLFEGENAMES.indexOf(a) != -1 && SOLFEGENAMES.indexOf(b) != -1) {
-                var ai = SOLFEGENAMES.indexOf(a);
-                var bi = SOLFEGENAMES.indexOf(b);
-                if (ai > bi) {
-                    ai = SOLFEGENAMES.indexOf(b);
-                    bi = SOLFEGENAMES.indexOf(a);
-                }
-
-                var ii = that._doRandom(ai, bi);
-                that.blocks.blockList[blk].value = SOLFEGENAMES[ii];
-            } else {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                that.blocks.blockList[blk].value = false
-            }
+            logo.errorMsg(NOINPUTERRORMSG, blk);
+            return 0;
         }
+        var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+        var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+        if (typeof(a) === 'number' && typeof(b) === 'number') {
+            return logo._doRandom(a, b);
+        } else if (typeof(a) === 'string' && typeof(b) === 'string' && SOLFEGENAMES.indexOf(a) != -1 && SOLFEGENAMES.indexOf(b) != -1) {
+            var ai = SOLFEGENAMES.indexOf(a);
+            var bi = SOLFEGENAMES.indexOf(b);
+            if (ai > bi) {
+                ai = SOLFEGENAMES.indexOf(b);
+                bi = SOLFEGENAMES.indexOf(a);
+            }
+
+            var ii = logo._doRandom(ai, bi);
+            return SOLFEGENAMES[ii];
+        }
+        logo.errorMsg(NOINPUTERRORMSG, blk);
+        return false;
     }
 }
 
@@ -507,6 +505,15 @@ class NumberBlock extends ValueBlock {
     constructor() {
         super('number');
         this.setPalette('number');
+    }
+
+    arg(logo, turtle, blk) {
+        try {
+            return Number(logo.blocks.blockList[blk].value);
+        } catch (e) {
+            console.debug(e);
+            return 0;
+        }
     }
 }
 

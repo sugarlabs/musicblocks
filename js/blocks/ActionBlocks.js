@@ -86,12 +86,12 @@ class CalcBlock extends LeftBlock {
         });
     }
 
-    flow(args, logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk, receivedArg) {
         var actionArgs = [];
         var cblk = logo.blocks.blockList[blk].connections[1];
         if (cblk === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         } else {
             var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             actionArgs = receivedArg;
@@ -99,10 +99,10 @@ class CalcBlock extends LeftBlock {
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-                logo.blocks.blockList[blk].value = logo.returns.shift();
+                return logo.returns.shift();
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         }
     }
@@ -128,10 +128,10 @@ class NamedCalcBlock extends ValueBlock {
         if (name in logo.actions) {
             logo.turtles.turtleList[turtle].running = true;
             logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-            logo.blocks.blockList[blk].value = logo.returns.shift();
+            return logo.returns.shift();
         } else {
             logo.errorMsg(NOACTIONERRORMSG, blk, name);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         }
     }
 }
@@ -170,7 +170,7 @@ class NamedCalcArgBlock extends LeftBlock {
         });
     }
 
-    flow(arg, logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk, receivedArg) {
         var name = logo.blocks.blockList[blk].privateData;
         var actionArgs = [];
         // logo.getBlockAtStartOfArg(blk);
@@ -184,10 +184,10 @@ class NamedCalcArgBlock extends LeftBlock {
             // Just run the stack.
             logo.turtles.turtleList[turtle].running = true;
             logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-            logo.blocks.blockList[blk].value = logo.returns.pop();
+            return logo.returns.pop();
         } else {
             logo.errorMsg(NOACTIONERRORMSG, blk, name);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         }
     }
 }
@@ -230,7 +230,7 @@ class CalcArgBlock extends LeftBlock {
         });
     }
 
-    flow(args, logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk, receivedArg) {
         var actionArgs = [];
         // logo.getBlockAtStartOfArg(blk);
         if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
@@ -242,16 +242,16 @@ class CalcArgBlock extends LeftBlock {
         var cblk = logo.blocks.blockList[blk].connections[1];
         if (cblk === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         } else {
             var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-                logo.blocks.blockList[blk].value = logo.returns.pop();
+                return logo.returns.pop();
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         }
     }
@@ -273,20 +273,20 @@ class ArgBlock extends LeftBlock {
         });
     }
 
-    flow(args, logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk, receivedArg) {
         var cblk = logo.blocks.blockList[blk].connections[1];
         if (cblk === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
-            logo.blocks.blockList[blk].value = 0;
+            return 0;
         } else {
             var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             var action_args = receivedArg
             if (action_args && action_args.length >= Number(name)) {
                 var value = action_args[Number(name) - 1];
-                logo.blocks.blockList[blk].value = value;
+                return value;
             } else {
                 logo.errorMsg(_('Invalid argument'), blk);
-                logo.blocks.blockList[blk].value = 0;
+                return 0;
             }
         }
 
@@ -315,15 +315,15 @@ class NamedArgBlock extends LeftBlock {
         // the arg will have no value.
         if (actionArgs == null) {
             logo.errorMsg(_('Invalid argument'), blk);
-            logo.blocks.blockList[blk].value = 0
+            return 0
         }
 
         if (actionArgs.length >= Number(name)) {
             var value = actionArgs[Number(name) - 1];
-            logo.blocks.blockList[blk].value = value;
+            return value;
         } else {
             logo.errorMsg(_('Invalid argument'), blk);
-            logo.blocks.blockList[blk].value = 0
+            return 0
         }
 
         // return [0, 0, logo.blocks.blockList[blk].value];

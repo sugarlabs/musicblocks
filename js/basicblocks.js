@@ -66,6 +66,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     setupNumberBlocks();
     setupActionBlocks();
     setupBoxesBlocks();
+    setupBooleanBlocks();
 
     // PITCH PALETTE
 
@@ -3618,82 +3619,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.oneArgBlock();
     newblock.defaults.push(0);
     if (beginnerMode && !beginnerBlock('setcolor')) {
-        newblock.hidden = true;
-    }
-
-    // NUMBERS PALETTE
-
-    var newblock = new ProtoBlock('not');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['not'] = newblock;
-    newblock.extraWidth = 30;
-    newblock.staticLabels.push(_('not'));
-    newblock.booleanOneBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('not')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('and');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['and'] = newblock;
-    newblock.extraWidth = 10;
-    newblock.staticLabels.push(_('and'));
-    newblock.booleanTwoBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('and')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('or');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['or'] = newblock;
-    newblock.extraWidth = 10;
-    newblock.staticLabels.push(_('or'));
-    newblock.booleanTwoBooleanArgBlock();
-    if (beginnerMode && !beginnerBlock('or')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('greater');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['greater'] = newblock;
-    newblock.fontsize = 14;
-    newblock.staticLabels.push('>');
-    newblock.extraWidth = 20;
-    newblock.booleanTwoArgBlock();
-    if (beginnerMode && !beginnerBlock('greater')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('less');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['less'] = newblock;
-    newblock.fontsize = 14;
-    newblock.staticLabels.push('<');
-    newblock.extraWidth = 20;
-    newblock.booleanTwoArgBlock();
-    if (beginnerMode && !beginnerBlock('less')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('equal');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['equal'] = newblock;
-    newblock.fontsize = 14;
-    newblock.staticLabels.push('=');
-    newblock.extraWidth = 20;
-    newblock.booleanTwoArgBlock();
-    newblock.dockTypes[0] = 'booleanout';
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    if (beginnerMode && !beginnerBlock('equal')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('boolean');
-    newblock.palette = palettes.dict['boolean'];
-    blocks.protoBlockDict['boolean'] = newblock;
-    newblock.booleanZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('boolean')) {
         newblock.hidden = true;
     }
 

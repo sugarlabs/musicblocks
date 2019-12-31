@@ -2004,19 +2004,17 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'storein':
+        case 'storein2':
         case 'increment':
         case 'incrementOne':
         case 'return':
         case 'returnToUrl':
         case 'namedcalc':
         case 'nameddoArg':
-        case 'namedcalcArg':
-        case 'calcArg':
         case 'namedarg':
         case 'listen':
-        case 'arg':
         case 'doArg':
-        case 'calc':
         case 'start':
         case 'nameddo':
         case 'action':
@@ -9598,31 +9596,20 @@ function Logo () {
             }
         }
 
+        if ((typeof that.blocks.blockList[blk].protoblock.arg) === 'function')
+            return that.blocks.blockList[blk].value = that.blocks.blockList[blk].protoblock.arg(that, turtle, blk, receivedArg);
+
         if (that.blocks.blockList[blk].name === 'intervalname') {
             if (typeof(that.blocks.blockList[blk].value) === 'string') {
                 that.noteDirection[turtle] = getIntervalDirection(that.blocks.blockList[blk].value);
                 return getIntervalNumber(that.blocks.blockList[blk].value);
             } else return 0;
         } else if (that.blocks.blockList[blk].isValueBlock()) {
-            if (that.blocks.blockList[blk].name === 'number' && typeof(that.blocks.blockList[blk].value) === 'string') {
-                try {
-                    that.blocks.blockList[blk].value = Number(that.blocks.blockList[blk].value);
-                } catch (e) {
-                    console.debug(e);
-                }
-            }
-
             if (that.blocks.blockList[blk].name in that.evalArgDict) {
                 eval(that.evalArgDict[that.blocks.blockList[blk].name]);
             }
 
             return that.blocks.blockList[blk].value;
-        } else if (that.blocks.blockList[blk].name === 'boolean') {
-            if (typeof(that.blocks.blockList[blk].value) === 'string') {
-                return that.blocks.blockList[blk].value === _('true') || that.blocks.blockList[blk].value === 'true';
-            } else {
-                return that.blocks.blockList[blk].value;
-            }
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'pitchness':
@@ -9681,96 +9668,6 @@ function Logo () {
                 that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].name;
                 break;
             
-            // ----- ADD SMART BLOCK CLASSES HERE -----
-            case 'number':
-            case 'box':
-            case 'storein':
-            case 'storein2':
-            case 'namedbox':
-            case 'int':
-            case 'divide':
-            case 'minus':
-            case 'multiply':
-            case 'neg':
-            case 'sqrt':
-            case 'mod':
-            case 'abs':
-            case 'plus':
-            case 'random':
-            case 'oneOf':
-            case 'power':
-                that.blocks.blockList[blk].protoblock.arg(that);
-                break;
-            case 'not':
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = false;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    try {
-                        that.blocks.blockList[blk].value = !a;
-                    } catch (e) {
-                        console.debug(e);
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = false
-                    }
-                }
-                break;
-            case 'greater':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = false;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    try {
-                        that.blocks.blockList[blk].value = (Number(a) > Number(b));
-                    } catch (e) {
-                        console.debug(e);
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = false
-                    }
-                }
-                break;
-            case 'equal':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = false;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    try {
-                        that.blocks.blockList[blk].value = (a === b);
-                    } catch (e) {
-                        console.debug(e);
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = false
-                    }
-                }
-                break;
-            case 'less':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = false;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                    var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                    try {
-                        that.blocks.blockList[blk].value = (Number(a) < Number(b));
-                    } catch (e) {
-                        console.debug(e);
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = false
-                    }
-                }
-                break;
             case 'doubly':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 //find block at end of chain
