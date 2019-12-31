@@ -4258,7 +4258,6 @@ function Block(protoblock, blocks, overrideName) {
         var __selectionChanged = function () {
             that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
             that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
-
             // Make sure text is on top.
             var z = that.container.children.length - 1;
             that.container.setChildIndex(that.text, z);
@@ -4342,6 +4341,11 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         this._exitWheel.navItems[1].navigateFunction = function () {
+            if(that.value == 1)
+            {
+              alert("Note value must be greater than 0");
+              return false;
+            }
             that.value -= 1;
             that.text.text = that.value.toString();
 
@@ -4364,8 +4368,8 @@ function Block(protoblock, blocks, overrideName) {
 
             that.label.value = that.value;
         };
-        
-        
+
+
         var __pitchPreviewForNum = function () {
             var label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
             var i = wheelLabels.indexOf(label);
@@ -4508,6 +4512,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.addEventListener('change', function () {
             that._labelChanged(false, false);
         });
+
 
         // Position the widget over the note block.
         var x = this.container.x;
@@ -5495,6 +5500,13 @@ function Block(protoblock, blocks, overrideName) {
         var oldValue = this.value;
         var newValue = this.label.value;
 
+        if(newValue < 1)
+        {
+          alert("Note value must be greater than 0");
+          return false;
+        }
+
+
         if (this.labelattr != null) {
             var attrValue = this.labelattr.value;
             switch (attrValue) {
@@ -5727,6 +5739,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
     };
+
 
     /*
      * Sets up context menu for each block
