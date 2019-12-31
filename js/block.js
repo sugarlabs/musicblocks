@@ -3134,7 +3134,7 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
                     break;
                 case 'hertz':
-                    this._piemenuNumber([220, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
+                    this._piemenuNumber([220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880], this.value);
                     break;
                 case 'right':
                     this._piemenuNumber([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330], this.value);
@@ -4392,6 +4392,31 @@ function Block(protoblock, blocks, overrideName) {
 
             __selectionChanged();
         };
+        
+        var __hertzPreview = function () {
+            var label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
+            var i = wheelLabels.indexOf(label);
+            var actualPitch = frequencyToPitch(wheelValues[i]);
+
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            that.blocks.logo.synth.trigger(0, actualPitch[0] + actualPitch[1], 1 / 8, DEFAULTVOICE, null, null);
+
+
+            __selectionChanged();
+        };
 
 
         // Handler for pitchnumber preview. This is to ensure that
@@ -4399,6 +4424,15 @@ function Block(protoblock, blocks, overrideName) {
         if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'pitchnumber'){
           for (var i = 0; i < wheelValues.length; i++) {
               this._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
+          }
+        }
+        
+        //Handler for Hertz preview. Need to also ensure that
+        //only hertz block gets a different sound preview
+        if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'hertz'){
+          console.log(this.blocks.blockList[this.connections[0]].name);
+          for (var i = 0; i < wheelValues.length; i++) {
+              this._numberWheel.navItems[i].navigateFunction = __hertzPreview;
           }
         }
     };

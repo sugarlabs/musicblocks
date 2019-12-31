@@ -11059,7 +11059,9 @@ function Logo () {
                 } else {
                     if (that.lastNotePlayed[turtle] !== null) {
                         that.blocks.blockList[blk].value = that.synth._getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
-                    }
+                    } else {
+                        that.blocks.blockList[blk].value = 0;
+		    }
                 }
                 break;
             case 'turtleelapsednotes':
