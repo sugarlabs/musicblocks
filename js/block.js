@@ -4371,7 +4371,6 @@ function Block(protoblock, blocks, overrideName) {
             var i = wheelLabels.indexOf(label);
             var actualPitch = numberToPitch(wheelValues[i] + 3);
 
-
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -4385,10 +4384,8 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
-
             actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
             that.blocks.logo.synth.trigger(0, actualPitch[0] + (actualPitch[1] + 3), 1 / 8, DEFAULTVOICE, null, null);
-
 
             __selectionChanged();
         };
@@ -4398,7 +4395,6 @@ function Block(protoblock, blocks, overrideName) {
             var i = wheelLabels.indexOf(label);
             var actualPitch = frequencyToPitch(wheelValues[i]);
 
-
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -4412,28 +4408,27 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
+            actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
             that.blocks.logo.synth.trigger(0, actualPitch[0] + actualPitch[1], 1 / 8, DEFAULTVOICE, null, null);
 
 
             __selectionChanged();
         };
 
-
         // Handler for pitchnumber preview. This is to ensure that
-        //only pitchnumber block's pie menu gets a sound preview
+        // only pitchnumber block's pie menu gets a sound preview
         if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'pitchnumber'){
-          for (var i = 0; i < wheelValues.length; i++) {
-              this._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
-          }
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
+            }
         }
         
-        //Handler for Hertz preview. Need to also ensure that
-        //only hertz block gets a different sound preview
+        // Handler for Hertz preview. Need to also ensure that
+        // only hertz block gets a different sound preview
         if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'hertz'){
-          console.log(this.blocks.blockList[this.connections[0]].name);
-          for (var i = 0; i < wheelValues.length; i++) {
-              this._numberWheel.navItems[i].navigateFunction = __hertzPreview;
-          }
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.navItems[i].navigateFunction = __hertzPreview;
+            }
         }
     };
 

@@ -1671,7 +1671,7 @@ function frequencyToPitch(hz) {
         var f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             var cents = i % 100;
-            var j = Math.floor(i / 100);
+            var j = Math.floor((i / 100) + 0.5);
             return [PITCHES[(j + PITCHES.indexOf('A')) % 12], Math.floor((j + PITCHES.indexOf('A')) / 12), cents];
         }
     }
