@@ -3699,6 +3699,8 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuScaleDegree = function (noteValues, note) {
+        var prevPitch = null;
+        
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
@@ -3771,6 +3773,8 @@ function Block(protoblock, blocks, overrideName) {
         if (i === -1) {
             i = 4;
         }
+        
+        prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
 
@@ -3812,13 +3816,49 @@ function Block(protoblock, blocks, overrideName) {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
-            var note = noteValues[i];
+
+
+            //Check if passing C
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+
+            var deltaPitch = i - prevPitch;
+            if (deltaPitch > 3) {
+                var delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                var delta = deltaPitch + 7;
+            } else {
+                var delta = deltaPitch;
+            }
+
+            //When user passed across C, move one octave higher if going from B to C
+            //hence, go one octave lower when passing from C to B
+            var deltaOctave = 0;
+
+            if ((prevPitch + delta) > 6) {
+                deltaOctave = 1;
+            } else if ((prevPitch + delta) < 0) {
+                deltaOctave = -1;
+            }
+
+            prevPitch = i;
             var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
 
-            // FIX ME: get key signature if available
-            // FIX ME: get moveable if available
+            if (deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+            }
 
-            var noteName = scaleDegreeToPitch('C major', note);
+
+            var note = scaleDegreeToPitch('C major', noteValues[i]);
+
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -3829,13 +3869,21 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, DEFAULTVOICE, null, null);
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            //Play sample note and prevent extra sounds from playing
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                that.blocks.logo.synth.trigger(0, [note.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, DEFAULTVOICE, null, null);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, that.blocks.logo.defaultBPMFactor / 8);
 
             __selectionChanged();
         };
-
         // Set up handlers for pitch preview.
         for (var i = 0; i < noteValues.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
