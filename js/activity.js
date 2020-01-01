@@ -4049,30 +4049,12 @@ function Activity() {
             this.hideMusicBlocks = function () {
                 hideSearchWidget();
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    // storage.setItem('isMatrixHidden', docById('ptmDiv').style.visibility);
-                    // storage.setItem('isStaircaseHidden', docById('pscDiv').style.visibility);
                     storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
-                    storage.setItem('isPitchDrumMatrixHidden', docById('pdmDiv').style.visibility);
                     storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
                     storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
                     storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
-                    // storage.setItem('isSliderHidden', docById('sliderDiv').style.visibility);
                     storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
-                    storage.setItem('isTempoHidden', docById('tempoDiv').style.visibility);
 
-                    /*
-                    if (docById('ptmDiv').style.visibility !== 'hidden') {
-                        docById('ptmDiv').style.visibility = 'hidden';
-                        docById('ptmTableDiv').style.visibility = 'hidden';
-                        docById('ptmButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('pdmDiv').style.visibility !== 'hidden') {
-                        docById('pdmDiv').style.visibility = 'hidden';
-                        docById('pdmButtonsDiv').style.visibility = 'hidden';
-                        docById('pdmTableDiv').style.visibility = 'hidden';
-                    }
-                    */
                     if (docById('mkbDiv').style.visibility !== 'hidden') {
                         docById('mkbDiv').style.visibility = 'hidden';
                         docById('mkbButtonsDiv').style.visibility = 'hidden';
@@ -4097,9 +4079,6 @@ function Activity() {
                         docById('temperamentButtonsDiv').style.visibility = 'hidden';
                     }
 
-                    window.widgetWindows.clear('status');
-                    window.widgetWindows.clear('slider');
-
                     if (docById('modeDiv').style.visibility !== 'hidden') {
                         docById('modeDiv').style.visibility = 'hidden';
                         docById('modeButtonsDiv').style.visibility = 'hidden';
@@ -4113,7 +4092,8 @@ function Activity() {
                     }
                 }
 
-                storage.setItem('isStatusHidden', window.widgetWindows.isOpen('status'));
+                widgetWindows.hideWindows();
+
                 logo.doStopTurtle();
                 docById('helpElem').style.visibility = 'hidden';
                 document.querySelector('.canvasHolder').classList.add('hide');
@@ -4129,44 +4109,24 @@ function Activity() {
             this.showMusicBlocks = function () {
                 document.getElementById('toolbars').style.display = "block";
 
-                if (storage.getItem('isStatusHidden')) {
-                    logo.statusMatrix = new StatusMatrix();
-                    logo.statusMatrix.init(logo);
-                }
+                widgetWindows.showWindows();
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    // docById('ptmDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    // docById('ptmButtonsDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    // docById('ptmTableDiv').style.visibility = storage.getItem('isMatrixHidden');
-                    // docById('pscDiv').style.visibility = storage.getItem('isStaircaseHidden');
-                    // docById('pscButtonsDiv').style.visibility = storage.getItem('isStaircaseHidden');
-                    // docById('pscTableDiv').style.visibility = storage.getItem('isStaircaseHidden');
                     docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
                     docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
                     docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
                     docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
                     docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    // docById('sliderDiv').style.visibility = storage.getItem('isSliderHidden');
-                    // docById('sliderButtonsDiv').style.visibility = storage.getItem('isSliderHidden');
-                    // docById('sliderTableDiv').style.visibility = storage.getItem('isSliderHidden');
-                    docById('pdmDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
-                    docById('pdmButtonsDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
-                    docById('pdmTableDiv').style.visibility = storage.getItem('isPitchDrumMatrixHidden');
                     docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
                     docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    // docById('rulerButtonsDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
-                    // docById('rulerTableDiv').style.visibility = storage.getItem('isRhythmRulerHidden');
                     docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
                     docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
                     docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
                     docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                    // Don't reopen the tempo widget since we didn't just hide it, but also closed it.
-                    // docById('tempoDiv').style.visibility = localStorage.getItem('isTempoHidden');
-                    // docById('tempoButtonsDiv').style.visibility = localStorage.getItem('isTempoHidden');
                 }
                 document.querySelector('.canvasHolder').classList.remove('hide');
                 document.querySelector('#canvas').style.display = '';
