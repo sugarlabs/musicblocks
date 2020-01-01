@@ -154,6 +154,8 @@ function StatusMatrix() {
 
             activeTurtles += 1;
         }
+
+        widgetWindow.sendToCenter();
     };
 
     this.updateAll = function() {

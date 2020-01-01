@@ -180,20 +180,16 @@ function WidgetWindow(key, title) {
     };
 
     this.sendToCenter = function () {
-        let rect = this._frame.getBoundingClientRect();
-        let width = rect.right - rect.left;
-        let height = rect.bottom - rect.top;
+        let fRect = this._frame.getBoundingClientRect();
+        let cRect = canvas.getBoundingClientRect();
 
-        rect = canvas.getBoundingClientRect();
-        let cw = rect.right - rect.left;
-        let ch = rect.bottom - rect.top;
-
-        if (cw === 0 || ch === 0) {
+        if (cRect.width === 0 || cRect.height === 0) {
             // The canvas isn't shown so we don't know how large it really is
             return this;
         }
 
-        this.setPosition((cw - width) / 2, (ch - height) / 2);
+        this.setPosition((cRect.width - fRect.width) / 2,
+                         (cRect.height - fRect.height) / 2);
 
         return this;
     };
@@ -285,5 +281,17 @@ window.widgetWindows.clear = function (name) {
 };
 
 window.widgetWindows.isOpen = function (name) {
-    return !!window.widgetWindows.openWindows[name];
+    return window.widgetWindows.openWindows[name] ? true : "";
+};
+
+window.widgetWindows.hideWindows = function (name) {
+    Object.values(window.widgetWindows.openWindows).forEach(win => {
+        win._frame.style.display = 'none';
+    });
+};
+
+window.widgetWindows.showWindows = function (name) {
+    Object.values(window.widgetWindows.openWindows).forEach(win => {
+        win._frame.style.display = 'block';
+    });
 };
