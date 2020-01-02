@@ -2032,7 +2032,16 @@ function Logo () {
         case 'ifthenelse':
         case 'if':
         case 'repeat':
-        case 'forever':
+        case 'loadHeapFromApp':
+        case 'saveHeapToApp':
+        case 'showHeap':
+        case 'emptyHeap':
+        case 'saveHeap':
+        case 'reverseHeap':
+        case 'loadHeap':
+        case 'setHeapEntry':
+        case 'push':
+        case 'forever': {
             let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
             if (res) {
                 let [cf, cfc, ret] = res;
@@ -2041,7 +2050,7 @@ function Logo () {
                 if (ret) return ret
             }
             break;
-
+        }
         case 'hidden':
         case 'hiddennoflow':
             // Hidden block is used at end of clamps and actions to
@@ -2994,150 +3003,6 @@ function Logo () {
 
                 save.saveSVG(args[0]);
             }
-            break;
-        case 'showHeap':
-            if (!(turtle in that.turtleHeaps)) {
-                that.turtleHeaps[turtle] = [];
-            }
-            that.textMsg(JSON.stringify(that.turtleHeaps[turtle]));
-            break;
-        case 'emptyHeap':
-            that.turtleHeaps[turtle] = [];
-            break;
-        case 'reverseHeap':
-            that.turtleHeaps[turtle] = that.turtleHeaps[turtle].reverse();
-            break;
-        case 'push':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (!(turtle in that.turtleHeaps)) {
-                that.turtleHeaps[turtle] = [];
-            }
-
-            that.turtleHeaps[turtle].push(args[0]);
-            break;
-        case 'saveHeap':
-            if (args[0] !== null && turtle in that.turtleHeaps) {
-                save.download('json', 'data:text/json;charset-utf-8,'+JSON.stringify(that.turtleHeaps[turtle]), args[0]);
-            }
-            break;
-        case 'loadHeap':
-            var block = that.blocks.blockList[blk];
-            if (turtle in that.turtleHeaps) {
-                var oldHeap = that.turtleHeaps[turtle];
-            } else {
-                var oldHeap = [];
-            }
-
-            var c = block.connections[1];
-            if (c != null && that.blocks.blockList[c].name === 'loadFile') {
-                if (args.length !== 1) {
-                    that.errorMsg(_('You must select a file.'));
-                } else {
-                    try {
-                        that.turtleHeaps[turtle] = JSON.parse(that.blocks.blockList[c].value[1]);
-                        if (!Array.isArray(that.turtleHeaps[turtle])) {
-                            throw 'is not array';
-                        }
-                    } catch (e) {
-                        that.turtleHeaps[turtle] = oldHeap;
-                        that.errorMsg(_('The file you selected does not contain a valid heap.'));
-                    }
-                }
-            } else {
-                that.errorMsg(_('The loadHeap block needs a loadFile block.'))
-            }
-            break;
-        case 'loadHeapFromApp':
-            if (args[0] === null || args[1] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            var data = [];
-            var url = args[1];
-            var name = args [0]
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open('GET', url, false );
-            xmlHttp.send();
-            if (xmlHttp.readyState === 4  && xmlHttp.status === 200) {
-                console.debug(xmlHttp.responseText);
-                try {
-                    var data = JSON.parse(xmlHttp.responseText);
-                } catch (e) {
-                    console.debug(e);
-                    that.errorMsg(_('Error parsing JSON data:') + e);
-                }
-            }
-            else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                console.debug('fetched the wrong page or network error...');
-                that.errorMsg(_('404: Page not found'));
-                break;
-            }
-            else {
-                that.errorMsg('xmlHttp.readyState: ' + xmlHttp.readyState);
-                break;
-            }
-            if (name in that.turtleHeaps) {
-                var oldHeap = turtleHeaps[turtle];
-            } else {
-                var oldHeap = [];
-            }
-            that.turtleHeaps[name] = data;
-            break;
-        case 'saveHeapToApp':
-            if (args[0] === null || args[1] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            var name = args[0];
-            var url = args[1];
-            if (name in that.turtleHeaps) {
-                var data = JSON.stringify(that.turtleHeaps[name]);
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open('POST', url, true);
-                xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-                xmlHttp.send(data);
-            } else {
-                that.errorMsg(_('Cannot find a valid heap for') + ' ' + name);
-            }
-            break;
-        case 'setHeapEntry':
-            if (args[0] === null || args[1] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
-                that.errorMsg(NANERRORMSG, blk);
-                break;
-            }
-
-            if (!(turtle in that.turtleHeaps)) {
-                that.turtleHeaps[turtle] = [];
-            }
-
-            var idx = Math.floor(args[0]);
-            if (idx < 1) {
-                that.errorMsg(_('Index must be > 0.'))
-                idx = 1;
-            }
-
-            if (idx > 1000) {
-                that.errorMsg(_('Maximum heap size is 1000.'))
-                idx = 1000;
-            }
-
-            // If index > heap length, grow the heap.
-            while (that.turtleHeaps[turtle].length < idx) {
-                that.turtleHeaps[turtle].push(0);
-            }
-
-            that.turtleHeaps[turtle][idx - 1] = args[1];
             break;
 
             // Actions for music-related blocks
@@ -10498,68 +10363,6 @@ function Logo () {
                     } else {
                         block.value = 440 * Math.pow(2, (noteName - 69) / 12);
                     }
-                }
-                break;
-            case 'pop':
-                var block = that.blocks.blockList[blk];
-                if (turtle in that.turtleHeaps && that.turtleHeaps[turtle].length > 0) {
-                    block.value = that.turtleHeaps[turtle].pop();
-                } else {
-                    that.errorMsg(_('empty heap'));
-                    block.value = 0;
-                }
-                break;
-            case 'indexHeap':
-                var block = that.blocks.blockList[blk];
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    var a = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    if (typeof(a) === 'number') {
-                        if (!(turtle in that.turtleHeaps)) {
-                            that.turtleHeaps[turtle] = [];
-                        }
-
-                        if (a === -1) {
-                            // -1 to access top of heap
-                            a = that.turtleHeaps[turtle].length;
-                        } else if (a < 1) {
-                            a = 1;
-                            that.errorMsg(_('Index must be > 0.'))
-                        }
-
-                        if (a > 1000) {
-                            a = 1000;
-                            that.errorMsg(_('Maximum heap size is 1000.'))
-                        }
-
-                        // If index > heap length, grow the heap.
-                        while (that.turtleHeaps[turtle].length < a) {
-                            that.turtleHeaps[turtle].push(0);
-                        }
-
-                        block.value = that.turtleHeaps[turtle][a - 1];
-                    } else {
-                        that.errorMsg(NANERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 0;
-                    }
-                }
-                break;
-            case 'heapLength':
-                var block = that.blocks.blockList[blk];
-                if (!(turtle in that.turtleHeaps)) {
-                    that.turtleHeaps[turtle] = [];
-                }
-                block.value = that.turtleHeaps[turtle].length;
-                break;
-            case 'heapEmpty':
-                var block = that.blocks.blockList[blk];
-                if (turtle in that.turtleHeaps) {
-                    block.value = (that.turtleHeaps[turtle].length === 0);
-                } else {
-                    block.value = true;
                 }
                 break;
             case 'notecounter':
