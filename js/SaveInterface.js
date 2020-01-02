@@ -61,7 +61,7 @@ function SaveInterface(PlanetInterface) {
         }
 
         this.downloadURL(filename, dataurl);
-    }
+    };
 
     this.downloadURL = function(filename, dataurl){
         var a = document.createElement('a');
@@ -70,13 +70,13 @@ function SaveInterface(PlanetInterface) {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-    }
+    };
 
     this.setVariables = function(vars){
         for (var i = 0; i<vars.length; i++){
             this[vars[i][0]]=vars[i][1];
         }
-    }
+    };
 
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
     this.prepareHTML = function(){
@@ -110,13 +110,13 @@ function SaveInterface(PlanetInterface) {
                    .replace(new RegExp('{{ data }}', 'g'), data)
                    .replace(new RegExp('{{ project_image }}', 'g'), image);
         return file;
-    }
+    };
 
     this.saveHTML = function(filename){
         var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
         console.debug(filename);
         this.download('html', html, filename);
-    }
+    };
 
     this.saveHTMLNoPrompt = function(){
         setTimeout(function(){
@@ -127,22 +127,22 @@ function SaveInterface(PlanetInterface) {
                 this.downloadURL(_('My Project').replace(' ', '_') + '.html', html);
             }
         }.bind(this),500);
-    }
+    };
 
     this.saveSVG = function(filename){
         var svg = 'data:image/svg+xml;utf8,' + doSVG(this.logo.canvas, this.logo, this.logo.turtles, this.logo.canvas.width, this.logo.canvas.height, 1.0);
         this.download('svg', svg, filename);
-    }
+    };
 
     this.savePNG = function(filename){
         var png = docById('overlayCanvas').toDataURL('image/png');
         this.download('png', png, filename);
-    }
+    };
 
     this.saveBlockArtwork = function(filename){
         var svg = 'data:image/svg+xml;utf8,' + this.printBlockSVG();
         this.download('svg', svg, filename);
-    }
+    };
 
     this.saveWAV = function(filename){
         document.body.style.cursor = 'wait';
@@ -153,13 +153,13 @@ function SaveInterface(PlanetInterface) {
         this.logo.recording = true;
         console.debug('DURING SAVE WAV');
         this.logo.runLogoCommands();
-    }
+    };
 
     this.afterSaveWAV = function(blob){
         console.debug('AFTER SAVE WAV');
         //don't reset cursor
         this.download('wav',URL.createObjectURL(blob));
-    }
+    };
 
     this.saveAbc = function(filename){
         document.body.style.cursor = 'wait';
@@ -176,12 +176,12 @@ function SaveInterface(PlanetInterface) {
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
         this.logo.runLogoCommands();
-    }
+    };
 
     this.afterSaveAbc = function(filename){
         var abc = encodeURIComponent(saveAbcOutput(this.logo));
         this.download('abc', 'data:text;utf8,' + abc, filename);
-    }
+    };
 
     this.saveLilypond = function(filename) {
         var lyext = 'ly';
@@ -214,7 +214,7 @@ function SaveInterface(PlanetInterface) {
         docById('submitLilypond').textContent = _('Save as Lilypond');
         //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
 
-       // docById('submitPDF').textContent = _('Save as PDF');
+	// docById('submitPDF').textContent = _('Save as PDF');
 
         //TRANS: default file name when saving as Lilypond
         docById('fileName').value = filename;
@@ -246,7 +246,7 @@ function SaveInterface(PlanetInterface) {
             t.logo.runningLilypond = false;
             docById('lilypondModal').style.display = 'none';
         }
-    }
+    };
 
     this.saveLYFile = function(isPDF) {
         if (isPDF===undefined){
@@ -311,7 +311,7 @@ function SaveInterface(PlanetInterface) {
 
         // Close the dialog box after hitting button.
         docById('lilypondModal').style.display = 'none';
-    }
+    };
 
     this.afterSaveLilypond = function(filename){
         var ly = saveLilypondOutput(this.logo);
@@ -324,18 +324,23 @@ function SaveInterface(PlanetInterface) {
                 break;
         }
         this.notationConvert = '';
-    }
+    };
 
     this.afterSaveLilypondLY = function(lydata, filename){
-        let tmp = jQuery("<textarea />").appendTo(document.body);
-        tmp.val(lydata);
-        tmp.select();
-        tmp[0].setSelectionRange(0, lydata.length);
-        document.execCommand("copy");
-        tmp.remove();
-        textMsg(_('The Lilypond code is copied to clipboard. You can paste it here: ')  + "<a href='http://lilybin.com' target='_blank'>http://lilybin.com</a>.");
+	if (platform.FF) {
+	    console.debug('execCommand("copy") does not work on FireFox');
+	} else {
+            let tmp = jQuery('<textarea />').appendTo(document.body);
+            tmp.val(lydata);
+            tmp.select();
+            tmp[0].setSelectionRange(0, lydata.length);
+            document.execCommand('copy');
+            tmp.remove();
+            textMsg(_('The Lilypond code is copied to clipboard. You can paste it here: ')  + "<a href='http://lilybin.com' target='_blank'>http://lilybin.com</a>.");
+	}
+
         this.download('ly', 'data:text;utf8,' + encodeURIComponent(lydata), filename);
-    }
+    };
 
     this.afterSaveLilypondPDF = function(lydata, filename) {
         document.body.style.cursor = 'wait';
@@ -348,7 +353,7 @@ function SaveInterface(PlanetInterface) {
                 save.download('pdf', dataurl, filename);
             }
         });
-    }
+    };
 
     this.saveMxml = function(filename) {
         this.logo.runningMxml = true;
@@ -359,11 +364,8 @@ function SaveInterface(PlanetInterface) {
         }
         
         this.logo.runLogoCommands();
-
-
-
         // this.download('musicxml', 'data:text;utf8,'+data);
-    }
+    };
 
     this.afterSaveMxml = function(filename) {
         var data = saveMxmlOutput(this.logo);
@@ -373,7 +375,7 @@ function SaveInterface(PlanetInterface) {
         console.log(data);
         this.download('xml', 'data:text;utf8,' + encodeURIComponent(data), filename);
         this.logo.runningMxml = false;
-    }
+    };
 
     this.init = function(){
         this.timeLastSaved = -100;
@@ -400,5 +402,5 @@ function SaveInterface(PlanetInterface) {
                 e.returnValue = '';
             }
         }.bind(this);
-    }
-}
+    };
+};
