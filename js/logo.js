@@ -2036,11 +2036,16 @@ function Logo () {
         case 'saveHeapToApp':
         case 'showHeap':
         case 'emptyHeap':
+        case 'openpalette':
         case 'saveHeap':
         case 'reverseHeap':
         case 'loadHeap':
         case 'setHeapEntry':
         case 'push':
+        case 'deleteblock':
+        case 'runblock':
+        case 'dockblock':
+        case 'moveblock':
         case 'forever': {
             let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
             if (res) {
@@ -6925,169 +6930,6 @@ function Logo () {
 
             that._setListener(turtle, listenerName, __listener);
             break;
-        case 'deleteblock':
-            if (args.length < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                that.stopTurtle = true;
-                break;
-            }
-
-            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            // Is the block already in the trash?
-            if (that.blocks.blockList[args[0]].trash) {
-                break;
-            }
-
-            // Disconnect the block.
-            var c = that.blocks.blockList[args[0]].connections[0];
-            that.blocks.blockList[args[0]].connections[0] = null;
-            if (c !== null) {
-                for (var i = 0; i < that.blocks.blockList[c].connections.length; i++) {
-                    if (that.blocks.blockList[c].connections[i] === args[0]) {
-                        that.blocks.blockList[c].connections[i] = null;
-                    }
-                }
-            }
-
-            // Send it to the trash.
-            that.blocks.sendStackToTrash(that.blocks.blockList[args[0]]);
-
-            // And adjust the docs of the former connection
-            that.blocks.adjustDocks(c, true);
-            break;
-        case 'moveblock':
-            if (args.length < 3) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            var x = that.turtles.turtleX2screenX(args[1]);
-            var y = that.turtles.turtleY2screenY(args[2]);
-            that.blocks.moveBlock(args[0], x, y);
-            break;
-        case 'runblock':
-            if (args.length < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) == 'string') {
-                // Look for a block with that name
-                for (var i = 0; i < that.blocks.blockList.length; i++) {
-                    if (that.blocks.blockList[i].protoblock.staticLabels.length > 0 && that.blocks.blockList[i].protoblock.staticLabels[0] == args[0]) {
-                        args[0] = i;
-                        break;
-                    }
-                }
-            }
-
-            if (typeof(args[0]) == 'string') {
-                args[0] = -1;
-            }
-
-            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (that.blocks.blockList[args[0]].name === 'start') {
-                var thisTurtle = that.blocks.blockList[args[0]].value;
-                console.debug('run start ' + thisTurtle);
-                that.initTurtle(thisTurtle);
-                that.turtles.turtleList[thisTurtle].queue = [];
-                that.parentFlowQueue[thisTurtle] = [];
-                that.unhighlightQueue[thisTurtle] = [];
-                that.parameterQueue[thisTurtle] = [];
-                that.turtles.turtleList[thisTurtle].running = true;
-                that._runFromBlock(that, thisTurtle, args[0], 0, receivedArg);
-            } else {
-                childFlow = args[0];
-                childFlowCount = 1;
-            }
-            break;
-        case 'dockblock':
-            if (args.length < 3) {
-                console.debug(args.length + ' < 3');
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
-                console.debug(args[0] + ' > ' + that.blocks.blockList.length - 1);
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (args[0] === args[2]) {
-                console.debug(args[0] + ' == ' + args[2]);
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (args[2] < 0 || args[2] > that.blocks.blockList.length - 1) {
-                console.debug(args[2] + ' > ' + that.blocks.blockList.length - 1);
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (args[1] === -1) {
-                // Find the last connection.
-                args[1] = that.blocks.blockList[args[0]].connections.length - 1;
-            } else if (args[1] < 1 || args[1] > that.blocks.blockList[args[0]].connections.length - 1) {
-                console.debug(args[1] + ' out of bounds');
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            // Make sure there is not another block already connected.
-            var c = that.blocks.blockList[args[0]].connections[args[1]];
-            if (c !== null) {
-                if (that.blocks.blockList[c].name === 'hidden') {
-                    // Dock to the hidden block.
-                    args[0] = c;
-                    args[1] = 1;
-                } else {
-                    // Or disconnection the old connection.
-                    for (var i = 0; i < that.blocks.blockList[c].connections.length; i++) {
-                        if (that.blocks.blockList[c].connections[i] === args[0]) {
-                            that.blocks.blockList[c].connections[i] = null;
-                            break;
-                        }
-                    }
-
-                    that.blocks.blockList[args[0]].connections[args][1] = null;
-                }
-            }
-
-            that.blocks.blockList[args[0]].connections[args[1]] = args[2];
-            that.blocks.blockList[args[2]].connections[0] = args[0];
-
-            that.blocks.adjustDocks(args[0], true);
-            break;
-        case 'openpalette':
-            if (args.length < 1) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            for (var p in that.blocks.palettes.dict) {
-                if (_(that.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
-                    that.blocks.palettes.hide();
-                    that.blocks.palettes.dict[p].show();
-                    that.blocks.palettes.show();
-                    break;
-                }
-            }
-            break;
         case 'setxyturtle':
             // deprecated
             var targetTurtle = that._getTargetTurtle(args[0]);
@@ -10531,94 +10373,7 @@ function Logo () {
                 }
                 break;
             case 'makeblock':
-                that.showBlocks();  // Force blocks to be visible.
-                var blockArgs = [null];
-                if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                    for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
-                        blockArgs.push(t);
-                    }
-                }
-                var cblk = that.blocks.blockList[blk].connections[1];
-                var name = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                var blockNumber = that.blocks.blockList.length;
-
-                var x = that.turtles.turtleX2screenX(that.turtles.turtleList[turtle].x);
-                var y = that.turtles.turtleY2screenY(that.turtles.turtleList[turtle].y);
-
-                // We special case note blocks.
-                //.TRANS: a musical note consisting of pitch and duration
-                if (name === _('note')) {
-                    switch(blockArgs.length) {
-                    case 1:
-                        var p = 'sol';
-                        var o = 4;
-                        var v = 4;
-                        break;
-                    case 2:
-                        var p = blockArgs[1];
-                        var o = 4;
-                        var v = 4;
-                        break;
-                    case 3:
-                        var p = blockArgs[1];
-                        var o = blockArgs[2];
-                        var v = 4;
-                        break;
-                    default:
-                        var p = blockArgs[1];
-                        var o = blockArgs[2];
-                        var v = blockArgs[3];
-                        break;
-                    }
-
-                    var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': v}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': p}], 0, 0, [5]], [7, ['number', {'value': o}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
-                    that.blocks.loadNewBlocks(newNote);
-                    that.blocks.blockList[blk].value = blockNumber;
-                } else if (name === _('start')) {
-                    var newBlock = [[0, 'start', x, y, [null, null, null]]];
-                    that.blocks.loadNewBlocks(newBlock);
-                    that.blocks.blockList[blk].value = blockNumber;
-                } else if (name === _('silence')) {  // FIXME: others too
-                    var newBlock = [[0, 'rest2', x, y, [null, null]]];
-                    that.blocks.loadNewBlocks(newBlock);
-                    that.blocks.blockList[blk].value = blockNumber;
-                } else {
-                    var obj = that.blocks.palettes.getProtoNameAndPalette(name);
-                    var protoblk = obj[0];
-                    var protoName = obj[2];
-                    if (protoblk === null) {
-                        that.errorMsg(_('Cannot find block') + ' ' + name);
-                    } else {
-                        var newBlock = [[0, protoName, x, y, [null]]];
-                        for (var i = 1; i < that.blocks.protoBlockDict[protoblk].dockTypes.length; i++) {
-                            // FIXME: type check args
-                            if (i < blockArgs.length) {
-                                if (typeof(blockArgs[i]) === 'number') {
-                                    if (['anyin', 'numberin'].indexOf(that.blocks.protoBlockDict[protoblk].dockTypes[i]) === -1) {
-                                        that.errorMsg(_('Warning: block argument type mismatch'));
-                                    }
-                                    newBlock.push([i, ['number', {'value': blockArgs[i]}], 0, 0, [0]]);
-                                } else if (typeof(blockArgs[i]) === 'string') {
-                                    if (['anyin', 'textin'].indexOf(that.blocks.protoBlockDict[protoblk].dockTypes[i]) === -1) {
-                                        that.errorMsg(_('Warning: block argument type mismatch'));
-                                    }
-                                    newBlock.push([i, ['string', {'value': blockArgs[i]}], 0, 0, [0]]);
-                                } else {
-                                    newBlock[0][4].push(null);
-                                }
-
-                                newBlock[0][4].push(i);
-                            } else {
-                                newBlock[0][4].push(null);
-                            }
-                        }
-
-                        console.debug(newBlock);
-                        that.blocks.loadNewBlocks(newBlock);
-                        that.blocks.blockList[blk].value = blockNumber;
-                    }
-                }
+                
                 break;
             default:
                 if (that.blocks.blockList[blk].name in that.evalArgDict) {

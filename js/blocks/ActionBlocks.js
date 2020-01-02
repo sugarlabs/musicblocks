@@ -77,9 +77,7 @@ class CalcBlock extends LeftBlock {
 
         this.formBlock({
             name: _('calculate'),
-            flows: {
-                outType: 'anyout'
-            },
+            outType: 'anyout',
             args: 1,
             defaults: [_('action')],
             argTypes: ['anyin'],
@@ -164,9 +162,10 @@ class NamedCalcArgBlock extends LeftBlock {
         this.formBlock({
             name: _('calculate'),
             flows: {
-                outType: 'anyout', type: 'arg',
-                types: ['anyin'], labels: ['']
-            }
+                type: 'arg', types: ['anyin'],
+                labels: ['']
+            },
+            outType: 'anyout'
         });
     }
 
@@ -220,9 +219,9 @@ class CalcArgBlock extends LeftBlock {
 
         this.formBlock({
             name: _('calculate'),
+            outType: 'anyout',
             flows: {
-                outType: 'anyout', type: 'arg',
-                types: ['anyin'], labels: ['']
+                type: 'arg', types: ['anyin'], labels: ['']
             },
             args: 1,
             argTypes: ['anyin'],
@@ -264,9 +263,7 @@ class ArgBlock extends LeftBlock {
 
         this.formBlock({
             name: _('arg'),
-            flows: {
-                outType: 'anyout'
-            },
+            outType: 'anyout',
             args: 1,
             defaults: [1],
             argTypes: ['numberin'],

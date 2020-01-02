@@ -72,10 +72,11 @@ class BaseBlock extends ProtoBlock {
                 this.style = 'twoarg';
         }
         this.args = this._style.flows.labels.length + this._style.args;
-        this.size = this._style.flows.labels.length + 1;
+        this.size = 1 + this._style.flows.labels.length;
         if (this._style.argTypes[0] === 'booleanin') this.size++;
-        if (this._style.argTypes[1] === 'booleanin') this.size++;
+        else if (this._style.argTypes[1] === 'booleanin') this.size++;
         else this.size += Math.max(0, this._style.args - 1);
+        if (this._style.flows.type === 'arg') this.size++;
 
         this.staticLabels = [this._style.name || ''];
         this.dockTypes = [];
@@ -253,27 +254,31 @@ class BooleanBlock extends BaseBlock {
 
 
 class FlowBlock extends BaseBlock {
-    constructor(name) {
+    constructor(name, displayName) {
         super(name);
+        displayName = displayName || undefined;
 
         this.formBlock({
+            name: displayName,
             flows: {
                 top: true, bottom: true
             }
-        }, false);
+        }, !!displayName);
     }
 }
 
 
 class LeftBlock extends BaseBlock {
-    constructor(name) {
+    constructor(name, displayName) {
         super(name);
+        displayName = displayName || undefined;
 
         this.formBlock({
+            name: displayName,
             flows: {
                 left: true, type: null
             }
-        }, false);
+        }, !!displayName);
     }
 }
 
