@@ -494,6 +494,7 @@ function createHelpContent() {
         'storein2': [_('The Store in block will store a value in a box.'), 'documentation', ''],
         'namedbox': [_('The Box block returns the value stored in a box.'), 'documentation', ''],
         // Number palette
+	'distance': [_('The Distance block returns the distance between two points. For example, between the mouse and the center of the screen.'), 'documentation', ''],
         'abs': [_('The Abs block returns the absolute value.'), 'documentation', ''],
         'sqrt': [_('The Sqrt block returns the square root.'), 'documentation', ''],
         'power': [_('The Power block calculates a power function.'), 'documentation', ''],
