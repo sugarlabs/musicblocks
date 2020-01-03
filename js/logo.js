@@ -1916,92 +1916,6 @@ function Logo () {
                 childFlowCount = 1;
             }
             break;
-            // If we clicked on an action block, treat it like a do
-            // block.
-        case 'nameddoArg':
-            var name = that.blocks.blockList[blk].privateData;
-            while(actionArgs.length > 0) {
-                actionArgs.pop();
-            }
-
-            if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                    if (that.blocks.blockList[blk].connections[i + 1] != null) {
-                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
-                        actionArgs.push(t);
-                    } else {
-                        actionArgs.push(null);
-                    }
-                }
-            }
-
-            if (name in that.actions) {
-                if (that.justCounting[turtle].length === 0) {
-                    that.notationLineBreak(turtle);
-                }
-
-                if (that.backward[turtle].length > 0) {
-                    childFlow = that.blocks.findBottomBlock(that.actions[name]);
-                    var actionBlk = that.blocks.findTopBlock(that.actions[name]);
-                    that.backward[turtle].push(actionBlk);
-
-                    var listenerName = '_backward_action_' + turtle + '_' + blk;
-                    that._setDispatchBlock(blk, turtle, listenerName);
-
-                    var nextBlock = that.blocks.blockList[actionBlk].connections[2];
-                    if (nextBlock == null) {
-                        that.backward[turtle].pop();
-                    } else {
-                        if (nextBlock in that.endOfClampSignals[turtle]) {
-                            that.endOfClampSignals[turtle][nextBlock].push(listenerName);
-                        } else {
-                            that.endOfClampSignals[turtle][nextBlock] = [listenerName];
-                        }
-                    }
-
-                    var __listener = function (event) {
-                        that.backward[turtle].pop();
-                    };
-
-                    that._setListener(turtle, listenerName, __listener);
-                } else {
-                    childFlow = that.actions[name]
-                }
-
-                childFlowCount = 1;
-            } else{
-                that.errorMsg(NOACTIONERRORMSG, blk, name);
-            }
-            break;
-        case 'doArg':
-            while(actionArgs.length > 0) {
-                actionArgs.pop();
-            }
-
-            if (that.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (var i = 0; i < that.blocks.blockList[blk].argClampSlots.length; i++) {
-                    if (that.blocks.blockList[blk].connections[i + 2] != null) {
-                        var t = (that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
-                        actionArgs.push(t);
-                    } else {
-                        actionArgs.push(null);
-                    }
-                }
-            }
-
-            if (args.length >= 1) {
-                if (args[0] in that.actions) {
-                    if (that.justCounting[turtle].length === 0) {
-                        that.notationLineBreak(turtle);
-                    }
-                    actionName = args[0];
-                    childFlow = that.actions[args[0]];
-                    childFlowCount = 1;
-                } else {
-                    that.errorMsg(NOACTIONERRORMSG, blk, args[0]);
-                }
-            }
-            break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
         case 'storein':
@@ -2043,11 +1957,34 @@ function Logo () {
         case 'setHeapEntry':
         case 'push':
         case 'deleteblock':
+        case 'saveabc':
+        case 'savelilypond':
+        case 'savesvg':
+        case 'nobackground':
+        case 'showblocks':
+        case 'hideblocks':
+        case 'openProject':
+        case 'wait':
+        case 'comment':
+        case 'print':
         case 'runblock':
+        case 'vspace':
+        case 'scrollxy':
+        case 'clear':
+        case 'controlpoint1':
+        case 'controlpoint2':
+        case 'bezier':
+        case 'arc':
+        case 'setheading':
+        case 'setxy':
+        case 'right':
+        case 'left':
+        case 'back':
+        case 'forward':
         case 'dockblock':
         case 'moveblock':
         case 'forever': {
-            let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg);
+            let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg, actionArgs);
             if (res) {
                 let [cf, cfc, ret] = res;
                 if (cf !== undefined) childFlow = cf;
@@ -2060,54 +1997,6 @@ function Logo () {
         case 'hiddennoflow':
             // Hidden block is used at end of clamps and actions to
             // trigger listeners.
-            break;
-        case 'wait':
-            if (args.length === 1) {
-                if (that.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(that.bpm[turtle]);
-                } else {
-                    var bpmFactor = TONEBPM / that._masterBPM;
-                }
-
-                var noteBeatValue = bpmFactor / (1 / args[0]);
-                this.previousTurtleTime[turtle] = this.turtleTime[turtle];
-                this.turtleTime[turtle] += noteBeatValue;
-                that._doWait(turtle, args[0]);
-            }
-            break;
-        case 'comment':
-            if (args[0] !== null) {
-                console.debug(args[0].toString());
-                if (!that.suppressOutput[turtle] && that.turtleDelay > 0) {
-                    that.textMsg(args[0].toString());
-                }
-            }
-            break;
-        case 'print':
-            if (!that.inStatusMatrix) {
-                if (args.length === 1) {
-                    if (args[0] !== null) {
-                        if (that.inNoteBlock[turtle].length > 0) {
-                            that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                            that.markup[turtle].push(args[0].toString());
-                        } else {
-                            if (!that.suppressOutput[turtle]) {
-                                if (args[0] === undefined) {
-                                    that.textMsg('undefined');
-                                } else if (args[0] === null) {
-                                    that.textMsg('null');
-                                } else {
-                                    that.textMsg(args[0].toString());
-                                }
-                            }
-
-                            if (that.justCounting[turtle].length === 0) {
-                                that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'print', args[0]]);
-                            }
-                        }
-                    }
-                }
-            }
             break;
         case 'speak':
             if (args.length === 1) {
@@ -2179,303 +2068,6 @@ function Logo () {
         case 'movable':  // legacy typo
             if (args.length === 1) {
                 that.moveable[turtle] = args[0];
-            }
-            break;
-        case 'clear':
-            if (that.inMatrix) {
-                // ignore clear block in matrix
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doSetXY(0, 0);
-                    that.turtles.turtleList[turtle].doSetHeading(0);
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.svgBackground = true;
-                    that.turtles.turtleList[turtle].doClear(true, true, true);
-                }
-
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'clear']);
-                }
-            }
-            break;
-        case 'setxy':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doSetXY(args[0], args[1]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setxy', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'scrollxy':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doScrollXY(args[0], args[1]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doScrollXY(args[0], args[1]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'scrollxy', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'arc':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doArc(args[0], args[1]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doArc(args[0], args[1]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'arc', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'bezier':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], args[0], args[1]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doBezier(that.cp1x[turtle], that.cp1y[turtle], that.cp2x[turtle], that.cp2y[turtle], args[0], args[1]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'bezier', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'controlpoint1':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    that.cp1x[turtle] = args[0];
-                    that.cp1y[turtle] = args[1];
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'controlpoint1', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'controlpoint2':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string' || typeof(args[1]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    that.cp2x[turtle] = args[0];
-                    that.cp2y[turtle] = args[1];
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'controlpoint2', args[0], args[1]]);
-                    }
-                }
-            }
-        case 'forward':
-            if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doForward(args[0]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doForward(args[0]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'forward', args[0]]);
-                    }
-                }
-            }
-            break;
-        case 'back':
-            if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doForward(-args[0]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doForward(-args[0]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'forward', -args[0]]);
-                    }
-                }
-            }
-            break;
-        case 'right':
-            if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doRight(args[0]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doRight(args[0]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'right', args[0]]);
-                    }
-                }
-            }
-            break;
-        case 'left':
-            if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doRight(-args[0]);
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doRight(-args[0]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'right', -args[0]]);
-                    }
-                }
-            }
-            break;
-        case 'setheading':
-            if (args.length === 1) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else if (that.inMatrix) {
-                    that.pitchTimeMatrix.addRowBlock(blk);
-                    if (that.pitchBlocks.indexOf(blk) === -1) {
-                        that.pitchBlocks.push(blk);
-                    }
-                    that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                    that.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    that.turtles.turtleList[turtle].doSetHeading(args[0]);
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setheading', args[0]]);
-                    }
-                }
             }
             break;
         case 'show':
@@ -2902,9 +2494,6 @@ function Logo () {
                 that.turtles.turtleList[turtle].doSetChroma(chroma);
             }
             break;
-        case 'nobackground':
-            that.svgBackground = false;
-            break;
         case 'background':
             that.setBackgroundColor(turtle);
             break;
@@ -2927,42 +2516,6 @@ function Logo () {
                     that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'pendown']);
                 }
             }
-            break;
-        case 'openProject':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            url = args[0];
-
-            function ValidURL(str) {
-                var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-                                         '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-                                         '((\\d{1,3}\\.) {3}\\d{1,3}))'+ // OR ip (v4) address
-                                         '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-                                         '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-                                         '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-                if (!pattern.test(str)) {
-                    that.errorMsg(_('Please enter a valid URL.'));
-                    return false;
-                } else {
-                    return true;
-                }
-            };
-
-            if (ValidURL(url)) {
-                var win = window.open(url, '_blank')
-                if (win) {
-                    // Browser has allowed it to be opened.
-                    win.focus();
-                } else {
-                    // Broswer has blocked it.
-                    alert('Please allow popups for this site');
-                }
-            }
-            break;
-        case 'vspace':
             break;
         case 'playback':
             if (args[0] === null) {
@@ -2987,35 +2540,8 @@ function Logo () {
                 doStopVideoCam(that.cameraID, that.setCameraID);
             }
             break;
-        case 'showblocks':
-            that.showBlocks();
-            that.setTurtleDelay(DEFAULTDELAY);
-            break;
-        case 'hideblocks':
-            that.hideBlocks();
-            that.setTurtleDelay(0);
-            break;
-        case 'savesvg':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
 
-            if (args.length === 1) {
-                if (that.svgBackground) {
-                    that.svgOutput = '<rect x="0" y="0" height="' + that.canvas.height + '" width="' + that.canvas.width + '" fill="' + body.style.background + '"/> ' + that.svgOutput;
-                }
-
-                save.saveSVG(args[0]);
-            }
-            break;
-
-            // Actions for music-related blocks
-        case 'savelilypond':
-            if (args.length === 1) {
-                save.afterSaveLilypond(args[0]);
-            }
-            break;
+        // Actions for music-related blocks
         case 'amsynth':
             var harmonicity;
             if (that.inTimbre) {
@@ -3114,11 +2640,6 @@ function Logo () {
                 that.timbre.duoSynthesizer.push(blk);
                 that.timbre.duoSynthParams.push(synthVibratoRate);
                 that.timbre.duoSynthParams.push(synthVibratoAmount);
-            }
-            break;
-        case 'saveabc':
-            if (args.length === 1) {
-                save.afterSaveAbc(args[0]);
             }
             break;
 
@@ -8421,13 +7942,13 @@ function Logo () {
                 case 'setheading':
                     that.turtles.turtleList[turtle].doSetHeading(that.playbackQueue[turtle][idx][2]);
                     break;
-                case 'clear':
-                    that.svgBackground = true;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doSetHeading(0);
-                    that.turtles.turtleList[turtle].doSetXY(0, 0);
-                    that.turtles.turtleList[turtle].penState = true;
-                    // that.turtles.turtleList[turtle].doClear(true, true, true);
+                case 'clear':	
+                    that.svgBackground = true;	
+                    that.turtles.turtleList[turtle].penState = false;	
+                    that.turtles.turtleList[turtle].doSetHeading(0);	
+                    that.turtles.turtleList[turtle].doSetXY(0, 0);	
+                    that.turtles.turtleList[turtle].penState = true;	
+                    // that.turtles.turtleList[turtle].doClear(true, true, true);	
                     break;
                 case 'setcolor':
                     that.turtles.turtleList[turtle].doSetColor(that.playbackQueue[turtle][idx][2]);
@@ -9465,27 +8986,6 @@ function Logo () {
             case 'myclick':
                 that.blocks.blockList[blk].value = 'click' + that.turtles.turtleList[turtle].name;
                 break;
-            case 'heading':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'heading']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].orientation;
-                }
-                break;
-            case 'x':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'x']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.screenX2turtleX(that.turtles.turtleList[turtle].container.x);
-                }
-                break;
-            case 'y':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'y']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.screenY2turtleY(that.turtles.turtleList[turtle].container.y);
-                }
-                break;
             case 'turtleheading':
             case 'xturtle':
             case 'yturtle':
@@ -10058,11 +9558,6 @@ function Logo () {
                 var d = new Date();
                 that.blocks.blockList[blk].value = (d.getTime() - that.time) / 1000;
                 break;
-            case 'hspace':
-                var cblk = that.blocks.blockList[blk].connections[1];
-                var v = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                that.blocks.blockList[blk].value = v;
-                break;
             case 'mousex':
                 that.blocks.blockList[blk].value = that.getStageX();
                 break;
@@ -10371,9 +9866,6 @@ function Logo () {
                     console.debug('WARNING: No return value.');
                     that.blocks.blockList[blk].value = 0;
                 }
-                break;
-            case 'makeblock':
-                
                 break;
             default:
                 if (that.blocks.blockList[blk].name in that.evalArgDict) {

@@ -199,6 +199,7 @@ function Activity() {
             'activity/blocks/BooleanBlocks',
             'activity/blocks/HeapBlocks',
             'activity/blocks/ExtrasBlocks',
+            'activity/blocks/GraphicsBlocks',
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }

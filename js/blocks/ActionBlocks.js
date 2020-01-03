@@ -149,8 +149,61 @@ class NamedDoArgBlock extends FlowClampBlock {
         });
     }
 
-    flow(_, __, ___, blk) {
-        return [0, 0, blk];
+    flow(args, logo, turtle, blk, receivedArg, actionArgs) {
+        var name = logo.blocks.blockList[blk].privateData;
+        while(actionArgs.length > 0) {
+            actionArgs.pop();
+        }
+
+        if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
+                if (logo.blocks.blockList[blk].connections[i + 1] != null) {
+                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 1], blk, receivedArg));
+                    actionArgs.push(t);
+                } else {
+                    actionArgs.push(null);
+                }
+            }
+        }
+
+        if (name in logo.actions) {
+            if (logo.justCounting[turtle].length === 0) {
+                logo.notationLineBreak(turtle);
+            }
+
+            let childFlow;
+            if (logo.backward[turtle].length > 0) {
+                childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
+                var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                logo.backward[turtle].push(actionBlk);
+
+                var listenerName = '_backward_action_' + turtle + '_' + blk;
+                logo._setDispatchBlock(blk, turtle, listenerName);
+
+                var nextBlock = logo.blocks.blockList[actionBlk].connections[2];
+                if (nextBlock == null) {
+                    logo.backward[turtle].pop();
+                } else {
+                    if (nextBlock in logo.endOfClampSignals[turtle]) {
+                        logo.endOfClampSignals[turtle][nextBlock].push(listenerName);
+                    } else {
+                        logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    }
+                }
+
+                var __listener = function (event) {
+                    logo.backward[turtle].pop();
+                };
+
+                logo._setListener(turtle, listenerName, __listener);
+            } else {
+                childFlow = logo.actions[name]
+            }
+
+            return [childFlow, 1];
+        } else{
+            logo.errorMsg(NOACTIONERRORMSG, blk, name);
+        }
     }
 }
 
@@ -207,8 +260,32 @@ class DoArgBlock extends FlowClampBlock {
         });
     }
 
-    flow(_, __, ___, blk) {
-        return [0, 0, blk];
+    flow(args, logo, turtle, blk, receivedArg, actionArgs) {
+        while(actionArgs.length > 0) {
+            actionArgs.pop();
+        }
+
+        if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
+                if (logo.blocks.blockList[blk].connections[i + 2] != null) {
+                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                    actionArgs.push(t);
+                } else {
+                    actionArgs.push(null);
+                }
+            }
+        }
+
+        if (args.length >= 1) {
+            if (args[0] in logo.actions) {
+                if (logo.justCounting[turtle].length === 0) {
+                    logo.notationLineBreak(turtle);
+                }
+                return [logo.actions[args[0]], 1];
+            } else {
+                logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+            }
+        }
     }
 }
 

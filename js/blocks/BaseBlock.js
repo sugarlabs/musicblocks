@@ -37,7 +37,7 @@ class BaseBlock extends ProtoBlock {
         this.palette = palettes.dict[palette]
     }
 
-    formBlock(style, adjustWidth=true) {
+    formBlock(style) {
         mergeDeep(this._style, style);
         this._style.args = this._style.args || 0;
         this._style.argTypes = this._style.argTypes || [];
@@ -196,8 +196,6 @@ class BaseBlock extends ProtoBlock {
             return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
         }
 
-        if (adjustWidth)
-            this.adjustWidthToLabel();
     }
 
     makeMacro(macroFunc) {
@@ -213,6 +211,8 @@ class BaseBlock extends ProtoBlock {
         if (beginnerMode && !beginnerBlock(this.name)) {
             this.hidden = true;
         }
+        if (this._style.name)
+            this.adjustWidthToLabel();
         this.palette.add(this);
     }
 
@@ -227,14 +227,16 @@ class BaseBlock extends ProtoBlock {
 
 
 class ValueBlock extends BaseBlock {
-    constructor(name) {
+    constructor(name, displayName) {
         super(name);
+        displayName = displayName || undefined;
 
         this.formBlock({
+            name: displayName,
             flows: {
                 left: true, type: 'value'
             }
-        }, false);
+        }, !!displayName);
     }
 }
 
@@ -248,7 +250,7 @@ class BooleanBlock extends BaseBlock {
                 left: true, type: 'value'
             },
             outType: 'booleanout'
-        }, false);
+        });
     }
 }
 
@@ -291,7 +293,7 @@ class FlowClampBlock extends FlowBlock {
             flows: {
                 type: 'flow', labels: ['']
             }
-        }, false);
+        });
     }
 }
 
@@ -306,6 +308,6 @@ class StackClampBlock extends BaseBlock {
                 top: 'cap', bottom: 'tail',
                 type: 'flow', labels: ['']
             }
-        }, false);
+        });
     }
 }
