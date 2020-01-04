@@ -1982,6 +1982,21 @@ function Logo () {
         case 'back':
         case 'forward':
         case 'dockblock':
+        case 'beginfill':
+        case 'endfill':
+        case 'fillscreen':
+        case 'setfont':
+        case 'background':
+        case 'hollowline':
+        case 'fill':
+        case 'penup':
+        case 'pendown':
+        case 'setpensize':
+        case 'settranslucency':
+        case 'sethue':
+        case 'setshade':
+        case 'setgrey':
+        case 'setcolor':
         case 'moveblock':
         case 'forever': {
             let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg, actionArgs);
@@ -2217,260 +2232,6 @@ function Logo () {
                 that.turtleTime[turtle] = that.turtleTime[targetTurtle];
             }
             break;
-        case 'setcolor':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doSetColor(args[0]);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setcolor', args[0]]);
-                }
-            }
-            break;
-        case 'setfont':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.turtles.turtleList[turtle].doSetFont(args[0]);
-            }
-            break;
-        case 'sethue':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doSetHue(args[0]);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'sethue', args[0]]);
-                }
-            }
-            break;
-        case 'setshade':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doSetValue(args[0]);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setshade', args[0]]);
-                }
-            }
-            break;
-        case 'settranslucency':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                var arg = args[0] % 101;
-                var alpha = 1.0 - (arg / 100);
-                that.turtles.turtleList[turtle].doSetPenAlpha(alpha);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'settranslucency', arg]);
-                }
-            }
-            break;
-        case 'setgrey':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doSetChroma(args[0]);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setgrey', args[0]]);
-                }
-            }
-            break;
-        case 'setpensize':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            if (typeof(args[0]) === 'string') {
-                that.errorMsg(NANERRORMSG, blk);
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.pitchBlocks.indexOf(blk) === -1) {
-                    that.pitchBlocks.push(blk);
-                }
-
-                that.pitchTimeMatrix.rowLabels.push(that.blocks.blockList[blk].name);
-                that.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doSetPensize(args[0]);
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'setpensize', args[0]]);
-                }
-            }
-            break;
-        case 'fill':
-            if (args[0] === undefined) {
-                // nothing to do
-                break;
-            }
-
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                if (that.suppressOutput[turtle]) {
-                    var savedPenState = that.turtles.turtleList[turtle].penState;
-                    that.turtles.turtleList[turtle].penState = false;
-                    that.turtles.turtleList[turtle].doStartFill();
-                    that.turtles.turtleList[turtle].penState = savedPenState;
-                } else {
-                    that.turtles.turtleList[turtle].doStartFill();
-                }
-
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'fill']);
-                }
-            }
-
-            childFlow = args[0];
-            childFlowCount = 1;
-
-            var listenerName = '_fill_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (that.suppressOutput[turtle]) {
-                        var savedPenState = that.turtles.turtleList[turtle].penState;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doEndFill();
-                        that.turtles.turtleList[turtle].penState = savedPenState;
-                    } else {
-                        that.turtles.turtleList[turtle].doEndFill();
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'fill']);
-                    }
-                }
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-            // Deprecated
-        case 'beginfill':
-            that.turtles.turtleList[turtle].doStartFill();
-            break;
-            // Deprecated
-        case 'endfill':
-            that.turtles.turtleList[turtle].doEndFill();
-            break;
-        case 'hollowline':
-            if (args[0] === undefined) {
-                // nothing to do
-                break;
-            }
-
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doStartHollowLine();
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'hollowline']);
-                }
-            }
-
-            childFlow = args[0];
-            childFlowCount = 1;
-
-            var listenerName = '_hollowline_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    that.turtles.turtleList[turtle].doEndHollowLine();
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'hollowline']);
-                    }
-                }
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
             // Deprecated
         case 'beginhollowline':
             that.turtles.turtleList[turtle].doStartHollowLine();
@@ -2478,44 +2239,6 @@ function Logo () {
             // Deprecated
         case 'endhollowline':
             that.turtles.turtleList[turtle].doEndHollowLine();
-            break;
-            // Deprecated
-        case 'fillscreen':
-            if (args.length === 3) {
-                var hue = that.turtles.turtleList[turtle].color;
-                var value = that.turtles.turtleList[turtle].value;
-                var chroma = that.turtles.turtleList[turtle].chroma;
-                that.turtles.turtleList[turtle].doSetHue(args[0]);
-                that.turtles.turtleList[turtle].doSetValue(args[1]);
-                that.turtles.turtleList[turtle].doSetChroma(args[2]);
-                that.setBackgroundColor(turtle);
-                that.turtles.turtleList[turtle].doSetHue(hue);
-                that.turtles.turtleList[turtle].doSetValue(value);
-                that.turtles.turtleList[turtle].doSetChroma(chroma);
-            }
-            break;
-        case 'background':
-            that.setBackgroundColor(turtle);
-            break;
-        case 'penup':
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doPenUp();
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'penup']);
-                }
-            }
-            break;
-        case 'pendown':
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-            } else {
-                that.turtles.turtleList[turtle].doPenDown();
-                if (that.justCounting[turtle].length === 0) {
-                    that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'pendown']);
-                }
-            }
             break;
         case 'playback':
             if (args[0] === null) {
@@ -9479,7 +9202,6 @@ function Logo () {
                     that.blocks.blockList[blk].value = -1;
                 }
                 break;
-            case 'color':
             case 'hue':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'color']);
@@ -9507,27 +9229,6 @@ function Logo () {
 
                     var thisTurtle = that.turtles.turtleList[turtle];
                     that.blocks.blockList[blk].value = thisTurtle.color;
-                }
-                break;
-            case 'shade':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'shade']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].value;
-                }
-                break;
-            case 'grey':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'grey']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].chroma;
-                }
-                break;
-            case 'pensize':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'pensize']);
-                } else {
-                    that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].stroke;
                 }
                 break;
             case 'and':
