@@ -2565,7 +2565,7 @@ function PitchTimeMatrix () {
     this._createpiesubmenu = function (noteToDivide, tupletValue, condition) {
         docById('wheelDivptm').style.display = '';
 
-        this._menuWheel = new wheelnav('wheelDivptm', null, 600, 600);
+        this._menuWheel = new wheelnav('wheelDivptm', null, 800, 800);
         this._exitWheel = new wheelnav('_exitWheel', this._menuWheel.raphael);
 
         if (condition === 'tupletvalue') {
@@ -2577,7 +2577,7 @@ function PitchTimeMatrix () {
         } else if (condition === 'rhythmnote') {
             this._tabsWheel = new wheelnav('_tabsWheel', this._menuWheel.raphael);
             this.newNoteValue = 2;
-            mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
+            mainTabsLabels = ['divide', 'delete', 'duplicate', String(this.newNoteValue)];
         }
 
         wheelnav.cssMode = true;
