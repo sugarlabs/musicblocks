@@ -106,7 +106,7 @@ function Logo () {
 
     // When we leave a clamp block, we need to dispatch a signal.
     this.endOfClampSignals = {};
-    // Don't dispatch these signals (when exiting note counter or
+    // Don't dispatch these signals (when exiting sum note value or
     // interval measure.
     this.butNotThese = {};
 
@@ -11675,7 +11675,7 @@ function Logo () {
                     block.value = true;
                 }
                 break;
-            case 'notecounter':
+            case 'sumnotevalue':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 if (cblk === null) {
                     that.errorMsg(NOINPUTERRORMSG, blk);

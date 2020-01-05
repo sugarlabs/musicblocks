@@ -1988,7 +1988,7 @@ function Activity() {
                     stage.update();
                     break;
                 case KEYCODE_DOWN:
-                    textMsg('DOWN ARROW ' + _('Moving block down.'));
+                    textMsg('UP ARROW ' + _('Moving block down.'));
                     if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
                         blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
                         blocks.blockMoved(blocks.activeBlock);

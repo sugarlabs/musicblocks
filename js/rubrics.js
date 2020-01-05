@@ -119,7 +119,7 @@ const TACAT = {
     'bpmfactor': 'rhythmfactor',
     'measurevalue': 'rhythmfactor',
     'beatvalue': 'rhythmfactor',
-    'notecounter': 'rhythmfactor',
+    'sumnotevalue': 'rhythmfactor',
     'elapsednotes': 'rhythmfactor',
     'elapsednotes2': 'rhythmfactor',
     'drift': 'rhythmfactor',
