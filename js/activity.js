@@ -1956,6 +1956,7 @@ function Activity() {
                 case END:
                     textMsg('END ' + _('Jumping to the bottom of the page.'));
                     blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
+                    stage.update();
                     break;
                 case PAGE_UP:
                     textMsg('PAGE_UP ' + _('Scrolling up.'));
