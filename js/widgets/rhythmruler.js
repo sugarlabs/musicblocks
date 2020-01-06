@@ -341,7 +341,11 @@ function RhythmRuler () {
             that._inLongPress = false;
 
             that._longPressBeep = setTimeout(function () {
-                that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
+                // Removing audio feedback on long press since it
+                // occasionally confuses tone.js during rapid clicking
+                // in the widget.
+
+                // that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 var cell = that._mouseDownCell;
                 if (cell !== null && cell.parentNode !== null) {
