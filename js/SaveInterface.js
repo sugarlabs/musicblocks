@@ -22,7 +22,7 @@ function SaveInterface(PlanetInterface) {
     this.timeLastSaved = -100;
 
     this.htmlSaveTemplate = '<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="description" content="{{ project_description }}"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"> <title>{{ project_name }}</title> <meta property="og:site_name" content="Music Blocks"/> <meta property="og:type" content="website"/> <meta property="og:title" content="' + _('Music Blocks Project') + ' - {{ project_name }}"/> <meta property="og:description" content="{{ project_description }}"/> <style>body{background-color: #dbf0fb;}#main{background-color: white; padding: 5%; position: fixed; width: 80vw; height: max-content; margin: auto; top: 0; left: 0; bottom: 0; right: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; color: #424242; box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); font-family: "Roboto", "Helvetica","Arial",sans-serif;}h3{font-weight: 400; font-size: 36px; margin-top: 10px;}hr{border-top: 0px solid #ccc; margin: 1em;}.btn{border: solid; border-color: #96D3F3; padding: 5px 10px; line-height: 50px; color: #0a3e58;}.btn:hover{transition: 0.4s; -webkit-transition: 0.3s; -moz-transition: 0.3s; background-color: #96D3F3;}.code{word-break: break-all; height: 15vh; background: #f6f8fa; color: #494949; text-align: justify; margin-right: 10vw; margin-left: 10vw; padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;}.image{border-radius: 2px 2px 0 0; position: relative; background-color: #96D3F3;}.image-div{margin-bottom: 10px;}.moreinfo-div{margin-top: 20px;}h4{font-weight: 500; font-size: 1.4em; margin-top: 10px; margin-bottom: 10px;}.tbcode{margin-bottom: 10px;}</style></head><body> <div id="main"> <div class="image-div"><img class="image" id="project-image" src="{{ project_image }}"></div><h3 id="title">' + _('Music Blocks Project') + ' - {{ project_name }}</h3> <p>{{ project_description }}</p><hr> <div> <div style="color: #9E9E9E"><p>' + _('This project was created in Music Blocks') + ' (<a href="https://musicblocks.sugarlabs.org" target="_blank">https://musicblocks.sugarlabs.org</a>). ' + TITLESTRING + ' ' + _('Music Blocks is a Free/Libre Software application.') + ' ' + _('The source code can be accessed at') + ' <a href="https://github.com/sugarlabs/musicblocks" target="_blank">https://github.com/sugarlabs/musicblocks</a>.' + ' ' + _('For more information, please consult the') + ' <a href="' + GUIDEURL + '" target="_blank">' + _('Music Blocks Guide') + '</a>.' + '</p><p>' + _('To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window.') + ' ' + _('Alternatively, open the file in Music Blocks using the Load project button.') + '</p></div><div class="moreinfo-div"> <div class="tbcode"><h4>' + _('Project Code') + '</h4>' + _('This code stores data about the blocks in a project.') + ' <a href="javascript:toggle();" id="showhide">' + _('Show') + '</a></div> <div class="code">{{ data }}</div></div></div></div><script type="text/javascript">function toggle(){if (document.getElementsByClassName("code")[0].style.display=="none"){document.getElementsByClassName("code")[0].style.display="flex";document.getElementById("showhide").textContent = "' + _('Hide') + '";} else {document.getElementsByClassName("code")[0].style.display="none";document.getElementById("showhide").textContent = "Show";}} var name=decodeURIComponent(window.location.pathname.split("/").pop().slice(0, -5)); var prefix="' + _('Music Blocks Project') + ' - "; var title=prefix+name; document.querySelector(' + "'" + 'meta[property="og:title"]'+ "'" + ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
-    
+
     this.download = function(extension, dataurl, defaultfilename){
         var filename = null;
         if (defaultfilename === undefined || defaultfilename === null){
@@ -32,7 +32,7 @@ function SaveInterface(PlanetInterface) {
                 defaultfilename = this.PlanetInterface.getCurrentProjectName();
             }
 
-            console.log(defaultfilename);
+            console.debug(defaultfilename);
 
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += '.' + extension;
@@ -50,9 +50,9 @@ function SaveInterface(PlanetInterface) {
             filename = defaultfilename;
         }
 
-        console.log(filename);
+        console.debug(filename);
         if (filename === null) {
-            console.log('save cancelled');
+            console.debug('save cancelled');
             return;
         }
 
@@ -61,7 +61,7 @@ function SaveInterface(PlanetInterface) {
         }
 
         this.downloadURL(filename, dataurl);
-    }
+    };
 
     this.downloadURL = function(filename, dataurl){
         var a = document.createElement('a');
@@ -70,13 +70,13 @@ function SaveInterface(PlanetInterface) {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-    }
+    };
 
     this.setVariables = function(vars){
         for (var i = 0; i<vars.length; i++){
             this[vars[i][0]]=vars[i][1];
         }
-    }
+    };
 
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
     this.prepareHTML = function(){
@@ -110,13 +110,13 @@ function SaveInterface(PlanetInterface) {
                    .replace(new RegExp('{{ data }}', 'g'), data)
                    .replace(new RegExp('{{ project_image }}', 'g'), image);
         return file;
-    }
+    };
 
     this.saveHTML = function(filename){
         var html = 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.prepareHTML());
-        console.log(filename);
+        console.debug(filename);
         this.download('html', html, filename);
-    }
+    };
 
     this.saveHTMLNoPrompt = function(){
         setTimeout(function(){
@@ -127,22 +127,22 @@ function SaveInterface(PlanetInterface) {
                 this.downloadURL(_('My Project').replace(' ', '_') + '.html', html);
             }
         }.bind(this),500);
-    }
+    };
 
     this.saveSVG = function(filename){
         var svg = 'data:image/svg+xml;utf8,' + doSVG(this.logo.canvas, this.logo, this.logo.turtles, this.logo.canvas.width, this.logo.canvas.height, 1.0);
         this.download('svg', svg, filename);
-    }
+    };
 
     this.savePNG = function(filename){
         var png = docById('overlayCanvas').toDataURL('image/png');
         this.download('png', png, filename);
-    }
+    };
 
     this.saveBlockArtwork = function(filename){
         var svg = 'data:image/svg+xml;utf8,' + this.printBlockSVG();
         this.download('svg', svg, filename);
-    }
+    };
 
     this.saveWAV = function(filename){
         document.body.style.cursor = 'wait';
@@ -151,20 +151,20 @@ function SaveInterface(PlanetInterface) {
         this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
-        console.log('DURING SAVE WAV');
+        console.debug('DURING SAVE WAV');
         this.logo.runLogoCommands();
-    }
+    };
 
     this.afterSaveWAV = function(blob){
-        console.log('AFTER SAVE WAV');
+        console.debug('AFTER SAVE WAV');
         //don't reset cursor
         this.download('wav',URL.createObjectURL(blob));
-    }
+    };
 
     this.saveAbc = function(filename){
         document.body.style.cursor = 'wait';
         this.filename = filename;
-        console.log('Saving .abc file');
+        console.debug('Saving .abc file');
         //Suppress music and turtle output when generating
         // Abc output.
         this.logo.runningAbc = true;
@@ -176,12 +176,12 @@ function SaveInterface(PlanetInterface) {
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
         this.logo.runLogoCommands();
-    }
+    };
 
     this.afterSaveAbc = function(filename){
         var abc = encodeURIComponent(saveAbcOutput(this.logo));
         this.download('abc', 'data:text;utf8,' + abc, filename);
-    }
+    };
 
     this.saveLilypond = function(filename) {
         var lyext = 'ly';
@@ -196,7 +196,7 @@ function SaveInterface(PlanetInterface) {
             filename += '.' + lyext;
         }
 
-        console.log('Saving .ly file');
+        console.debug('Saving .ly file');
         docById('lilypondModal').style.display = 'block';
         var projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
@@ -213,8 +213,8 @@ function SaveInterface(PlanetInterface) {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById('submitLilypond').textContent = _('Save as Lilypond');
         //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
-       
-       // docById('submitPDF').textContent = _('Save as PDF');
+
+	// docById('submitPDF').textContent = _('Save as PDF');
 
         //TRANS: default file name when saving as Lilypond
         docById('fileName').value = filename;
@@ -246,7 +246,7 @@ function SaveInterface(PlanetInterface) {
             t.logo.runningLilypond = false;
             docById('lilypondModal').style.display = 'none';
         }
-    }
+    };
 
     this.saveLYFile = function(isPDF) {
         if (isPDF===undefined){
@@ -311,7 +311,7 @@ function SaveInterface(PlanetInterface) {
 
         // Close the dialog box after hitting button.
         docById('lilypondModal').style.display = 'none';
-    }
+    };
 
     this.afterSaveLilypond = function(filename){
         var ly = saveLilypondOutput(this.logo);
@@ -324,40 +324,83 @@ function SaveInterface(PlanetInterface) {
                 break;
         }
         this.notationConvert = '';
-    }
+    };
 
     this.afterSaveLilypondLY = function(lydata, filename){
+	if (platform.FF) {
+	    console.debug('execCommand("copy") does not work on FireFox');
+	} else {
+            let tmp = jQuery('<textarea />').appendTo(document.body);
+            tmp.val(lydata);
+            tmp.select();
+            tmp[0].setSelectionRange(0, lydata.length);
+            document.execCommand('copy');
+            tmp.remove();
+            textMsg(_('The Lilypond code is copied to clipboard. You can paste it here: ')  + "<a href='http://lilybin.com' target='_blank'>http://lilybin.com</a>.");
+	}
+
         this.download('ly', 'data:text;utf8,' + encodeURIComponent(lydata), filename);
-    }
+    };
 
     this.afterSaveLilypondPDF = function(lydata, filename) {
         document.body.style.cursor = 'wait';
         window.Converter.ly2pdf(lydata,function(success,dataurl){
             document.body.style.cursor = 'default';
             if (!success){
-                console.log('Error: '+dataurl);
+                console.debug('Error: '+dataurl);
                 //TODO: Error message box
             } else {
                 save.download('pdf', dataurl, filename);
             }
         });
-    }
+    };
+
+    this.saveMxml = function(filename) {
+        this.logo.runningMxml = true;
+        for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            this.logo.notationStaging[turtle] = [];
+            this.logo.notationDrumStaging[turtle] = [];
+            this.turtles.turtleList[turtle].doClear(true, true, true);
+        }
+        
+        this.logo.runLogoCommands();
+        // this.download('musicxml', 'data:text;utf8,'+data);
+    };
+
+    this.afterSaveMxml = function(filename) {
+        var data = saveMxmlOutput(this.logo);
+        data = saveMxmlOutput(this.logo);
+
+        console.log("data is:");
+        console.log(data);
+        this.download('xml', 'data:text;utf8,' + encodeURIComponent(data), filename);
+        this.logo.runningMxml = false;
+    };
 
     this.init = function(){
-        var unloadTimer;
         this.timeLastSaved = -100;
-        window.onbeforeunload = function() {
-            if (this.PlanetInterface !== undefined && this.PlanetInterface.getTimeLastSaved() != this.timeLastSaved){
-                this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                unloadTimer2 = null;
-                unloadTimer = window.requestAnimationFrame(function(){unloadTimer2=window.requestAnimationFrame(this.saveHTMLNoPrompt.bind(this),1000)}.bind(this), 500);
-                return _('Do you want to save your project?');
+        window.onbeforeunload = function(e) {
+            if (this.PlanetInterface !== undefined && this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved) {
+                // The following section of code is a bit of a hack. In order to detect the user selecting
+                // "Cancel", we attempt to perform an action that would otherwise be blocked. That is, if the
+                // user does not cancel the navigation, the HTTP request will fail, and the prompt never shown.
+                setTimeout(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", document.location.href, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === xhr.DONE) {
+                            if (confirm(_('Do you want to save your project?'))) {
+                                this.saveHTMLNoPrompt();
+                                this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
+                            }
+                        }
+                    }.bind(this);
+                    xhr.send();
+                }.bind(this));
+
+                e.preventDefault();
+                e.returnValue = '';
             }
         }.bind(this);
-
-        window.onunload = function(){
-            cancelAnimationFrame(unloadTimer);
-            cancelAnimationFrame(unloadTimer2);
-        }
-    }
-}
+    };
+};

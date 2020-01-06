@@ -25,7 +25,7 @@ const PIEMENUS = ['solfege', 'eastindiansolfege', 'notename', 'voicename', 'drum
 // Define block instance objects and any methods that are intra-block.
 function Block(protoblock, blocks, overrideName) {
     if (protoblock === null) {
-        console.log('null protoblock sent to Block');
+        console.debug('null protoblock sent to Block');
         return;
     }
 
@@ -118,7 +118,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        console.log('// Try regenerating the artwork');
+                        console.debug('// Try regenerating the artwork');
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                         await that.pause(100);
@@ -154,7 +154,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     if (that.bounds == null) {
-                        console.log('UPDATE CACHE: BOUNDS NOT READY');
+                        console.debug('UPDATE CACHE: BOUNDS NOT READY');
                         updateBounds(loopCount + 1);
                         await that.pause(200);
                     } else {
@@ -343,7 +343,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.bitmap === null) {
-            console.log('bitmap not ready');
+            console.debug('bitmap not ready');
             return;
         }
 
@@ -965,7 +965,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'voicename':
                     this.value = DEFAULTVOICE;
                     break;
-                case 'noiseename':
+                case 'noisename':
                     this.value = DEFAULTNOISE;
                     break;
                 case 'drumname':
@@ -1002,6 +1002,10 @@ function Block(protoblock, blocks, overrideName) {
                 if (attr !== '♮') {
                     label += attr;
                 }
+            } else if (this.name === 'drumname') {
+                var label = getDrumName(this.value);
+            } else if (this.name === 'noisename') {
+                var label = getNoiseName(this.value);
             } else {
                 if (this.value !== null) {
                     var label = this.value.toString();
@@ -1576,7 +1580,7 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
-            console.log('collapse bitmap not ready');
+            console.debug('collapse bitmap not ready');
             return;
         }
 
@@ -1606,7 +1610,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._oscTimeLabel();
                 break;
             default:
-                console.log('What do we do with a collapsed ' + this.name + ' block?');
+                console.debug('What do we do with a collapsed ' + this.name + ' block?');
                 break;
             }
         }
@@ -1700,7 +1704,7 @@ function Block(protoblock, blocks, overrideName) {
 
             i += 1;
             if (i > 5) {
-                console.log('loop?');
+                console.debug('loop?');
                 break;
             }
 
@@ -2132,7 +2136,7 @@ function Block(protoblock, blocks, overrideName) {
             if ('nativeEvent' in event) {
                 if ('button' in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
-                    console.log('loading context menu');
+                    console.debug('loading context menu');
                     docById('wheelDiv').style.display = 'none';
                     that.piemenuBlockContext(thisBlock);
                     return;
@@ -2191,7 +2195,7 @@ function Block(protoblock, blocks, overrideName) {
                 } else {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
-                        console.log('running from ' + that.blocks.blockList[topBlock].name);
+                        console.debug('running from ' + that.blocks.blockList[topBlock].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
@@ -2210,7 +2214,7 @@ function Block(protoblock, blocks, overrideName) {
             } else if (!moved) {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     var topBlock = that.blocks.findTopBlock(thisBlock);
-                    console.log('running from ' + that.blocks.blockList[topBlock].name);
+                    console.debug('running from ' + that.blocks.blockList[topBlock].name);
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.blocks.logo.synth.resume();
                     }
@@ -2503,7 +2507,7 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo', 'hertz'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (['steppitch', 'pitchnumber', 'meter', 'register', 'scaledegree', 'rhythmicdot2', 'crescendo', 'decrescendo', 'harmonic2', 'interval', 'setscalartransposition', 'semitoneinterval', 'settransposition', 'setnotevolume', 'articulation', 'vibrato', 'dis', 'neighbor', 'neighbor2', 'tremolo', 'chorus', 'phaser', 'amsynth', 'fmsynth', 'duosynth', 'rhythm2', 'stuplet', 'duplicatenotes', 'setcolor', 'setshade', 'setgrey', 'sethue', 'setpensize', 'settranslucency', 'setheading', 'arc', 'onbeatdo', 'hertz', 'right', 'left'].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
@@ -2639,7 +2643,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
 
-            console.log("hello");
+            console.debug("hello");
         } else if (this.name === 'customNote') {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -2846,7 +2850,7 @@ function Block(protoblock, blocks, overrideName) {
                 var selectedvoice = DEFAULTVOICE;
             }
 
-            console.log(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
+            console.debug(this.value + ' ' + DEFAULTVOICE + ' ' + selectedvoice);
 
             var voiceLabels = [];
             var voiceValues = [];
@@ -2877,12 +2881,12 @@ function Block(protoblock, blocks, overrideName) {
             this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
         } else if (this.name === 'noisename') {
             if (this.value != null) {
-                var selectednoisee = this.value;
+                var selectednoise = this.value;
             } else {
                 var selectednoise = DEFAULTNOISE;
             }
 
-            console.log(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
+            console.debug(this.value + ' ' + DEFAULTNOISE + ' ' + selectednoise);
 
             var noiseLabels = [];
             var noiseValues = [];
@@ -3130,12 +3134,18 @@ function Block(protoblock, blocks, overrideName) {
                     this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25], this.value);
                     break;
                 case 'hertz':
-                    this._piemenuNumber([220, 261, 293, 329, 349, 392, 440, 493, 523, 587, 659, 698,783,880], this.value);
+                    this._piemenuNumber([220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880], this.value);
+                    break;
+                case 'right':
+                    this._piemenuNumber([0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330], this.value);
+                    break;
+                case 'left':
+                    this._piemenuNumber([330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0], this.value);
                     break;
                 }
 
             } else {
-                console.log('NUMBER LABEL');
+                console.debug('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -3358,7 +3368,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // wheelNav pie menu for pitch selection
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3644,7 +3654,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
-                // console.log(obj[0] + obj[1] + ' 1 / 8 ' + DEFAULTVOICE);
+                // console.debug(obj[0] + obj[1] + ' 1 / 8 ' + DEFAULTVOICE);
                 that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
             }
 
@@ -3689,10 +3699,12 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._piemenuScaleDegree = function (noteValues, note) {
+        var prevPitch = null;
+        
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3761,6 +3773,8 @@ function Block(protoblock, blocks, overrideName) {
         if (i === -1) {
             i = 4;
         }
+        
+        prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
 
@@ -3802,13 +3816,49 @@ function Block(protoblock, blocks, overrideName) {
         var __pitchPreview = function () {
             var label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             var i = noteLabels.indexOf(label);
-            var note = noteValues[i];
+
+
+            //Check if passing C
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+
+            var deltaPitch = i - prevPitch;
+            if (deltaPitch > 3) {
+                var delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                var delta = deltaPitch + 7;
+            } else {
+                var delta = deltaPitch;
+            }
+
+            //When user passed across C, move one octave higher if going from B to C
+            //hence, go one octave lower when passing from C to B
+            var deltaOctave = 0;
+
+            if ((prevPitch + delta) > 6) {
+                deltaOctave = 1;
+            } else if ((prevPitch + delta) < 0) {
+                deltaOctave = -1;
+            }
+
+            prevPitch = i;
             var octave = Number(that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title);
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
 
-            // FIX ME: get key signature if available
-            // FIX ME: get moveable if available
+            if (deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+            }
 
-            var noteName = scaleDegreeToPitch('C major', note);
+
+            var note = scaleDegreeToPitch('C major', noteValues[i]);
+
             if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
                 if (that.blocks.logo.instrumentNames[0] === undefined) {
                     that.blocks.logo.instrumentNames[0] = [];
@@ -3819,13 +3869,21 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
 
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, [noteName.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, DEFAULTVOICE, null, null);
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            //Play sample note and prevent extra sounds from playing
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                that.blocks.logo.synth.trigger(0, [note.replace(SHARP, '#').replace(FLAT, 'b') + octave], 1 / 8, DEFAULTVOICE, null, null);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, that.blocks.logo.defaultBPMFactor / 8);
 
             __selectionChanged();
         };
-
         // Set up handlers for pitch preview.
         for (var i = 0; i < noteValues.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
@@ -3850,7 +3908,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for accidental selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -3961,7 +4019,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for note value selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4182,7 +4240,7 @@ function Block(protoblock, blocks, overrideName) {
         // input form and  wheelNav pie menu for number selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4226,7 +4284,7 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.createWheel(wheelLabels);
 
         if (this._numberWheel.navItems.length > 20) {
-            console.log('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
+            console.debug('LOTS OF NUMBERS: ' + this._numberWheel.navItems.length);
             for (var i = 0; i < this._numberWheel.navItems.length; i++) {
                 this._numberWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
                 this._numberWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
@@ -4354,13 +4412,79 @@ function Block(protoblock, blocks, overrideName) {
 
             that.label.value = that.value;
         };
+        
+        
+        var __pitchPreviewForNum = function () {
+            var label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
+            var i = wheelLabels.indexOf(label);
+            var actualPitch = numberToPitch(wheelValues[i] + 3);
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
+            that.blocks.logo.synth.trigger(0, actualPitch[0] + (actualPitch[1] + 3), 1 / 8, DEFAULTVOICE, null, null);
+
+            __selectionChanged();
+        };
+        
+        var __hertzPreview = function () {
+            var label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
+            var i = wheelLabels.indexOf(label);
+            var actualPitch = frequencyToPitch(wheelValues[i]);
+
+            if (that.blocks.logo.instrumentNames[0] === undefined || that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
+            that.blocks.logo.synth.trigger(0, actualPitch[0] + actualPitch[1], 1 / 8, DEFAULTVOICE, null, null);
+
+
+            __selectionChanged();
+        };
+
+        // Handler for pitchnumber preview. This is to ensure that
+        // only pitchnumber block's pie menu gets a sound preview
+        if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'pitchnumber'){
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
+            }
+        }
+        
+        // Handler for Hertz preview. Need to also ensure that
+        // only hertz block gets a different sound preview
+        if (this._usePieNumberC1() && this.blocks.blockList[this.connections[0]].name === 'hertz'){
+            for (var i = 0; i < wheelValues.length; i++) {
+                this._numberWheel.navItems[i].navigateFunction = __hertzPreview;
+            }
+        }
     };
 
     this._piemenuColor = function (wheelValues, selectedValue, mode) {
         // input form and  wheelNav pie menu for setcolor selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4519,7 +4643,7 @@ function Block(protoblock, blocks, overrideName) {
         // basic wheelNav pie menu
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4607,7 +4731,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for boolean selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4694,7 +4818,7 @@ function Block(protoblock, blocks, overrideName) {
         // wheelNav pie menu for voice selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -4851,7 +4975,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for interval selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -5037,7 +5161,7 @@ function Block(protoblock, blocks, overrideName) {
         // pie menu for mode selection
 
         if (this.blocks.stageClick) {
-            console.log('stageClick: aborting piemenu display');
+            console.debug('stageClick: aborting piemenu display');
             return;
         }
 
@@ -5423,7 +5547,7 @@ function Block(protoblock, blocks, overrideName) {
 
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
-        console.log('LABEL CHANGED ' + this.name);
+        console.debug('LABEL CHANGED ' + this.name);
 
         if (this === null || this.label === null) {
             this._labelLock = false;
@@ -5688,7 +5812,7 @@ function Block(protoblock, blocks, overrideName) {
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
-        console.log('Showing context menu for ' + this.name);
+        console.debug('Showing context menu for ' + this.name);
 
         // Position the widget centered over the active block.
         docById('contextWheelDiv').style.position = 'absolute';
@@ -5705,16 +5829,15 @@ function Block(protoblock, blocks, overrideName) {
         docById('contextWheelDiv').style.display = '';
 
         labels = ['imgsrc:header-icons/copy-button.svg',
-                  'imgsrc:header-icons/paste-disabled-button.svg',
                   'imgsrc:header-icons/extract-button.svg',
                   'imgsrc:header-icons/empty-trash-button.svg',
                   'imgsrc:header-icons/cancel-button.svg'
                  ];
 
         var topBlock = this.blocks.findTopBlock(thisBlock);
-        if (this.name === 'action') {
-            labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        }
+        // if (this.name === 'action') {
+        //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        // }
 
         if (this.name in BLOCKHELP) {
             labels.push('imgsrc:header-icons/help-button.svg');
@@ -5735,13 +5858,12 @@ function Block(protoblock, blocks, overrideName) {
         wheel.initWheel(labels);
         wheel.createWheel();
 
-        wheel.navItems[0].setTooltip(_('Copy'));
-        wheel.navItems[1].setTooltip(_('Paste'));
-        wheel.navItems[2].setTooltip(_('Extract'));
-        wheel.navItems[3].setTooltip(_('Move to trash'));
-        wheel.navItems[4].setTooltip(_('Close'));
+        wheel.navItems[0].setTooltip(_('Duplicate'));
+        wheel.navItems[1].setTooltip(_('Extract'));
+        wheel.navItems[2].setTooltip(_('Move to trash'));
+        wheel.navItems[3].setTooltip(_('Close'));
         if (this.blocks.blockList[topBlock].name === 'action') {
-            wheel.navItems[5].setTooltip(_('Save stack'));
+            wheel.navItems[4].setTooltip(_('Save stack'));
         }
 
         if (helpButton !== null) {
@@ -5753,35 +5875,30 @@ function Block(protoblock, blocks, overrideName) {
         wheel.navItems[0].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.prepareStackForCopy();
-            wheel.navItems[1].setTitle('imgsrc:header-icons/paste-button.svg');
-            wheel.navItems[1].refreshNavItem(true);
-            wheel.refreshWheel();
+            that.blocks.pasteStack();
+            docById('contextWheelDiv').style.display = 'none';
         };
 
         wheel.navItems[1].navigateFunction = function () {
-            that.blocks.pasteStack();
-        };
-
-        wheel.navItems[2].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.extract();
             docById('contextWheelDiv').style.display = 'none';
         };
 
-        wheel.navItems[3].navigateFunction = function () {
+        wheel.navItems[2].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.extract();
             that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
             docById('contextWheelDiv').style.display = 'none';
         };
 
-        wheel.navItems[4].navigateFunction = function () {
+        wheel.navItems[3].navigateFunction = function () {
             docById('contextWheelDiv').style.display = 'none';
         };
 
         if (this.name === 'action') {
-            wheel.navItems[5].navigateFunction = function () {
-                console.log('CALLING saveStack');
+            wheel.navItems[4].navigateFunction = function () {
+                console.debug('CALLING saveStack');
                 that.blocks.activeBlock = thisBlock;
                 that.blocks.prepareStackForCopy();
                 that.blocks.saveStack();
@@ -5798,7 +5915,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         setTimeout(function () {
-            console.log('Setting stage click to false.');
+            console.debug('Setting stage click to false.');
             that.blocks.stageClick = false;
         }, 500);
     };

@@ -71,12 +71,11 @@ function Planet(isMusicBlocks, storage) {
         this.GlobalPlanet.openGlobalProject(id,error);
     };
 
-    this.init = function() {
+    this.init = async function() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
-
         this.ProjectStorage = new ProjectStorage(this);
-        this.ProjectStorage.init();
+        await this.ProjectStorage.init();
         this.prepareUserID();
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();

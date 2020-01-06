@@ -1,4 +1,4 @@
-window.widgetWindows = { openWindows: {} };
+window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 function WidgetWindow(key, title) {
     // Keep a refernce to the object within handlers
@@ -120,7 +120,7 @@ function WidgetWindow(key, title) {
         e.stopImmediatePropagation();
     };
 
-    this.takeFocus = function() {
+    this.takeFocus = function () {
         let siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
@@ -130,18 +130,22 @@ function WidgetWindow(key, title) {
         this._frame.style.opacity = "1";
     }
 
-    this.addButton = function (icon, iconSize, label) {
-        let el = create("div", "wfbtItem", this._toolbar);
+    this.addButton = function (icon, iconSize, label, parent) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         this._buttons.push(el);
         return el;
     };
 
-    this.addInputButton = function (initial) {
-        let el = create("div", "wfbtItem", this._toolbar);
+    this.addInputButton = function (initial, parent) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
-        this._buttons.push(el);
         return el.querySelector("input");
+    };
+
+    this.addDivider = function () {
+        let el = create("div", "wfbtHR", this._toolbar);
+        return el;
     };
 
     this.modifyButton = function (index, icon, iconSize, label) {
@@ -170,20 +174,22 @@ function WidgetWindow(key, title) {
     this.setPosition = function (x, y) {
         this._frame.style.left = x + "px";
         this._frame.style.top = Math.max(y, 64) + "px";
+        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
 
         return this;
     };
 
     this.sendToCenter = function () {
-        let rect = this._frame.getBoundingClientRect();
-        let width = rect.right - rect.left;
-        let height = rect.bottom - rect.top;
+        let fRect = this._frame.getBoundingClientRect();
+        let cRect = canvas.getBoundingClientRect();
 
-        rect = canvas.getBoundingClientRect();
-        let cw = rect.right - rect.left;
-        let ch = rect.bottom - rect.top;
+        if (cRect.width === 0 || cRect.height === 0) {
+            // The canvas isn't shown so we don't know how large it really is
+            return this;
+        }
 
-        this.setPosition((cw - width) / 2, (ch - height) / 2);
+        this.setPosition((cRect.width - fRect.width) / 2,
+                         (cRect.height - fRect.height) / 2);
 
         return this;
     };
@@ -240,20 +246,24 @@ function WidgetWindow(key, title) {
         this._frame.style.height = "auto";
     };
 
-    this.close = function() {
+    this.close = function () {
         this.onclose();
     }
 
+    if (!!window.widgetWindows._posCache[this._key]) {
+        let _pos = window.widgetWindows._posCache[this._key];
+        this.setPosition(_pos[0], _pos[1]);
+    }
     this.takeFocus();
 };
 
-window.widgetWindows.windowFor = function (widget, title) {
+window.widgetWindows.windowFor = function (widget, title, saveAs) {
     let key = undefined;
     // Check for a blockNo attribute
     if (typeof widget.blockNo !== "undefined")
         key = widget.blockNo;
     // Fall back on the next best thing we have
-    else key = title;
+    else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
         let win = new WidgetWindow(key, title).sendToCenter();
@@ -261,4 +271,27 @@ window.widgetWindows.windowFor = function (widget, title) {
     }
 
     return window.widgetWindows.openWindows[key].unroll();
+};
+
+window.widgetWindows.clear = function (name) {
+    let win = window.widgetWindows.openWindows[name];
+    if (!win) return;
+    if (typeof win.onclose === "function")
+        win.onclose();
+};
+
+window.widgetWindows.isOpen = function (name) {
+    return window.widgetWindows.openWindows[name] ? true : "";
+};
+
+window.widgetWindows.hideWindows = function (name) {
+    Object.values(window.widgetWindows.openWindows).forEach(win => {
+        win._frame.style.display = 'none';
+    });
+};
+
+window.widgetWindows.showWindows = function (name) {
+    Object.values(window.widgetWindows.openWindows).forEach(win => {
+        win._frame.style.display = 'block';
+    });
 };

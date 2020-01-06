@@ -81,7 +81,10 @@ Once Music Blocks is running, you'll want suggestions on how to use it.
 See [Using Music
 Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
 and [Music Blocks
-Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+
+Looking for a block? Find it in the [Palette
+Tables](https://github.com/sugarlabs/musicblocks/blob/master/guide/README.md#APPENDIX_1).
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
@@ -140,6 +143,11 @@ is available.
 Bugs can be reported in the
 [issues section](https://github.com/sugarlabs/musicblocks/issues)
 of this repository.
+
+If possible, please include the browser console log output when
+reporting bugs. To access the console, type ```Ctrl-Shift-J``` on most
+browsers. You may need to set the "Default level" for the console to
+"Verbose" in order to see all of the output.
 
 ## <a name="CONTRIBUTING"></a>Contributing
 

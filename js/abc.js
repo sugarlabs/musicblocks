@@ -264,7 +264,7 @@ processAbcNotes = function (logo, turtle) {
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     } else {
-                        console.log('ignoring ' + notes);
+                        console.debug('ignoring ' + notes);
                         j++;  // Jump to next note.
                         k++;  // Increment notes in tuplet.
                     }
@@ -392,7 +392,7 @@ saveAbcOutput = function(logo) {
     for (var t in logo.notationStaging) {
         turtleCount += 1;
     }
-    console.log('saving as abc: ' + turtleCount);
+    console.debug('saving as abc: ' + turtleCount);
 
     var c = 0;
     for (var t in logo.notationStaging) {

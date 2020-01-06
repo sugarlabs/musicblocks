@@ -87,7 +87,7 @@ function createDefaultStack() {
         language = navigator.language;
     }
 
-    console.log('language setting is ' + language);
+    console.debug('language setting is ' + language);
     if (language === 'ja') {
         DATAOBJS =
             [[0, 'start', (screen.width / 2) + 28, 100, [null, 1, null]],
@@ -192,7 +192,7 @@ function createHelpContent() {
 
     var TITLESTRING = _('Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.')
     if (beginnerMode) {
-	console.log(TITLESTRING);
+	console.debug(TITLESTRING);
         HELPCONTENT = [
             [_('Welcome to Music Blocks'), TITLESTRING, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGO)))],
             [_('Meet Mr. Mouse!'), _('Mr Mouse is our Music Blocks conductor.') + ' ' + _('Mr Mouse encourages you to explore Music Blocks.') + ' ' + _('Let us start our tour!'), 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))],
@@ -494,6 +494,7 @@ function createHelpContent() {
         'storein2': [_('The Store in block will store a value in a box.'), 'documentation', ''],
         'namedbox': [_('The Box block returns the value stored in a box.'), 'documentation', ''],
         // Number palette
+	'distance': [_('The Distance block returns the distance between two points. For example, between the mouse and the center of the screen.'), 'documentation', ''],
         'abs': [_('The Abs block returns the absolute value.'), 'documentation', ''],
         'sqrt': [_('The Sqrt block returns the square root.'), 'documentation', ''],
         'power': [_('The Power block calculates a power function.'), 'documentation', ''],

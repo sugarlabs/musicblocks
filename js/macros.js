@@ -37,7 +37,7 @@
 
 function blockIsMacro (blkname) {
 
-    const BLOCKISMACRO = ['accidental', 'action', 'actionhelp', 'amsynthhelp', 'archelp', 'articulation', 'articulationhelp', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'beatvaluehelp', 'bottle', 'bottomposhelp', 'box1', 'box1help', 'box2', 'box2help', 'bpmhelp', 'broadcasthelp', 'bubbles', 'cat', 'chine', 'chordI', 'chordIV', 'chordV', 'chorushelp', 'chromatic', 'clang', 'clap', 'clickhelp', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'custompitch', 'darbuka', 'decrescendo', 'decrescendohelp', 'definemode', 'deltapitchhelp', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dishelp', 'dohelp', 'dog', 'dothelp', 'doublyhelp', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'duphelp', 'effectshelp', 'eihelp', 'eighthNote', 'elapsedhelp', 'elapsednotes2', 'elifhelp', 'everybeathelp', 'f', 'ff', 'fff', 'fill', 'fillhelp', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fmsynthhelp', 'foreverhelp', 'forwardhelp', 'fourth', 'fourthinterval', 'glide', 'halfNote', 'harmonic', 'harmonic2', 'harmonichelp', 'hihat', 'hollowline', 'ifhelp', 'interval', 'intervalhelp', 'invert', 'invert1', 'inverthelp', 'keyboard', 'kick', 'lrhelp', 'major2', 'major3', 'major6', 'major7', 'makehelp', 'mapdrum', 'mapdrumhelp', 'matrix', 'matrixcmajor', 'matrixgmajor', 'meter', 'meterwidget', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'mousebuttonhelp', 'movable', 'movablehelp', 'mp', 'multiplybeatfactor', 'multiplybeathelp', 'musickeyboard2', 'musickeyboardja', 'neighbor', 'neighbor2', 'neighborhelp', 'neighbor2help', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'swinghelp', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'notecounterhelp', 'octave', 'oneOf', 'oneofhelp', 'osctime', 'osctimehelp', 'p', 'perfect4', 'perfect5', 'perfect8', 'phaserhelp', 'pickup', 'pitch2', 'pitchdrummatrix', 'pitchnumberhelp', 'pitchslider', 'pitchstaircase', 'playdrum', 'playeffect', 'playnoise', 'pp', 'ppp', 'quarterNote', 'randomhelp', 'registerhelp', 'repeathelp', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmicdot2', 'rhythmruler2', 'rhythmruler3', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setbpm2', 'setbpm3', 'setdrum', 'setdrumhelp', 'setdrumvolume', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'setmasterbpm', 'setmasterbpm2', 'settimbre', 'settimbrehelp', 'settemperament', 'setscalartransposition', 'scalartranshelp', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'skiphelp', 'slap', 'slur', 'slurhelp', 'snare', 'splash', 'square', 'staccato', 'staccatohelp', 'startdrum', 'status', 'storebox1', 'storebox2', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'switchhelp', 'temperament', 'tempo', 'third', 'thirtysecondNote', 'tie', 'tiehelp', 'timbre', 'tom', 'tone', 'tremolo', 'tremolohelp', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'turtleshell', 'unison', 'unisoninterval', 'untilhelp', 'vibrato', 'vibratohelp', 'waitforhelp', 'whilehelp', 'wholeNote', 'black', 'white', 'xyhelp', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+    const BLOCKISMACRO = ['accidental', 'action', 'actionhelp', 'amsynthhelp', 'archelp', 'articulation', 'articulationhelp', 'augmented1', 'augmented2', 'augmented3', 'augmented4', 'augmented5', 'augmented6', 'augmented7', 'augmented8', 'backward', 'beatvaluehelp', 'bottle', 'bottomposhelp', 'box1', 'box1help', 'box2', 'box2help', 'bpmhelp', 'broadcasthelp', 'bubbles', 'cat', 'chine', 'chordI', 'chordIV', 'chordV', 'chorushelp', 'chromatic', 'clang', 'clap', 'clickhelp', 'cowbell', 'crash', 'crescendo', 'cricket', 'cup', 'custompitch', 'darbuka', 'decrescendo', 'decrescendohelp', 'definemode', 'deltapitchhelp', 'diminished2', 'diminished3', 'diminished4', 'diminished5', 'diminished6', 'diminished7', 'diminished8', 'dishelp', 'distance', 'dohelp', 'dog', 'dothelp', 'doublyhelp', 'downsixthinterval', 'downthirdinterval', 'downmajor3', 'downmajor6', 'downminor3', 'downminor6', 'downsixth', 'downthird', 'drift', 'duck', 'duplicatenotes', 'duphelp', 'effectshelp', 'eihelp', 'eighthNote', 'elapsedhelp', 'elapsednotes2', 'elifhelp', 'everybeathelp', 'f', 'ff', 'fff', 'fill', 'fillhelp', 'fingercymbals', 'fifth',, 'fifthinterval', 'flat', 'floortom', 'fmsynthhelp', 'foreverhelp', 'forwardhelp', 'fourth', 'fourthinterval', 'glide', 'halfNote', 'harmonic', 'harmonic2', 'harmonichelp', 'hihat', 'hollowline', 'ifhelp', 'interval', 'intervalhelp', 'invert', 'invert1', 'inverthelp', 'keyboard', 'kick', 'lrhelp', 'major2', 'major3', 'major6', 'major7', 'makehelp', 'mapdrum', 'mapdrumhelp', 'matrix', 'matrixcmajor', 'matrixgmajor', 'meter', 'meterwidget', 'mf', 'midi', 'minor2', 'minor3', 'minor6', 'minor7', 'mousebuttonhelp', 'movable', 'movablehelp', 'mp', 'multiplybeatfactor', 'multiplybeathelp', 'musickeyboard2', 'musickeyboardja', 'neighbor', 'neighbor2', 'neighborhelp', 'neighbor2help', 'newnote', 'newslur', 'newstaccato', 'newswing', 'newswing2', 'swinghelp', 'note', 'note1', 'note2', 'note3', 'note4', 'note5', 'note6', 'note7', 'notecounterhelp', 'octave', 'oneOf', 'oneofhelp', 'osctime', 'osctimehelp', 'p', 'perfect4', 'perfect5', 'perfect8', 'phaserhelp', 'pickup', 'pitch2', 'pitchdrummatrix', 'pitchnumberhelp', 'pitchslider', 'pitchstaircase', 'playdrum', 'playeffect', 'playnoise', 'pp', 'ppp', 'quarterNote', 'randomhelp', 'registerhelp', 'repeathelp', 'rest2', 'rhythm2', 'rhythmicdot', 'rhythmicdot2', 'rhythmruler2', 'rhythmruler3', 'ridebell', 'sawtooth', 'second', 'secondinterval', 'semitoneinterval', 'setbpm', 'setbpm2', 'setbpm3', 'setdrum', 'setdrumhelp', 'setdrumvolume', 'setkey2', 'setnotevolume2', 'setsynthvolume', 'setmasterbpm', 'setmasterbpm2', 'settimbre', 'settimbrehelp', 'settemperament', 'setscalartransposition', 'scalartranshelp', 'settransposition', 'setvoice', 'seventh', 'seventhinterval', 'sharp', 'sine', 'sixteenthNote', 'sixth', 'sixthinterval', 'sixtyfourthNote', 'skipnotes', 'skiphelp', 'slap', 'slur', 'slurhelp', 'snare', 'splash', 'square', 'staccato', 'staccatohelp', 'startdrum', 'status', 'storebox1', 'storebox2', 'stuplet', 'stuplet3', 'stuplet5', 'stuplet7', 'swing', 'switch', 'switchhelp', 'temperament', 'tempo', 'third', 'thirtysecondNote', 'tie', 'tiehelp', 'timbre', 'tom', 'tone', 'tremolo', 'tremolohelp', 'triangle', 'trianglebell', 'tuplet3', 'tuplet4', 'turtleshell', 'unison', 'unisoninterval', 'untilhelp', 'vibrato', 'vibratohelp', 'waitforhelp', 'whilehelp', 'wholeNote', 'black', 'white', 'xyhelp', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
     return BLOCKISMACRO.indexOf(blkname) > -1;
 };
 
@@ -45,7 +45,7 @@ function getMacroExpansion (blkname, x, y) {
     // Some blocks are expanded on load.
     const ACCIDENTALOBJ = [[0, 'accidental', x, y, [null, 11, 1, 10]], [1, 'newnote', x, y, [0, 2, 5, 9]], [2, 'divide', 0, 0, [1, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'vspace', 0, 0, [1, 6]], [6, 'pitch', 0, 0, [5, 7, 8, null]], [7, ['solfege', {'value': 'sol'}], 0, 0, [6]], [8, ['number', {'value': 4}], 0, 0, [6]], [9, 'hidden', 0, 0, [1, null]], [10, 'hidden', 0, 0, [0, null]], [11, ['accidentalname', {value: 'natural' + ' ♮'}], 0, 0, [0]]];
     const ACTIONOBJ = [[0, 'action', x, y, [null, 1, 2, null]], [1, ['text', {'value': _('action')}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
-    const ACTIONHELP = [[0, 'action', x, y, [null, 31, 1, null]], [1, 'settimbre', 0, 0, [0, 2, 4, 3]], [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]], [3, 'hidden', 0, 0, [1, null]], [4, 'newnote', 0, 0, [1, 5, 8, 12]], [5, 'divide', 0, 0, [4, 6, 7]], [6, ['number', {'value': 1}], 0, 0, [5]], [7, ['number', {'value': 4}], 0, 0, [5]], [8, 'vspace', 0, 0, [4, 9]], [9, 'pitch', 0, 0, [8, 10, 11, null]], [10, ['solfege', {'value': 'sol'}], 0, 0, [9]], [11, ['number', {'value': 4}], 0, 0, [9]], [12, 'hidden', 0, 0, [4, 13]], [13, 'newnote', 0, 0, [12, 14, 17, 21]], [14, 'divide', 0, 0, [13, 15, 16]], [15, ['number', {'value': 1}], 0, 0, [14]], [16, ['number', {'value': 4}], 0, 0, [14]], [17, 'vspace', 0, 0, [13, 18]], [18, 'pitch', 0, 0, [17, 19, 20, null]], [19, ['solfege', {'value': 'mi'}], 0, 0, [18]], [20, ['number', {'value': 4}], 0, 0, [18]], [21, 'hidden', 0, 0, [13, 22]], [22, 'newnote', 0, 0, [21, 23, 26, 30]], [23, 'divide', 0, 0, [22, 24, 25]], [24, ['number', {'value': 1}], 0, 0, [23]], [25, ['number', {'value': 2}], 0, 0, [23]], [26, 'vspace', 0, 0, [22, 27]], [27, 'pitch', 0, 0, [26, 28, 29, null]], [28, ['solfege', {'value': 'sol'}], 0, 0, [27]], [29, ['number', {'value': 4}], 0, 0, [27]],	[30, 'hidden', 0, 0, [22, null]], [31, ['text', {'value': _('action')}], 0, 0, [0]]];
+    const ACTIONHELP = [[0, 'action', x, y, [null, 31, 1, null]], [1, 'settimbre', 0, 0, [0, 2, 4, 3]], [2, ['voicename', {'value': 'guitar'}], 0, 0, [1]], [3, 'hidden', 0, 0, [1, null]], [4, 'newnote', 0, 0, [1, 5, 8, 12]], [5, 'divide', 0, 0, [4, 6, 7]], [6, ['number', {'value': 1}], 0, 0, [5]], [7, ['number', {'value': 4}], 0, 0, [5]], [8, 'vspace', 0, 0, [4, 9]], [9, 'pitch', 0, 0, [8, 10, 11, null]], [10, ['solfege', {'value': 'sol'}], 0, 0, [9]], [11, ['number', {'value': 4}], 0, 0, [9]], [12, 'hidden', 0, 0, [4, 13]], [13, 'newnote', 0, 0, [12, 14, 17, 21]], [14, 'divide', 0, 0, [13, 15, 16]], [15, ['number', {'value': 1}], 0, 0, [14]], [16, ['number', {'value': 4}], 0, 0, [14]], [17, 'vspace', 0, 0, [13, 18]], [18, 'pitch', 0, 0, [17, 19, 20, null]], [19, ['solfege', {'value': 'mi'}], 0, 0, [18]], [20, ['number', {'value': 4}], 0, 0, [18]], [21, 'hidden', 0, 0, [13, 22]], [22, 'newnote', 0, 0, [21, 23, 26, 30]], [23, 'divide', 0, 0, [22, 24, 25]], [24, ['number', {'value': 1}], 0, 0, [23]], [25, ['number', {'value': 2}], 0, 0, [23]], [26, 'vspace', 0, 0, [22, 27]], [27, 'pitch', 0, 0, [26, 28, 29, null]], [28, ['solfege', {'value': 'sol'}], 0, 0, [27]], [29, ['number', {'value': 4}], 0, 0, [27]], [30, 'hidden', 0, 0, [22, null]], [31, ['text', {'value': _('action')}], 0, 0, [0]]];
     const ARCHELP = [[0, 'everybeatdo', x, y, [null, 1, null]], [1, ['text', {'value': 'action'}], 0, 0, [0]], [2, ['action', {'collapsed': false}], x, y + 100, [null, 3, 4, null]], [3, ['text', {'value': 'action'}], 0, 0, [2]], [4, 'hidden', 0, 0, [2, 5]], [5, 'arc', 0, 0, [4, 8, 7, null]], [6, ['number', {'value': 360}], 0, 0, [8]], [7, ['number', {'value': 100}], 0, 0, [5]], [8, 'multiply', 0, 0, [5, 9, 6]], [9, 'mynotevalue', 0, 0, [8]]];
     const AMSYNTHHELP = [[0, ['newnote', {'collapsed': false}], 0, 0, [9, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': 2}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': 'sol'}], 0, 0, [5]], [7, ['number', {'value': 4}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]], [9, 'settimbre', x, y + 200, [null, 10, 0, 11]], [10, ['voicename', {'value': 'custom'}], 0, 0, [9]], [11, 'hidden', 0, 0, [9, null]], [12, ['timbre', {'collapsed': false}], x, y, [null, 13, 15, 14]], [13, ['text', {'value': 'custom'}], 0, 0, [12]], [14, 'hiddennoflow', 0, 0, [12, null]], [15, 'amsynth', 0, 0, [12, 16, null]], [16, ['number', {'value': 1}], 0, 0, [15]]];
     const ARTICULATIONOBJ = [[0, 'articulation', x, y, [null, 1, null, 2]], [1, ['number', {'value': 25}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
@@ -78,7 +78,7 @@ function getMacroExpansion (blkname, x, y) {
     const CHORDIV = [[0, 'interval', x, y, [null, 1, 3, 2]], [1, ['number', {'value': 5}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]], [3, 'interval', 0, 0, [0, 4, 6, 5]], [4, ['number', {'value': 3}], 0, 0, [3]], [5, 'hidden', 0, 0, [3, null]], [6, ['newnote', {'collapsed': false}], 0, 0, [3, 7, 10, 14]], [7, 'divide', 0, 0, [6, 8, 9]], [8, ['number', {'value': 1}], 0, 0, [7]], [9, ['number', {'value': 1}], 0, 0, [7]], [10, 'vspace', 0, 0, [6, 11]], [11, 'pitch', 0, 0, [10, 12, 13, null]], [12, ['solfege', {'value': 'do'}], 0, 0, [11]], [13, ['number', {'value': 4}], 0, 0, [11]], [14, 'hidden', 0, 0, [6, null]]];
     const CHORDV = [[0, 'interval', x, y, [null, 1, 3, 2]], [1, ['number', {'value': 3}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]], [3, 'interval', 0, 0, [0, 4, 6, 5]], [4, ['number', {'value': 2}], 0, 0, [3]], [5, 'hidden', 0, 0, [3, null]], [6, ['newnote', {'collapsed': false}], 0, 0, [3, 7, 10, 14]], [7, 'divide', 0, 0, [6, 8, 9]], [8, ['number', {'value': 1}], 0, 0, [7]], [9, ['number', {'value': 1}], 0, 0, [7]], [10, 'vspace', 0, 0, [6, 11]], [11, 'pitch', 0, 0, [10, 12, 13, null]], [12, ['solfege', {'value': 're'}], 0, 0, [11]], [13, ['number', {'value': 4}], 0, 0, [11]], [14, 'hidden', 0, 0, [6, null]]];
     const CHORUSHELP = [[0, 'chorus', x, y, [null, 1, 2, 3, 4, null]], [1, ['number', {'value': 1.5}], 0, 0, [0]], [2, ['number', {'value': 3.5}], 0, 0, [0]], [3, ['number', {'value': 70}], 0, 0, [0]], [4, ['newnote', {'collapsed': false}], 0, 0, [0, 5, 8, 12]], [5, 'divide', 0, 0, [4, 6, 7]], [6, ['number', {'value': 1}], 0, 0, [5]], [7, ['number', {'value': 4}], 0, 0, [5]], [8, 'vspace', 0, 0, [4, 9]], [9, 'pitch', 0, 0, [8, 10, 11, null]], [10, ['solfege', {'value': 'sol'}], 0, 0, [9]], [11, ['number', {'value': 4}], 0, 0, [9]], [12, 'hidden', 0, 0, [4, null]]];
-    const CHROMATIC = [[0, ['musickeyboard', {'collapsed': false}], x, y, [null, 2, 1]], [1, ['hiddennoflow', {}], 0, 0, [0, null]], [2, ['setkey2', {}], 0, 0, [0, 3, 4, 5]], [3, ['notename', {'value': 'C'}], 0, 0, [2]], [4, ['modename', {'value': 'chromatic'}], 0, 0, [2]], [5, ['pitch', {}], 0, 0, [2, 6, 7, 8]], [6, ['solfege', {'value': 'sol'}], 0, 0, [5]], [7, ['number', {'value': 2}], 0, 0, [5]], [8, ['repeat', {}], 0, 0, [5, 9, 10, null]], [9, ['modelength', {}], 0, 0, [8]], [10, ['steppitch', {}], 0, 0, [8, 11, null]], [11, ['number', {'value': -1}], 0, 0, [10]]];
+    const CHROMATIC = [[0, ['musickeyboard', {'collapsed': false}], x, y, [null, 2, 1]], [1, ['hiddennoflow', {}], 0, 0, [0, null]], [2, ['setkey2', {}], 0, 0, [0, 3, 4, 5]], [3, ['notename', {'value': 'C'}], 0, 0, [2]], [4, ['modename', {'value': 'chromatic'}], 0, 0, [2]], [5, ['pitch', {}], 0, 0, [2, 6, 7, 8]], [6, ['solfege', {'value': 'do'}], 0, 0, [5]], [7, ['number', {'value': 5}], 0, 0, [5]], [8, ['repeat', {}], 0, 0, [5, 9, 10, null]], [9, ['modelength', {}], 0, 0, [8]], [10, ['steppitch', {}], 0, 0, [8, 11, null]], [11, ['number', {'value': -1}], 0, 0, [10]]];
     const CLANGOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['effectsname', {'value': 'clang'}], 0, 0, [0]]];
     const CLAPOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['effectsname', {'value': 'clap'}], 0, 0, [0]]];
     const CLICKHELP = [[0, ['start', {'collapsed': false}], x, y, [null, 1, null]], [1, 'setturtlename2', 0, 0, [0, 2, 3]], [2, ['text', {'value': 'snare drum'}], 0, 0, [1]], [3, 'listen', 0, 0, [1, 5, 4, null]], [4, ['text', {'value': 'action'}], 0, 0, [3]], [5, 'myclick', 0, 0, [3]], [6, ['action', {'collapsed': false}], x, y + 200, [null, 7, 8, null]], [7, ['text', {'value': 'action'}], 0, 0, [6]], [8, 'hidden', 0, 0, [6, 9]], [9, ['newnote', {'collapsed': false}], 0, 0, [8, 10, 13, 15]], [10, 'divide', 0, 0, [9, 11, 12]], [11, ['number', {'value': 1}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]], [13, 'vspace', 0, 0, [9, 14]], [14, 'playdrum', 0, 0, [13, 16, null]], [15, 'hidden', 0, 0, [9, null]], [16, 'turtlename', 0, 0, [14]]];
@@ -103,6 +103,7 @@ function getMacroExpansion (blkname, x, y) {
     const DIMINISHED7OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 7'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DIMINISHED8OBJ = [[0, 'semitoneinterval', x, y, [null, 1, 6, 7]], [1, 'plus', 0, 0, [0, 2, 3]], [2, ['intervalname', {'value': 'diminished 8'}], 0, 0, [1]], [3, 'multiply', 0, 0, [1, 4, 5]], [4, ['number', {'value': 0}], 0, 0, [3]], [5, ['number', {'value': 12}], 0, 0, [3]], [6, 'vspace', 0, 0, [0, null]], [7, 'hidden', 0, 0, [0, null]]];
     const DISHELP = [[0, 'dis', x, y, [null, 11, 1, 10]], [1, 'newnote', x, y, [0, 2, 5, 9]], [2, 'divide', 0, 0, [1, 3, 4]], [3, ['number', {'value': 1}], 0, 0, [2]], [4, ['number', {'value': 4}], 0, 0, [2]], [5, 'vspace', 0, 0, [1, 6]], [6, 'pitch', 0, 0, [5, 7, 8, null]], [7, ['solfege', {'value': 'sol'}], 0, 0, [6]], [8, ['number', {'value': 4}], 0, 0, [6]], [9, 'hidden', 0, 0, [1, null]], [10, 'hidden', 0, 0, [0, null]], [11, ['number', {value: 40}], 0, 0, [0]]];
+    const DISTANCEOBJ = [[0, 'distance', x, y, [null, 1, 2, 3, 4]], [1, ['number', {'value': 0}], 0, 0, [0]], [2, ['number', {'value': 0}], 0, 0, [0]], [3, 'x', 0, 0, [0]], [4, 'y', 0, 0, [0]]];
     const DOHELP = [[0, 'do', x, y, [null, 2, 3]], [1, ['text', {'value': 'part 2'}], 790, 122, [2]], [2, 'oneOf', 0, 0, [0, 4, 1]], [3, 'vspace', 0, 0, [0, null]], [4, ['text', {'value': 'part 1'}], 0, 0, [2]]];
     const DOGOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['effectsname', {'value': 'dog'}], 0, 0, [0]]];
     const DOTHELP = [[0, ['newnote', {'collapsed': false}], 0, 0, [18, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': 'sol'}], 0, 0, [5]], [7, ['number', {'value': 4}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]], [9, ['newnote', {'collapsed': false}], 0, 0, [20, 10, 13, 17]], [10, 'divide', 0, 0, [9, 11, 12]], [11, ['number', {'value': 3}], 0, 0, [10]], [12, ['number', {'value': 8}], 0, 0, [10]], [13, 'vspace', 0, 0, [9, 14]], [14, 'pitch', 0, 0, [13, 15, 16, null]], [15, ['solfege', {'value': 'sol'}], 0, 0, [14]], [16, ['number', {'value': 4}], 0, 0, [14]], [17, 'hidden', 0, 0, [9, null]], [18, 'rhythmicdot2', x, y, [null, 19, 0, 20]], [19, ['number', {'value': 1}], 0, 0, [18]], [20, 'hidden', 0, 0, [18, 9]]];
@@ -284,8 +285,8 @@ function getMacroExpansion (blkname, x, y) {
     const TIMBREOBJ = [[0, 'timbre', x, y, [null, 1, 3, 2]], [1, ['text', {'value': _('custom')}], 0, 0, [0]], [2, 'hiddennoflow', 0, 0, [0, null]], [3, 'newnote', 0, 0, [0, 4, 7, 11]], [4, 'divide', 0, 0, [3, 5, 6]], [5, ['number', {'value': 1}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'vspace', 0, 0, [3, 8]], [8, 'pitch', 0, 0, [7, 9, 10, null]], [9, ['solfege', {'value': 'sol'}], 0, 0, [8]], [10, ['number', {'value': 4}], 0, 0, [8]], [11, 'hidden', 0, 0, [3, 12]], [12, 'newnote', 0, 0, [11, 13, 16, 20]], [13, 'divide', 0, 0, [12, 14, 15]], [14, ['number', {'value': 1}], 0, 0, [13]], [15, ['number', {'value': 4}], 0, 0, [13]], [16, 'vspace', 0, 0, [12, 17]], [17, 'pitch', 0, 0, [16, 18, 19, null]], [18, ['solfege', {'value': 'mi'}], 0, 0, [17]], [19, ['number', {'value': 4}], 0, 0, [17]], [20, 'hidden', 0, 0, [12, 21]], [21, 'newnote', 0, 0, [20, 22, 25, 29]], [22, 'divide', 0, 0, [21, 23, 24]], [23, ['number', {'value': 1}], 0, 0, [22]], [24, ['number', {'value': 2}], 0, 0, [22]], [25, 'vspace', 0, 0, [21, 26]], [26, 'pitch', 0, 0, [25, 27, 28, null]], [27, ['solfege', {'value': 'sol'}], 0, 0, [26]], [28, ['number', {'value': 4}], 0, 0, [26]], [29, 'hidden', 0, 0, [21, null]]];
     const TOMOBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': 'tom tom'}], 0, 0, [0]]];
     const TONEOBJ = [[0, 'drift', x, y, [null, 1, null]], [1, 'osctime', 0, 0, [0, 3, 2, null]], [2, 'vspace', 0, 0, [1, 6]], [3, 'divide', 0, 0, [1, 4, 5]], [4, ['number', {'value': 1000}], 0, 0, [3]], [5, ['number', {'value': 3}], 0, 0, [3]], [6, 'hertz', 0, 0, [2, 7, null]], [7, ['number', {'value': 392}], 0, 0, [6]]];
-    const TREMOLOOBJ = [[0, 'tremolo', 0, 0, [null, 1, 2, null, 3]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
-    const TREMOLOHELP = [[0, 'tremolo', 0, 0, [null, 1, 2, 3, 12]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, ['newnote', {'collapsed': false}], 0, 0, [0, 4, 7, 11]], [4, 'divide', 0, 0, [3, 5, 6]], [5, ['number', {'value': 1}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'vspace', 0, 0, [3, 8]], [8, 'pitch', 0, 0, [7, 9, 10, null]], [9, ['solfege', {'value': 'sol'}], 0, 0, [8]], [10, ['number', {'value': 4}], 0, 0, [8]], [11, 'hidden', 0, 0, [3, null]], [12, 'hidden', 0, 0, [0, null]]];
+    const TREMOLOOBJ = [[0, 'tremolo', x, y, [null, 1, 2, null, 3]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, 'hidden', 0, 0, [0, null]]];
+    const TREMOLOHELP = [[0, 'tremolo', x, y, [null, 1, 2, 3, 12]], [1, ['number', {'value': 10}], 0, 0, [0]], [2, ['number', {'value': 50}], 0, 0, [0]], [3, ['newnote', {'collapsed': false}], 0, 0, [0, 4, 7, 11]], [4, 'divide', 0, 0, [3, 5, 6]], [5, ['number', {'value': 1}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'vspace', 0, 0, [3, 8]], [8, 'pitch', 0, 0, [7, 9, 10, null]], [9, ['solfege', {'value': 'sol'}], 0, 0, [8]], [10, ['number', {'value': 4}], 0, 0, [8]], [11, 'hidden', 0, 0, [3, null]], [12, 'hidden', 0, 0, [0, null]]];
     const TRIANGLE1OBJ = [[0, 'playdrum', x, y, [null, 1, null]], [1, ['drumname', {'value': 'triangle bell'}], 0, 0, [0]]];
     const TRIANGLEOBJ = [[0, 'newnote', x, y, [null, 1, 4, 7]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': 4}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'triangle', 0, 0, [4, 6, null]], [6, ['number', {'value': 392}], 0, 0, [5]], [7, 'hidden', 0, 0, [0, null]]];
     const TUPLETOBJ = [[0, 'tuplet3', x, y, [null, 1, 10, 9, 7]], [1, ['number', {'value': 1}], 0, 0, [0]], [2, 'rhythm2', 0, 0, [9, 3, 4, 8]], [3, ['number', {'value': 3}], 0, 0, [2]], [4, 'divide', 0, 0, [2, 5, 6]], [5, ['number', {'value': 1}], 0, 0, [4]], [6, ['number', {'value': 4}], 0, 0, [4]], [7, 'hidden', 0, 0, [0, null]], [8, 'vspace', 0, 0, [2, null]], [9, 'vspace', 0, 0, [0, 2]], [10, 'divide', 0, 0, [0, 11, 12]], [11, ['number', {'value': 1}], 0, 0, [10]], [12, ['number', {'value': 4}], 0, 0, [10]]];
@@ -322,8 +323,8 @@ function getMacroExpansion (blkname, x, y) {
         'accidental': ACCIDENTALOBJ,
         'action': ACTIONOBJ,
         'actionhelp': ACTIONHELP,
-	'archelp': ARCHELP,
-	'amsynthhelp': AMSYNTHHELP,
+        'archelp': ARCHELP,
+        'amsynthhelp': AMSYNTHHELP,
         'articulation': ARTICULATIONOBJ,
         'acticulationhelp': ARTICULATIONHELP,
         'augmented1': AUGMENTED1OBJ,
@@ -335,15 +336,15 @@ function getMacroExpansion (blkname, x, y) {
         'augmented7': AUGMENTED7OBJ,
         'augmented8': AUGMENTED8OBJ,
         'backward': BACKWARDOBJ,
-	'beatvaluehelp': BEATVALUEHELP,
+        'beatvaluehelp': BEATVALUEHELP,
         'bottle': BOTTLEOBJ,
-	'bottomposhelp': BOTTOMPOSHELP,
+        'bottomposhelp': BOTTOMPOSHELP,
         'box1': BOX1,
-	'box1help': BOX1HELP,
+        'box1help': BOX1HELP,
         'box2': BOX2,
-	'box2help': BOX2HELP,
-	'bpmhelp': BPMHELP,
-	'broadcasthelp': BROADCASTHELP,
+        'box2help': BOX2HELP,
+        'bpmhelp': BPMHELP,
+        'broadcasthelp': BROADCASTHELP,
         'bubbles': BUBBLESOBJ,
         'cat': CATOBJ,
         'chine': CHINEOBJ,
@@ -354,7 +355,7 @@ function getMacroExpansion (blkname, x, y) {
         'chromatic': CHROMATIC,
         'clang': CLANGOBJ,
         'clap': CLAPOBJ,
-	'clickhelp': CLICKHELP,
+        'clickhelp': CLICKHELP,
         'cowbell': COWBELLOBJ,
         'crash': CRASHOBJ,
         'crescendo': CRESCENDOOBJ,
@@ -367,7 +368,7 @@ function getMacroExpansion (blkname, x, y) {
         'decrescendohelp': DECRESCENDOHELP,
         'definemode': DEFINEMODEOBJ,
         'deletehelp': DELETEHELP,
-	'deltapitchhelp': DELTAPITCHHELP,
+        'deltapitchhelp': DELTAPITCHHELP,
         'diminished2': DIMINISHED2OBJ,
         'diminished3': DIMINISHED3OBJ,
         'diminished4': DIMINISHED4OBJ,
@@ -375,11 +376,12 @@ function getMacroExpansion (blkname, x, y) {
         'diminished6': DIMINISHED6OBJ,
         'diminished7': DIMINISHED7OBJ,
         'diminished8': DIMINISHED8OBJ,
-	'dishelp': DISHELP,
-	'dohelp': DOHELP,
+        'dishelp': DISHELP,
+        'distance': DISTANCEOBJ,
+        'dohelp': DOHELP,
         'dog': DOGOBJ,
-	'dothelp': DOTHELP,
-	'doublyhelp': DOUBLYHELP,
+        'dothelp': DOTHELP,
+        'doublyhelp': DOUBLYHELP,
         'downmajor3': DOWNMAJOR3OBJ,
         'downmajor6': DOWNMAJOR6OBJ,
         'downminor3': DOWNMINOR3OBJ,
@@ -390,16 +392,16 @@ function getMacroExpansion (blkname, x, y) {
         'downthird': DOWNTHIRDOBJ,
         'drift': DRIFTOBJ,
         'duck': DUCKOBJ,
-	'duosynthhelp': DUOSYNTHHELP,
+        'duosynthhelp': DUOSYNTHHELP,
         'duplicatenotes': DUPOBJ,
         'duphelp': DUPHELP,
-	'effectshelp': EFFECTSHELP,
-	'eihelp': EIHELP,  // East indian solfege
+        'effectshelp': EFFECTSHELP,
+        'eihelp': EIHELP,  // East indian solfege
         'eighthNote': EIGHTHOBJ,
-	'elifhelp': ELIFHELP, // if-then-else
-	'elapsedhelp': ELAPSEDHELP,
+        'elifhelp': ELIFHELP, // if-then-else
+        'elapsedhelp': ELAPSEDHELP,
         'elapsednotes2': ELAPSEDNOTESOBJ,
-	'everybeathelp': EVERYBEATHELP,
+        'everybeathelp': EVERYBEATHELP,
         'f': VOLOBJ60,
         'ff': VOLOBJ80,
         'fff': VOLOBJ100,
@@ -410,27 +412,27 @@ function getMacroExpansion (blkname, x, y) {
         'fingercymbals': FINGERCYMBALSOBJ,
         'flat': FLATOBJ,
         'floortom': FLOORTOMOBJ,
-	'fmsynthhelp': FMSYNTHHELP,
-	'foreverhelp': FOREVERHELP,
-	'forwardhelp': FORWARDHELP,
+        'fmsynthhelp': FMSYNTHHELP,
+        'foreverhelp': FOREVERHELP,
+        'forwardhelp': FORWARDHELP,
         'fourth': FOURTHOBJ,
         'fourthinterval': FOURTHINTERVALOBJ,
         'glide': GLIDEOBJ,
         'halfNote': HALFOBJ,
         'harmonic': HARMONICOBJ,
         'harmonic2': HARMONIC2OBJ,
-	'harmonichelp': HARMONICHELP,
+        'harmonichelp': HARMONICHELP,
         'hihat': HIHATOBJ,
         'hollowline': HOLLOWOBJ,
-	'ifhelp': IFHELP,
+        'ifhelp': IFHELP,
         'interval': INTERVALOBJ,
-	'intervalhelp': INTERVALHELP,
+        'intervalhelp': INTERVALHELP,
         'invert': INVERTOBJ,
         'invert1': INVERT1OBJ,
         'inverthelp': INVERTHELP,
-	'keyboard': KEYBOARDOBJ,
+        'keyboard': KEYBOARDOBJ,
         'kick': KICKOBJ,
-	'lrhelp': LRHELP,
+        'lrhelp': LRHELP,
         'major2': MAJOR2OBJ,
         'major3': MAJOR3OBJ,
         'major6': MAJOR6OBJ,
@@ -450,9 +452,9 @@ function getMacroExpansion (blkname, x, y) {
         'minor6': MINOR6OBJ,
         'minor7': MINOR7OBJ,
         'modewidget': MODEWIDGETOBJ,
-	'mousebuttonhelp': MOUSEBUTTONHELP,
+        'mousebuttonhelp': MOUSEBUTTONHELP,
         'movable': MOVABLEOBJ,
-	'movablehelp': MOVABLEHELP,
+        'movablehelp': MOVABLEHELP,
         'mp': VOLOBJ40,
         'multiplybeatfactor': MULTBEATOBJ,
         'multiplybeathelp': MULTBEATHELP,
@@ -473,7 +475,7 @@ function getMacroExpansion (blkname, x, y) {
         'note6': NOTE6OBJ,  // step pitch +1
         'note7': NOTE7OBJ,  // scale degree 5 4
         'note': NOTEOBJ,
-	'notecounterhelp': NOTECOUNTERHELP,
+        'notecounterhelp': NOTECOUNTERHELP,
         'octave': OCTAVEOBJ,
         'oneOf': ONEOFOBJ,
         'oneofhelp': ONEOFHELP,
@@ -482,11 +484,11 @@ function getMacroExpansion (blkname, x, y) {
         'perfect4': PERFECT4OBJ,
         'perfect5': PERFECT5OBJ,
         'perfect8': PERFECT8OBJ,
-	'phaserhelp': PHASERHELP,
+        'phaserhelp': PHASERHELP,
         'pickup': PICKUPOBJ,
         'pitch2': PITCH2OBJ,
         'pitchdrummatrix': PITCHDRUMMATRIXOBJ,
-	'pitchnumberhelp': PITCHNUMBERHELP,
+        'pitchnumberhelp': PITCHNUMBERHELP,
         'pitchslider': PITCHSLIDEROBJ,
         'musickeyboard2': MUSICKEYBOARDOBJ,
         'musickeyboardja': MUSICKEYBOARDJAOBJ,
@@ -498,9 +500,9 @@ function getMacroExpansion (blkname, x, y) {
         'pp': VOLOBJ20,
         'p': VOLOBJ30,
         'quarterNote': QUARTEROBJ,
-	'randomhelp': RANDOMHELP,
-	'registerhelp': REGISTERHELP,
-	'repeathelp': REPEATHELP,
+        'randomhelp': RANDOMHELP,
+        'registerhelp': REGISTERHELP,
+        'repeathelp': REPEATHELP,
         'rest2': RESTOBJ,
         'rhythm2': RHYTHMOBJ,
         'rhythmicdot': DOTOBJ,
@@ -522,10 +524,10 @@ function getMacroExpansion (blkname, x, y) {
         'setnotevolume2': VOLOBJ,
         'setsynthvolume': SETSYNTHVOLUMEOBJ,
         'setscalartransposition': SETSCALARTRANSPOBJ,
-	'scalartranshelp': SCALARTRANSHELP,
+        'scalartranshelp': SCALARTRANSHELP,
         'settransposition': SETTRANSPOSITIONOBJ,
         'settimbre': SETTIMBREOBJ,
-	'settimbrehelp': SETTIMBREHELP,
+        'settimbrehelp': SETTIMBREHELP,
         'settemperament':SETTEMPERAMENTOBJ,
         'setvoice': SETVOICEOBJ,
         'seventh': SEVENTHOBJ,
@@ -540,7 +542,7 @@ function getMacroExpansion (blkname, x, y) {
         'skiphelp': SKIPHELP,
         'slap': SLAPOBJ,
         'slur': SLUROBJ,
-	'slurhelp': SLURHELP,
+        'slurhelp': SLURHELP,
         'snare': SNAREOBJ,
         'splash': SPLASHOBJ,
         'square': SQUAREOBJ,
@@ -557,7 +559,7 @@ function getMacroExpansion (blkname, x, y) {
         'swing': SWINGOBJ,
         'switch': SWITCHOBJ,
         'switchhelp': SWITCHHELP,
-	'swinghelp': SWINGHELP,
+        'swinghelp': SWINGHELP,
         'setmasterbpm2': TEMPOOBJ2,
         'temperament': TEMPERAMENTOBJ,
         'tempo': TEMPOOBJ,
@@ -565,26 +567,26 @@ function getMacroExpansion (blkname, x, y) {
         'thirdinterval': THIRDINTERVALOBJ,
         'thirtysecondNote': THIRTYSECONDOBJ,
         'tie': TIEOBJ,
-	'tiehelp': TIEHELP,
+        'tiehelp': TIEHELP,
         'timbre': TIMBREOBJ,
         'tom': TOMOBJ,
         'tone': TONEOBJ,
-	'tremolo': TREMOLOOBJ,
-	'tremolohelp': TREMOLOHELP,
+        'tremolo': TREMOLOOBJ,
+        'tremolohelp': TREMOLOHELP,
         'triangle': TRIANGLEOBJ,
         'trianglebell': TRIANGLE1OBJ,
         'tuplet3': TUPLETOBJ,
         'tuplet4': TUPLET4OBJ,
-	'turtleshell': TURTLESHELLOBJ,
+        'turtleshell': TURTLESHELLOBJ,
         'unison': UNISONOBJ,
         'unisoninterval': UNISONINTERVALOBJ,
-	'untilhelp': UNTILHELP,
+        'untilhelp': UNTILHELP,
         'vibrato': VIBRATOOBJ,
         'vibratohelp': VIBRATOHELP,
-	'waitforhelp': WAITFORHELP,
+        'waitforhelp': WAITFORHELP,
         'whilehelp': WHILEHELP,
         'wholeNote': WHOLEOBJ,
-	'xyhelp': XYHELP,
+        'xyhelp': XYHELP,
 
         'black': BLACKOBJ,
         'white': WHITEOBJ,

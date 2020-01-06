@@ -75,7 +75,7 @@ function Toolbar() {
         };
     };
 
-    this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
+    this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, mxml_onclick, blockartworksvg_onclick) {
         var saveButton = docById('saveButton');
             console.log('ADVANCED MODE BUTTONS');
             
@@ -95,7 +95,6 @@ function Toolbar() {
             saveButton.style.display = 'block';
 
             saveButton.onclick = function () {
-
                 var saveHTML = docById('save-html');
 
                 saveHTML.onclick = function () {
@@ -150,6 +149,12 @@ function Toolbar() {
 
                     saveABC.onclick = function () {
                         abc_onclick();
+                    };
+
+                    var saveMXML = docById('save-mxml');
+
+                    saveMXML.onclick = function () {
+                        mxml_onclick();
                     };
                 }
 
@@ -431,6 +436,7 @@ function Toolbar() {
             ['save-wav', _('Save music as WAV'), 'innerHTML'],
             ['save-abc', _('Save sheet music as ABC'), 'innerHTML'],
             ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
+            ['save-mxml', _('Save sheet music as MusicXML'), 'innerHTML'],
             ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
             ['new-project', _('Confirm'), 'innerHTML'],
             ['enUS', _('English (United States)'), 'innerHTML'],

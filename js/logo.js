@@ -41,7 +41,6 @@ const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
 
 function Logo () {
-
     this.canvas = null;
     this.blocks = null;
     this.turtles = null;
@@ -304,6 +303,7 @@ function Logo () {
     this.pickupPoint = {};
     this.runningLilypond = false;
     this.runningAbc = false;
+    this.runningMxml = false;
     this.checkingCompletionState = false;
     this.compiling = false;
     this.recording = false;
@@ -734,7 +734,7 @@ function Logo () {
      * @returns {boolean}
      */
     this.recordingStatus = function () {
-        return this.recording || this.runningLilypond || this.runningAbc;
+        return this.recording || this.runningLilypond || this.runningAbc || this.runningMxml;
     };
 
     /**
@@ -777,7 +777,7 @@ function Logo () {
 
         document.body.style.cursor = 'default';
         if (this.showBlocksAfterRun) {
-            console.log('SHOW BLOCKS');
+            console.debug('SHOW BLOCKS');
             this.showBlocks();
             document.getElementById('stop').style.color = 'white';
         }
@@ -828,6 +828,7 @@ function Logo () {
             case 'minus':
             case 'multiply':
             case 'power':
+            case 'distance':
             case 'divide':
             case 'namedbox':
             case 'box':
@@ -912,6 +913,7 @@ function Logo () {
             case 'minus':
             case 'multiply':
             case 'power':
+            case 'distance':
                 value = toFixed2(this.blocks.blockList[blk].value);
                 break;
             case 'divide':
@@ -1137,7 +1139,7 @@ function Logo () {
                 break;
                 // Deprecated
             case 'bpmfactor':
-                console.log(this.bpm[turtle]);
+                console.debug(this.bpm[turtle]);
                 if (this.bpm[turtle].length > 0) {
                     value = last(this.bpm[turtle]);
                 } else {
@@ -1201,16 +1203,16 @@ function Logo () {
      */
     this.initMediaDevices = function () {
         var that = this;
-        console.log('INIT MICROPHONE');
+        console.debug('INIT MICROPHONE');
         if (_THIS_IS_MUSIC_BLOCKS_) {
             var mic = new Tone.UserMedia();
             try {
                 mic.open();
             } catch (e) {
-                console.log('MIC NOT FOUND');
-                console.log(e.name + ': ' + e.message);
+                console.debug('MIC NOT FOUND');
+                console.debug(e.name + ': ' + e.message);
 
-                console.log(mic);
+                console.debug(mic);
                 that.errorMsg(NOMICERRORMSG);
                 mic = null;
             }
@@ -1222,7 +1224,7 @@ function Logo () {
                 this.mic = new p5.AudioIn()
                 that.mic.start();
             } catch (e) {
-                console.log(e);
+                console.debug(e);
                 this.errorMsg(NOMICERRORMSG);
                 this.mic = null;
             }
@@ -1346,7 +1348,7 @@ function Logo () {
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
         this.pitchNumberOffset[turtle] = 39; // C4
-        this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.compiling;
+        this.suppressOutput[turtle] = this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.moveable[turtle] = false;
         this.inNeighbor[turtle] = [];
         this.neighborStepPitch[turtle] = [];
@@ -1387,13 +1389,13 @@ function Logo () {
         this.prematureRestart = this.alreadyRunning;
         if (this.alreadyRunning && this.runningBlock !== null) {
             this.ignoringBlock = this.runningBlock;
-            console.log(this.alreadyRunning + ' ' + this.runningBlock);
+            console.debug(this.alreadyRunning + ' ' + this.runningBlock);
         } else {
             this.ignoringBlock = null;
         }
 
         if (this.lastNoteTimeout != null) {
-            console.log('clearing lastNoteTimeout');
+            console.debug('clearing lastNoteTimeout');
             clearTimeout(this.lastNoteTimeout);
             this.lastNoteTimeout = null;
         }
@@ -1482,7 +1484,7 @@ function Logo () {
         }
 
         // Set up status block
-        if (docById('statusDiv').style.visibility === 'visible') {
+        if (window.widgetWindows.isOpen('status')) {
             // Ensure widget has been created before trying to
             // initialize it.
             if (this.statusMatrix === null) {
@@ -1543,14 +1545,14 @@ function Logo () {
 
         // Make sure that there is atleast one turtle.
         if (this.turtles.turtleList.length === 0) {
-            console.log('No start block... adding a turtle');
+            console.debug('No start block... adding a turtle');
             this.turtles.addTurtle(null);
         }
 
         // And mark all turtles as not running.
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             if (this.turtles.turtleList[turtle].running) {
-                console.log('already running...');
+                console.debug('already running...');
             }
 
             this.turtles.turtleList[turtle].running = false;
@@ -1576,7 +1578,7 @@ function Logo () {
             this.parameterQueue[turtle] = [];
 
             if (this.turtles.turtleList[turtle].running) {
-                console.log('already running...');
+                console.debug('already running...');
             }
 
             this.turtles.turtleList[turtle].running = true;
@@ -1593,7 +1595,7 @@ function Logo () {
                     this.parameterQueue[turtle] = [];
 
                     if (this.turtles.turtleList[turtle].running) {
-                        console.log('already running...');
+                        console.debug('already running...');
                     }
 
                     this.turtles.turtleList[turtle].running = true;
@@ -1621,7 +1623,7 @@ function Logo () {
                         that.parameterQueue[turtle] = [];
                         if (!that.turtles.turtleList[turtle].trash) {
                             if (that.turtles.turtleList[turtle].running) {
-                                console.log('already running...');
+                                console.debug('already running...');
                             }
 
                             that.turtles.turtleList[turtle].running = true;
@@ -1631,7 +1633,7 @@ function Logo () {
                 }
             }, delayStart);
         } else {
-            console.log('Empty start block: ' + turtle + ' ' + this.suppressOutput[turtle]);
+            console.debug('Empty start block: ' + turtle + ' ' + this.suppressOutput[turtle]);
             if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
@@ -1692,7 +1694,7 @@ function Logo () {
     this._blockSetter = function (blk, value, turtle) {
         var turtleObj = this.turtles.turtleList[turtle];
 
-        console.log(this.blocks.blockList[blk].name);
+        console.debug(this.blocks.blockList[blk].name);
         switch (this.blocks.blockList[blk].name) {
         case 'x':
             turtleObj.doSetXY(value, turtleObj.y);
@@ -1847,7 +1849,7 @@ function Logo () {
         if (that.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < that.blocks.blockList[blk].protoblock.args + 1; i++) {
                 if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null) {
-                    console.log('skipping null inflow args');
+                    console.debug('skipping null inflow args');
                 } else {
                     args.push(that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i], blk, receivedArg));
                 }
@@ -2004,11 +2006,11 @@ function Logo () {
                         that.notationLineBreak(turtle);
                     }
 
-                    console.log('action: ' + args[0]);
+                    console.debug('action: ' + args[0]);
                     childFlow = that.actions[args[0]];
                     childFlowCount = 1;
                 } else {
-                    console.log('action ' + args[0] + ' not found');
+                    console.debug('action ' + args[0] + ' not found');
                     that.errorMsg(NOACTIONERRORMSG, blk, args[0]);
                 }
             }
@@ -2141,7 +2143,7 @@ function Logo () {
             break;
         case 'comment':
             if (args[0] !== null) {
-                console.log(args[0].toString());
+                console.debug(args[0].toString());
                 if (!that.suppressOutput[turtle] && that.turtleDelay > 0) {
                     that.textMsg(args[0].toString());
                 }
@@ -2201,7 +2203,7 @@ function Logo () {
 
                 var newBlock = [[0, 'start', x, y, [null, 1, null]], [1, 'setturtlename2', 0, 0, [0, 2, null]], [2, ['text', {'value': turtleName}], 0, 0, [1]]];
                 var __afterLoad = function () {
-                    console.log('AFTERLOAD');
+                    console.debug('AFTERLOAD');
                     var thisTurtle = that.blocks.blockList[blockNumber].value;
                     that.initTurtle(thisTurtle);
                     that.turtles.turtleList[thisTurtle].queue = [];
@@ -2224,7 +2226,7 @@ function Logo () {
 
                 that.blocks.loadNewBlocks(newBlock);
             } else {
-                console.log('Turtle ' + turtleName + ' already exists.');
+                console.debug('Turtle ' + turtleName + ' already exists.');
                 that.stage.dispatchEvent(turtleName);
             }
             break;
@@ -2900,7 +2902,7 @@ function Logo () {
                 that.parentFlowQueue[targetTurtle] = [];
                 that.unhighlightQueue[targetTurtle] = [];
                 that.parameterQueue[targetTurtle] = [];
-                console.log('stopping ' + targetTurtle);
+                console.debug('stopping ' + targetTurtle);
                 that._doBreak(targetTurtle);
             }
             break;
@@ -3374,16 +3376,16 @@ function Logo () {
             xmlHttp.open('GET', url, false );
             xmlHttp.send();
             if (xmlHttp.readyState === 4  && xmlHttp.status === 200) {
-                console.log(xmlHttp.responseText);
+                console.debug(xmlHttp.responseText);
                 try {
                     var data = JSON.parse(xmlHttp.responseText);
                 } catch (e) {
-                    console.log(e);
+                    console.debug(e);
                     that.errorMsg(_('Error parsing JSON data:') + e);
                 }
             }
             else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                console.log('fetched the wrong page or network error...');
+                console.debug('fetched the wrong page or network error...');
                 that.errorMsg(_('404: Page not found'));
                 break;
             }
@@ -4455,7 +4457,7 @@ function Logo () {
 
             // If we are just counting notes we don't care about the pitch.
             if (that.justCounting[turtle].length > 0 && that.lastNotePlayed[turtle] == null) {
-                console.log('Just counting, so spoofing last note played.');
+                console.debug('Just counting, so spoofing last note played.');
                 that.previousNotePlayed[turtle] = ['G4', 4];
                 that.lastNotePlayed[turtle] = ['G4', 4];
             }
@@ -4705,7 +4707,7 @@ function Logo () {
             that.pushedNote[turtle] = true;
             break;
         case 'setpitchnumberoffset':
-            console.log(args[0] + ' ' + args[1]);
+            console.debug(args[0] + ' ' + args[1]);
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg0 = 'C';
@@ -4799,7 +4801,7 @@ function Logo () {
                     // Negative numbers will throw an error.
                     if (arg0 < 13) { // moveable solfege
                         if (arg0 < 1) {
-                            console.log(arg0);
+                            console.debug(arg0);
                             that.errorMsg(INVALIDPITCH, blk);
                             arg0 = 7;  // throws an error
                         }
@@ -4811,7 +4813,7 @@ function Logo () {
                     } else {
                         if (arg0 < A0 || arg0 > C8) {
                             that.errorMsg(INVALIDPITCH, blk);
-                            console.log(arg0);
+                            console.debug(arg0);
                             arg0 = 398;
                         }
 
@@ -4836,7 +4838,7 @@ function Logo () {
                     }
 
                     if (arg0 === 0) {
-                        console.log(arg0);
+                        console.debug(arg0);
                         that.errorMsg(INVALIDPITCH, blk);
                         note = 7;
                     }
@@ -4862,7 +4864,7 @@ function Logo () {
                         var octave = Math.floor(calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], that.currentNote)) + deltaOctave;
                     }
 
-                    console.log('that.currentNote = ' + that.currentNote);
+                    console.debug('that.currentNote = ' + that.currentNote);
                     var cents = 0;
                 } else {
                     var cents = 0;
@@ -4873,11 +4875,11 @@ function Logo () {
 
                     that.currentNote = note;
                     if (calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], that.currentNote) < 0) {
-                        console.log('minimum allowable octave is 0');
+                        console.debug('minimum allowable octave is 0');
                         var octave = 0;
                     } else if (calcOctave(that.currentOctave[turtle], arg1, that.lastNotePlayed[turtle], that.currentNote) > 9) {
                         // Humans can only hear 10 octaves.
-                        console.log('clipping octave at 9');
+                        console.debug('clipping octave at 9');
                         var octave = 9;
                     } else {
                         // Octave must be a whole number.
@@ -5133,7 +5135,12 @@ function Logo () {
 
                     if (that.blocks.blockList[blk].name == 'scaledegree') {
                         var noteObj = getNote(that.currentNote, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], that.currentNote), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
-                    } else {
+                    } else if (that.blocks.blockList[blk].name == 'pitchnumber'){
+                        //For pitch number, need to translate number value to pitch
+                        var getNumberToPitch = numberToPitch(Math.floor(arg0 + that.pitchNumberOffset[turtle]), that.synth.inTemperament, that.synth.startingPitch, that.pitchNumberOffset[turtle]);
+                        var noteObj = getNote(getNumberToPitch[0], calcOctave(that.currentCalculatedOctave[turtle], getNumberToPitch[1], that.lastPitchPlayed[turtle], getNumberToPitch[0]), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
+                    }
+                    else {
                         var noteObj = getNote(arg0, calcOctave(that.currentCalculatedOctave[turtle], arg1, that.lastPitchPlayed[turtle], arg0), 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     }
 
@@ -5623,7 +5630,7 @@ function Logo () {
                 that.dotCount[turtle] += arg;
             } else if (arg === -1) {
                 that.errorMsg(_('An argument of -1 results in a note value of 0.'), blk);
-                console.log('ignoring dot arg of -1');
+                console.debug('ignoring dot arg of -1');
                 arg = 0;
             } else {
                 that.dotCount[turtle] += 1 / arg;
@@ -5682,7 +5689,7 @@ function Logo () {
                 }
 
                 if (that.instrumentNames[turtle].indexOf(synth) === -1) {
-                    // console.log('pushing ' + synth + ' to instrumentNames');
+                    // console.debug('pushing ' + synth + ' to instrumentNames');
                     that.instrumentNames[turtle].push(synth);
                     that.synth.loadSynth(turtle, synth);
 
@@ -5700,7 +5707,7 @@ function Logo () {
 
                 var __listener = function (event) {
                     that.inSetTimbre[turtle] = false;
-                    // console.log('popping ' + that.instrumentNames[turtle].pop() + ' from instrumentNames');
+                    // console.debug('popping ' + that.instrumentNames[turtle].pop() + ' from instrumentNames');
                     that.instrumentNames[turtle].pop();
                 };
 
@@ -6326,7 +6333,7 @@ function Logo () {
             childFlowCount = 1;
 
             that.glideOverride[turtle] = that._noteCounter(turtle, childFlow);
-            console.log('length of glide ' + that.glideOverride[turtle]);
+            console.debug('length of glide ' + that.glideOverride[turtle]);
 
             var listenerName = '_glide_' + turtle;
             that._setDispatchBlock(blk, turtle, listenerName);
@@ -6558,7 +6565,7 @@ function Logo () {
                     // Check for a race condition.
                     // FIXME: Do something about the race condition.
                     if (that.connectionStoreLock) {
-                        console.log('LOCKED');
+                        console.debug('LOCKED');
                     }
 
                     that.connectionStoreLock = true;
@@ -6585,7 +6592,7 @@ function Logo () {
                 // Test for race condition.
                 // FIXME: Do something about the race condition.
                 if (that.connectionStoreLock) {
-                    console.log('LOCKED');
+                    console.debug('LOCKED');
                 }
 
                 that.connectionStoreLock = true;
@@ -6896,7 +6903,7 @@ function Logo () {
                 break;
             }
 
-            if (args[0] === null || typeof(args[0] !== 'number')) {
+	    if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg = 0;
             } else {
@@ -6906,10 +6913,10 @@ function Logo () {
             for (var synth in that.synthVolume[turtle]) {
                 var newVolume = last(that.synthVolume[turtle][synth]) * (100 + arg) / 100;
                 if (newVolume > 100) {
-                    console.log('articulated volume exceeds 100%. clipping');
+                    console.debug('articulated volume exceeds 100%. clipping');
                     newVolume = 100;
                 } else if (newVolume < -100) {
-                    console.log('articulated volume exceeds 100%. clipping');
+                    console.debug('articulated volume exceeds 100%. clipping');
                     newVolume = -100;
                 }
 
@@ -7696,7 +7703,7 @@ function Logo () {
 
             if (that.blocks.blockList[args[0]].name === 'start') {
                 var thisTurtle = that.blocks.blockList[args[0]].value;
-                console.log('run start ' + thisTurtle);
+                console.debug('run start ' + thisTurtle);
                 that.initTurtle(thisTurtle);
                 that.turtles.turtleList[thisTurtle].queue = [];
                 that.parentFlowQueue[thisTurtle] = [];
@@ -7711,25 +7718,25 @@ function Logo () {
             break;
         case 'dockblock':
             if (args.length < 3) {
-                console.log(args.length + ' < 3');
+                console.debug(args.length + ' < 3');
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;
             }
 
             if (args[0] < 0 || args[0] > that.blocks.blockList.length - 1) {
-                console.log(args[0] + ' > ' + that.blocks.blockList.length - 1);
+                console.debug(args[0] + ' > ' + that.blocks.blockList.length - 1);
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;
             }
 
             if (args[0] === args[2]) {
-                console.log(args[0] + ' == ' + args[2]);
+                console.debug(args[0] + ' == ' + args[2]);
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;
             }
 
             if (args[2] < 0 || args[2] > that.blocks.blockList.length - 1) {
-                console.log(args[2] + ' > ' + that.blocks.blockList.length - 1);
+                console.debug(args[2] + ' > ' + that.blocks.blockList.length - 1);
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;
             }
@@ -7738,7 +7745,7 @@ function Logo () {
                 // Find the last connection.
                 args[1] = that.blocks.blockList[args[0]].connections.length - 1;
             } else if (args[1] < 1 || args[1] > that.blocks.blockList[args[0]].connections.length - 1) {
-                console.log(args[1] + ' out of bounds');
+                console.debug(args[1] + ' out of bounds');
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 break;
             }
@@ -7835,13 +7842,11 @@ function Logo () {
                 }
             }
         } else {
-            console.log('Ignoring block on overlapped start.');
+            console.debug('Ignoring block on overlapped start.');
         }
 
-        if (docById('statusDiv').style.visibility === 'visible') {
-            if (!that.inStatusMatrix) {
-                that.statusMatrix.updateAll();
-            }
+        if (that.statusMatrix && that.statusMatrix.isOpen && !that.inStatusMatrix) {
+            that.statusMatrix.updateAll();
         }
 
         // If there is a child flow, queue it.
@@ -7859,7 +7864,7 @@ function Logo () {
                 that.parentFlowQueue[turtle].push(blk);
                 that.turtles.turtleList[turtle].queue.push(queueBlock);
             } else {
-                console.log('cannot find queue for turtle ' + turtle);
+                console.debug('cannot find queue for turtle ' + turtle);
             }
         }
 
@@ -7903,7 +7908,7 @@ function Logo () {
                     // If we are at the end of the child flow, queue the
                     // unhighlighting of the parent block to the flow.
                     if (that.unhighlightQueue[turtle] === undefined) {
-                        console.log('cannot find highlight queue for turtle ' + turtle);
+                        console.debug('cannot find highlight queue for turtle ' + turtle);
                     } else if (that.parentFlowQueue[turtle].length > 0 && that.turtles.turtleList[turtle].queue.length > 0 && last(that.turtles.turtleList[turtle].queue).parentBlk !== last(that.parentFlowQueue[turtle])) {
                         that.unhighlightQueue[turtle].push(last(that.parentFlowQueue[turtle]));
                         // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
@@ -7911,7 +7916,7 @@ function Logo () {
                         // The child flow is finally complete, so unhighlight.
                         setTimeout(function () {
                             if (!turtle in that.unhighlightQueue) {
-                                console.log('turtle ' + turtle + ' not found in unhighlightQueue');
+                                console.debug('turtle ' + turtle + ' not found in unhighlightQueue');
                                 return;
                             }
 
@@ -7942,7 +7947,7 @@ function Logo () {
             that.alreadyRunning = false;
 
             if (!that.prematureRestart) {
-                // console.log('Make sure any unissued signals are dispatched.');
+                // console.debug('Make sure any unissued signals are dispatched.');
                 for (var b in that.endOfClampSignals[turtle]) {
                     for (var i = 0; i < that.endOfClampSignals[turtle][b].length; i++) {
                         if (that.endOfClampSignals[turtle][b][i] != null) {
@@ -7971,15 +7976,19 @@ function Logo () {
             __checkCompletionState = function () {
                 if (!that.turtles.running() && queueStart === 0 && that.justCounting[turtle].length === 0) {
                     if (that.runningLilypond) {
-                        console.log('saving lilypond output:');
+                        console.debug('saving lilypond output:');
                         save.afterSaveLilypond();
                         that.runningLilypond = false;
                     } else if (that.runningAbc) {
-                        console.log('saving abc output:');
+                        console.debug('saving abc output:');
                         save.afterSaveAbc();
                         that.runningAbc = false;
+                    } else if (that.runningMxml) {
+                        console.log('saving mxml output');
+                        save.afterSaveMxml();
+                        that.runningMxml = false;
                     } else if (that.suppressOutput[turtle]) {
-                        console.log('finishing compiling');
+                        console.debug('finishing compiling');
                         if (!that.recording) {
                             that.errorMsg(_('Playback is ready.'));
                         }
@@ -8000,15 +8009,15 @@ function Logo () {
                     }
 
                     // Give the last note time to play.
-                    console.log('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
+                    console.debug('SETTING LAST NOTE TIMEOUT: ' + that.recording + ' ' + that.suppressOutput[turtle]);
                     that.lastNoteTimeout = setTimeout(function () {
-                        console.log('LAST NOTE PLAYED');
+                        console.debug('LAST NOTE PLAYED');
                         that.lastNoteTimeout = null;
                         if (that.suppressOutput[turtle] && that.recording) {
                             that.suppressOutput[turtle] = false;
                             that.checkingCompletionState = false;
                             that.saveLocally();
-                            console.log('PLAYBACK FOR RECORD');
+                            console.debug('PLAYBACK FOR RECORD');
                             that.playback(-1, true);
                             // that.recording = false;
                         } else {
@@ -8070,14 +8079,14 @@ function Logo () {
                 if (that.showBlocksAfterRun) {
                     // If this is a status stack, not run showBlocks.
                     if (blk !== null && that.blocks.blockList[blk].connections[0] !== null && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'status') {
-                        console.log('running status block');
+                        console.debug('running status block');
                     } else {
                         that.showBlocks();
                         that.showBlocksAfterRun = false;
                     }
                 }
                 document.getElementById('stop').style.color = 'white';
-                console.log('fin');
+                console.debug('fin');
             }
         }
     };
@@ -8296,7 +8305,7 @@ function Logo () {
             for (var synth in this.synthVolume[turtle]) {
                 var len = this.synthVolume[turtle][synth].length;
                 this.synthVolume[turtle][synth][len - 1] += last(this.crescendoDelta[turtle]);
-                console.log(synth + '= ' + this.synthVolume[turtle][synth][len - 1]);
+                console.debug(synth + '= ' + this.synthVolume[turtle][synth][len - 1]);
                 this._playbackPush(turtle, [this.previousTurtleTime[turtle], 'setsynthvolume', synth, last(this.synthVolume[turtle][synth])]);
                 if (!this.suppressOutput[turtle]) {
                     this.setSynthVolume(turtle, synth, last(this.synthVolume[turtle][synth]));
@@ -8561,7 +8570,7 @@ function Logo () {
 
                 if (that.notePitches[turtle][thisBlk] === undefined) {
                     // Rest?
-                    // console.log('no note found');
+                    // console.debug('no note found');
                     return;
                 }
 
@@ -8741,7 +8750,7 @@ function Logo () {
                                 var d = that.tieCarryOver[turtle];
                             }
 
-                            if (that.runningLilypond) {
+                            if (that.runningLilypond || that.runningMxml) {
                                 that.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
@@ -8781,18 +8790,21 @@ function Logo () {
 
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
-                        // console.log('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
+                        if (obj[0] / obj[1] > 2) {
+                            that.errorMsg(_('Warning: Note value is greater than 2.'), blk);
+                        }
+                        // console.debug('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
                         if (that.justCounting[turtle].length === 0) {
                             if (notes.length === 0) {
-                                console.log('notes to play: R ' + obj[0] + '/' + obj[1]);
+                                console.debug('notes to play: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
+                                console.debug('notes to play: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
                             }
                         } else {
                             if (notes.length === 0) {
-                                console.log('notes to count: R ' + obj[0] + '/' + obj[1]);
+                                console.debug('notes to count: R ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
+                                console.debug('notes to count: ' + notes + ' ' + obj[0] + '/' + obj[1] + notesInfo);
                             }
                         }
                     }
@@ -8895,7 +8907,7 @@ function Logo () {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (notes[d] in that.pitchDrumTable[turtle]) {
                                             if (!that.suppressOutput[turtle]) {
-                                                console.log(that.glide[turtle].length);
+                                                console.debug(that.glide[turtle].length);
                                                 that.synth.trigger(turtle, notes[d], beatValue, that.pitchDrumTable[turtle][notes[d]], null, null, false);
                                             }
 
@@ -8907,12 +8919,12 @@ function Logo () {
                                                 // If we are in a glide, use setNote after the first note.
                                                 if (that.glide[turtle].length > 0) {
                                                     if (that.glideOverride[turtle] === 0) {
-                                                        console.log('glide note ' + beatValue);
+                                                        console.debug('glide note ' + beatValue);
                                                         that.synth.trigger(turtle, notes[d], beatValue, last(that.instrumentNames[turtle]), paramsEffects, filters, true);
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
                                                         var beatValueOverride = bpmFactor / that.glideOverride[turtle];
-                                                        console.log('first glide note: ' + that.glideOverride[turtle] + ' ' + beatValueOverride);
+                                                        console.debug('first glide note: ' + that.glideOverride[turtle] + ' ' + beatValueOverride);
                                                         that.synth.trigger(turtle, notes[d], beatValueOverride, last(that.instrumentNames[turtle]), paramsEffects, filters, false);
                                                         that.glideOverride[turtle] = 0;
                                                     }
@@ -8926,7 +8938,7 @@ function Logo () {
                                             }
                                         } else if (turtle in that.voices && last(that.voices[turtle])) {
                                             if (!that.suppressOutput[turtle]) {
-                                                console.log(that.glide[turtle].length);
+                                                console.debug(that.glide[turtle].length);
                                                 that.synth.trigger(turtle, notes[d], beatValue, last(that.voices[turtle]), paramsEffects, null, false);
                                             }
 
@@ -8973,9 +8985,9 @@ function Logo () {
                         var obj = rationalToFraction(1 / noteBeatValue);
                         if (obj[0] > 0) {
                             if (that.justCounting[turtle].length === 0) {
-                                console.log('drums to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                console.debug('drums to play ' + notes + ' ' + obj[0] + '/' + obj[1]);
                             } else {
-                                console.log('drums to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
+                                console.debug('drums to count ' + notes + ' ' + obj[0] + '/' + obj[1]);
                             }
                         }
 
@@ -9115,7 +9127,7 @@ function Logo () {
         }
 
         if (this.turtles.running()) {
-            console.log(this.turtles.running() + ' PUNTING');
+            console.debug(this.turtles.running() + ' PUNTING');
             if (this.playbackTime === 0)
                 return;
             else {
@@ -9155,7 +9167,7 @@ function Logo () {
             }
         }
 
-        console.log(playbackList.length);
+        console.debug(playbackList.length);
 
         var d = new Date();
         this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
@@ -9309,7 +9321,7 @@ function Logo () {
                     that.turtles.turtleList[turtle].doPenDown();
                     break;
                 default:
-                    console.log(that.playbackQueue[turtle][idx][1]);
+                    console.debug(that.playbackQueue[turtle][idx][1]);
                     break;
                 }
 
@@ -9342,7 +9354,7 @@ function Logo () {
                             }
 
                             setTimeout(function(){
-                                console.log('FINISHING RECORDING');
+                                console.debug('FINISHING RECORDING');
                                 that.synth.recorder.stop();
                                 that.synth.recorder.exportWAV(save.afterSaveWAV.bind(save));
                                 that.recording = false;
@@ -9375,7 +9387,7 @@ function Logo () {
                 }
             }
 
-            console.log('resume index: ' + idx);
+            console.debug('resume index: ' + idx);
 
             if (idx < that.playbackQueue[turtle].length) {
                 __playbackLoop(turtle, idx);
@@ -9390,12 +9402,12 @@ function Logo () {
         this.stopTurtle = false;
 
         if (recording) {
-            console.log('RECORDING');
+            console.debug('RECORDING');
             this.synth.recorder.clear();
             this.synth.recorder.record();
         }
 
-        console.log(this.playbackQueue);
+        console.debug(this.playbackQueue);
 
         if (whichMouse < 0) {
             for (var turtle in this.playbackQueue) {
@@ -9405,13 +9417,13 @@ function Logo () {
                         this.turtles.turtleList[turtle].running = true;
                     }
                     if (recording){
-                        console.log('recording');
+                        console.debug('recording');
                         __playback(turtle);
                     } else if (this.playbackTime > 0) {
-                        console.log('resuming play at ' + this.playbackTime);
+                        console.debug('resuming play at ' + this.playbackTime);
                         __resumePlayback(turtle);
                     } else {
-                        console.log('play');
+                        console.debug('play');
                         __playback(turtle);
                     }
                 }
@@ -9435,12 +9447,12 @@ function Logo () {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
         if (!turtle in this.embeddedGraphics) {
-            console.log('Could not find turtle ' + turtle + 'in embeddedGraphics.');
+            console.debug('Could not find turtle ' + turtle + 'in embeddedGraphics.');
             return;
         }
 
         if (!blk in this.embeddedGraphics[turtle]) {
-            console.log('Could not find blk ' + blk + 'in embeddedGraphics.');
+            console.debug('Could not find blk ' + blk + 'in embeddedGraphics.');
             return;
         }
 
@@ -9895,7 +9907,7 @@ function Logo () {
                 waitTime += NOTEDIV * stepTime;
                 break;
             default:
-                console.log(name + ' is not supported inside of Note Blocks');
+                console.debug(name + ' is not supported inside of Note Blocks');
                 break;
             }
         }
@@ -10154,7 +10166,7 @@ function Logo () {
                     that.parameterQueue[turtle].push(blk);
                 }
             } else {
-                // console.log('turtle ' + turtle + ' has no parameterQueue');
+                // console.debug('turtle ' + turtle + ' has no parameterQueue');
             }
         }
 
@@ -10168,7 +10180,7 @@ function Logo () {
                 try {
                     that.blocks.blockList[blk].value = Number(that.blocks.blockList[blk].value);
                 } catch (e) {
-                    console.log(e);
+                    console.debug(e);
                 }
             }
 
@@ -10377,7 +10389,7 @@ function Logo () {
                             try {
                                 that.blocks.blockList[blk].value = Math.floor(Number(a));
                             } catch (e) {
-                                console.log(e);
+                                console.debug(e);
                                 that.errorMsg(NANERRORMSG, blk);
                                 that.blocks.blockList[blk].value = 0;
                             }
@@ -10416,7 +10428,7 @@ function Logo () {
                     try {
                         that.blocks.blockList[blk].value = !a;
                     } catch (e) {
-                        console.log(e);
+                        console.debug(e);
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         that.blocks.blockList[blk].value = false
                     }
@@ -10434,7 +10446,7 @@ function Logo () {
                     try {
                         that.blocks.blockList[blk].value = (Number(a) > Number(b));
                     } catch (e) {
-                        console.log(e);
+                        console.debug(e);
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         that.blocks.blockList[blk].value = false
                     }
@@ -10452,7 +10464,7 @@ function Logo () {
                     try {
                         that.blocks.blockList[blk].value = (a === b);
                     } catch (e) {
-                        console.log(e);
+                        console.debug(e);
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         that.blocks.blockList[blk].value = false
                     }
@@ -10470,7 +10482,7 @@ function Logo () {
                     try {
                         that.blocks.blockList[blk].value = (Number(a) < Number(b));
                     } catch (e) {
-                        console.log(e);
+                        console.debug(e);
                         that.errorMsg(NOINPUTERRORMSG, blk);
                         that.blocks.blockList[blk].value = false
                     }
@@ -10630,6 +10642,50 @@ function Logo () {
                         if (typeof(a) === 'number' && typeof(b) === 'number') {
 
                             that.blocks.blockList[blk].value = that._doPower(a, b);
+                        } else {
+                            that.errorMsg(NANERRORMSG, blk);
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    }
+                }
+                break;
+            case 'distance':
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'distance']);
+                } else {
+                    var cblk1 = that.blocks.blockList[blk].connections[1];
+                    var cblk2 = that.blocks.blockList[blk].connections[2];
+                    var cblk3 = that.blocks.blockList[blk].connections[3];
+                    var cblk4 = that.blocks.blockList[blk].connections[4];
+                    if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null ) {
+                        that.errorMsg(NOINPUTERRORMSG, blk);
+                        if (cblk1 !== null ) {
+                            var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x1;
+                        }
+                        if (cblk2 !== null) {
+                            var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y1;
+                        } 
+                        if (cblk3 !== null) {
+                            var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                            that.blocks.blockList[blk].value = x2;
+                        } 
+                        if (cblk4 !== null) {
+                            var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                            that.blocks.blockList[blk].value = y2;
+                        } 
+                        if (cblk1 === null && cblk2 === null && cblk3 === null && cblk4 === null ) {
+                            that.blocks.blockList[blk].value = 0;
+                        }
+                    } else {
+                        var x1 = that.parseArg(that, turtle, cblk1, blk, receivedArg);
+                        var y1 = that.parseArg(that, turtle, cblk2, blk, receivedArg);
+                        var x2 = that.parseArg(that, turtle, cblk3, blk, receivedArg);
+                        var y2 = that.parseArg(that, turtle, cblk4, blk, receivedArg);
+                        if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
+
+                            that.blocks.blockList[blk].value = that._docalculatedistance(x1, y1, x2, y2);
                         } else {
                             that.errorMsg(NANERRORMSG, blk);
                             that.blocks.blockList[blk].value = 0;
@@ -11003,7 +11059,9 @@ function Logo () {
                 } else {
                     if (that.lastNotePlayed[turtle] !== null) {
                         that.blocks.blockList[blk].value = that.synth._getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
-                    }
+                    } else {
+                        that.blocks.blockList[blk].value = 0;
+		    }
                 }
                 break;
             case 'turtleelapsednotes':
@@ -11068,7 +11126,7 @@ function Logo () {
                         } else if (that.notePitches[i].length > 0) {
                             var obj = getNote(that.notePitches[i][0], that.noteOctaves[i][0], 0, that.keySignature[i], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
                         } else {
-                            console.log('Cannot find a note for mouse ' + turtle);
+                            console.debug('Cannot find a note for mouse ' + turtle);
                             that.errorMsg(INVALIDPITCH, blk);
                             var obj = ['G', 4];
                         }
@@ -11094,7 +11152,7 @@ function Logo () {
                     } else if (that.notePitches[turtle].length > 0) {
                         var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg, that.synth.inTemperament);
                     } else {
-                        console.log('Cannot find a note for mouse ' + turtle);
+                        console.debug('Cannot find a note for mouse ' + turtle);
                         that.errorMsg(INVALIDPITCH, blk);
                         var obj = ['G', 4];
                     }
@@ -11179,7 +11237,7 @@ function Logo () {
                         var obj = getNote(that.notePitches[turtle][last(that.inNoteBlock[turtle])][0], that.noteOctaves[turtle][last(that.inNoteBlock[turtle])][0], 0, that.keySignature[turtle], that.moveable[turtle], null, that.errorMsg);
                     } else {
                         if (that.lastNotePlayed[turtle] !== null) {
-                            console.log('Cannot find a note ');
+                            console.debug('Cannot find a note ');
                             that.errorMsg(INVALIDPITCH, blk);
                         }
 
@@ -11228,7 +11286,7 @@ function Logo () {
                     } else if (that.notePitches[turtle][last(that.inNoteBlock[turtle])] !== undefined && that.notePitches[turtle][last(that.inNoteBlock[turtle])].length > 0) {
                         value = that.noteBeat[turtle][last(that.inNoteBlock[turtle])];
                     } else {
-                        console.log('Cannot find a note for turtle ' + turtle);
+                        console.debug('Cannot find a note for turtle ' + turtle);
                         value = 0;
                     }
 
@@ -11864,7 +11922,7 @@ function Logo () {
                 if (that.returns.length > 0) {
                     that.blocks.blockList[blk].value = that.returns.pop();
                 } else {
-                    console.log('WARNING: No return value.');
+                    console.debug('WARNING: No return value.');
                     that.blocks.blockList[blk].value = 0;
                 }
                 break;
@@ -11952,7 +12010,7 @@ function Logo () {
                             }
                         }
 
-                        console.log(newBlock);
+                        console.debug(newBlock);
                         that.blocks.loadNewBlocks(newBlock);
                         that.blocks.blockList[blk].value = blockNumber;
                     }
@@ -11962,7 +12020,7 @@ function Logo () {
                 if (that.blocks.blockList[blk].name in that.evalArgDict) {
                     eval(that.evalArgDict[that.blocks.blockList[blk].name]);
                 } else {
-                    console.log('ERROR: I do not know how to ' + that.blocks.blockList[blk].name);
+                    console.debug('ERROR: I do not know how to ' + that.blocks.blockList[blk].name);
                 }
                 break;
             }
@@ -12031,7 +12089,9 @@ function Logo () {
             this.notesPlayed[turtle] = saveNoteCount;
 
             // Restore previous state
+            console.debug(saveBoxes);
             this.boxes = JSON.parse(saveBoxes);
+            console.debug(saveTurtleHeaps);
             this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
             this.turtles.turtleList[turtle].doPenUp();
@@ -12055,7 +12115,7 @@ function Logo () {
             this.butNotThese[turtle] = {};
         }
 
-        return returnValue;
+        return returnValue[0] / returnValue[1];
     };
 
     /**
@@ -12201,6 +12261,28 @@ function Logo () {
 
         return Number(a) * Number(b);
     };
+    /** 
+     * calculate euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y')
+     * @privileged
+     * @param   a
+     * @param   b
+     * @param   c
+     * @param   d
+     * @returns {number}
+     */
+    this._docalculatedistance = function (x1, y1, x2, y2) {
+        if (typeof(x1) === 'string' || typeof(y1) === 'string' || typeof(x2) === 'string' || typeof(y2) === 'string') {
+            this.errorMsg(NANERRORMSG);
+            this.stopTurtle = true;
+            return 0;
+        }
+
+        if (x1 === x2 && y1 === y2) {
+            return(0);
+	}
+
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    };
 
     /**
      * Returns a to the power of b.
@@ -12218,6 +12300,7 @@ function Logo () {
 
         return Math.pow(a, b);
     };
+
 
     /**
      * Divides a by b.
@@ -12426,6 +12509,8 @@ function Logo () {
      * @returns {void}
      */
     this._prepSynths = function () {
+        this.synth.newTone();
+
         for (var turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};
@@ -12528,7 +12613,7 @@ function Logo () {
             var d = durationTime - timeLeftInMeasure;
             var d2 = timeLeftInMeasure;
             var b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
-            console.log('splitting note across measure boundary.');
+            console.debug('splitting note across measure boundary.');
             var obj = rationalToFraction(d);
 
             if (d2 > 0) {
@@ -12619,7 +12704,7 @@ function Logo () {
                     this.notationMarkup(turtle, markup, false);
                 }
             } catch (e) {
-                console.log(e);
+                console.debug(e);
             }
         }
     };
@@ -12749,7 +12834,7 @@ function Logo () {
      */
     this.notationPickup = function (turtle, factor) {
         if (factor === 0) {
-            console.log('ignoring pickup of 0');
+            console.debug('ignoring pickup of 0');
             return;
         }
 

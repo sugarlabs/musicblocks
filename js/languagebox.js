@@ -116,7 +116,7 @@ function LanguageBox() {
         };
 
         localStorage.languagePreference = language;
-        console.log(language);
+        console.debug(language);
         if (language === 'ja' && localStorage.kanaPreference === 'kana') {
             this._message(MSGPrefix + MSG['kana'] + MSGSuffix);
         } else {
