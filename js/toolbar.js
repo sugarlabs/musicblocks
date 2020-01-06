@@ -77,42 +77,25 @@ function Toolbar() {
 
     this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
         var saveButton = docById('saveButton');
-        var saveButtonAdvanced = docById('saveButtonAdvanced');
-        if (beginnerMode) {
-            saveButton.style.display = 'block';
-            saveButtonAdvanced.style.display = 'none';
+            console.log('ADVANCED MODE BUTTONS');
             
-            // saveButton.onclick = function () {
-            //     html_onclick();
-            // };
-            saveButton.onclick = function() {
+            var saveSVGItem = docById('save-svg-item');
+            var saveWAVItem = docById('save-wav-item');
+            var saveABCItem = docById('save-abc-item');
+            var saveLYItem = docById('save-ly-item');
+            var saveBlockSVGItem = docById('save-blockartwork-svg-item');
 
-                
-                var saveHTML = docById('save-html');
-
-                saveHTML.onclick = function () {
-                    html_onclick();
-                };
-
-                var savePNG = docById('save-png');
-                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
-
-                if (svgData == '') {
-                    savePNG.disabled = true;
-                    savePNG.className = 'grey-text inactiveLink';
-                } else {
-                    savePNG.disabled = false;
-                    savePNG.className = '';
-                    savePNG.onclick = function () {
-                        png_onclick();
-                    };
-                }                
+            if(beginnerMode){
+                saveSVGItem.style.display = 'none';
+                saveWAVItem.style.display = 'none';
+                saveABCItem.style.display = 'none';
+                saveLYItem.style.display = 'none';
+                saveBlockSVGItem.style.display = 'none';
             }
-        } else {
-	    console.log('ADVANCED MODE BUTTONS')
-            saveButton.style.display = 'none';
-            saveButtonAdvanced.style.display = 'block';
-            saveButtonAdvanced.onclick = function () {
+            saveButton.style.display = 'block';
+
+            saveButton.onclick = function () {
+
                 var saveHTML = docById('save-html');
 
                 saveHTML.onclick = function () {
@@ -176,7 +159,7 @@ function Toolbar() {
                     blockartworksvg_onclick();
                 };
             }
-        }
+        // }
     };
 
     this.renderPlanetIcon = function (planet, onclick) {
@@ -424,8 +407,8 @@ function Toolbar() {
             ['stop', _('Stop')],
             ['newFile', _('New project')],
             ['load', _('Load project from file')],
-            ['saveButton', _('Save project')],
-            ['saveButtonAdvanced', _('Save project as HTML')],
+            // ['saveButton', _('Save project')],
+            ['saveButton', _('Save project as HTML')],
             ['planetIcon', _('Find and share projects')],
             ['planetIconDisabled', _('Offline. Sharing is unavailable')],
             ['toggleAuxBtn', _('Auxilary menu')],
@@ -508,8 +491,8 @@ function Toolbar() {
             ['stop', _('Stop')],
             ['newFile', _('New project')],
             ['load', _('Load project from file')],
-            ['saveButton', _('Save project')],
-            ['saveButtonAdvanced', _('Save project as HTML')],
+            // ['saveButton', _('Save project')],
+            ['saveButton', _('Save project as HTML')],
             ['planetIcon', _('Find and share projects')],
             ['planetIconDisabled', _('Offline. Sharing is unavailable')],
             ['toggleAuxBtn', _('Auxilary menu')],
