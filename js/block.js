@@ -5548,6 +5548,18 @@ function Block(protoblock, blocks, overrideName) {
     this._labelChanged = function (closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
         console.debug('LABEL CHANGED ' + this.name);
+        
+        //Detect if label is changed, then reinit widget windows
+        //if open
+        var thisBlock = this.blocks.blockList.indexOf(this);
+        var topBlock = this.blocks.findTopBlock(thisBlock);
+        for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++){
+          if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
+            if (closeInput === false){
+              this.blocks.logo.runLogoCommands(topBlock);
+            }
+          }
+        }
 
         if (this === null || this.label === null) {
             this._labelLock = false;
