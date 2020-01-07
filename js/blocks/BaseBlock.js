@@ -77,6 +77,10 @@ class BaseBlock extends ProtoBlock {
         else if (this._style.argTypes[1] === 'booleanin') this.size++;
         else this.size += Math.max(0, this._style.args - 1);
         if (this._style.flows.type === 'arg') this.size++;
+        if (this._style.image) {
+            this.size++;
+            this.image = this._style.image;
+        }
 
         this.staticLabels = [this._style.name || ''];
         this.dockTypes = [];
@@ -137,7 +141,7 @@ class BaseBlock extends ProtoBlock {
             if (!this._style.flows.type) pad += 10;
             if (this._style.outType === 'booleanout' && this._style.args === 2) pad -= 30;
             else if (this._style.argTypes[0] === 'booleanin') pad -= 5;
-            svg.setExpand(pad + this.extraWidth, 0, 0,
+            svg.setExpand(pad + this.extraWidth, this.image ? 23 : 0, 0,
                 this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
             debugLog('setExpand', pad + this.extraWidth, 0, 0, 0);
 
@@ -213,7 +217,10 @@ class BaseBlock extends ProtoBlock {
         }
         if (this._style.name)
             this.adjustWidthToLabel();
-        this.palette.add(this);
+        if (!this.palette)
+            console.warn('Block ' + this.name + ' was not added to a palette!');
+        else
+            this.palette.add(this);
     }
 
     flow() {

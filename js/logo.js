@@ -1998,6 +1998,10 @@ function Logo () {
         case 'setgrey':
         case 'setcolor':
         case 'moveblock':
+        case 'stopvideocam':
+        case 'tone':
+        case 'turtleshell':
+        case 'show':
         case 'forever': {
             let res = that.blocks.blockList[blk].protoblock.flow(args, that, turtle, blk, receivedArg, actionArgs);
             if (res) {
@@ -2083,30 +2087,6 @@ function Logo () {
         case 'movable':  // legacy typo
             if (args.length === 1) {
                 that.moveable[turtle] = args[0];
-            }
-            break;
-        case 'show':
-            if (args.length === 2) {
-                if (that.inNoteBlock[turtle].length > 0) {
-                    that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                } else {
-                    if (!that.suppressOutput[turtle]) {
-                        that._processShow(turtle, blk, args[0], args[1]);
-                    }
-
-                    if (that.justCounting[turtle].length === 0) {
-                        that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'show', args[0], args[1]]);
-                    }
-                }
-            }
-            break;
-        case 'turtleshell':
-            if (args.length === 2) {
-                if (typeof(args[0]) === 'string') {
-                    that.errorMsg(NANERRORMSG, blk);
-                } else {
-                    that.turtles.turtleList[turtle].doTurtleShell(args[0], args[1]);
-                }
             }
             break;
         case 'setturtlename':
@@ -2257,11 +2237,6 @@ function Logo () {
                 that.sounds[sound].stop();
             }
             that.sounds = [];
-            break;
-        case 'stopvideocam':
-            if (cameraID != null) {
-                doStopVideoCam(that.cameraID, that.setCameraID);
-            }
             break;
 
         // Actions for music-related blocks
@@ -5782,8 +5757,6 @@ function Logo () {
             that._setListener(turtle, listenerName, __listener);
             break;
             // Deprecated P5 tone generator replaced by macro.
-        case 'tone':
-            break;
         case 'tone2':
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 if (typeof(that.turtleOscs[turtle]) === 'undefined') {
@@ -9265,24 +9238,6 @@ function Logo () {
             case 'mousey':
                 that.blocks.blockList[blk].value = that.getStageY();
                 break;
-            case 'toppos':
-                that.blocks.blockList[blk].value = (that.turtles._canvas.height / (2.0 * that.turtles.scale));
-                break;
-            case 'rightpos':
-                that.blocks.blockList[blk].value = (that.turtles._canvas.width / (2.0 * that.turtles.scale));
-                break;
-            case 'leftpos':
-                that.blocks.blockList[blk].value = -1 * (that.turtles._canvas.width / (2.0 * that.turtles.scale));
-                break;
-            case 'bottompos':
-                that.blocks.blockList[blk].value = -1 * (that.turtles._canvas.height / (2.0 * that.turtles.scale));
-                break;
-            case 'width':
-                that.blocks.blockList[blk].value = (that.turtles._canvas.width / (that.turtles.scale));
-                break;
-            case 'height':
-                that.blocks.blockList[blk].value = (that.turtles._canvas.height / (that.turtles.scale));
-                break;
             case 'mousebutton':
                 that.blocks.blockList[blk].value = that.getStageMouseDown();
                 break;
@@ -9337,70 +9292,6 @@ function Logo () {
                 that.blocks.blockList[blk].value = color;
                 if (wasVisible) {
                     that.turtles.turtleList[turtle].container.visible = true;
-                }
-                break;
-            case 'loadFile':
-                // No need to do anything here.
-                break;
-            case 'tofrequency':
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    var block = that.blocks.blockList[blk];
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    var cblk2 = that.blocks.blockList[blk].connections[2];
-                    if (cblk1 === null || cblk2 === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 392;
-                    } else {
-                        var note = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        var octave = Math.floor(calcOctave(that.currentOctave[turtle], that.parseArg(that, turtle, cblk2, blk, receivedArg), that.lastNotePlayed[turtle], note));
-                        block.value = Math.round(pitchToFrequency(note, octave, 0, that.keySignature[turtle]));
-                    }
-                } else {
-                    const NOTENAMES = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
-                    const NOTECONVERSION = {'A♯': 'B♭', 'C♯': 'D♭', 'D♯': 'E♭', 'F♯': 'G♭', 'G♯': 'A♭'};
-                    var block = that.blocks.blockList[blk];
-                    var cblk = block.connections[1];
-                    if (cblk === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        var noteName = 'G';
-                    } else {
-                        var noteName = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    }
-
-                    if (typeof(noteName) === 'string') {
-                        noteName = noteName.replace('b', '♭');
-                        noteName = noteName.replace('#', '♯');
-                        if (noteName in NOTECONVERSION) {
-                            noteName = NOTECONVERSION[noteName];
-                        }
-
-                        var idx = NOTENAMES.indexOf(noteName);
-                        if (idx === -1) {
-                            this.errorMsg(_('Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭.'));
-                            block.value = 440;
-                        } else {
-                            var cblk = block.connections[2];
-                            if (cblk === null) {
-                                that.errorMsg(NOINPUTERRORMSG, blk);
-                                var octave = 4;
-                            } else {
-                                var octave = Math.floor(that.parseArg(that, turtle, cblk, blk, receivedArg));
-                            }
-
-                            if (octave < 1) {
-                                octave = 1;
-                            }
-
-                            if (idx > 2) {
-                                octave -= 1;  // New octave starts on C
-                            }
-
-                            var i = octave * 12 + idx;
-                            block.value = 27.5 * Math.pow(1.05946309435929, i);
-                        }
-                    } else {
-                        block.value = 440 * Math.pow(2, (noteName - 69) / 12);
-                    }
                 }
                 break;
             case 'notecounter':
