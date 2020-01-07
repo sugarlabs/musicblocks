@@ -231,7 +231,7 @@ function Tempo () {
         var w = window.innerWidth;
         var iconSize = ICONSIZE;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        var widgetWindow = window.widgetWindows.windowFor(this, "tempo");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
