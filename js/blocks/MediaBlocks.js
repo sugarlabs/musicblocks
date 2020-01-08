@@ -66,44 +66,81 @@ class HeightBlock extends ValueBlock {
     }
 }
 
-/*
-    var newblock = new ProtoBlock('stopplayback');
-    newblock.palette = palettes.dict['media'];
-    blocks.protoBlockDict['stopplayback'] = newblock;
-    //.TRANS: stops playback of an audio recording
-    newblock.staticLabels.push(_('stop play'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    // if (beginnerMode && !beginnerBlock('stopplayback')) {
-        newblock.hidden = true;
-    // }
+class StopPlaybackBlock extends FlowBlock {
+    constructor() {
+        //.TRANS: stops playback of an audio recording
+        super('stopplayback', _('stop play'));
+        this.setPalette('media');
+    
+        this.hidden = true;
+    }
 
-    var newblock = new ProtoBlock('playback');
-    newblock.palette = palettes.dict['media'];
-    blocks.protoBlockDict['playback'] = newblock;
-    newblock.defaults.push(null);
-    //.TRANS: play an audio recording
-    newblock.staticLabels.push(_('play back'));
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    newblock.dockTypes[1] = 'mediain';
-    // if (beginnerMode && !beginnerBlock('playback')) {
-        newblock.hidden = true;
-    // }
+    flow(args, logo) {
+        for (var sound in logo.sounds) {
+            logo.sounds[sound].stop();
+        }
+        logo.sounds = [];
+    }
+}
 
+class PlaybackBlock extends FlowBlock {
+    constructor() {
+        //.TRANS: play an audio recording
+        super('playback', _('play back'));
+        this.setPalette('media');
+        this.formBlock({
+            args: 1, defaults: [null],
+            argTypes: ['medain']
+        })
+
+        this.hidden = true;
+    }
+
+    flow(args, logo, turtle, blk) {
+        if (args[0] === null) {
+            logo.errorMsg(NOINPUTERRORMSG, blk);
+            return;
+        }
+
+        var sound = new Howl({
+            urls: [args[0]]
+        });
+        logo.sounds.push(sound);
+        sound.play();
+    }
+}
+
+class SpeakBlock extends FlowBlock {
     // Eliminating until we find a better option.
-    var newblock = new ProtoBlock('speak');
-    newblock.palette = palettes.dict['media'];
-    blocks.protoBlockDict['speak'] = newblock;
-    newblock.staticLabels.push(_('speak'));
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    newblock.defaults.push('hello');
-    newblock.dockTypes[1] = 'textin';
-    // if (beginnerMode && !beginnerBlock('speak')) {
-        newblock.hidden = true;
-    // }
-*/
+    constructor() {
+        super('speak', _('speak'));
+        this.setPalette('media');
+        this.formBlock({
+            args: 1, defaults: ['hello'],
+            argTypes: ['textin']
+        })
+
+        this.hidden = true;
+    }
+
+    flow(args, logo, turtle, blk) {
+        if (args.length === 1) {
+            if (logo.meSpeak !== null) {
+                if (logo.inNoteBlock[turtle].length > 0) {
+                    logo.embeddedGraphics[turtle][last(logo.inNoteBlock[turtle])].push(blk);
+                } else {
+                    if (!logo.suppressOutput[turtle]) {
+                        logo._processSpeak(args[0]);
+                    }
+
+                    if (logo.justCounting[turtle].length === 0) {
+                        logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'speak', args[0]]);
+                    }
+                }
+            }
+        }
+    }
+}
 
 class CameraBlock extends ValueBlock {
     constructor() {
@@ -342,6 +379,9 @@ function setupMediaBlocks() {
     new WidthBlock().setup();
     new HeightBlock().setup();
     new CameraBlock().setup();
+    new StopPlaybackBlock().setup();
+    new PlaybackBlock().setup();
+    new SpeakBlock().setup();
     new VideoBlock().setup();
     new LoadFileBlock().setup();
     new StopVideoCamBlock().setup();

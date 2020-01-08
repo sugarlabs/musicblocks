@@ -1919,6 +1919,9 @@ function Logo () {
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
         case 'storein':
+        case 'speak':
+        case 'stopplayback':
+        case 'playback':
         case 'storein2':
         case 'increment':
         case 'incrementOne':
@@ -2016,23 +2019,6 @@ function Logo () {
         case 'hiddennoflow':
             // Hidden block is used at end of clamps and actions to
             // trigger listeners.
-            break;
-        case 'speak':
-            if (args.length === 1) {
-                if (that.meSpeak !== null) {
-                    if (that.inNoteBlock[turtle].length > 0) {
-                        that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
-                    } else {
-                        if (!that.suppressOutput[turtle]) {
-                            that._processSpeak(args[0]);
-                        }
-
-                        if (that.justCounting[turtle].length === 0) {
-                            that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'speak', args[0]]);
-                        }
-                    }
-                }
-            }
             break;
         case 'newturtle':
             var cblk = that.blocks.blockList[blk].connections[1];
@@ -2221,22 +2207,7 @@ function Logo () {
             that.turtles.turtleList[turtle].doEndHollowLine();
             break;
         case 'playback':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            }
-
-            var sound = new Howl({
-                urls: [args[0]]
-            });
-            that.sounds.push(sound);
-            sound.play();
-            break;
-        case 'stopplayback':
-            for (var sound in that.sounds) {
-                that.sounds[sound].stop();
-            }
-            that.sounds = [];
+            
             break;
 
         // Actions for music-related blocks
@@ -8536,58 +8507,6 @@ function Logo () {
             return that.blocks.blockList[blk].value;
         } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
-            case 'pitchness':
-                if (this.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
-                    that.blocks.blockList[blk].value = 440;
-                } else {
-                    if (this.pitchAnalyser == null) {
-                        this.pitchAnalyser = new Tone.Analyser({
-                            'type': 'fft',
-                            'size': this.limit
-                        });
-
-                        this.mic.connect(this.pitchAnalyser);
-                    }
-
-                    var values = that.pitchAnalyser.getValue();
-                    var max = 0;
-                    var idx = 0;
-                    for (var i = 0; i < this.limit; i++) {
-                        var v2 = values[i] * values[i];
-                        if (v2 > max) {
-                            max = v2;
-                            idx = i;
-                        }
-                    }
-
-                    that.blocks.blockList[blk].value = idx;
-                }
-                break;
-            case 'loudness':
-                if (this.mic === null) {
-                    that.blocks.blockList[blk].value = 0;
-                } else if (_THIS_IS_TURTLE_BLOCKS_) {
-                    that.blocks.blockList[blk].value = Math.round(that.mic.getLevel() * 1000);
-                } else {
-                    if (this.volumeAnalyser == null) {
-                        this.volumeAnalyser = new Tone.Analyser({
-                            'type': 'waveform',
-                            'size': this.limit
-                        });
-
-                        this.mic.connect(this.volumeAnalyser);
-                    }
-
-                    var values = that.volumeAnalyser.getValue();
-                    var sum = 0;
-                    for (var k = 0; k < that.limit; k++) {
-                        sum += values[k] * values[k];
-                    }
-
-                    var rms = Math.sqrt(sum / that.limit);
-                    that.blocks.blockList[blk].value = Math.round(rms * 100);
-                }
-                break;
             case 'turtlename':
                 that.blocks.blockList[blk].value = that.turtles.turtleList[turtle].name;
                 break;
@@ -8655,32 +8574,6 @@ function Logo () {
                         }
                     }
                 }
-                break;
-            case 'toascii':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'toascii']);
-                } else {
-                    var cblk1 = that.blocks.blockList[blk].connections[1];
-                    if (cblk === null) {
-                        that.errorMsg(NOINPUTERRORMSG, blk);
-                        that.blocks.blockList[blk].value = 'A';
-                    } else {
-                        var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                        if (typeof(a) === 'number') {
-                            if (a < 1) {
-                                that.blocks.blockList[blk].value = 0;
-                            } else {
-                                that.blocks.blockList[blk].value = String.fromCharCode(a);
-                            }
-                        } else {
-                            that.errorMsg(NANERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
-                        }
-                    }
-                }
-                break;
-            case 'myclick':
-                that.blocks.blockList[blk].value = 'click' + that.turtles.turtleList[turtle].name;
                 break;
             case 'turtleheading':
             case 'xturtle':
@@ -9228,71 +9121,10 @@ function Logo () {
                     that.blocks.blockList[blk].value = a || b;
                 }
                 break;
-            case 'time':
-                var d = new Date();
-                that.blocks.blockList[blk].value = (d.getTime() - that.time) / 1000;
-                break;
-            case 'mousex':
-                that.blocks.blockList[blk].value = that.getStageX();
-                break;
-            case 'mousey':
-                that.blocks.blockList[blk].value = that.getStageY();
-                break;
-            case 'mousebutton':
-                that.blocks.blockList[blk].value = that.getStageMouseDown();
-                break;
             case 'foundturtle':
                 var cblk = that.blocks.blockList[blk].connections[1];
                 var targetTurtle = that.parseArg(that, turtle, cblk, blk, receivedArg);
                 that.blocks.blockList[blk].value = (that._getTargetTurtle(targetTurtle) !== null);
-                break;
-            case 'keyboard':
-                that.lastKeyCode = that.getCurrentKeyCode();
-                that.blocks.blockList[blk].value = that.lastKeyCode;
-                that.clearCurrentKeyCode();
-                break;
-            case 'getred':
-            case 'getgreen':
-            case 'getblue':
-                var colorString = that.turtles.turtleList[turtle].canvasColor;
-                // 'rgba(255,0,49,1)' or '#ff0031'
-                if (colorString[0] === '#') {
-                    colorString = hex2rgb(colorString.split('#')[1]);
-                }
-                var obj = colorString.split('(');
-                var obj = obj[1].split(',');
-                switch (that.blocks.blockList[blk].name) {
-                case 'getred':
-                    that.blocks.blockList[blk].value = parseInt(Number(obj[0]) / 2.55);
-                    break;
-                case 'getgreen':
-                    that.blocks.blockList[blk].value = parseInt(Number(obj[1]) / 2.55);
-                    break;
-                case 'getblue':
-                    that.blocks.blockList[blk].value = parseInt(Number(obj[2]) / 2.55);
-                    break;
-                }
-                break;
-            case 'getcolorpixel':
-                var wasVisible = that.turtles.turtleList[turtle].container.visible;
-                that.turtles.turtleList[turtle].container.visible = false;
-                var x = that.turtles.turtleList[turtle].container.x;
-                var y = that.turtles.turtleList[turtle].container.y;
-                that.refreshCanvas();
-
-                var canvas = docById('overlayCanvas');
-                var ctx = canvas.getContext('2d');
-                var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-                var color = searchColors(imgData[0], imgData[1], imgData[2]);
-                if (imgData[3] === 0) {
-                    color = body.style.background.substring(body.style.background.indexOf('(') + 1, body.style.background.lastIndexOf(')')).split(/,\s*/),
-                    color = searchColors(color[0], color[1], color[2]);
-                }
-
-                that.blocks.blockList[blk].value = color;
-                if (wasVisible) {
-                    that.turtles.turtleList[turtle].container.visible = true;
-                }
                 break;
             case 'notecounter':
                 var cblk = that.blocks.blockList[blk].connections[1];
