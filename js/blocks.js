@@ -1292,6 +1292,7 @@ function Blocks (activity) {
      * @return {void}
      */
     this.blockMoved = function (thisBlock) {
+        var initialTopBlock = this.findTopBlock(thisBlock);
         // Find any containing expandable blocks.
         this.clampBlocksToCheck = [];
         if (thisBlock == null) {
@@ -1350,16 +1351,6 @@ function Blocks (activity) {
 
         // Disconnect from connection[0] (both sides of the connection).
         if (c != null) {
-            //Check if we are disconnecting blocks from widget blocks
-            //then reinit if windget windows is open
-            for (var x = 0; x < document.getElementsByClassName('wftTitle').length; x++){
-              console.log(document.getElementsByClassName('wftTitle')[x].innerHTML);
-              if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'tempo'){
-                if (this.blockList[this.findTopBlock(thisBlock)].name === 'tempo'){
-                  this.logo.runLogoCommands(this.findTopBlock(thisBlock));
-                }
-              }
-            }
             // Disconnect both ends of the connection.
             for (var i = 1; i < cBlock.connections.length; i++) {
                 if (cBlock.connections[i] === thisBlock) {
@@ -1370,6 +1361,19 @@ function Blocks (activity) {
 
             myBlock.connections[0] = null;
             this.raiseStackToTop(thisBlock);
+
+            // Check if we are disconnecting blocks from widget blocks
+            // then reinit if windget windows is open
+            for (var x = 0; x < document.getElementsByClassName('wftTitle').length; x++){
+                if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'tempo'){
+                    if (this.blockList[initialTopBlock].name === 'tempo'){
+                        var that = this;
+                        setTimeout(function () {
+                            that.logo.runLogoCommands(initialTopBlock);
+                        }, 1500);
+                    }
+                }
+            }
         }
 
         // Look for a new connection.
@@ -1715,13 +1719,18 @@ function Blocks (activity) {
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
             
-            //Check if block is one of the widget blocks
-            for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++){
-              if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
-                if (this.blockList[this.findTopBlock(thisBlock)].name === 'tempo'){
-                  this.logo.runLogoCommands(this.findTopBlock(thisBlock));
+            // Check if block is one of the widget blocks
+            if (c === null){
+                for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
+                    if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo') {
+                        if (this.blockList[this.findTopBlock(thisBlock)].name === 'tempo') {
+                            var that = this;
+                            setTimeout(function () {
+                                that.logo.runLogoCommands(that.findTopBlock(thisBlock));
+                            }, 1500);
+                        }
+                    }
                 }
-              }
             }
         }
 
