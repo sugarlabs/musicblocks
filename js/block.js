@@ -2175,6 +2175,7 @@ function Block(protoblock, blocks, overrideName) {
             }, 500);
 
             hideDOMLabel();
+            that._checkWidgets(false);
 
             dx = (event.stageX / that.blocks.getStageScale()) - that.container.x;
             if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
@@ -2439,6 +2440,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (!this._usePiemenu()) {
                     this._labelChanged(true, true);
                     hideDOMLabel();
+                    this._checkWidgets(false);
                 }
 
                 this.blocks.unhighlight(null);
@@ -2643,7 +2645,6 @@ function Block(protoblock, blocks, overrideName) {
                 this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
 
-            console.debug("hello");
         } else if (this.name === 'customNote') {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -3145,7 +3146,6 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
             } else {
-                console.debug('NUMBER LABEL');
                 labelElem.innerHTML = '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' + labelValue + '" />';
                 labelElem.classList.add('hasKeyboard');
                 this.label = docById('numberLabel');
@@ -5545,21 +5545,30 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.navItems[1].navigateFunction = __prepScale;
     };
 
-    this._labelChanged = function (closeInput, notPieMenu) {
-        // Update the block values as they change in the DOM label.
-        console.debug('LABEL CHANGED ' + this.name);
-        
-        //Detect if label is changed, then reinit widget windows
-        //if open
+    this._checkWidgets = function (closeInput) {
+        // Detect if label is changed, then reinit widget windows
+        // if they are open.
         var thisBlock = this.blocks.blockList.indexOf(this);
         var topBlock = this.blocks.findTopBlock(thisBlock);
         for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
             if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
                 if (closeInput === false) {
-                    this.blocks.logo.runLogoCommands(topBlock);
+                    var that = this;
+                    setTimeout(function () {
+                        that.blocks.logo.runLogoCommands(topBlock);
+                        console.debug('VALUE: ' + that.value);
+                    }, 5000);
                 }
             }
         }
+    };
+
+    this._labelChanged = function (closeInput, notPieMenu) {
+        // Update the block values as they change in the DOM label.
+        // console.debug('LABEL CHANGED ' + this.name);
+        
+        // Instead, we do this when we hide the DOM element.
+        // this._checkWidgets(closeInput);
 
         if (this === null || this.label === null) {
             this._labelLock = false;

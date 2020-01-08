@@ -1362,8 +1362,8 @@ function Blocks (activity) {
             myBlock.connections[0] = null;
             this.raiseStackToTop(thisBlock);
 
-            // Check if we are disconnecting blocks from widget blocks
-            // then reinit if windget windows is open
+            // Check if we are disconnecting blocks from widget blocks;
+            // then reinit if widget windows is open.
             for (var x = 0; x < document.getElementsByClassName('wftTitle').length; x++){
                 if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'tempo'){
                     if (this.blockList[initialTopBlock].name === 'tempo'){
@@ -1718,8 +1718,8 @@ function Blocks (activity) {
             // console.debug('Adjust Docks: ' + this.blockList[newBlock].name);
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
-            
-            // Check if block is one of the widget blocks
+
+            // Check if top block is one of the widget blocks.
             if (c === null){
                 for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
                     if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo') {
