@@ -1716,9 +1716,10 @@ function Blocks (activity) {
             // TODO: some graphical feedback re new connection?
             
             //Check if block is one of the widget blocks
-            for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++){
-              if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
-                if (this.blockList[this.findTopBlock(thisBlock)].name === 'tempo'){
+            //and run only when not disconnecting blocks
+            if (c === null){
+              for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++){
+                if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
                   this.logo.runLogoCommands(this.findTopBlock(thisBlock));
                 }
               }
