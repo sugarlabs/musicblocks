@@ -1268,6 +1268,15 @@ function Blocks (activity) {
             return thisBlockobj.connections[0];
         }
     };
+    
+    //To make everything cleaner, use this function to reinit widget
+    //when it's widget windows is open
+    this.reInitWidget = function(topBlock, timeout){
+      var that = this;
+      setTimeout(function () {
+          that.logo.runLogoCommands(topBlock);
+      }, timeout);
+    };
 
     /*
      * When a block is moved, we have to check the following:
@@ -1365,13 +1374,12 @@ function Blocks (activity) {
             // Check if we are disconnecting blocks from widget blocks;
             // then reinit if widget windows is open.
             for (var x = 0; x < document.getElementsByClassName('wftTitle').length; x++){
+              console.log(initialTopBlock);
                 if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'tempo'){
-                    if (this.blockList[initialTopBlock].name === 'tempo'){
-                        var that = this;
-                        setTimeout(function () {
-                            that.logo.runLogoCommands(initialTopBlock);
-                        }, 1500);
-                    }
+                  this.reInitWidget(initialTopBlock, 1500);
+                }
+                if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'rhythm maker'){
+                  this.reInitWidget(initialTopBlock, 1500);
                 }
             }
         }
@@ -1723,12 +1731,12 @@ function Blocks (activity) {
             if (c === null){
                 for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
                     if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo') {
-                        if (this.blockList[this.findTopBlock(thisBlock)].name === 'tempo') {
-                            var that = this;
-                            setTimeout(function () {
-                                that.logo.runLogoCommands(that.findTopBlock(thisBlock));
-                            }, 1500);
-                        }
+                      var that = this;
+                      this.reInitWidget(that.findTopBlock(thisBlock), 1500);
+                    }
+                    if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'rhythm maker'){
+                      var that = this;
+                      this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                     }
                 }
             }
