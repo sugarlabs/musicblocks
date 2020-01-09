@@ -203,6 +203,7 @@ function Activity() {
             'activity/blocks/PenBlocks',
             'activity/blocks/MediaBlocks',
             'activity/blocks/SensorsBlocks',
+            'activity/blocks/EnsembleBlocks',
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
