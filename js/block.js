@@ -5553,11 +5553,12 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
             if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
                 if (closeInput === false) {
-                    var that = this;
-                    setTimeout(function () {
-                        that.blocks.logo.runLogoCommands(topBlock);
-                        console.debug('VALUE: ' + that.value);
-                    }, 5000);
+                  this.blocks.reInitWidget(topBlock, 5000);
+                }
+            }
+            if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'rhythm maker'){
+                if (closeInput === false) {
+                  this.blocks.reInitWidget(topBlock, 5000);
                 }
             }
         }
