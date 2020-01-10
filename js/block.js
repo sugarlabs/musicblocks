@@ -5561,6 +5561,11 @@ function Block(protoblock, blocks, overrideName) {
                   this.blocks.reInitWidget(topBlock, 5000);
                 }
             }
+            if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'pitch slider'){
+              if (closeInput === false) {
+                this.blocks.reInitWidget(topBlock, 5000);
+              }
+            }
         }
     };
 
