@@ -5551,19 +5551,20 @@ function Block(protoblock, blocks, overrideName) {
         var thisBlock = this.blocks.blockList.indexOf(this);
         var topBlock = this.blocks.findTopBlock(thisBlock);
         var widgetTitle = document.getElementsByClassName('wftTitle');
+        var lockInit = false;
         if (closeInput === false) {
           for (var i = 0; i < widgetTitle.length; i++) {
-            switch(widgetTitle[i].innerHTML){
-              case 'tempo':
-                this.blocks.reInitWidget(topBlock, 5000);
-                break;
-              case 'rhythm maker':
-                this.blocks.reInitWidget(topBlock, 5000);
-                break;
-              case 'pitch slider':
-                this.blocks.reInitWidget(topBlock, 5000);
-                break;
+            if (lockInit === false){
+              switch(widgetTitle[i].innerHTML){
+                case 'tempo':
+                case 'rhythm maker':
+                case 'pitch slider':
+                  lockInit = true;
+                  this.blocks.reInitWidget(topBlock, 5000);
+                  break;
+              }
             }
+
           }
         }
     };
