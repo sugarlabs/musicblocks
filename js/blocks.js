@@ -1381,6 +1381,9 @@ function Blocks (activity) {
                 if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'rhythm maker'){
                   this.reInitWidget(initialTopBlock, 1500);
                 }
+                if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'pitch slider'){
+                  this.reInitWidget(initialTopBlock, 1500);
+                }
             }
         }
 
@@ -1735,6 +1738,10 @@ function Blocks (activity) {
                       this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                     }
                     if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'rhythm maker'){
+                      var that = this;
+                      this.reInitWidget(that.findTopBlock(thisBlock), 1500);
+                    }
+                    if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'pitch slider'){
                       var that = this;
                       this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                     }
