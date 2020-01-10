@@ -180,6 +180,9 @@ function RhythmRuler () {
         }
 
         // this._piemenuRuler(this._rulerSelected);
+        
+        //Save dissect history everytime user dissects ruler
+        this.saveDissectHistory();
     };
 
     this.__startTapping = function (noteValues, interval) {
@@ -1507,35 +1510,6 @@ function RhythmRuler () {
             // docById('wheelDiv').style.display = 'none';
             // docById('contextWheelDiv').style.display = 'none';
 
-            // Save the new dissect history.
-            var dissectHistory = [];
-            var drums = [];
-            for (var i = 0; i < that.Rulers.length; i++) {
-                if (that.Drums[i] === null) {
-                    continue;
-                }
-
-                var history = [];
-                for (var j = 0; j < that.Rulers[i][1].length; j++) {
-                    history.push(that.Rulers[i][1][j]);
-                }
-
-                that._dissectNumber.classList.add('hasKeyboard');
-                dissectHistory.push([history, that.Drums[i]]);
-                drums.push(that.Drums[i]);
-            }
-
-            // Look for any old entries that we may have missed.
-            for (var i = 0; i < that._dissectHistory.length; i++) {
-                var drum = that._dissectHistory[i][1];
-                if (drums.indexOf(drum) === -1) {
-                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
-                    dissectHistory.push([history, drum]);
-                }
-            }
-
-            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
-
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
@@ -1823,6 +1797,39 @@ function RhythmRuler () {
 
         this._logo.textMsg(_('Click on the ruler to divide it.'));
         // this._piemenuRuler(this._rulerSelected);
+    };
+    
+    this.saveDissectHistory = function() {
+      // Save the new dissect history.
+      var that = this;
+      var dissectHistory = [];
+      var drums = [];
+      for (var i = 0; i < that.Rulers.length; i++) {
+          if (that.Drums[i] === null) {
+              continue;
+          }
+
+          var history = [];
+          for (var j = 0; j < that.Rulers[i][1].length; j++) {
+              history.push(that.Rulers[i][1][j]);
+          }
+
+          that._dissectNumber.classList.add('hasKeyboard');
+          dissectHistory.push([history, that.Drums[i]]);
+          drums.push(that.Drums[i]);
+      }
+
+      // Look for any old entries that we may have missed.
+      for (var i = 0; i < that._dissectHistory.length; i++) {
+          var drum = that._dissectHistory[i][1];
+          if (drums.indexOf(drum) === -1) {
+              var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+              dissectHistory.push([history, drum]);
+          }
+      }
+
+      that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
     };
 
     this._piemenuRuler = function (selectedRuler) {
