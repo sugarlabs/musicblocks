@@ -5546,26 +5546,25 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this._checkWidgets = function (closeInput) {
-        // Detect if label is changed, then reinit widget windows
+       // Detect if label is changed, then reinit widget windows
         // if they are open.
         var thisBlock = this.blocks.blockList.indexOf(this);
         var topBlock = this.blocks.findTopBlock(thisBlock);
-        for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
-            if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo'){
-                if (closeInput === false) {
-                  this.blocks.reInitWidget(topBlock, 5000);
-                }
-            }
-            if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'rhythm maker'){
-                if (closeInput === false) {
-                  this.blocks.reInitWidget(topBlock, 5000);
-                }
-            }
-            if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'pitch slider'){
-              if (closeInput === false) {
+        var widgetTitle = document.getElementsByClassName('wftTitle');
+        if (closeInput === false) {
+          for (var i = 0; i < widgetTitle.length; i++) {
+            switch(widgetTitle[i].innerHTML){
+              case 'tempo':
                 this.blocks.reInitWidget(topBlock, 5000);
-              }
+                break;
+              case 'rhythm maker':
+                this.blocks.reInitWidget(topBlock, 5000);
+                break;
+              case 'pitch slider':
+                this.blocks.reInitWidget(topBlock, 5000);
+                break;
             }
+          }
         }
     };
 
