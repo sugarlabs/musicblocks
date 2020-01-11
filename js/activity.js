@@ -2539,7 +2539,6 @@ function Activity() {
      * event handler indicates a change has happened.
      */
     this.__tick = function (event) {
-
         if (update || createjs.Tween.hasActiveTweens()) {
             update = false; // Only update once
             stage.update(event);
@@ -3862,11 +3861,18 @@ function Activity() {
         stage = new createjs.Stage(canvas);
         createjs.Touch.enable(stage);
 
-        createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 15;
+        // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+        // createjs.Ticker.framerate = 15;
         // createjs.Ticker.addEventListener('tick', stage);
-        createjs.Ticker.addEventListener('tick', that.__tick);
-
+        // createjs.Ticker.addEventListener('tick', that.__tick);
+        
+        var mouseEvents = 0;
+        document.addEventListener('mousemove', function() {
+            mouseEvents++;
+            if(mouseEvents % 4 == 0) {
+                that.__tick();
+            }
+        })
         _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
