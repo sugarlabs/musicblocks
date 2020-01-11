@@ -2051,7 +2051,7 @@ function Activity() {
                     break;
                 case ESC:
                     if (searchWidget.style.visibility === 'visible') {
-                        textMsg('ESC ' + _('Hide blocks.'));
+                        textMsg('ESC ' + _('Hide blocks'));
                         searchWidget.style.visibility = 'hidden';
                     } else {
                         // toggle full screen
