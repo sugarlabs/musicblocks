@@ -106,7 +106,7 @@ function Logo () {
 
     // When we leave a clamp block, we need to dispatch a signal.
     this.endOfClampSignals = {};
-    // Don't dispatch these signals (when exiting note counter or
+    // Don't dispatch these signals (when exiting sum note values or
     // interval measure.
     this.butNotThese = {};
 

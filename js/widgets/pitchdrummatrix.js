@@ -718,5 +718,6 @@ function PitchDrumMatrix() {
         // Create a new stack for the chunk.
         console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
     };
 };
