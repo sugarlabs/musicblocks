@@ -62,6 +62,8 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
 
     console.debug('language setting is ' + language);
 
+    setupRhythmBlocks();
+    
     setupFlowBlocks();
     setupNumberBlocks();
     setupActionBlocks();
@@ -845,317 +847,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     if (beginnerMode && !beginnerBlock('stuplet')) {
         newblock.hidden = true;
     }
-
-    var newblock = new ProtoBlock('rhythm');
-    newblock.palette = palettes.dict[rhythmBlockPalette];
-    blocks.protoBlockDict['rhythm'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    if (language === 'ja') {
-        //.TRANS: rhythm block
-        newblock.staticLabels.push(_('rhythm1'));
-    } else {
-        newblock.staticLabels.push(_('rhythm'));
-    }
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    newblock.hidden = true;
-    newblock.deprecated = true;
-
-    var newblock = new ProtoBlock('rhythm2');
-    newblock.palette = palettes.dict[rhythmBlockPalette];
-    blocks.protoBlockDict['rhythm2'] = newblock;
-    //.TRANS: an arrangement of notes based on duration
-    if (language === 'ja') {
-        //.TRANS: rhythm block
-        newblock.staticLabels.push(_('rhythm1'));
-    } else {
-        newblock.staticLabels.push(_('rhythm'));
-    }
-    newblock.staticLabels.push(_('number of notes'), _('note value'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(3);
-    newblock.defaults.push(4);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'anyin';
-    if (beginnerMode && !beginnerBlock('rhythm2')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('mynotevalue');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['mynotevalue'] = newblock;
-    //.TRANS: the value (e.g., 1/4 note) of the note being played.
-    newblock.staticLabels.push(_('note value'));
-    newblock.parameterBlock();
-    newblock.adjustWidthToLabel();
-    if (beginnerMode && !beginnerBlock('mynotevalue')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('skipfactor');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['skipfactor'] = newblock;
-    newblock.staticLabels.push('skip factor');
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('osctime');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['osctime'] = newblock;
-    //.TRANS: oscillator time (in milliseconds)
-    newblock.staticLabels.push(_('milliseconds'));
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(200);
-    if (beginnerMode && !beginnerBlock('osctime')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('swing');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['swing'] = newblock;
-    //.TRANS: swing is a rhythmic variation that emphasises the offbeat
-    newblock.staticLabels.push(_('swing'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(32);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('newswing');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['newswing'] = newblock;
-    //.TRANS: swing is a rhythmic variation that emphasises the offbeat
-    newblock.staticLabels.push(_('swing'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 24);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('newswing2');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['newswing2'] = newblock;
-    newblock.staticLabels.push(_('swing'));
-    //.TRANS: the amount to shift to the offbeat note
-    newblock.staticLabels.push(_('swing value'));
-    newblock.staticLabels.push(_('note value'));
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(1 / 24);
-    newblock.defaults.push(1 / 8);
-    if (beginnerMode && !beginnerBlock('newswing2')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('skipnotes');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['skipnotes'] = newblock;
-    //.TRANS: substitute rests on notes being skipped
-    newblock.staticLabels.push(_('skip notes'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(2);
-    if (beginnerMode && !beginnerBlock('skipnotes')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('multiplybeatfactor');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['multiplybeatfactor'] = newblock;
-    //.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
-    newblock.staticLabels.push(_('multiply note value'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(2);
-    if (beginnerMode && !beginnerBlock('multiplybeatfactor')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('tie');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['tie'] = newblock;
-    //.TRANS: tie notes together into one longer note
-    newblock.staticLabels.push(_('tie'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('tie')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('rhythmicdot');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['rhythmicdot'] = newblock;
-    //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-    newblock.staticLabels.push(_('dot'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    newblock.hidden = true;
-    newblock.deprecated = true;
-
-    // macro
-    var newblock = new ProtoBlock('rhythmicdot2');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['rhythmicdot2'] = newblock;
-    //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-    newblock.staticLabels.push(_('dot'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1);
-    newblock.dockTypes[1] = 'numberin';
-    if (beginnerMode && !beginnerBlock('rhythmicdot2')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('rest2');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['rest2'] = newblock;
-    newblock.staticLabels.push(_('silence'));
-    newblock.adjustWidthToLabel();
-    newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('rest2')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note4');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note4'] = newblock;
-    if (language === 'ja') {
-        //.TRANS: Japanese only: note value block for drum
-        newblock.staticLabels.push(_('note value drum'));
-    } else {
-        newblock.staticLabels.push(_('note value') + ' ' + _('drum'));
-    }
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note4')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note3');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note3'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' ' + _('392 hertz'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note3')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note5');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note5'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' 7');
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock(); // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note5')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note7');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note7'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' 5 4');
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note7')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note6');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note6'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' +1');
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note6')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note2');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note2'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' ' + 'G4');
-    newblock.adjustWidthToLabel();
-        newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note2')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note1');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note1'] = newblock;
-    newblock.staticLabels.push(_('note value') + ' ' + i18nSolfege('sol') + '4');
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();  // newblock.zeroArgBlock();
-    if (beginnerMode && !beginnerBlock('note1')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('note');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['note'] = newblock;
-    newblock.staticLabels.push('deprecated note value');
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(4);
-    newblock.hidden = true;
-    newblock.deprecated = true;
-
-    // macro
-    var newblock = new ProtoBlock('newnote');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['newnote'] = newblock;
-    newblock.staticLabels.push(_('note'));
-    if (language === 'ja') {
-        //.TRANS: value2 is note value of note (JAPANESE ONLY)
-        newblock.staticLabels.push(_('value2'));
-    } else {
-        newblock.staticLabels.push(_('value'));
-    }
-    newblock.extraWidth = 40;
-    newblock.adjustWidthToLabel();
-    newblock.labelOffset = 15;
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 4);
-    if (beginnerMode && !beginnerBlock('newnote')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var defineFrequencyBlock = new ProtoBlock('definefrequency');
-    defineFrequencyBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['definefrequency'] = defineFrequencyBlock;
-    defineFrequencyBlock.staticLabels.push(_('define frequency'));
-    defineFrequencyBlock.adjustWidthToLabel();
-    defineFrequencyBlock.flowClampOneArgBlock();
-    defineFrequencyBlock.hidden = true;
 
     // WIDGETS PALETTE
 
@@ -2063,13 +1754,48 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('octavespace');
-    newblock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['octavespace'] = newblock;
-    newblock.staticLabels.push(_('octave space'));
+    var newblock = new ProtoBlock('rhythm');
+    newblock.palette = palettes.dict[rhythmBlockPalette];
+    blocks.protoBlockDict['rhythm'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    if (language === 'ja') {
+        //.TRANS: rhythm block
+        newblock.staticLabels.push(_('rhythm1'));
+    } else {
+        newblock.staticLabels.push(_('rhythm'));
+    }
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
     newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
     newblock.hidden = true;
+    newblock.deprecated = true;
+
+    var newblock = new ProtoBlock('rhythm2');
+    newblock.palette = palettes.dict[rhythmBlockPalette];
+    blocks.protoBlockDict['rhythm2'] = newblock;
+    //.TRANS: an arrangement of notes based on duration
+    if (language === 'ja') {
+        //.TRANS: rhythm block
+        newblock.staticLabels.push(_('rhythm1'));
+    } else {
+        newblock.staticLabels.push(_('rhythm'));
+    }
+    newblock.staticLabels.push(_('number of notes'), _('note value'));
+    newblock.extraWidth = 10;
+    newblock.adjustWidthToLabel();
+    newblock.defaults.push(3);
+    newblock.defaults.push(4);
+    newblock.twoArgBlock();
+    newblock.dockTypes[1] = 'anyin';
+    newblock.dockTypes[2] = 'anyin';
+    if (beginnerMode && !beginnerBlock('rhythm2')) {
+        newblock.hidden = true;
+    }
 
     var newblock = new ProtoBlock('temperamentname');
     newblock.palette = palettes.dict['tone'];

@@ -175,6 +175,8 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
+            'activity/blocks/BaseBlock',
+            
             'Tone',
             'widgets/widgetWindows',
             'widgets/modewidget',
@@ -191,7 +193,7 @@ function Activity() {
             'activity/lilypond',
             'activity/abc',
 
-            'activity/blocks/BaseBlock',
+            'activity/blocks/RhythmBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',

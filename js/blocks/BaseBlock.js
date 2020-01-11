@@ -296,6 +296,7 @@ class FlowClampBlock extends FlowBlock {
     constructor(name) {
         super(name);
 
+        this.extraWidth = 20;
         this.formBlock({
             flows: {
                 type: 'flow', labels: ['']
