@@ -3873,6 +3873,10 @@ function Activity() {
                 that.__tick();
             }
         })
+
+        document.addEventListener('click', function() {
+            that.__tick();
+        })
         _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
@@ -4267,6 +4271,7 @@ function Activity() {
             };
 
             this.saveLocally = function () {
+                stage.update(event);
                 console.log('overwriting session data');
                 var data = prepareExport();
                 var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
@@ -4290,6 +4295,7 @@ function Activity() {
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
                 //    sugarizerCompatibility.saveLocally();
                 //}
+
             };
 
             this.openCurrentProject = function () {
