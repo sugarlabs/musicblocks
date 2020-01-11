@@ -1519,7 +1519,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
         newblock.hidden = true;
     }
 
-    var newblock = new ProtoBlock('sumnotevalues');
+    var newblock = new ProtoBlock('notecounter');
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['sumnotevalues'] = newblock;
     //.TRANS: count the number of notes
