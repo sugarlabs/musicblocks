@@ -2531,6 +2531,7 @@ function Activity() {
      * Updates all canvas elements
      */
     function refreshCanvas() {
+        stage.update(event);
         update = true;
     };
 
