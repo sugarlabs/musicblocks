@@ -1735,20 +1735,24 @@ function Blocks (activity) {
             this.adjustDocks(newBlock, true);
             // TODO: some graphical feedback re new connection?
 
-            // Check if we are disconnecting blocks from widget blocks;
-            // then reinit if widget windows is open.
+            // Check if top block is one of the widget blocks.
             var lockInit = false;
-            for (var x = 0; x < widgetTitle.length; x++){
-              if (lockInit === false){
-                switch(widgetTitle[x].innerHTML){
-                  case 'tempo':
-                  case 'rhythm maker':
-                  case 'pitch slider':
-                    lockInit = true;
-                    this.reInitWidget(initialTopBlock, 1500);
-                    break;
+            if (c === null){
+                for (var i = 0; i < widgetTitle.length; i++) {
+                  var that = this;
+                  console.log(widgetTitle[i].innerHTML);
+                  if(lockInit === false){
+                    switch(widgetTitle[i].innerHTML){
+                      case 'tempo':
+                      case 'rhythm maker':
+                      case 'pitch slider':
+                        lockInit = true;
+                        this.reInitWidget(that.findTopBlock(thisBlock), 1500);
+                        break;
+                    }
+                  }
+
                 }
-              }
             }
         }
 
