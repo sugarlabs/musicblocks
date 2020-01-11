@@ -110,6 +110,23 @@
 <!-- #96D3F3-->
 
 <body onload="init();" data-title="index" id="body" style="background: #f9f9f9;">
+	
+<div id="loading" style="text-align: center; font-size: 4rem; padding: 10px">
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          showText("#loading", "Loading...", 0, 650);
+        });
+
+      let showText = function (target, message, index, interval) {
+      if (index < message.length) {
+          document.querySelector(target).innerHTML =
+            document.querySelector(target).innerHTML + message[index++];
+          setTimeout(function () { showText(target, message, index, interval); }, interval);
+        }
+      }
+      </script>
+</div>
+
   <div id="loading-image-container" style="position: absolute; width: 100%; height: 100%;">
 
 <script>
