@@ -9069,6 +9069,7 @@ function Logo () {
         if (callback !== undefined && callback !== null) {
             callback();
         }
+        stage.update(event);
     };
 
     /**
