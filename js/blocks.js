@@ -1383,6 +1383,7 @@ function Blocks (activity) {
                   case 'tempo':
                   case 'rhythm maker':
                   case 'pitch slider':
+                  case 'pitch staircase':
                     lockInit = true;
                     this.reInitWidget(initialTopBlock, 1500);
                     break;
@@ -1746,6 +1747,7 @@ function Blocks (activity) {
                       case 'tempo':
                       case 'rhythm maker':
                       case 'pitch slider':
+                      case 'pitch staircase':
                         lockInit = true;
                         this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                         break;
