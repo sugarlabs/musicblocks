@@ -357,6 +357,7 @@ function PitchStaircase () {
         }
 
         this._logo.blocks.loadNewBlocks(newStack);
+        this._logo.textMsg(_('New action block generated!'))
     };
 
     this._get_save_lock = function() {
