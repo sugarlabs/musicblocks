@@ -2759,6 +2759,7 @@ function Activity() {
         var __afterLoad = function () {
             if (!turtles.running()) {
                 setTimeout(function () {
+                    stage.update(event);
                     console.log('reset turtles after load: ' + turtles.turtleList.length);
 
                     for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
