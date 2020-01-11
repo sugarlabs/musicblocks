@@ -1357,6 +1357,9 @@ function Blocks (activity) {
                 }
             }
         }
+        
+        //Get widget windows title
+        var widgetTitle = document.getElementsByClassName('wftTitle');
 
         // Disconnect from connection[0] (both sides of the connection).
         if (c != null) {
@@ -1373,14 +1376,19 @@ function Blocks (activity) {
 
             // Check if we are disconnecting blocks from widget blocks;
             // then reinit if widget windows is open.
-            for (var x = 0; x < document.getElementsByClassName('wftTitle').length; x++){
-              console.log(initialTopBlock);
-                if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'tempo'){
-                  this.reInitWidget(initialTopBlock, 1500);
+            var lockInit = false;
+            for (var x = 0; x < widgetTitle.length; x++){
+              if (lockInit === false){
+                switch(widgetTitle[x].innerHTML){
+                  case 'tempo':
+                  case 'rhythm maker':
+                  case 'pitch slider':
+                    lockInit = true;
+                    this.reInitWidget(initialTopBlock, 1500);
+                    break;
                 }
-                if (document.getElementsByClassName('wftTitle')[x].innerHTML === 'rhythm maker'){
-                  this.reInitWidget(initialTopBlock, 1500);
-                }
+              }
+
             }
         }
 
@@ -1728,16 +1736,22 @@ function Blocks (activity) {
             // TODO: some graphical feedback re new connection?
 
             // Check if top block is one of the widget blocks.
+            var lockInit = false;
             if (c === null){
-                for (var i = 0; i < document.getElementsByClassName('wftTitle').length; i++) {
-                    if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'tempo') {
-                      var that = this;
-                      this.reInitWidget(that.findTopBlock(thisBlock), 1500);
+                for (var i = 0; i < widgetTitle.length; i++) {
+                  var that = this;
+                  console.log(widgetTitle[i].innerHTML);
+                  if(lockInit === false){
+                    switch(widgetTitle[i].innerHTML){
+                      case 'tempo':
+                      case 'rhythm maker':
+                      case 'pitch slider':
+                        lockInit = true;
+                        this.reInitWidget(that.findTopBlock(thisBlock), 1500);
+                        break;
                     }
-                    if (document.getElementsByClassName('wftTitle')[i].innerHTML === 'rhythm maker'){
-                      var that = this;
-                      this.reInitWidget(that.findTopBlock(thisBlock), 1500);
-                    }
+                  }
+
                 }
             }
         }
