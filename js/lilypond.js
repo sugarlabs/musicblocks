@@ -474,9 +474,9 @@ processLilypondNotes = function (lilypond, logo, turtle) {
 
 
 saveLilypondOutput = function(logo) {
-    console.log("one function call");
-    console.log('logo notation staging is');
-    console.log(logo.notationStaging);
+    // console.log("one function call");
+    // console.log('logo notation staging is');
+    // console.log(logo.notationStaging);
     const NUMBERNAMES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     var turtleCount = 0;
     var clef = [];
@@ -512,7 +512,7 @@ saveLilypondOutput = function(logo) {
     var c = 0;
     var occupiedShortNames = [];
     for (var t in logo.notationStaging) {
-            console.debug('value of t: ' + t);
+        // console.debug('value of t: ' + t);
         if (typeof(t) === 'string') {
             var tNumber = Number(t);
         } else {
@@ -524,8 +524,8 @@ saveLilypondOutput = function(logo) {
             var noteCount = 0;
             for (var i = 0; i < logo.notationStaging[t].length; i++) {
                 var obj = logo.notationStaging[t][i];
-                console.log("obj is ");
-                console.log(obj);
+                // console.log("obj is ");
+                // console.log(obj);
                 if (typeof(obj) === 'object') {
                     for (var ii = 0; ii < obj[0].length; ii++) {
                         if (obj[0][ii] === 'R') {
@@ -601,6 +601,7 @@ saveLilypondOutput = function(logo) {
 
                 instrumentName = instrumentName.replace(/ /g, '_').replace('.', '');
 
+		console.log('L604: ' + instrumentName);
                 logo.notationOutput += instrumentName + ' = {\n';
                 logo.notationOutput += logo.notationNotes[t];
 
@@ -695,7 +696,9 @@ saveLilypondOutput = function(logo) {
             logo.notationOutput += '   \\clef "' + last(clef) + '"\n';
             logo.notationOutput += '   instrumentName = "' + instrumentName + '"\n';
             if (tNumber > startDrums - 1) {
-                logo.notationOutput += '   shortInstrumentName = "' + 'd' + '"\n';
+		var num = tNumber - startDrums;
+		console.debug('shortInstrumentName = d' + num);
+                logo.notationOutput += '   shortInstrumentName = "' + 'd' + num + '"\n';
                 logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
                 logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
@@ -739,7 +742,7 @@ saveLilypondOutput = function(logo) {
                             var instrumentName = _('mouse');
                         }
 
-			console.debug(instrumentName);
+			console.debug('Source: ' + instrumentName);
 
 			if (instrumentName === '') {
                             var instrumentName = _('mouse');
