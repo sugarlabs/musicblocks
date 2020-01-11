@@ -1523,7 +1523,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.palette = palettes.dict['meter'];
     blocks.protoBlockDict['notecounter'] = newblock;
     //.TRANS: count the number of notes
-    newblock.staticLabels.push(_('note counter'));
+    newblock.staticLabels.push(_('sum note values'));
     newblock.argFlowClampBlock();
     newblock.adjustWidthToLabel();
     if (beginnerMode && !beginnerBlock('notecounter')) {
