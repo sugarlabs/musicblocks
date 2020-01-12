@@ -1918,6 +1918,17 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'drift':
+        case 'offbeatdo':
+        case 'onbeatdo':
+        case 'everybeatdo':
+        case 'setmasterbpm2':
+        case 'setmasterbpm':
+        case 'setbpm':
+        case 'setbpm2':
+        case 'setbpm3':
+        case 'pickup':
+        case 'meter':
         case 'rest2':
         case 'rhythmicdot':
         case 'rhythmicdot2':
@@ -2533,137 +2544,6 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
-            break;
-        // Deprecated
-        case 'setmasterbpm':
-            if (args.length === 1 && typeof(args[0]) === 'number') {
-                if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'), blk);
-                    that._masterBPM = 30;
-                } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'), blk);
-                    that._masterBPM = 1000;
-                } else {
-                    that._masterBPM = args[0];
-                }
-
-                that.defaultBPMFactor = TONEBPM / that._masterBPM;
-            }
-
-            if (that.inTempo) {
-                that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = that.blocks.blockList[blk].connections[1];
-                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-            }
-            break;
-            // Deprecated
-        case 'setbpm':
-            if (args.length === 2 && typeof(args[0]) === 'number') {
-                if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'), blk);
-                    var bpm = 30;
-                } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'), blk);
-                    var bpm = 1000;
-                } else {
-                    var bpm = args[0];
-                }
-
-                that.bpm[turtle].push(bpm);
-
-                childFlow = args[1];
-                childFlowCount = 1;
-
-                var listenerName = '_bpm_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.bpm[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-            }
-            break;
-        case 'setmasterbpm2':
-            if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
-                var bpm  = args[0] * args[1] / 0.25
-                if (bpm < 30) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = 30 * 0.25 / args[1];
-                    that.errorMsg(obj[0] + '/' + obj[1] + ' ' + _('beats per minute must be greater than') + ' ' + target, blk);
-                    that._masterBPM = 30;
-                } else if (bpm > 1000) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = 1000 * 0.25 / args[1];
-                    that.errorMsg(_('maximum') + ' ' + obj[0] + '/' + obj[1] + ' ' + _('beats per minute is') + ' ' + target, blk);
-                    that._masterBPM = 1000;
-                } else {
-                    that._masterBPM = bpm;
-                }
-
-                that.notationTempo(turtle, args[0], args[1]);
-                that.defaultBPMFactor = TONEBPM / that._masterBPM;
-            }
-
-            if (that.inTempo) {
-                that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-            }
-            break;
-        case 'setbpm3':
-            if (args.length === 2 && typeof(args[0]) === 'number' && typeof(args[1]) === 'number') {
-                var bpm  = args[0] * args[1] / 0.25;
-                if (bpm < 30) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = 30 * 0.25 / args[1];
-                    that.errorMsg(obj[0] + '/' + obj[1] + ' ' + _('beats per minute must be greater than') + ' ' + target, blk);
-                    bpm = 30;
-                } else if (bpm > 1000) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = 1000 * 0.25 / args[1];
-                    that.errorMsg(_('maximum') + ' ' + obj[0] + '/' + obj[1] + ' ' + _('beats per minute is') + ' ' + target, blk);
-                    bpm = 1000;
-                } else {
-                    bpm = bpm;
-                }
-
-                that.notationTempo(turtle, args[0], args[1]);
-                that.bpm[turtle].push(bpm);
-            }
-
-            if (that.inTempo) {
-                that.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = that.blocks.blockList[blk].connections[1]
-                that.tempo.BPMs.push(that.blocks.blockList[bpmnumberblock].text.text);
-            }
-            break;
-        case 'setbpm2':
-            if (args.length === 3 && typeof(args[0]) === 'number' && typeof(args[1]) == 'number') {
-                var bpm  = args[0] * args[1] / 0.25
-                if (args[0] < 30) {
-                    that.errorMsg(_('Beats per minute must be > 30.'))
-                    var bpm = 30;
-                } else if (args[0] > 1000) {
-                    that.errorMsg(_('Maximum beats per minute is 1000.'))
-                    bpm = 1000;
-                }
-
-                that.notationTempo(turtle, args[0], args[1]);
-                that.bpm[turtle].push(bpm);
-
-                childFlow = args[2];
-                childFlowCount = 1;
-
-                var listenerName = '_bpm_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.bpm[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-            }
             break;
         case 'status':
             if (that.statusMatrix == null) {
@@ -3801,145 +3681,6 @@ function Logo () {
             that._processNote(64, blk, turtle);
             break;
 
-        case 'pickup':
-            if (args.length !== 1 || typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                break;
-            } else {
-                var arg0 = args[0];
-            }
-
-            if (arg0 < 0) {
-                that.pickup[turtle] = 0;
-            } else {
-                that.pickup[turtle] = arg0;
-            }
-
-            that.notationPickup(turtle, that.pickup[turtle]);
-            break;
-        case 'everybeatdo':
-            // Set up a listener for every beat for this turtle.
-            if (!(args[0] in that.actions)) {
-                that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
-            } else {
-                var __listener = function (event) {
-                    if (that.turtles.turtleList[turtle].running) {
-                        var queueBlock = new Queue(that.actions[args[0]], 1, blk);
-                        that.parentFlowQueue[turtle].push(blk);
-                        that.turtles.turtleList[turtle].queue.push(queueBlock);
-                    } else {
-                        // Since the turtle has stopped
-                        // running, we need to run the stack
-                        // from here.
-                        if (isflow) {
-                            that._runFromBlockNow(that, turtle, that.actions[args[0]], isflow, receivedArg);
-                        } else {
-                            that._runFromBlock(that, turtle, that.actions[args[0]], isflow, receivedArg);
-                        }
-                    }
-                };
-
-                var eventName = '__everybeat_' + turtle + '__';
-                that._setListener(turtle, eventName, __listener);
-
-                that.beatList[turtle].push('everybeat');
-            }
-            break;
-        case 'offbeatdo':
-            // Set up a listener for this turtle/offbeat combo.
-            if (!(args[0] in that.actions)) {
-                that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
-            } else {
-                var __listener = function (event) {
-                    if (that.turtles.turtleList[turtle].running) {
-                        var queueBlock = new Queue(that.actions[args[0]], 1, blk);
-                        that.parentFlowQueue[turtle].push(blk);
-                        that.turtles.turtleList[turtle].queue.push(queueBlock);
-                    } else {
-                        // Since the turtle has stopped
-                        // running, we need to run the stack
-                        // from here.
-                        if (isflow) {
-                            that._runFromBlockNow(that, turtle, that.actions[args[0]], isflow, receivedArg);
-                        } else {
-                            that._runFromBlock(that, turtle, that.actions[args[0]], isflow, receivedArg);
-                        }
-                    }
-                };
-
-                var eventName = '__offbeat_' + turtle + '__';
-                that._setListener(turtle, eventName, __listener);
-
-                that.beatList[turtle].push('offbeat');
-            }
-            break;
-        case 'onbeatdo':
-            // Set up a listener for this turtle/onbeat combo.
-            if (args.length === 2) {
-                if (!(args[1] in that.actions)) {
-                    that.errorMsg(NOACTIONERRORMSG, blk, args[1]);
-                } else {
-                    var __listener = function (event) {
-                        if (that.turtles.turtleList[turtle].running) {
-                            var queueBlock = new Queue(that.actions[args[1]], 1, blk);
-                            that.parentFlowQueue[turtle].push(blk);
-                            that.turtles.turtleList[turtle].queue.push(queueBlock);
-                        } else {
-                            // Since the turtle has stopped
-                            // running, we need to run the stack
-                            // from here.
-                            if (isflow) {
-                                that._runFromBlockNow(that, turtle, that.actions[args[1]], isflow, receivedArg);
-                            } else {
-                                that._runFromBlock(that, turtle, that.actions[args[1]], isflow, receivedArg);
-                            }
-                        }
-                    };
-
-                    var eventName = '__beat_' + args[0] + '_' + turtle + '__';
-                    that._setListener(turtle, eventName, __listener);
-
-                    if (args[0] > that.beatsPerMeasure[turtle]) {
-                        that.factorList[turtle].push(args[0]);
-                    } else {
-                        that.beatList[turtle].push(args[0]);
-                    }
-                }
-            }
-            break;
-        case 'meter':
-            if (args[0] === null || typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 4;
-            } else {
-                var arg0 = args[0];
-            }
-
-            if (that.insideMeterWidget) {
-                that._meterBlock = blk;
-            }
-
-            if (args[1] === null || typeof(args[1]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 1 / 4;
-            } else {
-                var arg1 = args[1];
-            }
-
-            if (arg0 <= 0) {
-                that.beatsPerMeasure[turtle] = 4;
-            } else {
-                that.beatsPerMeasure[turtle] = arg0;
-            }
-
-            if (arg1 <= 0) {
-                that.noteValuePerBeat[turtle] = 4;
-            } else {
-                that.noteValuePerBeat[turtle] = 1 / arg1;
-            }
-
-            that.notationMeter(turtle, that.beatsPerMeasure[turtle], that.noteValuePerBeat[turtle]);
-            break;
         case 'settimbre':
             if (args[0] === null) {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -4619,25 +4360,6 @@ function Logo () {
                 }
 
                 that.glide[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'drift':
-            if (args[0] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            that.drift[turtle] += 1;
-            childFlow = args[0];
-            childFlowCount = 1;
-
-            var listenerName = '_drift_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.drift[turtle] -= 1;
             };
 
             that._setListener(turtle, listenerName, __listener);
@@ -8035,15 +7757,6 @@ function Logo () {
                     that.blocks.blockList[blk].value = last(that.instrumentNames[turtle]);
                 }
                 break;
-            case 'bpmfactor':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'bpm']);
-                } else if (that.bpm[turtle].length > 0) {
-                    that.blocks.blockList[blk].value = last(that.bpm[turtle]);
-                } else {
-                    that.blocks.blockList[blk].value = that._masterBPM;
-                }
-                break;
             case 'staccatofactor':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'staccato']);
@@ -8075,13 +7788,6 @@ function Logo () {
                 } else {
                     var obj = that.keySignature[turtle].split(' ');
                     that.blocks.blockList[blk].value = obj[1];
-                }
-                break;
-            case 'currentmeter':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'currentmeter']);
-                } else {
-                    that.blocks.blockList[blk].value = that.beatsPerMeasure[turtle] + ':' + that.noteValuePerBeat[turtle];
                 }
                 break;
             case 'modelength':
@@ -8128,26 +7834,6 @@ function Logo () {
                     that.blocks.blockList[blk].value = last(that.masterVolume);
                 }
                 break;
-            case 'elapsednotes2':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'elapsednotes2']);
-                } else {
-                    var cblk = that.blocks.blockList[blk].connections[1];
-                    var notevalue = that.parseArg(that, turtle, cblk, blk, receivedArg);
-                    if (notevalue == null || notevalue === 0) {
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        that.blocks.blockList[blk].value = (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1]) / notevalue;
-                    }
-                }
-                break;
-            case 'elapsednotes':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'elapsednotes']);
-                } else {
-                    that.blocks.blockList[blk].value = that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1];
-                }
-                break;
             case 'pitchinhertz':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
                     that.statusFields.push([blk, 'pitchinhertz']);
@@ -8181,11 +7867,7 @@ function Logo () {
                 }
                 break;
             case 'beatfactor':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'beatfactor']);
-                } else {
-                    that.blocks.blockList[blk].value = that.beatFactor[turtle];
-                }
+                
                 break;
             case 'number2pitch':
             case 'number2octave':
@@ -8290,28 +7972,6 @@ function Logo () {
                     that.blocks.blockList[blk].value = value;
                 }
                 break;
-            case 'beatvalue':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'beatvalue']);
-                } else {
-                    if (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] < that.pickup[turtle]) {
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        that.blocks.blockList[blk].value = (((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) % that.beatsPerMeasure[turtle]) + 1;
-                    }
-                }
-                break;
-            case 'measurevalue':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'measurevalue']);
-                } else {
-                    if (that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] < that.pickup[turtle]) {
-                        that.blocks.blockList[blk].value = 0;
-                    } else {
-                        that.blocks.blockList[blk].value = Math.floor(((that.notesPlayed[turtle][0] / that.notesPlayed[turtle][1] - that.pickup[turtle]) * that.noteValuePerBeat[turtle]) / that.beatsPerMeasure[turtle]) + 1;
-                    }
-                }
-                break;
             case 'turtleheap':
                 var value = null;
                 var cblk = that.blocks.blockList[blk].connections[1];
@@ -8413,15 +8073,6 @@ function Logo () {
                     var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
                     var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
                     that.blocks.blockList[blk].value = a || b;
-                }
-                break;
-            case 'notecounter':
-                var cblk = that.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
-                    that.errorMsg(NOINPUTERRORMSG, blk);
-                    that.blocks.blockList[blk].value = 0;
-                } else {
-                    that.blocks.blockList[blk].value = that._noteCounter(turtle, cblk);
                 }
                 break;
             case 'measureintervalsemitones':
@@ -8584,7 +8235,7 @@ function Logo () {
                 if (that.blocks.blockList[blk].name in that.evalArgDict) {
                     eval(that.evalArgDict[that.blocks.blockList[blk].name]);
                 } else {
-                    console.debug('ERROR: I do not know how to ' + that.blocks.blockList[blk].name);
+                    console.error('I do not know how to ' + that.blocks.blockList[blk].name);
                 }
                 break;
             }

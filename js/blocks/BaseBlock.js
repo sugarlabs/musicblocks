@@ -65,7 +65,7 @@ class BaseBlock extends ProtoBlock {
         } else {
             if (this._style.flows.type === 'value')
                 this.style = 'value';
-            else if (this._style.args === 1 || this._style.flows.left) {
+            else if (this._style.flows.left) {
                 this.style = 'arg';
                 this.parameter = true;
             } else if (this._style.args === 2)
