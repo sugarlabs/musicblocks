@@ -175,6 +175,8 @@ function Activity() {
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
         MUSICBLOCKS_EXTRAS = [
+            'activity/blocks/BaseBlock',
+            
             'Tone',
             'widgets/widgetWindows',
             'widgets/modewidget',
@@ -190,7 +192,21 @@ function Activity() {
             'widgets/timbre',
             'activity/lilypond',
             'activity/abc',
-            'activity/mxml'
+
+            'activity/blocks/RhythmBlocks',
+            'activity/blocks/ActionBlocks',
+            'activity/blocks/FlowBlocks',
+            'activity/blocks/NumberBlocks',
+            'activity/blocks/BoxesBlocks',
+            'activity/blocks/BooleanBlocks',
+            'activity/blocks/HeapBlocks',
+            'activity/blocks/ExtrasBlocks',
+            'activity/blocks/GraphicsBlocks',
+            'activity/blocks/PenBlocks',
+            'activity/blocks/MediaBlocks',
+            'activity/blocks/SensorsBlocks',
+            'activity/blocks/EnsembleBlocks',
+
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
