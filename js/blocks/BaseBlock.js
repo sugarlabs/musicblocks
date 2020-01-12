@@ -222,14 +222,6 @@ class BaseBlock extends ProtoBlock {
         else
             this.palette.add(this);
     }
-
-    flow() {
-        return [];
-    }
-
-    arg() {
-        return null;
-    }
 }
 
 
