@@ -366,6 +366,7 @@ function GlobalPlanet(Planet) {
             if (id in that.cache) {
                 var remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+                this._logo.(that.cache[id].ProjectName)
             } else {
                 var remixedName = that.remixPrefix + ' ' + _('My Project');
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
