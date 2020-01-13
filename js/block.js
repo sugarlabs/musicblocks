@@ -5560,6 +5560,8 @@ function Block(protoblock, blocks, overrideName) {
                 case 'rhythm maker':
                 case 'pitch slider':
                 case 'pitch staircase':
+                case 'status':
+                case 'phrase maker':
                   lockInit = true;
                   this.blocks.reInitWidget(topBlock, 5000);
                   break;
