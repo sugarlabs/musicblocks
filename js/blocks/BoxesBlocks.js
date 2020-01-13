@@ -117,7 +117,7 @@ class StoreIn2Block extends FlowBlock {
         });
     }
 
-    args(logo, turtle, blk, receivedArg) {
+    flow(args, logo, turtle, blk) {
         if (args.length !== 1) return;
         logo.boxes[logo.blocks.blockList[blk].privateData] = args[0];
     }
@@ -139,7 +139,7 @@ class StoreInBlock extends FlowBlock {
         })
     }
 
-    args(logo) {
+    flow(args, logo) {
         if (args.length !== 1) return;
         logo.boxes[args[0]] = args[1];
     }

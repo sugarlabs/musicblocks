@@ -195,6 +195,7 @@ function Activity() {
 
             'activity/blocks/RhythmBlocks',
             'activity/blocks/MeterBlocks',
+            'activity/blocks/PitchBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',

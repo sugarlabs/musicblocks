@@ -85,8 +85,8 @@ class BaseBlock extends ProtoBlock {
         this.staticLabels = [this._style.name || ''];
         this.dockTypes = [];
         this.defaults = [];
-        this._style.flows.labels.forEach(i => this.staticLabels.push(i));
         this._style.argLabels.forEach(i => this.staticLabels.push(i));
+        this._style.flows.labels.forEach(i => this.staticLabels.push(i));
 
         if (this._style.flows.left)
             this.dockTypes.push(this._style.outType || 'numberout');
