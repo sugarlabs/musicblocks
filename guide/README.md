@@ -1432,12 +1432,12 @@ keyboard.
 When there are no *Pitch* blocks inside the widget clamp, a keyboard with
 all keys between C4 and G5 is created.
 
-![alt tag](https://rawgithub.com/sdziuda/musicblocks/master/guide/keyboard1.svg "keyboard without clamp")
+![alt tag](https://github.com/sdziuda/musicblocks/blob/master/guide/keyboard1.svg "keyboard without clamp")
 
 When there are *Pitch* blocks inside the widget clamp, a keyboard with
 only those pitches is created.
 
-![alt tag](https://rawgithub.com/sdziuda/musicblocks/master/guide/keyboard2.svg "keyboard with pitch block in clamp")
+![alt tag](https://github.com/sdziuda/musicblocks/blob/master/guide/keyboard2.svg "keyboard with pitch block in clamp")
 
 Click on the keys to hear sounds. Click on the Play button to playback
 all of the notes played. Click on the Save button to output code (a
