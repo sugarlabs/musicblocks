@@ -2530,7 +2530,16 @@ function Activity() {
     /*
      * Updates all canvas elements
      */
+    var blockRefreshCanvas = false;
     function refreshCanvas() {
+        if(blockRefreshCanvas) return;
+
+        console.log('updating');
+
+        blockRefreshCanvas = true;
+        setTimeout(function() {
+            blockRefreshCanvas = false;
+        }, 5)
         stage.update(event);
         update = true;
     };
