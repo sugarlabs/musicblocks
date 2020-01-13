@@ -333,9 +333,9 @@ function Logo () {
     // this.blinkState = !this.optimize;
     this.blinkState = true;
     if (this.optimize) {
-        createjs.Ticker.framerate = 10;
+        // createjs.Ticker.framerate = 10;
     } else {
-        createjs.Ticker.framerate = 30;
+        // createjs.Ticker.framerate = 30;
     }
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -384,12 +384,12 @@ function Logo () {
     this.setOptimize = function (state) {
         if (state) {
             // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
-            createjs.Ticker.framerate = 10;
+            // createjs.Ticker.framerate = 10;
             this.optimize = true;
 
         } else {
             // this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            createjs.Ticker.framerate = 10; // 30;
+            // createjs.Ticker.framerate = 10; // 30;
             this.optimize = false;
         }
 
@@ -9083,6 +9083,7 @@ function Logo () {
         if (callback !== undefined && callback !== null) {
             callback();
         }
+        stage.update(event);
     };
 
     /**

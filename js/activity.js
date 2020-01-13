@@ -2549,7 +2549,18 @@ function Activity() {
     /*
      * Updates all canvas elements
      */
+    var blockRefreshCanvas = false;
     function refreshCanvas() {
+        if (blockRefreshCanvas) {
+            return;
+        }
+
+        blockRefreshCanvas = true;
+        setTimeout(function() {
+            blockRefreshCanvas = false;
+        }, 5);
+
+        stage.update(event);
         update = true;
     };
 
@@ -2558,7 +2569,6 @@ function Activity() {
      * event handler indicates a change has happened.
      */
     this.__tick = function (event) {
-
         if (update || createjs.Tween.hasActiveTweens()) {
             update = false; // Only update once
             stage.update(event);
@@ -2786,6 +2796,7 @@ function Activity() {
         var __afterLoad = function () {
             if (!turtles.running()) {
                 setTimeout(function () {
+                    stage.update(event);
                     console.debug('reset turtles after load: ' + turtles.turtleList.length);
 
                     for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -3894,11 +3905,22 @@ function Activity() {
         stage = new createjs.Stage(canvas);
         createjs.Touch.enable(stage);
 
-        createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 15;
+        // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+        // createjs.Ticker.framerate = 15;
         // createjs.Ticker.addEventListener('tick', stage);
-        createjs.Ticker.addEventListener('tick', that.__tick);
+        // createjs.Ticker.addEventListener('tick', that.__tick);
+        
+        var mouseEvents = 0;
+        document.addEventListener('mousemove', function() {
+            mouseEvents++;
+            if(mouseEvents % 4 == 0) {
+                that.__tick();
+            }
+        })
 
+        document.addEventListener('click', function() {
+            that.__tick();
+        })
         _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
@@ -4239,6 +4261,7 @@ function Activity() {
             };
 
             this.saveLocally = function () {
+                stage.update(event);
                 console.debug('overwriting session data');
                 var data = prepareExport();
                 var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
@@ -4266,6 +4289,7 @@ function Activity() {
                 //if (sugarizerCompatibility.isInsideSugarizer()) {
                 //    sugarizerCompatibility.saveLocally();
                 //}
+
             };
 
             this.openCurrentProject = async function () {
