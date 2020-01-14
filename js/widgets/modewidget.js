@@ -31,44 +31,28 @@ function ModeWidget() {
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var modeDiv = docById('modeDiv');
-        modeDiv.style.visibility = 'visible';
-        modeDiv.setAttribute('draggable', 'true');
-        modeDiv.style.left = '200px';
-        modeDiv.style.top = '150px';
-
-        // The mode buttons
-        var modeButtonsDiv = docById('modeButtonsDiv');
-        modeButtonsDiv.style.display = 'inline';
-        modeButtonsDiv.style.visibility = 'visible';
-        modeButtonsDiv.style.width = BUTTONDIVWIDTH;
-        modeButtonsDiv.innerHTML = '<table cellpadding="0px" id="modeButtonTable"></table>';
-
-        var buttonTable = docById('modeButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        this.modeTableDiv = document.createElement("div");
+        widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
-        cell.onclick=function() {
+
+        widgetWindow.onclose=function() {
             docById('modeDiv').style.visibility = 'hidden';
             docById('modeButtonsDiv').style.visibility = 'hidden';
             docById('modeTableDiv').style.visibility = 'hidden';
             docById('modePianoDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
+            this.destroy();
         }
 
-
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
-        this._playButton = cell;
-
-        cell.onclick=function() {
+        this._playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play'));
+        this._playButton.onclick = function() {
             that._logo.resetSynth(0);
             if (that._playingStatus()) {
                 that._playing = false;
@@ -83,39 +67,32 @@ function ModeWidget() {
             }
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-
-        cell.onclick=function() {
-            that._save();
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
+          that._save();
         }
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
 
-        cell.onclick=function() {
+        widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function() {
             that._clear();
         }
 
-        var cell = this._addButton(row, 'rotate-left.svg', ICONSIZE, _('Rotate counter clockwise'));
 
-        cell.onclick=function() {
+
+        widgetWindow.addButton('rotate-left.svg', ICONSIZE, _('Rotate counter clockwise')).onclick = function() {
             that._rotateLeft();
         }
 
-        var cell = this._addButton(row, 'rotate-right.svg', ICONSIZE, _('Rotate clockwise'));
 
-        cell.onclick=function() {
+
+        widgetWindow.addButton('rotate-right.svg', ICONSIZE, _('Rotate clockwise')).onclick = function() {
             that._rotateRight();
         }
 
-        var cell = this._addButton(row, 'invert.svg', ICONSIZE, _('Invert'));
-
-        cell.onclick=function() {
+        widgetWindow.addButton('invert.svg', ICONSIZE, _('Invert')).onclick = function() {
             that._invert();
         }
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
-
-        cell.onclick=function() {
+        widgetWindow.addButton('restore-button.svg', ICONSIZE, _('Undo')).onclick = function() {
             that._undo();
         }
 
@@ -128,82 +105,15 @@ function ModeWidget() {
         //     that._logo.hideMsgs();
         // }
 
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - modeDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - modeDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                modeDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                modeDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        modeDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        modeDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                modeDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                modeDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        modeDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        modeDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
         // The mode table (holds a pie menu and a label)
-        var modeTableDiv = docById('modeTableDiv');
+        var modeTableDiv = this.modeTableDiv;
         modeTableDiv.style.display = 'inline';
         modeTableDiv.style.visibility = 'visible';
         modeTableDiv.style.border = '0px';
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
         modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
         modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
-		modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+		    modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
         this._piemenuMode();
 
@@ -227,6 +137,7 @@ function ModeWidget() {
 
         //.TRANS: A circle of notes represents the musical mode.
         this._logo.textMsg(_('Click in the circle to select notes for the mode.'));
+        widgetWindow.sendToCenter();
     };
 
     this._playingStatus = function() {
