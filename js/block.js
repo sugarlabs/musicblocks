@@ -5562,6 +5562,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'pitch staircase':
                 case 'status':
                 case 'phrase maker':
+                case 'custom mode':
                   lockInit = true;
                   this.blocks.reInitWidget(topBlock, 5000);
                   break;
