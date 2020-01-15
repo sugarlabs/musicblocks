@@ -308,7 +308,7 @@ function MusicKeyboard() {
         widgetWindow.clear();
 
 
-        // The pitch-staircase (psc) table
+  	//Keyboard Table and Div
         this.keyboardDiv = document.createElement("div");
         this.keyTable = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.keyboardDiv);
@@ -382,6 +382,7 @@ function MusicKeyboard() {
 
         this._createKeyboard();
         this._createTable();
+	widgetWindow.sendToCenter();
 
         /*
         this.toggleNotesButton = function () {
