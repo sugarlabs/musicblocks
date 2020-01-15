@@ -4180,7 +4180,7 @@ function Activity() {
                     errorMsg(_('project undefined'));
                     return;
                 }
-                textMsg(_(this.getCurrentProjectName()));
+                textMsg(this.getCurrentProjectName());
                 console.debug('LOADING' + this.getCurrentProjectName());
                 console.debug('loadRawProject ' + data);
                 loading = true;
