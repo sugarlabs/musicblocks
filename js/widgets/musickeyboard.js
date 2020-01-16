@@ -325,7 +325,6 @@ function MusicKeyboard() {
         widgetWindow.onmaximize = function(){
           if(widgetWindow._maximized){
             widgetWindow.getWidgetBody().style.height = "700px";
-            console.log(widgetWindow._maximized);
           } else{
             widgetWindow.getWidgetBody().style.height = "550px";
           }
