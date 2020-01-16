@@ -163,6 +163,7 @@ function Activity() {
         'activity/rubrics',
         'activity/macros',
         'activity/SaveInterface',
+        'activity/LoadInterface',
         'utils/musicutils',
         'utils/synthutils',
         // 'activity/playbackbox',
@@ -2583,6 +2584,7 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
+        console.log('hiasdf');
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -4340,7 +4342,9 @@ function Activity() {
         } catch (e) {
             planet = undefined;
         }
-
+        
+        console.log("save is ")
+        console.log(save);
         save = new SaveInterface(planet);
         save.setVariables([
             ['logo', logo],
@@ -4351,6 +4355,10 @@ function Activity() {
         ]);
         save.init();
 
+        load = new LoadInterface();
+        console.log('hi');
+        console.log(load);
+
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
 
@@ -4358,8 +4366,9 @@ function Activity() {
         toolbar.renderPlayIcon(that._doFastButton);
         toolbar.renderStopIcon(that.doHardStopButton);
         toolbar.renderNewProjectIcon(_afterDelete);
-        toolbar.renderLoadIcon(doLoad);
+        // toolbar.renderLoadIcon(doLoad);
         toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveBlockArtwork.bind(save));
+        toolbar.renderLoadIcon(load.loadHTML.bind(load), load.loadABC.bind(load));
         toolbar.renderPlanetIcon(planet, _doOpenSamples);
         toolbar.renderMenuIcon(_showHideAuxMenu);
         toolbar.renderHelpIcon(_showHelp);

@@ -66,12 +66,34 @@ function Toolbar() {
         };
     };
 
-    this.renderLoadIcon = function (onclick) {
-        var loadIcon = docById('load');
+    this.renderLoadIcon = function (html_onclick, abc_onclick) {
+        console.log("Rendering load buttons")
+        var loadFromFileButton = docById('loadFromFileButton');
+        var loadFromFileButtonAdvanced = docById('loadFromFileButtonAdvanced');
 
-        loadIcon.onclick = function () {
-            onclick();
-        };
+        if(beginnerMode) {
+            loadFromFileButtonAdvanced.style.display = 'none';
+
+            loadFromFileButton.onclick = function() {
+                html_onclick();
+            }
+        } else {
+            console.log("advanced mode load buttons, provide option for abc");
+            loadFromFileButton.style.display = 'none';
+            loadFromFileButtonAdvanced.style.display = 'block';
+            loadFromFileButtonAdvanced.onclick = function() {
+                var loadHTML = docById('load-html');
+                var loadABC = docById('load-abc');
+
+                loadHTML.onclick = function() {
+                    console.log("load project from html file");
+                }
+
+                loadABC.onclick = function() {
+                    console.log("load project from ABC file");
+                }
+            }
+        }
     };
 
     this.renderSaveIcons = function (html_onclick, doSVG_onclick, svg_onclick, png_onclick, wave_onclick, ly_onclick, abc_onclick, blockartworksvg_onclick) {
@@ -399,7 +421,8 @@ function Toolbar() {
             ['play', _('Play')],
             ['stop', _('Stop')],
             ['newFile', _('New project')],
-            ['load', _('Load project from file')],
+            ['loadFromFileButton', _('Load project from file')],
+            ['loadFromFileButtonAdvanced', _('Load project from file')],
             ['saveButton', _('Save project')],
             ['saveButtonAdvanced', _('Save project as HTML')],
             ['planetIcon', _('Find and share projects')],
@@ -426,6 +449,8 @@ function Toolbar() {
             ['save-ly', _('Save sheet music as Lilypond'), 'innerHTML'],
             ['save-blockartwork-svg', _('Save block artwork as SVG'), 'innerHTML'],
             ['new-project', _('Confirm'), 'innerHTML'],
+            ['load-html', _('Load from HTML'), 'innerHTML'],
+            ['load-abc', _('Load from ABC file'), 'innerHTML'],
             ['enUS', _('English (United States)'), 'innerHTML'],
             ['enUK', _('English (United Kingdom)'), 'innerHTML'],
             ['ja', _('日本語'), 'innerHTML'],
@@ -483,7 +508,8 @@ function Toolbar() {
             ['play', _('Play')],
             ['stop', _('Stop')],
             ['newFile', _('New project')],
-            ['load', _('Load project from file')],
+            ['loadFromFileButton', _('Load project'), 'innerHTML'],
+            ['loadFromFileButtonAdvanced', _('Load project'), 'innerHTML'],
             ['saveButton', _('Save project')],
             ['saveButtonAdvanced', _('Save project as HTML')],
             ['planetIcon', _('Find and share projects')],
