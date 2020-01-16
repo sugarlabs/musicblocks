@@ -80,7 +80,8 @@ function WidgetWindow(key, title) {
             let dy = bcr.top - e.clientY;
 
             that.restore();
-
+            that.onmaximize();
+            
             bcr = that._drag.getBoundingClientRect();
             dx *= (bcr.right - bcr.left);
             that.setPosition(e.clientX + dx, e.clientY + dy);
