@@ -319,6 +319,17 @@ function MusicKeyboard() {
         this._keysLayout();
 
         var that = this;
+	    
+	//Change widget size on fullscreen mode, else
+        //revert back to original size on unfullscreen mode
+        widgetWindow.onmaximize = function(){
+          if(widgetWindow._maximized){
+            widgetWindow.getWidgetBody().style.height = "700px";
+            console.log(widgetWindow._maximized);
+          } else{
+            widgetWindow.getWidgetBody().style.height = "550px";
+          }
+        };
 
         widgetWindow.onclose = function() {
           document.onkeydown = saveOnKeyDown;
