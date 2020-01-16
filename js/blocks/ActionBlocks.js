@@ -621,6 +621,16 @@ class NamedDoBlock extends FlowBlock {
     }
 }
 
+class Temperament1Block extends StackClampBlock {
+    constructor() {
+        super('temperament1');
+        this.setPalette('action');
+        this.formBlock({
+            name: _('define temperament'), args: 1
+        });
+        this.hidden = true;
+    }
+}
 
 function setupActionBlocks() {
     new ReturnBlock().setup();
