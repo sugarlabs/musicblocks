@@ -2584,7 +2584,6 @@ function Activity() {
      *  Loads/merges existing MB file
      */
     doLoad = function (merge) {
-        console.log('hiasdf');
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -4343,8 +4342,6 @@ function Activity() {
             planet = undefined;
         }
         
-        console.log("save is ")
-        console.log(save);
         save = new SaveInterface(planet);
         save.setVariables([
             ['logo', logo],
@@ -4356,8 +4353,6 @@ function Activity() {
         save.init();
 
         load = new LoadInterface();
-        console.log('hi');
-        console.log(load);
 
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
