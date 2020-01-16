@@ -115,7 +115,7 @@ function WidgetWindow(key, title) {
         if (that._maximized) that.restore();
         else that.maximize();
         that.takeFocus();
-
+        that.onmaximize(); 
         e.preventDefault();
         e.stopImmediatePropagation();
     };
@@ -169,6 +169,10 @@ function WidgetWindow(key, title) {
         this._frame.remove();
 
         window.widgetWindows.openWindows[this._key] = undefined;
+    };
+    
+    this.onmaximize = function() {
+        this.maximize();
     };
 
     this.setPosition = function (x, y) {
