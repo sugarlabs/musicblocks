@@ -308,7 +308,7 @@ function MusicKeyboard() {
         widgetWindow.clear();
 
 
-  	//Keyboard Table and Div
+        // Keyboard
         this.keyboardDiv = document.createElement("div");
         this.keyTable = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.keyboardDiv);
@@ -319,16 +319,22 @@ function MusicKeyboard() {
         this._keysLayout();
 
         var that = this;
-	    
-	//Change widget size on fullscreen mode, else
+
+        //Change widget size on fullscreen mode, else
         //revert back to original size on unfullscreen mode
         widgetWindow.onmaximize = function(){
           if(widgetWindow._maximized){
-            widgetWindow.getWidgetBody().style.height = "700px";
+            widgetWindow.getWidgetBody().style.position = "absolute";
+            widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
+            widgetWindow.getWidgetBody().style.width = "200vh";
+            widgetWindow.getWidgetBody().style.left = "70px";
           } else{
+            widgetWindow.getWidgetBody().style.position = "relative";
+            widgetWindow.getWidgetBody().style.left = "0px";
             widgetWindow.getWidgetBody().style.height = "550px";
+            widgetWindow.getWidgetBody().style.width = "1000px";
           }
-        };
+        }
 
         widgetWindow.onclose = function() {
           document.onkeydown = saveOnKeyDown;
@@ -392,7 +398,8 @@ function MusicKeyboard() {
 
         this._createKeyboard();
         this._createTable();
-	widgetWindow.sendToCenter();
+
+        widgetWindow.sendToCenter();
 
         /*
         this.toggleNotesButton = function () {
