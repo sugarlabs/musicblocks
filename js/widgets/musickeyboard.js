@@ -50,6 +50,7 @@ function MusicKeyboard() {
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
+
     this.addRowBlock = function(rowBlock) {
         // In case there is a repeat block, use a unique block number
         // for each instance.
@@ -308,33 +309,11 @@ function MusicKeyboard() {
         widgetWindow.clear();
 
 
-        // Keyboard
-        this.keyboardDiv = document.createElement("div");
-        this.keyTable = document.createElement("div");
-        widgetWindow.getWidgetBody().append(this.keyboardDiv);
-        widgetWindow.getWidgetBody().append(this.keyTable);
-        widgetWindow.getWidgetBody().style.height = "550px";
-        widgetWindow.getWidgetBody().style.width = "1000px";
-
         this._keysLayout();
+
 
         var that = this;
 
-        //Change widget size on fullscreen mode, else
-        //revert back to original size on unfullscreen mode
-        widgetWindow.onmaximize = function(){
-          if(widgetWindow._maximized){
-            widgetWindow.getWidgetBody().style.position = "absolute";
-            widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-            widgetWindow.getWidgetBody().style.width = "200vh";
-            widgetWindow.getWidgetBody().style.left = "70px";
-          } else{
-            widgetWindow.getWidgetBody().style.position = "relative";
-            widgetWindow.getWidgetBody().style.left = "0px";
-            widgetWindow.getWidgetBody().style.height = "550px";
-            widgetWindow.getWidgetBody().style.width = "1000px";
-          }
-        }
 
         widgetWindow.onclose = function() {
           document.onkeydown = saveOnKeyDown;
@@ -395,9 +374,53 @@ function MusicKeyboard() {
 
         //that._createKeyboard();
 
+        // Keyboard
+        this.keyboardDiv = document.createElement("div");
+        this.keyTable = document.createElement("div");
+        widgetWindow.getWidgetBody().append(this.keyboardDiv);
+        widgetWindow.getWidgetBody().append(this.keyTable);
+        widgetWindow.getWidgetBody().style.height = "550px";
+        widgetWindow.getWidgetBody().style.width = "1000px";
+
 
         this._createKeyboard();
+
+
+        //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
+
         this._createTable();
+
+
+
+        var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
+
+
+        //Change widget size on fullscreen mode, else
+        //revert back to original size on unfullscreen mode
+        widgetWindow.onmaximize = function(){
+          if(widgetWindow._maximized){
+            widgetWindow.getWidgetBody().style.position = "absolute";
+            widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
+            widgetWindow.getWidgetBody().style.width = "200vh";
+            docById('mkbOuterDiv').style.width = "calc(200vh - 64px)";
+            try{
+              docById('mkbInnerDiv').style.width = "calc(200vh - 200px)";
+            }
+            catch(e){
+              console.log("Hello");
+            }
+            widgetWindow.getWidgetBody().style.left = "70px";
+
+          } else{
+            widgetWindow.getWidgetBody().style.position = "relative";
+            widgetWindow.getWidgetBody().style.left = "0px";
+            widgetWindow.getWidgetBody().style.height = "550px";
+            widgetWindow.getWidgetBody().style.width = "1000px";
+            docById('mkbOuterDiv').style.width = w + 'px';
+          }
+        }
+
+
 
         widgetWindow.sendToCenter();
 
@@ -753,19 +776,16 @@ function MusicKeyboard() {
         var outerDiv = docById('mkbOuterDiv');
         if (this.layout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
         } else {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.layout.length + 4) + 'px';
-            var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
-            outerDiv.style.width = w + 'px';
         }
+
+
         outerDiv.style.backgroundColor = 'white';
         outerDiv.style.marginTop = '15px';
 
-        var w = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
+        //var w = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
         var innerDiv = docById('mkbInnerDiv');
-        innerDiv.style.width = w + 'px';
         innerDiv.style.marginLeft = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + 'px';
 
         var mkbTable = docById('mkbTable');
