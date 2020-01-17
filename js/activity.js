@@ -4494,6 +4494,33 @@ function Activity() {
                         errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else if (rawData.substring(0, 2) === "X:") { // Check for ABC notation header
                         console.log("is abc notation");
+                        var cleanData = rawData.replace('\n', ' ')
+
+                        var blocksData = [];
+                        // TODO: Parse cleanData into blocksData here
+
+                        
+                        for (var name in blocks.palettes.dict) {
+                            blocks.palettes.dict[name].hideMenu(true);
+                        }
+
+                        stage.removeAllEventListeners('trashsignal');
+                        
+                        // Wait for the old blocks to be removed.
+                        var __listener = function (event) {
+                            logo.playbackQueue = {};
+                            blocks.loadNewBlocks(blocksData);
+                            setPlaybackStatus();
+                            stage.removeAllEventListeners('trashsignal');
+                        };
+
+                        stage.addEventListener('trashsignal', __listener, false);
+                        sendAllToTrash(false, false);
+                        console.log('clearing on load...');
+                        _allClear(false);
+                        if (planet) {
+                            planet.initialiseNewProject(fileChooser.files[0].name.substr(0, fileChooser.files[0].name.lastIndexOf('.')));
+                        }
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 
