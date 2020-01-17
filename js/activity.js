@@ -4492,6 +4492,8 @@ function Activity() {
                     if (rawData == null || rawData === '') {
                         console.log('rawData is ' + rawData);
                         errorMsg(_('Cannot load project from the file. Please check the file type.'));
+                    } else if (rawData.substring(0, 2) === "X:") { // Check for ABC notation header
+                        console.log("is abc notation");
                     } else {
                         var cleanData = rawData.replace('\n', ' ');
 

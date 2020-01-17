@@ -87,10 +87,12 @@ function Toolbar() {
 
                 loadHTML.onclick = function() {
                     console.log("load project from html file");
+                    html_onclick();
                 }
 
                 loadABC.onclick = function() {
                     console.log("load project from ABC file");
+                    abc_onclick();
                 }
             }
         }
