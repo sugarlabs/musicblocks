@@ -80,7 +80,8 @@ function WidgetWindow(key, title) {
             let dy = bcr.top - e.clientY;
 
             that.restore();
-
+            that.onmaximize();
+            
             bcr = that._drag.getBoundingClientRect();
             dx *= (bcr.right - bcr.left);
             that.setPosition(e.clientX + dx, e.clientY + dy);
@@ -115,7 +116,7 @@ function WidgetWindow(key, title) {
         if (that._maximized) that.restore();
         else that.maximize();
         that.takeFocus();
-
+        that.onmaximize(); 
         e.preventDefault();
         e.stopImmediatePropagation();
     };
@@ -169,6 +170,10 @@ function WidgetWindow(key, title) {
         this._frame.remove();
 
         window.widgetWindows.openWindows[this._key] = undefined;
+    };
+    
+    this.onmaximize = function() {
+        this.maximize();
     };
 
     this.setPosition = function (x, y) {

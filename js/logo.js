@@ -2154,22 +2154,21 @@ function Logo () {
                 if (args.length === 1) {
                     if (args[0] !== null) {
                         if (that.inNoteBlock[turtle].length > 0) {
-                            that.embeddedGraphics[turtle][last(that.inNoteBlock[turtle])].push(blk);
                             that.markup[turtle].push(args[0].toString());
-                        } else {
-                            if (!that.suppressOutput[turtle]) {
-                                if (args[0] === undefined) {
-                                    that.textMsg('undefined');
-                                } else if (args[0] === null) {
-                                    that.textMsg('null');
-                                } else {
-                                    that.textMsg(args[0].toString());
-                                }
-                            }
+                        }
 
-                            if (that.justCounting[turtle].length === 0) {
-                                that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'print', args[0]]);
+                        if (!that.suppressOutput[turtle]) {
+                            if (args[0] === undefined) {
+                                that.textMsg('undefined');
+                            } else if (args[0] === null) {
+                                that.textMsg('null');
+                            } else {
+                                that.textMsg(args[0].toString());
                             }
+                        }
+
+                        if (that.justCounting[turtle].length === 0) {
+                            that._playbackPush(turtle, [that.previousTurtleTime[turtle], 'print', args[0]]);
                         }
                     }
                 }
@@ -6903,7 +6902,7 @@ function Logo () {
                 break;
             }
 
-	    if (args[0] === null || typeof(args[0]) !== 'number') {
+            if (args[0] === null || typeof(args[0]) !== 'number') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
                 var arg = 0;
             } else {
@@ -11062,7 +11061,7 @@ function Logo () {
                         that.blocks.blockList[blk].value = that.synth._getFrequency(that.lastNotePlayed[turtle][0], that.synth.changeInTemperament);
                     } else {
                         that.blocks.blockList[blk].value = 0;
-		    }
+                    }
                 }
                 break;
             case 'turtleelapsednotes':
@@ -11615,6 +11614,8 @@ function Logo () {
                 }
                 break;
             case 'pop':
+                console.log('pop from:')
+                console.log(that.turtleHeaps[turtle])
                 var block = that.blocks.blockList[blk];
                 if (turtle in that.turtleHeaps && that.turtleHeaps[turtle].length > 0) {
                     block.value = that.turtleHeaps[turtle].pop();
@@ -12280,7 +12281,7 @@ function Logo () {
 
         if (x1 === x2 && y1 === y2) {
             return(0);
-	}
+        }
 
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     };

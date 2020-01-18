@@ -5563,6 +5563,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'status':
                 case 'phrase maker':
                 case 'custom mode':
+                case 'music keyboard':
                   lockInit = true;
                   this.blocks.reInitWidget(topBlock, 5000);
                   break;

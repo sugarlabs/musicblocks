@@ -1387,6 +1387,7 @@ function Blocks (activity) {
                   case 'status':
                   case 'phrase maker':
                   case 'custom mode':
+                  case 'music keyboard':
                     lockInit = true;
                     this.reInitWidget(initialTopBlock, 1500);
                     break;
@@ -1754,6 +1755,7 @@ function Blocks (activity) {
                       case 'status':
                       case 'phrase maker':
                       case 'custom mode':
+                      case 'music keyboard':
                         lockInit = true;
                         this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                         break;
