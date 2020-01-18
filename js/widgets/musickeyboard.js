@@ -50,7 +50,6 @@ function MusicKeyboard() {
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
-
     this.addRowBlock = function(rowBlock) {
         // In case there is a repeat block, use a unique block number
         // for each instance.
@@ -71,7 +70,6 @@ function MusicKeyboard() {
         this._notesPlayed.sort(function(a, b) {
             return a.startTime - b.startTime;
         });
-
 
         // Cluster notes that start at the same time.
         if (beginnerMode === 'true') {
@@ -308,59 +306,56 @@ function MusicKeyboard() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
-
         this._keysLayout();
-
 
         var that = this;
 
-
         widgetWindow.onclose = function() {
-          document.onkeydown = saveOnKeyDown;
-          document.onkeyup = saveOnKeyUp;
+            document.onkeydown = saveOnKeyDown;
+            document.onkeyup = saveOnKeyUp;
 
-          if (document.getElementById('keyboardHolder2')) {
-              document.getElementById('keyboardHolder2').style.display = 'none';
-          }
+            if (document.getElementById('keyboardHolder2')) {
+                document.getElementById('keyboardHolder2').style.display = 'none';
+            }
 
-          var myNode = document.getElementById('myrow');
-          if (myNode != null) {
-              myNode.innerHTML = '';
-          }
+            var myNode = document.getElementById('myrow');
+            if (myNode != null) {
+                myNode.innerHTML = '';
+            }
 
-          var myNode = document.getElementById('myrow2');
-          if (myNode != null) {
-              myNode.innerHTML = '';
-          }
+            var myNode = document.getElementById('myrow2');
+            if (myNode != null) {
+                myNode.innerHTML = '';
+            }
 
-          selected = [];
-          selectedNotes = [];
+            selected = [];
+            selectedNotes = [];
 
-          this.destroy();
+            this.destroy();
         };
 
         this.playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play'));
 
         this.playButton.onclick = function() {
-          that._logo.setTurtleDelay(0);
-          that.processSelected();
-          that.playAll();
+            that._logo.setTurtleDelay(0);
+            that.processSelected();
+            that.playAll();
         };
 
         widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
-          that._save();
+            that._save();
         };
 
         widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function() {
-          that._notesPlayed =[];
-          selectedNotes = [];
-          // if (!that.keyboardShown) {
-              that._createTable();
-          // }
+            that._notesPlayed =[];
+            selectedNotes = [];
+            // if (!that.keyboardShown) {
+            that._createTable();
+            // }
         };
 
         widgetWindow.addButton('add2.svg', ICONSIZE, _('Add note')).onclick = function() {
-          that._createAddRowPieSubmenu();
+            that._createAddRowPieSubmenu();
         };
 
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
@@ -368,60 +363,51 @@ function MusicKeyboard() {
         //that._createKeyboard();
 
         // Append keyboard and div on widget windows
-        this.keyboardDiv = document.createElement("div");
-        var attr = document.createAttribute("id");
-        attr.value = "mkbKeyboardDiv";
+        this.keyboardDiv = document.createElement('div');
+        var attr = document.createAttribute('id');
+        attr.value = 'mkbKeyboardDiv';
         this.keyboardDiv.setAttributeNode(attr);
-        this.keyTable = document.createElement("div");
+        this.keyTable = document.createElement('div');
         widgetWindow.getWidgetBody().append(this.keyboardDiv);
         widgetWindow.getWidgetBody().append(this.keyTable);
-        widgetWindow.getWidgetBody().style.height = "550px";
-        widgetWindow.getWidgetBody().style.width = "1000px";
-
+        widgetWindow.getWidgetBody().style.height = '550px';
+        widgetWindow.getWidgetBody().style.width = '1000px';
 
         this._createKeyboard();
-
 
         //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
 
         this._createTable();
-
-
 
         var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
 
         //Change widget size on fullscreen mode, else
         //revert back to original size on unfullscreen mode
         widgetWindow.onmaximize = function(){
-          if(widgetWindow._maximized){
-            widgetWindow.getWidgetBody().style.position = "absolute";
-            widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-            widgetWindow.getWidgetBody().style.width = "200vh";
-            docById('mkbOuterDiv').style.width = "calc(200vh - 64px)";
-            docById("keyboardHolder2").style.width = 'calc(200vh - 64px)';
-            try{
-              docById('mkbInnerDiv').style.width = "calc(200vh - 200px)";
-            }
-            catch(e){
-              console.debug("Error");
-            }
-            widgetWindow.getWidgetBody().style.left = "70px";
+            if(widgetWindow._maximized){
+                widgetWindow.getWidgetBody().style.position = 'absolute';
+                widgetWindow.getWidgetBody().style.height = 'calc(100vh - 64px)';
+                widgetWindow.getWidgetBody().style.width = '200vh';
+                docById('mkbOuterDiv').style.width = 'calc(200vh - 64px)';
+                docById('keyboardHolder2').style.width = 'calc(200vh - 64px)';
+                try {
+                    docById('mkbInnerDiv').style.width = 'calc(200vh - 200px)';
+                }
+                catch(e) {
+                    console.debug('Error calculating InnerDiv width');
+                }
 
-          } else{
-            widgetWindow.getWidgetBody().style.position = "relative";
-            widgetWindow.getWidgetBody().style.left = "0px";
-            widgetWindow.getWidgetBody().style.height = "550px";
-            widgetWindow.getWidgetBody().style.width = "1000px";
-            docById('mkbOuterDiv').style.width = w + 'px';
-          }
+                widgetWindow.getWidgetBody().style.left = '70px';
+            } else {
+                widgetWindow.getWidgetBody().style.position = 'relative';
+                widgetWindow.getWidgetBody().style.left = '0px';
+                widgetWindow.getWidgetBody().style.height = '550px';
+                widgetWindow.getWidgetBody().style.width = '1000px';
+                docById('mkbOuterDiv').style.width = w + 'px';
+            }
         }
 
-
-
         widgetWindow.sendToCenter();
-
-
-
     };
 
     this.playAll = function() {
@@ -753,7 +739,6 @@ function MusicKeyboard() {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (this.layout.length + 4) + 'px';
         }
 
-
         outerDiv.style.backgroundColor = 'white';
         outerDiv.style.marginTop = '15px';
 
@@ -831,7 +816,7 @@ function MusicKeyboard() {
         newCell.innerHTML = '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var cellColor = 'lightgrey';
 
-	console.debug(selectedNotes);
+        console.debug(selectedNotes);
         for (var j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
             var noteMaxWidth = this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + 'px';
@@ -888,7 +873,6 @@ function MusicKeyboard() {
         this.newNoteValue = 2;
         var mainTabsLabels = ['divide', 'delete', 'add', String(this.newNoteValue)];
         var editDurationLabels = ['1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8', '1/1']
-
 
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
@@ -1436,7 +1420,7 @@ function MusicKeyboard() {
 
             this._accidentalsWheel.navigateWheel(accidentalsValue)
             this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()))
-	    console.debug(noteValue);
+            console.debug(noteValue);
             this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue))
         }
 
@@ -1488,8 +1472,8 @@ function MusicKeyboard() {
             if (condition === 'pitchblocks') {
                 var i = noteLabelsI18n.indexOf(label);
                 var labelValue = noteLabels[i];
-		console.debug(label);
-		console.debug(labelValue);
+                console.debug(label);
+                console.debug(labelValue);
                 var attr = that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
                 var flag = false;
                 if (attr !== '♮') {
@@ -1592,7 +1576,6 @@ function MusicKeyboard() {
         blackRow[0].style.borderSpacing = '0px 0px 20px';
         blackRow[0].style.borderCollapse= 'separate';
 
-
         var myNode = document.getElementById('myrow');
         myNode.innerHTML = '';
         var myNode = document.getElementById('myrow2');
@@ -1618,7 +1601,6 @@ function MusicKeyboard() {
         that.idContainer = [];
         var myrowId = 0;
         var myrow2Id = 0;
-
 
         for (var p = 0; p < this.layout.length; p++) {
             if (this.layout[p].noteName === null) {
@@ -1750,8 +1732,6 @@ function MusicKeyboard() {
                 newel.style.zIndex = '100';
                 parenttbl.appendChild(newel);
             }
-
-
         }
 
         for (var i = 0; i < that.idContainer.length; i++) {
@@ -1841,7 +1821,6 @@ function MusicKeyboard() {
         this.noteNames = [];
         this.octaves = [];
     };
-
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
