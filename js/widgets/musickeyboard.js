@@ -319,13 +319,6 @@ function MusicKeyboard() {
           document.onkeydown = saveOnKeyDown;
           document.onkeyup = saveOnKeyUp;
 
-          var mkbKeyboardDiv = docById('mkbKeyboardDiv');
-          mkbKeyboardDiv.innerHTML = '';
-          var mkbTableDiv = docById('mkbTableDiv');
-          mkbTableDiv.innerHTML = '';
-          mkbDiv.style.visibility = 'hidden';
-          mkbButtonsDiv.style.visibility = 'hidden';
-
           if (document.getElementById('keyboardHolder2')) {
               document.getElementById('keyboardHolder2').style.display = 'none';
           }
@@ -374,8 +367,11 @@ function MusicKeyboard() {
 
         //that._createKeyboard();
 
-        // Keyboard
+        // Append keyboard and div on widget windows
         this.keyboardDiv = document.createElement("div");
+        var attr = document.createAttribute("id");
+        attr.value = "mkbKeyboardDiv";
+        this.keyboardDiv.setAttributeNode(attr);
         this.keyTable = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.keyboardDiv);
         widgetWindow.getWidgetBody().append(this.keyTable);
@@ -394,7 +390,6 @@ function MusicKeyboard() {
 
         var w = Math.max(Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20), BUTTONDIVWIDTH);
 
-
         //Change widget size on fullscreen mode, else
         //revert back to original size on unfullscreen mode
         widgetWindow.onmaximize = function(){
@@ -403,11 +398,12 @@ function MusicKeyboard() {
             widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
             widgetWindow.getWidgetBody().style.width = "200vh";
             docById('mkbOuterDiv').style.width = "calc(200vh - 64px)";
+            docById("keyboardHolder2").style.width = 'calc(200vh - 64px)';
             try{
               docById('mkbInnerDiv').style.width = "calc(200vh - 200px)";
             }
             catch(e){
-              console.log("Hello");
+              console.debug("Error");
             }
             widgetWindow.getWidgetBody().style.left = "70px";
 
@@ -424,30 +420,7 @@ function MusicKeyboard() {
 
         widgetWindow.sendToCenter();
 
-        /*
-        this.toggleNotesButton = function () {
-            if (that.keyboardShown) {
-                cell.getElementsByTagName('img')[0].src = 'header-icons/keyboard.svg';
-                cell.getElementsByTagName('img')[0].title = 'keyboard';
-                cell.getElementsByTagName('img')[0].alt = 'keyboard';
-            } else {
-                cell.getElementsByTagName('img')[0].src = 'header-icons/table.svg';
-                cell.getElementsByTagName('img')[0].title = 'table';
-                cell.getElementsByTagName('img')[0].alt = 'table';
 
-            }
-        };
-
-        cell.onclick = function() {
-            if (that.keyboardShown) {
-                that._createTable();
-            } else {
-                that._createKeyboard();
-            }
-            that.toggleNotesButton();
-            that.keyboardShown = !that.keyboardShown;
-        };
-        */
 
     };
 
@@ -1603,6 +1576,7 @@ function MusicKeyboard() {
         mkbKeyboardDiv.style.visibility = 'visible';
         mkbKeyboardDiv.style.border = '0px';
         mkbKeyboardDiv.style.width = '300px';
+        mkbKeyboardDiv.style.top = '0px';
         mkbKeyboardDiv.innerHTML = '';
 
         mkbKeyboardDiv.innerHTML = ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>'
@@ -1610,12 +1584,14 @@ function MusicKeyboard() {
         var keyboardHolder2 = docById('keyboardHolder2');
         keyboardHolder2.style.bottom = '10px';
         keyboardHolder2.style.left = '0px';
-        keyboardHolder2.style.height = '145px'
-        keyboardHolder2.style.width = '700px';
+        keyboardHolder2.style.height = '145px';
         keyboardHolder2.style.backgroundColor = 'white';
 
         var blackRow = document.getElementsByClassName('black');
         blackRow[0].style.top = '1px';
+        blackRow[0].style.borderSpacing = '0px 0px 20px';
+        blackRow[0].style.borderCollapse= 'separate';
+
 
         var myNode = document.getElementById('myrow');
         myNode.innerHTML = '';
@@ -1642,6 +1618,7 @@ function MusicKeyboard() {
         that.idContainer = [];
         var myrowId = 0;
         var myrow2Id = 0;
+
 
         for (var p = 0; p < this.layout.length; p++) {
             if (this.layout[p].noteName === null) {
@@ -1773,6 +1750,8 @@ function MusicKeyboard() {
                 newel.style.zIndex = '100';
                 parenttbl.appendChild(newel);
             }
+
+
         }
 
         for (var i = 0; i < that.idContainer.length; i++) {
