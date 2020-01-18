@@ -4493,17 +4493,81 @@ function Activity() {
                         console.log('rawData is ' + rawData);
                         errorMsg(_('Cannot load project from the file. Please check the file type.'));
                     } else if (rawData.substring(0, 2) === "X:") { // Check for ABC notation header
-                        console.log("is abc notation");
+                        // TODO: support files with multiple tunes
                         rawData = rawData.split('\n');
-                        console.log("rawData is "+rawData);
-                        console.log(rawData);
 
                         var x = 100;
                         var y = 100;
-                        var curInd = 1;
-                        var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],461,109,[null,1,null]],[1,["hidden",{}],475,150,[0,null]]];
-                        // TODO: Parse cleanData into blocksData here
+                        var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,null]]];
+                        
+                        // Read data from header
+                        var headerInfo = {};
+                        var curline = 0;
+                        while(curline < rawData.length) {
+                            var lineVal = rawData[curline];
 
+                            if(!lineVal.includes(':') || lineVal.includes('|:') || lineVal.includes(':|')) {
+                                break;
+                            }
+
+                            var lineValSplit = lineVal.split(':');
+                            headerInfo[lineValSplit[0]] = lineValSplit[1]
+                            curline++;
+                        }
+
+                        while(curline < rawData.length) {
+                            var lineVal = rawData[curline].split('');
+                            
+                            for(var i = 0; i < lineVal.length; i++) {
+                                var shouldReplace = false;
+
+                                if(lineVal[i] === '|') shouldReplace = true;
+                                if(lineVal[i] === ':') shouldReplace = true;
+                                if(lineVal[i] === '[') shouldReplace = true;
+                                if(lineVal[i] === ']') shouldReplace = true;
+
+
+                                if(shouldReplace) {
+                                    lineVal[i] = ' ';
+                                }
+                            }
+                            
+                            lineVal = lineVal.join('').trim().split(' ');
+
+                            for(var note of lineVal) {
+                                var pitch = note[0].toLowerCase();
+                                var octave = null;
+
+                                if(note[0] === note[0].toUpperCase()) {
+                                    octave = 4;
+                                } else {
+                                    octave = 5;
+                                }
+
+                                var commaCnt = 0;
+                                var aposCnt = 0;
+                                
+                                for(var i = 0; i < note.length; i++) {
+                                    if(note[i] === ',') {
+                                        commaCnt++;
+                                    } else if(note[i] === '\'') {
+                                        aposCnt++;
+                                    }
+                                }
+
+                                octave -= commaCnt;
+                                octave += aposCnt;
+
+                                
+                                console.log('add note with pitch '+pitch)
+                                console.log('octave '+octave)
+                                console.log('length '+headerInfo.L)
+                            }
+
+                            curline++;
+                        }
+
+                        
                         for (var name in blocks.palettes.dict) {
                             blocks.palettes.dict[name].hideMenu(true);
                         }
