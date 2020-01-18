@@ -2531,6 +2531,9 @@ function Blocks (activity) {
      * @return {void}
      */
     this.makeNewBlock = function (name, postProcess, postProcessArg) {
+        console.log("making new block");
+        console.log(postProcess);
+        console.log(postProcessArg);
         // Create a new block
         if (!name in this.protoBlockDict) {
             // Should never happen: nop blocks should be substituted
@@ -2595,7 +2598,7 @@ function Blocks (activity) {
      */
     this.makeBlock = function (name, arg) {
 
-        // console.log('makeBlock ' + name + ' ' + arg);
+        console.log('makeBlock ' + name + ' ' + arg);
 
         var postProcess = function (args) {
             var thisBlock = args[0];
