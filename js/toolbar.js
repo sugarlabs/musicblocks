@@ -476,6 +476,7 @@ function Toolbar() {
             _('Stop'),
             _('New project'),
             _('Load project from file'),
+            _('Load project from file'),
             _('Save project'),
             _('Save project'),
             _('Find and share projects'),
