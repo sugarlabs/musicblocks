@@ -284,6 +284,52 @@ function Palettes () {
         return this;
     };
 
+    this.menuScrollEvent = function (direction, scrollSpeed) {
+        var keys = Object.keys(this.buttons);
+
+        var diff = direction * scrollSpeed;
+        if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+            this.upIndicator.visible = false;
+            this.upIndicatorStatus = this.upIndicator.visible;
+            this.refreshCanvas();
+            return;
+        } else {
+            this.upIndicatorStatus = this.upIndicator.visible;
+            this.upIndicator.visible = true;
+        }
+
+        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+            this.downIndicator.visible = false;
+            this.downIndicatorStatus = this.downIndicator.visible;
+            this.refreshCanvas();
+            return;
+        } else {
+            this.downIndicator.visible = true;
+            this.downIndicatorStatus = this.downIndicator.visible;
+        }
+
+        this.scrollDiff += diff;
+
+        for (var name in this.buttons) {
+            this.buttons[name].y += diff;
+            this.buttons[name].visible = true;
+        }
+
+        this._updateButtonMasks();
+        this.refreshCanvas();
+    };
+
+    this._updateButtonMasks = function () {
+        for (var name in this.buttons) {
+            var s = new createjs.Shape();
+            s.graphics.r(0, 0, this.cellSize, windowHeight() / this.scale);
+            s.x = 0;
+            s.y = this.cellSize / 2;
+            this.buttons[name].mask = s;
+        }
+    };
+
+
     this.setSearch = function (show, hide) {
         this.showSearchWidget = show;
         this.hideSearchWidget = hide;
@@ -636,6 +682,26 @@ function Palettes () {
         var searchlocked = false;
         var scrolling = false;
         var that = this;
+
+        this.buttons[name].on('mousedown', function (event) {
+            scrolling = true;
+            var lastY = event.stageY;
+
+            palettes.buttons[name].on('pressmove', function (event) {
+                if (!scrolling) {
+                    return;
+                }
+
+                var diff = event.stageY - lastY;
+                palettes.menuScrollEvent(diff, 10);
+                lastY = event.stageY;
+            });
+
+            palettes.buttons[name].on('pressup', function (event) {
+                scrolling = false;
+            }, null, true);  // once = true
+        });
+
 
         // A palette button opens or closes a palette.
         this.buttons[name].on('mouseover', function (event) {
@@ -1887,13 +1953,73 @@ function Palette(palettes, name) {
             that.palettes.refreshCanvas();
         });
 
+        this.menuContainer.on('mousedown', function (event) {
+            trashcan.show();
+            // Move them all?
+            var offset = {
+                x: palette.menuContainer.x - Math.round(event.stageX / palette.palettes.scale),
+                y: palette.menuContainer.y - Math.round(event.stageY / palette.palettes.scale)
+            };
+
+            palette.menuContainer.on('pressup', function (event) {
+                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+                    if (trashcan.isVisible) {
+                        palette.hide();
+                        palette.palettes.refreshCanvas();
+                        // Only delete plugin palettes.
+                        if (palette.name === 'myblocks') {
+                            palette._promptMacrosDelete();
+                        } else if (BUILTINPALETTES.indexOf(palette.name) === -1) {
+                            palette._promptPaletteDelete();
+                        }
+                    }
+                }
+                trashcan.hide();
+            });
+
+            palette.menuContainer.on('mouseout', function (event) {
+                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+                    if (trashcan.isVisible) {
+                        palette.hide();
+                        palette.palettes.refreshCanvas();
+                    }
+                }
+                trashcan.hide();
+            });
+
+            palette.menuContainer.on('pressmove', function (event) {
+                var oldX = palette.menuContainer.x;
+                var oldY = palette.menuContainer.y;
+                palette.menuContainer.x = Math.round(event.stageX / palette.palettes.scale) + offset.x;
+                palette.menuContainer.y = Math.round(event.stageY / palette.palettes.scale) + offset.y;
+                palette.palettes.refreshCanvas();
+                var dx = palette.menuContainer.x - oldX;
+                var dy = palette.menuContainer.y - oldY;
+                palette.palettes.initial_x = palette.menuContainer.x;
+                palette.palettes.initial_y = palette.menuContainer.y;
+
+                // If we are over the trash, warn the user.
+                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+                    trashcan.startHighlightAnimation();
+                } else {
+                    trashcan.stopHighlightAnimation();
+                }
+
+                // Hide the menu items while drag.
+                palette._hideMenuItems(false);
+                palette._moveMenuItemsRelative(dx, dy);
+            });
+        });
+
         this.menuContainer.on('mouseover', function(event) {
             document.body.style.cursor = 'pointer';
         });
 
-        this.menuContainer.on('mouseout', function(event) {
-            document.body.style.cursor = 'default';
-        });
+
+
+        //this.menuContainer.on('mouseout', function(event) {
+          //  document.body.style.cursor = 'default';
+        //});
     };
 
     // Menu Item event handlers
@@ -1968,7 +2094,7 @@ function Palette(palettes, name) {
         this.protoContainers[blkname].on('mouseout', function (event) {
             // Catch case when pressup event is missed.
             // Put the protoblock back on the palette...
-            document.body.style.cursor = 'default';
+            //document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressed && moved) {
@@ -1979,7 +2105,7 @@ function Palette(palettes, name) {
         });
 
         this.protoContainers[blkname].on('pressup', function (event) {
-            document.body.style.cursor = 'default';
+            //document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressupLock) {

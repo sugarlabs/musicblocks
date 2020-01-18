@@ -1407,16 +1407,15 @@ function Activity() {
 
                 if (scrollBlockContainer) {
                     blocksContainer.x += event.stageX - lastCoords.x;
-                }
-
-                blocksContainer.y += event.stageY - lastCoords.y;
+                    blocksContainer.y += event.stageY - lastCoords.y;
                 lastCoords = {
                     x: event.stageX,
                     y: event.stageY,
                     delta: lastCoords.delta + delta
                 };
 
-                refreshCanvas();
+                    refreshCanvas();
+                }
             });
 
             stage.removeAllEventListeners('stagemouseup');
