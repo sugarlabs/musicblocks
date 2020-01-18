@@ -4498,7 +4498,10 @@ function Activity() {
 
                         var x = 100;
                         var y = 100;
-                        var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,null]]];
+
+                        // Add new notes to curInd
+                        var curInd = 1;
+                        var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,2]]];
                         
                         // Read data from header
                         var headerInfo = {};
@@ -4558,10 +4561,25 @@ function Activity() {
                                 octave -= commaCnt;
                                 octave += aposCnt;
 
-                                
+
                                 console.log('add note with pitch '+pitch)
                                 console.log('octave '+octave)
                                 console.log('length '+headerInfo.L)
+                                // push notes onto blocksData
+
+                                // blocksData[curInd[5][curInd[5].length-1]] = curInd+1;
+
+                                // blocksData.push(
+                                //     // Conections: [prev block, note value, contained notes, next block]
+                                //     [curInd+1, ['newnote', {collapsed: false}], x, y, [curInd, curInd+2, curInd+5, curInd+9]]
+                                // )
+
+                                // curInd++;
+
+                                // blocksData.push(
+                                //     []
+                                // )
+                                
                             }
 
                             curline++;
