@@ -5562,6 +5562,19 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // macro
+    var newblock = new ProtoBlock('synthvolumefactor');
+    newblock.palette = palettes.dict['volume'];
+    blocks.protoBlockDict['synthvolumefactor'] = newblock;
+    //.TRANS: the volume at which notes are played
+    newblock.staticLabels.push(_('synth volume'));
+    newblock.adjustWidthToLabel();
+    newblock.oneArgMathBlock();
+    newblock.dockTypes[1] = 'anyin';
+    if (beginnerMode && !beginnerBlock('synthvolumefactor')) {
+        newblock.hidden = true;
+    }
+
+    // macro
     var newblock = new ProtoBlock('ppp');
     newblock.palette = palettes.dict['volume'];
     blocks.protoBlockDict['ppp'] = newblock;
