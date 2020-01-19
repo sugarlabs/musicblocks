@@ -64,6 +64,10 @@ function Palettes () {
     this.trashcan = null;
     this.firstTime = true;
     this.background = null;
+    this.upIndicator = null;
+    this.upIndicatorStatus = false;
+    this.downIndicator = null;
+    this.downIndicatorStatus = true;
     this.circles = {};
     // paletteText is used for the highlighted tooltip
     this.paletteText = new createjs.Text('', '20px Sans', platformColor.paletteText);
@@ -291,6 +295,7 @@ function Palettes () {
         if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
             this.upIndicator.visible = false;
             this.upIndicatorStatus = this.upIndicator.visible;
+
             this.refreshCanvas();
             return;
         } else {
@@ -404,6 +409,44 @@ function Palettes () {
             this.stage.addChild(shape);
             this.background = shape;
         }
+
+        function __processUpIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = 55;
+            bitmap.visible = false;
+            palettes.upIndicator = bitmap;
+
+        palettes.upIndicator.on('click', function (event) {
+                palettes.menuScrollEvent(1, 40);
+                palettes.hidePaletteIconCircles();
+            });
+        };
+
+        function __processDownIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = (windowHeight() / palettes.scale) - 27;
+
+        bitmap.visible = true;
+            palettes.downIndicator = bitmap;
+
+        palettes.downIndicator.on('click', function (event) {
+                palettes.menuScrollEvent(-1, 40);
+                palettes.hidePaletteIconCircles();
+            });
+        };
+
+        if (this.upIndicator == null && this.firstTime) {
+            makePaletteBitmap(this, UPICON.replace('#000000', '#FFFFFF'), 'up', __processUpIcon, null);
+        }
+
+        if (this.downbIndicator == null && this.firstTime) {
+            makePaletteBitmap(this, DOWNICON.replace('#000000', '#FFFFFF'), 'down', __processDownIcon, null);
+        }
+
 
         this.firstTime = false;
 
@@ -687,17 +730,17 @@ function Palettes () {
             scrolling = true;
             var lastY = event.stageY;
 
-            palettes.buttons[name].on('pressmove', function (event) {
+            that.buttons[name].on('pressmove', function (event) {
                 if (!scrolling) {
                     return;
                 }
 
                 var diff = event.stageY - lastY;
-                palettes.menuScrollEvent(diff, 10);
+                that.menuScrollEvent(diff, 10);
                 lastY = event.stageY;
             });
 
-            palettes.buttons[name].on('pressup', function (event) {
+            that.buttons[name].on('pressup', function (event) {
                 scrolling = false;
             }, null, true);  // once = true
         });
@@ -1957,61 +2000,61 @@ function Palette(palettes, name) {
             trashcan.show();
             // Move them all?
             var offset = {
-                x: palette.menuContainer.x - Math.round(event.stageX / palette.palettes.scale),
-                y: palette.menuContainer.y - Math.round(event.stageY / palette.palettes.scale)
+                x: that.menuContainer.x - Math.round(event.stageX / that.palettes.scale),
+                y: that.menuContainer.y - Math.round(event.stageY / that.palettes.scale)
             };
 
-            palette.menuContainer.on('pressup', function (event) {
-                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+            that.menuContainer.on('pressup', function (event) {
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
                     if (trashcan.isVisible) {
-                        palette.hide();
-                        palette.palettes.refreshCanvas();
+                        that.hide();
+                        that.palettes.refreshCanvas();
                         // Only delete plugin palettes.
-                        if (palette.name === 'myblocks') {
-                            palette._promptMacrosDelete();
-                        } else if (BUILTINPALETTES.indexOf(palette.name) === -1) {
-                            palette._promptPaletteDelete();
+                        if (that.name === 'myblocks') {
+                            that._promptMacrosDelete();
+                        } else if (BUILTINPALETTES.indexOf(that.name) === -1) {
+                            that._promptPaletteDelete();
                         }
                     }
                 }
                 trashcan.hide();
             });
 
-            palette.menuContainer.on('mouseout', function (event) {
-                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+            that.menuContainer.on('mouseout', function (event) {
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
                     if (trashcan.isVisible) {
-                        palette.hide();
-                        palette.palettes.refreshCanvas();
+                        that.hide();
+                        that.palettes.refreshCanvas();
                     }
                 }
                 trashcan.hide();
             });
 
-            palette.menuContainer.on('pressmove', function (event) {
-                var oldX = palette.menuContainer.x;
-                var oldY = palette.menuContainer.y;
-                palette.menuContainer.x = Math.round(event.stageX / palette.palettes.scale) + offset.x;
-                palette.menuContainer.y = Math.round(event.stageY / palette.palettes.scale) + offset.y;
-                palette.palettes.refreshCanvas();
-                var dx = palette.menuContainer.x - oldX;
-                var dy = palette.menuContainer.y - oldY;
-                palette.palettes.initial_x = palette.menuContainer.x;
-                palette.palettes.initial_y = palette.menuContainer.y;
+            that.menuContainer.on('pressmove', function (event) {
+                var oldX = that.menuContainer.x;
+                var oldY = that.menuContainer.y;
+                that.menuContainer.x = Math.round(event.stageX / that.palettes.scale) + offset.x;
+                that.menuContainer.y = Math.round(event.stageY / that.palettes.scale) + offset.y;
+                that.palettes.refreshCanvas();
+                var dx = that.menuContainer.x - oldX;
+                var dy = that.menuContainer.y - oldY;
+                that.palettes.initial_x = that.menuContainer.x;
+                that.palettes.initial_y = that.menuContainer.y;
 
                 // If we are over the trash, warn the user.
-                if (trashcan.overTrashcan(event.stageX / palette.palettes.scale, event.stageY / palette.palettes.scale)) {
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
                     trashcan.startHighlightAnimation();
                 } else {
                     trashcan.stopHighlightAnimation();
                 }
 
                 // Hide the menu items while drag.
-                palette._hideMenuItems(false);
-                palette._moveMenuItemsRelative(dx, dy);
+                that._hideMenuItems(false);
+                that._moveMenuItemsRelative(dx, dy);
             });
         });
 
-        this.menuContainer.on('mouseover', function(event) {
+       this.menuContainer.on('mouseover', function(event) {
             document.body.style.cursor = 'pointer';
         });
 
@@ -2446,7 +2489,7 @@ function Palette(palettes, name) {
 };
 
 
-async  function initPalettes (palettes) {
+async function initPalettes (palettes) {
 // function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
