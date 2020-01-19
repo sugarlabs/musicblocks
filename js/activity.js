@@ -1256,7 +1256,7 @@ function Activity() {
 
         var __paletteWheelHandler = function (event) {
             // vertical scroll
-            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+           /*if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
                         palettesContainer.y -= event.deltaY;
@@ -1267,7 +1267,8 @@ function Activity() {
                     }
                 }
             }
-
+            */ 
+            
             // horizontal scroll
             if (scrollPaletteContainer) {
                 if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
@@ -1417,6 +1418,7 @@ function Activity() {
                 };
 
                 refreshCanvas();
+
             });
 
             stage.removeAllEventListeners('stagemouseup');
@@ -1436,12 +1438,11 @@ function Activity() {
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-           var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+            var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
             if (palette) {
                 // if we are moving the palettes, deselect the active block.
                 blocks.activeBlock = null;
-
-                palette.scrollEvent(delta, scrollSpeed);
+                palettes.ScrollEvent(delta, scrollSpeed);
             }
         }
     };

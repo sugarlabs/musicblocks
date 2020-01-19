@@ -5757,7 +5757,6 @@ function Logo () {
                         that.synthVolume[turtle][synth][len - 1] = last(that.crescendoInitialVolume[turtle][synth]);
                         that.crescendoInitialVolume[turtle][synth].pop();
                     }
-
                 };
 
                 that._setListener(turtle, listenerName, __listener);
@@ -11031,6 +11030,23 @@ function Logo () {
                     that.statusFields.push([blk, 'volume']);
                 } else {
                     that.blocks.blockList[blk].value = last(that.masterVolume);
+                }
+                break;
+            case 'synthvolumefactor':  // synth volume
+                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
+                    that.statusFields.push([blk, 'synth volume']);
+                } else {
+                    that.blocks.blockList[blk].value = 0;
+                    var cblk = that.blocks.blockList[blk].connections[1];
+                    if (cblk !== null) {
+                        var targetSynth = that.parseArg(that, turtle, cblk, blk, receivedArg);
+                        for (var synth in that.synthVolume[turtle]) {
+                            if (synth === targetSynth) {
+                                that.blocks.blockList[blk].value = last(that.synthVolume[turtle][synth]);
+                                break;
+                            }
+                        }
+                    }
                 }
                 break;
             case 'elapsednotes2':
