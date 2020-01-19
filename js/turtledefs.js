@@ -456,7 +456,8 @@ function createHelpContent() {
         'duosynth': [_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', null, 'duosynthhelp'],
         // Volume palette
         'articulation': [_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', null, 'articulationhelp'],
-        'notevolumefactor': [_('The Note volume block returns the current volume of the current synthesizer.'), 'documentation', ''],
+        'notevolumefactor': [_('The Master volume block returns the master volume.'), 'documentation', ''],
+	'synthvolumefactor': [_('The Synth volume block returns the current volume of the current synthesizer.'), 'documentation', ''],
         // Drum palette
         'playnoise': [_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', ''],
         'drumname': [_('The Drum name block is used to select a drum.'), 'documentation', null, 'note4'],
