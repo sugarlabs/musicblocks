@@ -103,64 +103,41 @@ function PitchDrumMatrix() {
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var pdmDiv = docById('pdmDiv');
-        pdmDiv.style.visibility = 'visible';
-        pdmDiv.setAttribute('draggable', 'true');
-        pdmDiv.style.left = '200px';
-        pdmDiv.style.top = '150px';
-
-        // The pdm buttons
-        var pdmButtonsDiv = docById('pdmButtonsDiv');
-        pdmButtonsDiv.style.display = 'inline';
-        pdmButtonsDiv.style.visibility = 'visible';
-        pdmButtonsDiv.style.width = BUTTONDIVWIDTH;
-        pdmButtonsDiv.innerHTML = '<table cellpadding="0px" id="pdmButtonTable"></table>';
-
-        var buttonTable = docById('pdmButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         // For the button callbacks
         var that = this;
 
 
-        var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
-
-        cell.onclick=function() {
+        widgetWindow.onclose=function() {
             pdmDiv.style.visibility = 'hidden';
             pdmButtonsDiv.style.visibility = 'hidden';
             pdmTableDiv.style.visibility = 'hidden';
             that._logo.hideMsgs();
+            this.destroy();
         }
 
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-
-        cell.onclick=function() {
+        widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick = function() {
             that._logo.setTurtleDelay(0);
             that._playAll();
         }
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
         this._save_lock = false;
-
-        cell.onclick = function () {
-	    // Debounce button
-	    if (!that._get_save_lock()) {
-		that._save_lock = true;
-		that._save();
-		setTimeout(function () {
-		    that._save_lock = false;
-		}, 1000);
-	    }
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
+    	    // Debounce button
+    	    if (!that._get_save_lock()) {
+        		that._save_lock = true;
+        		that._save();
+        		setTimeout(function () {
+        		    that._save_lock = false;
+        		}, 1000);
+        	}
         };
 
-        var cell = this._addButton(row, 'erase-button.svg', ICONSIZE, _('Clear'));
-
-        cell.onclick=function() {
+        widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function() {
             that._clear();
         }
 
@@ -173,75 +150,17 @@ function PitchDrumMatrix() {
         //     that._logo.hideMsgs();
         // }
 
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
 
-        this._dx = dragCell.getBoundingClientRect().left - pdmDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - pdmDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
 
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
 
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
+        this.pitchDrumDiv = document.createElement("div");
+        widgetWindow.getWidgetBody().append(this.pitchDrumDiv);
+        widgetWindow.getWidgetBody().style.height = "300px";
+        widgetWindow.getWidgetBody().style.width = "300px";
 
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                pdmDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                pdmDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        pdmDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        pdmDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                pdmDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                pdmDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        pdmDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        pdmDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
 
         // The pdm table
-        var pdmTableDiv = docById('pdmTableDiv');
+        var pdmTableDiv = this.pitchDrumDiv;
         pdmTableDiv.style.display = 'inline';
         pdmTableDiv.style.visibility = 'visible';
         pdmTableDiv.style.border = '0px';
@@ -332,6 +251,26 @@ function PitchDrumMatrix() {
         // Add any drum blocks here.
         for (var i = 0; i < this.drums.length; i++) {
             this._addDrum(i);
+        }
+
+        //Change widget size on fullscreen mode, else
+        //revert back to original size on unfullscreen mode
+        widgetWindow.onmaximize = function(){
+          if(widgetWindow._maximized){
+            widgetWindow.getWidgetBody().style.position = "absolute";
+            widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
+            widgetWindow.getWidgetBody().style.width = "200vh";
+            docById('pdmOuterDiv').style.height = "calc(100vh - 80px)";
+            docById('pdmOuterDiv').style.width = "calc(200vh - 64px)";
+            docById('pdmInnerDiv').style.width = "calc(200vh - 64px)";
+            widgetWindow.getWidgetBody().style.left = "70px";
+
+          } else{
+            widgetWindow.getWidgetBody().style.position = "relative";
+            widgetWindow.getWidgetBody().style.left = "0px";
+            widgetWindow.getWidgetBody().style.height = "300px";
+            widgetWindow.getWidgetBody().style.width = "300px";
+          }
         }
 
 	this._logo.textMsg(_('Click in the grid to map notes to drums.'));
@@ -718,6 +657,5 @@ function PitchDrumMatrix() {
         // Create a new stack for the chunk.
         console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
-        this._logo.textMsg(_('New action block generated!'))
     };
 };
