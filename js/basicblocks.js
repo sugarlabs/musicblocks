@@ -66,6 +66,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     setupMeterBlocks();
     setupPitchBlocks();
     setupIntervalsBlocks();
+    setupToneBlocks();
     
     setupFlowBlocks();
     setupNumberBlocks();
@@ -123,15 +124,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.twoArgBlock();
     newblock.dockTypes[1] = 'anyin';
     newblock.dockTypes[2] = 'anyin';
-    */
-    class TemperamentNameBlock extends ValueBlock {
-        constructor() {
-            super('temperamentname');
-            this.setPalette('tone');
-            this.hidden = true;
-            this.formBlock({ outType: 'anyout' });
-        }
-    }
 
     // macro
     var newblock = new ProtoBlock('sixtyfourthNote');
@@ -298,38 +290,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     }
 
     // WIDGETS PALETTE
-
-    var newblock = new ProtoBlock('oscillator');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['oscillator'] = newblock;
-    //.TRANS: there are different types (sine, triangle, square...) of oscillators.
-    newblock.staticLabels.push(_('oscillator'));
-    newblock.staticLabels.push(_('type'));
-    //.TRANS: Partials refers to the number of sine waves combined into the sound.
-    newblock.staticLabels.push(_('partials'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    //.TRANS: triangle wave
-    newblock.defaults.push(_('triangle'));
-    newblock.defaults.push(6);
-    newblock.twoArgBlock();
-    newblock.dockTypes[1] = 'anyin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('filtertype');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['filtertype'] = newblock;
-    newblock.valueBlock();
-    newblock.dockTypes[0] = 'textout';
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('oscillatortype');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['oscillatortype'] = newblock;
-    newblock.valueBlock();
-    newblock.dockTypes[0] = 'textout';
-    newblock.hidden = true;
 
     var newblock = new ProtoBlock('envelope');
     newblock.palette = palettes.dict['widgets'];
@@ -631,89 +591,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.parameterBlock();
     newblock.hidden = true;
 
-    var newblock = new ProtoBlock('duosynth');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['duosynth'] = newblock;
-    //.TRANS: a duo synthesizer combines a synth with a sequencer
-    newblock.staticLabels.push(_('duo synth'));
-    newblock.staticLabels.push(_('vibrato rate'), _('vibrato intensity'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.twoArgBlock();
-    newblock.defaults.push(10);
-    newblock.defaults.push(5);
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    if (beginnerMode && !beginnerBlock('duosynth')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('amsynth');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['amsynth'] = newblock;
-    //.TRANS: AM (amplitude modulation) synthesizer
-    newblock.staticLabels.push(_('AM synth'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(1);
-    newblock.oneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    if (beginnerMode && !beginnerBlock('amsynth')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('fmsynth');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['fmsynth'] = newblock;
-    //.TRANS: FM (frequency modulation) synthesizer
-    newblock.staticLabels.push(_('FM synth'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.defaults.push(10);
-    newblock.oneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    if (beginnerMode && !beginnerBlock('fmsynth')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('partial');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['partial'] = newblock;
-    //.TRANS: partials are weighted components in a harmonic series
-    newblock.staticLabels.push(_('partial'));
-    newblock.adjustWidthToLabel();
-    newblock.oneArgBlock();
-    newblock.defaults.push(1);
-    if (beginnerMode && !beginnerBlock('partial')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('harmonic');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['harmonic'] = newblock;
-    //.TRANS: partials are weighted components in a harmonic series
-    newblock.staticLabels.push(_('weighted partials'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampZeroArgBlock();
-    if (beginnerMode && !beginnerBlock('harmonic')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('harmonic2');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['harmonic2'] = newblock;
-    //.TRANS: A harmonic is a overtone.
-    newblock.staticLabels.push(_('harmonic'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.defaults.push(1);
-    if (beginnerMode && !beginnerBlock('harmonic2')) {
-        newblock.hidden = true;
-    }
-
     // macro
     var newblock = new ProtoBlock('neighbor');
     newblock.palette = palettes.dict['ornament'];
@@ -747,106 +624,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.defaults.push(1);
     newblock.defaults.push(1 / 16);
     if (beginnerMode && !beginnerBlock('neighbor2')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('dis');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['dis'] = newblock;
-    //.TRANS: distortion is an alteration in the sound
-    newblock.staticLabels.push(_('distortion'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.defaults.push(40);
-    if (beginnerMode && !beginnerBlock('dis')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('tremolo');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['tremolo'] = newblock;
-    //.TRANS: a wavering effect in a musical tone
-    newblock.staticLabels.push(_('tremolo'));
-    //.TRANS: rate at which tremolo wavers
-    newblock.staticLabels.push(_('rate'));
-    //.TRANS: amplitude of tremolo waver
-    newblock.staticLabels.push(_('depth'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.defaults.push(10);
-    newblock.defaults.push(50);
-    if (beginnerMode && !beginnerBlock('tremolo')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('phaser');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['phaser'] = newblock;
-    //.TRANS: alter the phase of the sound
-    newblock.staticLabels.push(_('phaser'));
-    newblock.staticLabels.push(_('rate'), _('octaves'), _('base frequency'));
-    newblock.extraWidth = 10;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampThreeArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.dockTypes[3] = 'numberin';
-    newblock.defaults.push(0.5);
-    newblock.defaults.push(3);
-    newblock.defaults.push(392);
-    if (beginnerMode && !beginnerBlock('phaser')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('chorus');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['chorus'] = newblock;
-    //.TRANS: musical effect to simulate a choral sound
-    newblock.staticLabels.push(_('chorus'));
-    newblock.staticLabels.push(_('rate'), _('delay') + ' (MS)', _('depth'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampThreeArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.dockTypes[3] = 'numberin';
-    newblock.defaults.push(1.5);
-    newblock.defaults.push(3.5);
-    newblock.defaults.push(70);
-    if (beginnerMode && !beginnerBlock('chorus')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('vibrato');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['vibrato'] = newblock;
-    //.TRANS: a rapid, slight variation in pitch
-    newblock.staticLabels.push(_('vibrato'));
-    newblock.staticLabels.push(_('intensity'), _('rate'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.defaults.push(5);
-    newblock.defaults.push(1 / 16);
-    if (beginnerMode && !beginnerBlock('vibrato')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('setvoice');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['setvoice'] = newblock;
-    //.TRANS: select synthesizer
-    newblock.staticLabels.push(_('set synth'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'textin';
-    newblock.defaults.push('violin');
-    newblock.hidden = true;
-    newblock.deprecated = true;
-    if (beginnerMode && !beginnerBlock('setvoice')) {
         newblock.hidden = true;
     }
 
@@ -906,41 +683,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.flowClampOneArgBlock();
     newblock.defaults.push(1 / 32);
     if (beginnerMode && !beginnerBlock('newstaccato')) {
-        newblock.hidden = true;
-    }
-
-    var newblock = new ProtoBlock('synthname');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['synthname'] = newblock;
-    newblock.staticLabels.push(_('synth name'));
-    newblock.adjustWidthToLabel();
-    newblock.dockTypes[0] = 'textout';
-    newblock.parameterBlock();
-    newblock.hidden = true;
-    newblock.deprecated = true;
-
-    var newblock = new ProtoBlock('voicename');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['voicename'] = newblock;
-    newblock.valueBlock();
-    newblock.dockTypes[0] = 'textout';
-    newblock.extraWidth = 50;
-    if (beginnerMode && !beginnerBlock('voicename')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('settimbre');
-    newblock.palette = palettes.dict['tone'];
-    blocks.protoBlockDict['settimbre'] = newblock;
-    //.TRANS: set the characteristics of a custom instrument
-    newblock.staticLabels.push(_('set instrument'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.dockTypes[1] = 'textin';
-    //.TRANS: user-defined
-    newblock.defaults.push(_('custom'));
-    if (beginnerMode && !beginnerBlock('settimbre')) {
         newblock.hidden = true;
     }
 

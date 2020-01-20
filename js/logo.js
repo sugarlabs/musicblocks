@@ -1918,6 +1918,20 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'oscillator':
+        case 'duosynth':
+        case 'amsynth':
+        case 'fmsynth':
+        case 'partial':
+        case 'harmonic':
+        case 'harmonic2':
+        case 'dis':
+        case 'tremolo':
+        case 'phaser':
+        case 'chorus':
+        case 'vibrato':
+        case 'setvoice':
+        case 'settimbre':
         case 'steppitch':
         case 'pitchnumber':
         case 'scaledegree':
@@ -2084,107 +2098,6 @@ function Logo () {
             // Deprecated
         case 'endhollowline':
             that.turtles.turtleList[turtle].doEndHollowLine();
-            break;
-        // Actions for music-related blocks
-        case 'amsynth':
-            var harmonicity;
-            if (that.inTimbre) {
-                that.timbre.AMSynthParams = [];
-                if (that.timbre.osc.length != 0) {
-                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
-                }
-            }
-
-            if (args[0] === null ||  typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1;
-            } else {
-                var arg = args[0];
-            }
-
-            if (arg < 0) {
-                that.errorMsg(_('The input cannot be negative.'));
-                harmonicity = -arg;
-            } else {
-                harmonicity = arg;
-            }
-
-            if (that.inTimbre) {
-                that.timbre.amSynthParamvals['harmonicity'] = harmonicity;
-                that.synth.createSynth(turtle, that.timbre.instrumentName, 'amsynth', that.timbre.amSynthParamvals);
-
-                that.timbre.AMSynthesizer.push(blk);
-                that.timbre.AMSynthParams.push(harmonicity);
-            }
-            break;
-        case 'fmsynth':
-            var modulationIndex;
-            if (that.inTimbre) {
-                that.timbre.FMSynthParams = [];
-                if (that.timbre.osc.length != 0) {
-                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
-                }
-            }
-
-            if (args[0] === null ||  typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 10;
-            } else {
-                var arg = args[0];
-            }
-
-            if (arg < 0) {
-                that.errorMsg(_('The input cannot be negative.'));
-                modulationIndex = -arg;
-            } else {
-                modulationIndex = arg;
-            }
-
-            if (that.inTimbre) {
-                that.timbre.fmSynthParamvals['modulationIndex'] = modulationIndex;
-                that.synth.createSynth(turtle, that.timbre.instrumentName, 'fmsynth', that.timbre.fmSynthParamvals);
-
-                that.timbre.FMSynthesizer.push(blk);
-                that.timbre.FMSynthParams.push(modulationIndex);
-            }
-            break;
-        case 'duosynth':
-            var synthVibratoRate;
-            var synthVibratoAmount;
-            if (that.inTimbre) {
-                if (that.timbre.osc.length != 0) {
-                    that.errorMsg(_('Unable to use synth due to existing oscillator'));
-                }
-
-                that.timbre.duoSynthParams = [];
-            }
-
-            if (args[0] === null ||  typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 10;
-            } else {
-                var arg0 = args[0];
-            }
-
-            if (args[1] === null ||  typeof(args[1]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 50;
-            } else {
-                var arg1 = args[1];
-            }
-
-            synthVibratoRate = Math.abs(arg0);
-            synthVibratoAmount = Math.abs(arg1) / 100;
-
-            if (that.inTimbre) {
-                that.timbre.duoSynthParamVals['vibratoRate'] = synthVibratoRate;
-                that.timbre.duoSynthParamVals['vibratoAmount'] = synthVibratoAmount;
-                that.synth.createSynth(turtle, that.timbre.instrumentName, 'duosynth', that.timbre.duoSynthParamVals);
-
-                that.timbre.duoSynthesizer.push(blk);
-                that.timbre.duoSynthParams.push(synthVibratoRate);
-                that.timbre.duoSynthParams.push(synthVibratoAmount);
-            }
             break;
         case 'rhythmruler2':
         case 'rhythmruler':
@@ -2633,35 +2546,6 @@ function Logo () {
                 }
             }
             break;
-        case 'oscillator':
-            var oscillatorType = DEFAULTOSCILLATORTYPE;
-            var partials = 0;
-
-            if (args.length === 2 && typeof(args[1]) === 'number') {
-                for (var otype in OSCTYPES) {
-                    if (OSCTYPES[otype][0] === args[0]) {
-                        oscillatorType = OSCTYPES[otype][1];
-                    } else if (OSCTYPES[otype][1] === args[0]) {
-                        oscillatorType = args[0];
-                    }
-                }
-
-                partials = args[1];
-            }
-
-            if (that.inTimbre) {
-                if (that.timbre.osc.length != 0) {
-                    that.errorMsg(_('You are adding multiple oscillator blocks.'));
-                } else {
-                    that.timbre.oscParams = [];
-                    that.synth.createSynth(turtle, that.timbre.instrumentName, oscillatorType, that.timbre.synthVals);
-                }
-
-                that.timbre.osc.push(blk);
-                that.timbre.oscParams.push(oscillatorType);
-                that.timbre.oscParams.push(partials);
-            }
-            break;
         case 'playnoise':
             if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
                 that.errorMsg(NOINPUTERRORMSG, blk);
@@ -2908,62 +2792,6 @@ function Logo () {
         case 'sixtyfourthNote':
             that._processNote(64, blk, turtle);
             break;
-
-        case 'settimbre':
-            if (args[0] === null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                childFlow = args[1];
-                childFlowCount = 1;
-            } else {
-                that.inSetTimbre[turtle] = true;
-
-                var synth = args[0];
-                for (var voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === args[0]) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === args[0]) {
-                        synth = args[0];
-                        break;
-                    }
-                }
-
-                if (that.inMatrix) {
-                    that.pitchTimeMatrix._instrumentName = synth;
-                }
-
-                if (that.instrumentNames[turtle].indexOf(synth) === -1) {
-                    // console.debug('pushing ' + synth + ' to instrumentNames');
-                    that.instrumentNames[turtle].push(synth);
-                    that.synth.loadSynth(turtle, synth);
-
-                    if (that.synthVolume[turtle][synth] == undefined) {
-                        that.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                        that.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
-                    }
-                }
-
-                childFlow = args[1];
-                childFlowCount = 1;
-
-                var listenerName = '_settimbre_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.inSetTimbre[turtle] = false;
-                    // console.debug('popping ' + that.instrumentNames[turtle].pop() + ' from instrumentNames');
-                    that.instrumentNames[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-
-                if (that.inRhythmRuler) {
-                    that._currentDrumBlock = blk;
-                    that.rhythmRuler.Drums.push(blk);
-                    that.rhythmRuler.Rulers.push([[],[]]);
-                }
-            }
-            break;
         case 'decrescendo':
         case 'crescendo':
             if (args.length > 1 && args[0] !== 0) {
@@ -3102,286 +2930,6 @@ function Logo () {
                 that._currentDrumBlock = blk;
                 that.rhythmRuler.Drums.push(blk);
                 that.rhythmRuler.Rulers.push([[],[]]);
-            }
-            break;
-        case 'setvoice':
-            var voicename = null;
-            for (var voice in VOICENAMES) {
-                if (VOICENAMES[voice][0] === args[0]) {
-                    voicename = VOICENAMES[voice][1];
-                } else if (VOICENAMES[voice][1] === args[0]) {
-                    voicename = args[0];
-                }
-            }
-
-            // Maybe it is a drum?
-            if (voicename == null) {
-                for (var drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0] === args[0]) {
-                        voicename = DRUMNAMES[drum][1];
-                    } else if (DRUMNAMES[drum][1] === args[0]) {
-                        voicename = args[0];
-                    }
-                }
-            }
-
-            if (voicename == null) {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-
-                childFlow = args[1];
-                childFlowCount = 1;
-            } else {
-                that.voices[turtle].push(voicename);
-                childFlow = args[1];
-                childFlowCount = 1;
-
-                var listenerName = '_setvoice_' + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
-
-                var __listener = function (event) {
-                    that.voices[turtle].pop();
-                };
-
-                that._setListener(turtle, listenerName, __listener);
-            }
-            break;
-        case 'vibrato':
-            var intensity = args[0];
-            var rate = args[1];
-
-            if (intensity < 1 || intensity > 100) {
-                that.errorMsg(_('Vibrato intensity must be between 1 and 100.'), blk);
-                that.stopTurtle = true;
-            }
-
-            if (rate <= 0) {
-                that.errorMsg(_('Vibrato rate must be greater than 0.'), blk);
-                that.stopTurtle = true;
-            }
-
-            childFlow = args[2];
-            childFlowCount = 1;
-
-            that.vibratoIntensity[turtle].push(intensity / 100);
-            that.vibratoRate[turtle].push(1 / rate);
-
-            var listenerName = '_vibrato_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-               that.vibratoIntensity[turtle].pop();
-               that.vibratoRate[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-
-            if (that.inTimbre) {
-                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoActive'] = true;
-                that.timbre.vibratoEffect.push(blk);
-                that.timbre.vibratoParams.push(last(that.vibratoIntensity[turtle]) * 100);
-                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoIntensity'] = that.vibratoIntensity[turtle];
-                that.timbre.vibratoParams.push(last(that.vibratoRate[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['vibratoFrequency'] = rate;
-            }
-            break;
-        case 'dis':
-            var distortion = (args[0] / 100);
-            if (distortion < 0 || distortion > 1) {
-                that.errorMsg(_('Distortion must be from 0 to 100.'), blk);
-                that.stopTurtle = true;
-            }
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            that.distortionAmount[turtle].push(distortion);
-
-            var listenerName = '_distortion_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-               that.distortionAmount[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-
-            if (that.inTimbre) {
-                instrumentsEffects[turtle][that.timbre.instrumentName]['distortionActive'] = true;
-                that.timbre.distortionEffect.push(blk);
-                that.timbre.distortionParams.push(last(that.distortionAmount[turtle]) * 100);
-                instrumentsEffects[turtle][that.timbre.instrumentName]['distortionAmount'] = distortion;
-            }
-            break;
-        case 'tremolo':
-            var frequency = args[0];
-            var depth = (args[1] / 100);
-
-            if (depth < 0 || depth > 1) {
-                //.TRANS: Depth is the intesity of the tremolo effect.
-                that.errorMsg(_('Depth is out of range.'), blk);
-                that.stopTurtle = true;
-            }
-
-            childFlow = args[2];
-            childFlowCount = 1;
-
-            that.tremoloFrequency[turtle].push(frequency);
-            that.tremoloDepth[turtle].push(depth);
-
-            var listenerName = '_tremolo_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-               that.tremoloFrequency[turtle].pop();
-               that.tremoloDepth[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            if (that.inTimbre) {
-                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloActive'] = true;
-                that.timbre.tremoloEffect.push(blk);
-                that.timbre.tremoloParams.push(last(that.tremoloFrequency[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloFrequency'] = frequency;
-                that.timbre.tremoloParams.push(last(that.tremoloDepth[turtle]) * 100);
-                instrumentsEffects[turtle][that.timbre.instrumentName]['tremoloDepth'] = depth;
-            }
-            break;
-        case 'phaser':
-            var rate = args[0];
-            var octaves = args[1];
-            var baseFrequency = args[2];
-
-            childFlow = args[3];
-            childFlowCount = 1;
-
-            that.rate[turtle].push(rate);
-            that.octaves[turtle].push(octaves);
-            that.baseFrequency[turtle].push(baseFrequency);
-
-            var listenerName = '_phaser_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.rate[turtle].pop();
-                that.octaves[turtle].pop();
-                that.baseFrequency[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            if (that.inTimbre) {
-                instrumentsEffects[turtle][that.timbre.instrumentName]['phaserActive'] = true;
-                that.timbre.phaserEffect.push(blk);
-                that.timbre.phaserParams.push(last(that.rate[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['rate'] = rate;
-                that.timbre.phaserParams.push(last(that.octaves[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['octaves'] = octaves;
-                that.timbre.phaserParams.push(last(that.baseFrequency[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['baseFrequency'] = baseFrequency;
-            }
-            break;
-        case 'chorus':
-            var chorusRate = args[0];
-            var delayTime = args[1];
-            var chorusDepth = (args[2] / 100);
-
-            if (chorusDepth < 0 || chorusDepth > 1) {
-                //.TRANS: Depth is the intesity of the chorus effect.
-                that.errorMsg(_('Depth is out of range.'), blk);
-                that.stopTurtle = true;
-            }
-
-            childFlow = args[3];
-            childFlowCount = 1;
-
-            that.chorusRate[turtle].push(chorusRate);
-            that.delayTime[turtle].push(delayTime);
-            that.chorusDepth[turtle].push(chorusDepth);
-
-            var listenerName = '_chorus_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.chorusRate[turtle].pop();
-                that.delayTime[turtle].pop();
-                that.chorusDepth[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-
-            if (that.inTimbre) {
-                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusActive'] = true;
-                that.timbre.chorusEffect.push(blk);
-                that.timbre.chorusParams.push(last(that.chorusRate[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusRate'] = chorusRate;
-                that.timbre.chorusParams.push(last(that.delayTime[turtle]));
-                instrumentsEffects[turtle][that.timbre.instrumentName]['delayTime'] = delayTime;
-                that.timbre.chorusParams.push(last(that.chorusDepth[turtle]) * 100);
-                instrumentsEffects[turtle][that.timbre.instrumentName]['chorusDepth'] = chorusDepth;
-            }
-            break;
-        case 'harmonic2':
-            if (typeof(args[0]) !== 'number' || args[0] < 0) {
-                //.TRANS: partials components in a harmonic series
-                that.errorMsg(_('Partial must be greater than or equal to 0.'));
-                that.stopTurtle = true;
-                break;
-            }
-
-            that.inHarmonic[turtle].push(blk);
-            that.partials[turtle].push([]);
-            var n = that.partials[turtle].length - 1;
-
-            for (var i = 0; i < args[0]; i++) {
-                that.partials[turtle][n].push(0);
-            }
-
-            that.partials[turtle][n].push(1);
-            that.notationBeginHarmonics(turtle);
-
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_harmonic_' + turtle + '_' + blk;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.inHarmonic[turtle].pop();
-                that.partials[turtle].pop();
-                that.notationEndHarmonics(turtle);
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'harmonic':
-            that.inHarmonic[turtle].push(blk);
-            that.partials[turtle].push([]);
-
-            childFlow = args[0];
-            childFlowCount = 1;
-
-            var listenerName = '_harmonic_' + turtle + '_' + blk;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.inHarmonic[turtle].pop();
-                that.partials[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'partial':
-            if (typeof(args[0]) !== 'number' || args[0] > 1 || args[0] < 0) {
-                //.TRANS: partials are weighted components in a harmonic series
-                that.errorMsg(_('Partial weight must be between 0 and 1.'));
-                that.stopTurtle = true;
-                break;
-            }
-
-            if (that.inHarmonic[turtle].length > 0) {
-                var n = that.inHarmonic[turtle].length - 1;
-                that.partials[turtle][n].push(args[0]);
-            } else {
-                //.TRANS: partials are weighted components in a harmonic series
-                that.errorMsg(_('Partial block should be used inside of a Weighted-partials block.'));
             }
             break;
         case 'neighbor':  // semi-tone step
@@ -6480,13 +6028,6 @@ function Logo () {
                             that.blocks.blockList[blk].value = 0;
                         }
                     }
-                }
-                break;
-            case 'synthname':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'synthname']);
-                } else {
-                    that.blocks.blockList[blk].value = last(that.instrumentNames[turtle]);
                 }
                 break;
             case 'staccatofactor':

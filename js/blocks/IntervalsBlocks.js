@@ -21,6 +21,15 @@ class SetTemperamentBlock extends FlowBlock {
     }
 }
 
+class TemperamentNameBlock extends ValueBlock {
+    constructor() {
+        super('temperamentname');
+        this.setPalette('tone');
+        this.hidden = true;
+        this.formBlock({ outType: 'anyout' });
+    }
+}
+
 class ModeNameBlock extends ValueBlock {
     constructor() {
         super('modename');

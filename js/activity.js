@@ -197,6 +197,7 @@ function Activity() {
             'activity/blocks/MeterBlocks',
             'activity/blocks/PitchBlocks',
             'activity/blocks/IntervalsBlocks',
+            'activity/blocks/ToneBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',
