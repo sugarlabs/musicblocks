@@ -198,6 +198,7 @@ function Activity() {
             'activity/blocks/PitchBlocks',
             'activity/blocks/IntervalsBlocks',
             'activity/blocks/ToneBlocks',
+            'activity/blocks/OrnamentBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',

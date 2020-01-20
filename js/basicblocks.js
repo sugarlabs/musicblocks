@@ -67,6 +67,7 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     setupPitchBlocks();
     setupIntervalsBlocks();
     setupToneBlocks();
+    setupOrnamentBlocks();
     
     setupFlowBlocks();
     setupNumberBlocks();
@@ -568,121 +569,6 @@ function initBasicProtoBlocks(palettes, blocks, beginnerMode) {
     newblock.labelOffset = 15;
     newblock.stackClampZeroArgBlock();
     if (beginnerMode && !beginnerBlock('status')) {
-        newblock.hidden = true;
-    }
-
-    // TONE (ARTICULATION) PALETTE
-
-    var newblock = new ProtoBlock('staccatofactor');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['staccatofactor'] = newblock;
-    //.TRANS: the duration of a note played as staccato
-    newblock.staticLabels.push(_('staccato factor'));
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    newblock.hidden = true;
-
-    var newblock = new ProtoBlock('slurfactor');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['slurfactor'] = newblock;
-    //.TRANS: the degree of overlap of notes played as legato
-    newblock.staticLabels.push(_('slur factor'));
-    newblock.adjustWidthToLabel();
-    newblock.parameterBlock();
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('neighbor');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['neighbor'] = newblock;
-    //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
-    newblock.staticLabels.push(_('neighbor') + ' (+/–)');
-    newblock.staticLabels.push(_('semi-tone interval'), _('note value'));
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.defaults.push(1);
-    newblock.defaults.push(1 / 16);
-    if (beginnerMode && !beginnerBlock('neighbor')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('neighbor2');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['neighbor2'] = newblock;
-    //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
-    newblock.staticLabels.push(_('neighbor') + ' (+/–)');
-    newblock.staticLabels.push(_('scalar interval'), _('note value'));
-    newblock.extraWidth = 15;
-    newblock.adjustWidthToLabel();
-    newblock.flowClampTwoArgBlock();
-    newblock.dockTypes[1] = 'numberin';
-    newblock.dockTypes[2] = 'numberin';
-    newblock.defaults.push(1);
-    newblock.defaults.push(1 / 16);
-    if (beginnerMode && !beginnerBlock('neighbor2')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('glide');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['glide'] = newblock;
-   //.TRANS: glide (glissando) is a blended overlap successive notes
-    newblock.staticLabels.push(_('glide'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 16);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('slur');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['slur'] = newblock;
-    //.TRANS: slur or legato is an overlap successive notes
-    newblock.staticLabels.push(_('slur'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(16);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('staccato');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['staccato'] = newblock;
-    //.TRANS: play each note sharply detached from the others
-    newblock.staticLabels.push(_('staccato'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(32);
-    newblock.hidden = true;
-
-    // macro
-    var newblock = new ProtoBlock('newslur');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['newslur'] = newblock;
-    //.TRANS: legato: overlap successive notes
-    newblock.staticLabels.push(_('slur'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 16);
-    if (beginnerMode && !beginnerBlock('newslur')) {
-        newblock.hidden = true;
-    }
-
-    // macro
-    var newblock = new ProtoBlock('newstaccato');
-    newblock.palette = palettes.dict['ornament'];
-    blocks.protoBlockDict['newstaccato'] = newblock;
-    //.TRANS: play each note sharply detached from the others
-    newblock.staticLabels.push(_('staccato'));
-    newblock.adjustWidthToLabel();
-    newblock.flowClampOneArgBlock();
-    newblock.defaults.push(1 / 32);
-    if (beginnerMode && !beginnerBlock('newstaccato')) {
         newblock.hidden = true;
     }
 

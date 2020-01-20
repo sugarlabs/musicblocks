@@ -1918,6 +1918,13 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'neighbor':  // semi-tone step
+        case 'neighbor2':  // scalar step
+        case 'glide':
+        case 'newslur':
+        case 'slur':
+        case 'newstaccato':
+        case 'staccato':
         case 'oscillator':
         case 'duosynth':
         case 'amsynth':
@@ -2931,145 +2938,6 @@ function Logo () {
                 that.rhythmRuler.Drums.push(blk);
                 that.rhythmRuler.Rulers.push([[],[]]);
             }
-            break;
-        case 'neighbor':  // semi-tone step
-        case 'neighbor2':  // scalar step
-            if (typeof(args[0]) !== 'number' || typeof(args[1]) !== 'number') {
-                that.errorMsg(NANERRORMSG, blk);
-                that.stopTurtle = true;
-                break;
-            }
-
-            that.inNeighbor[turtle].push(blk);
-            that.neighborStepPitch[turtle].push(args[0]);
-            that.neighborNoteValue[turtle].push(args[1]);
-
-            childFlow = args[2];
-            childFlowCount = 1;
-
-            var listenerName = '_neighbor_' + turtle + '_' + blk;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.inNeighbor[turtle].pop();
-                that.neighborStepPitch[turtle].pop();
-                that.neighborNoteValue[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'newstaccato':
-        case 'staccato':
-            if (args[1] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 32;
-            } else {
-                var arg = args[0];
-            }
-
-            if (that.blocks.blockList[blk].name === 'newstaccato') {
-                that.staccato[turtle].push(1 / arg);
-            } else {
-                that.staccato[turtle].push(arg);
-            }
-
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_staccato_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.staccato[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'newslur':
-        case 'slur':
-            if (args[1] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
-            } else {
-                var arg = args[0];
-            }
-
-            if (that.blocks.blockList[blk].name === 'slur') {
-                that.staccato[turtle].push(-arg);
-            } else {
-                that.staccato[turtle].push(-1 / arg);
-            }
-
-            if (that.justCounting[turtle].length === 0) {
-                that.notationBeginSlur(turtle);
-            }
-
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_staccato_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.staccato[turtle].pop();
-                if (that.justCounting[turtle].length === 0) {
-                    that.notationEndSlur(turtle);
-                }
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'glide':
-            // TODO: Duration should be the sum of all the notes (like
-            // in a tie). If we set the synth portamento and use
-            // setNote for all but the first note, it should produce a
-            // glissando.
-            if (args[1] === undefined) {
-                // Nothing to do.
-                break;
-            }
-
-            if (args[0] === null || typeof(args[0]) !== 'number') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
-            } else {
-                var arg = args[0];
-            }
-
-            that.glide[turtle].push(arg);
-
-            if (that.justCounting[turtle].length === 0) {
-                that.notationBeginSlur(turtle);
-            }
-
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            that.glideOverride[turtle] = that._noteCounter(turtle, childFlow);
-            console.debug('length of glide ' + that.glideOverride[turtle]);
-
-            var listenerName = '_glide_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                if (that.justCounting[turtle].length === 0) {
-                    that.notationEndSlur(turtle);
-                }
-
-                that.glide[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
             break;
         case 'articulation':
             if (args[1] === undefined) {
@@ -6028,24 +5896,6 @@ function Logo () {
                             that.blocks.blockList[blk].value = 0;
                         }
                     }
-                }
-                break;
-            case 'staccatofactor':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'staccato']);
-                } else if (that.staccato[turtle].length > 0) {
-                    that.blocks.blockList[blk].value = last(that.staccato[turtle]);
-                } else {
-                    that.blocks.blockList[blk].value = 0;
-                }
-                break;
-            case 'slurfactor':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'slur']);
-                } else if (that.staccato[turtle].length > 0) {
-                    that.blocks.blockList[blk].value = -last(that.staccato[turtle]);
-                } else {
-                    that.blocks.blockList[blk].value = 0;
                 }
                 break;
             case 'duplicatefactor':
