@@ -12033,6 +12033,9 @@ function Logo () {
                         that.blocks.blockList[blk].value = blockNumber;
                     }
                 }
+
+		// We need to wait for the new block to load before continuing.
+		that._doWait(turtle, 1);
                 break;
             default:
                 if (that.blocks.blockList[blk].name in that.evalArgDict) {
