@@ -28,25 +28,9 @@ function MeterWidget() {
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
-
-        // Position the widget and make it visible.
-        var meterDiv = docById('meterDiv');
-        meterDiv.style.visibility = 'visible';
-        meterDiv.setAttribute('draggable', 'true');
-        meterDiv.style.left = '200px';
-        meterDiv.style.top = '175px';
-
-        // The meter widget buttons
-        var meterButtonsDiv = docById('meterButtonsDiv');
-        meterButtonsDiv.style.display = 'inline';
-        meterButtonsDiv.style.visibility = 'visible';
-        meterButtonsDiv.style.width = BUTTONDIVWIDTH;
-        meterButtonsDiv.innerHTML = '<table cellpadding="0px" id="meterButtonTable"></table>';
-
-        var buttonTable = docById('meterButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        var widgetWindow = window.widgetWindows.windowFor(this, "meter");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
         this._logo.synth.setMasterVolume(PREVIEWVOLUME);
         this._logo.synth.loadSynth(0, 'kick drum');
@@ -57,122 +41,68 @@ function MeterWidget() {
         // For the button callbacks
         var that = this;
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        this.meterDiv = document.createElement("table");
+        widgetWindow.getWidgetBody().append(this.meterDiv);
 
-        cell.onclick=function() {
+        widgetWindow.onclose=function() {
             that._playing = false;
             docById('meterDiv').style.visibility = 'hidden';
             docById('meterButtonsDiv').style.visibility = 'hidden';
             docById('meterTableDiv').style.visibility = 'hidden';
             docById('meterWheelDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
+            this.destroy();
         }
 
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
+        widgetWindow.onmaximize = function(){
+          if(widgetWindow._maximized){
+            widgetWindow.getWidgetBody().style.position = "absolute";
+            widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
+            widgetWindow.getWidgetBody().style.width = "200vh";
+            widgetWindow.getWidgetBody().style.left = "70px";
+
+          } else{
+            widgetWindow.getWidgetBody().style.position = "relative";
+            widgetWindow.getWidgetBody().style.left = "0px";
+            widgetWindow.getWidgetBody().style.height = "410px";
+            widgetWindow.getWidgetBody().style.width = "410px";
+          }
+        }
+
 
         this._click_lock = false;
+        widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick = function() {
+          if (that._get_click_lock()) {
+              console.debug('click lock');
+              return;
+          } else {
+              console.debug('CLICK PLAY/PAUSE');
+              that._click_lock = true;
+              if (that.__getPlayingStatus()) {
+                  console.debug('PAUSING');
+                  this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                  that._playing = false;
+              } else {
+                  console.debug('PLAYING');
+                  this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                  that._playing = true;
+                  that._logo.setTurtleDelay(0);
+                  that._logo.resetSynth(0);
+                  that._playBeat();
+              }
+          }
 
-        cell.onclick=function() {
-            if (that._get_click_lock()) {
-                console.debug('click lock');
-                return;
-            } else {
-                console.debug('CLICK PLAY/PAUSE');
-                that._click_lock = true;
-                if (that.__getPlayingStatus()) {
-                    console.debug('PAUSING');
-                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = false;
-                } else {
-                    console.debug('PLAYING');
-                    this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = true;
-                    that._logo.setTurtleDelay(0);
-                    that._logo.resetSynth(0);
-                    that._playBeat();
-                }
-            }
-
-            setTimeout(function () {
-                that._click_lock = false;
-            }, 1000);
-        };
-
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-
-        cell.onclick=function() {
-            that._save();
+          setTimeout(function () {
+              that._click_lock = false;
+          }, 1000);
         }
 
-        // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - meterDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - meterDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                meterDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                meterDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        meterDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        meterDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                meterDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                meterDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        meterDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        meterDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
+          that._save();
+        }
 
         // The pie menu goes here.
-        var meterTableDiv = docById('meterTableDiv');
+        var meterTableDiv = this.meterDiv;
         meterTableDiv.style.display = 'inline';
         meterTableDiv.style.visibility = 'visible';
         meterTableDiv.style.border = '0px';
@@ -198,6 +128,7 @@ function MeterWidget() {
         }
 
         this._logo.textMsg(_('Click in the circle to select strong beats for the meter.'));
+        widgetWindow.sendToCenter();
     };
 
     this._get_click_lock = function() {
