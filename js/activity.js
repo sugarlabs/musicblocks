@@ -1267,7 +1267,8 @@ function Activity() {
                     }
                 }
             }
-
+          
+            
             // horizontal scroll
             if (scrollPaletteContainer) {
                 if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
@@ -1417,6 +1418,7 @@ function Activity() {
                 };
 
                 refreshCanvas();
+
             });
 
             stage.removeAllEventListeners('stagemouseup');
@@ -1433,18 +1435,23 @@ function Activity() {
         var scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
+            console.debug(event.clientX);
+            console.debug("Yes");
+            console.debug(cellSize);
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-           var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
+            console.debug(event.clientX);
+            console.debug(cellSize);
+            var palette = palettes.findPalette(event.clientX / turtleBlocksScale, event.clientY / turtleBlocksScale);
             if (palette) {
                 // if we are moving the palettes, deselect the active block.
                 blocks.activeBlock = null;
-
                 palette.scrollEvent(delta, scrollSpeed);
             }
         }
     };
+
 
     function getStageScale() {
         return turtleBlocksScale;
@@ -3917,6 +3924,7 @@ function Activity() {
                 that.__tick();
             }
         })
+        
 
         document.addEventListener('click', function() {
             that.__tick();

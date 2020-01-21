@@ -64,6 +64,10 @@ function Palettes () {
     this.trashcan = null;
     this.firstTime = true;
     this.background = null;
+    this.upIndicator = null;
+    this.upIndicatorStatus = false;
+    this.downIndicator = null;
+    this.downIndicatorStatus = true;
     this.circles = {};
     // paletteText is used for the highlighted tooltip
     this.paletteText = new createjs.Text('', '20px Sans', platformColor.paletteText);
@@ -284,6 +288,42 @@ function Palettes () {
         return this;
     };
 
+    this.menuScrollEvent = function (direction, scrollSpeed) {
+        var keys = Object.keys(this.buttons);
+
+        var diff = direction * scrollSpeed;
+        if (this.buttons[keys[0]].y + diff > this.cellSize && direction > 0) {
+            this.upIndicator.visible = false;
+            this.upIndicatorStatus = this.upIndicator.visible;
+
+            this.refreshCanvas();
+            return;
+        } else {
+            this.upIndicatorStatus = this.upIndicator.visible;
+            this.upIndicator.visible = true;
+        }
+
+        if (this.buttons[last(keys)].y + diff < windowHeight() / this.scale - this.cellSize && direction < 0) {
+            this.downIndicator.visible = false;
+            this.downIndicatorStatus = this.downIndicator.visible;
+            this.refreshCanvas();
+            return;
+        } else {
+            this.downIndicator.visible = true;
+            this.downIndicatorStatus = this.downIndicator.visible;
+        }
+
+        this.scrollDiff += diff;
+
+        for (var name in this.buttons) {
+            this.buttons[name].y += diff;
+            this.buttons[name].visible = true;
+        }
+
+        this._updateButtonMasks();
+        this.refreshCanvas();
+    };
+
     this.setSearch = function (show, hide) {
         this.showSearchWidget = show;
         this.hideSearchWidget = hide;
@@ -358,6 +398,44 @@ function Palettes () {
             this.stage.addChild(shape);
             this.background = shape;
         }
+
+        function __processUpIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = 55;
+            bitmap.visible = false;
+            palettes.upIndicator = bitmap;
+
+        palettes.upIndicator.on('click', function (event) {
+                palettes.menuScrollEvent(1, 40);
+                palettes.hidePaletteIconCircles();
+            });
+        };
+
+        function __processDownIcon(palettes, name, bitmap, args) {
+            bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.4;
+            palettes.stage.addChild(bitmap);
+            bitmap.x = 55;
+            bitmap.y = (windowHeight() / palettes.scale) - 27;
+
+        bitmap.visible = true;
+            palettes.downIndicator = bitmap;
+
+        palettes.downIndicator.on('click', function (event) {
+                palettes.menuScrollEvent(-1, 40);
+                palettes.hidePaletteIconCircles();
+            });
+        };
+
+        if (this.upIndicator == null && this.firstTime) {
+            makePaletteBitmap(this, UPICON.replace('#000000', '#FFFFFF'), 'up', __processUpIcon, null);
+        }
+
+        if (this.downbIndicator == null && this.firstTime) {
+            makePaletteBitmap(this, DOWNICON.replace('#000000', '#FFFFFF'), 'down', __processDownIcon, null);
+        }
+
 
         this.firstTime = false;
 
@@ -636,6 +714,26 @@ function Palettes () {
         var searchlocked = false;
         var scrolling = false;
         var that = this;
+        var palettes = this;
+
+       this.buttons[name].on('mousedown', function (event) {
+            scrolling = true;
+            var lastY = event.stageY;
+
+            that.buttons[name].on('pressmove', function (event) {
+                if (!scrolling) {
+                    return;
+                }
+                var diff = event.stageY - lastY;
+                that.menuScrollEvent(diff, 10);
+                lastY = event.stageY;
+            });
+
+            that.buttons[name].on('pressup', function (event) {
+                scrolling = false;
+            }, null, true);  // once = true
+        });
+       
 
         // A palette button opens or closes a palette.
         this.buttons[name].on('mouseover', function (event) {
@@ -1843,7 +1941,7 @@ function Palette(palettes, name) {
                 scrolling = false;
             }, null, true);  // once = true
         });
-    };
+            };
 
     // Palette Menu event handlers
     this._loadPaletteMenuHandler = function () {
@@ -1887,9 +1985,69 @@ function Palette(palettes, name) {
             that.palettes.refreshCanvas();
         });
 
-        this.menuContainer.on('mouseover', function(event) {
+        this.menuContainer.on('mousedown', function (event) {
+            trashcan.show();
+            // Move them all?
+            var offset = {
+                x: that.menuContainer.x - Math.round(event.stageX / that.palettes.scale),
+                y: that.menuContainer.y - Math.round(event.stageY / that.palettes.scale)
+            };
+
+            that.menuContainer.on('pressup', function (event) {
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
+                    if (trashcan.isVisible) {
+                        that.hide();
+                        that.palettes.refreshCanvas();
+                        // Only delete plugin palettes.
+                        if (that.name === 'myblocks') {
+                            that._promptMacrosDelete();
+                        } else if (BUILTINPALETTES.indexOf(that.name) === -1) {
+                            that._promptPaletteDelete();
+                        }
+                    }
+                }
+                trashcan.hide();
+            });
+
+            that.menuContainer.on('mouseout', function (event) {
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
+                    if (trashcan.isVisible) {
+                        that.hide();
+                        that.palettes.refreshCanvas();
+                    }
+                }
+                trashcan.hide();
+            });
+
+            that.menuContainer.on('pressmove', function (event) {
+                var oldX = that.menuContainer.x;
+                var oldY = that.menuContainer.y;
+                that.menuContainer.x = Math.round(event.stageX / that.palettes.scale) + offset.x;
+                that.menuContainer.y = Math.round(event.stageY / that.palettes.scale) + offset.y;
+                that.palettes.refreshCanvas();
+                var dx = that.menuContainer.x - oldX;
+                var dy = that.menuContainer.y - oldY;
+                that.palettes.initial_x = that.menuContainer.x;
+                that.palettes.initial_y = that.menuContainer.y;
+
+                // If we are over the trash, warn the user.
+                if (trashcan.overTrashcan(event.stageX / that.palettes.scale, event.stageY / that.palettes.scale)) {
+                    trashcan.startHighlightAnimation();
+                } else {
+                    trashcan.stopHighlightAnimation();
+                }
+
+                // Hide the menu items while drag.
+                that._hideMenuItems(false);
+                that._moveMenuItemsRelative(dx, dy);
+            });
+        });
+
+       this.menuContainer.on('mouseover', function(event) {
             document.body.style.cursor = 'pointer';
         });
+
+
 
         this.menuContainer.on('mouseout', function(event) {
             document.body.style.cursor = 'default';
@@ -1968,7 +2126,7 @@ function Palette(palettes, name) {
         this.protoContainers[blkname].on('mouseout', function (event) {
             // Catch case when pressup event is missed.
             // Put the protoblock back on the palette...
-            document.body.style.cursor = 'default';
+            //document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressed && moved) {
@@ -1978,8 +2136,20 @@ function Palette(palettes, name) {
             }
         });
 
+
+        //scrolling
+        this.protoContainers[blkname].on('mousemove', function (event) {
+            // Catch case when pressup event is missed.
+            // Put the protoblock back on the palette...
+            palette.palettes.activePalette = null;
+
+            palette.palettes.menuScrollEvent(1, 40);
+            console.debug("I am here at 2169");
+        });
+
+
         this.protoContainers[blkname].on('pressup', function (event) {
-            document.body.style.cursor = 'default';
+            //document.body.style.cursor = 'default';
             that.palettes.activePalette = null;
 
             if (pressupLock) {
@@ -2320,7 +2490,7 @@ function Palette(palettes, name) {
 };
 
 
-async  function initPalettes (palettes) {
+async function initPalettes (palettes) {
 // function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
