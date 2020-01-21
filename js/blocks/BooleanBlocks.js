@@ -35,6 +35,19 @@ class AndBlock extends BooleanBlock {
             args: 2, argTypes: ['booleanin', 'booleanin']
         });
     }
+
+    arg(logo, turtle, blk, receivedArg) {
+        var cblk1 = logo.blocks.blockList[blk].connections[1];
+        var cblk2 = logo.blocks.blockList[blk].connections[2];
+        if (cblk1 === null || cblk2 === null) {
+            logo.errorMsg(NOINPUTERRORMSG, blk);
+            return false;
+        } else {
+            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            return a && b;
+        }
+    }
 }
 
 class OrBlock extends BooleanBlock {
@@ -48,6 +61,16 @@ class OrBlock extends BooleanBlock {
     }
 
     arg(logo, turtle, blk, receivedArg) {
+        var cblk1 = logo.blocks.blockList[blk].connections[1];
+        var cblk2 = logo.blocks.blockList[blk].connections[2];
+        if (cblk1 === null || cblk2 === null) {
+            logo.errorMsg(NOINPUTERRORMSG, blk);
+            return false;
+        } else {
+            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            return a || b;
+        }
     }
 }
 
@@ -148,7 +171,7 @@ class StaticBooleanBlock extends BooleanBlock {
         this.setPalette('boolean');
     }
 
-    arg(logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk) {
         if (typeof(logo.blocks.blockList[blk].value) === 'string') {
             return logo.blocks.blockList[blk].value === _('true') || logo.blocks.blockList[blk].value === 'true';
         }

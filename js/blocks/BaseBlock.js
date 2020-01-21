@@ -65,7 +65,7 @@ class BaseBlock extends ProtoBlock {
         } else {
             if (this._style.flows.type === 'value')
                 this.style = 'value';
-            else if (this._style.args === 1 || this._style.flows.left) {
+            else if (this._style.flows.left) {
                 this.style = 'arg';
                 this.parameter = true;
             } else if (this._style.args === 2)
@@ -85,8 +85,8 @@ class BaseBlock extends ProtoBlock {
         this.staticLabels = [this._style.name || ''];
         this.dockTypes = [];
         this.defaults = [];
-        this._style.flows.labels.forEach(i => this.staticLabels.push(i));
         this._style.argLabels.forEach(i => this.staticLabels.push(i));
+        this._style.flows.labels.forEach(i => this.staticLabels.push(i));
 
         if (this._style.flows.left)
             this.dockTypes.push(this._style.outType || 'numberout');
