@@ -5843,6 +5843,10 @@ function Block(protoblock, blocks, overrideName) {
      * Sets up context menu for each block
      */
     this.piemenuBlockContext = function () {
+	var pasteDx = 0;
+	var pasteDy = 0;
+
+
         var that = this;
         var thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -5909,8 +5913,12 @@ function Block(protoblock, blocks, overrideName) {
         wheel.navItems[0].navigateFunction = function () {
             that.blocks.activeBlock = thisBlock;
             that.blocks.prepareStackForCopy();
+            that.blocks.pasteDx = pasteDx;
+            that.blocks.pasteDy = pasteDy;
             that.blocks.pasteStack();
-            docById('contextWheelDiv').style.display = 'none';
+	    pasteDx += 21;
+	    pasteDy += 21;
+            // docById('contextWheelDiv').style.display = 'none';
         };
 
         wheel.navItems[1].navigateFunction = function () {

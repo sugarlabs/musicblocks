@@ -63,8 +63,8 @@ function Blocks (activity) {
     this.longPressTimeout = null;
 
     // Paste offset is used to ensure pasted blocks don't overlap.
-    this._pasteDX = 0;
-    this._pasteDY = 0;
+    this.pasteDx = 0;
+    this.pasteDy = 0;
 
     // What did we select?
     this.selectedStack = null;
@@ -4319,8 +4319,8 @@ function Blocks (activity) {
         // console.debug(this.selectedBlocksObj);
 
         // Reset paste offset.
-        this._pasteDX = 0;
-        this._pasteDY = 0;
+        this.pasteDx = 0;
+        this.pasteDy = 0;
     };
 
    /*
@@ -4356,10 +4356,10 @@ function Blocks (activity) {
         // Reposition the paste location relative to the stage position.
         console.debug(this.selectedBlocksObj);
         if (this.selectedBlocksObj != null) {
-            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this._pasteDX;
-            this.selectedBlocksObj[0][3] = 75 - this.stage.y + this._pasteDY;
-            this._pasteDX += 21;
-            this._pasteDY += 21;
+            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this.pasteDx;
+            this.selectedBlocksObj[0][3] = 75 - this.stage.y + this.pasteDy;
+            this.pasteDx += 21;
+            this.pasteDy += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
         }
     };
