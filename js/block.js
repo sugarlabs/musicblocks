@@ -5910,7 +5910,7 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.activeBlock = thisBlock;
             that.blocks.prepareStackForCopy();
             that.blocks.pasteStack();
-            docById('contextWheelDiv').style.display = '';
+            // docById('contextWheelDiv').style.display = 'none';
         };
 
         wheel.navItems[1].navigateFunction = function () {
