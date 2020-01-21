@@ -2675,6 +2675,8 @@ function Activity() {
         doLoadAnimation();
 
         // palettes.updatePalettes();
+        console.debug('LOADING' + planet.getCurrentProjectName());
+        textMsg(planet.getCurrentProjectName());
         setTimeout(function () {
             try {
                 planet.openProjectFromPlanet(projectID, function () {
@@ -4200,7 +4202,8 @@ function Activity() {
                     errorMsg(_('project undefined'));
                     return;
                 }
-
+                textMsg(this.getCurrentProjectName());
+                console.debug('LOADING' + this.getCurrentProjectName());
                 console.debug('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
