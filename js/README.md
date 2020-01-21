@@ -36,29 +36,29 @@ Other utilities
 * `background.js` -- extenstion utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
-* sugarizer-`compatibility.js` -- datastore utilities used by sugarizer
+* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
 * `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 Subdirectories with additional utilities
 * utils -- additional general-purpose utilities
-	* `detectIE.js`: check if Music Blocks is being run in Internet Explorer
-	* `munsell.js`: Munsell color system used for mice and widgets
-	* `musicutils.js`: related to musical notations
-	* `platformstyle.js`: checking platform that Music Blocks is run in
-	* `synthutils.js`: related to defining synths in tone.js
-	* `utils.js`: general utility functions
-  * ` widgets` : widget code
-	* `help.js`: show help for individual blocks and the tour of Music Blocks
-	* `modewidget.js`: explore musical modes
-	* `pitchdrummatrix.js`: map pitches to drum sounds
-	* `pitchslider.js`: generate pitch blocks based on frequency (in Hertz)
-	* `pitchstaircase.js`: generate a collection of pitches based on ratios of frequency (Hertz)
-	* `pitchtimematrix.js`: map pitch to rhythm (create a "chunk" of notes)
-	* `rhythmruler.js`: define rhythms (and drum machines)
-	* `status.js`: track the status of various parameters as the program plays (a useful debugging tool)
-	* `tempo.js`: change the tempo
-	* `timbre.js`: design new instruments
+	* `detectIE.js` -- check if Music Blocks is being run in Internet Explorer
+	* `munsell.js` -- Munsell color system used for mice and widgets
+	* `musicutils.js` -- related to musical notations
+	* `platformstyle.js` -- checking platform that Music Blocks is run in
+	* `synthutils.js` -- related to defining synths in tone.js
+	* `utils.js` -- general utility functions
+* widgets -- widget code
+	* `help.js` -- show help for individual blocks and the tour of Music Blocks
+	* `modewidget.js` -- explore musical modes
+	* `pitchdrummatrix.js` -- map pitches to drum sounds
+	* `pitchslider.js` -- generate pitch blocks based on frequency (in Hertz)
+	* `pitchstaircase.js` -- generate a collection of pitches based on ratios of frequency (Hertz)
+	* `pitchtimematrix.js` -- map pitch to rhythm (create a "chunk" of notes)
+	* `rhythmruler.js` -- define rhythms (and drum machines)
+	* `status.js` -- track the status of various parameters as the program plays (a useful debugging tool)
+	* `tempo.js` -- change the tempo
+	* `timbre.js` -- design new instruments
 
 # __How to add new blocks__
 
