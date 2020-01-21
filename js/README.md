@@ -143,7 +143,6 @@ e.g., `pitchNumberBlock.defaults.push(7);`
 
   Text: `uniquenameBlock.defaults.push(_('label'));`
 
-
 Note: if you want to add a fraction as an argument, e.g.,
 `uniquenameBlock.defaults.push(1 / 4);`, you will need to define a
 macro in `macro.js`:
@@ -422,3 +421,57 @@ There are many, but here are a few:
 * `pitchToNumber`
 * `errorMsg`
 
+## About the internal block format.
+
+In `blocks.js` is a instance variable, `blockList` that is a list of
+the current set of blocks that Music Blocks knows about. There are
+methods to add blocks to the list, notably, `loadNewBlocks`. There is
+even a block that can be used to create new blocks, enabling Music
+Blocks programs to self-modify.
+
+The internal format of this list is:
+
+```
+[block, block, block, ...]
+```
+
+Each block is itself a list.
+
+```
+[block number, block name, x position, y position, [connection 0, connection 1...]]
+```
+
+where block number and the connections are integer indecies into
+`blockList`, block name is string that matches one of the blocks
+defined in `basicblocks.js`, and the x and y positions are float value
+screen coordinates.
+
+For example, a *Note block* might look like this:
+
+```
+[[0, 'newnote', 100, 100, [null, 1, 4, null]],
+ [1, 'divide', 0, 0, [0, 2, 3]],
+ [2, ['number', {'value': 1}], 0, 0, [1]],
+ [3, ['number', {'value': 4}], 0, 0, [1]],
+ [4, 'vspace', 0, 0, [0, 5]],
+ [5, 'pitch', 0, 0, [4, 6, 7, null]]
+ [6, ['solfege', {'value': 'sol'}], 0, 0, [5]],
+ [7, ['number', {'value': 4}], 0, 0, [5]],
+]
+```
+
+The block names are the internal names, not the labels shown in the
+interface. Hence *Note blocks* are `newnote` blocks.  Note that the
+`newnote` block has 4 connections, two of which are null, since there
+is no block connected above or below.  Also note that the only x, y
+poaition that is relevant is that of the `newnote` block, since the
+other blocks will be positioned by where they connect. (Typically, you
+only need to worry about the position of the first block in a stack of
+blocks. Everything else is calculated for you.)
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/block-connections-diagram.svg
+ "Blocks maintain a list of connections to other blocks.")
+
+In the figure about and in the code example above, the `divide` block
+connection 0 connects to the `newnote` block connection 1, etc.
