@@ -4500,9 +4500,9 @@ function Activity() {
                         var y = 100;
 
                         // Add new notes to curInd
-                        var curInd = 1;
+                        var curInd = null;
                         var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,2]]];
-                        
+                        var notes = [];
                         // Read data from header
                         var headerInfo = {};
                         var curline = 0;
@@ -4565,6 +4565,10 @@ function Activity() {
                                 console.log('add note with pitch '+pitch)
                                 console.log('octave '+octave)
                                 console.log('length '+headerInfo.L)
+
+                                var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': headerInfo.L}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': pitch}], 0, 0, [5]], [7, ['number', {'value': octave}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
+                                notes.push(newNote);
+
                                 // push notes onto blocksData
 
                                 // blocksData[curInd[5][curInd[5].length-1]] = curInd+1;
@@ -4596,6 +4600,8 @@ function Activity() {
                         var __listener = function (event) {
                             logo.playbackQueue = {};
                             blocks.loadNewBlocks(blocksData);
+                            blocks.loadNewBlocks(notes);
+                            blocks.blockList[1].value = blocks.blockList.length;
                             setPlaybackStatus();
                             stage.removeAllEventListeners('trashsignal');
                         };
