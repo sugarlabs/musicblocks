@@ -4601,7 +4601,6 @@ function Activity() {
                             logo.playbackQueue = {};
                             blocks.loadNewBlocks(blocksData);
                             blocks.loadNewBlocks(notes);
-                            blocks.blockList[1].value = blocks.blockList.length;
                             setPlaybackStatus();
                             stage.removeAllEventListeners('trashsignal');
                         };
