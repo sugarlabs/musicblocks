@@ -46,12 +46,6 @@ class BaseBlock extends ProtoBlock {
         this._style.flows = this._style.flows || {}
         this._style.flows.labels = this._style.flows.labels || [];
 
-        let that = this;
-        const debugLog = function () {
-            return;  // Silence logging
-            console.log(...arguments);
-        };
-
         if (this._style.flows.labels.length > 0) {
             if (this._style.flows.type === 'arg')
                 this.style = 'argclamp';
@@ -107,43 +101,29 @@ class BaseBlock extends ProtoBlock {
             this.dockTypes.push(this._style.flows.bottom === 'tail' ? 'unavailable' : 'in');
 
         this.generator = function () {
-            debugLog(':: generating block', this.name);
-            debugLog('dockTypes:', this.dockTypes);
-            debugLog('args:', this.args);
-            debugLog('size:', this.size);
-            debugLog('style:', this.style);
-
             var svg = new SVG();
             svg.init();
             svg.setScale(this.scale);
 
-            if (this._style.flows.top === 'cap') {
+            if (this._style.flows.top === 'cap')
                 svg.setCap(true);
-                debugLog('setCap true');
-            } else {
+            else
                 svg.setSlot(this._style.flows.top);
-                debugLog('setSlot', this._style.flows.top);
-            }
 
-            if (this._style.flows.bottom === 'tail') {
+            if (this._style.flows.bottom === 'tail')
                 svg.setTail(true);
-                debugLog('setTail true')
-            } else if (this._style.flows.bottom) {
+            else if (this._style.flows.bottom)
                 svg.setTab(true);
-                debugLog('setTab true')
-            }
-            if (this._style.flows.left) {
+            if (this._style.flows.left)
                 svg.setOutie(true);
-                debugLog('setOutie true')
-            }
 
             let pad = (this._style.flows.type === 'value') ? 60 : 20;
             if (!this._style.flows.type) pad += 10;
             if (this._style.outType === 'booleanout' && this._style.args === 2) pad -= 30;
             else if (this._style.argTypes[0] === 'booleanin') pad -= 5;
-            svg.setExpand(pad + this.extraWidth, this.image ? 23 : 0, 0,
-                this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
-            debugLog('setExpand', pad + this.extraWidth, 0, 0, 0);
+            if (this.size !== 0)
+                svg.setExpand(pad + this.extraWidth, this.image ? 23 : 0, 0,
+                    this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
 
             for (let i = 0; i < arguments.length; i++)
                 svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
@@ -153,10 +133,8 @@ class BaseBlock extends ProtoBlock {
 
             if (this._style.argTypes[0] === 'booleanin') {
                 svg.setBoolean(true)
-                debugLog('setBoolean', true);
             } else if (typeof this._style.args === 'number') {
                 svg.setInnies(Array(this._style.args).fill(true));
-                debugLog('setInnies', Array(this._style.args).fill(true))
             }
 
             // Make space for the expand icon
@@ -169,34 +147,30 @@ class BaseBlock extends ProtoBlock {
             let artwork;
             if (this._style.flows.type === 'arg') {
                 artwork = svg.argClamp();
-                debugLog('artwork = argClamp');
             } else if (this._style.flows.type === 'flow') {
                 artwork = svg.basicClamp();
-                debugLog('artwork = basicClamp');
             } else if (this._style.outType === 'booleanout') {
                 if (this._style.args === 1 || !this._style.args) {
-                    debugLog('artwork = booleanNot', !this._style.args);
                     artwork = svg.booleanNot(!this._style.args);
                 } else if (this._style.argTypes[0] === 'booleanin') {
-                    debugLog('artwork = booleanAndOr');
                     artwork = svg.booleanAndOr();
                 } else {
-                    debugLog('artwork = booleanCompare');
                     artwork = svg.booleanCompare();
                 }
             } else if (this._style.flows.type === 'value') {
                 artwork = svg.basicBox();
-                debugLog('artwork = basicBox');
             } else {
                 artwork = svg.basicBlock();
-                debugLog('artwork = basicBlock');
             }
-            debugLog('generation complete', svg.docks)
+            // If the block has 0 size, clear out the artwork
+            if (this.size === 0)
+                artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
             let clickHeight;
             if (this._style.flows.top || this._style.flows.bottom)
                 clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length - 1][1];
             else
                 clickHeight = svg.getHeight();
+            if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
             return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
         }
 

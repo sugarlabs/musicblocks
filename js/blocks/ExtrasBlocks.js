@@ -617,6 +617,98 @@ class PrintBlock extends FlowBlock {
     }
 }
 
+class DrumBlock extends StackClampBlock {
+    constructor() {
+        super('drum');
+        this.setPalette('extras');
+        this.formBlock({ name: _('start drum'), canCollapse: true });
+        this.hidden = this.deprecated = true;
+    }
+
+    flow(args) {
+        if (args.length === 1)
+            return [args[0], 1];
+    }
+}
+
+// NOP blocks (used as placeholders when loaded blocks not found)
+class NOPValueBlock extends ValueBlock {
+    constructor() {
+        super('nopValueBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({ outType: 'anyout' });
+        this.hidden = true;
+    }
+}
+
+class NOPOneArgMathBlock extends LeftBlock {
+    constructor() {
+        super('nopOneArgMathBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({
+            args: 1, argTypes: ['anyin'],
+            outType: 'anyout'
+        });
+        this.hidden = true;
+    }
+}
+
+class NOPTwoArgMathBlock extends LeftBlock {
+    constructor() {
+        super('nopOneArgMathBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({
+            args: 2, argTypes: ['anyin', 'anyin'],
+            outType: 'anyout'
+        });
+        this.hidden = true;
+    }
+}
+
+class NOPZeroArgBlock extends FlowBlock {
+    constructor() {
+        super('nopZeroArgBlock', _('unknown'));
+        this.setPalette('extras');
+        this.hidden = true;
+    }
+}
+
+class NOPOneArgBlock extends FlowBlock {
+    constructor() {
+        super('nopOneArgBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({ args: 1, argTypes: ['anyin'] });
+        this.hidden = true;
+    }
+}
+
+class NOPTwoArgBlock extends FlowBlock {
+    constructor() {
+        super('nopTwoArgBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({ args: 2, argTypes: ['anyin', 'anyin'] });
+        this.hidden = true;
+    }
+}
+
+class NOPThreeArgBlock extends FlowBlock {
+    constructor() {
+        super('nopThreeArgBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({ args: 3, argTypes: ['anyin', 'anyin', 'anyin'] });
+        this.hidden = true;
+    }
+}
+
+class NOPFourArgBlock extends FlowBlock {
+    constructor() {
+        super('nopFourArgBlock', _('unknown'));
+        this.setPalette('extras');
+        this.formBlock({ args: 4, argTypes: ['anyin', 'anyin', 'anyin', 'anyin'] });
+        this.hidden = true;
+    }
+}
+
 function setupExtrasBlocks() {
     new OpenPaletteBlock().setup();
     new DeleteBlockBlock().setup();
@@ -636,4 +728,14 @@ function setupExtrasBlocks() {
     new WaitBlock().setup();
     new CommentBlock().setup();
     new PrintBlock().setup();
+    new DrumBlock().setup();
+    // NOP blocks
+    new NOPValueBlock().setup();
+    new NOPOneArgMathBlock().setup();
+    new NOPTwoArgMathBlock().setup();
+    new NOPZeroArgBlock().setup();
+    new NOPOneArgBlock().setup();
+    new NOPTwoArgBlock().setup();
+    new NOPThreeArgBlock().setup();
+    new NOPFourArgBlock().setup();
 }

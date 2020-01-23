@@ -589,6 +589,46 @@ class RepeatBlock extends FlowClampBlock {
     }
 }
 
+class DuplicateFactorBlock extends ValueBlock {
+    constructor() {
+        //.TRANS: factor used in determining how many duplications to make
+        super('duplicatefactor', _('duplicate factor'));
+        this.setPalette('flow');
+        this.hidden = true;
+    }
+
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'duplicate']);
+        } else {
+            logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+        }
+    }
+}
+
+class HiddenNoFlowBlock extends FlowBlock {
+    constructor() {
+        super('hiddennoflow');
+        this.setPalette('flow');
+        this.dockTypes[this.dockTypes.length - 1] = 'unavailable';
+        this.size = 0;
+        this.hidden = true;
+    }
+
+    flow() {}
+}
+class HiddenBlock extends FlowBlock {
+    constructor() {
+        super('hidden');
+        this.setPalette('flow');
+        this.size = 0;
+        this.hidden = true;
+    }
+
+    flow() {}
+}
+
+
 
 function setupFlowBlocks() {
     new BackwardBlock().setup();
@@ -605,4 +645,7 @@ function setupFlowBlocks() {
     new IfBlock().setup();
     new ForeverBlock().setup();
     new RepeatBlock().setup();
+    new DuplicateFactorBlock().setup();
+    new HiddenNoFlowBlock().setup();
+    new HiddenBlock().setup();
 }

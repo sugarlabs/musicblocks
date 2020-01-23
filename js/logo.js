@@ -1907,20 +1907,6 @@ function Logo () {
         }
 
         switch (that.blocks.blockList[blk].name) {
-        case 'dispatch':
-            
-            break;
-        case 'drum':
-            if (args.length === 1) {
-                childFlow = args[0];
-                childFlowCount = 1;
-            }
-            break;
-        case 'hidden':
-        case 'hiddennoflow':
-            // Hidden block is used at end of clamps and actions to
-            // trigger listeners.
-            break;
             // Deprecated
         case 'beginhollowline':
             that.turtles.turtleList[turtle].doStartHollowLine();
@@ -1928,8 +1914,6 @@ function Logo () {
             // Deprecated
         case 'endhollowline':
             that.turtles.turtleList[turtle].doEndHollowLine();
-            break;
-        case 'temperament1':
             break;
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
             // deprecated
@@ -4424,13 +4408,6 @@ function Logo () {
                             that.blocks.blockList[blk].value = 0;
                         }
                     }
-                }
-                break;
-            case 'duplicatefactor':
-                if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-                    that.statusFields.push([blk, 'duplicate']);
-                } else {
-                    that.blocks.blockList[blk].value = that.duplicateFactor[turtle];
                 }
                 break;
             case 'hue':

@@ -630,6 +630,8 @@ class Temperament1Block extends StackClampBlock {
         });
         this.hidden = true;
     }
+
+    flow() {}
 }
 
 function setupActionBlocks() {
