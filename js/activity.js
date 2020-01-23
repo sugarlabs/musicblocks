@@ -199,6 +199,7 @@ function Activity() {
             'activity/blocks/IntervalsBlocks',
             'activity/blocks/ToneBlocks',
             'activity/blocks/OrnamentBlocks',
+            'activity/blocks/VolumeBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',
