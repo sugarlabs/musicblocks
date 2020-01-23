@@ -1918,6 +1918,10 @@ function Logo () {
             break;
         
         // ----- ADD SMART BLOCK CLASSES HERE -----
+        case 'playnoise':
+        case 'mapdrum':
+        case 'setdrum':
+        case 'playdrum':
         case 'setsynthvolume2':
         case 'setsynthvolume':
         case 'setnotevolume':  // master volume
@@ -2560,123 +2564,6 @@ function Logo () {
                 }
             }
             break;
-        case 'playnoise':
-            if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 'noise1';
-            } else {
-                var arg = args[0];
-            }
-
-            var noisename = arg;
-            for (var noise in NOISENAMES) {
-                if (NOISENAMES[noise][0] === arg) {
-                    noisename = NOISENAMES[noise][1];
-                    break;
-                } else if (NOISENAMES[noise][1] === arg) {
-                    noisename = arg;
-                    break;
-                }
-            }
-
-            if (that.inNoteBlock[turtle].length > 0) {
-                // Add the noise sound as if it were a drum
-                that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(noisename);
-                if (that.synthVolume[turtle][noisename] == undefined) {
-                    that.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
-                    that.crescendoInitialVolume[turtle][noisename] = [DEFAULTVOLUME];
-                }
-            } else {
-                that.errorMsg(_('Noise Block: Did you mean to use a Note block?'), blk);
-                break;
-            }
-
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-            }
-
-            that.pushedNote[turtle] = true;
-            break;
-        case 'playdrum':
-            if (args.length !== 1 || args[0] == null || typeof(args[0]) !== 'string') {
-                that.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = DEFAULTDRUM;
-            } else {
-                var arg = args[0];
-            }
-
-            var drumname = DEFAULTDRUM;
-            if (arg.slice(0, 4) === 'http') {
-                drumname = arg;
-            } else {
-                for (var drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0] === arg) {
-                        drumname = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1] === arg) {
-                        drumname = arg;
-                        break;
-                    }
-                }
-            }
-
-            // If we are in a setdrum clamp, override the drum name.
-            if (that.drumStyle[turtle].length > 0) {
-                drumname = last(that.drumStyle[turtle]);
-            }
-
-            if (that.inPitchDrumMatrix) {
-                that.pitchDrumMatrix.drums.push(drumname);
-                that.pitchDrumMatrix.addColBlock(blk);
-                if (that.drumBlocks.indexOf(blk) === -1) {
-                    that.drumBlocks.push(blk);
-                }
-            } else if (that.inMatrix) {
-                that.pitchTimeMatrix.rowLabels.push(drumname);
-                that.pitchTimeMatrix.rowArgs.push(-1);
-
-                that.pitchTimeMatrix.addRowBlock(blk);
-                if (that.drumBlocks.indexOf(blk) === -1) {
-                    that.drumBlocks.push(blk);
-                }
-            } else if (that.inNoteBlock[turtle].length > 0) {
-                that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(drumname);
-                if (that.synthVolume[turtle][drumname] == undefined) {
-                    that.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
-                    that.crescendoInitialVolume[turtle][drumname] = [DEFAULTVOLUME];
-                }
-            } else if (that.blocks.blockList[blk].connections[0] == null && last(that.blocks.blockList[blk].connections) == null) {
-                // Play a stand-alone drum block as a quarter note.
-                that.clearNoteParams(turtle, blk, []);
-                that.inNoteBlock[turtle].push(blk);
-                that.noteDrums[turtle][last(that.inNoteBlock[turtle])].push(drumname);
-
-                if (that.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(that.bpm[turtle]);
-                } else {
-                    var bpmFactor = TONEBPM / that._masterBPM;
-                }
-
-                var noteBeatValue = 4;
-                var beatValue = bpmFactor / noteBeatValue;
-
-                __callback = function () {
-                    var j = that.inNoteBlock[turtle].indexOf(blk);
-                    that.inNoteBlock[turtle].splice(j, 1);
-                };
-
-                that._processNote(noteBeatValue, blk, turtle, __callback);
-            } else {
-                that.errorMsg(_('Drum Block: Did you mean to use a Note block?'), blk);
-                break;
-            }
-
-            if (that.inNoteBlock[turtle].length > 0) {
-                that.noteBeatValues[turtle][last(that.inNoteBlock[turtle])].push(that.beatFactor[turtle]);
-            }
-
-            that.pushedNote[turtle] = true;
-            break;
         case 'rhythm2':
         case 'rhythm':
             if (args[0] === null || typeof(args[0]) !== 'number' || args[0] < 1) {
@@ -2844,63 +2731,6 @@ function Logo () {
             };
 
             that._setListener(turtle, listenerName, __listener);
-            break;
-        case 'setdrum':
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
-                }
-            }
-
-            that.drumStyle[turtle].push(drumname);
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_setdrum_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                var drumname = that.drumStyle[turtle].pop();
-                that.pitchDrumTable[turtle] = {};
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            if (that.inRhythmRuler) {
-                that._currentDrumBlock = blk;
-                that.rhythmRuler.Drums.push(blk);
-                that.rhythmRuler.Rulers.push([[],[]]);
-            }
-            break;
-        case 'mapdrum':
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
-                }
-            }
-
-            that.drumStyle[turtle].push(drumname);
-            childFlow = args[1];
-            childFlowCount = 1;
-
-            var listenerName = '_mapdrum_' + turtle;
-            that._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function (event) {
-                that.drumStyle[turtle].pop();
-            };
-
-            that._setListener(turtle, listenerName, __listener);
-            if (that.inRhythmRuler) {
-                that._currentDrumBlock = blk;
-                that.rhythmRuler.Drums.push(blk);
-                that.rhythmRuler.Rulers.push([[],[]]);
-            }
             break;
             // Deprecated P5 tone generator replaced by macro.
         case 'tone2':

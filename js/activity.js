@@ -200,6 +200,7 @@ function Activity() {
             'activity/blocks/ToneBlocks',
             'activity/blocks/OrnamentBlocks',
             'activity/blocks/VolumeBlocks',
+            'activity/blocks/DrumBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',
