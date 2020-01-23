@@ -173,7 +173,7 @@ function WidgetWindow(key, title) {
     };
     
     this.onmaximize = function() {
-        this.maximize();
+        return this;
     };
 
     this.setPosition = function (x, y) {
