@@ -27,13 +27,13 @@ also available.
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
-      4. [Dotted Notes](#DOTTED)
-      5. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      6. [Repeating Notes](#REPETITION)
-      7. [Swinging Notes and Tied Notes](#SWINGING)
-      8. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      9. [Intervals](#INTERVALS)
-      10. [Absolute Intervals](#ABSOLUTE-INTERVALS)
+      4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
+      5. [Dotted Notes](#DOTTED)
+      6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+      7. [Repeating Notes](#REPETITION)
+      8. [Swinging Notes and Tied Notes](#SWINGING)
+      9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+      10. [Intervals](#INTERVALS)
       11. [Inversion](#INVERSION)
       12. [Backwards](#BACKWARDS)
       13. [Setting Voice and Keys](#SETTING)
@@ -364,7 +364,97 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="DOTTED"></a>3.2.4 Dotted Notes
+#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Scalar Step | scalar | 0=no change |
+| | | 1=next scalar pitch in current key and mode |
+| | | -1=previous scalar pitch in current key and mode |
+| | | If the argument to scalar step is positive, it moves up the scale; if it is negative, it moves down the scale. |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.svg "scalar") |
+| The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.png "scalar step up and down") |
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Transposition | Semi-tone | Creates shifts in pitch by half-steps |
+| | | If the argument to transpose is positive, it will shift upwards in pitch; if it is negative, there will be a downwards shift. |
+| | | There are 12 half-steps shifts per octave. |
+| | | An argument of -12 will shift down one octave. |
+| | | An argument of zero will not change the pitch. |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.svg "semi-tone transposition") |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.png "semi-tone transposition") |
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Transposition | Scalar | Shifts the pitch based on the current key and mode |
+| | | Each number represents a scalar step. |
+| | | Scalar transposition can transform your original key to a new key by counting the notes between the keys. |
+| | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
+| | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.svg "scalar transposition") |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.png "scalar transposition") |
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Scale Degree | Scalar | The key block sets the key and mode. |
+| | | The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic. |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.svg "scale degree") |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.png "scale degree") |
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Movable “Do” | Advanced transposition by mode | Movable Do in combination with the Scale/Mode blocks will transpose sections of music in a nuanced way. |
+| | | The Set-key block allows you to  change both the mode and key of how solfege is mapped to the notes. |
+| | | For example, in C major - Do is C, Re is D, Mi is E, etc. |
+| | | In F major - Do is F, Re is G, Mi is A |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.svg "moveable do") |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.png "moveable do") |
+
+| Representation | Pitch Movement | Properties |
+| --- | --- | --- |
+| Movable “Do” | Advanced transposition by mode | You also have the option of changing the mode to Minor, Major, Chromatic, and many other exotic modes like hirajoshi, as shown in the example below. |
+
+| Music Blocks |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.svg "moveable do") |
+
+| Standard Notation |
+| --- |
+| ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
+
+#### <a name="DOTTED"></a>3.2.5 Dotted Notes
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform4.svg "Creating dotted notes using the Dot block")
 
@@ -389,7 +479,7 @@ calculation into a note's note value.
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.5 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.6 Changing Note(s) duration via Mathematical Operations
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
@@ -407,7 +497,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.2.6 Repeating Notes
+#### <a name="REPETITION"></a>3.2.7 Repeating Notes
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg "repeating notes")
 
@@ -419,7 +509,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.7 Swinging Notes and Tied Notes
+#### <a name="SWINGING"></a>3.2.8 Swinging Notes and Tied Notes
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform7.svg "swinging notes and tied notes")
 
@@ -438,7 +528,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.8 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.9 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
@@ -478,7 +568,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS"></a>3.2.9 Intervals
+#### <a name="INTERVALS"></a>3.2.10 Intervals
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform9.svg "Scalar interval block")
 
