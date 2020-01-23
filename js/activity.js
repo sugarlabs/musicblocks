@@ -4550,7 +4550,7 @@ function Activity() {
                                     'B': 'ti',
 
                                 }
-                                var pitch = pitchMap[note[0]];
+                                var pitch = pitchMap[note[0].toUpperCase()];
                                 console.log("pitch map key is "+note[0]);
                                 console.log(pitch);
                                 var multiplier = 1;
