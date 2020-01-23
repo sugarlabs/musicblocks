@@ -4500,7 +4500,7 @@ function Activity() {
                         var y = 100;
 
                         // Attach notes to prevInd;
-                        var prevInd = 0;
+                        var prevInd = 1;
                         var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,2]]];
                         var notes = [];
                         // Read data from header
@@ -4551,8 +4551,6 @@ function Activity() {
 
                                 }
                                 var pitch = pitchMap[note[0].toLowerCase()];
-                                console.log('cute');
-                                console.log(note);
 
 
                                 var octave = null;
@@ -4585,8 +4583,7 @@ function Activity() {
                                     nextBlock = null;
                                 }
                                 
-                                console.log("hello, nextBLock is "+nextBlock)
-                                var newNote = [[0+len, 'newnote', x, y, [prevInd, 1+len, 4+len, nextBlock]], [1+len, 'divide', 0+len, 0+len, [0+len, 2+len, 3+len]], [2+len, ['number', {'value': 1}], 0+len, 0+len, [1+len]], [3+len, ['number', {'value': parseInt(headerInfo.M.substring(2, headerInfo.M.length))}], 0+len, 0+len, [1+len]], [4+len, 'vspace', 0+len, 0+len, [0+len, 5+len]], [5+len, 'pitch', 0+len, 0+len, [4+len, 6+len, 7+len, null]], [6+len, ['solfege', {'value': pitch}], 0+len, 0+len, [5+len]], [7+len, ['number', {'value': octave}], 0+len, 0+len, [5+len]]];
+                                var newNote = [[0+len, 'newnote', x, y, [prevInd, 1+len, 4+len, nextBlock]], [1+len, 'divide', 0+len, 0+len, [0+len, 2+len, 3+len]], [2+len, ['number', {'value': 1}], 0+len, 0+len, [1+len]], [3+len, ['number', {'value': parseInt(headerInfo.M.substring(2, headerInfo.M.length))}], 0+len, 0+len, [1+len]], [4+len, 'vspace', 0+len, 0+len, [0+len, 5+len]], [5+len, 'pitch', 0+len, 0+len, [4+len, 6+len, 7+len, null]], [6+len, ['solfege', {'value': pitch}], 0+len, 0+len, [5+len]], [7+len, ['number', {'value': octave}], 0+len, 0+len, [5+len]], [8+len, 'hidden', len, len, [len, null]]];
                                 
                                 blocksData.push(...newNote);
 
