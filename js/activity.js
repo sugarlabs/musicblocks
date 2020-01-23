@@ -4551,6 +4551,14 @@ function Activity() {
 
                                 }
                                 var pitch = pitchMap[note[0].toLowerCase()];
+                                var multiplier = 1;
+
+                                // TODO: do some lcm stuff 
+                                if('123456789'.includes(note[1])) {
+                                    multiplier = parseInt(note[1]);
+                                }
+
+                                console.log("multiplier is "+multiplier);
 
                                 console.log("making note with pitch "+pitch);
                                 console.log("note is "+note);
@@ -4590,7 +4598,7 @@ function Activity() {
                                     blocksData[prevInd+8][4][1] = len;
                                 }
 
-                                var newNote = [[0+len, 'newnote', x, y, [prevInd, 1+len, 4+len, nextBlock]], [1+len, 'divide', 0+len, 0+len, [0+len, 2+len, 3+len]], [2+len, ['number', {'value': parseInt(headerInfo.L.split('/')[0])}], 0+len, 0+len, [1+len]], [3+len, ['number', {'value': parseInt(headerInfo.L.split('/')[1])}], 0+len, 0+len, [1+len]], [4+len, 'vspace', 0+len, 0+len, [0+len, 5+len]], [5+len, 'pitch', 0+len, 0+len, [4+len, 6+len, 7+len, null]], [6+len, ['solfege', {'value': pitch}], 0+len, 0+len, [5+len]], [7+len, ['number', {'value': octave}], 0+len, 0+len, [5+len]]];
+                                var newNote = [[0+len, 'newnote', x, y, [prevInd, 1+len, 4+len, nextBlock]], [1+len, 'divide', 0+len, 0+len, [0+len, 2+len, 3+len]], [2+len, ['number', {'value': parseInt(headerInfo.L.split('/')[0]) * multiplier}], 0+len, 0+len, [1+len]], [3+len, ['number', {'value': parseInt(headerInfo.L.split('/')[1])}], 0+len, 0+len, [1+len]], [4+len, 'vspace', 0+len, 0+len, [0+len, 5+len]], [5+len, 'pitch', 0+len, 0+len, [4+len, 6+len, 7+len, null]], [6+len, ['solfege', {'value': pitch}], 0+len, 0+len, [5+len]], [7+len, ['number', {'value': octave}], 0+len, 0+len, [5+len]]];
                                 
                                 blocksData.push(...newNote);
 
