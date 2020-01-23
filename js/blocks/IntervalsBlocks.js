@@ -6,6 +6,12 @@ class SetTemperamentBlock extends FlowBlock {
             args: 3,
             argLabels: [_('temperament'), _('pitch'), _('octave')]
         });
+        this.makeMacro((x, y) => [
+            [0, 'settemperament', x, y, [null, 1, 2, 3, null]],
+            [1, ['temperamentname', {'value': 'equal'}], 0, 0, [0]],
+            [2, ['notename', {'value': 'C'}], 0, 0, [0]],
+            [3, ['number', {'value': 4}], 0, 0, [0]]
+        ]);
     }
 
     flow(args, that) {
@@ -35,6 +41,7 @@ class ModeNameBlock extends ValueBlock {
         super('modename');
         this.setPalette('intervals');
         this.formBlock({ outType: 'textout' });
+        this.extraWidth = 50;
         this.hidden = true;
     }
 }
@@ -69,7 +76,6 @@ class DoublyBlock extends LeftBlock {
                     } else {
                         return that.parseArg(that, turtle, cblk, blk, receivedArg);
                     }
-                    break;
                 } else if (blockToCheck.name !== 'doubly') {
                     var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
                     if (typeof(value) === 'number') {
@@ -79,13 +85,11 @@ class DoublyBlock extends LeftBlock {
                     } else {
                         return value;
                     }
-                    break;
                 }
 
                 currentblock=that.blocks.blockList[currentblock].connections[1];
                 if (currentblock == null) {
                     return 0;
-                    break;
                 }
             }
         }

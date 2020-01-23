@@ -767,6 +767,11 @@ class MIDIBlock extends FlowBlock {
         //.TRANS: MIDI is a technical standard for electronic music
         super('midi', _('MIDI'));
         this.setPalette('pitch');
+        this.makeMacro((x, y) => [
+            [0, 'setpitchnumberoffset', x, y, [null, 1, 2, null]],
+            [1, ['notename', {'value': 'C'}], 0, 0, [0]],
+            [2, ['number', {'value': -1}], 0, 0, [0]]
+        ]);
     }
 }
 
@@ -1009,6 +1014,12 @@ class InvertBlock extends Invert2Block {
             argTypes: ['solfegein', 'anyin'],
             argLabels: [_('note'), _('octave')]
         });
+        this.makeMacro((x, y) => [
+            [0, 'invert', x, y, [null, 1, 2, null, 3]],
+            [1, ['solfege', {'value': 'sol'}], 0, 0, [0]],
+            [2, ['number', {'value': 4}], 0, 0, [0]],
+            [3, 'hidden', 0, 0, [0, null]]
+        ]);
         this.hidden = true;
     }
 }
@@ -1039,6 +1050,16 @@ class SetTranspositionBlock extends FlowClampBlock {
             name: _('semi-tone transpose'),
             args: 1, defaults: ['1']
         });
+        this.makeMacro((x, y) => [
+            [0, 'settransposition', x, y, [null, 1, 6, 7]],
+            [1, 'plus', 0, 0, [0, 2, 3]],
+            [2, ['number', {'value': 1}], 0, 0, [1]],
+            [3, 'multiply', 0, 0, [1, 4, 5]],
+            [4, ['number', {'value': 0}], 0, 0, [3]],
+            [5, ['number', {'value': 12}], 0, 0, [3]],
+            [6, 'vspace', 0, 0, [0, null]],
+            [7, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {
@@ -1081,6 +1102,14 @@ class OctaveBlock extends FlowBlock {
         //.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
         super('octave', _('octave'));
         this.setPalette('pitch');
+        this.makeMacro((x, y) => [
+            [0, 'settransposition', x, y, [null, 1, 4, 5]],
+            [1, 'multiply', 0, 0, [0, 2, 3]],
+            [2, ['number', {'value': 1}], 0, 0, [1]],
+            [3, ['number', {'value': 12}], 0, 0, [1]],
+            [4, 'vspace', 0, 0, [0, null]],
+            [5, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 }
 
@@ -1088,6 +1117,11 @@ class CustomPitchBlock extends FlowBlock {
     constructor() {
         super('custompitch', _('custom pitch'));
         this.setPalette('pitch');
+        this.makeMacro((x, y) => [
+            [0, 'pitch', x, y, [null, 1, 2, null]],
+            [1, ['customNote', {'value': 'C(+0)'}], 0, 0, [0]],
+            [2, ['number', {'value': 4}], 0, 0, [0]]
+        ]);
         this.hidden = true;
     }
 

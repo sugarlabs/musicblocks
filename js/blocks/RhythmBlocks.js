@@ -471,6 +471,14 @@ class MultiplyBeatFactorBlock extends FlowClampBlock {
             args: 1, defaults: [2],
             canCollapse: true,
         });
+        this.makeMacro((x, y) => [
+            [0, 'multiplybeatfactor', x, y, [null, 1, 4, 5]],
+            [1, 'divide', 0, 0, [0, 2, 3]],
+            [2, ['number', {'value': 1}], 0, 0, [1]],
+            [3, ['number', {'value': 2}], 0, 0, [1]],
+            [4, 'vspace', 0, 0, [0, null]],
+            [5, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {

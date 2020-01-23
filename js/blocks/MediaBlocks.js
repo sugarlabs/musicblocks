@@ -197,6 +197,16 @@ class ToneBlock extends FlowBlock {
             args: 2, defaults: [392, 1000 / 3],
             argLabels: [_('frequency'), _('duration (ms)')],
         });
+        this.formBlock((x, y) => [
+            [0, 'drift', x, y, [null, 1, null]],
+            [1, 'osctime', 0, 0, [0, 3, 2, null]],
+            [2, 'vspace', 0, 0, [1, 6]],
+            [3, 'divide', 0, 0, [1, 4, 5]],
+            [4, ['number', {'value': 1000}], 0, 0, [3]],
+            [5, ['number', {'value': 3}], 0, 0, [3]],
+            [6, 'hertz', 0, 0, [2, 7, null]],
+            [7, ['number', {'value': 392}], 0, 0, [6]]
+        ]);
     }
 
     flow() {
@@ -292,6 +302,12 @@ class TurtleShellBlock extends FlowBlock {
             argTypes: ['numberin', 'anyin'],
             argLabels: [_('size'), _('image')]
         });
+        this.makeMacro((x, y) => [
+            [0, 'turtleshell', x, y, [null, 1, 2, 3]],
+            [1, ['number', {'value': 55}], 0, 0, [0]],
+            [2, 'media', 0, 0, [0]],
+            [3, 'vspace', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {

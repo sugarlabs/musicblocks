@@ -234,6 +234,10 @@ class KeyboardBlock extends ValueBlock {
     constructor() {
         super('keyboard', _('keyboard'));
         this.setPalette('sensors');
+        this.makeMacro((x, y) => [
+            [0, 'toascii', x, y, [null, 1]],
+            [1, 'keyboard', 0, 0, [0, null]]
+        ]);
     }
 
     arg(logo) {

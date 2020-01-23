@@ -372,6 +372,12 @@ class TremoloBlock extends FlowClampBlock {
                 _('depth')
             ]
         });
+        this.formBlock((x, y) => [
+            [0, 'tremolo', 0, 0, [null, 1, 2, null, 3]],
+            [1, ['number', {'value': 10}], 0, 0, [0]],
+            [2, ['number', {'value': 50}], 0, 0, [0]],
+            [3, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {
