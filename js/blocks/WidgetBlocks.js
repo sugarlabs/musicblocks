@@ -124,6 +124,17 @@ class TempreamentBlock extends StackClampBlock {
         super('temperament');
         this.setPalette('widgets');
         this.formBlock({ args: 1, name: _('temperament'), canCollapse: true });
+        this.makeMacro((x, y) => [
+            [0, 'temperament', x, y, [null, 1, 2, 8]],
+            [1, ['temperamentname', {'value': 'equal'}], 0, 0, [0]],
+            [2, 'pitch', 0, 0, [0, 3, 4, 5]],
+            [3, ['notename', {'value': 'C'}], 0, 0, [2]],
+            [4, ['number', {'value': 4}], 0, 0, [2]],
+            [5, 'setkey2', 0, 0, [2, 6, 7, null]],
+            [6, ['notename', {'value': 'C'}], 0, 0, [5]],
+            [7, ['modename', {'value': DEFAULTMODE}], 0, 0, [5]],
+            [8, 'hiddennoflow', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {
@@ -589,6 +600,13 @@ class PitchStaircaseBlock extends StackClampBlock {
         this.setPalette('widgets');
         //.TRANS: generate a progressive sequence of pitches
         this.formBlock({ name: _('pitch staircase'), canCollapse: true });
+        this.makeMacro((x, y) => [
+            [0, 'pitchstaircase', x, y, [null, 1, 4]],
+            [1, 'pitch', 0, 0, [0, 2, 3, null]],
+            [2, ['solfege', {'value': 'sol'}], 0, 0, [1]],
+            [3, ['number', {'value': 3}], 0, 0, [1]],
+            [4, 'hiddennoflow', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {

@@ -550,6 +550,11 @@ class ActionBlock extends StackClampBlock {
             argLabels: [''],
             defaults: [_('action')]
         });
+        this.makeMacro((x, y) => [
+            [0, 'action', x, y, [null, 1, 2, null]],
+            [1, ['text', {'value': _('action')}], 0, 0, [0]],
+            [2, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {

@@ -141,6 +141,12 @@ class ElapsedNotes2Block extends LeftBlock {
         this.formBlock({
             args: 1
         });
+        this.makeMacro((x, y) => [
+            [0, 'elapsednotes2', x, y, [null, 1]],
+            [1, 'divide', 0, 0, [0, 2, 3]],
+            [2, ['number', {'value': 1}], 0, 0, [1]],
+            [3, ['number', {'value': 4}], 0, 0, [1]]
+        ]);
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -166,6 +172,10 @@ class DriftBlock extends FlowClampBlock {
             //.TRANS: don't lock notes to master clock
             name: _('no clock')
         });
+        this.makeMacro((x, y) => [
+            [0, 'drift', x, y, [null, null, 1]],
+            [1, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {

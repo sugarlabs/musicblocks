@@ -6,6 +6,12 @@ class SetTemperamentBlock extends FlowBlock {
             args: 3,
             argLabels: [_('temperament'), _('pitch'), _('octave')]
         });
+        this.makeMacro((x, y) => [
+            [0, 'settemperament', x, y, [null, 1, 2, 3, null]],
+            [1, ['temperamentname', {'value': 'equal'}], 0, 0, [0]],
+            [2, ['notename', {'value': 'C'}], 0, 0, [0]],
+            [3, ['number', {'value': 4}], 0, 0, [0]]
+        ]);
     }
 
     flow(args, that) {

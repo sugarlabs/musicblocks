@@ -401,6 +401,12 @@ class SetNoteVolume2Block extends FlowClampBlock {
             name: _('set master volume'),
             args: 1, defaults: [50],
         });
+        this.makeMacro((x, y) => [
+            [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
+            [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
+            [2, ['number', {'value': 50}], 0, 0, [0]],
+            [3, 'hidden', 0, 0, [0, null]]
+        ]);
         this.hidden = true;
         this.deprecated = true;
     }

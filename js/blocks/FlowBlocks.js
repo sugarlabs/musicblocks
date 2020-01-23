@@ -6,6 +6,10 @@ class BackwardBlock extends FlowClampBlock {
         this.formBlock({
             name: _('backward'),
         });
+        this.makeMacro((x, y) => [
+            [0, 'backward', x, y, [null, 1, null]],
+            [1, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk) {
@@ -48,6 +52,11 @@ class DuplicateBlock extends FlowClampBlock {
             args: 1,
             defaults: [2]
         });
+        this.makeMacro((x, y) => [
+            [0, 'duplicatenotes', x, y, [null, 1, null, 2]],
+            [1, ['number', {'value': 2}], 0, 0, [0]],
+            [2, 'hidden', 0, 0, [0, null]]
+        ]);
     }
 
     flow(args, logo, turtle, blk, receivedArg) {
