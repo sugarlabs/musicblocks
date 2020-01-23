@@ -35,6 +35,7 @@ class ModeNameBlock extends ValueBlock {
         super('modename');
         this.setPalette('intervals');
         this.formBlock({ outType: 'textout' });
+        this.extraWidth = 50;
         this.hidden = true;
     }
 }
@@ -69,7 +70,6 @@ class DoublyBlock extends LeftBlock {
                     } else {
                         return that.parseArg(that, turtle, cblk, blk, receivedArg);
                     }
-                    break;
                 } else if (blockToCheck.name !== 'doubly') {
                     var value = that.parseArg(that, turtle, cblk, blk, receivedArg);
                     if (typeof(value) === 'number') {
@@ -79,13 +79,11 @@ class DoublyBlock extends LeftBlock {
                     } else {
                         return value;
                     }
-                    break;
                 }
 
                 currentblock=that.blocks.blockList[currentblock].connections[1];
                 if (currentblock == null) {
                     return 0;
-                    break;
                 }
             }
         }

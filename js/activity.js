@@ -201,6 +201,8 @@ function Activity() {
             'activity/blocks/OrnamentBlocks',
             'activity/blocks/VolumeBlocks',
             'activity/blocks/DrumBlocks',
+            'activity/blocks/WidgetBlocks',
+            'activity/blocks/RhythmBlockPaletteBlocks',
             'activity/blocks/ActionBlocks',
             'activity/blocks/FlowBlocks',
             'activity/blocks/NumberBlocks',
