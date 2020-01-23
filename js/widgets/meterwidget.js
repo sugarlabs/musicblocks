@@ -54,21 +54,6 @@ function MeterWidget() {
             this.destroy();
         }
 
-        widgetWindow.onmaximize = function(){
-          if(widgetWindow._maximized){
-            widgetWindow.getWidgetBody().style.position = "absolute";
-            widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
-            widgetWindow.getWidgetBody().style.width = "200vh";
-            widgetWindow.getWidgetBody().style.left = "70px";
-
-          } else{
-            widgetWindow.getWidgetBody().style.position = "relative";
-            widgetWindow.getWidgetBody().style.left = "0px";
-            widgetWindow.getWidgetBody().style.height = "410px";
-            widgetWindow.getWidgetBody().style.width = "410px";
-          }
-        }
-
 
         this._click_lock = false;
         widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick = function() {
