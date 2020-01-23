@@ -4499,8 +4499,8 @@ function Activity() {
                         var x = 100;
                         var y = 100;
 
-                        // Add new notes to curInd
-                        var curInd = null;
+                        // Attach notes to prevInd;
+                        var prevInd = 0;
                         var blocksData = [[0,["start",{"collapsed":false,"xcor":0,"ycor":0,"heading":0,"color":10,"shade":50,"pensize":5,"grey":100,"name":"start"}],x,y,[null,1,null]],[1,["hidden",{}],x,y,[0,2]]];
                         var notes = [];
                         // Read data from header
@@ -4536,9 +4536,25 @@ function Activity() {
                             }
                             
                             lineVal = lineVal.join('').trim().split(' ');
-
+                            
+                            var noteIndex = 0;
                             for(var note of lineVal) {
-                                var pitch = note[0].toLowerCase();
+
+                                var pitchMap = {
+                                    'C': 'do',
+                                    'D': 're',
+                                    'E': 'mi',
+                                    'F': 'fa',
+                                    'G': 'sol',
+                                    'A': 'la',
+                                    'B': 'ti',
+
+                                }
+                                var pitch = pitchMap[note[0].toLowerCase()];
+                                console.log('cute');
+                                console.log(note);
+
+
                                 var octave = null;
 
                                 if(note[0] === note[0].toUpperCase()) {
@@ -4560,30 +4576,22 @@ function Activity() {
 
                                 octave -= commaCnt;
                                 octave += aposCnt;
-
-
-                                console.log('add note with pitch '+pitch)
-                                console.log('octave '+octave)
-                                console.log('length '+headerInfo.L)
-
-                                var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', {'value': 1}], 0, 0, [1]], [3, ['number', {'value': headerInfo.L}], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', {'value': pitch}], 0, 0, [5]], [7, ['number', {'value': octave}], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
-                                notes.push(newNote);
-
-                                // push notes onto blocksData
-
-                                // blocksData[curInd[5][curInd[5].length-1]] = curInd+1;
-
-                                // blocksData.push(
-                                //     // Conections: [prev block, note value, contained notes, next block]
-                                //     [curInd+1, ['newnote', {collapsed: false}], x, y, [curInd, curInd+2, curInd+5, curInd+9]]
-                                // )
-
-                                // curInd++;
-
-                                // blocksData.push(
-                                //     []
-                                // )
                                 
+                                var len = blocksData.length;
+                                var nextBlock = null;
+                                if(noteIndex < lineVal.length-1) {
+                                    nextBlock = len+8;
+                                } else {
+                                    nextBlock = null;
+                                }
+                                
+                                console.log("hello, nextBLock is "+nextBlock)
+                                var newNote = [[0+len, 'newnote', x, y, [prevInd, 1+len, 4+len, nextBlock]], [1+len, 'divide', 0+len, 0+len, [0+len, 2+len, 3+len]], [2+len, ['number', {'value': 1}], 0+len, 0+len, [1+len]], [3+len, ['number', {'value': parseInt(headerInfo.M.substring(2, headerInfo.M.length))}], 0+len, 0+len, [1+len]], [4+len, 'vspace', 0+len, 0+len, [0+len, 5+len]], [5+len, 'pitch', 0+len, 0+len, [4+len, 6+len, 7+len, null]], [6+len, ['solfege', {'value': pitch}], 0+len, 0+len, [5+len]], [7+len, ['number', {'value': octave}], 0+len, 0+len, [5+len]]];
+                                
+                                blocksData.push(...newNote);
+
+                                prevInd = len;
+                                noteIndex++;
                             }
 
                             curline++;
@@ -4600,7 +4608,6 @@ function Activity() {
                         var __listener = function (event) {
                             logo.playbackQueue = {};
                             blocks.loadNewBlocks(blocksData);
-                            blocks.loadNewBlocks(notes);
                             setPlaybackStatus();
                             stage.removeAllEventListeners('trashsignal');
                         };
