@@ -423,9 +423,9 @@ There are many, but here are a few:
 
 ## About the internal block format.
 
-In `blocks.js` is a instance variable, `blockList` that is a list of
+In `blocks.js` there is an instance variable, `blockList` that is a list of
 the current set of blocks that Music Blocks knows about. There are
-methods to add blocks to the list, notably, `loadNewBlocks`. There is
+methods to add blocks to the list, notably `loadNewBlocks`. There is
 even a block that can be used to create new blocks, enabling Music
 Blocks programs to self-modify.
 
@@ -435,7 +435,7 @@ The internal format of this list is:
 [block, block, block, ...]
 ```
 
-Each block is itself a list.
+Each block is itself a list of the form:
 
 ```
 [block number, block name, x position, y position, [connection 0, connection 1...]]
