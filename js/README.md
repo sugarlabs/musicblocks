@@ -441,7 +441,7 @@ Each block is itself a list.
 [block number, block name, x position, y position, [connection 0, connection 1...]]
 ```
 
-where block number and the connections are integer indecies into
+where block number and the connections are integer indices into
 `blockList`, block name is string that matches one of the blocks
 defined in `basicblocks.js`, and the x and y positions are float value
 screen coordinates.
