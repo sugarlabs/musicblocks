@@ -289,19 +289,8 @@ function TemperamentWidget () {
                 }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
-                if (angle[i] >= 270 && angle[i] <= 360) {
-                    docById('noteInfo').style.top = y - 100 + 'px';
-                    docById('noteInfo').style.left = x + 'px';
-                } else if (angle[i] > 360 && angle[i] <= 450 ) {
-                    docById('noteInfo').style.top = y + 'px';
-                    docById('noteInfo').style.left = x + 'px';
-                } else if (angle[i] > 450 && angle[i] <= 540 ) {
-                    docById('noteInfo').style.top = y + 'px';
-                    docById('noteInfo').style.left = x - 180 + 'px';
-                } else if (angle[i] > 540 && angle[i] <= 630 ) {
-                    docById('noteInfo').style.top = y - 100 + 'px';
-                    docById('noteInfo').style.left = x - 180 + 'px';
-                }
+                docById('noteInfo').style.top = '130px';
+		docById('noteInfo').style.left = '132px';
                 docById('noteInfo').style.position = 'absolute';
                 docById('noteInfo').style.zIndex = 10;
                 docById('close').onclick = function() {
@@ -1126,19 +1115,8 @@ function TemperamentWidget () {
                 docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + frequencies[i] + '</span>';
                 docById('noteInfo1').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
-                if (angle[i] >= 270 && angle[i] <= 360) {
-                    docById('noteInfo1').style.top = y - 100 + 'px';
-                    docById('noteInfo1').style.left = x + 'px';
-                } else if (angle[i] > 360 && angle[i] <= 450 ) {
-                    docById('noteInfo1').style.top = y + 'px';
-                    docById('noteInfo1').style.left = x + 'px';
-                } else if (angle[i] > 450 && angle[i] <= 540 ) {
-                    docById('noteInfo1').style.top = y + 'px';
-                    docById('noteInfo1').style.left = x - 180 + 'px';
-                } else if (angle[i] > 540 && angle[i] <= 630 ) {
-                    docById('noteInfo1').style.top = y - 100 + 'px';
-                    docById('noteInfo1').style.left = x - 180 + 'px';
-                }
+                docById('noteInfo1').style.top = '100px';
+		docById('noteInfo1').style.left = '90px';
 
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
