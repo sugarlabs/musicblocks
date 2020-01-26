@@ -894,18 +894,88 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
-        const MSGPrefix = '<a href=\'#\' ' +
+        var displayStatsIcon = docById('displayStatsIcon');
+        var loadPluginIcon = docById('loadPluginIcon');
+        var delPluginIcon = docById('delPluginIcon');
+        var enableHorizScrollIcon = docById('enableHorizScrollIcon');
+        var disableHorizScrollIcon = docById('disableHorizScrollIcon');
+        var begIcon = docById('beginnerMode');
+        var advIcon = docById('advancedMode');
+
+        /*const MSGPrefix = '<a href=\'#\' ' +
         'onClick=\'window.location.reload()\'' +
         'onMouseOver=\'this.style.opacity = 0.5\'' +
         'onMouseOut=\'this.style.opacity = 1\'>';
         const MSGSuffix = '</a>';
+        */
 
         if (mode === null || mode === undefined || mode === 'true') {
-            textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
+            //textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
+            
+            if(_THIS_IS_MUSIC_BLOCKS_) {
+
+                displayStatsIcon.style.display = 'block';
+                loadPluginIcon.style.display = 'block';
+                delPluginIcon.style.display = 'block';
+                enableHorizScrollIcon.style.display = 'block';
+
+                displayStatsIcon.onclick = function () {
+                doAnalytics();
+                };
+
+                loadPluginIcon.onclick = function () {
+                doOpenPlugin();
+                };
+
+                delPluginIcon.onclick = function () {
+                deletePlugin();
+                };
+
+                enableHorizScrollIcon.onclick = function () {
+                setScroller();
+                that._setupBlocksContainerEvents();
+                };
+
+                disableHorizScrollIcon.onclick = function () {
+                setScroller();
+                that._setupBlocksContainerEvents();
+                };
+
+            }
+            
             localStorage.setItem('beginnerMode', false);
+            begIcon.style.display === 'none';
+            advIcon.style.display === 'block';
+            if (advIcon.style.display === 'block') {
+                advIcon.onclick = function () {
+                    doSwitchMode();
+                };
+            }
+            palettes.makePalettes(true);
+            palettes.refreshCanvas();
+
+            //localStorage.setItem('beginnerMode', false);
         } else {
-            textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
+            //textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
+                        displayStatsIcon.style.display = 'none';
+            loadPluginIcon.style.display = 'none';
+            delPluginIcon.style.display = 'none';
+            enableHorizScrollIcon.style.display = 'none';
+            disableHorizScrollIcon.style.display = 'none';
+
+            begIcon.style.display === 'block';
+            advIcon.style.display === 'none';
             localStorage.setItem('beginnerMode', true);
+            if (begIcon.style.display === 'block') {
+                begIcon.onclick = function () {
+                    doSwitchMode();
+                };
+            }
+
+            palettes.makePalettes(false);
+            palettes.refreshCanvas();
+
+        
         }
 
         refreshCanvas();
@@ -937,7 +1007,7 @@ function Activity() {
         scrollPaletteContainer = !scrollPaletteContainer;
         var enableHorizScrollIcon = docById('enableHorizScrollIcon');
         var disableHorizScrollIcon = docById('disableHorizScrollIcon');
-        if (scrollBlockContainer && !beginnerMode) {
+        if (scrollBlockContainer) {
             enableHorizScrollIcon.style.display = 'none';
             disableHorizScrollIcon.style.display = 'block';
         } else {
