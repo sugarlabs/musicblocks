@@ -467,11 +467,7 @@ class ListenBlock extends FlowBlock {
                     // Since the turtle has stopped
                     // running, we must run the stack
                     // from here.
-                    if (isflow) {
-                        logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
-                    } else {
-                        logo._runFromBlock(logo, turtle, logo.actions[args[1]], isflow, receivedArg);
-                    }
+                    logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], true, receivedArg);
                 }
             };
 
