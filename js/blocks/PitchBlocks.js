@@ -429,7 +429,11 @@ function _playPitch(args, logo, turtle, blk) {
 
             if (logo.blocks.blockList[blk].name == 'scaledegree') {
                 var noteObj = getNote(logo.currentNote, calcOctave(logo.currentCalculatedOctave[turtle], arg1, logo.lastPitchPlayed[turtle], logo.currentNote), 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg);
-            } else {
+	    } else if (logo.blocks.blockList[blk].name == 'pitchnumber'){
+                //For pitch number, need to translate number value to pitch
+                var getNumberToPitch = numberToPitch(Math.floor(arg0 + logo.pitchNumberOffset[turtle]), logo.synth.inTemperament, logo.synth.startingPitch, logo.pitchNumberOffset[turtle]);
+                var noteObj = getNote(getNumberToPitch[0], calcOctave(logo.currentCalculatedOctave[turtle], getNumberToPitch[1], logo.lastPitchPlayed[turtle], getNumberToPitch[0]), 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg);
+ } else {
                 var noteObj = getNote(arg0, calcOctave(logo.currentCalculatedOctave[turtle], arg1, logo.lastPitchPlayed[turtle], arg0), 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg);
             }
 
