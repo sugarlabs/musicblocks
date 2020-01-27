@@ -177,6 +177,59 @@ class AbsBlock extends LeftBlock {
     }
 }
 
+class DistanceBlock extends LeftBlock {
+    constructor() {
+        super('distance');
+        this.setPalette('number');
+
+        this.formBlock({
+            name: _('distance'),
+	    args: 4,
+            defaults: [0, 0, 100, 100],
+            argTypes: ['anyin', 'anyin', 'anyin', 'anyin'],
+	    outType: 'anyout',
+            argLabels: [
+		_('x1'), _('y1'), _('x2'), _('y2')
+            ]
+        });
+
+        this.makeMacro((x, y) => [
+	    [0, 'distance', x, y, [null, 1, 2, 3, 4]],
+	    [1, ['number', {'value': 0}], 0, 0, [0]],
+	    [2, ['number', {'value': 0}], 0, 0, [0]],
+	    [3, 'x', 0, 0, [0]],
+	    [4, 'y', 0, 0, [0]]
+        ]);
+    }
+
+    arg(logo, turtle, blk, receivedArg) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'distance']);
+        } else {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            var cblk3 = logo.blocks.blockList[blk].connections[3];
+            var cblk4 = logo.blocks.blockList[blk].connections[4];
+            if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null ) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                var x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var y1 = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                var x2 = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+                var y2 = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
+                if (typeof(x1) === 'number' && typeof(y1) === 'number' && typeof(x2) === 'number' && typeof(y2) === 'number') {
+
+                    return logo._docalculatedistance(x1, y1, x2, y2);
+                } else {
+                    logo.errorMsg(NANERRORMSG, blk);
+                    return 0;
+                }
+            }
+        }
+    }
+}
+
 class DivideBlock extends LeftBlock {
     constructor() {
         super('divide');
@@ -519,6 +572,7 @@ class NumberBlock extends ValueBlock {
 
 
 function setupNumberBlocks() {
+    new DistanceBlock().setup();
     new IntBlock().setup();
     new ModBlock().setup();
     new PowerBlock().setup();
