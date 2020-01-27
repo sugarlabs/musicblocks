@@ -5567,6 +5567,7 @@ function Block(protoblock, blocks, overrideName) {
                 case 'pitch drum':
                 case 'meter':
 		case 'temperament':
+		case 'timbre':
                   lockInit = true;
                   this.blocks.reInitWidget(topBlock, 5000);
                   break;

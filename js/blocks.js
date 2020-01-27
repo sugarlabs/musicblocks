@@ -1391,6 +1391,7 @@ function Blocks (activity) {
                   case 'pitch drum':
                   case 'meter':
                   case 'temperament':
+                  case 'timbre':
                     lockInit = true;
                     this.reInitWidget(initialTopBlock, 1500);
                     break;
@@ -1762,6 +1763,7 @@ function Blocks (activity) {
                       case 'pitch drum':
                       case 'meter':
                       case 'temperament':
+                      case 'timbre':
                         lockInit = true;
                         this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                         break;
