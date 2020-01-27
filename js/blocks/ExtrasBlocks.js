@@ -240,10 +240,13 @@ class MakeBlockBlock extends LeftBlock {
         this.formBlock({
             //.TRANS: Create a new block programmatically.
             name: _('make block'),
-            args: 1, argTypes: ['anyin'],
-            outType: 'anyout',
+            args: 1,
+	    argTypes: ['anyin'],
+            outType: 'numberout',
             flows: {
-                type: 'arg', types: ['anyin'], labels: ['']
+                type: 'arg',
+		types: ['anyin'],
+		labels: ['']
             },
             defaults: [_('note')]
         });
@@ -265,6 +268,9 @@ class MakeBlockBlock extends LeftBlock {
         var x = logo.turtles.turtleX2screenX(logo.turtles.turtleList[turtle].x);
         var y = logo.turtles.turtleY2screenY(logo.turtles.turtleList[turtle].y);
 
+	// We need to wait for the new block to load before continuing.
+	logo._doWait(turtle, 1);
+
         // We special case note blocks.
         //.TRANS: a musical note consisting of pitch and duration
         if (name === _('note')) {
@@ -273,34 +279,37 @@ class MakeBlockBlock extends LeftBlock {
                     var p = 'sol';
                     var o = 4;
                     var v = 4;
-                    return;
+                    break;
                 case 2:
                     var p = blockArgs[1];
                     var o = 4;
                     var v = 4;
-                    return;
+                    break;
                 case 3:
                     var p = blockArgs[1];
                     var o = blockArgs[2];
                     var v = 4;
-                    return;
+                    break;
                 default:
                     var p = blockArgs[1];
                     var o = blockArgs[2];
                     var v = blockArgs[3];
-                    return;
+                    break;
             }
 
             var newNote = [[0, 'newnote', x, y, [null, 1, 4, 8]], [1, 'divide', 0, 0, [0, 2, 3]], [2, ['number', { 'value': 1 }], 0, 0, [1]], [3, ['number', { 'value': v }], 0, 0, [1]], [4, 'vspace', 0, 0, [0, 5]], [5, 'pitch', 0, 0, [4, 6, 7, null]], [6, ['solfege', { 'value': p }], 0, 0, [5]], [7, ['number', { 'value': o }], 0, 0, [5]], [8, 'hidden', 0, 0, [0, null]]];
             logo.blocks.loadNewBlocks(newNote);
+	    console.debug('BLOCKNUMBER ' + blockNumber);
             return blockNumber;
         } else if (name === _('start')) {
             var newBlock = [[0, 'start', x, y, [null, null, null]]];
             logo.blocks.loadNewBlocks(newBlock);
+	    console.debug('BLOCKNUMBER ' + blockNumber);
             return blockNumber;
         } else if (name === _('silence')) {  // FIXME: others too
             var newBlock = [[0, 'rest2', x, y, [null, null]]];
             logo.blocks.loadNewBlocks(newBlock);
+	    console.debug('BLOCKNUMBER ' + blockNumber);
             return blockNumber;
         } else {
             var obj = logo.blocks.palettes.getProtoNameAndPalette(name);
@@ -308,6 +317,8 @@ class MakeBlockBlock extends LeftBlock {
             var protoName = obj[2];
             if (protoblk === null) {
                 logo.errorMsg(_('Cannot find block') + ' ' + name);
+		console.debug('Cannot find block ' + name);
+		return 0;
             } else {
                 var newBlock = [[0, protoName, x, y, [null]]];
                 for (var i = 1; i < logo.blocks.protoBlockDict[protoblk].dockTypes.length; i++) {
@@ -334,6 +345,7 @@ class MakeBlockBlock extends LeftBlock {
                 }
 
                 logo.blocks.loadNewBlocks(newBlock);
+		console.debug('BLOCKNUMBER ' + blockNumber);
                 return blockNumber;
             }
         }
@@ -593,23 +605,18 @@ class PrintBlock extends FlowBlock {
         if (!logo.inStatusMatrix) {
             if (args.length === 1) {
                 if (args[0] !== null) {
-                    if (logo.inNoteBlock[turtle].length > 0) {
-                        logo.embeddedGraphics[turtle][last(logo.inNoteBlock[turtle])].push(blk);
-                        logo.markup[turtle].push(args[0].toString());
-                    } else {
-                        if (!logo.suppressOutput[turtle]) {
-                            if (args[0] === undefined) {
-                                logo.textMsg('undefined');
-                            } else if (args[0] === null) {
-                                logo.textMsg('null');
-                            } else {
-                                logo.textMsg(args[0].toString());
-                            }
+                    if (!logo.suppressOutput[turtle]) {
+                        if (args[0] === undefined) {
+                            logo.textMsg('undefined');
+                        } else if (args[0] === null) {
+                            logo.textMsg('null');
+                        } else {
+                            logo.textMsg(args[0].toString());
                         }
+                    }
 
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'print', args[0]]);
-                        }
+                    if (logo.justCounting[turtle].length === 0) {
+                        logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'print', args[0]]);
                     }
                 }
             }
