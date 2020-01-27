@@ -333,9 +333,9 @@ function Logo () {
     // this.blinkState = !this.optimize;
     this.blinkState = true;
     if (this.optimize) {
-        createjs.Ticker.framerate = 10;
+        // createjs.Ticker.framerate = 10;
     } else {
-        createjs.Ticker.framerate = 30;
+        // createjs.Ticker.framerate = 30;
     }
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -384,12 +384,12 @@ function Logo () {
     this.setOptimize = function (state) {
         if (state) {
             // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
-            createjs.Ticker.framerate = 10;
+            // createjs.Ticker.framerate = 10;
             this.optimize = true;
 
         } else {
             // this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            createjs.Ticker.framerate = 10; // 30;
+            // createjs.Ticker.framerate = 10; // 30;
             this.optimize = false;
         }
 
@@ -2019,7 +2019,7 @@ function Logo () {
                     if (cfc !== undefined) childFlowCount = cfc;
                     if (ret) return ret
                 }
-            } if (that.blocks.blockList[blk].name in that.evalFlowDict) {
+            } else if (that.blocks.blockList[blk].name in that.evalFlowDict) {
                 eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
             } else {
                 // Could be an arg block, so we need to print its value.
@@ -2997,6 +2997,9 @@ function Logo () {
 
                     var obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
+			if (obj[0] / obj[1] > 2) {
+                            that.errorMsg(_('Warning: Note value greater than 2.'), blk);
+			}
                         // console.debug('temperament: ' + that.synth.startingPitch + ' ' + that.synth.inTemperament);
                         if (that.justCounting[turtle].length === 0) {
                             if (notes.length === 0) {
@@ -3287,6 +3290,8 @@ function Logo () {
         if (callback !== undefined && callback !== null) {
             callback();
         }
+
+        stage.update(event);
     };
 
     /**
@@ -4674,6 +4679,7 @@ function Logo () {
 
         return Number(a) * Number(b);
     };
+
     /** 
      * calculate euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y')
      * @privileged
