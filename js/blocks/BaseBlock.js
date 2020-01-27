@@ -163,8 +163,10 @@ class BaseBlock extends ProtoBlock {
                 artwork = svg.basicBlock();
             }
             // If the block has 0 size, clear out the artwork
-            if (this.size === 0)
+            if (this.size === 0) {
                 artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
+                svg.docks[1][1] = svg.docks[0][1];
+	    }
             let clickHeight;
             if (this._style.flows.top || this._style.flows.bottom)
                 clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length - 1][1];
