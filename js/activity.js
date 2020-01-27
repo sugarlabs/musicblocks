@@ -1028,7 +1028,7 @@ function Activity() {
       var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
-        doLoadAnimation();
+        
       var myRadarChart = null;
       var  scores = analyzeProject(blocks);
       var data = scoreToChartData(scores);
