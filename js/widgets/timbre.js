@@ -18,7 +18,7 @@ function TimbreWidget () {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    var timbreTableDiv = docById('timbreTableDiv');
+    var timbreTableDiv = document.createElement("div");
 
     this.notesToPlay = [];
     this.env = [];
@@ -290,12 +290,12 @@ function TimbreWidget () {
        }
     };
 
-    this._play = function (row) {
+    this._play = function () {
         this._playing = !this._playing;
 
         this._logo.resetSynth(0);
 
-        var cell = row.cells[0];
+        var cell = this.playButton;
         if (this._playing) {
             cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('stop') + '" alt="' + _('stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
@@ -333,8 +333,7 @@ function TimbreWidget () {
 
     this._save = function () {
         // Just save a set timbre block with the current instrument name.
-        var timbreName = docById('timbreName').value;
-        var obj = [[0, 'settimbre', 100 + this._delta, 100 + this._delta, [null, 1, null, 2]], [1, ['text', {'value': timbreName}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
+        var obj = [[0, 'settimbre', 100 + this._delta, 100 + this._delta, [null, 1, null, 2]], [1, ['text', {'value': 'custom'}], 0, 0, [0]], [2, 'hidden', 0, 0, [0, null]]];
         this._logo.blocks.loadNewBlocks(obj);
         this._delta += 42;
     };
@@ -521,28 +520,30 @@ function TimbreWidget () {
 
         this._playing = false;
 
+
+
+        var widgetWindow = window.widgetWindows.windowFor(this, "timbre");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
         var timbreDiv = docById('timbreDiv');
         timbreDiv.style.visibility = 'visible';
-        timbreDiv.setAttribute('draggable', 'true');
         timbreDiv.style.left = '200px';
         timbreDiv.style.top = '150px';
 
-        var widgetButtonsDiv = docById('timbreButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="timbreButtonTable"></table>';
 
-        var canvas = docById('myCanvas');
-
-        var buttonTable = docById('timbreButtonTable');
+        var buttonTable = document.createElement("table");
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
         var that = this;
+
+        widgetWindow.getWidgetBody().append(timbreTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "600px";
 
         _unhighlightButtons = function () {
             addFilterButtonCell.style.backgroundColor = '#808080';
@@ -553,55 +554,27 @@ function TimbreWidget () {
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-
-        cell.onclick = function () {
+        widgetWindow.onclose=function() {
             docById('timbreDiv').style.visibility = 'hidden';
             docById('timbreButtonsDiv').style.visibility = 'hidden';
             docById('timbreTableDiv').style.visibility = 'hidden';
-            docById('timbreName').classList.remove('hasKeyboard');
             that._logo.hideMsgs();
-        }
-
-
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play'));
-
-        cell.onclick = function () {
-            that._play(row);
+            this.destroy();
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-        cell.onclick = function () {
+        this.playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play'));
+        this.playButton.onclick = function(){
+            that._play();
+        };
+
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
             that._save();
         };
 
 
 
-        var cell = row.insertCell();
-        cell.innerHTML = '<input id="timbreName" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="timbreName" type="text" value="' + this.instrumentName + '" />';
-        cell.style.width = (2*BUTTONSIZE) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = BUTTONSIZE + 'px';
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-        var timbreInput = docById('timbreName');
-        timbreInput.classList.add('hasKeyboard');
 
-        timbreInput.oninput = function(event) {
-            var cblk0 = that._logo.blocks.blockList[that.blockNo].connections[1];
-            var blk = that._logo.blocks.blockList[cblk0];
-            blk.value = timbreInput.value;
-            var label = blk.value.toString();
-            if (label.length > 8) {
-                label = label.substr(0, 7) + '...';
-            }
-            blk.text.text = label;
-            blk.updateCache();
-        };
-
-        var synthButtonCell = this._addButton(row, 'synth.svg', ICONSIZE, _('Synthesizer'));
+        var synthButtonCell = widgetWindow.addButton('synth.svg', ICONSIZE, _('Synthesizer'));
         synthButtonCell.id = 'synthButtonCell';
         this.isActive['synth'] = false;
 
@@ -621,7 +594,7 @@ function TimbreWidget () {
             }
         }
 
-        var oscillatorButtonCell = this._addButton(row, 'oscillator.svg', ICONSIZE, _('Oscillator'));
+        var oscillatorButtonCell = widgetWindow.addButton('oscillator.svg', ICONSIZE, _('Oscillator'));
         oscillatorButtonCell.id = 'oscillatorButtonCell';
         this.isActive['oscillator'] = false;
 
@@ -657,7 +630,7 @@ function TimbreWidget () {
             }
         }
 
-        var envelopeButtonCell = this._addButton(row, 'envelope.svg', ICONSIZE, _('Envelope'));
+        var envelopeButtonCell = widgetWindow.addButton('envelope.svg', ICONSIZE, _('Envelope'));
         envelopeButtonCell.id = 'envelopeButtonCell';
         this.isActive['envelope'] = false;
 
@@ -692,7 +665,7 @@ function TimbreWidget () {
         }
 
 
-        var effectsButtonCell = this._addButton(row, 'effects.svg', ICONSIZE, _('Effects'));
+        var effectsButtonCell = widgetWindow.addButton('effects.svg', ICONSIZE, _('Effects'));
         effectsButtonCell.id = 'effectsButtonCell';
         this.isActive['effects'] = false;
 
@@ -706,7 +679,7 @@ function TimbreWidget () {
             that._effects();
         }
 
-        var filterButtonCell = this._addButton(row, 'filter.svg', ICONSIZE, _('Filter'));
+        var filterButtonCell = widgetWindow.addButton('filter.svg', ICONSIZE, _('Filter'));
         filterButtonCell.id = 'filterButtonCell';
         this.isActive['filter'] = false;
 
@@ -737,7 +710,7 @@ function TimbreWidget () {
             that._filter();
         }
 
-        var addFilterButtonCell = this._addButton(row, 'filter+.svg', ICONSIZE, _('Add filter'));
+        var addFilterButtonCell = widgetWindow.addButton('filter+.svg', ICONSIZE, _('Add filter'));
         addFilterButtonCell.style.backgroundColor = '#808080';
 
         addFilterButtonCell.onclick = function () {
@@ -753,10 +726,10 @@ function TimbreWidget () {
         }
 
 
-        var cell = this._addButton(row, 'restore-button.svg', ICONSIZE, _('Undo'));
-        cell.onclick = function () {
+        widgetWindow.addButton('restore-button.svg', ICONSIZE, _('Undo')).onclick = function () {
             that._undo();
         };
+
 
         // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
 
@@ -768,70 +741,8 @@ function TimbreWidget () {
         //     that._logo.hideMsgs();
         // };
 
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - timbreDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - timbreDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function (e) {
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function (e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                timbreDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                timbreDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        timbreDiv.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        timbreDiv.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                timbreDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                timbreDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        timbreDiv.onmousedown = function (e) {
-            that._target = e.target;
-        };
-
-        timbreDiv.ondragstart = function (e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
         this._logo.textMsg(_('Click on buttons to open the timbre design tools.'));
+        widgetWindow.sendToCenter();
     };
 
     this.clampConnection = function (n, clamp, topOfClamp) {
