@@ -1,3 +1,37 @@
+class SynthVolumeBlock extends LeftBlock {
+    constructor() {
+        //.TRANS: the volume for this synth
+        super('synthvolumefactor', _('synth volume'));
+        this.setPalette('volume');
+
+        this.formBlock({
+            args: 1, argTypes: ['anyin'], defaults: [_('piano')]
+        });
+
+        this.makeMacro((x, y) => [
+	    [0, 'synthvolumefactor', x, y, [null, 1]],
+	    [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]]
+	]);
+    }
+
+    arg(logo, turtle, blk, receivedArg) {
+	if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'synth volume']);
+        } else {
+            var cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk !== null) {
+                var targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                for (var synth in logo.synthVolume[turtle]) {
+                    if (synth === targetSynth) {
+                        return last(logo.synthVolume[turtle][synth]);
+                    }
+                }
+            }
+	    return 0;
+        }
+    }
+}
+
 class MasterVolumeBlock extends ValueBlock {
     constructor() {
         //.TRANS: the volume at which notes are played
@@ -484,7 +518,7 @@ class ArticulationBlock extends FlowClampBlock {
             return;
         }
 
-        if (args[0] === null || typeof(args[0] !== 'number')) {
+        if (args[0] === null || typeof(args[0]) !== 'number') {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             var arg = 0;
         } else {
@@ -620,6 +654,7 @@ class CrescendoBlock extends DecrescendoBlock {
 
 function setupVolumeBlocks() {
     new MasterVolumeBlock().setup();
+    new SynthVolumeBlock().setup();
     new PPPBlock().setup();
     new PPBlock().setup();
     new PBlock().setup();
