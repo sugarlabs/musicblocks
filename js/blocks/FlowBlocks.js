@@ -626,6 +626,7 @@ class HiddenNoFlowBlock extends FlowBlock {
 
     flow() {}
 }
+
 class HiddenBlock extends FlowBlock {
     constructor() {
         super('hidden');
@@ -636,7 +637,6 @@ class HiddenBlock extends FlowBlock {
 
     flow() {}
 }
-
 
 
 function setupFlowBlocks() {
