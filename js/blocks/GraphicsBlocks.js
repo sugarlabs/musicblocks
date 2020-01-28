@@ -104,7 +104,7 @@ class ClearBlock extends FlowBlock {
         this.setPalette('graphics');
     }
 
-    flow(args, logo, turtle) {
+    flow(args, logo, turtle, blk) {
         if (logo.inMatrix) {
             // ignore clear block in matrix
         } else if (logo.inNoteBlock[turtle].length > 0) {
