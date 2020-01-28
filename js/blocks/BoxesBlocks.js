@@ -140,7 +140,7 @@ class StoreInBlock extends FlowBlock {
     }
 
     flow(args, logo) {
-        if (args.length !== 1) return;
+        if (args.length !== 2) return;
         logo.boxes[args[0]] = args[1];
     }
 }
