@@ -1694,7 +1694,7 @@ function Logo () {
     this._blockSetter = function (blk, value, turtle) {
         var turtleObj = this.turtles.turtleList[turtle];
 
-        console.debug(this.blocks.blockList[blk].name);
+        // console.debug(this.blocks.blockList[blk].name);
         switch (this.blocks.blockList[blk].name) {
         case 'x':
             turtleObj.doSetXY(value, turtleObj.y);
@@ -1848,8 +1848,12 @@ function Logo () {
         var args = [];
         if (that.blocks.blockList[blk].protoblock.args > 0) {
             for (var i = 1; i < that.blocks.blockList[blk].protoblock.args + 1; i++) {
-                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in' && that.blocks.blockList[blk].connections[i] == null) {
-                    console.debug('skipping null inflow args');
+                if (that.blocks.blockList[blk].protoblock.dockTypes[i] === 'in') {
+		    if (that.blocks.blockList[blk].connections[i] == null) {
+			console.debug('skipping inflow args');
+		    } else {
+			args.push(that.blocks.blockList[blk].connections[i]);
+		    }
                 } else {
                     args.push(that.parseArg(that, turtle, that.blocks.blockList[blk].connections[i], blk, receivedArg));
                 }
@@ -4393,7 +4397,7 @@ function Logo () {
             }
 
             return that.blocks.blockList[blk].value;
-        } else if (that.blocks.blockList[blk].isArgBlock() || that.blocks.blockList[blk].isArgClamp() || that.blocks.blockList[blk].isArgFlowClampBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
+        } else if (['anyout', 'numberout', 'textout', 'booleanout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
             switch (that.blocks.blockList[blk].name) {
             case 'dectofrac':
                 if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
