@@ -268,7 +268,7 @@ class DoArgBlock extends FlowClampBlock {
         if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
             for (var i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                 if (logo.blocks.blockList[blk].connections[i + 2] != null) {
-                    var t = (logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg));
+                    var t = logo.parseArg(logo, turtle, logo.blocks.blockList[blk].connections[i + 2], blk, receivedArg);
                     actionArgs.push(t);
                 } else {
                     actionArgs.push(null);
@@ -381,9 +381,12 @@ class NamedArgBlock extends LeftBlock {
         });
     }
 
-    flow(args, logo, turtle, blk, receivedArg) {
+    arg(logo, turtle, blk, receivedArg) {
         var name = logo.blocks.blockList[blk].privateData;
         var actionArgs = receivedArg;
+
+	console.debug('NAMED ARG BLOCK: ' + name)
+	console.debug(actionArgs);
 
         // If an action block with an arg is clicked,
         // the arg will have no value.
