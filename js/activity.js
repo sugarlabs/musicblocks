@@ -3087,6 +3087,8 @@ function Activity() {
         var data = [];
         for (var blk = 0; blk < blocks.blockList.length; blk++) {
             var myBlock = blocks.blockList[blk];
+            var args = null;
+
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
                 continue;
@@ -3094,9 +3096,18 @@ function Activity() {
 
             if (myBlock.isValueBlock() || myBlock.name === 'loadFile' || myBlock.name === 'boolean') {
                 // FIX ME: scale image if it exceeds a maximum size.
-                var args = {
-                    'value': myBlock.value
-                };
+                switch (myBlock.name) {
+                    case 'namedbox':
+                    case 'namedarg':
+                        args = {
+                            'value': myBlock.privateData
+                        }
+                    break;
+                default:
+                    args = {
+                        'value': myBlock.value
+                    };
+                }
             } else {
                 switch (myBlock.name) {
                     case 'start':
@@ -3104,7 +3115,7 @@ function Activity() {
                         // Find the turtle associated with this block.
                         var turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
-                            var args = {
+                            args = {
                                 'collapsed': false,
                                 'xcor': 0,
                                 'ycor': 0,
@@ -3115,7 +3126,7 @@ function Activity() {
                                 'grey': 100
                             };
                         } else {
-                            var args = {
+                            args = {
                                 'collapsed': myBlock.collapsed,
                                 'xcor': turtle.x,
                                 'ycor': turtle.y,
@@ -3131,7 +3142,7 @@ function Activity() {
                     case 'temperament1':
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
-                            var args = {
+                            args = {
                                 'customTemperamentNotes': TEMPERAMENT['custom'],
                                 'startingPitch': logo.synth.startingPitch,
                                 'octaveSpace': OCTAVERATIO
@@ -3152,18 +3163,16 @@ function Activity() {
                     case 'modewidget':
                     case 'meterwidget':
                     case 'status':
-                        var args = {
+                        args = {
                             'collapsed': myBlock.collapsed
                         }
                         break;
-                    case 'namedbox':
                     case 'storein2':
                     case 'nameddo':
                     case 'nameddoArg':
                     case 'namedcalc':
                     case 'namedcalcArg':
-                    case 'namedarg':
-                        var args = {
+                        args = {
                             'value': myBlock.privateData
                         }
                         break;
@@ -3174,18 +3183,16 @@ function Activity() {
                     case 'nopThreeArgBlock':
                         // restore original block name
                         myBlock.name = myBlock.privateData;
-                        var args = {}
                         break;
                     case 'matrixData':
                         // deprecated
-                        var args = {
+                        args = {
                             'notes': window.savedMatricesNotes,
                             'count': window.savedMatricesCount
                         }
                         hasMatrixDataBlock = true;
                         break;
                     default:
-                        var args = {}
                         break;
                 }
             }
@@ -3200,7 +3207,11 @@ function Activity() {
                 }
             }
 
-            data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
+            if (args == null) {
+                data.push([blockMap.indexOf(blk), myBlock.name, myBlock.container.x, myBlock.container.y, connections]);
+            } else {
+                data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
+            }
         }
 
         // remap block connections
