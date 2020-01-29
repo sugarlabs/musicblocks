@@ -97,11 +97,12 @@ class RhythmBlock extends FlowBlock {
 
             var beatValue = bpmFactor / noteBeatValue;
 
-            __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+            let __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                 setTimeout(function () {
                     logo._processNote(thisBeat, blk, turtle, callback);
                 }, timeout);
             };
+            let __callback;
 
             for (var i = 0; i < arg0; i++) {
                 if (i === arg0 - 1) {
