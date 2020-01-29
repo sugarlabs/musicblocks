@@ -230,6 +230,22 @@ class BooleanBlock extends BaseBlock {
 }
 
 
+class BooleanSensorBlock extends BaseBlock {
+    constructor(name, displayName) {
+        super(name);
+        displayName = displayName || undefined;
+
+        this.formBlock({
+            name: displayName,
+            flows: {
+                left: true, type: 'value'
+            },
+            outType: 'booleanout'
+        });
+    }
+}
+
+
 class FlowBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);

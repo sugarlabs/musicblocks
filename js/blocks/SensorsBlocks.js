@@ -186,7 +186,7 @@ class MouseXBlock extends ValueBlock {
     }
 }
 
-class MouseButtonBlock extends BooleanBlock {
+class MouseButtonBlock extends BooleanSensorBlock {
     constructor() {
         super('mousebutton', _('mouse button'));
         this.setPalette('sensors');
