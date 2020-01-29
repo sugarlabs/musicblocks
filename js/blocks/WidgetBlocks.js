@@ -119,7 +119,7 @@ class FilterBlock extends FlowBlock {
     }
 }
 
-class TempreamentBlock extends StackClampBlock {
+class TemperamentBlock extends StackClampBlock {
     constructor() {
         super('temperament');
         this.setPalette('widgets');
@@ -711,29 +711,23 @@ class MatrixGMajorBlock extends FlowBlock {
         super('matrixgmajor', _('G major scale'));
         this.setPalette('widgets');
         this.makeMacro((x, y) => [
-            [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 21]],
-            [1, ['notename', {'value': 'G'}], 0, 0, [10]],
-            [2, ['number', {'value': 5}], 0, 0, [10]],
-            [3, 'steppitch', 0, 0, [8, 4, null]],
-            [4, ['number', {'value': -1}], 0, 0, [3]],
-            [5, 'setkey2', 0, 0, [0, 6, 7, 10]],
-            [6, ['notename', {'value': 'G'}], 0, 0, [5]],
-            [7, ['modename', {'value': 'major'}], 0, 0, [5]],
-            [8, 'repeat', 0, 0, [10, 9, 3, 11]],
-            [9, 'modelength', 0, 0, [8]],
-            [10, 'pitch', 0, 0, [5, 1, 2, 8]],
-            [11, 'rhythm2', 0, 0, [8, 12, 14, 22]],
-            [12, ['number', {'value': 6}], 0, 0, [11]],
-            [13, ['number', {'value': 1}], 0, 0, [14]],
-            [14, 'divide', 0, 0, [11, 13, 15]],
-            [15, ['number', {'value': 4}], 0, 0, [14]],
-            [16, 'rhythm2', 0, 0, [22, 17, 19, null]],
-            [17, ['number', {'value': 1}], 0, 0, [16]],
-            [18, ['number', {'value': 1}], 0, 0, [19]],
-            [19, 'divide', 0, 0, [16, 18, 20]],
-            [20, ['number', {'value': 2}], 0, 0.5, [19]],
-            [21, 'hiddennoflow', 0, 0, [0, null]],
-            [22, 'vspace', 0, 0, [11, 16]]
+            [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
+	    [1, ['solfege', {'value': 'sol'}], 0, 0, [10]],
+	    [2, ['number', {'value': 5}], 0, 0, [10]],
+	    [3, 'steppitch', 0, 0, [8, 4, null]],
+	    [4, ['number', {'value': -1}], 0, 0, [3]],
+	    [5, 'setkey2', 0, 0, [0, 6, 7, 10]],
+	    [6, ['notename', {'value': 'G'}], 0, 0, [5]],
+	    [7, ['modename', {'value': 'major'}], 0, 0, [5]],
+	    [8, 'repeat', 0, 0, [10, 9, 3, 11]],
+	    [9, 'modelength', 0, 0, [8]],
+	    [10, 'pitch', 0, 0, [5, 1, 2, 8]],
+	    [11, 'rhythm2', 0, 0, [8, 12, 14, null]],
+	    [12, ['number', {'value': 8}], 0, 0, [11]],
+	    [13, ['number', {'value': 1}], 0, 0, [14]],
+	    [14, 'divide', 0, 0, [11, 13, 15]],
+	    [15, ['number', {'value': 4}], 0, 0, [14]],
+	    [16, 'hiddennoflow', 0, 0, [0, null]]
         ]);
     }
 }
@@ -743,8 +737,23 @@ class MatrixCMajorBlock extends FlowBlock {
         super('matrixcmajor', _('C major scale'));
         this.setPalette('widgets');
         this.makeMacro((x, y) => [
-            [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 21]], [1, ['notename', {'value': 'C'}], 0, 0, [10]], [2, ['number', {'value': 5}], 0, 0, [10]], [3, 'steppitch', 0, 0, [8, 4, null]], [4, ['number', {'value': -1}], 0, 0, [3]], [5, 'setkey2', 0, 0, [0, 6, 7, 10]], [6, ['notename', {'value': 'C'}], 0, 0, [5]], [7, ['modename', {'value': 'major'}], 0, 0, [5]], [8, 'repeat', 0, 0, [10, 9, 3, 11]], [9, 'modelength', 0, 0, [8]], [10, 'pitch', 0, 0, [5, 1, 2, 8]], [11, 'rhythm2', 0, 0, [8, 12, 14, 22]], [12, ['number', {'value': 6}], 0, 0, [11]], [13, ['number', {'value': 1}], 0, 0, [14]], [14, 'divide', 0, 0, [11, 13, 15]], [15, ['number', {'value': 4}], 0, 0, [14]], [16, 'rhythm2', 0, 0, [22, 17, 19, null]], [17, ['number', {'value': 1}], 0, 0, [16]], [18, ['number', {'value': 1}], 0, 0, [19]], [19, 'divide', 0, 0, [16, 18, 20]], [20, ['number', {'value': 2}], 0, 0.5, [19]], [21, 'hiddennoflow', 0, 0, [0, null]], [22, 'vspace', 0, 0, [11, 16]]
-
+            [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
+	    [1, ['solfege', {'value': 'do'}], 0, 0, [10]],
+	    [2, ['number', {'value': 5}], 0, 0, [10]],
+	    [3, 'steppitch', 0, 0, [8, 4, null]],
+	    [4, ['number', {'value': -1}], 0, 0, [3]],
+	    [5, 'setkey2', 0, 0, [0, 6, 7, 10]],
+	    [6, ['notename', {'value': 'C'}], 0, 0, [5]],
+	    [7, ['modename', {'value': 'major'}], 0, 0, [5]],
+	    [8, 'repeat', 0, 0, [10, 9, 3, 11]],
+	    [9, 'modelength', 0, 0, [8]],
+	    [10, 'pitch', 0, 0, [5, 1, 2, 8]],
+	    [11, 'rhythm2', 0, 0, [8, 12, 14, null]],
+	    [12, ['number', {'value': 8}], 0, 0, [11]],
+	    [13, ['number', {'value': 1}], 0, 0, [14]],
+	    [14, 'divide', 0, 0, [11, 13, 15]],
+	    [15, ['number', {'value': 4}], 0, 0, [14]],
+	    [16, 'hiddennoflow', 0, 0, [0, null]]
         ]);
     }
 }
@@ -906,7 +915,7 @@ class StatusBlock extends StackClampBlock {
 function setupWidgetBlocks() {
     new EnvelopeBlock().setup();
     new FilterBlock().setup();
-    new TempreamentBlock().setup();
+    new TemperamentBlock().setup();
     new TimbreBlock().setup();
     new MeterWidgetBlock().setup();
     new ModeWidgetBlock().setup();
