@@ -310,7 +310,7 @@ function _playPitch(args, logo, turtle, blk) {
     } else if (logo.inNoteBlock[turtle].length > 0) {
 
         function addPitch(note, octave, cents, direction) {
-            t = transposition + logo.register[turtle] * 12;
+            var t = transposition + logo.register[turtle] * 12;
             var noteObj = getNote(note, octave, t, logo.keySignature[turtle], logo.moveable[turtle], direction, logo.errorMsg, logo.synth.inTemperament);
             if (!logo.validNote) {
                 logo.errorMsg(INVALIDPITCH, blk);
@@ -1751,7 +1751,7 @@ class StepPitchBlock extends FlowBlock {
         }
 
         function addPitch(note, octave, cents, direction) {
-            t = transposition + logo.register[turtle] * 12;
+            var t = transposition + logo.register[turtle] * 12;
             var noteObj = getNote(note, octave, t, logo.keySignature[turtle], true, direction, logo.errorMsg, logo.synth.inTemperament);
 
             if (logo.drumStyle[turtle].length > 0) {
