@@ -9,8 +9,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-//The ProtoBlock class is defined in this file. Protoblocks are the prototypes
-//from which Blocks are created.
+// The ProtoBlock class is defined in this file. Protoblocks are the
+// prototypes from which Blocks are created.
+
+// Note that protoblocks.js is largely deprecated. It is only used to
+// generate palette blocks.
 
 // Protoblock contain generic information about blocks and some
 // methods common to all blocks.
