@@ -32,7 +32,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 5`. The first note is a `1/2` note; the second and third notes are
 `1/4` notes; the fourth note is a `1/1` note.
 
-https://rawgithub.com/sugarlabs/
+https://github.com/sugarlabs/
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
@@ -91,7 +91,7 @@ additional menu appears when a "right click" is applied to a stack of
 blocks).
 
 These toolbars are described in detail in the
-[Turtle Blocks documentation pages](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Keyboard shortcuts
 ------------------
@@ -122,16 +122,16 @@ Looking for a block? Find it in the [Palette
 Tables](https://github.com/sugarlabs/musicblocks/blob/master/guide/README.md#APPENDIX_1).
 
 See the
-[Turtle Blocks Programming Guide](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
+[Turtle Blocks Programming Guide](http://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
 for general details on how to use the blocks.
 
 See the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
 for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 *Tone*, *Ornament*, *Volume*, *Drum*, and *Widget*.
 
 All of the other palettes are described in the
-[Turtle Blocks documentation pages](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Defining a note
 ---------------
@@ -177,7 +177,7 @@ in that it lets you scroll through `C`, `D`, `E`, `F`, `G`, `A`,
 `B`. It also uses a second selector for sharps and flats.
 
 As noted, and described in more detail in the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
@@ -246,7 +246,7 @@ modified.)
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/storebox1_block.svg "storein-Box-Add One")
@@ -407,7 +407,7 @@ Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
 
 More details about all of the widgets are available in the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
 Creating help artwork
 ---------------------
