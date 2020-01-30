@@ -2027,7 +2027,7 @@ function Logo () {
                 eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
             } else {
                 // Could be an arg block, so we need to print its value.
-                if (that.blocks.blockList[blk].isArgBlock() || ['anyout', 'numberout', 'textout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
+                if (that.blocks.blockList[blk].isArgBlock() || ['anyout', 'numberout', 'textout', 'booleanout'].indexOf(that.blocks.blockList[blk].protoblock.dockTypes[0]) !== -1) {
                     args.push(that.parseArg(that, turtle, blk, that.receievedArg));
                     if (that.blocks.blockList[blk].value == null) {
                         that.textMsg('null block value');
