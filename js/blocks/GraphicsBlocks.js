@@ -309,7 +309,7 @@ class SetXYBlock extends FlowBlock {
         this.setPalette('graphics');
         
         this.formBlock({
-            //.TRANS: set xy position
+            //.TRANS: set xy (Cartesian) position
             name: _('set xy'),
             args: 2, defaults: [0, 0],
             argLabels: this.lang === 'ja' ? [_('x1'), _('y1')] : [_('x'), _('y')]
@@ -353,8 +353,7 @@ class RightBlock extends FlowBlock {
         this.setPalette('graphics');
 
         this.formBlock({
-            //.TRANS: turn right (clockwise)
-            //.TRANS: right1 is right when turning right (clickwise)
+            //.TRANS: right1 and right are when turning right (clockwise)
             name: this.lang === 'ja' ? _('right1') : _('right'),
             args: 1, defaults: [90]
         });
@@ -397,8 +396,7 @@ class MLeftBlock extends FlowBlock {
         this.setPalette('graphics');
 
         this.formBlock({
-            //.TRANS: turn right (clockwise)
-            //.TRANS: right1 is right when turning right (clickwise)
+            //.TRANS: left and left1 are when turning left (counter-clockwise)
             name: this.lang === 'ja' ? _('left1') : _('left'),
             args: 1, defaults: [90]
         });
@@ -479,7 +477,7 @@ class BackBlock extends FlowBlock {
 
 class ForwardBlock extends FlowBlock {
     constructor() {
-        //.TRANS: move backward (in the opposite direction of the current heading)
+        //.TRANS: move forward (in the direction of the current heading)
         super('forward', _('forward'));
         this.setPalette('graphics');
 
