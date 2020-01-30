@@ -46,6 +46,10 @@ class BaseBlock extends ProtoBlock {
         this._style.flows = this._style.flows || {}
         this._style.flows.labels = this._style.flows.labels || [];
 
+	if (this._style.args > 1) {
+	    this.expandable = true;
+	}
+
         if (this._style.flows.labels.length > 0) {
             if (this._style.flows.type === 'arg')
                 this.style = 'argclamp';
@@ -65,6 +69,10 @@ class BaseBlock extends ProtoBlock {
             } else if (this._style.args === 2)
                 this.style = 'twoarg';
         }
+
+	if (this._style.flows.type === 'value' && this._style.args === 2)
+	    this.expandable = true;
+
         this.args = this._style.flows.labels.length + this._style.args;
         this.size = 1 + this._style.flows.labels.length;
         if (this._style.argTypes[0] === 'booleanin') this.size++;
@@ -125,11 +133,19 @@ class BaseBlock extends ProtoBlock {
                 svg.setExpand(pad + this.extraWidth, this.image ? 23 : 0, 0,
                     this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
 
-            for (let i = 0; i < arguments.length; i++)
-                svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
             for (let i = arguments.length; i < this._style.flows.labels.length; i++)
                 svg.setClampSlots(i, 1);
             svg.setClampCount(this._style.flows.labels.length);
+
+            for (let i = 0; i < arguments.length; i++) {
+		if (this._style.flows.type == undefined) {
+		    svg.setExpand(30 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+		} else if (this._style.flows.type == value) {
+		    svg.setExpand(30 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+		} else {
+                    svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
+		}
+	    }
 
             if (this._style.argTypes[0] === 'booleanin') {
                 svg.setBoolean(true)
