@@ -1676,11 +1676,15 @@ function Activity() {
     /*
      * Uses JQuery to add autocompleted search suggestions
      */
-    doSearch = function () {
+        doSearch = function () {
         var $j = jQuery.noConflict();
 
         $j('#search').autocomplete({
-            source: searchSuggestions
+            source: searchSuggestions,
+            select: function(event, ui){
+              searchWidget.value = ui.item.label;
+              doSearch();
+            }
         });
 
         $j('#search').autocomplete('widget').addClass('scrollSearch');
