@@ -1,7 +1,8 @@
 MusicBlocks/js
 ==============
 
-The core code for Music Blocks resides in this directory.
+The core code for Music Blocks resides in this directory and the
+blocks subdirectory.
 
 * `activity.js` -- where the menus are defined
 
@@ -40,6 +41,40 @@ Other utilities
 * `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
+In the `blocks` subdirectory is the code for generating blocks and
+associating them with some action.
+
+`BaseBlock.js` is the base class for all blocks. All of the other
+files define blocks in each of the palettes:
+
+`Music Palette`
+`   RhythmBlockPaletteBlocks.js`
+`   RhythmBlocks.js`
+`   MeterBlocks.js`
+`   PitchBlocks.js`
+`   IntervalsBlocks.js`
+`   ToneBlocks.js`
+`   OrnamentBlocks.js`
+`   VolumeBlocks.js`
+`   DrumBlocks.js`
+`   WidgetBlocks.js`
+
+`Flow Palette`
+`   FlowBlocks.js`
+`   ActionBlocks.js`
+`   BoxesBlocks.js`
+`   NumberBlocks.js`
+`   BooleanBlocks.js`
+`   HeapBlocks.js`
+`   ExtrasBlocks.js`
+
+`Graphics Palette`
+`   GraphicsBlocks.js`
+`   PenBlocks.js`
+`   MediaBlocks.js`
+`   SensorsBlocks.js`
+`   EnsembleBlocks.js`
+
 Subdirectories with additional utilities
 * utils -- additional general-purpose utilities
 	* `detectIE.js` -- check if Music Blocks is being run in Internet Explorer
@@ -76,7 +111,11 @@ application, you may want to write a plugin. Please see:
 [plugin](http://github.com/sugarlabs/musicblocks/tree/master/plugins)
 instead.
 
-## How to define a new block in basicblocks.js
+## How to define a new block in basicblocks.js (deprecated)
+
+Note: New blocks are now added to the appropriate file in the `blocks`
+subdirectory. Much of the discussion below is still somewhat relevant
+as background reading.
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is where each block is defined, its palette assigned, its shape and
