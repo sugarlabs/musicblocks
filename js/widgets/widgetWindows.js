@@ -291,12 +291,14 @@ window.widgetWindows.isOpen = function (name) {
 
 window.widgetWindows.hideWindows = function (name) {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        win._frame.style.display = 'none';
+	if (win !== undefined)
+            win._frame.style.display = 'none';
     });
 };
 
 window.widgetWindows.showWindows = function (name) {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-        win._frame.style.display = 'block';
+	if (win !== undefined)
+            win._frame.style.display = 'block';
     });
 };

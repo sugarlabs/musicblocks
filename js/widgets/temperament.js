@@ -1563,6 +1563,7 @@ function TemperamentWidget () {
 	widgetWindow.clear();
 
 	var temperamentDiv = docById("temperamentDiv");
+        // var temperamentDiv = document.createElement("div");
 	temperamentDiv.style.visibility = "visible";
 	temperamentDiv.style.left = '200px';
 	temperamentDiv.style.top = '150px';
@@ -1571,16 +1572,14 @@ function TemperamentWidget () {
 	widgetWindow.getWidgetBody().style.height = "500px";
 	widgetWindow.getWidgetBody().style.width = "500px";
 
-
-
         var that = this;
 
         widgetWindow.onclose=function() {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
             docById('temperamentDiv').style.visibility = 'hidden';
-            docById('temperamentButtonsDiv').style.visibility = 'hidden';
-            docById('temperamentTableDiv').style.visibility = 'hidden';
+            // docById('temperamentButtonsDiv').style.visibility = 'hidden';
+            // docById('temperamentTableDiv').style.visibility = 'hidden';
             if (docById('wheelDiv2') != null) {
                 docById('wheelDiv2').style.display = 'none';
                 that.notesCircle.removeWheel();

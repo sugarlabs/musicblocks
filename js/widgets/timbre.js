@@ -529,11 +529,6 @@ function TimbreWidget () {
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
-        var timbreDiv = docById('timbreDiv');
-        timbreDiv.style.visibility = 'visible';
-        timbreDiv.style.left = '200px';
-        timbreDiv.style.top = '150px';
-
 
         var buttonTable = document.createElement("table");
         var header = buttonTable.createTHead();
@@ -555,9 +550,6 @@ function TimbreWidget () {
         };
 
         widgetWindow.onclose=function() {
-            docById('timbreDiv').style.visibility = 'hidden';
-            docById('timbreButtonsDiv').style.visibility = 'hidden';
-            docById('timbreTableDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
             this.destroy();
         };

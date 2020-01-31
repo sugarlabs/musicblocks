@@ -46,10 +46,6 @@ function MeterWidget() {
 
         widgetWindow.onclose=function() {
             that._playing = false;
-            docById('meterDiv').style.visibility = 'hidden';
-            docById('meterButtonsDiv').style.visibility = 'hidden';
-            docById('meterTableDiv').style.visibility = 'hidden';
-            docById('meterWheelDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
             this.destroy();
         }

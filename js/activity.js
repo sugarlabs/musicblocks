@@ -4113,50 +4113,6 @@ function Activity() {
 
             this.hideMusicBlocks = function () {
                 hideSearchWidget();
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
-                    storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
-                    storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
-                    storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
-                    storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
-
-                    if (docById('mkbDiv').style.visibility !== 'hidden') {
-                        docById('mkbDiv').style.visibility = 'hidden';
-                        docById('mkbButtonsDiv').style.visibility = 'hidden';
-                        docById('mkbTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('pscDiv').style.visibility !== 'hidden') {
-                        docById('pscDiv').style.visibility = 'hidden';
-                        docById('pscTableDiv').style.visibility = 'hidden';
-                        docById('pscButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('timbreDiv').style.visibility !== 'hidden') {
-                        docById('timbreDiv').style.visibility = 'hidden';
-                        docById('timbreTableDiv').style.visibility = 'hidden';
-                        docById('timbreButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('temperamentDiv').style.visibility !== 'hidden') {
-                        docById('temperamentDiv').style.visibility = 'hidden';
-                        docById('temperamentTableDiv').style.visibility = 'hidden';
-                        docById('temperamentButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('modeDiv').style.visibility !== 'hidden') {
-                        docById('modeDiv').style.visibility = 'hidden';
-                        docById('modeButtonsDiv').style.visibility = 'hidden';
-                        docById('modeTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('tempoDiv').style.visibility !== 'hidden') {
-                        if (logo.tempo != null) {
-                            logo.tempo.hide();
-                        }
-                    }
-                }
-
                 widgetWindows.hideWindows();
 
                 logo.doStopTurtle();
@@ -4176,23 +4132,6 @@ function Activity() {
 
                 widgetWindows.showWindows();
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                    docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                    docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                }
                 document.querySelector('.canvasHolder').classList.remove('hide');
                 document.querySelector('#canvas').style.display = '';
                 document.querySelector('#theme-color').content = platformColor.header;
