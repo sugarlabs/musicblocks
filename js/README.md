@@ -138,7 +138,6 @@ as background reading. -->
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is the file where setup function related to each block file is called.
-<<<<<<< HEAD
 
 <!-- [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 is where the code associated with running each block is defined. -->
@@ -151,20 +150,6 @@ e.g. `class uniqueNameBlock extends AnotherBlock{}`
 
 `super(uniquename);`
 
-=======
-
-<!-- [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
-is where the code associated with running each block is defined. -->
-
-1. Create a new class inside the file. All demonstrations extend from `BaseBlock`, however blocks can extend each other also.
-
-e.g. `class uniqueNameBlock extends AnotherBlock{}`
-
-* As part of MVC structure the argument earlier passed to `new ProtoBlock()` is now passed to `super` call inside constructor of the defined class.
-
-`super(uniquename);`
-
->>>>>>> 3d377f8ba0cf655f3118c78e9f81fb7950086d20
 <!-- `var uniquenameBlock = new ProtoBlock('uniquename');` -->
 
 <!-- e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');` -->
@@ -175,17 +160,10 @@ create instances of the block. -->
 2. Assign a palette to the block
 
 <!-- `uniquenameBlock.palette = palettes.dict['yourpalettename'];` -->
-<<<<<<< HEAD
 
 <!-- e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];` -->
 e.g. `this.setPalette('yourPalleteName);`
 
-=======
-
-<!-- e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];` -->
-e.g. `this.setPalette('yourPalleteName);`
-
->>>>>>> 3d377f8ba0cf655f3118c78e9f81fb7950086d20
 * Your class definition should look similar to this:
 
 ```
@@ -196,10 +174,7 @@ e.g. `this.setPalette('yourPalleteName);`
     }
   }
 ```
-<<<<<<< HEAD
 Note: After the new update there is no requirement for a `beginnerMode` check as `BaseBlock` automatically performs that check. 
-=======
->>>>>>> 3d377f8ba0cf655f3118c78e9f81fb7950086d20
 
 The palette can be any of the palettes listed in `turtledef.js`. The
 color of the block is defined by the palette used.
@@ -251,7 +226,37 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
  -->
 <!-- e.g., `blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;` -->
 
-4. Define additional block properties, e.g.,
+4. Write the logic for the block in either of the two functions, `arg()` or `flow()`.
+
+Note: Change of syntax after MVC structure:
+
+* `that.` used while writing logic in `logo.js` is to be replaced with `logo.`
+* For arg blocks calls to `that.blocks.blockList[blk].value = ` are to be replace with a `return` statement.
+* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if they are unchanged. 
+
+So changes to these variabled should be checked and return keyword should be used.
+
+e.g. 
+```
+class StartBlock extends StackClampBlock {
+    constructor() {
+        super('start');
+        this.setPalette('action');
+        
+        this.formBlock({ name: _('start'), canCollapse: true });
+    }
+
+    flow(args) {
+        if (args.length === 1)
+            return [args[0], 1];
+    }
+}
+```
+
+5. In case of flow blocks, blockID should be added to the case stack.
+Argument blocks are automatically detected.
+
+<!-- Define additional block properties, e.g.,
 
 * Define the block prototype
 
@@ -312,16 +317,18 @@ The format of a macro is the same as the format of saved projects: a list of blo
 e.g., `pitchNumberBlock.dockTypes[1] = 'numberin';`
 
 Check
-[protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties.
+[protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties. -->
 
 ## Macro expansions
 
 In some cases, you may want a block on the palette to expand into a stack
 of blocks.
 
+Note: Macro related code is no longed written in `macros.js` 
+
 To add a macro:
 
-1. be sure that there is a block defined in `basicblocks.js`;
+1. Write definition using `this.makeMacro((x, y) => [....])`
 
 2. add an entry in `BLOCKISMACRO` array `macros.js` in the `blockIsMacro`
 function below with the block name from `basicblocks.js`;
