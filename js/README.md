@@ -120,19 +120,21 @@ e.g. `setupGraphicsBlocks()`.
 
 * Call that setup function in `js/basicblocks.js` inside `initBasicProtoBlocks()` function.
 
-* If the block you are adding needs to expand into a stack of blocks,
-you may also need to modify `macro.js`.
+<!-- * If the block you are adding needs to expand into a stack of blocks,
+you may also need to modify `macro.js`. -->
 
-* If you want to add a new palette with multiple blocks for a specific
+<!-- * If you want to add a new palette with multiple blocks for a specific
 application, you may want to write a plugin. Please see:
 [plugin](http://github.com/sugarlabs/musicblocks/tree/master/plugins)
-instead.
+instead. -->
 
-## How to define a new block in basicblocks.js (deprecated)
+## How to define a new block
 
+Note: You should directly start with this step if the block you want to add doesn't require a new file and makes use of an existing file inside `js/blocks`.
+<!-- 
 Note: New blocks are now added to the appropriate file in the `blocks`
 subdirectory. Much of the discussion below is still somewhat relevant
-as background reading.
+as background reading. -->
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is where each block is defined, its palette assigned, its shape and
@@ -141,7 +143,9 @@ label defined, and any default arguments assigned.
 [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 is where the code associated with running each block is defined.
 
-1. Define the type of block
+1. Create a new class inside the file. All demonstrations extend from `BaseBlock`, however blocks can extend each other also.
+
+e.g. `class NamedDoBlock extends FlowBlock{}`
 
 `var uniquenameBlock = new ProtoBlock('uniquename');`
 
