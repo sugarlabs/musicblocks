@@ -478,6 +478,41 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
         * `arg` : Mainly used for blocks like do and calculate.
         * `value`: Used for blocks such as number.
         * `null` : Indicates that it is just a plain block with nothing special.
+      
+      * `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use and empty string.
+
+3. `args` : Defines the number of arguments the block takes.
+
+4. `argTypes` : The type for each argument. Default type is `numberin`.
+
+5. `argLabels` : A list of labels to be applied to arguments.
+
+6. `defaults` : A list of default values for arguments.
+
+e.g. Below definition shows the use of most of the above properties: 
+```
+class MakeBlockBlock extends LeftBlock {
+    constructor() {
+        super('makeblock');
+        this.setPalette('extras');
+
+        this.formBlock({
+            //.TRANS: Create a new block programmatically.
+            name: _('make block'),
+            args: 1,
+	    argTypes: ['anyin'],
+            outType: 'numberout',
+            flows: {
+                type: 'arg',
+		types: ['anyin'],
+		labels: ['']
+            },
+            defaults: [_('note')]
+        });
+    }
+}
+
+```
 
 <!-- ## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 
