@@ -137,28 +137,43 @@ subdirectory. Much of the discussion below is still somewhat relevant
 as background reading. -->
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
-is where each block is defined, its palette assigned, its shape and
-label defined, and any default arguments assigned.
+is the file where setup function related to each block file is called.
 
-[logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
-is where the code associated with running each block is defined.
+<!-- [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
+is where the code associated with running each block is defined. -->
 
 1. Create a new class inside the file. All demonstrations extend from `BaseBlock`, however blocks can extend each other also.
 
-e.g. `class NamedDoBlock extends FlowBlock{}`
+e.g. `class uniqueNameBlock extends AnotherBlock{}`
 
-`var uniquenameBlock = new ProtoBlock('uniquename');`
+* As part of MVC structure the argument earlier passed to `new ProtoBlock()` is now passed to `super` call inside constructor of the defined class.
 
-e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');`
+`super(uniquename);`
 
+<!-- `var uniquenameBlock = new ProtoBlock('uniquename');` -->
+
+<!-- e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');` -->
+<!-- 
 This creates a new instance of the class protoBlock, which is used to
-create instances of the block.
+create instances of the block. -->
 
 2. Assign a palette to the block
 
-`uniquenameBlock.palette = palettes.dict['yourpalettename'];`
+<!-- `uniquenameBlock.palette = palettes.dict['yourpalettename'];` -->
 
-e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];`
+<!-- e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];` -->
+e.g. `this.setPalette('yourPalleteName);`
+
+* Your class definition should look similar to this:
+
+```
+  class NamedDoBlock extends FlowBlock{
+    constructor() {
+      super(nameddo);
+      this.setPalette('action');
+    }
+  }
+```
 
 The palette can be any of the palettes listed in `turtledef.js`. The
 color of the block is defined by the palette used.
