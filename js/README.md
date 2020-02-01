@@ -146,7 +146,7 @@ is where the code associated with running each block is defined. -->
 
 e.g. `class uniqueNameBlock extends AnotherBlock{}`
 
-* As part of MVC structure the argument earlier passed to `new ProtoBlock()` is now passed to `super` call inside constructor of the defined class.
+* As part of MVC structure the argument earlier passed to `new ProtoBlock()` is now passed to `super()` call inside constructor of the defined class.
 
 `super(uniquename);`
 
@@ -174,15 +174,57 @@ e.g. `this.setPalette('yourPalleteName);`
     }
   }
 ```
+Note: After the new update there is no requirement for a `beginnerMode` check as `BaseBlock` automatically performs that check. 
 
 The palette can be any of the palettes listed in `turtledef.js`. The
 color of the block is defined by the palette used.
 
-3. To add block to the protoblock dictionary
+3. Add a call to `new myNewBlock.setup()` in the previously defined `setup` function.
+
+e.g. `function setupActionBlocks() {`
+
+  `new CalcBlock().setup();`
+
+`}`
+
+* For arg blocks, define a function `arg` inside the block class definition. There are 4 arguments currently passed to this function viz. `(logo, turtle, blk, receivedArg)`.
+
+e.g. 
+
+```
+  class CalcBlock extends LeftBlock {
+    constructor() {
+        super('calc');
+        this.setPalette('action');
+    }
+
+    arg(logo, turtle, blk, receivedArg) {
+    }
+}
+```
+
+* For flow bocks define a function `flow` on the block. The same 4 arguments are passed to the flow function currently: `(logo, turtle, blk, receivedArg)`.
+
+e.g 
+```
+class ListenBlock extends FlowBlock {
+    constructor() {
+        super('listen');
+        this.setPalette('action');
+    }
+
+    flow(args, logo, turtle, blk, receivedArg) {
+    }
+}
+```
+
+Note: Trailing arguments can be neglected in both functions, if not needed.
+
+<!-- To add block to the protoblock dictionary
 
 `blocks.protoBlockDict['uniquename'] = uniquenameBlock;`
-
-e.g., `blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;`
+ -->
+<!-- e.g., `blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;` -->
 
 4. Define additional block properties, e.g.,
 
