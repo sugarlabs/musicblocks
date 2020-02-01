@@ -85,10 +85,10 @@ function _createPlayDrumMacros() {
             super(name, _(name || displayName));
             this.setPalette('drum');
             this.formBlock({ args: 1 });
-            this.makeMacro((x, y) => {
+            this.makeMacro((x, y) => [
                 [0, 'playdrum', x, y, [null, 1, null]],
                 [1, [isDrum ? 'drumname' : 'effectsname', {'value': drumName || isDrum ? (displayName || name) : name}], 0, 0, [0]]
-            });
+            ]);
         }
     }
 
