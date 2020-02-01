@@ -100,8 +100,25 @@ Subdirectories with additional utilities
 This section describes how to add new blocks to Music Blocks in order
 to add functionality.
 
-* You can add an individual block to a palette by modifying two files:
-`basicblocks.js` and `logo.js`.
+<!-- * You can add an individual block to a palette by modifying two files:
+`basicblocks.js` and `logo.js`. -->
+* To add a new block you first need to look through `js/blocks/` and determine if a new file is needed or not. If required then go through the section down below on how to declare new files for blocks requiring so.
+
+## How to define new files for blocks
+
+Note: You may skip this section if the block you're trying to add doesn't require a new file.
+
+* Make a new file in `js/blocks` with a meaningful name.
+
+e.g. Current files are named as  `GraphicsBlocks.js` , `MediaBlocks.js`.
+
+* Add that file to `MUSICBLOCKS_EXTRAS` in `js/activity.js`.
+
+* Create a setup function in your new file at the end, with a meaningful name.
+
+e.g. `setupGraphicsBlocks()`.
+
+* Call that setup function in `js/basicblocks.js` inside `initBasicProtoBlocks()` function.
 
 * If the block you are adding needs to expand into a stack of blocks,
 you may also need to modify `macro.js`.
