@@ -453,7 +453,33 @@ More details can be found in the comment at the top of `macros.js`. -->
         ]);
   ```
 
-## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
+  ## Working with formBlock function
+
+  `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that
+  object is as follows:
+
+1. `name` : This specifies the display name on the block. Typically it is of the format  `_('...')`. 
+
+Note: If the `name` is omitted or is set to an empty string, a second argument of `false` should be passed to `formBlock` or else it will resize the block to fit the non-existent text.
+
+2. `flows` :
+
+      * `top` : Defines how top of the block should connect. Values: `true`, `false` or `cap`. `cap` is used for blocks like start, to produce the protruding spike.
+
+      * `bottom` :  Defines how bottom of the block should connect. Values: `true`, `false` or `cap`. `tail` is used for blocks like start, to produce the protruding spike.
+
+      * `left`: Defines how top of the block should connect. It's value is a boolean.
+
+      * `type` : Defines the flow used by the block. 
+      
+        Values:
+
+        * `flow` : Flow blocks are most commonly used one.
+        * `arg` : Mainly used for blocks like do and calculate.
+        * `value`: Used for blocks such as number.
+        * `null` : Indicates that it is just a plain block with nothing special.
+
+<!-- ## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 
 There are two basic types of blocks: *flow* blocks, that connect vertically, and *arg* blocks, that connect horizontally, into *flow* blocks.
 
@@ -505,7 +531,7 @@ display their values on their labels and be used with a
         case 'color':
             turtleObj.doSetColor(value);
             break;
-  ```
+  ``` -->
   
 ### Setting up listeners in clamp blocks
 
