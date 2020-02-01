@@ -514,6 +514,8 @@ class MakeBlockBlock extends LeftBlock {
 
 ```
 
+Note: The call to `formBlock` will attempt further call `adjustWidthToLabel`. This behaviour by passing a false value as the second argument. There is currently no way to define left-hand output as a boolean. Though it can be done by passing a third option of `bool` to `flows.left`
+
 <!-- ## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 
 There are two basic types of blocks: *flow* blocks, that connect vertically, and *arg* blocks, that connect horizontally, into *flow* blocks.
