@@ -782,26 +782,24 @@ function Activity() {
             logo.synth.resume();
 
             /*
-            if (docById('pscDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                logo.pitchStaircase.playUpAndDown();
-            }
-
             // We were using the run button to play a widget, not
             // the turtles.
             if (playingWidget) {
                 return;
             }
-
-            if (docById('tempoDiv').style.visibility === 'visible') {
-                if (logo.tempo.isMoving) {
-                    logo.tempo.pause();
-                }
-
-                logo.tempo.resume();
-            }
             */
 
+            var widgetTitle = document.getElementsByClassName('wftTitle');
+            for (var i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === 'tempo') {
+                    if (logo.tempo.isMoving) {
+                        logo.tempo.pause();
+                    }
+
+                    logo.tempo.resume();
+                    break;
+                }
+            }
         }
 
         if (!turtles.running()) {
@@ -904,9 +902,13 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo._setMasterVolume(0);
 
-            if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
-                if (logo.tempo.isMoving) {
-                    logo.tempo.pause();
+            var widgetTitle = document.getElementsByClassName('wftTitle');
+            for (var i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === 'tempo') {
+                    if (logo.tempo.isMoving) {
+                        logo.tempo.pause();
+                    }
+                    break;
                 }
             }
         }
@@ -1807,26 +1809,24 @@ function Activity() {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            if (docById('BPMInput').classList.contains('hasKeyboard')) {
+            if (docById('BPMInput') !== null && docById('BPMInput').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('musicratio1').classList.contains('hasKeyboard')) {
+            if (docById('musicratio1') !== null && docById('musicratio1').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('musicratio2').classList.contains('hasKeyboard')) {
+            if (docById('musicratio2') !== null && docById('musicratio2').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('dissectNumber').classList.contains('hasKeyboard')) {
+            if (docById('dissectNumber') !== null && docById('dissectNumber').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('timbreName') !== null) {
-                if (docById('timbreName').classList.contains('hasKeyboard')) {
+            if (docById('timbreName') !== null && docById('timbreName').classList.contains('hasKeyboard')) {
                     return;
-                }
             }
         }
 
@@ -1876,7 +1876,14 @@ function Activity() {
             var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
         }
 
-        var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('tempoDiv').style.visibility === 'visible');
+        var widgetTitle = document.getElementsByClassName('wftTitle');
+        var inTempoWidget = false;
+        for (var i = 0; i < widgetTitle.length; i++) {
+            if (widgetTitle[i].innerHTML === 'tempo') {
+                var inTempoWidget = true;
+                break;
+            }
+        }
 
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
@@ -2002,58 +2009,70 @@ function Activity() {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    textMsg('UP ARROW ' + _('Moving block up.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y -= 20;
+                    if (inTempoWidget) {
+                        logo.tempo.speedUp(0);
+                    } else {
+                        textMsg('UP ARROW ' + _('Moving block up.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y -= 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_DOWN:
-                    textMsg('DOWN ARROW ' + _('Moving block down.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(-1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y += 20;
+                    if (inTempoWidget) {
+                        logo.tempo.slowDown(0);
+                    } else {
+                        textMsg('DOWN ARROW ' + _('Moving block down.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(-1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y += 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_LEFT:
-                    textMsg('LEFT ARROW ' + _('Moving block left.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x -= 20;
+                    if (!inTempoWidget) {
+                        textMsg('LEFT ARROW ' + _('Moving block left.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x -= 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_RIGHT:
-                    textMsg('RIGHT ARROW ' + _('Moving block right.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x += 20;
+                    if (!inTempoWidget) {
+                        textMsg('RIGHT ARROW ' + _('Moving block right.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x += 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case HOME:
                     textMsg('HOME ' + _('Jump to home position.'));
@@ -2088,10 +2107,18 @@ function Activity() {
                     }
                     break;
                 case RETURN:
-                    if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
+                    if (docById('search').value.length > 0) {
                         doSearch();
                     } else {
                         textMsg('Return ' + _('Play'));
+                        if (inTempoWidget) {
+                            if (logo.tempo.isMoving) {
+                                logo.tempo.pause();
+                            }
+
+                            logo.tempo.resume();
+                        }
+
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
                         }

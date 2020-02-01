@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+b// Copyright (c) 2016-19 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -84,7 +84,7 @@ function Tempo () {
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this._speedUp = function (i) {
+    this.speedUp = function (i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
@@ -95,7 +95,7 @@ function Tempo () {
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this._slowDown = function (i) {
+    this.slowDown = function (i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
@@ -288,10 +288,10 @@ function Tempo () {
             var r3 = this.bodyTable.insertRow();
 
             widgetWindow.addButton('up.svg', ICONSIZE, _('speed up'), r1.insertCell()).onclick = ((i) => () => {
-                that._speedUp(i);
+                that.speedUp(i);
             })(i);
             widgetWindow.addButton('down.svg', ICONSIZE, _('slow down'), r2.insertCell()).onclick = ((i) => () => {
-                that._slowDown(i);
+                that.slowDown(i);
             })(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
