@@ -31,6 +31,7 @@ class TemperamentNameBlock extends ValueBlock {
     constructor() {
         super('temperamentname');
         this.setPalette('tone');
+        this.extraWidth = 50;
         this.hidden = true;
         this.formBlock({ outType: 'anyout' });
     }
