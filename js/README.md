@@ -330,7 +330,26 @@ To add a macro:
 
 1. Write definition using `this.makeMacro((x, y) => [....])`
 
-2. add an entry in `BLOCKISMACRO` array `macros.js` in the `blockIsMacro`
+e.g. 
+```
+class StartDrumBlock extends StartBlock {
+    constructor() {
+        super();
+        this.changeName('startdrum');
+
+        this.formBlock({ name: _('start drum') });
+
+        this.makeMacro((x, y) => [
+            [0, 'start', x, y, [null, 1, null]],
+            [1, 'setdrum', 0, 0,[0, 2, null, 3]],
+            [2, ['drumname', {'value': 'kick drum'}], 0, 0, [1]],
+            [3, 'hidden', 0, 0, [1, null]]
+        ])
+    }
+}
+```
+
+<!-- 2. add an entry in `BLOCKISMACRO` array `macros.js` in the `blockIsMacro`
 function below with the block name from `basicblocks.js`;
 
 3. define the macro (the JSON representation of the blocks that
@@ -338,7 +357,7 @@ the macro expands to, where the position is specified as x, y); and
 
 4. add an entry to the `BUILTINMACROS` dictionary.
 
-More details can be found in the comment at the top of `macros.js`.
+More details can be found in the comment at the top of `macros.js`. -->
 
 ## Examples
 
