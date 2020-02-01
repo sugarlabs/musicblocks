@@ -1,6 +1,18 @@
+// Copyright (c) 2018 Riya Lohia
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+
 function TemperamentWidget () {
 
-	const BUTTONDIVWIDTH = 430;
+    const BUTTONDIVWIDTH = 430;
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
@@ -54,9 +66,6 @@ function TemperamentWidget () {
         temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
         var temperamentTable = docById('temperamentTable');
         temperamentTable.style.position = 'relative';
-				//temperamentTable.style.top = '100px';
-				//temperamentTable.style.left = '100px';
-				//temperamentTable.style.right = '100px';
 
         var radius = 150;
         var height = (2*radius) + 60;
@@ -66,7 +75,7 @@ function TemperamentWidget () {
         html += '<div id ="information"></div>';
 
         temperamentTable.innerHTML = html;
-        temperamentTable.style.width = temperamentDiv.width;
+        temperamentTable.style.width = '300px';
 
         var canvas = docById('circ');
         canvas.style.position = 'absolute';
@@ -290,7 +299,7 @@ function TemperamentWidget () {
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
                 docById('noteInfo').style.top = '130px';
-		docById('noteInfo').style.left = '132px';
+                docById('noteInfo').style.left = '132px';
                 docById('noteInfo').style.position = 'absolute';
                 docById('noteInfo').style.zIndex = 10;
                 docById('close').onclick = function() {
@@ -360,7 +369,7 @@ function TemperamentWidget () {
             this.notesCircle.removeWheel();
         }
 
-				temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>'
+                                temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>'
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
@@ -1116,7 +1125,7 @@ function TemperamentWidget () {
                 docById('noteInfo1').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
                 docById('noteInfo1').style.top = '100px';
-		docById('noteInfo1').style.left = '90px';
+                docById('noteInfo1').style.left = '90px';
 
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
@@ -1357,7 +1366,7 @@ function TemperamentWidget () {
         var octave = this._logo.synth.startingPitch.slice(-1);
         var newStack1 = [[0,'settemperament', 100, 100, [null, 1, 2, 3, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['notename', {'value': note}], 0, 0, [0]], [3, ['number', {'value': octave}], 0, 0, [0]]];
         this._logo.blocks.loadNewBlocks(newStack1);
-	this._logo.textMsg(_('New action block generated!'));
+        this._logo.textMsg(_('New action block generated!'));
 
         if (this.inTemperament === 'custom') {
             TEMPERAMENT['custom'] = [];
@@ -1551,35 +1560,25 @@ function TemperamentWidget () {
     };
 
     this.init = function(logo) {
-	this._logo = logo;
+        this._logo = logo;
 
-	var w = window.innerWidth;
-	this._cellScale = w / 1200;
-	var iconSize = ICONSIZE * this._cellScale;
+        var w = window.innerWidth;
+        this._cellScale = w / 1200;
+        var iconSize = ICONSIZE * this._cellScale;
 
+        var widgetWindow = window.widgetWindows.windowFor(this, "temperament");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
-	var widgetWindow = window.widgetWindows.windowFor(this, "temperament");
-	this.widgetWindow = widgetWindow;
-	widgetWindow.clear();
-
-	var temperamentDiv = docById("temperamentDiv");
-        // var temperamentDiv = document.createElement("div");
-	temperamentDiv.style.visibility = "visible";
-	temperamentDiv.style.left = '200px';
-	temperamentDiv.style.top = '150px';
-
-	widgetWindow.getWidgetBody().append(temperamentTableDiv);
-	widgetWindow.getWidgetBody().style.height = "500px";
-	widgetWindow.getWidgetBody().style.width = "500px";
+        widgetWindow.getWidgetBody().append(temperamentTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "500px";
 
         var that = this;
 
         widgetWindow.onclose=function() {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
-            docById('temperamentDiv').style.visibility = 'hidden';
-            // docById('temperamentButtonsDiv').style.visibility = 'hidden';
-            // docById('temperamentTableDiv').style.visibility = 'hidden';
             if (docById('wheelDiv2') != null) {
                 docById('wheelDiv2').style.display = 'none';
                 that.notesCircle.removeWheel();
@@ -1593,17 +1592,17 @@ function TemperamentWidget () {
                 that.wheel1.removeWheel();
             }
 
-	    this.destroy();
+            this.destroy();
         };
 
         this._playing = false;
 
-	var buttonTable = document.createElement("table");
-	var header = buttonTable.createTHead();
-	var row = header.insertRow(0);
-	row.id = 'buttonsRow';
+        var buttonTable = document.createElement("table");
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
+        row.id = 'buttonsRow';
 
-	temperamentCell = row.insertCell();
+        temperamentCell = row.insertCell();
         temperamentCell.innerHTML = this.inTemperament;
         temperamentCell.style.width = (2 * BUTTONSIZE) + 'px';
         temperamentCell.style.minWidth = temperamentCell.style.width;
@@ -1614,7 +1613,7 @@ function TemperamentWidget () {
         temperamentCell.style.textAlign = 'center';
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
-				this.playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play all'));
+                                this.playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play all'));
         this.playButton.onclick = function() {
             that.playAll();
         };
@@ -1624,7 +1623,7 @@ function TemperamentWidget () {
         };
 
 
-	var noteCell = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Table'));
+        var noteCell = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Table'));
 
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
@@ -1709,27 +1708,6 @@ function TemperamentWidget () {
             that.edit();
         };
 
-        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        // cell.onclick = function () {
-        //     that._logo.synth.setMasterVolume(0);
-        //     that._logo.synth.stop();
-        //     docById('temperamentDiv').style.visibility = 'hidden';
-        //     docById('temperamentButtonsDiv').style.visibility = 'hidden';
-        //     docById('temperamentTableDiv').style.visibility = 'hidden';
-        //     if (docById('wheelDiv2') != null) {
-        //         docById('wheelDiv2').style.display = 'none';
-        //         that.notesCircle.removeWheel();
-        //     }
-        //     if (docById('wheelDiv3') != null) {
-        //         docById('wheelDiv3').style.display = 'none';
-        //         that.wheel.removeWheel();
-        //     }
-        //     if (docById('wheelDiv4') != null) {
-        //         docById('wheelDiv4').style.display = 'none';
-        //         that.wheel1.removeWheel();
-        //     }
-        // };
-
-	    widgetWindow.sendToCenter()
-	};
+        widgetWindow.sendToCenter()
+    };
 };
