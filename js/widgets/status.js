@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -19,6 +19,7 @@ function StatusMatrix() {
     const ICONSIZE = 32;
     const OUTERWINDOWWIDTH = 620;
     const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
+    const FONTSCALEFACTOR = 75;
     var x, y;  //Drop coordinates of statusDiv
 
     this.init = function(logo) {
@@ -48,8 +49,10 @@ function StatusMatrix() {
             this.destroy();
         }
 
-        // Each row in the status table contains a note label in the
-        // first column and a table of buttons in the second column.
+        // Each row in the status table contains a field label in the
+        // first column and a table of values (one per mouse) in the
+        // remaining columns.
+        // The first row contains the mice icons.
         var header = this._statusTable.createTHead();
         var row = header.insertRow();
 
@@ -62,10 +65,37 @@ function StatusMatrix() {
         cell.style.width = (BUTTONSIZE * this._cellScale) + 'px';
         cell.innerHTML = '&nbsp;';
 
-        // One column per field
+        // One column per mouse/turtle
+        var activeTurtles = 0;
+        for (var turtle = 0; turtle < this._logo.turtles.turtleList.length; turtle++) {
+            if (this._logo.turtles.turtleList[turtle].trash) {
+                continue;
+            }
+
+            var cell = row.insertCell();
+            cell.style.backgroundColor = platformColor.labelColor;
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
+            } else {
+                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
+            }
+
+            cell.style.width = (BUTTONSIZE * this._cellScale) + 'px';
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+            cell.className = 'headcol';
+
+            activeTurtles += 1;
+        }
+
+        console.debug('active turtles: ' + activeTurtles);
+
+        // One row per field, one column per mouse (plus the labels)
         for (var i = 0; i < this._logo.statusFields.length; i++) {
-            var cell = row.insertCell(i + 1);
-            cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
+            var row = header.insertRow();
+
+            var cell = row.insertCell(); // i + 1);
+            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + '%';
 
             console.debug(this._logo.statusFields[i][1]);
 
@@ -102,57 +132,33 @@ function StatusMatrix() {
             cell.innerHTML = '<b>' + label + '</b>'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = platformColor.selectorBackground;
+
+            for (var j = 0; j < activeTurtles; j++) {
+                var cell = row.insertCell();
+                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + '%';
+                cell.innerHTML = '';
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.textAlign = 'center';
+            }
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
+            var row = header.insertRow();
             var cell = row.insertCell();
-            cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
+            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + '%';
             cell.innerHTML = '<b>' + _('note') + '</b>'
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
             cell.style.backgroundColor = platformColor.selectorBackground;
-        }
 
-        // One row per voice (turtle)
-        var activeTurtles = 0;
-        for (var turtle = 0; turtle < this._logo.turtles.turtleList.length; turtle++) {
-            if (this._logo.turtles.turtleList[turtle].trash) {
-                continue;
+            for (var i = 0; i < activeTurtles; i++) {
+                var cell = row.insertCell();
+                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + '%';
+                cell.innerHTML = '';
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
+                cell.style.textAlign = 'center';
             }
-
-            var row = header.insertRow();
-            var cell = row.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-            } else {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' + this._logo.turtles.turtleList[turtle].name + '" alt="' + this._logo.turtles.turtleList[turtle].name + '" height="' + iconSize + '" width="' + iconSize + '">&nbsp;&nbsp;';
-            }
-
-            cell.style.width = (BUTTONSIZE * this._cellScale) + 'px';
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-            cell.className = 'headcol';
-
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                // + 1 is for the note column
-                for (var i = 0; i < this._logo.statusFields.length + 1; i++) {
-                    var cell = row.insertCell();
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                    cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
-                    cell.innerHTML = '';
-                    cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                }
-            } else {
-                for (var i = 0; i < this._logo.statusFields.length; i++) {
-                    var cell = row.insertCell();
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                    cell.style.fontSize = Math.floor(this._cellScale * 100) + '%';
-                    cell.innerHTML = '';
-                    cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
-                }
-            }
-
-            activeTurtles += 1;
         }
 
         widgetWindow.sendToCenter();
@@ -230,7 +236,7 @@ function StatusMatrix() {
 
                 this._logo.inStatusMatrix = saveStatus;
 
-                var cell = this._statusTable.rows[activeTurtles + 1].cells[i + 1];
+                var cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = innerHTML;
                 }
@@ -256,7 +262,7 @@ function StatusMatrix() {
                     note += obj[1] + '/' + obj[0];
                 }
 
-                var cell = this._statusTable.rows[activeTurtles + 1].cells[i + 1];
+                var cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = note.replace(/#/g, '♯').replace(/b/g, '♭');
                 }
@@ -266,27 +272,5 @@ function StatusMatrix() {
         }
 
         this._logo.updatingStatusMatrix = false;
-    };
-
-    this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover=function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
-
-        cell.onmouseout=function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        }
-
-        return cell;
     };
 };
