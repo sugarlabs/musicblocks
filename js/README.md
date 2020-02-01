@@ -364,33 +364,59 @@ More details can be found in the comment at the top of `macros.js`. -->
 ### A flow block:
 
   ```
-    var pitch = new ProtoBlock('pitch');
-    pitch.palette = palettes.dict['pitch'];
-    blocks.protoBlockDict['pitch'] = pitch;
-    //.TRANS: we specify pitch in terms of a name and an octave.
-    //.TRANS: The name can be CDEFGAB or Do Re Mi Fa Sol La Ti.
-    //.TRANS: Octave is a number between 1 and 8.
-    pitch.staticLabels.push(_('pitch'), _('name'), _('octave'));
-    pitch.adjustWidthToLabel();
-    pitch.defaults.push('sol');
-    pitch.defaults.push(4);
-    pitch.twoArgBlock();
-    pitch.dockTypes[1] = 'solfegein';
-    pitch.dockTypes[2] = 'anyin';
+    class DispatchBlock extends FlowBlock {
+    constructor() {
+        super('dispatch');
+        this.setPalette('action');
+
+        //.TRANS: dispatch an event to trigger a listener
+        this.formBlock({
+            name: _('broadcast'),
+            args: 1,
+            defaults: [_('event')],
+            argTypes: ['textin'],
+        });
+    }
+
+    flow(args, logo) {
+        // Dispatch an event.
+        if (args.length !== 1) return;
+
+        // If the event is not in the event list, add it.
+        if (!(args[0] in logo.eventList)) {
+            var event = new Event(args[0]);
+            logo.eventList[args[0]] = event;
+        }
+        logo.stage.dispatchEvent(args[0]);
+    }
+}
   ```
 
 ### An arg block:
 
   ```
-    var colorBlock = new ProtoBlock('color');
-    colorBlock.palette = palettes.dict['pen'];
-    blocks.protoBlockDict['color'] = colorBlock;
-    colorBlock.staticLabels.push(_('color'));
-    colorBlock.adjustWidthToLabel();
-    colorBlock.parameterBlock();
+    class XBlock extends ValueBlock {
+    constructor() {
+        //.TRANS: x coordinate
+        super('x');
+        this.setPalette('graphics');
+
+        this.formBlock({
+            name: this.lang === 'ja' ? _('x3') : _('x')
+        });
+    }
+
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'x']);
+        } else {
+            return logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
+        }
+    }
+}
   ```
 
-* A macro as seen in `basicblocks.js`:
+<!-- * A macro as seen in `basicblocks.js`:
 
   ```
     var newnoteBlock = new ProtoBlock('newnote');
@@ -413,7 +439,18 @@ More details can be found in the comment at the top of `macros.js`. -->
                         [5, 'pitch', 0, 0, [4, 6, 7, null]],
                         [6, ['solfege', {'value': 'sol'}], 0, 0, [5]],
                         [7, ['number', {'value': 4}], 0, 0, [5]],
-                        [8, 'hidden', 0, 0, [0, null]]];
+                        [8, 'hidden', 0, 0, [0, null]]]; -->
+  <!-- ``` -->
+
+* A macro definiton: 
+
+  ```
+    this.makeMacro((x, y) => [
+            [0, 'settemperament', x, y, [null, 1, 2, 3, null]],
+            [1, ['temperamentname', {'value': 'equal'}], 0, 0, [0]],
+            [2, ['notename', {'value': 'C'}], 0, 0, [0]],
+            [3, ['number', {'value': 4}], 0, 0, [0]]
+        ]);
   ```
 
 ## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
