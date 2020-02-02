@@ -145,13 +145,17 @@ is the file where setup function related to each block file is called.
 <!-- [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
 is where the code associated with running each block is defined. -->
 
-1. Create a new class inside the file. All demonstrations extend from `BaseBlock`, however blocks can extend each other also.
+1. Create a new class inside the file. Block classes can also extend each other.
+Your class definition and `super()` call should follow following syntax.
 
-e.g. `class uniqueNameBlock extends AnotherBlock{}`
-
-* As part of MVC structure the argument earlier passed to `new ProtoBlock()` is now passed to `super()` call inside constructor of the defined class.
-
-`super(uniquename);`
+e.g. 
+``` 
+    class UniqueNameBlock extends SomeBlockClass{ // one block extending another
+      constructor() {
+        super(uniquename);
+      }
+    }
+```
 
 <!-- `var uniquenameBlock = new ProtoBlock('uniquename');` -->
 
@@ -160,23 +164,23 @@ e.g. `class uniqueNameBlock extends AnotherBlock{}`
 This creates a new instance of the class protoBlock, which is used to
 create instances of the block. -->
 
-2. Assign a palette to the block
+2. Assign a palette to the block.
 
 <!-- `uniquenameBlock.palette = palettes.dict['yourpalettename'];` -->
 
 <!-- e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];` -->
-e.g. `this.setPalette('yourPalleteName);`
+e.g. `this.setPalette('yourPaletteName);`
 
-* Your class definition should look similar to this:
+* At this point your class definition should look similar to this:
 
 ```
-  class NamedDoBlock extends FlowBlock{
+  class UniqueNameBlock extends SomeBlockClass{
     constructor() {
-      super(nameddo);
-      this.setPalette('action');
+      super(uniquename);
+      this.setPalette('paletteName');
     }
   }
-```
+``` 
 Note: After the new update there is no requirement for a `beginnerMode` check as `BaseBlock` automatically performs that check. 
 
 The palette can be any of the palettes listed in `turtledef.js`. The
@@ -184,21 +188,24 @@ color of the block is defined by the palette used.
 
 3. Add a call to `new myNewBlock.setup()` in the previously defined `setup` function.
 
-e.g. `function setupActionBlocks() {`
+e.g.
+```
+function setupUniqueBlocks() {`
 
-  `new CalcBlock().setup();`
+  new UniqueNameBlock().setup();
 
-`}`
+}
+```
 
 * For arg blocks, define a function `arg` inside the block class definition. There are 4 arguments currently passed to this function viz. `(logo, turtle, blk, receivedArg)`.
 
 e.g. 
 
 ```
-  class CalcBlock extends LeftBlock {
+ class UniqueNameBlock extends SomeBlockClass{
     constructor() {
-        super('calc');
-        this.setPalette('action');
+      super(uniquename);
+      this.setPalette('paletteName');
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -210,10 +217,10 @@ e.g.
 
 e.g 
 ```
-class ListenBlock extends FlowBlock {
+class UniqueNameBlock extends SomeBlockClass{
     constructor() {
-        super('listen');
-        this.setPalette('action');
+      super(uniquename);
+      this.setPalette('paletteName');
     }
 
     flow(args, logo, turtle, blk, receivedArg) {
@@ -231,25 +238,22 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
 
 4. Write the logic for the block in either of the two functions, `arg()` or `flow()`.
 
-Note: Change of syntax after MVC structure:
-
 * `that.` used while writing logic in `logo.js` is to be replaced with `logo.`
 * For arg blocks calls to `that.blocks.blockList[blk].value = ` are to be replace with a `return` statement.
-* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if they are unchanged. 
 
-So changes to these variabled should be checked and return keyword should be used.
+* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if if there is no child flow. (A child flow is, for example, the internal flow of a clamp, e.g. what is repeated in a repeat block.
+
+So changes to these variables should be checked and return keyword should be used.
 
 e.g. 
 ```
-class StartBlock extends StackClampBlock {
+class UniqueNameBlock extends SomeBlockClass{
     constructor() {
-        super('start');
-        this.setPalette('action');
-        
-        this.formBlock({ name: _('start'), canCollapse: true });
+      super(uniquename);
+      this.setPalette('paletteName');
     }
 
-    flow(args) {
+    flow(args) {  // Trailing arguments neglected
         if (args.length === 1)
             return [args[0], 1];
     }
