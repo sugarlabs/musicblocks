@@ -102,11 +102,14 @@ to add functionality.
 
 <!-- * You can add an individual block to a palette by modifying two files:
 `basicblocks.js` and `logo.js`. -->
-* To add a new block you first need to look through `js/blocks/` and determine if a new file is needed or not. If required then go through the section down below on how to declare new files for blocks requiring so.
 
-## How to define new files for blocks
+Note: All block related code is located inside `js/blocks`
 
-Note: You may skip this section if the block you're trying to add doesn't require a new file.
+* To add a new block you first need to go through `js/blocks` and determine if a new file is needed or not. A new file is needed if you want to add a new palette. Otherwise, you can modify the file associated with the palette to add a new block to it.
+
+## How to define new files (if required) for blocks
+
+Note: You may skip this section if the block you are adding doesn't require a new palette.
 
 * Make a new file in `js/blocks` with a meaningful name.
 
@@ -453,7 +456,7 @@ More details can be found in the comment at the top of `macros.js`. -->
         ]);
   ```
 
-  ## Working with formBlock function
+## Working with formBlock function
 
   `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that
   object is as follows:
