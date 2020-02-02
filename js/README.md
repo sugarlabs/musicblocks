@@ -133,7 +133,7 @@ instead. -->
 
 ## How to define a new block
 
-Note: You should directly start with this step if the block you want to add doesn't require a new file and makes use of an existing file inside `js/blocks`.
+Note: You should directly start with this step if you want to add your block to an existing palette. Start with searching the file inside `js/blocks` associated with the palette you want to add your new block to.  
 <!-- 
 Note: New blocks are now added to the appropriate file in the `blocks`
 subdirectory. Much of the discussion below is still somewhat relevant
