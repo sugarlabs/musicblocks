@@ -100,9 +100,6 @@ Subdirectories with additional utilities
 This section describes how to add new blocks to Music Blocks in order
 to add functionality.
 
-<!-- * You can add an individual block to a palette by modifying two files:
-`basicblocks.js` and `logo.js`. -->
-
 Note: All block related code is located inside `js/blocks`
 
 * To add a new block you first need to determine if you want to create a new palette or add it to an existing palette. 
@@ -130,29 +127,14 @@ e.g. `setupGraphicsBlocks()`.
 
 After the above steps are complete, move to [defining a new block](#how-to-define-a-new-block)
 
-<!-- * If the block you are adding needs to expand into a stack of blocks,
-you may also need to modify `macro.js`. -->
-
-<!-- * If you want to add a new palette with multiple blocks for a specific
-application, you may want to write a plugin. Please see:
-[plugin](http://github.com/sugarlabs/musicblocks/tree/master/plugins)
-instead. -->
-
 ## How to define a new block
 
 Note: You should directly start with this step if you want to add your block to an existing palette. 
 
 * Start with searching the file inside `js/blocks` associated with the palette you want to add your new block to.  
-<!-- 
-Note: New blocks are now added to the appropriate file in the `blocks`
-subdirectory. Much of the discussion below is still somewhat relevant
-as background reading. -->
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is the file where setup function related to each block file is called.
-
-<!-- [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
-is where the code associated with running each block is defined. -->
 
 1. Create a new class inside the file. Block classes can also extend each other.
 Your class definition and `super()` call should follow following syntax.
@@ -166,18 +148,8 @@ e.g.
     }
 ```
 
-<!-- `var uniquenameBlock = new ProtoBlock('uniquename');` -->
-
-<!-- e.g., `var pitchNumberBlock = new ProtoBlock('pitchnumber');` -->
-<!-- 
-This creates a new instance of the class protoBlock, which is used to
-create instances of the block. -->
-
 2. Assign a palette to the block.
 
-<!-- `uniquenameBlock.palette = palettes.dict['yourpalettename'];` -->
-
-<!-- e.g., `pitchNumberBlock.palette = palettes.dict['pitch'];` -->
 e.g. `this.setPalette('yourPaletteName);`
 
 * At this point your class definition should look similar to this:
@@ -239,12 +211,6 @@ class UniqueNameBlock extends SomeBlockClass{
 
 Note: Trailing arguments can be neglected in both functions, if not needed.
 
-<!-- To add block to the protoblock dictionary
-
-`blocks.protoBlockDict['uniquename'] = uniquenameBlock;`
- -->
-<!-- e.g., `blocks.protoBlockDict['pitchnumber'] = pitchNumberBlock;` -->
-
 4. Write the logic for the block in either of the two functions, `arg()` or `flow()`.
 
 * For arg blocks value is set by using a `return` statement.
@@ -292,69 +258,6 @@ class UniqueNameBlock extends SomeBlockClass{
 }
 ```
 
-<!-- Define additional block properties, e.g.,
-
-* Define the block prototype
-
-  `uniquenameBlock.oneArgBlock();`
-
-e.g., `pitchNumberBlock.oneArgBlock();`
-
-* Add a label to the block
-
-  `uniquenameBlock.staticLabels.push(_('label'));`
-
-e.g., `pitchNumberBlock.staticLabels.push(_('pitch number'));`
-  
-  * Adding more labels:
-  
-  `uniquenameBlock.staticLabels.push(_('label'), _('label'));`
-
-Note that we use the _ function for marking strings for
-translation. You may also want to provide a translation note to
-explain to the translators what the label refers to, e.g.,
-`//.TRANS: a mapping of pitch to the 88 piano keys`
-
-The translation note should appear in the line above the string it
-references.
-
-* Add any default arguments
-
-  Number: `uniquenameBlock.defaults.push(100);`
-  
-e.g., `pitchNumberBlock.defaults.push(7);`
-
-  Text: `uniquenameBlock.defaults.push(_('label'));`
-
-Note: if you want to add a fraction as an argument, e.g.,
-`uniquenameBlock.defaults.push(1 / 4);`, you will need to define a
-macro in `macro.js`:
-
-  ```
-    const UNIQUENAMEBLOCKOBJ = [
-        [0, 'uniquenameblock', x, y, [null, 1, 4]],
-        [1, 'divide', 0, 0, [0, 2, 3]],
-        [2, ['number', {'value': 1}], 0, 0, [1]],
-        [3, ['number', {'value': 4}], 0, 0, [1]],
-        [4, 'vspace', 0, 0, [0, null]]
-    ];
-  ```
-
-The format of a macro is the same as the format of saved projects: a list of blocks, which each block is defined by a list: [block number, block name, block x position, block y position, [list of block connections]]. Block name can also be a list, where the name of the block is the first item in the list and any special block data, e.g., a value in the case of a number block, is stored in a dictionary, e.g., [block name, {value: 123}]
-
-* Override the default docktype if necessary
-
-  Any input: `uniquenameBlock.dockTypes[1] = 'anyin'`;
-  
-  Text Input: `uniquenameBlock.dockTypes[1] = 'textin'`;
-  
-  Number Input: `uniquenameBlock.dockTypes[1] = 'numberin'`;
-
-e.g., `pitchNumberBlock.dockTypes[1] = 'numberin';`
-
-Check
-[protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js) for additional block properties. -->
-
 ## Macro expansions
 
 In some cases, you may want a block on the palette to expand into a stack
@@ -384,16 +287,6 @@ class StartDrumBlock extends StartBlock {
     }
 }
 ```
-
-<!-- 2. add an entry in `BLOCKISMACRO` array `macros.js` in the `blockIsMacro`
-function below with the block name from `basicblocks.js`;
-
-3. define the macro (the JSON representation of the blocks that
-the macro expands to, where the position is specified as x, y); and
-
-4. add an entry to the `BUILTINMACROS` dictionary.
-
-More details can be found in the comment at the top of `macros.js`. -->
 
 ## Examples
 
@@ -452,33 +345,7 @@ More details can be found in the comment at the top of `macros.js`. -->
 }
   ```
 
-<!-- * A macro as seen in `basicblocks.js`:
-
-  ```
-    var newnoteBlock = new ProtoBlock('newnote');
-    newnoteBlock.palette = palettes.dict['rhythm'];
-    blocks.protoBlockDict['newnote'] = newnoteBlock;
-    newnoteBlock.staticLabels.push(_('note value'));
-    newnoteBlock.adjustWidthToLabel();
-    newnoteBlock.flowClampOneArgBlock();
-    newnoteBlock.defaults.push(1 / 4);
-  ```
-
-* And it definition in `macros.js`:
-
-  ```
-    const NEWNOTEOBJ = [[0, 'newnote', x, y, [null, 1, 4, 8]],
-                        [1, 'divide', 0, 0, [0, 2, 3]],
-                        [2, ['number', {'value': 1}], 0, 0, [1]],
-                        [3, ['number', {'value': 4}], 0, 0, [1]],
-                        [4, 'vspace', 0, 0, [0, 5]],
-                        [5, 'pitch', 0, 0, [4, 6, 7, null]],
-                        [6, ['solfege', {'value': 'sol'}], 0, 0, [5]],
-                        [7, ['number', {'value': 4}], 0, 0, [5]],
-                        [8, 'hidden', 0, 0, [0, null]]]; -->
-  <!-- ``` -->
-
-* A macro definiton: 
+### A macro definiton: 
 
   ```
     this.makeMacro((x, y) => [
@@ -551,60 +418,6 @@ class MakeBlockBlock extends LeftBlock {
 ```
 
 Note: The call to `formBlock` will attempt further call `adjustWidthToLabel`. This behaviour by passing a false value as the second argument. There is currently no way to define left-hand output as a boolean. Though it can be done by passing a third option of `bool` to `flows.left`
-
-<!-- ## How to define block function in [logo.js](https://github.com/sugarlabs/musicblocks/blob/master/js/logo.js)
-
-There are two basic types of blocks: *flow* blocks, that connect vertically, and *arg* blocks, that connect horizontally, into *flow* blocks.
-
-There are switch statements in `logo.js` where the function of *flow* blocks and *arg* blocks are defined. 
-
-  ```
-        case 'uniquename':
-
-            Your code here...
-
-            break;
-  ```
-
-## Examples
-
-### A *flow* block:
-
-  ```
-        case 'setturtlename2':
-            if (args[0] != null) {
-                that.turtles.turtleList[turtle].rename(args[0]);
-            }
-            break;
-  ```
-
-### An *arg* block:
-
-  ```
-            case 'random':
-                var cblk1 = that.blocks.blockList[blk].connections[1];
-                var cblk2 = that.blocks.blockList[blk].connections[2];
-                var a = that.parseArg(that, turtle, cblk1, blk, receivedArg);
-                var b = that.parseArg(that, turtle, cblk2, blk, receivedArg);
-                that.blocks.blockList[blk].value = that._doRandom(a, b);
-                break;
-  ```
-
-There are some special *arg* blocks call *parameter* blocks, which can
-display their values on their labels and be used with a
-*setter*. There are additional switch statements for parameter blocks:
-
-  ```
-            case 'color':
-                value = toFixed2(this.turtles.turtleList[turtle].color);
-                break;
-  ```
-
-  ```
-        case 'color':
-            turtleObj.doSetColor(value);
-            break;
-  ``` -->
   
 ### Setting up listeners in clamp blocks
 
