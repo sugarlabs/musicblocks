@@ -592,6 +592,7 @@ class MoveableBlock extends FlowBlock {
     constructor() {
         super('movable', _('moveable Do'));  // legacy typo
         this.setPalette('intervals');
+	this.size = 0;
         this.formBlock({
             args: 1, argTypes: ['booleanin']
         });

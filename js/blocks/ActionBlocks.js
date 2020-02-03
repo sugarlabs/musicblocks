@@ -544,6 +544,7 @@ class ActionBlock extends StackClampBlock {
         this.setPalette('action');
 
         this.formBlock({
+	    canCollapse: true,
             name: _('action'),
             args: 1,
             argLabels: [''],

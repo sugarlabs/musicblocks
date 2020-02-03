@@ -1779,7 +1779,6 @@ function Blocks (activity) {
         if ((myBlock.isArgBlock() || ['calcArg', 'namedcalcArg', 'makeblock'].indexOf(myBlock.name) !== -1) && newBlock != null) {
             // We care about twoarg blocks with connections to the
             // first arg;
-            // console.debug(newBlock + ' ' + this.blockList[newBlock].name);
             if (this.blockList[newBlock].isTwoArgBlock()) {
                 if (this.blockList[newBlock].connections[1] === thisBlock) {
                     if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
@@ -4431,16 +4430,21 @@ function Blocks (activity) {
                 y = 0;
             }
 
+	    console.log(myBlock.name + ' ' + myBlock.isValueBlock());
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
                 case 'media':
                     blockItem = [b, [myBlock.name, null], x, y, []];
                     break;
+		case 'namedbox':
+		case 'namedarg':
+                    blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
+		    break;
                 default:
                     blockItem = [b, [myBlock.name, {'value': myBlock.value}], x, y, []];
                     break;
                 }
-            } else if (['storein2', 'namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
+            } else if (['storein2', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(myBlock.name) !== -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];
