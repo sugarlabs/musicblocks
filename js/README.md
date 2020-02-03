@@ -105,9 +105,14 @@ to add functionality.
 
 Note: All block related code is located inside `js/blocks`
 
-* To add a new block you first need to go through `js/blocks` and determine if a new file is needed or not. A new file is needed if you want to add a new palette. Otherwise, you can modify the file associated with the palette to add a new block to it.
+* To add a new block you first need to determine if you want to create a new palette or add it to an existing palette. 
 
-## How to define new files (if required) for blocks
+    * If you want a new palette, you need to declare a new file corresponding to that palette inside `js/blocks`. Steps for the same are defined [here](#how-to-define-a-new-palette-for-adding-blocks).
+
+    * If you want to add the block to an existing palette, skip the following section and jump right to [How to define a new block](#how-to-define-a-new-block).
+
+
+## How to define a new palette for adding blocks
 
 Note: You may skip this section if the block you are adding doesn't require a new palette.
 
@@ -117,11 +122,13 @@ e.g. Current files are named as  `GraphicsBlocks.js` , `MediaBlocks.js`.
 
 * Add that file to `MUSICBLOCKS_EXTRAS` in `js/activity.js`.
 
-* Create a setup function in your new file at the end, with a meaningful name.
+* Create a `setup` function in your new file at the end, with a meaningful name.
 
 e.g. `setupGraphicsBlocks()`.
 
 * Call that setup function in `js/basicblocks.js` inside `initBasicProtoBlocks()` function.
+
+After the above steps are complete, move to [defining a new block](#how-to-define-a-new-block)
 
 <!-- * If the block you are adding needs to expand into a stack of blocks,
 you may also need to modify `macro.js`. -->
@@ -133,7 +140,9 @@ instead. -->
 
 ## How to define a new block
 
-Note: You should directly start with this step if you want to add your block to an existing palette. Start with searching the file inside `js/blocks` associated with the palette you want to add your new block to.  
+Note: You should directly start with this step if you want to add your block to an existing palette. 
+
+* Start with searching the file inside `js/blocks` associated with the palette you want to add your new block to.  
 <!-- 
 Note: New blocks are now added to the appropriate file in the `blocks`
 subdirectory. Much of the discussion below is still somewhat relevant
@@ -181,10 +190,10 @@ e.g. `this.setPalette('yourPaletteName);`
     }
   }
 ``` 
-Note: After the new update there is no requirement for a `beginnerMode` check as `BaseBlock` automatically performs that check. 
+Note: After the new update there is no requirement for a `beginnerMode` check as setup() defined in `BaseBlock` automatically performs that check.  
 
-The palette can be any of the palettes listed in `turtledef.js`. The
-color of the block is defined by the palette used.
+* The palette can be any of the palettes listed in `turtledef.js`. 
+* The color of the block is defined by the palette used.
 
 3. Add a call to `new myNewBlock.setup()` in the previously defined `setup` function.
 
@@ -238,14 +247,37 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
 
 4. Write the logic for the block in either of the two functions, `arg()` or `flow()`.
 
-* `that.` used while writing logic in `logo.js` is to be replaced with `logo.`
-* For arg blocks calls to `that.blocks.blockList[blk].value = ` are to be replace with a `return` statement.
+* For arg blocks value is set by using a `return` statement.
 
-* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if if there is no child flow. (A child flow is, for example, the internal flow of a clamp, e.g. what is repeated in a repeat block.
+* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if if there is no child flow. (A child flow is, for example, the internal flow of a clamp, e.g. what is repeated in a repeat block.)
 
-So changes to these variables should be checked and return keyword should be used.
+So changes to these variables should be checked and `return` keyword should be used.
 
 e.g. 
+
+* An arg block:
+
+```
+  class TranspositionFactorBlock extends ValueBlock {
+    constructor() {
+        //.TRANS: musical transposition (adjustment of pitch up or down)
+        super('transpositionfactor', _('transposition'));
+        this.setPalette('pitch');
+        this.hidden = true;
+    }
+
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'transposition']);
+        } else {
+            return logo.transposition[turtle];
+        }
+    }
+}
+```
+
+* A flow block:
+
 ```
 class UniqueNameBlock extends SomeBlockClass{
     constructor() {
@@ -259,9 +291,6 @@ class UniqueNameBlock extends SomeBlockClass{
     }
 }
 ```
-
-5. In case of flow blocks, blockID should be added to the case stack.
-Argument blocks are automatically detected.
 
 <!-- Define additional block properties, e.g.,
 
