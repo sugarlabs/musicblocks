@@ -1072,7 +1072,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.postProcess = null;
                 }
 
-		that.unhighlight();
+                that.unhighlight();
             };
 
             if (this.isCollapsible()) {
@@ -1080,8 +1080,8 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        this.blocks.refreshCanvas();
-	stage.update();
+        // this.blocks.refreshCanvas();
+        // stage.update();
     };
 
     /*
@@ -5551,8 +5551,8 @@ function Block(protoblock, blocks, overrideName) {
                 case 'music keyboard':
                 case 'pitch drum':
                 case 'meter':
-		case 'temperament':
-		case 'timbre':
+                case 'temperament':
+                case 'timbre':
                   lockInit = true;
                   this.blocks.reInitWidget(topBlock, 5000);
                   break;
@@ -5829,8 +5829,8 @@ function Block(protoblock, blocks, overrideName) {
      * Sets up context menu for each block
      */
     this.piemenuBlockContext = function () {
-	var pasteDx = 0;
-	var pasteDy = 0;
+        var pasteDx = 0;
+        var pasteDy = 0;
 
 
         var that = this;
@@ -5900,8 +5900,8 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.pasteDx = pasteDx;
             that.blocks.pasteDy = pasteDy;
             that.blocks.pasteStack();
-	    pasteDx += 21;
-	    pasteDy += 21;
+            pasteDx += 21;
+            pasteDy += 21;
             // docById('contextWheelDiv').style.display = 'none';
         };
 
