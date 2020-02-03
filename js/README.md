@@ -162,7 +162,7 @@ e.g. `this.setPalette('yourPaletteName);`
     }
   }
 ``` 
-Note: After the new update there is no requirement for a `beginnerMode` check as setup() defined in `BaseBlock` automatically performs that check.  
+Note: After the new update there is no requirement for a `beginnerMode` check as `setup()` defined in `BaseBlock` references the list in [`beginnerBlock()`](https://github.com/sugarlabs/musicblocks/blob/a5d65723331eb465f3fdc9142e220f0b4b5acda2/js/turtledefs.js#L58) function inside `turtledefs.js` to check if a block is beginner mode.
 
 * The palette can be any of the palettes listed in `turtledef.js`. 
 * The color of the block is defined by the palette used.
