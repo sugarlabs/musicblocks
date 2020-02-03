@@ -1072,7 +1072,8 @@ function Block(protoblock, blocks, overrideName) {
                     that.postProcess = null;
                 }
 
-                that.unhighlight();
+                if (that.name !== 'text')
+                    that.unhighlight();
             };
 
             if (this.isCollapsible()) {
@@ -1081,7 +1082,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // this.blocks.refreshCanvas();
-        // stage.update();
+        stage.update();
     };
 
     /*
