@@ -74,7 +74,10 @@ class BaseBlock extends ProtoBlock {
 	    this.expandable = true;
 
         this.args = this._style.flows.labels.length + this._style.args;
-        this.size = 1 + this._style.flows.labels.length;
+	if (this.size === 0) {
+	} else {
+            this.size = 1 + this._style.flows.labels.length;
+	}
         if (this._style.argTypes[0] === 'booleanin') this.size++;
         else if (this._style.argTypes[1] === 'booleanin') this.size++;
         else this.size += Math.max(0, this._style.args - 1);
