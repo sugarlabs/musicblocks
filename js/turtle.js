@@ -1072,7 +1072,7 @@ function Turtle (name, turtles, drum) {
         }
 
         this.orientation %= 360;
-        this.bitmap.rotation = this.orientation;
+        this.container.rotation = this.orientation;
         // We cannot update the cache during the 'tween'.
         if (this.blinkFinished) {
             this.updateCache();
