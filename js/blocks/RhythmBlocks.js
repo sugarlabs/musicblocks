@@ -168,7 +168,7 @@ function _playSwing(args, logo, turtle, blk) {
     if (logo.blocks.blockList[blk].name === 'newswing2') {
         if (args[2] === undefined) {
             // Nothing to do.
-            break;
+	    return;
         }
 
         if (args[0] === null || typeof(args[0]) !== 'number' || args[0] <= 0) {
