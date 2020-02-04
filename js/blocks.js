@@ -1037,7 +1037,7 @@ function Blocks (activity) {
                         label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
-		    that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
+		    // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
 
 

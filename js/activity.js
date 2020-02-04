@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-20 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -3990,6 +3990,7 @@ function Activity() {
         document.addEventListener('click', function() {
             that.__tick();
         })
+
         _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
