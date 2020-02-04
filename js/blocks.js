@@ -1037,7 +1037,9 @@ function Blocks (activity) {
                         label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
+		    that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
+
 
                     if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
 
@@ -2161,7 +2163,7 @@ function Blocks (activity) {
         var z = myBlock.container.children.length - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
-        if (myBlock.loadComplete) {
+	if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
             console.debug('Load not yet complete for (' + blk + ') ' + myBlock.name);
