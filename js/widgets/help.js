@@ -15,8 +15,6 @@ function HelpWidget () {
     const ICONSIZE = 32;
 
     this.init = function (blocks) {
-        var iconSize = ICONSIZE;
-
         this.isOpen = true;
 
         // Which help page are we on?
@@ -26,22 +24,34 @@ function HelpWidget () {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
-        // Position the widget and make it visible.
-	this._helpDiv = document.createElement('div');
-        this._helpDiv.style.width = iconSize * 2 + 400 + 'px';
-        this._helpDiv.style.backgroundColor = '#e8e8e8';
-	this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
-
-	widgetWindow.getWidgetBody().append(this._helpDiv);
-	widgetWindow.onClose = function() {
+        widgetWindow.onClose = function() {
             that.isOpen = false;
             this.destroy();
-	}
+        }
 
-        // For the button callbacks
+        // Position the widget and make it visible.
+        this._helpDiv = document.createElement('div');
+
+        // Give the DOM time to create the div.
         var that = this;
+        setTimeout(function() {
+            that._setup(blocks);
+        }, 100);
+    };
+
+    this._setup = function (blocks) {
+        var iconSize = ICONSIZE;
+
+        this._helpDiv.style.width = iconSize * 2 + 400 + 'px';
+        this._helpDiv.style.backgroundColor = '#e8e8e8';
+        this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+
+        this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        this.widgetWindow.setPosition(100, 100);
 
         if (blocks === null) {
+            var that = this;
+
             // topDiv.innerHTML = _('Take a tour');
             var rightArrow = document.getElementById('right-arrow');
             rightArrow.style.display = 'block';
@@ -95,7 +105,7 @@ function HelpWidget () {
 
         if (blocks === null) {
             // display help menu
-	    docById('helpBodyDiv').style.height = '300px';
+            docById('helpBodyDiv').style.height = '300px';
             this._showPage(0);
         } else {
             // display help for this block
@@ -104,7 +114,7 @@ function HelpWidget () {
 
                 if (name in BLOCKHELP) {
                     var helpBody = docById('helpBodyDiv');
-		    helpBody.style.height = '';
+                    helpBody.style.height = '';
 
                     var body = '';
                     if (BLOCKHELP[name].length > 1) {
@@ -180,6 +190,8 @@ function HelpWidget () {
                 }
             }
         }
+
+        this.widgetWindow.takeFocus();
     };
 
     this._showPage = function(page) {
@@ -201,6 +213,8 @@ function HelpWidget () {
 
         helpBody.style.color = "#505050";
         helpBody.innerHTML = body;
+
+        this.widgetWindow.takeFocus();
     };
 
     this.showPageByName = function(pageName) {
