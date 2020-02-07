@@ -1073,7 +1073,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 // if (that.name !== 'text')
-		// if (that.isCollapsible())
+                // if (that.isCollapsible())
                 //     that.unhighlight();
             };
 
@@ -3658,7 +3658,7 @@ function Block(protoblock, blocks, overrideName) {
 
             setTimeout(function() {
                 that._triggerLock = false;
-            }, that.blocks.logo.defaultBPMFactor / 8);
+            }, 1 / 8);
 
             __selectionChanged();
         };
@@ -3877,7 +3877,7 @@ function Block(protoblock, blocks, overrideName) {
 
             setTimeout(function() {
                 that._triggerLock = false;
-            }, that.blocks.logo.defaultBPMFactor / 8);
+            }, 1 / 8);
 
             __selectionChanged();
         };
@@ -4426,7 +4426,14 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
-            that.blocks.logo.synth.trigger(0, actualPitch[0] + (actualPitch[1] + 3), 1 / 8, DEFAULTVOICE, null, null);
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                that.blocks.logo.synth.trigger(0, actualPitch[0] + (actualPitch[1] + 3), 1 / 8, DEFAULTVOICE, null, null);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, 1 / 8);
 
             __selectionChanged();
         };
@@ -4450,8 +4457,14 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0].replace(SHARP, '#').replace(FLAT, 'b');
-            that.blocks.logo.synth.trigger(0, actualPitch[0] + actualPitch[1], 1 / 8, DEFAULTVOICE, null, null);
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                that.blocks.logo.synth.trigger(0, actualPitch[0] + actualPitch[1], 1 / 8, DEFAULTVOICE, null, null);
+            }
 
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, 1 / 8);
 
             __selectionChanged();
         };
@@ -5134,7 +5147,17 @@ function Block(protoblock, blocks, overrideName) {
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
             that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+
+                that.blocks.logo.synth.trigger(0, ['C4', obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, 1 / 8);
+
         };
 
         // Set up handlers for preview.
