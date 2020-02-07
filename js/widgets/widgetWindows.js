@@ -24,7 +24,7 @@ function WidgetWindow(key, title) {
     let rollButton = create("div", "wftButton rollup", this._drag);
 
     let titleEl = create("div", "wftTitle", this._drag);
-    titleEl.innerHTML = title;
+    titleEl.innerHTML = _(title);
 
     let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
     this._maxminIcon = create("img", undefined, maxminButton);
