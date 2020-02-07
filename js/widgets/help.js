@@ -17,9 +17,6 @@ function HelpWidget () {
     this.init = function (blocks) {
         this.isOpen = true;
 
-        // Which help page are we on?
-        var page = 0;
-
         var widgetWindow = window.widgetWindows.windowFor(this, 'help', 'help');
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -41,6 +38,8 @@ function HelpWidget () {
 
     this._setup = function (blocks) {
         var iconSize = ICONSIZE;
+        // Which help page are we on?
+        var page = 0;
 
         this._helpDiv.style.width = iconSize * 2 + 400 + 'px';
         this._helpDiv.style.backgroundColor = '#e8e8e8';
@@ -52,7 +51,8 @@ function HelpWidget () {
         if (blocks === null) {
             var that = this;
 
-            // topDiv.innerHTML = _('Take a tour');
+	    var wftTitle = docById("helpWidgetID");
+	    wftTitle.innerHTML = _('Take a tour');
             var rightArrow = document.getElementById('right-arrow');
             rightArrow.style.display = 'block';
             rightArrow.classList.add('hover');
@@ -90,8 +90,8 @@ function HelpWidget () {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
             }
 
-            // var cell = this._addLabel(row, ICONSIZE, label);
-            // topDiv.innerHTML = label;
+	    var wftTitle = docById("helpWidgetID");
+	    wftTitle.innerHTML = _(label);
             var rightArrow = document.getElementById('right-arrow');
             // rightArrow.style.opacity = '0';
             rightArrow.style.display = 'none';
@@ -105,7 +105,7 @@ function HelpWidget () {
 
         if (blocks === null) {
             // display help menu
-            docById('helpBodyDiv').style.height = '300px';
+            docById('helpBodyDiv').style.height = '325px';
             this._showPage(0);
         } else {
             // display help for this block

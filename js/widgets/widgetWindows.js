@@ -25,6 +25,7 @@ function WidgetWindow(key, title) {
 
     let titleEl = create("div", "wftTitle", this._drag);
     titleEl.innerHTML = _(title);
+    titleEl.id = key + 'WidgetID';
 
     let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
     this._maxminIcon = create("img", undefined, maxminButton);
@@ -58,6 +59,7 @@ function WidgetWindow(key, title) {
 
         that.setPosition(x, y);
     });
+
     document.addEventListener("mousedown", function (e) {
         if (e.target === that._frame || that._frame.contains(e.target)) {
             that._frame.style.opacity = "1";
@@ -93,6 +95,7 @@ function WidgetWindow(key, title) {
         that._dy = e.clientY - that._drag.getBoundingClientRect().top;
         e.preventDefault();
     };
+
     document.addEventListener("mouseup", function (e) {
         that._dragging = false;
     });
@@ -104,6 +107,7 @@ function WidgetWindow(key, title) {
         e.preventDefault();
         e.stopPropagation();
     };
+
     rollButton.onclick = function (e) {
         if (that._rolled) that.unroll();
         else that.rollup();
@@ -112,6 +116,7 @@ function WidgetWindow(key, title) {
         e.preventDefault();
         e.stopPropagation();
     };
+
     maxminButton.onclick = maxminButton.onmousedown = function (e) {
         if (that._maximized) that.restore();
         else that.maximize();
@@ -291,14 +296,14 @@ window.widgetWindows.isOpen = function (name) {
 
 window.widgetWindows.hideWindows = function (name) {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-	if (win !== undefined)
+        if (win !== undefined)
             win._frame.style.display = 'none';
     });
 };
 
 window.widgetWindows.showWindows = function (name) {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
-	if (win !== undefined)
+        if (win !== undefined)
             win._frame.style.display = 'block';
     });
 };
