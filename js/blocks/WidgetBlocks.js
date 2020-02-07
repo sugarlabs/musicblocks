@@ -1,3 +1,5 @@
+function setupWidgetBlocks() {
+
 class EnvelopeBlock extends FlowBlock {
     constructor() {
         //.TRANS: sound envelope (ADSR)
@@ -912,7 +914,7 @@ class StatusBlock extends StackClampBlock {
     }
 }
 
-function setupWidgetBlocks() {
+
     new EnvelopeBlock().setup();
     new FilterBlock().setup();
     new TemperamentBlock().setup();

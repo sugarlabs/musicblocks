@@ -1,3 +1,5 @@
+function setupMeterBlocks() {
+
 class CurrentMeterBlock extends ValueBlock {
     constructor() {
         //.TRANS: musical meter, e.g., 4:4
@@ -641,7 +643,6 @@ class MeterBlock extends FlowBlock {
     }
 }
 
-function setupMeterBlocks() {
     new CurrentMeterBlock().setup();
     new BeatFactorBlock().setup();
     new BPMFactorBlock().setup();

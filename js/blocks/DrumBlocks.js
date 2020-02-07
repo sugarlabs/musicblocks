@@ -1,3 +1,5 @@
+function setupDrumBlocks() {
+
 class NoiseNameBlock extends ValueBlock {
     constructor() {
         super('noisename');
@@ -324,7 +326,6 @@ class PlayDrumBlock extends FlowBlock {
     }
 }
 
-function setupDrumBlocks() {
     new NoiseNameBlock().setup();
     new DrumNameBlock().setup();
     new EffectsNameBlock().setup();

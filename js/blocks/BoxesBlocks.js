@@ -1,3 +1,5 @@
+function setupBoxesBlocks() {
+
 class IncrementBlock extends FlowBlock {
     constructor(name) {
         super(name || 'increment');
@@ -196,7 +198,6 @@ class StoreBox1Block extends FlowBlock {
 }
 
 
-function setupBoxesBlocks() {
     new IncrementOneBlock().setup();
     new IncrementBlock().setup();
     new BoxBlock().setup();

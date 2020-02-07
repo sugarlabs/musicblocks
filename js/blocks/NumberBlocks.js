@@ -1,3 +1,5 @@
+function setupNumberBlocks() {
+
 class IntBlock extends LeftBlock {
     constructor() {
         super('int');
@@ -571,7 +573,6 @@ class NumberBlock extends ValueBlock {
 }
 
 
-function setupNumberBlocks() {
     new DistanceBlock().setup();
     new IntBlock().setup();
     new ModBlock().setup();

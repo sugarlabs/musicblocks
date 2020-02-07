@@ -1,3 +1,5 @@
+function setupIntervalsBlocks() {
+
 class SetTemperamentBlock extends FlowBlock {
     constructor() {
         super('settemperament', _('set temperament'));
@@ -729,7 +731,6 @@ class SetKey2Block extends FlowBlock {
     }
 }
 
-function setupIntervalsBlocks() {
     new SetTemperamentBlock().setup();
     new TemperamentNameBlock().setup();
     new ModeNameBlock().setup();

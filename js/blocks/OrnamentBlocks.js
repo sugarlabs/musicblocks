@@ -1,3 +1,5 @@
+function setupOrnamentBlocks() {
+
 class StaccatoFactorBlock extends ValueBlock {
     constructor() {
         //.TRANS: the duration of a note played as staccato
@@ -312,7 +314,7 @@ class NewStaccatoBlock extends StaccatoBlock {
     }
 }
 
-function setupOrnamentBlocks() {
+
     new StaccatoFactorBlock().setup();
     new SlurFactorBlock().setup();
     new NeighborBlock().setup();

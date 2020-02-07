@@ -1,3 +1,5 @@
+function setupHeapBlocks() {
+
 class LoadHeapFromAppBlock extends FlowBlock {
     constructor() {
         super('loadHeapFromApp');
@@ -380,7 +382,6 @@ class PushBlock extends FlowBlock {
     }
 }
 
-function setupHeapBlocks() {
     new LoadHeapFromAppBlock().setup();
     new SaveHeapToAppBlock().setup();
     new ShowHeapBlock().setup();

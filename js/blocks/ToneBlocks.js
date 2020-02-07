@@ -1,3 +1,5 @@
+function setupToneBlocks() {
+
 class OscillatorBlock extends FlowBlock {
     constructor() {
         super('oscillator', _('oscillator'));
@@ -728,7 +730,6 @@ class SetTimbreBlock extends FlowClampBlock {
     }
 }
 
-function setupToneBlocks() {
     new OscillatorBlock().setup();
     new FillerTypeBlock().setup();
     new OscillatorTypeBlock().setup()

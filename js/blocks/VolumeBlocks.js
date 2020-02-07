@@ -1,3 +1,5 @@
+function setupVolumeBlocks() {
+
 class SynthVolumeBlock extends LeftBlock {
     constructor() {
         //.TRANS: the volume for this synth
@@ -652,7 +654,6 @@ class CrescendoBlock extends DecrescendoBlock {
     }
 }
 
-function setupVolumeBlocks() {
     new MasterVolumeBlock().setup();
     new SynthVolumeBlock().setup();
     new PPPBlock().setup();

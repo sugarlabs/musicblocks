@@ -1,3 +1,5 @@
+function setupPenBlocks() {
+
 class PurpleBlock extends FlowBlock {
     constructor() {
         super('purple', _('purple'));
@@ -624,7 +626,6 @@ class SetColorBlock extends FlowBlock {
 }
 
 
-function setupPenBlocks() {
     new PurpleBlock().setup();
     new BlueBlock().setup();
     new GreenBlock().setup();

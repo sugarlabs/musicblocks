@@ -1,3 +1,5 @@
+function setupBooleanBlocks() {
+
 class NotBlock extends BooleanBlock {
     constructor() {
         super('not');
@@ -180,7 +182,6 @@ class StaticBooleanBlock extends BooleanBlock {
 }
 
 
-function setupBooleanBlocks() {
     new NotBlock().setup();
     new AndBlock().setup();
     new OrBlock().setup();

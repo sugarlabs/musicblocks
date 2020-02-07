@@ -276,6 +276,8 @@ function _playDotted(args, logo, turtle, blk) {
     }
 }
 
+function setupRhythmBlocks() {
+
 class MyNoteValueBlock extends ValueBlock {
     constructor() {
         //.TRANS: the value (e.g., 1/4 note) of the note being played.
@@ -926,7 +928,6 @@ class OctaveSpaceBlock extends FlowBlock {
     }
 }
 
-function setupRhythmBlocks() {
     new MyNoteValueBlock().setup();
     new SkipFactorBlock().setup();
     new MillisecondsBlock().setup();

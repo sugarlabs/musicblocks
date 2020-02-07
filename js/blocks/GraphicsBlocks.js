@@ -1,3 +1,5 @@
+function setupGraphicsBlocks() {
+
 class HeadingBlock extends ValueBlock {
     constructor() {
         //.TRANS: orientation or compass direction
@@ -518,7 +520,6 @@ class ForwardBlock extends FlowBlock {
 }
 
 
-function setupGraphicsBlocks() {
     new HeadingBlock().setup();
     new YBlock().setup();
     new XBlock().setup();

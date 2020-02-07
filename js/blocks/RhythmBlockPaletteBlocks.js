@@ -1,6 +1,8 @@
 let language = localStorage.languagePreference || navigator.language;
 let rhythmBlockPalette = language === 'ja' ? 'rhythm' : 'widgets';
 
+function setupRhythmBlockPaletteBlocks() {
+
 class RhythmBlock extends FlowBlock {
     constructor(name) {
         super(name || 'rhythm');
@@ -605,7 +607,6 @@ class STupletBlock extends FlowBlock {
     }
 }
 
-function setupRhythmBlockPaletteBlocks() {
     new RhythmBlock().setup();
     new Rhythm2Block().setup();
     new SixtyFourthNoteBlock().setup();

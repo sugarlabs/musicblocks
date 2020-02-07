@@ -1,3 +1,5 @@
+function setupFlowBlocks() {
+
 class BackwardBlock extends FlowClampBlock {
     constructor() {
         super('backward');
@@ -639,7 +641,6 @@ class HiddenBlock extends FlowBlock {
 }
 
 
-function setupFlowBlocks() {
     new BackwardBlock().setup();
     new DuplicateBlock().setup();
     new DefaultCaseBlock().setup();

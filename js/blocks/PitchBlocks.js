@@ -473,6 +473,9 @@ function _playPitch(args, logo, turtle, blk) {
     }
 }
 
+function setupPitchBlocks() {
+
+
 class RestBlock extends ValueBlock {
     constructor() {
         super('rest');
@@ -1905,7 +1908,6 @@ class PitchBlock extends FlowBlock {
     }
 }
 
-function setupPitchBlocks() {
     new ConsonantStepSizeDownBlock().setup();
     new ConsonantStepSizeUpBlock().setup();
     new RestBlock().setup();

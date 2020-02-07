@@ -13,6 +13,8 @@ function _blockFindTurtle(logo, turtle, blk, receivedArg) {
 }
 
 
+function setupEnsembleBlocks() {
+
 class TurtleHeapBlock extends LeftBlock {
     constructor() {
         super('turtleheap', _('mouse index heap'));
@@ -622,7 +624,6 @@ class SetTurtleName2Block extends FlowBlock {
 }
 
 
-function setupEnsembleBlocks() {
     new TurtleHeapBlock().setup();
     new StopTurtleBlock().setup();
     new StartTurtleBlock().setup();

@@ -1,3 +1,5 @@
+function setupSensorsBlocks() {
+
 class PitchnessBlock extends ValueBlock {
     constructor() {
         super('pitchness', _('pitch'));
@@ -248,7 +250,6 @@ class KeyboardBlock extends ValueBlock {
     }
 }
 
-function setupSensorsBlocks() {
     new PitchnessBlock().setup();
     new LoudnessBlock().setup();
     new MyClickBlock().setup();

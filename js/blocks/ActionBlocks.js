@@ -1,3 +1,5 @@
+function setupActionBlocks() {
+
 class ReturnBlock extends FlowBlock {
     constructor() {
         super('return');
@@ -639,7 +641,7 @@ class Temperament1Block extends StackClampBlock {
     flow() {}
 }
 
-function setupActionBlocks() {
+
     new ReturnBlock().setup();
     new ReturnToURLBlock().setup();
     new CalcBlock().setup();

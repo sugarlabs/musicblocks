@@ -1,3 +1,5 @@
+function setupExtrasBlocks() {
+
 class OpenPaletteBlock extends FlowBlock {
     constructor() {
         super('openpalette');
@@ -716,7 +718,6 @@ class NOPFourArgBlock extends FlowBlock {
     }
 }
 
-function setupExtrasBlocks() {
     new OpenPaletteBlock().setup();
     new DeleteBlockBlock().setup();
     new MoveBlockBlock().setup();

@@ -1,3 +1,5 @@
+function setupMediaBlocks() {
+
 class RightPosBlock extends ValueBlock {
     constructor() {
         //.TRANS: right side of the screen
@@ -387,7 +389,6 @@ class TextBlock extends ValueBlock {
 }
 
 
-function setupMediaBlocks() {
     new RightPosBlock().setup();
     new LeftPosBlock().setup();
     new TopPosBlock().setup();

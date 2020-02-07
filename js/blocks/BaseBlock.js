@@ -1,6 +1,7 @@
 function isObject(item) {
     return (item && typeof item === 'object' && !Array.isArray(item));
-}
+};
+
 
 function mergeDeep(target, ...sources) {
     // From https://stackoverflow.com/a/34749873
@@ -19,7 +20,7 @@ function mergeDeep(target, ...sources) {
     }
 
     return mergeDeep(target, ...sources);
-}
+};
 
 
 class BaseBlock extends ProtoBlock {
@@ -193,7 +194,7 @@ class BaseBlock extends ProtoBlock {
                 clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
             return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
-        }
+        };
 
     }
 
