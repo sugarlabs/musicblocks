@@ -154,11 +154,11 @@ class GreyBlock extends ValueBlock {
         this.setPalette('pen');
     }
 
-    arg(that, turtle, blk) {
-        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-            that.statusFields.push([blk, 'grey']);
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'grey']);
         } else {
-            return that.turtles.turtleList[turtle].chroma;
+            return logo.turtles.turtleList[turtle].chroma;
         }
     }
 }
@@ -169,11 +169,11 @@ class ShadeBlock extends ValueBlock {
         this.setPalette('pen');
     }
 
-    arg(that, turtle, blk) {
-        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-            that.statusFields.push([blk, 'shade']);
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'shade']);
         } else {
-            return that.turtles.turtleList[turtle].value;
+            return logo.turtles.turtleList[turtle].value;
         }
     }
 }
@@ -184,11 +184,11 @@ class ColorBlock extends ValueBlock {
         this.setPalette('pen');
     }
 
-    arg(that, turtle, blk) {
-        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-            that.statusFields.push([blk, 'color']);
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'color']);
         } else {
-            return that.turtles.turtleList[turtle].color;
+            return logo.turtles.turtleList[turtle].color;
         }
     }
 }
@@ -199,11 +199,11 @@ class PenSizeBlock extends ValueBlock {
         this.setPalette('pen');
     }
 
-    arg(that, turtle, blk) {
-        if (that.inStatusMatrix && that.blocks.blockList[that.blocks.blockList[blk].connections[0]].name === 'print') {
-            that.statusFields.push([blk, 'pensize']);
+    arg(logo, turtle, blk) {
+        if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
+            logo.statusFields.push([blk, 'pensize']);
         } else {
-            return that.turtles.turtleList[turtle].stroke;
+            return logo.turtles.turtleList[turtle].stroke;
         }
     }
 }
