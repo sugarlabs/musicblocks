@@ -246,7 +246,7 @@ class SetSynthVolume2Block extends FlowBlock {
         }
 
         logo.synthVolume[turtle][synth].push(arg1);
-        if (!that.suppressOutput[turtle]) {
+        if (!logo.suppressOutput[turtle]) {
             logo.setSynthVolume(turtle, synth, arg1);
         }
 
@@ -380,7 +380,7 @@ class SetSynthVolumeBlock extends FlowBlock {
         }
 
         logo.synthVolume[turtle][synth].push(args[1]);
-        if (!that.suppressOutput[turtle]) {
+        if (!logo.suppressOutput[turtle]) {
             logo.setSynthVolume(turtle, synth, args[1]);
         }
 
@@ -416,7 +416,7 @@ class SetNoteVolumeBlock extends FlowBlock {
                 }
 
                 logo.masterVolume.push(arg);
-                if (!that.suppressOutput[turtle]) {
+                if (!logo.suppressOutput[turtle]) {
                     logo._setMasterVolume(arg);
                 }
 
@@ -473,7 +473,7 @@ class SetNoteVolume2Block extends FlowClampBlock {
         }
 
         logo.masterVolume.push(arg);
-        if (!that.suppressOutput[turtle]) {
+        if (!logo.suppressOutput[turtle]) {
             logo._setMasterVolume(arg);
         }
 
@@ -543,7 +543,7 @@ class ArticulationBlock extends FlowClampBlock {
                 logo.synthVolume[turtle][synth].push(newVolume);
             }
 
-            if (!that.suppressOutput[turtle]) {
+            if (!logo.suppressOutput[turtle]) {
                 logo.setSynthVolume(turtle, synth, newVolume);
             }
         }
