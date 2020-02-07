@@ -1649,11 +1649,6 @@ function Activity() {
         }
 
         searchSuggestions = searchSuggestions.reverse();
-
-        // searchWidget.onclick = function () {
-        //     console.debug('DO SEARCH');
-        //     doSearch();
-        // };
     }
 
     /*
@@ -1692,7 +1687,6 @@ function Activity() {
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function () {
-                console.debug('DO SEARCH!!!');
                 searchWidget.focus();
                 doSearch();
             }, 500);
