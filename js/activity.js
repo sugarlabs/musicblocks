@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-20 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -190,7 +190,30 @@ function Activity() {
             'widgets/timbre',
             'activity/lilypond',
             'activity/abc',
-            'activity/mxml'
+
+            'activity/blocks/RhythmBlocks',
+            'activity/blocks/MeterBlocks',
+            'activity/blocks/PitchBlocks',
+            'activity/blocks/IntervalsBlocks',
+            'activity/blocks/ToneBlocks',
+            'activity/blocks/OrnamentBlocks',
+            'activity/blocks/VolumeBlocks',
+            'activity/blocks/DrumBlocks',
+            'activity/blocks/WidgetBlocks',
+            'activity/blocks/RhythmBlockPaletteBlocks',
+            'activity/blocks/ActionBlocks',
+            'activity/blocks/FlowBlocks',
+            'activity/blocks/NumberBlocks',
+            'activity/blocks/BoxesBlocks',
+            'activity/blocks/BooleanBlocks',
+            'activity/blocks/HeapBlocks',
+            'activity/blocks/ExtrasBlocks',
+            'activity/blocks/GraphicsBlocks',
+            'activity/blocks/PenBlocks',
+            'activity/blocks/MediaBlocks',
+            'activity/blocks/SensorsBlocks',
+            'activity/blocks/EnsembleBlocks',
+
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
@@ -274,6 +297,7 @@ function Activity() {
 
         searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
+	searchWidget.placeholder = _('search for blocks');
 
         progressBar = docById('myProgress');
         progressBar.style.visibility = 'hidden';
@@ -757,26 +781,24 @@ function Activity() {
             logo.synth.resume();
 
             /*
-            if (docById('pscDiv').style.visibility === 'visible') {
-                playingWidget = true;
-                logo.pitchStaircase.playUpAndDown();
-            }
-
             // We were using the run button to play a widget, not
             // the turtles.
             if (playingWidget) {
                 return;
             }
-
-            if (docById('tempoDiv').style.visibility === 'visible') {
-                if (logo.tempo.isMoving) {
-                    logo.tempo.pause();
-                }
-
-                logo.tempo.resume();
-            }
             */
 
+            var widgetTitle = document.getElementsByClassName('wftTitle');
+            for (var i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === 'tempo') {
+                    if (logo.tempo.isMoving) {
+                        logo.tempo.pause();
+                    }
+
+                    logo.tempo.resume();
+                    break;
+                }
+            }
         }
 
         if (!turtles.running()) {
@@ -879,9 +901,13 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo._setMasterVolume(0);
 
-            if (docById('tempoDiv') != null && docById('tempoDiv').style.visibility === 'visible') {
-                if (logo.tempo.isMoving) {
-                    logo.tempo.pause();
+            var widgetTitle = document.getElementsByClassName('wftTitle');
+            for (var i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === 'tempo') {
+                    if (logo.tempo.isMoving) {
+                        logo.tempo.pause();
+                    }
+                    break;
                 }
             }
         }
@@ -1028,7 +1054,7 @@ function Activity() {
       var ctx = myChart.getContext('2d');
         loading = true;
         document.body.style.cursor = 'wait';
-        doLoadAnimation();
+        
       var myRadarChart = null;
       var  scores = analyzeProject(blocks);
       var data = scoreToChartData(scores);
@@ -1676,11 +1702,15 @@ function Activity() {
     /*
      * Uses JQuery to add autocompleted search suggestions
      */
-    doSearch = function () {
+        doSearch = function () {
         var $j = jQuery.noConflict();
 
         $j('#search').autocomplete({
-            source: searchSuggestions
+            source: searchSuggestions,
+            select: function(event, ui){
+              searchWidget.value = ui.item.label;
+              doSearch();
+            }
         });
 
         $j('#search').autocomplete('widget').addClass('scrollSearch');
@@ -1778,26 +1808,24 @@ function Activity() {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            if (docById('BPMInput').classList.contains('hasKeyboard')) {
+            if (docById('BPMInput') !== null && docById('BPMInput').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('musicratio1').classList.contains('hasKeyboard')) {
+            if (docById('musicratio1') !== null && docById('musicratio1').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('musicratio2').classList.contains('hasKeyboard')) {
+            if (docById('musicratio2') !== null && docById('musicratio2').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('dissectNumber').classList.contains('hasKeyboard')) {
+            if (docById('dissectNumber') !== null && docById('dissectNumber').classList.contains('hasKeyboard')) {
                 return;
             }
 
-            if (docById('timbreName') !== null) {
-                if (docById('timbreName').classList.contains('hasKeyboard')) {
+            if (docById('timbreName') !== null && docById('timbreName').classList.contains('hasKeyboard')) {
                     return;
-                }
             }
         }
 
@@ -1847,7 +1875,14 @@ function Activity() {
             var disableKeys = searchWidget.style.visibility === 'visible' || docById('paste').style.visibility === 'visible' || logo.turtles.running();
         }
 
-        var disableArrowKeys = _THIS_IS_MUSIC_BLOCKS_ && (docById('tempoDiv').style.visibility === 'visible');
+        var widgetTitle = document.getElementsByClassName('wftTitle');
+        var inTempoWidget = false;
+        for (var i = 0; i < widgetTitle.length; i++) {
+            if (widgetTitle[i].innerHTML === 'tempo') {
+                var inTempoWidget = true;
+                break;
+            }
+        }
 
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
@@ -1973,58 +2008,70 @@ function Activity() {
                     blocks.extract();
                     break;
                 case KEYCODE_UP:
-                    textMsg('UP ARROW ' + _('Moving block up.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y -= 20;
+                    if (inTempoWidget) {
+                        logo.tempo.speedUp(0);
+                    } else {
+                        textMsg('UP ARROW ' + _('Moving block up.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, -STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y -= 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_DOWN:
-                    textMsg('DOWN ARROW ' + _('Moving block down.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (palettes.mouseOver) {
-                        palettes.menuScrollEvent(-1, 10);
-                        palettes.hidePaletteIconCircles();
-                    } else if (palettes.activePalette != null) {
-                        palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.y += 20;
+                    if (inTempoWidget) {
+                        logo.tempo.slowDown(0);
+                    } else {
+                        textMsg('DOWN ARROW ' + _('Moving block down.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, 0, STANDARDBLOCKHEIGHT / 2);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (palettes.mouseOver) {
+                            palettes.menuScrollEvent(-1, 10);
+                            palettes.hidePaletteIconCircles();
+                        } else if (palettes.activePalette != null) {
+                            palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.y += 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_LEFT:
-                    textMsg('LEFT ARROW ' + _('Moving block left.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x -= 20;
+                    if (!inTempoWidget) {
+                        textMsg('LEFT ARROW ' + _('Moving block left.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, -STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x -= 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case KEYCODE_RIGHT:
-                    textMsg('RIGHT ARROW ' + _('Moving block right.'));
-                    if (disableArrowKeys) {} else if (blocks.activeBlock != null) {
-                        blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
-                        blocks.blockMoved(blocks.activeBlock);
-                        blocks.adjustDocks(blocks.activeBlock, true);
-                    } else if (scrollBlockContainer) {
-                        blocksContainer.x += 20;
+                    if (!inTempoWidget) {
+                        textMsg('RIGHT ARROW ' + _('Moving block right.'));
+                        if (blocks.activeBlock != null) {
+                            blocks.moveStackRelative(blocks.activeBlock, STANDARDBLOCKHEIGHT / 2, 0);
+                            blocks.blockMoved(blocks.activeBlock);
+                            blocks.adjustDocks(blocks.activeBlock, true);
+                        } else if (scrollBlockContainer) {
+                            blocksContainer.x += 20;
+                        }
+                        stage.update();
                     }
-                    stage.update();
                     break;
                 case HOME:
                     textMsg('HOME ' + _('Jump to home position.'));
@@ -2059,10 +2106,18 @@ function Activity() {
                     }
                     break;
                 case RETURN:
-                    if (disableArrowKeys) {} else if (docById('search').value.length > 0) {
+                    if (docById('search').value.length > 0) {
                         doSearch();
                     } else {
                         textMsg('Return ' + _('Play'));
+                        if (inTempoWidget) {
+                            if (logo.tempo.isMoving) {
+                                logo.tempo.pause();
+                            }
+
+                            logo.tempo.resume();
+                        }
+
                         if (blocks.activeBlock == null || SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1) {
                             logo.runLogoCommands();
                         }
@@ -2675,6 +2730,8 @@ function Activity() {
         doLoadAnimation();
 
         // palettes.updatePalettes();
+        console.debug('LOADING' + planet.getCurrentProjectName());
+        textMsg(planet.getCurrentProjectName());
         setTimeout(function () {
             try {
                 planet.openProjectFromPlanet(projectID, function () {
@@ -3073,6 +3130,8 @@ function Activity() {
         var data = [];
         for (var blk = 0; blk < blocks.blockList.length; blk++) {
             var myBlock = blocks.blockList[blk];
+            var args = null;
+
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
                 continue;
@@ -3080,9 +3139,18 @@ function Activity() {
 
             if (myBlock.isValueBlock() || myBlock.name === 'loadFile' || myBlock.name === 'boolean') {
                 // FIX ME: scale image if it exceeds a maximum size.
-                var args = {
-                    'value': myBlock.value
-                };
+                switch (myBlock.name) {
+                    case 'namedbox':
+                    case 'namedarg':
+                        args = {
+                            'value': myBlock.privateData
+                        }
+                    break;
+                default:
+                    args = {
+                        'value': myBlock.value
+                    };
+                }
             } else {
                 switch (myBlock.name) {
                     case 'start':
@@ -3090,7 +3158,7 @@ function Activity() {
                         // Find the turtle associated with this block.
                         var turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
-                            var args = {
+                            args = {
                                 'collapsed': false,
                                 'xcor': 0,
                                 'ycor': 0,
@@ -3101,7 +3169,7 @@ function Activity() {
                                 'grey': 100
                             };
                         } else {
-                            var args = {
+                            args = {
                                 'collapsed': myBlock.collapsed,
                                 'xcor': turtle.x,
                                 'ycor': turtle.y,
@@ -3117,7 +3185,7 @@ function Activity() {
                     case 'temperament1':
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
-                            var args = {
+                            args = {
                                 'customTemperamentNotes': TEMPERAMENT['custom'],
                                 'startingPitch': logo.synth.startingPitch,
                                 'octaveSpace': OCTAVERATIO
@@ -3138,18 +3206,16 @@ function Activity() {
                     case 'modewidget':
                     case 'meterwidget':
                     case 'status':
-                        var args = {
+                        args = {
                             'collapsed': myBlock.collapsed
                         }
                         break;
-                    case 'namedbox':
                     case 'storein2':
                     case 'nameddo':
                     case 'nameddoArg':
                     case 'namedcalc':
                     case 'namedcalcArg':
-                    case 'namedarg':
-                        var args = {
+                        args = {
                             'value': myBlock.privateData
                         }
                         break;
@@ -3160,18 +3226,16 @@ function Activity() {
                     case 'nopThreeArgBlock':
                         // restore original block name
                         myBlock.name = myBlock.privateData;
-                        var args = {}
                         break;
                     case 'matrixData':
                         // deprecated
-                        var args = {
+                        args = {
                             'notes': window.savedMatricesNotes,
                             'count': window.savedMatricesCount
                         }
                         hasMatrixDataBlock = true;
                         break;
                     default:
-                        var args = {}
                         break;
                 }
             }
@@ -3186,7 +3250,11 @@ function Activity() {
                 }
             }
 
-            data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
+            if (args == null) {
+                data.push([blockMap.indexOf(blk), myBlock.name, myBlock.container.x, myBlock.container.y, connections]);
+            } else {
+                data.push([blockMap.indexOf(blk), [myBlock.name, args], myBlock.container.x, myBlock.container.y, connections]);
+            }
         }
 
         // remap block connections
@@ -3921,6 +3989,7 @@ function Activity() {
         document.addEventListener('click', function() {
             that.__tick();
         })
+
         _createMsgContainer('#ffffff', '#7a7a7a', function (text) {
             msgText = text;
         }, 130);
@@ -4071,50 +4140,6 @@ function Activity() {
 
             this.hideMusicBlocks = function () {
                 hideSearchWidget();
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    storage.setItem('isTimbreHidden', docById('timbreDiv').style.visibility);
-                    storage.setItem('isMusicKeyboardHidden', docById('mkbDiv').style.visibility);
-                    storage.setItem('isModeWidgetHidden', docById('modeDiv').style.visibility);
-                    storage.setItem('isMeterWidgetHidden', docById('meterDiv').style.visibility);
-                    storage.setItem('isTemperamentHidden', docById('temperamentDiv').style.visibility);
-
-                    if (docById('mkbDiv').style.visibility !== 'hidden') {
-                        docById('mkbDiv').style.visibility = 'hidden';
-                        docById('mkbButtonsDiv').style.visibility = 'hidden';
-                        docById('mkbTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('pscDiv').style.visibility !== 'hidden') {
-                        docById('pscDiv').style.visibility = 'hidden';
-                        docById('pscTableDiv').style.visibility = 'hidden';
-                        docById('pscButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('timbreDiv').style.visibility !== 'hidden') {
-                        docById('timbreDiv').style.visibility = 'hidden';
-                        docById('timbreTableDiv').style.visibility = 'hidden';
-                        docById('timbreButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('temperamentDiv').style.visibility !== 'hidden') {
-                        docById('temperamentDiv').style.visibility = 'hidden';
-                        docById('temperamentTableDiv').style.visibility = 'hidden';
-                        docById('temperamentButtonsDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('modeDiv').style.visibility !== 'hidden') {
-                        docById('modeDiv').style.visibility = 'hidden';
-                        docById('modeButtonsDiv').style.visibility = 'hidden';
-                        docById('modeTableDiv').style.visibility = 'hidden';
-                    }
-
-                    if (docById('tempoDiv').style.visibility !== 'hidden') {
-                        if (logo.tempo != null) {
-                            logo.tempo.hide();
-                        }
-                    }
-                }
-
                 widgetWindows.hideWindows();
 
                 logo.doStopTurtle();
@@ -4134,23 +4159,6 @@ function Activity() {
 
                 widgetWindows.showWindows();
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    docById('timbreDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('timbreButtonsDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('timbreTableDiv').style.visibility = storage.getItem('isTimbreHidden');
-                    docById('temperamentDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('temperamentButtonsDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('temperamentTableDiv').style.visibility = storage.getItem('isTemperamentHidden');
-                    docById('mkbDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('mkbButtonsDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('mkbTableDiv').style.visibility = storage.getItem('isMusicKeyboardHidden');
-                    docById('modeDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('modeButtonsDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('modeTableDiv').style.visibility = storage.getItem('isModeWidgetHidden');
-                    docById('meterDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                    docById('meterButtonsDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                    docById('meterTableDiv').style.visibility = storage.getItem('isMeterWidgetHidden');
-                }
                 document.querySelector('.canvasHolder').classList.remove('hide');
                 document.querySelector('#canvas').style.display = '';
                 document.querySelector('#theme-color').content = platformColor.header;
@@ -4200,7 +4208,8 @@ function Activity() {
                     errorMsg(_('project undefined'));
                     return;
                 }
-
+                textMsg(this.getCurrentProjectName());
+                console.debug('LOADING' + this.getCurrentProjectName());
                 console.debug('loadRawProject ' + data);
                 loading = true;
                 document.body.style.cursor = 'wait';
@@ -4561,7 +4570,7 @@ function Activity() {
             reader.onload = (function (theFile) {
                 loading = true;
                 document.body.style.cursor = 'wait';
-                doLoadAnimation();
+                // doLoadAnimation();
 
                 setTimeout(function () {
                     var rawData = reader.result;

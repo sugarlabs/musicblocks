@@ -43,10 +43,10 @@ function ModeWidget() {
 
 
         widgetWindow.onclose=function() {
-            docById('modeDiv').style.visibility = 'hidden';
-            docById('modeButtonsDiv').style.visibility = 'hidden';
-            docById('modeTableDiv').style.visibility = 'hidden';
-            docById('modePianoDiv').style.visibility = 'hidden';
+            // docById('modeDiv').style.visibility = 'hidden';
+            // docById('modeButtonsDiv').style.visibility = 'hidden';
+            // docById('modeTableDiv').style.visibility = 'hidden';
+            // docById('modePianoDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
             this.destroy();
         }

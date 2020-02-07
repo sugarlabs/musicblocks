@@ -713,7 +713,7 @@ table {
 #mkbOuterDiv {
     position: absolute;
     left: 0px;
-    top: 0px;
+    top: 140px;
     right: 5em;
     overflow-y: auto;
     overflow-x: none;
@@ -842,7 +842,6 @@ table {
     overflow-x: hidden;
     overflow-y: auto;
     width: 365px;
-    height: 300px;
     background: #e8e8e8 !important;
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-20 Walter Bender
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
@@ -12,36 +12,47 @@
 
 
 function HelpWidget () {
-    const BUTTONDIVWIDTH = 476;  // 8 buttons 476 = (55 + 4) * 8
-    // const BUTTONSIZE = 53;
-    const BUTTONSIZE = 82;
     const ICONSIZE = 32;
 
     this.init = function (blocks) {
-        var w = window.innerWidth;
-        var iconSize = ICONSIZE;
+        this.isOpen = true;
 
-        var canvas = docById('myCanvas');
+        var widgetWindow = window.widgetWindows.windowFor(this, 'help', 'help');
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
-        // help page
-        var page = 0;
+        widgetWindow.onClose = function() {
+            that.isOpen = false;
+            this.destroy();
+        }
 
         // Position the widget and make it visible.
-        var helpDiv = docById('helpDiv');
-        helpDiv.style.display = '';
-        helpDiv.style.visibility = 'visible';
-        helpDiv.setAttribute('draggable', 'true');
-        helpDiv.style.left = '200px';
-        helpDiv.style.top = '150px';
+        this._helpDiv = document.createElement('div');
 
-        var topDiv = docById('helpButtonsDiv');
-        topDiv.classList.add('top-wrapper');
-
-        // For the button callbacks
+        // Give the DOM time to create the div.
         var that = this;
+        setTimeout(function() {
+            that._setup(blocks);
+        }, 100);
+    };
+
+    this._setup = function (blocks) {
+        var iconSize = ICONSIZE;
+        // Which help page are we on?
+        var page = 0;
+
+        this._helpDiv.style.width = iconSize * 2 + 400 + 'px';
+        this._helpDiv.style.backgroundColor = '#e8e8e8';
+        this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+
+        this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        this.widgetWindow.setPosition(100, 100);
 
         if (blocks === null) {
-            topDiv.innerHTML = _('Take a tour');
+            var that = this;
+
+	    var wftTitle = docById("helpWidgetID");
+	    wftTitle.innerHTML = _('Take a tour');
             var rightArrow = document.getElementById('right-arrow');
             rightArrow.style.display = 'block';
             rightArrow.classList.add('hover');
@@ -74,13 +85,13 @@ function HelpWidget () {
 
         } else {
             if (blocks.activeBlock.name === null) {
-                helpDiv.style.display = 'none';
+                // helpDiv.style.display = 'none';
             } else {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
             }
 
-            // var cell = this._addLabel(row, ICONSIZE, label);
-            topDiv.innerHTML = label;
+	    var wftTitle = docById("helpWidgetID");
+	    wftTitle.innerHTML = _(label);
             var rightArrow = document.getElementById('right-arrow');
             // rightArrow.style.opacity = '0';
             rightArrow.style.display = 'none';
@@ -92,95 +103,20 @@ function HelpWidget () {
             leftArrow.classList.remove('hover');
         }
 
-        var cell = document.createElement('div');
-        cell.classList.add('close-button');
-        topDiv.appendChild(cell);
-
-        cell.onclick=function() {
-            helpDiv.style.display = 'none';
-        };
-
-        var dragCell = document.createElement('div');
-        dragCell.classList.add('drag-button');
-        topDiv.appendChild(dragCell);
-
-        this._dx = dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function(e) {
-            // In order to prevent the dragged item from triggering a
-            // browser reload in Firefox, we empty the cell contents
-            // before dragging.
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE / 2;
-                helpDiv.style.left = x + 'px';
-                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE / 2;
-                helpDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        helpDiv.ondragover = function(e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        helpDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - (dragCell.getBoundingClientRect().left - helpDiv.getBoundingClientRect().left) - BUTTONSIZE/2;
-                helpDiv.style.left = x + 'px';
-                var y = e.clientY - (dragCell.getBoundingClientRect().top - helpDiv.getBoundingClientRect().top) - BUTTONSIZE/2;
-                helpDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        helpDiv.onmousedown = function(e) {
-            that._target = e.target;
-        };
-
-        helpDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };
-
         if (blocks === null) {
             // display help menu
+            docById('helpBodyDiv').style.height = '325px';
             this._showPage(0);
         } else {
             // display help for this block
-            if (blocks.activeBlock.name === null) {
-                helpDiv.style.display = 'none';
-            } else {
+            if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
 
                 if (name in BLOCKHELP) {
                     var helpBody = docById('helpBodyDiv');
+                    helpBody.style.height = '';
 
-                  var body = '';
+                    var body = '';
                     if (BLOCKHELP[name].length > 1) {
                         var path = BLOCKHELP[name][1];
                         // We need to add a case here whenever we add
@@ -251,11 +187,11 @@ function HelpWidget () {
                             }
                         };
                     }
-                } else {
-                    helpDiv.style.display = 'none';
                 }
             }
         }
+
+        this.widgetWindow.takeFocus();
     };
 
     this._showPage = function(page) {
@@ -277,6 +213,8 @@ function HelpWidget () {
 
         helpBody.style.color = "#505050";
         helpBody.innerHTML = body;
+
+        this.widgetWindow.takeFocus();
     };
 
     this.showPageByName = function(pageName) {
@@ -284,19 +222,6 @@ function HelpWidget () {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
             }
-        }
-    };
-
-    this.hide = function () {
-        docById('helpDiv').style.visibility = 'hidden';
-        docById('helpButtonsDiv').style.visibility = 'hidden';
-
-        for (var i = 0; i < this.BPMs.length; i++) {
-            docById('helpCanvas' + i).style.visibility = 'hidden';
-        }
-
-        if (this._intervalID != null) {
-            clearInterval(this._intervalID);
         }
     };
 };

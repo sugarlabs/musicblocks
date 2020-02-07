@@ -63,8 +63,8 @@ function Blocks (activity) {
     this.longPressTimeout = null;
 
     // Paste offset is used to ensure pasted blocks don't overlap.
-    this._pasteDX = 0;
-    this._pasteDY = 0;
+    this.pasteDx = 0;
+    this.pasteDy = 0;
 
     // What did we select?
     this.selectedStack = null;
@@ -1037,7 +1037,9 @@ function Blocks (activity) {
                         label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
+		    // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
+
 
                     if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
 
@@ -1387,6 +1389,11 @@ function Blocks (activity) {
                   case 'status':
                   case 'phrase maker':
                   case 'custom mode':
+                  case 'music keyboard':
+                  case 'pitch drum':
+                  case 'meter':
+                  case 'temperament':
+                  case 'timbre':
                     lockInit = true;
                     this.reInitWidget(initialTopBlock, 1500);
                     break;
@@ -1754,6 +1761,11 @@ function Blocks (activity) {
                       case 'status':
                       case 'phrase maker':
                       case 'custom mode':
+                      case 'music keyboard':
+                      case 'pitch drum':
+                      case 'meter':
+                      case 'temperament':
+                      case 'timbre':
                         lockInit = true;
                         this.reInitWidget(that.findTopBlock(thisBlock), 1500);
                         break;
@@ -1769,7 +1781,6 @@ function Blocks (activity) {
         if ((myBlock.isArgBlock() || ['calcArg', 'namedcalcArg', 'makeblock'].indexOf(myBlock.name) !== -1) && newBlock != null) {
             // We care about twoarg blocks with connections to the
             // first arg;
-            // console.debug(newBlock + ' ' + this.blockList[newBlock].name);
             if (this.blockList[newBlock].isTwoArgBlock()) {
                 if (this.blockList[newBlock].connections[1] === thisBlock) {
                     if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
@@ -2152,7 +2163,7 @@ function Blocks (activity) {
         var z = myBlock.container.children.length - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
-        if (myBlock.loadComplete) {
+	if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
             console.debug('Load not yet complete for (' + blk + ') ' + myBlock.name);
@@ -4313,8 +4324,8 @@ function Blocks (activity) {
         // console.debug(this.selectedBlocksObj);
 
         // Reset paste offset.
-        this._pasteDX = 0;
-        this._pasteDY = 0;
+        this.pasteDx = 0;
+        this.pasteDy = 0;
     };
 
    /*
@@ -4350,10 +4361,10 @@ function Blocks (activity) {
         // Reposition the paste location relative to the stage position.
         console.debug(this.selectedBlocksObj);
         if (this.selectedBlocksObj != null) {
-            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this._pasteDX;
-            this.selectedBlocksObj[0][3] = 75 - this.stage.y + this._pasteDY;
-            this._pasteDX += 21;
-            this._pasteDY += 21;
+            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this.pasteDx;
+            this.selectedBlocksObj[0][3] = 75 - this.stage.y + this.pasteDy;
+            this.pasteDx += 21;
+            this.pasteDy += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
         }
     };
@@ -4421,16 +4432,21 @@ function Blocks (activity) {
                 y = 0;
             }
 
+	    console.log(myBlock.name + ' ' + myBlock.isValueBlock());
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
                 case 'media':
                     blockItem = [b, [myBlock.name, null], x, y, []];
                     break;
+		case 'namedbox':
+		case 'namedarg':
+                    blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
+		    break;
                 default:
                     blockItem = [b, [myBlock.name, {'value': myBlock.value}], x, y, []];
                     break;
                 }
-            } else if (['storein2', 'namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg', 'namedarg'].indexOf(myBlock.name) !== -1) {
+            } else if (['storein2', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(myBlock.name) !== -1) {
                 blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
             } else {
                 blockItem = [b, myBlock.name, x, y, []];

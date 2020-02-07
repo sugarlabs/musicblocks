@@ -1,11 +1,23 @@
+// Copyright (c) 2018 Riya Lohia
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+
 function TemperamentWidget () {
-	
-	const BUTTONDIVWIDTH = 430;
+
+    const BUTTONDIVWIDTH = 430;
     const OUTERWINDOWWIDTH = 685;
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    var temperamentTableDiv = docById('temperamentTableDiv');
+    var temperamentTableDiv = document.createElement("div");
     var temperamentCell = null;
     this.inTemperament = null;
     this.lastTriggered = null;
@@ -26,7 +38,7 @@ function TemperamentWidget () {
         cell.style.width = BUTTONSIZE + 'px';
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width; 
+        cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
@@ -63,7 +75,7 @@ function TemperamentWidget () {
         html += '<div id ="information"></div>';
 
         temperamentTable.innerHTML = html;
-        temperamentTable.style.width = temperamentDiv.width;
+        temperamentTable.style.width = '300px';
 
         var canvas = docById('circ');
         canvas.style.position = 'absolute';
@@ -72,7 +84,7 @@ function TemperamentWidget () {
         var ctx = canvas.getContext("2d");
         var centerX = canvas.width / 2;
         var centerY = canvas.height / 2;
-            
+
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
@@ -124,8 +136,8 @@ function TemperamentWidget () {
                         angleDiff[i-1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i-1] = angle[i] - angle[i-1];
-                    }       
-                }   
+                    }
+                }
                 if (i === 0) {
                     sliceAngle[i] = 360 / pitchNumber;
                     baseAngle[i] = this.notesCircle.navAngle - (sliceAngle[0] / 2);
@@ -153,7 +165,7 @@ function TemperamentWidget () {
             docById('wheelDiv2').style.width = BUTTONDIVWIDTH + 'px';
             docById('wheelDiv2').style.zIndex = 5;
         }
-       
+
         this.createMainWheel();
 
         var that = this;
@@ -211,7 +223,7 @@ function TemperamentWidget () {
                 that.frequencies[1] = frequency * that.powerBase;
                 that.pitchNumber = 1;
                 that.checkTemperament(that.ratios);
-                that._circleOfNotes();   
+                that._circleOfNotes();
             };
         }
 
@@ -237,7 +249,7 @@ function TemperamentWidget () {
         }
 
         docById('temperamentTable').addEventListener('click', function(e) {
-            that.showNoteInfo(e, angle);  
+            that.showNoteInfo(e, angle);
         });
     };
 
@@ -263,7 +275,7 @@ function TemperamentWidget () {
                         noteDefined = true;
                         docById('noteInfo').innerHTML += '<div id="note">&nbsp; Note : ' + this.ratiosNotesPair[j][1] + '</div>';
                         break;
-                    }     
+                    }
                 }
                 if (noteDefined == false) {
                     var cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
@@ -286,19 +298,8 @@ function TemperamentWidget () {
                 }
                 docById('noteInfo').innerHTML += '<div id="frequency">&nbsp Frequency : ' + frequency + '</div>';
 
-                if (angle[i] >= 270 && angle[i] <= 360) {
-                    docById('noteInfo').style.top = y - 100 + 'px';
-                    docById('noteInfo').style.left = x + 'px';
-                } else if (angle[i] > 360 && angle[i] <= 450 ) {
-                    docById('noteInfo').style.top = y + 'px';
-                    docById('noteInfo').style.left = x + 'px';
-                } else if (angle[i] > 450 && angle[i] <= 540 ) {
-                    docById('noteInfo').style.top = y + 'px';
-                    docById('noteInfo').style.left = x - 180 + 'px';
-                } else if (angle[i] > 540 && angle[i] <= 630 ) {
-                    docById('noteInfo').style.top = y - 100 + 'px';
-                    docById('noteInfo').style.left = x - 180 + 'px';
-                }
+                docById('noteInfo').style.top = '130px';
+                docById('noteInfo').style.left = '132px';
                 docById('noteInfo').style.position = 'absolute';
                 docById('noteInfo').style.zIndex = 10;
                 docById('close').onclick = function() {
@@ -307,9 +308,9 @@ function TemperamentWidget () {
 
                 if (docById('edit') !== null) {
                     docById('edit').addEventListener('click', function(e) {
-                        that.editFrequency(e);  
+                        that.editFrequency(e);
                     });
-                }   
+                }
             }
         }
     };
@@ -325,7 +326,7 @@ function TemperamentWidget () {
         docById('noteInfo').innerHTML += '<center><input type="range" class="sliders" id = "frequencySlider1" style="width:170px; background:white; border:0;" min="' + this.frequencies[i-1] + '" max="' + this.frequencies[i+1] + '"></center>';
         docById('noteInfo').innerHTML += '<br>&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv1">' + this.frequencies[i] + '</span>';
         docById('noteInfo').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
-        
+
         docById('frequencySlider1').oninput = function() {
             docById('frequencydiv1').innerHTML = docById('frequencySlider1').value;
             var frequency = docById('frequencySlider1').value;
@@ -356,7 +357,7 @@ function TemperamentWidget () {
             that.temporaryRatios = that.ratios.slice();
             that.createMainWheel();
             docById('noteInfo').remove();
-        }              
+        }
     }
 
     this._graphOfNotes = function (){
@@ -368,7 +369,7 @@ function TemperamentWidget () {
             this.notesCircle.removeWheel();
         }
 
-        temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>'
+                                temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>'
         var notesGraph = docById('notesGraph');
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
@@ -381,16 +382,16 @@ function TemperamentWidget () {
         }
         notesGraph.innerHTML = '<thead id="tablehead"><tr id="menu"></tr></thead><tbody id="tablebody"></tbody>'
         var menus = '';
-        
+
         for(var i = 0; i < menuLabels.length; i++) {
             menus += '<th id="menuLabels">'+ menuLabels[i] + '</th>';
         }
 
         docById('menu').innerHTML = menus;
-        
+
         var menuItems =  document.querySelectorAll("#menuLabels");
         for(var i = 0; i < menuLabels.length; i++) {
-            menuItems[i].style.background = platformColor.labelColor; 
+            menuItems[i].style.background = platformColor.labelColor;
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
@@ -475,7 +476,7 @@ function TemperamentWidget () {
                 notesCell[i,3].style.width = 120 + 'px';
                 notesCell[i,3].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[i,3].style.textAlign = 'center';
-                    
+
                 //Notes
                 notesCell[i,4] = notesRow[i].insertCell(-1);
                 notesCell[i,4].innerHTML = this.notes[i];
@@ -498,7 +499,7 @@ function TemperamentWidget () {
                 notesCell[i,5].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[i,5].style.textAlign = 'center';
             }
-                
+
             //Frequency
             notesCell[i,6] = notesRow[i].insertCell(-1);
             notesCell[i,6].innerHTML = this.frequencies[i];
@@ -538,7 +539,7 @@ function TemperamentWidget () {
         docById('editOctave').innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
         var menuItems =  document.querySelectorAll("#editMenus");
         for(var i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = platformColor.selectorBackground; 
+            menuItems[i].style.background = platformColor.selectorBackground;
             menuItems[i].style.height = 30 + 'px';
             menuItems[i].style.textAlign = 'center';
             menuItems[i].style.fontWeight = 'bold';
@@ -597,7 +598,7 @@ function TemperamentWidget () {
                 divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
             } else {
                 divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
-            }       
+            }
             divAppend.style.textAlign = 'center';
             divAppend.style.marginLeft = '-80px';
             divAppend.style.height = '32px';
@@ -637,7 +638,7 @@ function TemperamentWidget () {
         this.tempRatios = [];
 
         divAppend.addEventListener('click', function(event) {
-            that.performEqualEdit(event);  
+            that.performEqualEdit(event);
         });
 
         this.performEqualEdit = function(event) {
@@ -652,7 +653,7 @@ function TemperamentWidget () {
                 }
                 for (var i = 0; i < this.tempRatios.length; i++) {
                     ratio2[i] = this.tempRatios[i];
-                    ratio2[i] = ratio2[i].toFixed(2); 
+                    ratio2[i] = ratio2[i].toFixed(2);
                 }
                 var ratio4 = ratio1.filter(function(val) {
                     return ratio2.indexOf(val) == -1;
@@ -681,7 +682,7 @@ function TemperamentWidget () {
                     ratio[i] = Math.pow(this.powerBase , power);
                     this.tempRatios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
                     compareRatios[i] = this.tempRatios[i];
-                    compareRatios[i] = compareRatios[i].toFixed(2); 
+                    compareRatios[i] = compareRatios[i].toFixed(2);
                 }
                 this.typeOfEdit = 'nonequal';
             }
@@ -745,7 +746,7 @@ function TemperamentWidget () {
         ratioEdit.innerHTML += 'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>';
         ratioEdit.style.paddingLeft = '100px';
         var that = this;
-        
+
         function addButtons (preview) {
             var divAppend = document.createElement('div');
             divAppend.id = 'divAppend';
@@ -753,7 +754,7 @@ function TemperamentWidget () {
                 divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
             } else {
                 divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
-            }       
+            }
             divAppend.style.textAlign = 'center';
             divAppend.style.marginLeft = '-100px';
             divAppend.style.height = '32px';
@@ -779,7 +780,7 @@ function TemperamentWidget () {
         divAppend.onmouseover = function() {
             this.style.cursor = 'pointer';
         };
-        
+
         divAppend.onclick = function (event) {
             var input1 = docById('ratioIn').value;
             var input2 = docById('ratioOut').value;
@@ -807,7 +808,7 @@ function TemperamentWidget () {
                             that.tempRatios.splice(index[i], 1, ratio[i]);
                             break;
                         }
-                    } 
+                    }
                 } else {
                     ratio[i] = ratio[i] / 2;
                     frequency[i] = that.frequencies[0] * ratio[i];
@@ -818,7 +819,7 @@ function TemperamentWidget () {
             for (var i = 0; i < recursion; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
                 frequency[i] = that.frequencies[0] * ratio[i];
-                calculateRatios(i);      
+                calculateRatios(i);
             }
             that.tempRatios.sort(function(a, b){
                 return a-b;
@@ -881,7 +882,7 @@ function TemperamentWidget () {
 
                 docById('preview').onclick = function() {
                     that.ratioEdit();
-                };                   
+                };
             }
         };
     };
@@ -943,7 +944,7 @@ function TemperamentWidget () {
                         angleDiff[i-1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i-1] = angle[i] - angle[i-1];
-                    }    
+                    }
                 }
                 if (i === 0) {
                     sliceAngle[i] = 360 / pitchNumber;
@@ -970,7 +971,7 @@ function TemperamentWidget () {
                     that._refreshInnerWheel();
                 };
             }
-            this.wheel1.createWheel();  
+            this.wheel1.createWheel();
         }
         arbitraryEdit.innerHTML += '<div id="wheelDiv4" class="wheelNav"></div>';
         this._createInnerWheel();
@@ -984,7 +985,7 @@ function TemperamentWidget () {
         var ctx = canvas.getContext("2d");
         var centerX = canvas.width / 2;
         var centerY = canvas.height / 2;
-            
+
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
@@ -1036,8 +1037,8 @@ function TemperamentWidget () {
                     } else {
                         angleDiff1[i-1] = angle[i] - angle[i-1];
                     }
-                    angle1[i-1] = angle[i-1] + (angleDiff1[i-1] / 2);       
-                }  
+                    angle1[i-1] = angle[i-1] + (angleDiff1[i-1] / 2);
+                }
             }
             this.wheel.navAngle = 270 + (angleDiff1[0] / 2);
             this.wheel.initWheel(minutes);
@@ -1057,14 +1058,14 @@ function TemperamentWidget () {
             docById('wheelDiv3').style.marginTop = 15 + 'px';
             docById('wheelDiv3').style.marginLeft = 37 + 'px';
             docById('wheelDiv3').addEventListener('mouseover', function(e) {
-                that.arbitraryEditSlider(e, angle1, ratios, pitchNumber);  
+                that.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
             });
         }
-        
+
         this._createOuterWheel();
 
         var that = this;
-        
+
         var divAppend = document.createElement('div');
         divAppend.id = 'divAppend';
         divAppend.innerHTML = 'Done';
@@ -1123,19 +1124,8 @@ function TemperamentWidget () {
                 docById('noteInfo1').innerHTML += '&nbsp;&nbsp;Frequency : <span class="rangeslidervalue" id="frequencydiv">' + frequencies[i] + '</span>';
                 docById('noteInfo1').innerHTML += '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
-                if (angle[i] >= 270 && angle[i] <= 360) {
-                    docById('noteInfo1').style.top = y - 100 + 'px';
-                    docById('noteInfo1').style.left = x + 'px';
-                } else if (angle[i] > 360 && angle[i] <= 450 ) {
-                    docById('noteInfo1').style.top = y + 'px';
-                    docById('noteInfo1').style.left = x + 'px';
-                } else if (angle[i] > 450 && angle[i] <= 540 ) {
-                    docById('noteInfo1').style.top = y + 'px';
-                    docById('noteInfo1').style.left = x - 180 + 'px';
-                } else if (angle[i] > 540 && angle[i] <= 630 ) {
-                    docById('noteInfo1').style.top = y - 100 + 'px';
-                    docById('noteInfo1').style.left = x - 180 + 'px';
-                }
+                docById('noteInfo1').style.top = '100px';
+                docById('noteInfo1').style.left = '90px';
 
                 docById('frequencySlider').oninput = function() {
                     that._refreshInnerWheel();
@@ -1192,7 +1182,7 @@ function TemperamentWidget () {
         octaveSpaceEdit.innerHTML = '<br><br>Octave Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="'+ octaveRatio + '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
         octaveSpaceEdit.style.paddingLeft = '70px';
         var that = this;
-        
+
         var divAppend = document.createElement('div');
         divAppend.id = 'divAppend';
         divAppend.innerHTML = 'Done';
@@ -1238,7 +1228,7 @@ function TemperamentWidget () {
                 that.octaveChanged = true;
             }
             that._circleOfNotes();
-        };   
+        };
     };
 
     this.checkTemperament = function(ratios) {
@@ -1253,9 +1243,9 @@ function TemperamentWidget () {
                     intervals[j] = t.interval[j];
                     temperamentRatios[j] = t[intervals[j]];
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
-                } 
+                }
                 var ratiosEqual = (ratios.length == temperamentRatios.length) && ratios.every(function(element, index) {
-                    return element === temperamentRatios[index]; 
+                    return element === temperamentRatios[index];
                 });
 
                 if (ratiosEqual) {
@@ -1264,7 +1254,7 @@ function TemperamentWidget () {
                     temperamentCell.innerHTML = this.inTemperament;
                     break;
                 }
-            }   
+            }
         }
 
         if (selectedTemperament === undefined) {
@@ -1277,7 +1267,7 @@ function TemperamentWidget () {
         var notesMatch = false;
         var index = [];
         this.notes = [];
-        
+
         if (this.inTemperament == 'custom') {
             for (var i = 0; i < this.ratios.length; i++) {
                 for (var j = 0; j < this.ratiosNotesPair.length; j++) {
@@ -1334,7 +1324,7 @@ function TemperamentWidget () {
                     newStack.push([idx + 10, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 9]]);
                     newStack.push([idx + 11, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 9]]);
                 }
-            
+
                 if (i == this.pitchNumber - 1) {
                     newStack.push([idx + 12, 'hidden', 0, 0, [idx, null]]);
                 } else {
@@ -1351,7 +1341,7 @@ function TemperamentWidget () {
                 newStack.push([idx + 5, ['number',{'value': rationalToFraction(this.ratios[i])[1]}], 0, 0, [idx + 3]]);
                 newStack.push([idx + 6, 'vspace', 0, 0, [idx, idx + 7]]);
                 newStack.push([idx + 7, ['pitch'], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
-            
+
                 if (this.inTemperament !== 'custom') {
                     newStack.push([idx + 8, ['notename',{'value':this.ratiosNotesPair[i][1][0]}], 0, 0, [idx + 7]]);
                     newStack.push([idx + 9, ['number',{'value':this.ratiosNotesPair[i][1][1]}], 0, 0, [idx + 7]]);
@@ -1359,24 +1349,24 @@ function TemperamentWidget () {
                     newStack.push([idx + 8, ['text',{'value':this.notes[i].substring(0, this.notes[i].length - 1)}], 0, 0, [idx + 7]]);
                     newStack.push([idx + 9, ['number',{'value':this.notes[i].slice(-1)}], 0, 0, [idx + 7]]);
                 }
-            
+
                 if (i == this.pitchNumber - 1) {
                     newStack.push([idx + 10, 'hidden', 0, 0, [idx, null]]);
                 } else {
                     newStack.push([idx + 10, 'hidden', 0, 0, [idx, idx + 11]]);
                 }
                 previousBlock = idx + 10;
-            }  
+            }
         }
         this._logo.blocks.loadNewBlocks(newStack); 
-        this._logo.textMsg(_('New action block generated!')) 
+        this._logo.textMsg(_('New action block generated!'));
 
         var len = this._logo.synth.startingPitch.length;
         var note = this._logo.synth.startingPitch.substring(0, len - 1);
         var octave = this._logo.synth.startingPitch.slice(-1);
-        var newStack1 = [[0,'settemperament', 100, 100, [null, 1, 2, 3, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['notename', {'value': note}], 0, 0, [0]], [3, ['number', {'value': octave}], 0, 0, [0]]];        
+        var newStack1 = [[0,'settemperament', 100, 100, [null, 1, 2, 3, null]], [1, ['temperamentname', {'value': this.inTemperament}], 0, 0, [0]], [2, ['notename', {'value': note}], 0, 0, [0]], [3, ['number', {'value': octave}], 0, 0, [0]]];
         this._logo.blocks.loadNewBlocks(newStack1);
-        this._logo.textMsg(_('New action block generated!'))
+        this._logo.textMsg(_('New action block generated!'));
 
         if (this.inTemperament === 'custom') {
             TEMPERAMENT['custom'] = [];
@@ -1403,7 +1393,7 @@ function TemperamentWidget () {
         } else {
             var notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
         }
-        
+
         this._logo.synth.trigger(0, notes, this._logo.defaultBPMFactor * duration, 'electronic synth', null, null);
     };
 
@@ -1414,7 +1404,7 @@ function TemperamentWidget () {
 
         this._logo.resetSynth(0);
 
-        var cell = docById('buttonsRow').cells[1];
+        var cell = this.playButton;
         if (this._playing) {
             cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + 'stop-button.svg' + '" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
@@ -1458,7 +1448,7 @@ function TemperamentWidget () {
                     that.notesCircle.navItems[i].slicePathAttr.fill = '#808080';
                     that.notesCircle.navItems[i].sliceSelectedAttr.fill = '#808080';
                 }
-                
+
                 if (that.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.notesCircle.navItems[0].fillAttr = '#c8C8C8';
@@ -1478,7 +1468,7 @@ function TemperamentWidget () {
                         that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
                         that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
                     }
-                }  
+                }
 
                 that.notesCircle.refreshWheel();
             } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
@@ -1491,7 +1481,7 @@ function TemperamentWidget () {
                         var j = i - 1;
                         docById('pitchNumber_' + j).style.background = platformColor.selectorBackground;
                     }
-                }     
+                }
             } else if (docById('wheelDiv4') !== null) {
                 if (i === pitchNumber) {
                     that.wheel1.navItems[0].fillAttr = '#808080';
@@ -1504,7 +1494,7 @@ function TemperamentWidget () {
                     that.wheel1.navItems[i].slicePathAttr.fill = '#808080';
                     that.wheel1.navItems[i].sliceSelectedAttr.fill = '#808080';
                 }
-                
+
                 if (that.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.wheel1.navItems[0].fillAttr = '#e0e0e0';
@@ -1524,7 +1514,7 @@ function TemperamentWidget () {
                         that.wheel1.navItems[i-1].slicePathAttr.fill = '#e0e0e0';
                         that.wheel1.navItems[i-1].sliceSelectedAttr.fill = '#e0e0e0';
                     }
-                }  
+                }
 
                 that.wheel1.refreshWheel();
             }
@@ -1548,7 +1538,7 @@ function TemperamentWidget () {
                             that.notesCircle.navItems[i-1].sliceHoverAttr.fill = '#c8C8C8';
                             that.notesCircle.navItems[i-1].slicePathAttr.fill = '#c8C8C8';
                             that.notesCircle.navItems[i-1].sliceSelectedAttr.fill = '#c8C8C8';
-                            that.notesCircle.refreshWheel();   
+                            that.notesCircle.refreshWheel();
                         } else if (that.circleIsVisible == true && docById('wheelDiv4') == null) {
                             var j = i - 1;
                             docById('pitchNumber_' + j).style.background = platformColor.selectorBackground;
@@ -1559,7 +1549,7 @@ function TemperamentWidget () {
                             that.wheel1.navItems[i-1].sliceSelectedAttr.fill = '#e0e0e0';
                             that.wheel1.refreshWheel();
                         }
-                    }, that._logo.defaultBPMFactor * 1000 * duration); 
+                    }, that._logo.defaultBPMFactor * 1000 * duration);
                 }
                 that._playing = false;
             }
@@ -1570,53 +1560,47 @@ function TemperamentWidget () {
     };
 
     this.init = function(logo) {
-    	this._logo = logo;
+        this._logo = logo;
 
-    	var w = window.innerWidth;
+        var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
-        var temperamentDiv = docById("temperamentDiv");
-        temperamentDiv.style.visibility = "visible";
-        temperamentDiv.setAttribute('draggable', 'true');
-        temperamentDiv.style.left = '200px';
-        temperamentDiv.style.top = '150px';
 
-        var widgetButtonsDiv = docById('temperamentButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="temperamentButtonTable"></table>';
+        var widgetWindow = window.widgetWindows.windowFor(this, "temperament");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
 
-        var canvas = docById('myCanvas');
-
-        var buttonTable = docById('temperamentButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
-        row.id = 'buttonsRow';
+        widgetWindow.getWidgetBody().append(temperamentTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "500px";
 
         var that = this;
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick = function () {
+
+        widgetWindow.onclose=function() {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
-            docById('temperamentDiv').style.visibility = 'hidden';
-            docById('temperamentButtonsDiv').style.visibility = 'hidden';
-            docById('temperamentTableDiv').style.visibility = 'hidden';
             if (docById('wheelDiv2') != null) {
                 docById('wheelDiv2').style.display = 'none';
                 that.notesCircle.removeWheel();
             }
             if (docById('wheelDiv3') != null) {
                 docById('wheelDiv3').style.display = 'none';
-                that.wheel.removeWheel();  
+                that.wheel.removeWheel();
             }
             if (docById('wheelDiv4') != null) {
                 docById('wheelDiv4').style.display = 'none';
-                that.wheel1.removeWheel();  
+                that.wheel1.removeWheel();
             }
+
+            this.destroy();
         };
 
         this._playing = false;
+
+        var buttonTable = document.createElement("table");
+        var header = buttonTable.createTHead();
+        var row = header.insertRow(0);
+        row.id = 'buttonsRow';
 
         temperamentCell = row.insertCell();
         temperamentCell.innerHTML = this.inTemperament;
@@ -1629,22 +1613,17 @@ function TemperamentWidget () {
         temperamentCell.style.textAlign = 'center';
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
-       
-
-        var cell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
-
-        cell.onclick = function(event) {
+                                this.playButton = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play all'));
+        this.playButton.onclick = function() {
             that.playAll();
         };
 
-        var cell = this._addButton(row, 'export-chunk.svg', ICONSIZE, _('Save'));
-
-        cell.onclick = function() {
+        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
             that._save();
         };
-     
 
-        var noteCell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Table'));
+
+        var noteCell = widgetWindow.addButton('play-button.svg', ICONSIZE, _('Table'));
 
         var t = TEMPERAMENT[this.inTemperament];
         this.pitchNumber = t.pitchNumber;
@@ -1689,7 +1668,7 @@ function TemperamentWidget () {
                 if (str[i][0].substring(1, str[i][0].length) === FLAT || str[i][0].substring(1, str[i][0].length) === 'b' ) {
                     note[i] = str[i][0].replace(FLAT, 'b');
                 } else if (str[i][0].substring(1, str[i][0].length) === SHARP || str[i][0].substring(1, str[i][0].length) === '#' ) {
-                    note[i] = str[i][0].replace(SHARP, '#'); 
+                    note[i] = str[i][0].replace(SHARP, '#');
                 }
 
                 str[i] = note[i] + str[i][1];
@@ -1713,6 +1692,8 @@ function TemperamentWidget () {
             }
         }
 
+
+
         this._circleOfNotes();
 
         noteCell.onclick = function(event) {
@@ -1723,94 +1704,10 @@ function TemperamentWidget () {
             }
         }
 
-        var addButtonCell = this._addButton(row, 'add2.svg', ICONSIZE, _('Add pitches'));
-
-        addButtonCell.onclick = function(event) {
+        widgetWindow.addButton('add2.svg', ICONSIZE, _('Add pitches')).onclick = function(event) {
             that.edit();
         };
 
-        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        // cell.onclick = function () {
-        //     that._logo.synth.setMasterVolume(0);
-        //     that._logo.synth.stop();
-        //     docById('temperamentDiv').style.visibility = 'hidden';
-        //     docById('temperamentButtonsDiv').style.visibility = 'hidden';
-        //     docById('temperamentTableDiv').style.visibility = 'hidden';
-        //     if (docById('wheelDiv2') != null) {
-        //         docById('wheelDiv2').style.display = 'none';
-        //         that.notesCircle.removeWheel();
-        //     }
-        //     if (docById('wheelDiv3') != null) {
-        //         docById('wheelDiv3').style.display = 'none';
-        //         that.wheel.removeWheel();  
-        //     }
-        //     if (docById('wheelDiv4') != null) {
-        //         docById('wheelDiv4').style.display = 'none';
-        //         that.wheel1.removeWheel();  
-        //     }
-        // };
-
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
-
-        this._dx = dragCell.getBoundingClientRect().left - temperamentDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - temperamentDiv.getBoundingClientRect().top;
-        this._dragging = false;
-        this._target = false;
-        this._dragCellHTML = dragCell.innerHTML;
-
-        dragCell.onmouseover = function (e) {
-            dragCell.innerHTML = '';
-        };
-
-        dragCell.onmouseout = function (e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        canvas.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        canvas.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                temperamentDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                temperamentDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        temperamentDiv.ondragover = function (e) {
-            that._dragging = true;
-            e.preventDefault();
-        };
-
-        temperamentDiv.ondrop = function (e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
-                temperamentDiv.style.left = x + 'px';
-                var y = e.clientY - that._dy;
-                temperamentDiv.style.top = y + 'px';
-                dragCell.innerHTML = that._dragCellHTML;
-            }
-        };
-
-        temperamentDiv.onmousedown = function (e) {
-            that._target = e.target;
-        };
-
-        temperamentDiv.ondragstart = function (e) {
-            if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
-            } else {
-                e.preventDefault();
-            }
-        };	
-	};
+        widgetWindow.sendToCenter()
+    };
 };
