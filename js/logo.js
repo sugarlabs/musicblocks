@@ -2756,16 +2756,12 @@ function Logo () {
             // For the outermost note (when nesting), calculate the
             // time for the next note.
             if (duration > 0) {
-		console.log('duration: ' + duration + ' turtleTime: ' + this.turtleTime[turtle]);
                 this.previousTurtleTime[turtle] = this.turtleTime[turtle];
-		console.log('inNoteBlock: ' + this.inNoteBlock[turtle].length);
                 if (this.inNoteBlock[turtle].length === 1) {
                     this.turtleTime[turtle] += ((bpmFactor / duration) + (this.noteDelay / 1000));
                     if (!this.suppressOutput[turtle]) {
-			console.log('doWait: ' + Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) - turtleLag, 0));
                         this._doWait(turtle, Math.max(((bpmFactor / duration) + (this.noteDelay / 1000)) - turtleLag, 0));
                     }
-		    console.log('turtleTime: ' + this.turtleTime[turtle]);
                 }
             }
 
@@ -3281,8 +3277,6 @@ function Logo () {
                     }
                 }, beatValue * 1000);
             };
-
-	    console.log('elapsedTime: ' + elapsedTime + ' noteDelay: ' + this.noteDelay + ' turtleDelay: ' + this.turtleDelay);
 
             if (last(that.inNoteBlock[turtle]) != null) {
                 if (this.noteDelay === 0 || !this.suppressOutput[turtle]) {
