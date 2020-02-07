@@ -68,9 +68,6 @@ class NeighborBlock extends FlowClampBlock {
         logo.neighborStepPitch[turtle].push(args[0]);
         logo.neighborNoteValue[turtle].push(args[1]);
 
-        childFlow = args[2];
-        childFlowCount = 1;
-
         var listenerName = '_neighbor_' + turtle + '_' + blk;
         logo._setDispatchBlock(blk, turtle, listenerName);
 
@@ -150,7 +147,7 @@ class GlideBlock extends FlowClampBlock {
             logo.notationBeginSlur(turtle);
         }
 
-        logo.glideOverride[turtle] = logo._noteCounter(turtle, childFlow);
+        logo.glideOverride[turtle] = logo._noteCounter(turtle, args[1]);
         console.debug('length of glide ' + logo.glideOverride[turtle]);
 
         var listenerName = '_glide_' + turtle;
