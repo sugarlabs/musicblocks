@@ -1366,7 +1366,7 @@ class BaseBlock extends ProtoBlock {
 		if (this._style.flows.type == undefined) {
 		    svg.setExpand(30 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
 		} else if (this._style.flows.type == 'value') {
-		    svg.setExpand(30 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+		    svg.setExpand(60 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
 		} else {
                     svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
 		}
