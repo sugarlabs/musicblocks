@@ -63,7 +63,7 @@ function ProtoBlock(name) {
     this.textWidth = 0;
     this.labelOffset = 0;
     //Stores Help related strings
-    this.HELPSTRING = {};
+    this.helpString = {};
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -1261,7 +1261,7 @@ class BaseBlock extends ProtoBlock {
         this.palette = palettes.dict[palette]
     }
     setHelpString(help) {
-        this.HELPSTRING = help;
+        this.helpString = help;
     }
 
     formBlock(style) {

@@ -107,7 +107,7 @@ function HelpWidget () {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
-                var message = blocks.blockList[blocks.activeBlock].protoblock.HELPSTRING;
+                var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
                 // console.log(message);
                 // console.log(BLOCKHELP[name]);
                 if (message) {
