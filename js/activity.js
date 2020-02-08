@@ -538,7 +538,8 @@ function Activity() {
         setTimeout(function () {
             sendAllToTrash(false, true);
             setTimeout(function () {
-                if (BLOCKHELP[name].length < 4) {
+                var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+                if (message.length < 4) {
                     // If there is nothing specified, just
                     // load the block.
                     console.debug('CLICK: ' + name);
@@ -554,21 +555,21 @@ function Activity() {
                             blocks.moveBlock(newBlock, 0, 0);
                         });
                     }
-                } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                } else if (typeof(message[3]) === 'string') {
                     // If it is a string, load the macro
                     // assocuated with this block
-                    var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 0, 0);
+                    var blocksToLoad = getMacroExpansion(message[3], 0, 0);
                     console.debug('CLICK: ' + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 } else {
                     // Load the blocks.
-                    var blocksToLoad = BLOCKHELP[name][3];
+                    var blocksToLoad = message[3];
                     console.debug('CLICK: ' + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 }
 
                 setTimeout(function () {
-                    // save.saveBlockArtwork(BLOCKHELP[name][3]);
+                    // save.saveBlockArtwork(message[3]);
                     save.saveBlockArtwork(name + '_block.svg');
                 }, 500);
 
