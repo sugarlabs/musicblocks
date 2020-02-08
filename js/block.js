@@ -3560,12 +3560,6 @@ function Block(protoblock, blocks, overrideName) {
                 // We may need to update the mode widget.
                 var modeBlock = that.blocks.blockList.indexOf(that);
                 that.blocks.logo._modeBlock = modeBlock;
-                var modeDiv = docById('modeDiv');
-                if (modeDiv.style.visibility === 'visible') {
-                    parts = that.blocks.logo.keySignature[0].split(' ');
-                    that.blocks.logo.keySignature[0] = label + ' ' + parts[1];
-                    that.blocks.logo.modeWidget.init(that.blocks.logo, modeBlock);
-                }
             }
         };
 
@@ -5278,18 +5272,6 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.setChildIndex(that.text, z);
                 that.updateCache();
             }
-
-            var modeDiv = docById('modeDiv');
-            if (modeDiv.style.visibility === 'visible') {
-                var modeBlock = that.blocks.blockList.indexOf(that);
-                that.blocks.logo._modeBlock = modeBlock;
-                var modeDiv = docById('modeDiv');
-                if (modeDiv.style.visibility === 'visible') {
-                    parts = that.blocks.logo.keySignature[0].split(' ');
-                    that.blocks.logo.keySignature[0] = parts[0] + ' ' + that.value;
-                    that.blocks.logo.modeWidget.init(that.blocks.logo, modeBlock);
-                }
-            }
         };
 
         // Add function to each main menu for show/hide sub menus
@@ -5563,28 +5545,28 @@ function Block(protoblock, blocks, overrideName) {
         var widgetTitle = document.getElementsByClassName('wftTitle');
         var lockInit = false;
         if (closeInput === false) {
-          for (var i = 0; i < widgetTitle.length; i++) {
-            if (lockInit === false){
-              switch(widgetTitle[i].innerHTML){
-                case 'tempo':
-                case 'rhythm maker':
-                case 'pitch slider':
-                case 'pitch staircase':
-                case 'status':
-                case 'phrase maker':
-                case 'custom mode':
-                case 'music keyboard':
-                case 'pitch drum':
-                case 'meter':
-                case 'temperament':
-                case 'timbre':
-                  lockInit = true;
-                  this.blocks.reInitWidget(topBlock, 5000);
-                  break;
-              }
+            for (var i = 0; i < widgetTitle.length; i++) {
+                if (lockInit === false){
+                    switch(widgetTitle[i].innerHTML){
+                    case 'tempo':
+                    case 'rhythm maker':
+                    case 'pitch slider':
+                    case 'pitch staircase':
+                    case 'status':
+                    case 'phrase maker':
+                    case 'custom mode':
+                    case 'music keyboard':
+                    case 'pitch drum':
+                    case 'meter':
+                    case 'temperament':
+                    case 'mode':
+                    case 'timbre':
+                        lockInit = true;
+                        this.blocks.reInitWidget(topBlock, 5000);
+                        break;
+                    }
+                }
             }
-
-          }
         }
     };
 
