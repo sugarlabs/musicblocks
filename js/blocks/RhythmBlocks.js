@@ -283,6 +283,7 @@ class MyNoteValueBlock extends ValueBlock {
         //.TRANS: the value (e.g., 1/4 note) of the note being played.
         super('mynotevalue', _('note value'));
         this.setPalette('rhythm');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', null, 'everybeathelp']);
     }
 
@@ -523,6 +524,7 @@ class TieBlock extends FlowClampBlock {
     constructor() {
         super('tie');
         this.setPalette('rhythm');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', null, 'tiehelp']);
 
         this.formBlock({
@@ -681,6 +683,7 @@ class Rest2Block extends FlowBlock {
     constructor() {
         super('rest2', _('silence'));
         this.setPalette('rhythm');
+        this.beginnerBlock(true);
         this.setHelpString([_('A rest of the specified note value duration can be constructed using a Silence block.'), 'documentation', null, 'rest2']);
 
         this.makeMacro((x, y) => [
@@ -710,6 +713,7 @@ class Note4Block extends FlowClampBlock {
     constructor() {
         super('note4');
         this.setPalette('rhythm');
+        this.beginnerBlock(true);
         this.setHelpString();
 
         this.formBlock({
@@ -900,6 +904,7 @@ class NewNoteBlock extends FlowClampBlock {
     constructor() {
         super('newnote');
         this.setPalette('rhythm');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Note block is a container for one or more Pitch blocks.') + ' ' + _('The Note block specifies the duration (note value) of its contents.'), 'documentation', null, 'note1']);
 
         this.formBlock({

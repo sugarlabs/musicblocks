@@ -325,6 +325,7 @@ class ModeWidgetBlock extends StackClampBlock {
     constructor() {
         super('modewidget');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).'), 'documentation', '']);
         //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
         this.formBlock({ name: _('custom mode'), canCollapse: true });
@@ -363,6 +364,7 @@ class TempoBlock extends StackClampBlock {
     constructor() {
         super('tempo');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Tempo block opens a metronome to visualize the beat.'), 'documentation', null, 'tempo']);
         //.TRANS: the speed at music is should be played.
         this.formBlock({ name: _('tempo'), canCollapse: true });
@@ -463,6 +465,7 @@ class PitchSliderBlock extends StackClampBlock {
     constructor() {
         super('pitchslider');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Pitch slider tool to is used to generate pitches at selected frequencies.'), 'documentation', '']);
         //.TRANS: widget to generate pitches using a slider
         this.formBlock({ name: _('pitch slider'), canCollapse: true });
@@ -577,6 +580,7 @@ class MusicKeyboardBlock extends StackClampBlock {
     constructor() {
         super('musickeyboard');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', null, 'musickeyboard2']);
         //.TRANS: widget to generate pitches using a slider
         this.formBlock({ name: _('music keyboard'), canCollapse: true });
@@ -675,6 +679,7 @@ class RhythmRuler2Block extends StackClampBlock {
     constructor() {
         super('rhythmruler2');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Rhythm Maker block opens a tool to create drum machines.'), 'documentation', null, 'rhythmruler2']);
         //.TRANS: widget for subdividing a measure into distinct rhythmic elements
         this.formBlock({ name: _('rhythm maker'), canCollapse: true });
@@ -727,6 +732,7 @@ class MatrixGMajorBlock extends FlowBlock {
     constructor() {
         super('matrixgmajor', _('G major scale'));
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString();
         this.makeMacro((x, y) => [
             [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
@@ -754,6 +760,7 @@ class MatrixCMajorBlock extends FlowBlock {
     constructor() {
         super('matrixcmajor', _('C major scale'));
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString();
         this.makeMacro((x, y) => [
             [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
@@ -781,6 +788,7 @@ class MatrixBlock extends StackClampBlock {
     constructor() {
         super('matrix');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Phrase Maker block opens a tool to create musical phrases.'), 'documentation', null, 'matrix']);
         //.TRANS: assigns pitch to a sequence of beats to generate a melody
         this.formBlock({ name: _('phrase maker'), canCollapse: true });
@@ -889,6 +897,7 @@ class StatusBlock extends StackClampBlock {
     constructor() {
         super('status');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Status block opens a tool for inspecting the status of Music Blocks as it is running.'), 'documentation', null, 'status']);
         this.formBlock({ name: _('status'), canCollapse: true });
         this.makeMacro((x, y) => [

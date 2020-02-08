@@ -73,6 +73,7 @@ class MyClickBlock extends ValueBlock {
     constructor() {
         super('myclick', _('click'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Click block returns True if a mouse has been clicked.'), 'documentation', null, 'clickhelp']);
     }
 
@@ -178,6 +179,7 @@ class MouseYBlock extends ValueBlock {
     constructor() {
         super('mousey', _('cursor y'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', null, 'mousebuttonhelp']);
     }
 
@@ -190,6 +192,7 @@ class MouseXBlock extends ValueBlock {
     constructor() {
         super('mousex', _('cursor x'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', null, 'mousebuttonhelp']);
     }
 
@@ -202,6 +205,7 @@ class MouseButtonBlock extends BooleanSensorBlock {
     constructor() {
         super('mousebutton', _('mouse button'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', null, 'mousebuttonhelp']);
         this.extraWidth = 20;
     }

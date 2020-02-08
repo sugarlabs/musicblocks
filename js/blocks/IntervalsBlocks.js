@@ -4,6 +4,7 @@ class SetTemperamentBlock extends FlowBlock {
     constructor() {
         super('settemperament', _('set temperament'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', '']);
 
         this.formBlock({
@@ -401,6 +402,7 @@ function makeIntervalMacroBlocks() {
         constructor(name, display, value1, value2) {
             super(name, display);
             this.setPalette('intervals');
+            this.beginnerBlock(true);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, 'interval', x, y, [null, 1, 3, 2]],
@@ -425,6 +427,7 @@ function makeIntervalMacroBlocks() {
         constructor(name, value, down) {
             super((down ? 'down' : '') + name + 'interval', _((down ? 'down ' : '') + name));
             this.setPalette('intervals');
+            this.beginnerBlock(true);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, 'interval', x, y, [null, 1, 6, 8]],
@@ -609,6 +612,7 @@ class MoveableBlock extends FlowBlock {
     constructor() {
         super('movable', _('moveable Do'));  // legacy typo
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.setHelpString([_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', null, 'movablehelp']);
 	this.size = 0;
         this.formBlock({
@@ -632,6 +636,7 @@ class ModeLengthBlock extends ValueBlock {
         //.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
         super('modelength', _('mode length'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', '']);
     }
 
@@ -684,6 +689,7 @@ class SetKeyBlock extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey', _('set key'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.setHelpString();
         this.formBlock({
             args: 1, argTypes: ['textin'], defaults: ['C']
@@ -704,6 +710,7 @@ class SetKey2Block extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey2', _('set key'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', null, 'movablehelp']);
         this.formBlock({
             args: 2, argTypes: ['anyin', 'anyin'],

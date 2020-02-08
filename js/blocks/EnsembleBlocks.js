@@ -559,6 +559,7 @@ class TurtleNameBlock extends ValueBlock {
     constructor() {
         super('turtlename', _('mouse name'));
         this.setPalette('ensemble');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Mouse-name block returns the name of a mouse.'), 'documentation', null, 'clickhelp']);
 
         this.formBlock({
@@ -625,6 +626,7 @@ class SetTurtleName2Block extends FlowBlock {
     constructor() {
         super('setturtlename2', _('set name'));
         this.setPalette('ensemble');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Set-name block is used to name a mouse.'), 'documentation', null, 'clickhelp']);
 
         this.formBlock({
