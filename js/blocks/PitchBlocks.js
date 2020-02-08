@@ -616,7 +616,7 @@ class TranspositionFactorBlock extends ValueBlock {
 class ConsonantStepSizeDownBlock extends ValueBlock {
     constructor() {
         //.TRANS: step down one note in current musical scale
-        super('constonantstepsizedown', _('scalar step down'));
+        super('consonantstepsizedown', _('scalar step down'));
         this.setPalette('pitch');
         this.setHelpString();
     }
