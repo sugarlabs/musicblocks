@@ -450,7 +450,7 @@ class ListenBlock extends FlowBlock {
             //.TRANS: an event, such as user actions (mouse clicks, key presses)
             name: _('on'),
             args: 2,
-            argTypes: ['textin', 'textin'],
+            argTypes: ['anyin', 'anyin'],
             //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
             argLabels: [_('event'), this.lang === 'ja' ? _('do1') : _('do')],
             defaults: [_('event'), _('action')]
