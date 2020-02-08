@@ -71,6 +71,7 @@ class MyClickBlock extends ValueBlock {
     constructor() {
         super('myclick', _('click'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle) {
@@ -170,6 +171,7 @@ class MouseYBlock extends ValueBlock {
     constructor() {
         super('mousey', _('cursor y'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -181,6 +183,7 @@ class MouseXBlock extends ValueBlock {
     constructor() {
         super('mousex', _('cursor x'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -192,6 +195,7 @@ class MouseButtonBlock extends BooleanSensorBlock {
     constructor() {
         super('mousebutton', _('mouse button'));
         this.setPalette('sensors');
+        this.beginnerBlock(true);
         this.extraWidth = 20;
     }
 

@@ -62,6 +62,7 @@ function ProtoBlock(name) {
     //Stores the width of the text component
     this.textWidth = 0;
     this.labelOffset = 0;
+    this.beginnerModeBlock = false;
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -1250,6 +1251,7 @@ class BaseBlock extends ProtoBlock {
 
         this.macroFunc = null;
         this._style = {}
+        this.beginnerBlock = false;
 
         // Just for brevity
         this.lang = localStorage.languagePreference || navigator.language;
@@ -1427,9 +1429,14 @@ class BaseBlock extends ProtoBlock {
         this.name = name;
     }
 
+    beginnerBlock(value) {
+        this.beginnerModeBlock = value
+    }
+
     setup() {
         blocks.protoBlockDict[this.name] = this;
-        if (beginnerMode && !beginnerBlock(this.name)) {
+        console.debug(this.beginnerModeBlock);
+        if (beginnerMode && !this.beginnerModeBlock) {
             this.hidden = true;
         }
         if (this._style.name)

@@ -597,6 +597,8 @@ class PrintBlock extends FlowBlock {
         else
             this.setPalette('extras');
 
+        this.beginnerBlock(true);
+
         this.formBlock({
             args: 1, defaults: ['Music Blocks'],
             argTypes: ['anyin']

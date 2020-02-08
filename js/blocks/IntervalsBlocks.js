@@ -4,6 +4,7 @@ class SetTemperamentBlock extends FlowBlock {
     constructor() {
         super('settemperament', _('set temperament'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 3,
             argLabels: [_('temperament'), _('pitch'), _('octave')]
@@ -616,6 +617,7 @@ class ModeLengthBlock extends ValueBlock {
         //.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
         super('modelength', _('mode length'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle, blk) {
@@ -665,6 +667,7 @@ class SetKeyBlock extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey', _('set key'));
         this.setPalette('intervals');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, argTypes: ['textin'], defaults: ['C']
         });

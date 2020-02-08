@@ -236,6 +236,7 @@ class DivideBlock extends LeftBlock {
     constructor() {
         super('divide');
         this.setPalette('number');
+        this.beginnerBlock(true);
 
         this.fontsize = 9;
         this.formBlock({
@@ -276,6 +277,7 @@ class MultiplyBlock extends LeftBlock {
     constructor() {
         super('multiply');
         this.setPalette('number');
+        this.beginnerBlock(true);
 
         this.fontsize = 14;
         this.formBlock({
@@ -365,6 +367,7 @@ class MinusBlock extends LeftBlock {
     constructor() {
         super('minus');
         this.setPalette('number');
+        this.beginnerBlock(true);
 
         this.fontsize = 14;
         this.formBlock({
@@ -418,6 +421,7 @@ class PlusBlock extends LeftBlock {
     constructor() {
         super('plus');
         this.setPalette('number');
+        this.beginnerBlock(true);
 
         this.fontsize = 14;
         this.formBlock({
@@ -480,6 +484,7 @@ class OneOfBlock extends LeftBlock {
     constructor() {
         super('oneOf');
         this.setPalette('number');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('one of'), args: 2,
@@ -521,7 +526,7 @@ class RandomBlock extends LeftBlock {
     constructor() {
         super('random');
         this.setPalette('number');
-
+        this.beginnerBlock(true);
         this.formBlock({
             name: _('random'), args: 2,
             argLabels: [_('min'), _('max')],
@@ -560,6 +565,7 @@ class NumberBlock extends ValueBlock {
     constructor() {
         super('number');
         this.setPalette('number');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle, blk) {

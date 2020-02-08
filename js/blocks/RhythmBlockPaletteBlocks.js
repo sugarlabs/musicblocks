@@ -131,6 +131,7 @@ class Rhythm2Block extends RhythmBlock {
     constructor() {
         super('rhythm2');
         this.setPalette(rhythmBlockPalette);
+        //this.beginnerBlock(true);
         this.formBlock({
             name: this.lang === 'ja'
                 //.TRANS: rhythm block
@@ -512,6 +513,7 @@ class STupletBlock extends FlowBlock {
     constructor() {
         super('stuplet', _('simple tuplet'));
         this.setPalette(rhythmBlockPalette);
+        //this.beginnerBlock(true);
         this.formBlock({
             args: 2, defaults: [3, 1 / 2],
             argLabels: [_('number of notes'), _('note value')],

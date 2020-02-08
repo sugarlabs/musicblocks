@@ -182,6 +182,7 @@ class ColorBlock extends ValueBlock {
     constructor() {
         super('color', _('color'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle, blk) {
@@ -235,6 +236,7 @@ class BackgroundBlock extends FlowBlock {
     constructor() {
         super('background', _('background'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
     }
 
     flow(args, logo, turtle) {
@@ -297,6 +299,7 @@ class FillBlock extends FlowClampBlock {
     constructor() {
         super('fill');
         this.setPalette('pen');
+        this.beginnerBlock(true);
 
         this.formBlock({
             //.TRANS: fill in as a solid color
@@ -365,6 +368,7 @@ class PenUpBlock extends FlowBlock {
         //.TRANS: riase up the pen so logo it does not draw when it is moved
         super('penup', _('pen up'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
     }
 
     flow(args, logo, turtle, blk) {
@@ -384,6 +388,7 @@ class PenDownBlock extends FlowBlock {
         //.TRANS: put down the pen so logo it draws when it is moved
         super('pendown', _('pen down'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
     }
 
     flow(args, logo, turtle, blk) {
@@ -403,6 +408,7 @@ class SetPenSizeBlock extends FlowBlock {
         //.TRANS: set the width of the line drawn by the pen
         super('setpensize', _('set pen size'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 1, defaults: [5]
@@ -517,6 +523,7 @@ class SetShadeBlock extends FlowBlock {
     constructor() {
         super('setshade', _('set shade'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 1, defaults: [50]
@@ -592,6 +599,7 @@ class SetColorBlock extends FlowBlock {
     constructor() {
         super('setcolor', _('set color'));
         this.setPalette('pen');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 1, defaults: [0]

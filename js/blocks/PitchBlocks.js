@@ -717,6 +717,7 @@ class MyPitchBlock extends ValueBlock {
         //.TRANS: convert current note to piano key (1-88)
         super('mypitch', _('pitch number'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle, blk) {
@@ -756,6 +757,7 @@ class PitchInHertzBlock extends ValueBlock {
         //.TRANS: the current pitch expressed in Hertz
         super('pitchinhertz', _('pitch in hertz'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
     }
 
     arg(logo, turtle, blk) {
@@ -1224,6 +1226,7 @@ class FifthBlock extends FlowBlock {
         //.TRANS: fifth means the note is the four scale degrees above current note
         super('fifth', _('fifth'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1243,6 +1246,7 @@ class FourthBlock extends FlowBlock {
         //.TRANS: fourth means the note is three scale degrees above current note
         super('fourth', _('fourth'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 7]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1557,6 +1561,7 @@ class HertzBlock extends FlowBlock {
         //.TRANS: a measure of frequency: one cycle per second
         super('hertz', _('hertz'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: [
                 this.lang === 'ja' ? 440 : 392
@@ -1687,6 +1692,7 @@ class PitchNumberBlock extends FlowBlock {
         //.TRANS: a mapping of pitch to the 88 piano keys
         super('pitchnumber', _('pitch number'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: [7]
         });
@@ -1719,6 +1725,7 @@ class StepPitchBlock extends FlowBlock {
         //.TRANS: step some number of notes in current musical scale
         super('steppitch', _('scalar step') + ' (+/–)');
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: [1],
             argTypes: ['anyin']
@@ -1892,6 +1899,7 @@ class PitchBlock extends FlowBlock {
         //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
         super('pitch', _('pitch'));
         this.setPalette('pitch');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 2, defaults: ['sol', 4],
             argTypes: ['solfegein', 'anyin'],

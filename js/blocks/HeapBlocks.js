@@ -89,7 +89,7 @@ class ShowHeapBlock extends FlowBlock {
     constructor() {
         super('showHeap');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: Display the heap contents
             name: _('show heap')
@@ -108,7 +108,7 @@ class HeapLengthBlock extends ValueBlock {
     constructor() {
         super('heapLength');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: How many entries are in the heap?
             name: _('heap length'),
@@ -128,7 +128,7 @@ class HeapEmptyBlock extends ValueBlock {
     constructor() {
         super('heapEmpty');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: Is the heap empty?
             name: _('heap empty?'),
@@ -147,7 +147,7 @@ class EmptyHeapBlock extends FlowBlock {
     constructor() {
         super('emptyHeap');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: empty the heap
             name: _('empty heap')
@@ -225,7 +225,7 @@ class ReverseHeapBlock extends FlowBlock {
     constructor() {
         super('reverseHeap');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: reverse the order of the heap
             name: _('reverse heap')
@@ -241,7 +241,7 @@ class IndexHeapBlock extends LeftBlock {
     constructor() {
         super('indexHeap');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: retrieve a value from the heap at index position in the heap
             name: _('index heap'),
@@ -290,7 +290,7 @@ class SetHeapEntryBlock extends FlowBlock {
     constructor() {
         super('setHeapEntry');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             name: _('set heap'),
             args: 2, argTypes: ['numberin', 'anyin'],
@@ -339,7 +339,7 @@ class PopBlock extends ValueBlock {
     constructor() {
         super('pop');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: pop a value off the top of the heap
             name: _('pop')
@@ -359,7 +359,7 @@ class PushBlock extends FlowBlock {
     constructor() {
         super('push');
         this.setPalette('heap');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: push a value onto the top of the heap
             name: _('push'),

@@ -283,6 +283,7 @@ class MyNoteValueBlock extends ValueBlock {
         //.TRANS: the value (e.g., 1/4 note) of the note being played.
         super('mynotevalue', _('note value'));
         this.setPalette('rhythm');
+        this.beginnerBlock('true');
     }
 
     arg(logo, turtle, blk) {
@@ -515,6 +516,7 @@ class TieBlock extends FlowClampBlock {
     constructor() {
         super('tie');
         this.setPalette('rhythm');
+        this.beginnerBlock(true)
 
         this.formBlock({
             //.TRANS: tie notes together into one longer note
@@ -670,6 +672,7 @@ class Rest2Block extends FlowBlock {
     constructor() {
         super('rest2', _('silence'));
         this.setPalette('rhythm');
+        this.beginnerBlock(true)
 
         this.makeMacro((x, y) => [
             [0, 'newnote', x, y, [null, 1, 4, 6]],
@@ -698,6 +701,7 @@ class Note4Block extends FlowClampBlock {
     constructor() {
         super('note4');
         this.setPalette('rhythm');
+        this.beginnerBlock(true)
 
         this.formBlock({
             name: this.lang === 'ja'
@@ -879,6 +883,7 @@ class NewNoteBlock extends FlowClampBlock {
     constructor() {
         super('newnote');
         this.setPalette('rhythm');
+        this.beginnerBlock(true)
 
         this.formBlock({
             name: _('note'),
