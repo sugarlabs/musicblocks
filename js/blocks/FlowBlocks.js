@@ -4,6 +4,7 @@ class BackwardBlock extends FlowClampBlock {
     constructor() {
         super('backward');
         this.setPalette('flow');
+        this.setHelpString([_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', '']);
 
         this.formBlock({
             name: _('backward'),
@@ -48,6 +49,7 @@ class DuplicateBlock extends FlowClampBlock {
     constructor() {
         super('duplicatenotes');
         this.setPalette('flow');
+        this.setHelpString([_('The Duplicate block will run each block multiple times.') + ' ' + _('The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.'), 'documentation', null, 'duphelp']);
 
         this.formBlock({
             name: _('duplicate'),
@@ -201,6 +203,7 @@ class DefaultCaseBlock extends FlowClampBlock {
     constructor() {
         super('defaultcase');
         this.setPalette('flow');
+        this.setHelpString();
 
         this.formBlock({
             name: _('default'),
@@ -223,6 +226,7 @@ class CaseBlock extends FlowClampBlock {
     constructor() {
         super('case');
         this.setPalette('flow');
+        this.setHelpString([_('The Case block is used inside of a Switch to define matches.'), 'documentation', null, 'switchhelp']);
 
         this.formBlock({
             name: _('case'),
@@ -247,6 +251,7 @@ class SwitchBlock extends FlowClampBlock {
     constructor() {
         super('switch');
         this.setPalette('flow');
+        this.setHelpString([_('The Switch block will run the code in the matching Case.'), 'documentation', null, 'switchhelp']);
         
         this.formBlock({
             name: _('switch'),
@@ -312,6 +317,7 @@ class ClampBlock extends FlowClampBlock {
     constructor() {
         super('clamp');
         this.setPalette('flow');
+        this.setHelpString();
 
         this.hidden = true;
 
@@ -330,6 +336,7 @@ class BreakBlock extends BaseBlock {
     constructor() {
         super('break');
         this.setPalette('flow');
+        this.setHelpString([_('The Stop block will stop a loop') + ': ' + _('Forever, Repeat, While, or Until.'), 'documentation', '']);
         //this.staticLabels.push(_('stop'));
 
         //this.adjustWidthToLabel();
@@ -361,6 +368,7 @@ class WaitForBlock extends FlowBlock {
     constructor() {
         super('waitFor');
         this.setPalette('flow');
+        this.setHelpString([_('The Waitfor block will wait until the condition is true.'), 'documentation', null, 'waitforhelp']);
 
         this.formBlock({
             name: _('wait for'),
@@ -413,6 +421,7 @@ class UntilBlock extends FlowClampBlock {
     constructor() {
         super('until');
         this.setPalette('flow');
+        this.setHelpString([_('The Until block will repeat until the condition is true.'), 'documentation', null, 'untilhelp']);
 
         this.formBlock({
             name: _('until'),
@@ -463,6 +472,7 @@ class WhileBlock extends FlowClampBlock {
     constructor() {
         super('while');
         this.setPalette('flow');
+        this.setHelpString([_('The While block will repeat while the condition is true.'), 'documentation', null, 'whilehelp']);
 
         this.formBlock({
             name: _('while'),
@@ -517,6 +527,7 @@ class IfThenElseBlock extends FlowClampBlock {
     constructor() {
         super('ifthenelse');
         this.setPalette('flow');
+        this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', null, 'elifhelp']);
 
         this.formBlock({
             name: _('if'),
@@ -539,6 +550,7 @@ class IfBlock extends FlowClampBlock {
     constructor() {
         super('if');
         this.setPalette('flow');
+        this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'ifhelp']);
 
         this.formBlock({
             name: _('if'),
@@ -559,6 +571,7 @@ class ForeverBlock extends FlowClampBlock {
     constructor() {
         super('forever');
         this.setPalette('flow');
+        this.setHelpString([_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', null, 'foreverhelp']);
 
         this.formBlock({
             name: _('forever'),
@@ -576,6 +589,7 @@ class RepeatBlock extends FlowClampBlock {
     constructor() {
         super('repeat');
         this.setPalette('flow');
+        this.setHelpString([_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', null, 'repeathelp']);
 
         this.formBlock({
             name: _('repeat'),
@@ -605,6 +619,7 @@ class DuplicateFactorBlock extends ValueBlock {
         //.TRANS: factor used in determining how many duplications to make
         super('duplicatefactor', _('duplicate factor'));
         this.setPalette('flow');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -621,6 +636,7 @@ class HiddenNoFlowBlock extends FlowBlock {
     constructor() {
         super('hiddennoflow');
         this.setPalette('flow');
+        this.setHelpString();
         this.dockTypes[this.dockTypes.length - 1] = 'unavailable';
         this.size = 0;
         this.hidden = true;
@@ -633,6 +649,7 @@ class HiddenBlock extends FlowBlock {
     constructor() {
         super('hidden');
         this.setPalette('flow');
+        this.setHelpString();
         this.size = 0;
         this.hidden = true;
     }

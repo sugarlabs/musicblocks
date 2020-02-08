@@ -19,6 +19,7 @@ class TurtleHeapBlock extends LeftBlock {
     constructor() {
         super('turtleheap', _('mouse index heap'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 2, defaults: [_('Mr. Mouse'), 1],
@@ -70,6 +71,7 @@ class StopTurtleBlock extends FlowBlock {
     constructor() {
         super('stopTurtle', _('stop mouse'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Stop mouse block stops the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [_('Mr. Mouse')],
@@ -105,6 +107,7 @@ class StartTurtleBlock extends FlowBlock {
     constructor() {
         super('startTurtle', _('start mouse'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Start mouse block starts the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [_('Mr. Mouse')],
@@ -161,6 +164,7 @@ class TurtleColorBlock extends LeftBlock {
         //.TRANS: pen color for this mouse
         super('turtlecolor', _('mouse color'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse color block returns the pen color of the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -181,6 +185,7 @@ class TurtleHeadingBlock extends LeftBlock {
         //.TRANS: heading (compass direction) for this mouse
         super('turtleheading', _('mouse heading'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse heading block returns the heading of the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -201,6 +206,7 @@ class SetXYTurtleBlock extends FlowBlock {
         //.TRANS: set xy position for this mouse
         super('setxyturtle', _('set mouse'));
         this.setPalette('ensemble');
+        this.setHelpString();
         
         this.formBlock({
             args: 3, defaults: [_('Mr. Mouse', 0, 0)],
@@ -238,6 +244,7 @@ class SetTurtleBlock extends FlowClampBlock {
     constructor() {
         super('setturtle');
         this.setPalette('ensemble');
+        this.setHelpString([_('The Set mouse block sends a stack of blocks to be run by the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             name: _('set mouse'),
@@ -265,6 +272,7 @@ class YTurtleBlock extends LeftBlock {
         //.TRANS: y position for this mouse
         super('yturtle', _('mouse y'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Y mouse block returns the Y position of the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -286,6 +294,7 @@ class XTurtleBlock extends LeftBlock {
         //.TRANS: x position for this mouse
         super('xturtle', _('mouse x'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The X mouse block returns the X position of the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -307,6 +316,7 @@ class TurtleElapsedNotesBlock extends LeftBlock {
         //.TRANS: notes played by this mouse
         super('turtleelapsednotes', _('mouse notes played'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse elapse notes block returns the number of notes played by the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -328,6 +338,7 @@ class TurtlePitchBlock extends LeftBlock {
         //.TRANS: convert current note for this turtle to piano key (1-88)
         super('turtlepitch', _('mouse pitch number'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse pitch block returns the current pitch number being played by the specified mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -391,6 +402,7 @@ class TurtleNoteBlock extends LeftBlock {
     constructor(name, displayName) {
         super(name || 'turtlenote', displayName || _('mouse note value'));
         this.setPalette('ensemble');
+        this.setHelpString();
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -440,6 +452,7 @@ class TurtleNoteBlock extends LeftBlock {
 class TurtleNote2Block extends TurtleNoteBlock {
     constructor() {
         super('turtlenote2', _('mouse note value'));
+        this.setHelpString([_('The Mouse note block returns the current note value being played by the specified mouse.'), 'documentation', '']);
     }
 }
 
@@ -447,6 +460,7 @@ class TurtleSyncBlock extends FlowBlock {
     constructor() {
         super('turtlesync', _('mouse sync'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse sync block aligns the beat count between mice.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -476,6 +490,7 @@ class FoundTurtleBlock extends BooleanBlock {
     constructor() {
         super('foundturtle', _('found mouse'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Found mouse block will return true if the specified mouse can be found.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -493,6 +508,7 @@ class NewTurtleBlock extends FlowBlock {
     constructor() {
         super('newturtle', _('new mouse'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The New mouse block will create a new mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
@@ -543,6 +559,7 @@ class TurtleNameBlock extends ValueBlock {
     constructor() {
         super('turtlename', _('mouse name'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Mouse-name block returns the name of a mouse.'), 'documentation', null, 'clickhelp']);
 
         this.formBlock({
             outType: 'textout'
@@ -558,6 +575,7 @@ class SetTurtleNameBlock extends FlowBlock {
     constructor() {
         super('setturtlename', _('set name'));
         this.setPalette('ensemble');
+        this.setHelpString();
 
         this.formBlock({
             args: 2, defaults: [-1, _('Mr. Mouse')],
@@ -607,6 +625,7 @@ class SetTurtleName2Block extends FlowBlock {
     constructor() {
         super('setturtlename2', _('set name'));
         this.setPalette('ensemble');
+        this.setHelpString([_('The Set-name block is used to name a mouse.'), 'documentation', null, 'clickhelp']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
