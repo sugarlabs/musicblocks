@@ -4,6 +4,7 @@ class LoadHeapFromAppBlock extends FlowBlock {
     constructor() {
         super('loadHeapFromApp');
         this.setPalette('heap');
+        this.setHelpString([_('The Load-heap-from-app block loads the heap from a web page.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: load the heap contents from a URL
@@ -56,6 +57,7 @@ class SaveHeapToAppBlock extends FlowBlock {
     constructor() {
         super('saveHeapToApp');
         this.setPalette('heap');
+        this.setHelpString([_('The Save-heap-to-app block saves the heap to a web page.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: save the heap contents to a URL
@@ -89,6 +91,7 @@ class ShowHeapBlock extends FlowBlock {
     constructor() {
         super('showHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Show-heap block displays the contents of the heap at the top of the screen.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: Display the heap contents
@@ -108,6 +111,7 @@ class HeapLengthBlock extends ValueBlock {
     constructor() {
         super('heapLength');
         this.setPalette('heap');
+        this.setHelpString([_('The Heap-length block returns the length of the heap.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: How many entries are in the heap?
@@ -128,6 +132,7 @@ class HeapEmptyBlock extends ValueBlock {
     constructor() {
         super('heapEmpty');
         this.setPalette('heap');
+        this.setHelpString([_('The Heap-empty? block returns true if the heap is empty.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: Is the heap empty?
@@ -147,6 +152,7 @@ class EmptyHeapBlock extends FlowBlock {
     constructor() {
         super('emptyHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Empty-heap block empties the heap.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: empty the heap
@@ -163,6 +169,7 @@ class SaveHeapBlock extends FlowBlock {
     constructor() {
         super('saveHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Save-heap block saves the heap to a file.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: save the heap to a file
@@ -183,6 +190,7 @@ class LoadHeapBlock extends FlowBlock {
     constructor() {
         super('loadHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Load-heap block loads the heap from a file.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: load the heap from a file
@@ -225,6 +233,7 @@ class ReverseHeapBlock extends FlowBlock {
     constructor() {
         super('reverseHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Reverse-heap block reverses the order of the heap.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: reverse the order of the heap
@@ -241,6 +250,7 @@ class IndexHeapBlock extends LeftBlock {
     constructor() {
         super('indexHeap');
         this.setPalette('heap');
+        this.setHelpString([_('The Index-heap block returns a value in the heap at a specified location.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: retrieve a value from the heap at index position in the heap
@@ -290,6 +300,7 @@ class SetHeapEntryBlock extends FlowBlock {
     constructor() {
         super('setHeapEntry');
         this.setPalette('heap');
+        this.setHelpString([_('The Set-heap entry block sets a value in he heap at the specified location.'), 'documentation', '']);
 
         this.formBlock({
             name: _('set heap'),
@@ -339,6 +350,7 @@ class PopBlock extends ValueBlock {
     constructor() {
         super('pop');
         this.setPalette('heap');
+        this.setHelpString([_('The Pop block removes the value at the top of the heap.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: pop a value off the top of the heap
@@ -359,6 +371,7 @@ class PushBlock extends FlowBlock {
     constructor() {
         super('push');
         this.setPalette('heap');
+        this.setHelpString([_('The Push block adds a value to the top of the heap.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: push a value onto the top of the heap

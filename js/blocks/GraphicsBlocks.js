@@ -5,6 +5,8 @@ class HeadingBlock extends ValueBlock {
         //.TRANS: orientation or compass direction
         super('heading', _('heading'));
         this.setPalette('graphics');
+        this.setHelpString([_('The Heading block returns the orientation of the mouse.'), 'documentation', '']);
+
     }
 
     arg(logo, turtle, blk) {
@@ -21,6 +23,7 @@ class YBlock extends ValueBlock {
         //.TRANS: y coordinate
         super('y');
         this.setPalette('graphics');
+        this.setHelpString([_('The Y block returns the vertical position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('y3') : _('y')
@@ -41,6 +44,7 @@ class XBlock extends ValueBlock {
         //.TRANS: x coordinate
         super('x');
         this.setPalette('graphics');
+        this.setHelpString([_('The X block returns the horizontal position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('x3') : _('x')
@@ -61,6 +65,7 @@ class ScrollXYBlock extends FlowBlock {
         //.TRANS: scroll canvas image by x, y position
         super('scrollxy', _('scroll xy'));
         this.setPalette('graphics');
+        this.setHelpString([_('The Scroll XY block moves the canvas.'), 'documentation', null, 'everybeathelp']);
 
         this.formBlock({
             args: 2, defaults: [100, 0],
@@ -104,6 +109,7 @@ class ClearBlock extends FlowBlock {
         //.TRANS: erase the screen and return the mice to the center position
         super('clear', _('clear'));
         this.setPalette('graphics');
+        this.setHelpString();
     }
 
     flow(args, logo, turtle, blk) {
@@ -134,6 +140,7 @@ class ControlPoint2Block extends FlowBlock {
     constructor() {
         super('controlpoint2');
         this.setPalette('graphics');
+        this.setHelpString([_('The Control-point 2 block sets the second control point for the Bezier curve.'), 'documentation', '']);
         
         this.formBlock({
             //.TRANS: control point in a bezier curve
@@ -164,6 +171,7 @@ class ControlPoint1Block extends FlowBlock {
     constructor() {
         super('controlpoint1');
         this.setPalette('graphics');
+        this.setHelpString([_('The Control-point 1 block sets the first control point for the Bezier curve.'), 'documentation', '']);
         
         this.formBlock({
             //.TRANS: control point in a bezier curve
@@ -194,6 +202,7 @@ class BezierBlock extends FlowBlock {
     constructor() {
         super('bezier');
         this.setPalette('graphics');
+        this.setHelpString([_('The Bezier block draws a Bezier curve.'), 'documentation', '']);
         
         this.formBlock({
             //.TRANS: Bézier curves employ at least three points to define a curve
@@ -231,6 +240,7 @@ class ArcBlock extends FlowBlock {
     constructor() {
         super('arc');
         this.setPalette('graphics');
+        this.setHelpString([_('The Arc block moves the mouse in a arc.'), 'documentation', null, 'archelp']);
         
         this.formBlock({
             //.TRANS: draws a part of the circumference of a circle
@@ -276,6 +286,7 @@ class SetHeadingBlock extends FlowBlock {
         //.TRANS: set compass heading
         super('setheading', _('set heading'));
         this.setPalette('graphics');
+        this.setHelpString([_('The Set heading block sets the heading of the mouse.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [0]
@@ -309,6 +320,7 @@ class SetXYBlock extends FlowBlock {
     constructor() {
         super('setxy');
         this.setPalette('graphics');
+        this.setHelpString([_('The Set XY block moves the mouse to a specific position on the screen.'), 'documentation', '']);
         
         this.formBlock({
             //.TRANS: set xy (Cartesian) position
@@ -353,6 +365,7 @@ class RightBlock extends FlowBlock {
     constructor() {
         super('right');
         this.setPalette('graphics');
+        this.setHelpString([_('The Right block turns the mouse to the right.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
             //.TRANS: right1 and right are when turning right (clockwise)
@@ -396,6 +409,7 @@ class MLeftBlock extends FlowBlock {
     constructor() {
         super('left');
         this.setPalette('graphics');
+        this.setHelpString([_('The Left block turns the mouse to the left.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
             //.TRANS: left and left1 are when turning left (counter-clockwise)
@@ -440,6 +454,7 @@ class BackBlock extends FlowBlock {
         //.TRANS: move backward (in the opposite direction of the current heading)
         super('back', _('back'));
         this.setPalette('graphics');
+        this.setHelpString([_('The Back block moves the mouse backward.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
             args: 1, defaults: [100]
@@ -482,6 +497,7 @@ class ForwardBlock extends FlowBlock {
         //.TRANS: move forward (in the direction of the current heading)
         super('forward', _('forward'));
         this.setPalette('graphics');
+        this.setHelpString([_('The Forward block moves the mouse forward.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
             args: 1, defaults: [100]

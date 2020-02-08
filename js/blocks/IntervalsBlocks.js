@@ -4,6 +4,8 @@ class SetTemperamentBlock extends FlowBlock {
     constructor() {
         super('settemperament', _('set temperament'));
         this.setPalette('intervals');
+        this.setHelpString([_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', '']);
+
         this.formBlock({
             args: 3,
             argLabels: [_('temperament'), _('pitch'), _('octave')]
@@ -33,6 +35,7 @@ class TemperamentNameBlock extends ValueBlock {
     constructor() {
         super('temperamentname');
         this.setPalette('tone');
+        this.setHelpString([_('The Temperament name block is used to select a tuning method.'), 'documentation', '']);
         this.extraWidth = 50;
         this.hidden = true;
         this.formBlock({ outType: 'anyout' });
@@ -43,6 +46,7 @@ class ModeNameBlock extends ValueBlock {
     constructor() {
         super('modename');
         this.setPalette('intervals');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
         this.extraWidth = 50;
         this.hidden = true;
@@ -54,6 +58,7 @@ class DoublyBlock extends LeftBlock {
         // TRANS: doubly means to apply an augmentation or diminishment twice
         super('doubly', _('doubly'));
         this.setPalette('intervals');
+        this.setHelpString([_('The Doubly block will double the size of an interval.'), 'documentation', null, 'doublyhelp']);
         this.formBlock({
             outType: 'anyout', args: 1,
             argTypes: ['anyin']
@@ -103,6 +108,7 @@ class IntervalNameBlock extends ValueBlock {
     constructor() {
         super('intervalname');
         this.setPalette('intervals');
+        this.setHelpString();
         this.formBlock({ outType: 'numberout' });
     }
 }
@@ -111,6 +117,7 @@ class MeasureIntervalSemitonesBlock extends LeftBlock {
     constructor() {
         super('measureintervalsemitones');
         this.setPalette('intervals');
+        this.setHelpString([_('The Semi-tone interval block measures the distance between two notes in semi-tones.'), 'documentation', '']);
         this.formBlock({
             //.TRANS: measure the distance between two pitches in semi-tones
             name: _('semi-tone interval measure'),
@@ -197,6 +204,7 @@ class MeasureIntervalScalarBlock extends LeftBlock {
     constructor() {
         super('measureintervalscalar');
         this.setPalette('intervals');
+        this.setHelpString([_('The Scalar interval block measures the distance between two notes in the current key and mode.'), 'documentation', '']);
         this.formBlock({
             //.TRANS: measure the distance between two pitches in steps of musical scale
             name: _('scalar interval measure'),
@@ -287,6 +295,7 @@ function makeSemitoneIntervalMacroBlocks() {
             super((isDown ? 'down' : '') + type + value,
                   _((isDown ? 'down ' : '') + type) + ' ' + value);
             this.setPalette('intervals');
+            this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, 'semitoneinterval', x, y, [null, 1, 6, 7]],
                 ...[isDown
@@ -323,6 +332,7 @@ class PerfectBlock extends FlowClampBlock {
     constructor() {
         super('perfect');
         this.setPalette('intervals');
+        this.setHelpString();
         this.formBlock({
             name: _('perfect'),
             args: 1, defaults: [5]
@@ -335,6 +345,7 @@ class SemitoneIntervalBlock extends FlowClampBlock {
     constructor() {
         super('semitoneinterval');
         this.setPalette('intervals');
+        this.setHelpString([_('The Semi-tone interval block calculates a relative interval based on half steps.') + ' ' + _('In the figure, we add sol# to sol.'), 'documentation', '']);
         this.formBlock({
             //.TRANS: calculate a relative step between notes based on semi-tones
             name: _('semi-tone interval') + ' (+/–)',
@@ -390,6 +401,7 @@ function makeIntervalMacroBlocks() {
         constructor(name, display, value1, value2) {
             super(name, display);
             this.setPalette('intervals');
+            this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, 'interval', x, y, [null, 1, 3, 2]],
                 [1, ['number', {'value': value1}], 0, 0, [0]],
@@ -413,6 +425,7 @@ function makeIntervalMacroBlocks() {
         constructor(name, value, down) {
             super((down ? 'down' : '') + name + 'interval', _((down ? 'down ' : '') + name));
             this.setPalette('intervals');
+            this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, 'interval', x, y, [null, 1, 6, 8]],
                 [1, down ? 'minus' : 'plus',  0, 0, [0, 2, 3]],
@@ -455,6 +468,7 @@ class ScalarIntervalBlock extends FlowClampBlock {
     constructor() {
         super('interval');
         this.setPalette('intervals');
+        this.setHelpString([_('The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.') + ' ' + _('In the figure, we add la to sol.'), 'documentation', null, 'intervalhelp']);
         this.formBlock({
             //.TRANS: calculate a relative step between notes based on semi-tones
             name: _('scalar interval') + ' (+/–)',
@@ -501,6 +515,7 @@ class DefineModeBlock extends FlowClampBlock {
     constructor() {
         super('definemode');
         this.setPalette('intervals');
+        this.setHelpString([_('The Define mode block allows you define a custom mode by specifiying pitch numbers.'), 'documentation', null, 'definemode']);
         this.formBlock({
             //.TRANS: define a custom mode
             name: _('define mode'),
@@ -594,6 +609,7 @@ class MoveableBlock extends FlowBlock {
     constructor() {
         super('movable', _('moveable Do'));  // legacy typo
         this.setPalette('intervals');
+        this.setHelpString([_('When Moveable do is false, the solfege note names are always tied to specific pitches,') + ' ' + _('eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'), 'documentation', null, 'movablehelp']);
 	this.size = 0;
         this.formBlock({
             args: 1, argTypes: ['booleanin']
@@ -616,6 +632,7 @@ class ModeLengthBlock extends ValueBlock {
         //.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
         super('modelength', _('mode length'));
         this.setPalette('intervals');
+        this.setHelpString([_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -632,6 +649,7 @@ class CurrentModeBlock extends ValueBlock {
         //.TRANS: the mode in music is 'major', 'minor', etc.
         super('currentmode', _('current mode'));
         this.setPalette('intervals');
+        this.setHelpString();
     }
 
     arg(logo, turtle, blk) {
@@ -649,6 +667,7 @@ class KeyBlock extends ValueBlock {
         //.TRANS: the key is a group of pitches with which a music composition is created
         super('key', _('current key'));
         this.setPalette('intervals');
+        this.setHelpString();
     }
 
     arg(logo, turtle, blk) {
@@ -665,6 +684,7 @@ class SetKeyBlock extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey', _('set key'));
         this.setPalette('intervals');
+        this.setHelpString();
         this.formBlock({
             args: 1, argTypes: ['textin'], defaults: ['C']
         });
@@ -684,6 +704,7 @@ class SetKey2Block extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey2', _('set key'));
         this.setPalette('intervals');
+        this.setHelpString([_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', null, 'movablehelp']);
         this.formBlock({
             args: 2, argTypes: ['anyin', 'anyin'],
             argLabels: [
