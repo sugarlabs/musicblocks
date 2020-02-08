@@ -51,8 +51,7 @@ function HelpWidget () {
         if (blocks === null) {
             var that = this;
 
-	    var wftTitle = docById("helpWidgetID");
-	    wftTitle.innerHTML = _('Take a tour');
+            this.widgetWindow.updateTitle(_('Take a tour'));
             var rightArrow = document.getElementById('right-arrow');
             rightArrow.style.display = 'block';
             rightArrow.classList.add('hover');
@@ -84,14 +83,11 @@ function HelpWidget () {
             };
 
         } else {
-            if (blocks.activeBlock.name === null) {
-                // helpDiv.style.display = 'none';
-            } else {
+            if (blocks.activeBlock.name !== null) {
                 var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
+                this.widgetWindow.updateTitle(_(label));
             }
 
-	    var wftTitle = docById("helpWidgetID");
-	    wftTitle.innerHTML = _(label);
             var rightArrow = document.getElementById('right-arrow');
             // rightArrow.style.opacity = '0';
             rightArrow.style.display = 'none';
@@ -211,7 +207,7 @@ function HelpWidget () {
             body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
         }
 
-        helpBody.style.color = "#505050";
+        helpBody.style.color = '#505050';
         helpBody.innerHTML = body;
 
         this.widgetWindow.takeFocus();

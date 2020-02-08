@@ -86,6 +86,12 @@ function WidgetWindow(key, title) {
         }
     });
 
+    // The title may change, as with the Help Widget.
+    this.updateTitle = function (title) {
+        var wftTitle = docById(this._key + 'WidgetID');
+        wftTitle.innerHTML = title;
+    };
+
     // The handle needs the events bound as it's a sibling of the dragging div
     // not a relative in either direciton.
     this._drag.onmousedown = this._handle.onmousedown = function (e) {
