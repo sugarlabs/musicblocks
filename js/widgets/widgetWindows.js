@@ -15,25 +15,41 @@ function WidgetWindow(key, title) {
     }
 
     let windows = docById('floatingWindows');
-    this._frame = create("div", "windowFrame", windows);
+    this._frame = create('div', 'windowFrame', windows);
 
-    this._drag = create("div", "wfTopBar", this._frame);
-    this._handle = create("div", "wfHandle", this._drag);
+    this._drag = create('div', 'wfTopBar', this._frame);
+    this._handle = create('div', 'wfHandle', this._drag);
 
-    let closeButton = create("div", "wftButton close", this._drag);
-    let rollButton = create("div", "wftButton rollup", this._drag);
+    let closeButton = create('div', 'wftButton close', this._drag);
+    let rollButton = create('div', 'wftButton rollup', this._drag);
 
-    let titleEl = create("div", "wftTitle", this._drag);
+    let titleEl = create('div', 'wftTitle', this._drag);
     titleEl.innerHTML = _(title);
     titleEl.id = key + 'WidgetID';
 
-    let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
-    this._maxminIcon = create("img", undefined, maxminButton);
-    this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+    let maxminButton = create('div', 'wftButton wftMaxmin', this._drag);
+    this._maxminIcon = create('img', undefined, maxminButton);
+    this._maxminIcon.setAttribute('src', 'header-icons/icon-expand.svg');
 
-    this._body = create("div", "wfWinBody", this._frame);
-    this._toolbar = create("div", "wfbToolbar", this._body);
-    this._widget = create("div", "wfbWidget", this._body);
+    this._body = create('div', 'wfWinBody', this._frame);
+    this._toolbar = create('div', 'wfbToolbar', this._body);
+    this._widget = create('div', 'wfbWidget', this._body);
+
+    var language = localStorage.languagePreference;
+    if (language === undefined) {
+        language = navigator.language;
+    }
+
+    console.debug('language setting is ' + language);
+    // For Japanese, put the toolbar on the top.
+    if (language === 'ja') {
+        this._body.style.flexDirection = 'column';
+        this._body.style.flexGrow = '1';
+        this._toolbar.style.overflowY = 'auto';
+        this._toolbar.style.width = '100%';
+        this._toolbar.style.display = 'flex';
+        this._toolbar.style.flexShrink = '0';
+    }
 
     this._visible = true;
     this._rolled = false;
@@ -48,10 +64,10 @@ function WidgetWindow(key, title) {
     this._dragging = false;
 
     // Needed to keep things canvas-relative
-    let canvas = docById("myCanvas");
+    let canvas = docById('myCanvas');
 
     // Global watcher to track the mouse
-    document.addEventListener("mousemove", function (e) {
+    document.addEventListener('mousemove', function (e) {
         if (!that._dragging) return;
 
         let x = e.clientX - that._dx,
@@ -60,13 +76,13 @@ function WidgetWindow(key, title) {
         that.setPosition(x, y);
     });
 
-    document.addEventListener("mousedown", function (e) {
+    document.addEventListener('mousedown', function (e) {
         if (e.target === that._frame || that._frame.contains(e.target)) {
-            that._frame.style.opacity = "1";
-            that._frame.style.zIndex = "1";
+            that._frame.style.opacity = '1';
+            that._frame.style.zIndex = '1';
         } else {
-            that._frame.style.opacity = ".7";
-            that._frame.style.zIndex = "0";
+            that._frame.style.opacity = '.7';
+            that._frame.style.zIndex = '0';
         }
     });
 
@@ -96,7 +112,7 @@ function WidgetWindow(key, title) {
         e.preventDefault();
     };
 
-    document.addEventListener("mouseup", function (e) {
+    document.addEventListener('mouseup', function (e) {
         that._dragging = false;
     });
 
@@ -129,28 +145,28 @@ function WidgetWindow(key, title) {
     this.takeFocus = function () {
         let siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = ".7";
+            siblings[i].style.zIndex = '0';
+            siblings[i].style.opacity = '.7';
         }
-        this._frame.style.zIndex = "1";
-        this._frame.style.opacity = "1";
+        this._frame.style.zIndex = '1';
+        this._frame.style.opacity = '1';
     }
 
     this.addButton = function (icon, iconSize, label, parent) {
-        let el = create("div", "wfbtItem", parent || this._toolbar);
+        let el = create('div', 'wfbtItem', parent || this._toolbar);
         el.innerHTML = '<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" />';
         this._buttons.push(el);
         return el;
     };
 
     this.addInputButton = function (initial, parent) {
-        let el = create("div", "wfbtItem", parent || this._toolbar);
+        let el = create('div', 'wfbtItem', parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
-        return el.querySelector("input");
+        return el.querySelector('input');
     };
 
     this.addDivider = function () {
-        let el = create("div", "wfbtHR", this._toolbar);
+        let el = create('div', 'wfbtHR', this._toolbar);
         return el;
     };
 
@@ -182,8 +198,8 @@ function WidgetWindow(key, title) {
     };
 
     this.setPosition = function (x, y) {
-        this._frame.style.left = x + "px";
-        this._frame.style.top = Math.max(y, 64) + "px";
+        this._frame.style.left = x + 'px';
+        this._frame.style.top = Math.max(y, 64) + 'px';
         window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
 
         return this;
@@ -209,26 +225,26 @@ function WidgetWindow(key, title) {
     };
 
     this.clear = function () {
-        this._widget.innerHTML = "";
-        this._toolbar.innerHTML = "";
+        this._widget.innerHTML = '';
+        this._toolbar.innerHTML = '';
 
         return this;
     };
 
     this.rollup = function () {
         this._rolled = true;
-        this._body.style.display = "none";
+        this._body.style.display = 'none';
         return this;
     };
 
     this.unroll = function () {
         this._rolled = false;
-        this._body.style.display = "flex";
+        this._body.style.display = 'flex';
         return this;
     };
 
     this.maximize = function () {
-        this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
+        this._maxminIcon.setAttribute('src', 'header-icons/icon-contract.svg');
         this._maximized = true;
         this.unroll();
         this.takeFocus();
@@ -237,14 +253,14 @@ function WidgetWindow(key, title) {
             this._frame.style.left,
             this._frame.style.top,
         ]
-        this._frame.style.width = "100vw";
-        this._frame.style.height = "calc(100vh - 64px)";
-        this._frame.style.left = "0";
-        this._frame.style.top = "64px";
+        this._frame.style.width = '100vw';
+        this._frame.style.height = 'calc(100vh - 64px)';
+        this._frame.style.left = '0';
+        this._frame.style.top = '64px';
     };
 
     this.restore = function () {
-        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        this._maxminIcon.setAttribute('src', 'header-icons/icon-expand.svg');
         this._maximized = false;
 
         if (this._savedPos) {
@@ -252,8 +268,8 @@ function WidgetWindow(key, title) {
             this._frame.style.top = this._savedPos[1];
             this._savedPos = null;
         }
-        this._frame.style.width = "auto";
-        this._frame.style.height = "auto";
+        this._frame.style.width = 'auto';
+        this._frame.style.height = 'auto';
     };
 
     this.close = function () {
@@ -270,12 +286,12 @@ function WidgetWindow(key, title) {
 window.widgetWindows.windowFor = function (widget, title, saveAs) {
     let key = undefined;
     // Check for a blockNo attribute
-    if (typeof widget.blockNo !== "undefined")
+    if (typeof widget.blockNo !== 'undefined')
         key = widget.blockNo;
     // Fall back on the next best thing we have
     else key = saveAs || title;
 
-    if (typeof window.widgetWindows.openWindows[key] === "undefined") {
+    if (typeof window.widgetWindows.openWindows[key] === 'undefined') {
         let win = new WidgetWindow(key, title).sendToCenter();
         window.widgetWindows.openWindows[key] = win;
     }
@@ -286,12 +302,12 @@ window.widgetWindows.windowFor = function (widget, title, saveAs) {
 window.widgetWindows.clear = function (name) {
     let win = window.widgetWindows.openWindows[name];
     if (!win) return;
-    if (typeof win.onclose === "function")
+    if (typeof win.onclose === 'function')
         win.onclose();
 };
 
 window.widgetWindows.isOpen = function (name) {
-    return window.widgetWindows.openWindows[name] ? true : "";
+    return window.widgetWindows.openWindows[name] ? true : '';
 };
 
 window.widgetWindows.hideWindows = function (name) {
