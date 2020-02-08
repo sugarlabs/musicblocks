@@ -480,6 +480,7 @@ class RestBlock extends ValueBlock {
     constructor() {
         super('rest');
         this.setPalette('pitch');
+        this.setHelpString();
         this.hidden = this.deprecated = true;
     }
 }
@@ -489,6 +490,7 @@ class SquareBlock extends FlowBlock {
         //.TRANS: square wave
         super('square', _('square'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ args: 1, defaults: [440] });
         this.makeMacro((x, y) => [
             [0, 'newnote', x, y, [null, 1, 4, 7]],
@@ -513,6 +515,7 @@ class TriangleBlock extends FlowBlock {
         //.TRANS: triangle wave
         super('triangle', _('triangle'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ args: 1, defaults: [440] });
         this.makeMacro((x, y) => [
             [0, 'newnote', x, y, [null, 1, 4, 7]],
@@ -537,6 +540,7 @@ class SineBlock extends FlowBlock {
         //.TRANS: sine wave
         super('sine', _('sine'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ args: 1, defaults: [440] });
         this.makeMacro((x, y) => [
             [0, 'newnote', x, y, [null, 1, 4, 7]],
@@ -561,6 +565,7 @@ class SawtoothBlock extends FlowBlock {
         //.TRANS: sawtooth wave
         super('sawtooth', _('sawtooth'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ args: 1, defaults: [440] });
         this.makeMacro((x, y) => [
             [0, 'newnote', x, y, [null, 1, 4, 7]],
@@ -584,6 +589,7 @@ class InvertModeBlock extends ValueBlock {
     constructor() {
         super('invertmode');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
         this.hidden = true;
     }
@@ -594,6 +600,7 @@ class TranspositionFactorBlock extends ValueBlock {
         //.TRANS: musical transposition (adjustment of pitch up or down)
         super('transpositionfactor', _('transposition'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -611,6 +618,7 @@ class ConsonantStepSizeDownBlock extends ValueBlock {
         //.TRANS: step down one note in current musical scale
         super('constonantstepsizedown', _('scalar step down'));
         this.setPalette('pitch');
+        this.setHelpString();
     }
 
     arg(logo, turtle) {
@@ -628,6 +636,7 @@ class ConsonantStepSizeUpBlock extends ValueBlock {
         //.TRANS: step up one note in current musical scale
         super('consonantstepsizeup', _('scalar step up'));
         this.setPalette('pitch');
+        this.setHelpString();
     }
 
     arg(logo, turtle) {
@@ -645,6 +654,7 @@ class DeltaPitchBlock extends ValueBlock {
         //.TRANS: the change measured in half-steps between the current pitch and the previous pitch
         super(name || 'deltapitch', displayName || _('change in pitch'));
         this.setPalette('pitch');
+        this.setHelpString();
     }
 
     arg(logo, turtle, blk) {
@@ -709,6 +719,7 @@ class DeltaPitch2Block extends DeltaPitchBlock {
     constructor() {
         //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
         super('deltapitch2', _('scalar change in pitch'));
+        this.setHelpString();
     }
 }
 
@@ -717,6 +728,7 @@ class MyPitchBlock extends ValueBlock {
         //.TRANS: convert current note to piano key (1-88)
         super('mypitch', _('pitch number'));
         this.setPalette('pitch');
+        this.setHelpString();
     }
 
     arg(logo, turtle, blk) {
@@ -756,6 +768,7 @@ class PitchInHertzBlock extends ValueBlock {
         //.TRANS: the current pitch expressed in Hertz
         super('pitchinhertz', _('pitch in hertz'));
         this.setPalette('pitch');
+        this.setHelpString();
     }
 
     arg(logo, turtle, blk) {
@@ -774,6 +787,7 @@ class MIDIBlock extends FlowBlock {
         //.TRANS: MIDI is a technical standard for electronic music
         super('midi', _('MIDI'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setpitchnumberoffset', x, y, [null, 1, 2, null]],
             [1, ['notename', {'value': 'C'}], 0, 0, [0]],
@@ -787,6 +801,7 @@ class SetPitchNumberOffsetBlock extends FlowBlock {
         //.TRANS: set an offset associated with the numeric piano keyboard mapping
         super('setpitchnumberoffset', _('set pitch number offset'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: ['C', 4],
             argTypes: ['notein', 'anyin'],
@@ -823,6 +838,7 @@ class Number2PitchBlock extends LeftBlock {
         //.TRANS: convert piano key number (1-88) to pitch
         super(name || 'number2pitch', displayName || _('number to pitch'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [55]
         });
@@ -849,6 +865,7 @@ class Number2OctaveBlock extends Number2PitchBlock {
     constructor() {
         //.TRANS: convert piano key number (1-88) to octave
         super('number2octave', _('number to octave'));
+        this.setHelpString();
     }
 }
 
@@ -856,6 +873,7 @@ class AccidentalNameBlock extends ValueBlock {
     constructor() {
         super('accidentalname');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
     }
 }
@@ -864,6 +882,7 @@ class EastIndianSolfegeBlock extends ValueBlock {
     constructor() {
         super('eastindiansolfege');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ outType: 'solfegeout' });
     }
 }
@@ -872,6 +891,7 @@ class NoteNameBlock extends ValueBlock {
     constructor() {
         super('notename');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ outType: 'noteout' });
     }
 }
@@ -880,6 +900,7 @@ class SolfegeBlock extends ValueBlock {
     constructor() {
         super('solfege');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({ outType: 'solfegeout' });
     }
 }
@@ -888,6 +909,7 @@ class CustomNoteBlock extends ValueBlock {
     constructor() {
         super('customNote');
         this.setPalette('pitch');
+        this.setHelpString();
         this.hidden = true;
     }
 }
@@ -896,6 +918,7 @@ class Invert1Block extends FlowClampBlock {
     constructor() {
         super('invert1');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: pitch inversion rotates a pitch around another pitch
             name: _('invert'), args: 3,
@@ -984,6 +1007,7 @@ class Invert2Block extends FlowClampBlock {
         //.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
         super(name || 'invert2', displayName || _('invert (odd)'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: ['sol', 4],
             argTypes: ['solfegein', 'anyin'],
@@ -1016,6 +1040,7 @@ class InvertBlock extends Invert2Block {
         //.TRANS: pitch inversion rotates a pitch around another pitch (even number)
         super('invert', _('invert (even)'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: ['sol', 4],
             argTypes: ['solfegein', 'anyin'],
@@ -1036,6 +1061,7 @@ class RegisterBlock extends FlowBlock {
         //.TRANS: register is the octave of the current pitch
         super('register', _('register'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [0]
         });
@@ -1052,6 +1078,7 @@ class SetTranspositionBlock extends FlowClampBlock {
     constructor() {
         super('settransposition');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: adjust the amount of shift (up or down) of a pitch
             name: _('semi-tone transpose'),
@@ -1109,6 +1136,7 @@ class OctaveBlock extends FlowBlock {
         //.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
         super('octave', _('octave'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'settransposition', x, y, [null, 1, 4, 5]],
             [1, 'multiply', 0, 0, [0, 2, 3]],
@@ -1148,6 +1176,7 @@ class DownSixthBlock extends FlowBlock {
         //.TRANS: down sixth means the note is five scale degrees below current note
         super('downsixth', _('down sixth'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'minus', 0, 0, [0, 2, 3]],
@@ -1167,6 +1196,7 @@ class DownThirdBlock extends FlowBlock {
         //.TRANS: down third means the note is two scale degrees below current note
         super('downthird', _('down third'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'minus', 0, 0, [0, 2, 3]],
@@ -1186,6 +1216,7 @@ class SeventhBlock extends FlowBlock {
         //.TRANS: seventh means the note is the six scale degrees above current note
         super('seventh', _('seventh'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1205,6 +1236,7 @@ class SixthBlock extends FlowBlock {
         //.TRANS: sixth means the note is the five scale degrees above current note
         super('sixth', _('sixth'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1224,6 +1256,7 @@ class FifthBlock extends FlowBlock {
         //.TRANS: fifth means the note is the four scale degrees above current note
         super('fifth', _('fifth'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1243,6 +1276,7 @@ class FourthBlock extends FlowBlock {
         //.TRANS: fourth means the note is three scale degrees above current note
         super('fourth', _('fourth'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 7]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1261,6 +1295,7 @@ class ThirdBlock extends FlowBlock {
         //.TRANS: third means the note is two scale degrees above current note
         super('third', _('third'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1280,6 +1315,7 @@ class SecondBlock extends FlowBlock {
         //.TRANS: second means the note is one scale degree above current note
         super('second', _('second'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1299,6 +1335,7 @@ class UnisonBlock extends FlowBlock {
         //.TRANS: unison means the note is the same as the current note
         super('unison', _('unison'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setscalartransposition', x, y, [null, 1, 6, 8]],
             [1, 'plus', 0, 0, [0, 2, 3]],
@@ -1317,6 +1354,7 @@ class SetScalarTranspositionBlock extends FlowClampBlock {
     constructor() {
         super('setscalartransposition');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
             name: _('scalar transpose') + ' (+/–)',
@@ -1376,6 +1414,7 @@ class AccidentalBlock extends FlowClampBlock {
     constructor() {
         super('accidental');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
             name: _('accidental'),
@@ -1454,6 +1493,7 @@ class FlatBlock extends FlowClampBlock {
     constructor() {
         super('flat');
         this.setPalette('pitch');
+        this.setHelpString();
         //.TRANS: flat is a half-step down in pitch
         this.formBlock({ name: _('flat') + ' ♭' });
         this.makeMacro((x, y) => [
@@ -1505,6 +1545,7 @@ class SharpBlock extends FlowClampBlock {
     constructor() {
         super('sharp');
         this.setPalette('pitch');
+        this.setHelpString();
         //.TRANS: sharp is a half-step up in pitch
         this.formBlock({name: _('sharp') + ' ♯' });
         this.makeMacro((x, y) => [
@@ -1557,6 +1598,7 @@ class HertzBlock extends FlowBlock {
         //.TRANS: a measure of frequency: one cycle per second
         super('hertz', _('hertz'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [
                 this.lang === 'ja' ? 440 : 392
@@ -1687,6 +1729,7 @@ class PitchNumberBlock extends FlowBlock {
         //.TRANS: a mapping of pitch to the 88 piano keys
         super('pitchnumber', _('pitch number'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [7]
         });
@@ -1702,6 +1745,7 @@ class ScaleDegreeBlock extends FlowBlock {
         //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
         super('scaledegree', _('scale degree'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: [5, 4],  // 5 is G in C Majoe
             argLabels: [_('number'), _('octave')],
@@ -1719,6 +1763,7 @@ class StepPitchBlock extends FlowBlock {
         //.TRANS: step some number of notes in current musical scale
         super('steppitch', _('scalar step') + ' (+/–)');
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [1],
             argTypes: ['anyin']
@@ -1879,6 +1924,7 @@ class Pitch2Block extends FlowBlock {
     constructor() {
         super('pitch2', _('pitch') + ' ' + 'G4');
         this.setPalette('pitch');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'pitch', x, y, [null, 1, 2, null]],
             [1, ['notename', {'value': 'G'}], 0, 0, [0]],
@@ -1892,6 +1938,7 @@ class PitchBlock extends FlowBlock {
         //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
         super('pitch', _('pitch'));
         this.setPalette('pitch');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: ['sol', 4],
             argTypes: ['solfegein', 'anyin'],

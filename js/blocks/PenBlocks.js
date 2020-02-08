@@ -4,6 +4,7 @@ class PurpleBlock extends FlowBlock {
     constructor() {
         super('purple', _('purple'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -16,6 +17,7 @@ class BlueBlock extends FlowBlock {
     constructor() {
         super('blue', _('blue'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -28,6 +30,7 @@ class GreenBlock extends FlowBlock {
     constructor() {
         super('green', _('green'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -40,6 +43,7 @@ class YellowBlock extends FlowBlock {
     constructor() {
         super('yellow', _('yellow'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -52,6 +56,7 @@ class OrangeBlock extends FlowBlock {
     constructor() {
         super('orange', _('orange'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -64,6 +69,7 @@ class RedBlock extends FlowBlock {
     constructor() {
         super('red', _('red'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setcolor', x, y, [null, 1, null]],
@@ -76,6 +82,7 @@ class WhiteBlock extends FlowBlock {
     constructor() {
         super('white', _('white'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setshade', x, y, [null, 1, null]],
@@ -88,6 +95,7 @@ class BlackBlock extends FlowBlock {
     constructor() {
         super('black', _('black'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.makeMacro((x, y) => [
             [0, 'setshade', x, y, [null, 1, null]],
@@ -100,6 +108,7 @@ class BeginFillBlock extends FlowBlock {
     constructor() {
         super('beginfill', _('begin fill'));
         this.setPalette('pen');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -112,6 +121,7 @@ class EndFillBlock extends FlowBlock {
     constructor() {
         super('endfill', _('end fill'));
         this.setPalette('pen');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -125,6 +135,7 @@ class FillScreenBlock extends FlowBlock {
         //.TRANS: set the background color
         super('fillscreen', _('background'));
         this.setPalette('pen');
+        this.setHelpString();
 
         this.formBlock({
             args: 3
@@ -152,6 +163,7 @@ class GreyBlock extends ValueBlock {
     constructor() {
         super('grey', _('grey'));
         this.setPalette('pen');
+        this.setHelpString([_('The Grey block returns the current pen grey value.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -167,6 +179,7 @@ class ShadeBlock extends ValueBlock {
     constructor() {
         super('shade', _('shade'));
         this.setPalette('pen');
+        this.setHelpString([_('The Shade block returns the current pen shade value.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -182,6 +195,7 @@ class ColorBlock extends ValueBlock {
     constructor() {
         super('color', _('color'));
         this.setPalette('pen');
+        this.setHelpString([_('The Color block returns the current pen color.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -197,6 +211,7 @@ class PenSizeBlock extends ValueBlock {
     constructor() {
         super('pensize', _('pen size'));
         this.setPalette('pen');
+        this.setHelpString([_('The Pen size block returns the current pen size value.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -212,6 +227,7 @@ class SetFontBlock extends FlowBlock {
     constructor() {
         super('setfont', _('set font'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set font block sets the font used by the Show block.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [DEFAULTFONT],
@@ -235,6 +251,7 @@ class BackgroundBlock extends FlowBlock {
     constructor() {
         super('background', _('background'));
         this.setPalette('pen');
+        this.setHelpString([_('The Background block sets the window background color.'), 'documentation', '']);
     }
 
     flow(args, logo, turtle) {
@@ -246,6 +263,7 @@ class HollowLineBlock extends FlowClampBlock {
     constructor() {
         super('hollowline');
         this.setPalette('pen');
+        this.setHelpString([_('The Hollow line block creates a line with a hollow center.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: draw a line logo has a hollow space down its center
@@ -297,6 +315,7 @@ class FillBlock extends FlowClampBlock {
     constructor() {
         super('fill');
         this.setPalette('pen');
+        this.setHelpString([_('The Fill block fills in a shape with a color.'), 'documentation', null, 'fillhelp']);
 
         this.formBlock({
             //.TRANS: fill in as a solid color
@@ -365,6 +384,7 @@ class PenUpBlock extends FlowBlock {
         //.TRANS: riase up the pen so logo it does not draw when it is moved
         super('penup', _('pen up'));
         this.setPalette('pen');
+        this.setHelpString([_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', '']);
     }
 
     flow(args, logo, turtle, blk) {
@@ -384,6 +404,7 @@ class PenDownBlock extends FlowBlock {
         //.TRANS: put down the pen so logo it draws when it is moved
         super('pendown', _('pen down'));
         this.setPalette('pen');
+        this.setHelpString([_('The Pen-down block lowers the pen so that it draws.'), 'documentation', '']);
     }
 
     flow(args, logo, turtle, blk) {
@@ -403,6 +424,7 @@ class SetPenSizeBlock extends FlowBlock {
         //.TRANS: set the width of the line drawn by the pen
         super('setpensize', _('set pen size'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set-pen-size block changes the size of the pen.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [5]
@@ -441,6 +463,7 @@ class SetTranslucencyBlock extends FlowBlock {
         //.TRANS: set degree of translucence of the pen color
         super('settranslucency', _('set translucency'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set translucency block changes the opacity of the pen.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [50]
@@ -480,6 +503,7 @@ class SetHueBlock extends FlowBlock {
     constructor() {
         super('sethue', _('set hue'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set hue block changes the color of the pen.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [0]
@@ -517,6 +541,7 @@ class SetShadeBlock extends FlowBlock {
     constructor() {
         super('setshade', _('set shade'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set-shade block changes the pen color from dark to light.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [50]
@@ -555,6 +580,7 @@ class SetGreyBlock extends FlowBlock {
         //.TRANS: set the level of vividness of the pen color
         super('setgrey', _('set grey'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set grey block changes the vividness of the pen color.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [100]
@@ -592,6 +618,7 @@ class SetColorBlock extends FlowBlock {
     constructor() {
         super('setcolor', _('set color'));
         this.setPalette('pen');
+        this.setHelpString([_('The Set-color block changes the pen color.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [0]
