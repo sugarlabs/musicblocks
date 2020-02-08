@@ -108,8 +108,8 @@ function HelpWidget () {
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
                 var message = blocks.blockList[blocks.activeBlock].protoblock.HELPSTRING;
-                console.log(message);
-                console.log(BLOCKHELP[name]);
+                // console.log(message);
+                // console.log(BLOCKHELP[name]);
                 if (message) {
                     var helpBody = docById('helpBodyDiv');
                     helpBody.style.height = '';
