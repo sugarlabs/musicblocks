@@ -2237,7 +2237,7 @@ function Turtles () {
 
         newTurtle.container.on('click', function (event) {
             // If turtles listen for clicks then they can be used as buttons.
-            console.debug('--> [click' + newTurtle.name + ']');
+            console.debug('--> [click ' + newTurtle.name + ']');
             that.stage.dispatchEvent('click' + newTurtle.name);
         });
 
