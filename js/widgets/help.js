@@ -107,7 +107,7 @@ function HelpWidget () {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
-
+                console.log(blocks.blockList[blocks.activeBlock].name);
                 if (name in BLOCKHELP) {
                     var helpBody = docById('helpBodyDiv');
                     helpBody.style.height = '';

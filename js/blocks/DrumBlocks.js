@@ -6,6 +6,7 @@ class NoiseNameBlock extends ValueBlock {
         this.setPalette('drum');
         this.formBlock({ outType: 'textout' });
         this.extraWidth = 50;
+        this.setHelpString("[_('The Noise name block is used to select a noise synthesizer.'), 'documentation', '']")
     }
 }
 
@@ -15,6 +16,7 @@ class DrumNameBlock extends ValueBlock {
         this.setPalette('drum');
         this.formBlock({ outType: 'textout' });
         this.extraWidth = 50;
+        this.setHelpString("[_('The Drum name block is used to select a drum.'), 'documentation', null, 'note4']");
     }
 }
 
@@ -24,6 +26,7 @@ class EffectsNameBlock extends ValueBlock {
         this.setPalette('drum');
         this.formBlock({ outType: 'textout' });
         this.extraWidth = 50;
+        this.setHelpString("[_('The Effects name block is used to select a sound effect.'), 'documentation', null, 'effectshelp']");
     }
 }
 
@@ -31,6 +34,7 @@ class PlayNoiseBlock extends FlowBlock {
     constructor() {
         super('playnoise', _('noise'));
         this.setPalette('drum');
+        this.setHelpString("[_('The Play noise block will generate white, pink, or brown noise.'), 'documentation', '']")
         this.formBlock({
             args: 1, defaults: [_('white noise')],
             argTypes: ['anyin'],
@@ -124,6 +128,7 @@ class MapDrumBlock extends FlowClampBlock {
     constructor() {
         super('mapdrum');
         this.setPalette('drum');
+        this.setHelpString("[_('Replace every instance of a pitch with a drum sound.'), 'documentation', null, 'mapdrumhelp']");
         this.formBlock({
             //.TRANS: map a pitch to a drum sound
             name: _('map pitch to drum'),
@@ -173,6 +178,7 @@ class SetDrumBlock extends FlowClampBlock {
     constructor() {
         super('setdrum');
         this.setPalette('drum');
+        this.setHelpString("[_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', null, 'setdrumhelp']")
         this.formBlock({
             //.TRANS: set the current drum sound for playback
             name: _('set drum'),
@@ -237,6 +243,7 @@ class PlayDrumBlock extends FlowBlock {
     constructor() {
         super('playdrum', _('drum'));
         this.setPalette('drum');
+        this.setHelpString("[_('You can use multiple Drum blocks within a Note block.'), 'documentation', null, 'note4']")
         this.formBlock({ args: 1, argTypes: ['anyin'] });
         this.makeMacro((x, y) => [
             [0, 'playdrum', x, y, [null, 1, null]],
