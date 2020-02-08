@@ -63,7 +63,7 @@ function ProtoBlock(name) {
     this.textWidth = 0;
     this.labelOffset = 0;
     //Stores Help related strings
-    this.HELPSTRING = '';
+    this.HELPSTRING = {};
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
