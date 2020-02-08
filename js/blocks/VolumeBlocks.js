@@ -5,6 +5,7 @@ class SynthVolumeBlock extends LeftBlock {
         //.TRANS: the volume for this synth
         super('synthvolumefactor', _('synth volume'));
         this.setPalette('volume');
+        this.setHelpString([_('The Synth volume block returns the current volume of the current synthesizer.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('piano')]
@@ -39,6 +40,7 @@ class MasterVolumeBlock extends ValueBlock {
         //.TRANS: the volume at which notes are played
         super('notevolumefactor', _('master volume'));
         this.setPalette('volume');
+        this.setHelpString([_('The Master volume block returns the master volume.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {
@@ -54,6 +56,7 @@ class PPPBlock extends FlowBlock {
     constructor() {
         super('ppp', 'ppp');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -67,6 +70,7 @@ class PPBlock extends FlowBlock {
     constructor() {
         super('pp', 'pp');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -80,6 +84,7 @@ class PBlock extends FlowBlock {
     constructor() {
         super('p', 'p');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -93,6 +98,7 @@ class MPBlock extends FlowBlock {
     constructor() {
         super('mp', 'mp');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -106,6 +112,7 @@ class MFBlock extends FlowBlock {
     constructor() {
         super('mf', 'mf');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -119,6 +126,7 @@ class FBlock extends FlowBlock {
     constructor() {
         super('f', 'f');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -132,6 +140,7 @@ class FFBlock extends FlowBlock {
     constructor() {
         super('ff', 'ff');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -145,6 +154,7 @@ class FFFBlock extends FlowBlock {
     constructor() {
         super('fff', 'fff');
         this.setPalette('volume');
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'setsynthvolume2', x, y, [null, 1, 2, null, 3]],
             [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]],
@@ -159,6 +169,7 @@ class SetSynthVolume2Block extends FlowBlock {
         //.TRANS: a rapid, slight variation in pitch
         super('setsynthvolume2', _('set synth volume'));
         this.setPalette('volume');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: [DEFAULTVOICE, 50],
             argTypes: ['textin', 'numberin'],
@@ -277,6 +288,7 @@ class SetDrumVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setdrumvolume', _('set drum volume'));
         this.setPalette('volume');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: [DEFAULTDRUM, 50],
             argTypes: ['textin', 'numberin'],
@@ -295,6 +307,7 @@ class SetSynthVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setsynthvolume', _('set synth volume'));
         this.setPalette('volume');
+        this.setHelpString([_('The Set synth volume block will change the volume of a particular synth,') + ' ' + _('eg guitar violin snare drum etc.') + ' ' + _('The default volume is 50.') + ' ' + _('The range is 0 for silence to 100 for full volume.'), 'documentation', '']);
         this.formBlock({
             args: 2, defaults: [DEFAULTVOICE, 50],
             argTypes: ['textin', 'numberin'],
@@ -395,6 +408,7 @@ class SetNoteVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setnotevolume', _('set master volume'));
         this.setPalette('volume');
+        this.setHelpString([_('The Set master volume block sets the volume for all synthesizers.'), 'documentation', '']);
         this.formBlock({ args: 1, defaults: [50] });
     }
 
@@ -432,6 +446,7 @@ class SetNoteVolume2Block extends FlowClampBlock {
     constructor() {
         super('setnotevolume2');
         this.setPalette('volume');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: set the loudness level
             name: _('set master volume'),
@@ -502,6 +517,7 @@ class ArticulationBlock extends FlowClampBlock {
     constructor() {
         super('articulation');
         this.setPalette('volume');
+        this.setHelpString([_('The Set relative volume block changes the volume of the contained notes.'), 'documentation', null, 'articulationhelp']);
         this.formBlock({
             //.TRANS: set an articulation (change in volume)
             name: _('set relative volume'),
@@ -581,6 +597,7 @@ class DecrescendoBlock extends FlowClampBlock {
     constructor(name) {
         super(name || 'decrescendo');
         this.setPalette('volume');
+        this.setHelpString([_('The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.'), 'documentation', null, 'crescendohelp']);
         this.formBlock({
             //.TRANS: a gradual increase in loudness
             name: _('decrescendo'),
@@ -641,6 +658,7 @@ class CrescendoBlock extends DecrescendoBlock {
     constructor() {
         super('crescendo');
         this.setPalette('volume');
+        this.setHelpString([_('The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.') + ' ' + _('For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.'), 'documentation', null, 'crescendohelp']);
         this.formBlock({
             //.TRANS: a gradual increase in loudness
             name: _('crescendo'),

@@ -7,6 +7,7 @@ class RhythmBlock extends FlowBlock {
     constructor(name) {
         super(name || 'rhythm');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.formBlock({
             name: this.lang === 'ja'
                 //.TRANS: rhythm block
@@ -131,6 +132,7 @@ class Rhythm2Block extends RhythmBlock {
     constructor() {
         super('rhythm2');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString([_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', null, 'rhythm2']);
         this.formBlock({
             name: this.lang === 'ja'
                 //.TRANS: rhythm block
@@ -156,6 +158,7 @@ class SixtyFourthNoteBlock extends FlowBlock {
     constructor() {
         super('sixtyfourthNote', _('1/64 note') + ' 𝅘𝅥𝅱');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -171,6 +174,7 @@ class ThirtySecondNoteBlock extends FlowBlock {
     constructor() {
         super('thirtysecondNote', _('1/32 note') + ' 𝅘𝅥𝅰');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -186,6 +190,7 @@ class SixteenthNoteBlock extends FlowBlock {
     constructor() {
         super('sixteenthNote', _('1/16 note') + ' 𝅘𝅥𝅯');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -201,6 +206,7 @@ class EighthNoteBlock extends FlowBlock {
     constructor() {
         super('eighthNote', _('eighth note') + ' ♪');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -216,6 +222,7 @@ class QuarterNoteBlock extends FlowBlock {
     constructor() {
         super('quarterNote', _('quarter note') + ' ♩');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -231,6 +238,7 @@ class HalfNoteBlock extends FlowBlock {
     constructor() {
         super('halfNote', _('half note') + ' 𝅗𝅥');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -246,6 +254,7 @@ class WholeNoteBlock extends FlowBlock {
     constructor() {
         super('wholeNote', _('whole note') + ' 𝅝');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'rhythm2', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 1}], 0, 0, [0]],
@@ -261,6 +270,7 @@ class Tuplet2Block extends FlowClampBlock {
     constructor(name) {
         super(name || 'tuplet2');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.formBlock({
             //.TRANS: A tuplet is a note value divided into irregular time values.
             name: _('tuplet'),
@@ -302,6 +312,7 @@ class Tuplet3Block extends Tuplet2Block {
     constructor() {
         super('tuplet3');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.formBlock({
             name: _('tuplet'),
             args: 2, defaults: [1, 4],
@@ -330,6 +341,7 @@ class Tuplet4Block extends FlowClampBlock {
     constructor() {
         super('tuplet4');
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString([_('The Tuplet block is used to generate a group of notes played in a condensed amount of time.'), 'documentation', null, 'tuplet4']);
         this.formBlock({
             name: _('tuplet'),
             args: 1, defaults: [1 / 4],
@@ -465,6 +477,7 @@ class SeptupletBlock extends FlowBlock {
         //.TRANS: A tuplet divided into 7 time values.
         super('stuplet7', _('septuplet'));
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'stuplet', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 7}], 0, 0, [0]],
@@ -481,6 +494,7 @@ class QuintupletBlock extends FlowBlock {
         //.TRANS: A tuplet divided into 5 time values.
         super('stuplet5', _('quintuplet'));
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'stuplet', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 5}], 0, 0, [0]],
@@ -497,6 +511,7 @@ class TripletBlock extends FlowBlock {
         //.TRANS: A tuplet divided into 3 time values.
         super('stuplet3', _('triplet'));
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString();
         this.makeMacro((x, y) => [
             [0, 'stuplet', x, y, [null, 1, 2, 5]],
             [1, ['number', {'value': 3}], 0, 0, [0]],
@@ -512,6 +527,7 @@ class STupletBlock extends FlowBlock {
     constructor() {
         super('stuplet', _('simple tuplet'));
         this.setPalette(rhythmBlockPalette);
+        this.setHelpString([_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', null, 'matrix']);
         this.formBlock({
             args: 2, defaults: [3, 1 / 2],
             argLabels: [_('number of notes'), _('note value')],
