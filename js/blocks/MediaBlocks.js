@@ -5,6 +5,7 @@ class RightPosBlock extends ValueBlock {
         //.TRANS: right side of the screen
         super('rightpos', _('right (screen)'));
         this.setPalette('media');
+        this.setHelpString([_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
     }
 
     arg(logo) {
@@ -17,6 +18,7 @@ class LeftPosBlock extends ValueBlock {
         //.TRANS: left side of the screen
         super('leftpos', _('left (screen)'));
         this.setPalette('media');
+        this.setHelpString([_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
     }
 
     arg(logo) {
@@ -28,6 +30,7 @@ class TopPosBlock extends ValueBlock {
     constructor() {
         super('toppos', _('top (screen)'));
         this.setPalette('media');
+        this.setHelpString([_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
     }
 
     arg(logo) {
@@ -39,6 +42,7 @@ class BottomPosBlock extends ValueBlock {
     constructor() {
         super('bottompos', _('bottom (screen)'));
         this.setPalette('media');
+        this.setHelpString([_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
     }
 
     arg(logo) {
@@ -50,6 +54,7 @@ class WidthBlock extends ValueBlock {
     constructor() {
         super('width', _('width'));
         this.setPalette('media');
+        this.setHelpString([_('The Width block returns the width of the canvas.'), 'documentation', '']);
     }
 
     arg(logo) {
@@ -61,6 +66,7 @@ class HeightBlock extends ValueBlock {
     constructor() {
         super('height', _('height'));
         this.setPalette('media');
+        this.setHelpString([_('The Height block returns the height of the canvas.'), 'documentation', '']);
     }
 
     arg(logo) {
@@ -73,6 +79,7 @@ class StopPlaybackBlock extends FlowBlock {
         //.TRANS: stops playback of an audio recording
         super('stopplayback', _('stop play'));
         this.setPalette('media');
+        this.setHelpString();
     
         this.hidden = true;
     }
@@ -90,6 +97,7 @@ class PlaybackBlock extends FlowBlock {
         //.TRANS: play an audio recording
         super('playback', _('play back'));
         this.setPalette('media');
+        this.setHelpString();
         this.formBlock({
             args: 1, defaults: [null],
             argTypes: ['medain']
@@ -117,6 +125,7 @@ class SpeakBlock extends FlowBlock {
     constructor() {
         super('speak', _('speak'));
         this.setPalette('media');
+        this.setHelpString([_('The Speak block outputs to the text-to-speech synthesizer'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: ['hello'],
             argTypes: ['textin']
@@ -148,6 +157,7 @@ class CameraBlock extends ValueBlock {
     constructor() {
         super('camera');
         this.setPalette('media');
+        this.setHelpString([_('The Camera block connects a webcam to the Show block.'), 'documentation', '']);
         this.formBlock({
             image: 'images/camera.svg'
         });
@@ -158,6 +168,7 @@ class VideoBlock extends ValueBlock {
     constructor() {
         super('video');
         this.setPalette('media');
+        this.setHelpString([_('The Video block selects video for use with the Show block.'), 'documentation', '']);
         this.formBlock({
             image: 'images/video.svg'
         });
@@ -168,6 +179,7 @@ class LoadFileBlock extends ValueBlock {
     constructor() {
         super('loadFile', '');
         this.setPalette('media');
+        this.setHelpString([_('The Open file block opens a file for use with the Show block.'), 'documentation', '']);
         this.formBlock({
             outType: 'fileout'
         });
@@ -182,6 +194,7 @@ class StopVideoCamBlock extends FlowBlock {
     constructor() {
         super('stopvideocam', _('stop media'));
         this.setPalette('media');
+        this.setHelpString([_('The Stop media block stops audio or video playback.'), 'documentation', '']);
     }
 
     flow(args, logo) {
@@ -195,6 +208,7 @@ class ToneBlock extends FlowBlock {
     constructor() {
         super('tone', _('hertz'));
         this.setPalette('media');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: [392, 1000 / 3],
             argLabels: [_('frequency'), _('duration (ms)')],
@@ -221,6 +235,7 @@ class ToFrequencyBlock extends LeftBlock {
         super('tofrequency', _('note to frequency'));
         //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
         this.setPalette('media');
+        this.setHelpString([_('The To frequency block converts a pitch name and octave to Hertz.'), 'documentation', '']);
 
         this.formBlock({
             args: 2, defaults: ['G', 4],
@@ -298,6 +313,7 @@ class TurtleShellBlock extends FlowBlock {
         //.TRANS: Avatar is the image used to determine the appearance of the mouse.
         super('turtleshell', _('avatar'));
         this.setPalette('media');
+        this.setHelpString([_('The Shell block is used to change the appearance of the mouse.'), 'documentation', null, 'turtleshell']);
 
         this.formBlock({
             args: 2, defaults: [55, null],
@@ -327,6 +343,7 @@ class ShowBlock extends FlowBlock {
     constructor() {
         super('show');
         this.setPalette('media');
+        this.setHelpString([_('The Show block is used to display text or images on the canvas.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: show1 is show as in display an image or text on the screen.
@@ -359,6 +376,7 @@ class MediaBlock extends ValueBlock {
     constructor() {
         super('media');
         this.setPalette('media');
+        this.setHelpString([_('The Media block is used to import an image.'), 'documentation', null, 'turtleshell']);
 
         /*
         if (language === 'ja') {
@@ -382,6 +400,7 @@ class TextBlock extends ValueBlock {
         super('text');
         this.extraWidth = 30;
         this.setPalette('media');
+        this.setHelpString([_('The Text block holds a text string.'), 'documentation', '']);
         this.formBlock({
             outType: 'textout'
         });

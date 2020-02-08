@@ -4,6 +4,7 @@ class OpenPaletteBlock extends FlowBlock {
     constructor() {
         super('openpalette');
         this.setPalette('extras');
+        this.setHelpString([_('The Open palette block opens a palette.'), 'documentation', '']);
 
         this.formBlock({
             name: _('open palette'),
@@ -33,6 +34,7 @@ class DeleteBlockBlock extends FlowBlock {
     constructor() {
         super('deleteblock');
         this.setPalette('extras');
+        this.setHelpString([_('The Delete block block removes a block.'), 'documentation', '', 'deletehelp']);
 
         this.formBlock({
             //.TRANS: Move this block to the trash.
@@ -81,6 +83,7 @@ class MoveBlockBlock extends FlowBlock {
     constructor() {
         super('moveblock');
         this.setPalette('extras');
+        this.setHelpString([_('The Move block block moves a block.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: Move the position of a block on the screen.
@@ -110,6 +113,7 @@ class RunBlockBlock extends FlowBlock {
     constructor() {
         super('runblock');
         this.setPalette('extras');
+        this.setHelpString([_('The Run block block runs a block. It accepts two types of arguments: block number or block name.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: Run program beginning at this block.
@@ -163,6 +167,7 @@ class DockBlockBlock extends FlowBlock {
     constructor() {
         super('dockblock');
         this.setPalette('extras');
+        this.setHelpString([_('The Dock block block connections two blocks.'), 'documentation', '']);
 
         this.formBlock({
             //.TRANS: We can connect a block to another block.
@@ -238,6 +243,7 @@ class MakeBlockBlock extends LeftBlock {
     constructor() {
         super('makeblock');
         this.setPalette('extras');
+        this.setHelpString([_('The Make block block creates a new block.'), 'documentation', '', 'makehelp']);
 
         this.formBlock({
             //.TRANS: Create a new block programmatically.
@@ -358,6 +364,7 @@ class SaveABCBlock extends FlowBlock {
     constructor() {
         super('saveabc');
         this.setPalette('extras');
+        this.setHelpString();
 
         this.formBlock({
             name: _('save as ABC'),
@@ -380,6 +387,7 @@ class SaveLilypondBlock extends FlowBlock {
     constructor() {
         super('savelilypond');
         this.setPalette('extras');
+        this.setHelpString();
 
         this.formBlock({
             name: _('save as Lilypond'),
@@ -401,6 +409,7 @@ class SaveSVGBlock extends FlowBlock {
     constructor() {
         super('savesvg');
         this.setPalette('extras');
+        this.setHelpString();
 
         this.formBlock({
             name: _('save as SVG'),
@@ -431,6 +440,7 @@ class NoBackgroundBlock extends FlowBlock {
     constructor() {
         super('nobackground', _('no background'));
         this.setPalette('extras');
+        this.setHelpString([_('The No background block eliminates the background from the saved SVG output.'), 'documentation', '', 'makehelp']);
     }
 
     flow(args, logo) {
@@ -442,6 +452,7 @@ class ShowBlocksBlock extends FlowBlock {
     constructor() {
         super('showblocks', _('show blocks'));
         this.setPalette('extras');
+        this.setHelpString([_('The Show blocks block shows the blocks.'), 'documentation', '']);
     }
 
     flow(args, logo) {
@@ -454,6 +465,7 @@ class HideBlocksBlock extends FlowBlock {
     constructor() {
         super('hideblocks', _('hide blocks'));
         this.setPalette('extras');
+        this.setHelpString([_('The Hide blocks block hides the blocks.'), 'documentation', '']);
     }
 
     flow(args, logo) {
@@ -466,6 +478,7 @@ class OpenProjectBlock extends FlowBlock {
     constructor() {
         super('openProject');
         this.setPalette('extras');
+        this.setHelpString([_('The Open project block is used to open a project from a web page.'), 'documentation', '']);
 
         this.formBlock({
             name: _('open project'),
@@ -514,6 +527,7 @@ class VSpaceBlock extends FlowBlock {
     constructor() {
         super('vspace', '↓');
         this.setPalette('extras');
+        this.setHelpString([_('The Space block is used to add space between blocks.'), 'documentation', '']);
 
         this.extraWidth = -10;
     }
@@ -527,6 +541,7 @@ class HSpaceBlock extends LeftBlock {
     constructor() {
         super('hspace', '←');
         this.setPalette('extras');
+        this.setHelpString([_('The Space block is used to add space between blocks.'), 'documentation', '']);
 
         this.extraWidth = -10;
         this.formBlock({
@@ -545,6 +560,7 @@ class WaitBlock extends FlowBlock {
     constructor() {
         super('wait', _('wait'));
         this.setPalette('extras');
+        this.setHelpString([_('The Wait block pauses the program for a specified number of seconds.'), 'documentation', '']);
 
         this.formBlock({
             args: 1, defaults: [1]
@@ -571,6 +587,7 @@ class CommentBlock extends FlowBlock {
     constructor() {
         super('comment');
         this.setPalette('extras');
+        this.setHelpString([_('The Comment block prints a comment at the top of the screen when the program is running in slow mode.'), 'documentation', '']);
 
         this.formBlock({
             name: _('comment'),
@@ -597,6 +614,7 @@ class PrintBlock extends FlowBlock {
         else
             this.setPalette('extras');
 
+        this.setHelpString([_('The Print block displays text at the top of the screen.'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: ['Music Blocks'],
             argTypes: ['anyin']
@@ -630,6 +648,8 @@ class DrumBlock extends StackClampBlock {
     constructor() {
         super('drum');
         this.setPalette('extras');
+        this.setHelpString();
+
         this.formBlock({ name: _('start drum'), canCollapse: true });
         this.hidden = this.deprecated = true;
     }
@@ -645,6 +665,7 @@ class NOPValueBlock extends ValueBlock {
     constructor() {
         super('nopValueBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({ outType: 'anyout' });
         this.hidden = true;
     }
@@ -654,6 +675,7 @@ class NOPOneArgMathBlock extends LeftBlock {
     constructor() {
         super('nopOneArgMathBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({
             args: 1, argTypes: ['anyin'],
             outType: 'anyout'
@@ -666,6 +688,7 @@ class NOPTwoArgMathBlock extends LeftBlock {
     constructor() {
         super('nopOneArgMathBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({
             args: 2, argTypes: ['anyin', 'anyin'],
             outType: 'anyout'
@@ -678,6 +701,7 @@ class NOPZeroArgBlock extends FlowBlock {
     constructor() {
         super('nopZeroArgBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.hidden = true;
     }
 }
@@ -686,6 +710,7 @@ class NOPOneArgBlock extends FlowBlock {
     constructor() {
         super('nopOneArgBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({ args: 1, argTypes: ['anyin'] });
         this.hidden = true;
     }
@@ -695,6 +720,7 @@ class NOPTwoArgBlock extends FlowBlock {
     constructor() {
         super('nopTwoArgBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({ args: 2, argTypes: ['anyin', 'anyin'] });
         this.hidden = true;
     }
@@ -704,6 +730,7 @@ class NOPThreeArgBlock extends FlowBlock {
     constructor() {
         super('nopThreeArgBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({ args: 3, argTypes: ['anyin', 'anyin', 'anyin'] });
         this.hidden = true;
     }
@@ -713,6 +740,7 @@ class NOPFourArgBlock extends FlowBlock {
     constructor() {
         super('nopFourArgBlock', _('unknown'));
         this.setPalette('extras');
+        this.setHelpString();
         this.formBlock({ args: 4, argTypes: ['anyin', 'anyin', 'anyin', 'anyin'] });
         this.hidden = true;
     }

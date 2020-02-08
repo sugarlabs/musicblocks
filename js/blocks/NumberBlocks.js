@@ -4,6 +4,7 @@ class IntBlock extends LeftBlock {
     constructor() {
         super('int');
         this.setPalette('number');
+        this.setHelpString([_('The Int block returns an integer.'), 'documentation', '']);
 
         this.formBlock({
             name: _('int'),
@@ -42,6 +43,7 @@ class ModBlock extends LeftBlock {
     constructor() {
         super('mod');
         this.setPalette('number');
+        this.setHelpString([_('The Mod block returns the remainder from a division.'), 'documentation', '']);
 
         this.formBlock({
             name: _('mod'), args: 2,
@@ -76,6 +78,7 @@ class PowerBlock extends LeftBlock {
     constructor() {
         super('power');
         this.setPalette('number');
+        this.setHelpString([_('The Power block calculates a power function.'), 'documentation', '']);
 
         this.fontsize = 14;
         this.formBlock({
@@ -116,6 +119,7 @@ class SqrtBlock extends LeftBlock {
     constructor() {
         super('sqrt');
         this.setPalette('number');
+        this.setHelpString([_('The Sqrt block returns the square root.'), 'documentation', '']);
 
         this.formBlock({
             name: _('sqrt'), args: 1, defaults: [64]
@@ -152,6 +156,7 @@ class AbsBlock extends LeftBlock {
     constructor() {
         super('abs');
         this.setPalette('number');
+        this.setHelpString([_('The Abs block returns the absolute value.'), 'documentation', '']);
 
         this.formBlock({
             name: _('abs'), args: 1
@@ -183,6 +188,7 @@ class DistanceBlock extends LeftBlock {
     constructor() {
         super('distance');
         this.setPalette('number');
+        this.setHelpString([_('The Distance block returns the distance between two points. For example, between the mouse and the center of the screen.'), 'documentation', '']);
 
         this.formBlock({
             name: _('distance'),
@@ -236,6 +242,7 @@ class DivideBlock extends LeftBlock {
     constructor() {
         super('divide');
         this.setPalette('number');
+        this.setHelpString([_('The Divide block is used to divide.'), 'documentation', null, 'note1']);
 
         this.fontsize = 9;
         this.formBlock({
@@ -276,6 +283,7 @@ class MultiplyBlock extends LeftBlock {
     constructor() {
         super('multiply');
         this.setPalette('number');
+        this.setHelpString([_('The Multiply block is used to multiply.'), 'documentation', '']);
 
         this.fontsize = 14;
         this.formBlock({
@@ -330,6 +338,7 @@ class NegBlock extends LeftBlock {
     constructor() {
         super('neg');
         this.setPalette('number');
+        this.setHelpString();
         
         this.fontsize = 14;
         this.formBlock({
@@ -365,6 +374,7 @@ class MinusBlock extends LeftBlock {
     constructor() {
         super('minus');
         this.setPalette('number');
+        this.setHelpString([_('The Minus block is used to subtract.'), 'documentation', '']);
 
         this.fontsize = 14;
         this.formBlock({
@@ -418,6 +428,7 @@ class PlusBlock extends LeftBlock {
     constructor() {
         super('plus');
         this.setPalette('number');
+        this.setHelpString([_('The Plus block is used to add.'), 'documentation', '']);
 
         this.fontsize = 14;
         this.formBlock({
@@ -480,6 +491,7 @@ class OneOfBlock extends LeftBlock {
     constructor() {
         super('oneOf');
         this.setPalette('number');
+        this.setHelpString([_('The One-of block returns one of two choices.'), 'documentation', null, 'oneofhelp']);
 
         this.formBlock({
             name: _('one of'), args: 2,
@@ -521,6 +533,7 @@ class RandomBlock extends LeftBlock {
     constructor() {
         super('random');
         this.setPalette('number');
+        this.setHelpString([_('The Random block returns a random number.'), 'documentation', null, 'randomhelp']);
 
         this.formBlock({
             name: _('random'), args: 2,
@@ -560,6 +573,7 @@ class NumberBlock extends ValueBlock {
     constructor() {
         super('number');
         this.setPalette('number');
+        this.setHelpString([_('The Number block holds a number.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {

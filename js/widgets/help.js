@@ -107,14 +107,16 @@ function HelpWidget () {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
-
-                if (name in BLOCKHELP) {
+                var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+                // console.log(message);
+                // console.log(BLOCKHELP[name]);
+                if (message) {
                     var helpBody = docById('helpBodyDiv');
                     helpBody.style.height = '';
 
                     var body = '';
-                    if (BLOCKHELP[name].length > 1) {
-                        var path = BLOCKHELP[name][1];
+                    if (message.length > 1) {
+                        var path = message[1];
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
@@ -144,7 +146,7 @@ function HelpWidget () {
                         body = body + '<p><img src="' + path + '/' + name + '_block.svg"></p>';
                     }
 
-                    body = body + '<p>' + BLOCKHELP[name][0] + '</p>';
+                    body = body + '<p>' + message[0] + '</p>';
 
                     body += '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' + _('Load blocks') + '/>';
 
@@ -153,7 +155,7 @@ function HelpWidget () {
                     var loadButton = docById('loadButton');
                     if (loadButton !== null) {
                         loadButton.onclick = function() {
-                            if (BLOCKHELP[name].length < 4) {
+                            if (message.length < 4) {
                                 // If there is nothing specified, just
                                 // load the block.
                                 console.debug('CLICK: ' + name);
@@ -169,15 +171,15 @@ function HelpWidget () {
                                         blocks.moveBlock(newBlock, 100, 100);
                                     });
                                 }
-                            } else if (typeof(BLOCKHELP[name][3]) === 'string') {
+                            } else if (typeof(message[3]) === 'string') {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                var blocksToLoad = getMacroExpansion(BLOCKHELP[name][3], 100, 100);
+                                var blocksToLoad = getMacroExpansion(message[3], 100, 100);
                                 console.debug('CLICK: ' + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
-                                var blocksToLoad = BLOCKHELP[name][3];
+                                var blocksToLoad = message[3];
                                 console.debug('CLICK: ' + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             }

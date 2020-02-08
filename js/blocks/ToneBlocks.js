@@ -4,6 +4,7 @@ class OscillatorBlock extends FlowBlock {
     constructor() {
         super('oscillator', _('oscillator'));
         this.setPalette('tone');
+        this.setHelpString();
         this.formBlock({
             args: 2, defaults: [_('triangle'), 6],
             argLabels: [
@@ -52,6 +53,7 @@ class FillerTypeBlock extends ValueBlock {
     constructor() {
         super('filtertype');
         this.setPalette('tone');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
         this.hidden = true;
     }
@@ -61,6 +63,7 @@ class OscillatorTypeBlock extends ValueBlock {
     constructor() {
         super('oscillatortype');
         this.setPalette('tone');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
         this.hidden = true;
     }
@@ -71,6 +74,7 @@ class DuoSynthBlock extends FlowBlock {
         //.TRANS: a duo synthesizer combines a synth with a sequencer
         super('duosynth', _('duo synth'));
         this.setPalette('tone');
+        this.setHelpString([_('The Duo synth block is a duo-frequency modulator used to define a timbre.'), 'documentation', null, 'duosynthhelp']);
         this.formBlock({
             args: 2, defaults: [10, 5],
             argLabels: [_('vibrato rate'), _('vibrato intensity')]
@@ -122,6 +126,7 @@ class AMSynth extends FlowBlock {
         //.TRANS: AM (amplitude modulation) synthesizer
         super('amsynth', _('AM synth'));
         this.setPalette('tone');
+        this.setHelpString([_('The AM synth block is an amplitude modulator used to define a timbre.'), 'documentation', null, 'amsynthhelp']);
         this.formBlock({
             args: 1, defaults: [1],
         });
@@ -165,6 +170,7 @@ class FMSynth extends FlowBlock {
         //.TRANS: FM (frequency modulation) synthesizer
         super('fmsynth', _('FM synth'));
         this.setPalette('tone');
+        this.setHelpString([_('The FM synth block is a frequency modulator used to define a timbre.'), 'documentation', null, 'fmsynthhelp']);
         this.formBlock({
             args: 1, defaults: [10],
         });
@@ -208,6 +214,7 @@ class PartialBlock extends FlowBlock {
         //.TRANS: partials are weighted components in a harmonic series
         super('partial', _('partial'));
         this.setPalette('tone');
+        this.setHelpString([_('The Partial block is used to specify a weight for a specific partical harmonic.'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: [10],
         });
@@ -235,6 +242,7 @@ class HarmonicBlock extends FlowClampBlock {
     constructor() {
         super('harmonic');
         this.setPalette('tone');
+        this.setHelpString([_('The Weighted partials block is used to specify the partials associated with a timbre.'), 'documentation', '']);
         this.formBlock({
             //.TRANS: partials are weighted components in a harmonic series
             name: _('weighted partials')
@@ -273,6 +281,7 @@ class Harmonic2Block extends FlowClampBlock {
     constructor() {
         super('harmonic2');
         this.setPalette('tone');
+        this.setHelpString([_('The Harmonic block will add harmonics to the contained notes.'), 'documentation', null, 'harmonichelp']);
         this.formBlock({
             //.TRANS: A harmonic is a overtone.
             name: _('harmonic'),
@@ -323,6 +332,7 @@ class DisBlock extends FlowClampBlock {
     constructor() {
         super('dis');
         this.setPalette('tone');
+        this.setHelpString([_('The Distortion block adds distortion to the pitch.'), 'documentation', null, 'dishelp']);
         this.formBlock({
             //.TRANS: distortion is an alteration in the sound
             name: _('distortion'),
@@ -363,6 +373,7 @@ class TremoloBlock extends FlowClampBlock {
     constructor() {
         super('tremolo');
         this.setPalette('tone');
+        this.setHelpString([_('The Tremolo block adds a wavering effect.'), 'documentation', null, 'tremolohelp']);
         this.formBlock({
             //.TRANS: a wavering effect in a musical tone
             name: _('tremolo'),
@@ -421,6 +432,7 @@ class PhaserBlock extends FlowClampBlock {
     constructor() {
         super('phaser');
         this.setPalette('tone');
+        this.setHelpString([_('The Phaser block adds a sweeping sound.'), 'documentation', null, 'phaserhelp']);
         this.formBlock({
             //.TRANS: alter the phase of the sound
             name: _('phaser'),
@@ -467,6 +479,7 @@ class ChorusBlock extends FlowClampBlock {
     constructor() {
         super('chorus');
         this.setPalette('tone');
+        this.setHelpString([_('The Chorus block adds a chorus effect.'), 'documentation', null, 'chorushelp']);
         this.formBlock({
             //.TRANS: musical effect to simulate a choral sound
             name: _('chorus'),
@@ -520,6 +533,7 @@ class VibratoBlock extends FlowClampBlock {
     constructor() {
         super('vibrato');
         this.setPalette('tone');
+        this.setHelpString([_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', null, 'vibratohelp']);
         this.formBlock({
             //.TRANS: a rapid, slight variation in pitch
             name: _('vibrato'),
@@ -581,6 +595,7 @@ class SetVoiceBlock extends FlowClampBlock {
     constructor() {
         super('setvoice');
         this.setPalette('tone');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: select synthesizer
             name: _('set synth'),
@@ -638,6 +653,7 @@ class SynthNameBlock extends ValueBlock {
     constructor() {
         super('synthname', _('synth name'));
         this.setPalette('tone');
+        this.setHelpString();
         this.formBlock({ outType: 'textout' });
         this.hidden = this.deprecated = true;
     }
@@ -655,6 +671,7 @@ class VoiceNameBlock extends ValueBlock {
     constructor() {
         super('voicename');
         this.setPalette('tone');
+        this.setHelpString([_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', '']);
         this.formBlock({ outType: 'textout' });
         this.extraWidth = 50;
     }
@@ -664,6 +681,7 @@ class SetTimbreBlock extends FlowClampBlock {
     constructor() {
         super('settimbre');
         this.setPalette('tone');
+        this.setHelpString([_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'settimbrehelp']);
         this.formBlock({
             //.TRANS: set the characteristics of a custom instrument
             name: _('set instrument'),

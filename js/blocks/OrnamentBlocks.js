@@ -5,6 +5,7 @@ class StaccatoFactorBlock extends ValueBlock {
         //.TRANS: the duration of a note played as staccato
         super('staccatofactor', _('staccato factor'));
         this.setPalette('ornament');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -24,6 +25,7 @@ class SlurFactorBlock extends ValueBlock {
         //.TRANS: the degree of overlap of notes played as legato
         super('slurfactor', _('slur factor'));
         this.setPalette('ornament');
+        this.setHelpString();
         this.hidden = true;
     }
 
@@ -42,6 +44,7 @@ class NeighborBlock extends FlowClampBlock {
     constructor(name) {
         super(name || 'neighbor');
         this.setPalette('ornament');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
             name: _('neighbor') + ' (+/–)',
@@ -88,6 +91,7 @@ class NeighborBlock extends FlowClampBlock {
 class Neighbor2Block extends NeighborBlock {
     constructor() {
         super('neighbor2');
+        this.setHelpString([_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', null, 'neighbor2help']);
         this.formBlock({
             //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
             name: _('neighbor') + ' (+/–)',
@@ -110,6 +114,7 @@ class GlideBlock extends FlowClampBlock {
     constructor() {
         super('glide');
         this.setPalette('ornament');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: glide (glissando) is a blended overlap successive notes
             name: _('glide'),
@@ -173,6 +178,7 @@ class SlurBlock extends FlowClampBlock {
     constructor(name) {
         super(name || 'slur');
         this.setPalette('ornament');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: slur or legato is an overlap successive notes
             name: _('slur'),
@@ -229,6 +235,7 @@ class StaccatoBlock extends FlowClampBlock {
     constructor(name) {
         super(name || 'staccato');
         this.setPalette('ornament');
+        this.setHelpString();
         this.formBlock({
             //.TRANS: play each note sharply detached from the others
             name: _('staccato'),
@@ -277,6 +284,7 @@ class StaccatoBlock extends FlowClampBlock {
 class NewSlurBlock extends SlurBlock {
     constructor() {
         super('newslur');
+        this.setHelpString([_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'slurhelp']);
         this.formBlock({
             //.TRANS: legato: overlap successive notes
             name: _('slur'),
@@ -297,6 +305,7 @@ class NewSlurBlock extends SlurBlock {
 class NewStaccatoBlock extends StaccatoBlock {
     constructor() {
         super('newstaccato');
+        this.setHelpString([_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'staccatohelp']);
         this.formBlock({
             //.TRANS: play each note sharply detached from the others
             name: _('staccato'),
@@ -312,7 +321,7 @@ class NewStaccatoBlock extends StaccatoBlock {
         ]);
         this.hidden = false;
     }
-}
+} 
 
 
     new StaccatoFactorBlock().setup();

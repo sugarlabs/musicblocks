@@ -4,7 +4,7 @@ class ReturnBlock extends FlowBlock {
     constructor() {
         super('return');
         this.setPalette('action');
-
+        this.setHelpString([_('The Return block will return a value from an action.'), 'documentation', '']);
         this.formBlock({
             name: _('return'),
             args: 1,
@@ -24,7 +24,8 @@ class ReturnToURLBlock extends FlowBlock {
     constructor() {
         super('returnToUrl');
         this.setPalette('action');
-
+        this.setHelpString([_('The Return to URL block will return a value to a webpage.'), 'documentation', '']);
+        
         //.TRANS: return value from a function to a URL
         this.formBlock({
             name: _('return to URL'),
@@ -76,6 +77,7 @@ class CalcBlock extends LeftBlock {
     constructor() {
         super('calc');
         this.setPalette('action');
+        this.setHelpString([_('The Calculate block returns a value calculated by an action.'), 'documentation', '']);
 
         this.formBlock({
             name: _('calculate'),
@@ -112,6 +114,7 @@ class NamedCalcBlock extends ValueBlock {
     constructor() {
         super('namedcalc');
         this.setPalette('action');
+        this.setHelpString([_('The Calculate block returns a value calculated by an action.'), 'documentation', '']);
 
         this.extraWidth = 20;
         this.formBlock({
@@ -140,6 +143,7 @@ class NamedDoArgBlock extends FlowClampBlock {
     constructor() {
         super('nameddoArg');
         this.setPalette('action');
+        this.setHelpString([_('The Do block is used to initiate an action.'), 'documentation', ''])
 
         //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
         //.TRANS: take (do) some action
@@ -213,6 +217,7 @@ class NamedCalcArgBlock extends LeftBlock {
     constructor() {
         super('namedcalcArg');
         this.setPalette('action');
+        this.setHelpString([_('The Calculate block returns a value calculated by an action.'), 'documentation', ''])
 
         this.formBlock({
             name: _('calculate'),
@@ -250,6 +255,7 @@ class DoArgBlock extends FlowClampBlock {
     constructor() {
         super('doArg');
         this.setPalette('action');
+        this.setHelpString([_('The Do block is used to initiate an action.'), 'documentation', '']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('do1') : _('do'),
@@ -295,6 +301,7 @@ class CalcArgBlock extends LeftBlock {
     constructor() {
         super('calcArg');
         this.setPalette('action');
+        this.setHelpString([_('The Calculate block returns a value calculated by an action.'), 'documentation', '']);
 
         this.formBlock({
             name: _('calculate'),
@@ -339,6 +346,7 @@ class ArgBlock extends LeftBlock {
     constructor() {
         super('arg');
         this.setPalette('action');
+        this.setHelpString([_('The Arg block contains the value of an argument passed to an action.'), 'documentation', '']);
 
         this.formBlock({
             name: _('arg'),
@@ -374,6 +382,7 @@ class NamedArgBlock extends LeftBlock {
     constructor() {
         super('namedarg');
         this.setPalette('action');
+        this.setHelpString([_('The Arg block contains the value of an argument passed to an action.'), 'documentation', '']);
 
         this.formBlock({
             name: _('arg') + 1,
@@ -413,6 +422,7 @@ class DoBlock extends FlowBlock {
     constructor() {
         super('do');
         this.setPalette('action');
+        this.setHelpString([_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', null, 'dohelp']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('do1') : _('do'),
@@ -443,6 +453,7 @@ class ListenBlock extends FlowBlock {
     constructor() {
         super('listen');
         this.setPalette('action');
+        this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', null, 'broadcasthelp']);
 
         if (this.lang === 'ja')
             this.extraWidth = 15;
@@ -487,6 +498,7 @@ class DispatchBlock extends FlowBlock {
     constructor() {
         super('dispatch');
         this.setPalette('action');
+        this.setHelpString([_('The Broadcast block is used to trigger an event.'), 'documentation', null, 'broadcasthelp']);
 
         //.TRANS: dispatch an event to trigger a listener
         this.formBlock({
@@ -514,6 +526,7 @@ class StartBlock extends StackClampBlock {
     constructor() {
         super('start');
         this.setPalette('action');
+        this.setHelpString([_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', '']);
         
         this.formBlock({ name: _('start'), canCollapse: true });
     }
@@ -544,6 +557,7 @@ class ActionBlock extends StackClampBlock {
     constructor() {
         super('action');
         this.setPalette('action');
+        this.setHelpString([_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', null, 'actionhelp']);
 
         this.formBlock({
 	    canCollapse: true,
@@ -580,6 +594,7 @@ class NamedDoBlock extends FlowBlock {
     constructor() {
         super('nameddo');
         this.setPalette('action');
+        this.setHelpString([_('The Do block is used to initiate an action.'), 'documentation', '']);
 
         this.extraWidth = 30;
         this.formBlock({ name: _('action') });
@@ -632,6 +647,8 @@ class Temperament1Block extends StackClampBlock {
     constructor() {
         super('temperament1');
         this.setPalette('action');
+        this.setHelpString();
+
         this.formBlock({
             name: _('define temperament'), args: 1
         });

@@ -4,6 +4,7 @@ class NotBlock extends BooleanBlock {
     constructor() {
         super('not');
         this.setPalette('boolean');
+        this.setHelpString([_('The Not block is the logical not operator.'), 'documentation', '']);
 
         this.formBlock({
             name: _('not'),
@@ -32,6 +33,8 @@ class AndBlock extends BooleanBlock {
     constructor() {
         super('and');
         this.setPalette('boolean');
+        this.setHelpString([_('The And block is the logical and operator.'), 'documentation', '']);
+
         this.formBlock({
             name: _('and'),
             args: 2, argTypes: ['booleanin', 'booleanin']
@@ -56,6 +59,8 @@ class OrBlock extends BooleanBlock {
     constructor() {
         super('or');
         this.setPalette('boolean');
+        this.setHelpString([_('The Or block is the logical or operator.'), 'documentation', '']);
+
         this.formBlock({
             name: _('or'),
             args: 2, argTypes: ['booleanin', 'booleanin']
@@ -80,6 +85,7 @@ class GreaterBlock extends BooleanBlock {
     constructor() {
         super('greater');
         this.setPalette('boolean');
+        this.setHelpString([_('The Greater-than block returns True if the top number is greater than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({
             name: '>',
@@ -111,6 +117,7 @@ class LessBlock extends BooleanBlock {
     constructor() {
         super('less');
         this.setPalette('boolean');
+        this.setHelpString([_('The Less-than block returns True if the top number is less than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({
             name: '<',
@@ -141,6 +148,7 @@ class EqualBlock extends BooleanBlock {
     constructor() {
         super('equal');
         this.setPalette('boolean');
+        this.setHelpString([_('The Equal block returns True if the two numbers are equal.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({
             name: '=',
@@ -171,6 +179,7 @@ class StaticBooleanBlock extends BooleanBlock {
     constructor() {
         super('boolean');
         this.setPalette('boolean');
+        this.setHelpString([_('The Boolean block is used to specify true or false.'), 'documentation', '']);
     }
 
     arg(logo, turtle, blk) {

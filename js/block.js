@@ -5867,8 +5867,8 @@ function Block(protoblock, blocks, overrideName) {
         // if (this.name === 'action') {
         //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
         // }
-
-        if (this.name in BLOCKHELP) {
+        var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+        if (message) {
             labels.push('imgsrc:header-icons/help-button.svg');
             var helpButton = labels.length - 1;
         } else {
