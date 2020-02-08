@@ -173,6 +173,7 @@ class SetDrumBlock extends FlowClampBlock {
     constructor() {
         super('setdrum');
         this.setPalette('drum');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: set the current drum sound for playback
             name: _('set drum'),
@@ -225,6 +226,7 @@ class PlayEffectBlock extends FlowBlock {
     constructor() {
         super('playeffect', _('sound effect'));
         this.setPalette('drum');
+        this.beginnerBlock(true);
         this.formBlock({ args: 1, argTypes: ['anyin'] });
         this.makeMacro((x, y) => [
             [0, 'playdrum', x, y, [null, 1, null]],
@@ -237,6 +239,7 @@ class PlayDrumBlock extends FlowBlock {
     constructor() {
         super('playdrum', _('drum'));
         this.setPalette('drum');
+        this.beginnerBlock(true);
         this.formBlock({ args: 1, argTypes: ['anyin'] });
         this.makeMacro((x, y) => [
             [0, 'playdrum', x, y, [null, 1, null]],

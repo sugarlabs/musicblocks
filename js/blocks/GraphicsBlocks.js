@@ -21,7 +21,7 @@ class YBlock extends ValueBlock {
         //.TRANS: y coordinate
         super('y');
         this.setPalette('graphics');
-
+        this.beginnerBlock(true);
         this.formBlock({
             name: this.lang === 'ja' ? _('y3') : _('y')
         });
@@ -41,6 +41,7 @@ class XBlock extends ValueBlock {
         //.TRANS: x coordinate
         super('x');
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('x3') : _('x')
@@ -61,6 +62,7 @@ class ScrollXYBlock extends FlowBlock {
         //.TRANS: scroll canvas image by x, y position
         super('scrollxy', _('scroll xy'));
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 2, defaults: [100, 0],
@@ -231,6 +233,7 @@ class ArcBlock extends FlowBlock {
     constructor() {
         super('arc');
         this.setPalette('graphics');
+        this.beginnerBlock(true);
         
         this.formBlock({
             //.TRANS: draws a part of the circumference of a circle
@@ -309,6 +312,7 @@ class SetXYBlock extends FlowBlock {
     constructor() {
         super('setxy');
         this.setPalette('graphics');
+        this.beginnerBlock(true);
         
         this.formBlock({
             //.TRANS: set xy (Cartesian) position
@@ -353,6 +357,7 @@ class RightBlock extends FlowBlock {
     constructor() {
         super('right');
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             //.TRANS: right1 and right are when turning right (clockwise)
@@ -396,6 +401,7 @@ class MLeftBlock extends FlowBlock {
     constructor() {
         super('left');
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             //.TRANS: left and left1 are when turning left (counter-clockwise)
@@ -440,6 +446,7 @@ class BackBlock extends FlowBlock {
         //.TRANS: move backward (in the opposite direction of the current heading)
         super('back', _('back'));
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 1, defaults: [100]
@@ -482,6 +489,7 @@ class ForwardBlock extends FlowBlock {
         //.TRANS: move forward (in the direction of the current heading)
         super('forward', _('forward'));
         this.setPalette('graphics');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 1, defaults: [100]

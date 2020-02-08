@@ -320,6 +320,7 @@ class ModeWidgetBlock extends StackClampBlock {
     constructor() {
         super('modewidget');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
         this.formBlock({ name: _('custom mode'), canCollapse: true });
         this.makeMacro((x, y) => [
@@ -357,6 +358,7 @@ class TempoBlock extends StackClampBlock {
     constructor() {
         super('tempo');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: the speed at music is should be played.
         this.formBlock({ name: _('tempo'), canCollapse: true });
         this.makeMacro((x, y) => [
@@ -566,6 +568,7 @@ class MusicKeyboardBlock extends StackClampBlock {
     constructor() {
         super('musickeyboard');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: widget to generate pitches using a slider
         this.formBlock({ name: _('music keyboard'), canCollapse: true });
         this.hidden = true;
@@ -600,6 +603,7 @@ class PitchStaircaseBlock extends StackClampBlock {
     constructor() {
         super('pitchstaircase');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: generate a progressive sequence of pitches
         this.formBlock({ name: _('pitch staircase'), canCollapse: true });
         this.makeMacro((x, y) => [
@@ -661,6 +665,7 @@ class RhythmRuler2Block extends StackClampBlock {
     constructor() {
         super('rhythmruler2');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: widget for subdividing a measure into distinct rhythmic elements
         this.formBlock({ name: _('rhythm maker'), canCollapse: true });
         this.makeMacro((x, y) => [
@@ -712,6 +717,7 @@ class MatrixGMajorBlock extends FlowBlock {
     constructor() {
         super('matrixgmajor', _('G major scale'));
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.makeMacro((x, y) => [
             [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
 	    [1, ['solfege', {'value': 'sol'}], 0, 0, [10]],
@@ -738,6 +744,7 @@ class MatrixCMajorBlock extends FlowBlock {
     constructor() {
         super('matrixcmajor', _('C major scale'));
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.makeMacro((x, y) => [
             [0, ['matrix', {'collapsed': false}], x, y, [null, 5, 16]],
 	    [1, ['solfege', {'value': 'do'}], 0, 0, [10]],
@@ -764,6 +771,7 @@ class MatrixBlock extends StackClampBlock {
     constructor() {
         super('matrix');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         //.TRANS: assigns pitch to a sequence of beats to generate a melody
         this.formBlock({ name: _('phrase maker'), canCollapse: true });
         this.makeMacro((x, y) => [
@@ -871,6 +879,7 @@ class StatusBlock extends StackClampBlock {
     constructor() {
         super('status');
         this.setPalette('widgets');
+        this.beginnerBlock(true);
         this.formBlock({ name: _('status'), canCollapse: true });
         this.makeMacro((x, y) => [
             [0, 'status', x, y, [null, 1, 12]],

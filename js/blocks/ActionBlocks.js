@@ -413,6 +413,7 @@ class DoBlock extends FlowBlock {
     constructor() {
         super('do');
         this.setPalette('action');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('do1') : _('do'),
@@ -443,6 +444,7 @@ class ListenBlock extends FlowBlock {
     constructor() {
         super('listen');
         this.setPalette('action');
+        this.beginnerBlock(true);
 
         if (this.lang === 'ja')
             this.extraWidth = 15;
@@ -487,6 +489,7 @@ class DispatchBlock extends FlowBlock {
     constructor() {
         super('dispatch');
         this.setPalette('action');
+        this.beginnerBlock(true);
 
         //.TRANS: dispatch an event to trigger a listener
         this.formBlock({
@@ -514,6 +517,7 @@ class StartBlock extends StackClampBlock {
     constructor() {
         super('start');
         this.setPalette('action');
+        this.beginnerBlock(true);
         
         this.formBlock({ name: _('start'), canCollapse: true });
     }
@@ -544,6 +548,7 @@ class ActionBlock extends StackClampBlock {
     constructor() {
         super('action');
         this.setPalette('action');
+        this.beginnerBlock(true);
 
         this.formBlock({
 	    canCollapse: true,

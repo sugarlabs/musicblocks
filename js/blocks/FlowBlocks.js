@@ -4,6 +4,7 @@ class BackwardBlock extends FlowClampBlock {
     constructor() {
         super('backward');
         this.setPalette('flow');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('backward'),
@@ -517,6 +518,7 @@ class IfThenElseBlock extends FlowClampBlock {
     constructor() {
         super('ifthenelse');
         this.setPalette('flow');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('if'),
@@ -539,6 +541,7 @@ class IfBlock extends FlowClampBlock {
     constructor() {
         super('if');
         this.setPalette('flow');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('if'),
@@ -559,6 +562,7 @@ class ForeverBlock extends FlowClampBlock {
     constructor() {
         super('forever');
         this.setPalette('flow');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('forever'),
@@ -576,6 +580,7 @@ class RepeatBlock extends FlowClampBlock {
     constructor() {
         super('repeat');
         this.setPalette('flow');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('repeat'),

@@ -88,6 +88,7 @@ class NeighborBlock extends FlowClampBlock {
 class Neighbor2Block extends NeighborBlock {
     constructor() {
         super('neighbor2');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
             name: _('neighbor') + ' (+/–)',
@@ -277,6 +278,7 @@ class StaccatoBlock extends FlowClampBlock {
 class NewSlurBlock extends SlurBlock {
     constructor() {
         super('newslur');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: legato: overlap successive notes
             name: _('slur'),
@@ -297,6 +299,7 @@ class NewSlurBlock extends SlurBlock {
 class NewStaccatoBlock extends StaccatoBlock {
     constructor() {
         super('newstaccato');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: play each note sharply detached from the others
             name: _('staccato'),

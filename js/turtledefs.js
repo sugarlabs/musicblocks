@@ -55,7 +55,7 @@ function getAuxToolbarButtonNames(name) {
 };
 
 
-function beginnerBlock(name) {
+/*function beginnerBlock(name) {
  // Only these blocks appear on the palette in beginner mode.
     return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
            'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
@@ -79,6 +79,7 @@ function beginnerBlock(name) {
            'print',  // extras palette
           ].indexOf(name) !== -1
 };
+*/
 
 
 function createDefaultStack() {

@@ -80,6 +80,7 @@ class GreaterBlock extends BooleanBlock {
     constructor() {
         super('greater');
         this.setPalette('boolean');
+        this.beginnerBlock(true);
         this.fontsize = 14;
         this.formBlock({
             name: '>',
@@ -111,6 +112,7 @@ class LessBlock extends BooleanBlock {
     constructor() {
         super('less');
         this.setPalette('boolean');
+        this.beginnerBlock(true);
         this.fontsize = 14;
         this.formBlock({
             name: '<',
@@ -141,6 +143,7 @@ class EqualBlock extends BooleanBlock {
     constructor() {
         super('equal');
         this.setPalette('boolean');
+        this.beginnerBlock(true);
         this.fontsize = 14;
         this.formBlock({
             name: '=',

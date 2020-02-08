@@ -543,7 +543,7 @@ class TurtleNameBlock extends ValueBlock {
     constructor() {
         super('turtlename', _('mouse name'));
         this.setPalette('ensemble');
-
+        this.beginnerBlock(true);
         this.formBlock({
             outType: 'textout'
         });
@@ -607,7 +607,7 @@ class SetTurtleName2Block extends FlowBlock {
     constructor() {
         super('setturtlename2', _('set name'));
         this.setPalette('ensemble');
-
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, argTypes: ['anyin'], defaults: [_('Mr. Mouse')]
         });

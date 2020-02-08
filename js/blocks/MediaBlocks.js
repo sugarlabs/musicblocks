@@ -5,6 +5,7 @@ class RightPosBlock extends ValueBlock {
         //.TRANS: right side of the screen
         super('rightpos', _('right (screen)'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -17,6 +18,7 @@ class LeftPosBlock extends ValueBlock {
         //.TRANS: left side of the screen
         super('leftpos', _('left (screen)'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -28,6 +30,7 @@ class TopPosBlock extends ValueBlock {
     constructor() {
         super('toppos', _('top (screen)'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -39,6 +42,7 @@ class BottomPosBlock extends ValueBlock {
     constructor() {
         super('bottompos', _('bottom (screen)'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -50,6 +54,7 @@ class WidthBlock extends ValueBlock {
     constructor() {
         super('width', _('width'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -61,6 +66,7 @@ class HeightBlock extends ValueBlock {
     constructor() {
         super('height', _('height'));
         this.setPalette('media');
+        this.beginnerBlock(true);
     }
 
     arg(logo) {
@@ -117,6 +123,7 @@ class SpeakBlock extends FlowBlock {
     constructor() {
         super('speak', _('speak'));
         this.setPalette('media');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: ['hello'],
             argTypes: ['textin']
@@ -298,6 +305,7 @@ class TurtleShellBlock extends FlowBlock {
         //.TRANS: Avatar is the image used to determine the appearance of the mouse.
         super('turtleshell', _('avatar'));
         this.setPalette('media');
+        this.beginnerBlock(true);
 
         this.formBlock({
             args: 2, defaults: [55, null],
@@ -327,7 +335,7 @@ class ShowBlock extends FlowBlock {
     constructor() {
         super('show');
         this.setPalette('media');
-
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: show1 is show as in display an image or text on the screen.
             name: this.lang === 'ja' ? _('show1') : _('show'),
@@ -359,6 +367,7 @@ class MediaBlock extends ValueBlock {
     constructor() {
         super('media');
         this.setPalette('media');
+        this.beginnerBlock(true);
 
         /*
         if (language === 'ja') {
@@ -382,6 +391,7 @@ class TextBlock extends ValueBlock {
         super('text');
         this.extraWidth = 30;
         this.setPalette('media');
+        this.beginnerBlock(true);
         this.formBlock({
             outType: 'textout'
         });

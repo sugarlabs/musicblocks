@@ -4,6 +4,7 @@ class IncrementBlock extends FlowBlock {
     constructor(name) {
         super(name || 'increment');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({
             name: _('add'),
@@ -39,6 +40,7 @@ class IncrementOneBlock extends IncrementBlock {
     constructor() {
         super('incrementOne');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({ name: _('add 1 to'), args: 1, argTypes: ['anyin'], argLabels: [''] });
     }
@@ -84,6 +86,7 @@ class NamedBoxBlock extends ValueBlock {
     constructor() {
         super('namedbox');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.extraWidth = 20;
         this.formBlock({
@@ -129,6 +132,7 @@ class StoreInBlock extends FlowBlock {
     constructor() {
         super('storein');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
         
         this.formBlock({
             //.TRANS: put something into a container for later reference
@@ -151,6 +155,7 @@ class Box2Block extends ValueBlock {
     constructor() {
         super('box2');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({ name: _('box 2') });
         this.makeMacro((x, y) => [
@@ -163,6 +168,7 @@ class StoreBox2Block extends FlowBlock {
     constructor() {
         super('storebox2');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({ name: _('store in box 2'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [
@@ -176,6 +182,7 @@ class Box1Block extends ValueBlock {
     constructor() {
         super('box1');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({ name: _('box 1') });
         this.makeMacro((x, y) => [
@@ -188,6 +195,7 @@ class StoreBox1Block extends FlowBlock {
     constructor() {
         super('storebox1');
         this.setPalette('boxes');
+        this.beginnerBlock(true);
 
         this.formBlock({ name: _('store in box 1'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [

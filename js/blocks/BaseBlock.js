@@ -206,6 +206,10 @@ class BaseBlock extends ProtoBlock {
         this.name = name;
     }
 
+    beginnerBlock(value) {
+        this.beginnerBlock = value;
+    }
+
     setup() {
         blocks.protoBlockDict[this.name] = this;
         if (beginnerMode && !beginnerBlock(this.name)) {

@@ -277,6 +277,7 @@ class SetDrumVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setdrumvolume', _('set drum volume'));
         this.setPalette('volume');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 2, defaults: [DEFAULTDRUM, 50],
             argTypes: ['textin', 'numberin'],
@@ -295,6 +296,7 @@ class SetSynthVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setsynthvolume', _('set synth volume'));
         this.setPalette('volume');
+        this.beginnerBlock(true);
         this.formBlock({
             args: 2, defaults: [DEFAULTVOICE, 50],
             argTypes: ['textin', 'numberin'],
@@ -395,6 +397,7 @@ class SetNoteVolumeBlock extends FlowBlock {
         //.TRANS: set the loudness level
         super('setnotevolume', _('set master volume'));
         this.setPalette('volume');
+        this.beginnerBlock(true);
         this.formBlock({ args: 1, defaults: [50] });
     }
 
@@ -581,6 +584,7 @@ class DecrescendoBlock extends FlowClampBlock {
     constructor(name) {
         super(name || 'decrescendo');
         this.setPalette('volume');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: a gradual increase in loudness
             name: _('decrescendo'),
@@ -641,6 +645,7 @@ class CrescendoBlock extends DecrescendoBlock {
     constructor() {
         super('crescendo');
         this.setPalette('volume');
+        this.beginnerBlock(true);
         this.formBlock({
             //.TRANS: a gradual increase in loudness
             name: _('crescendo'),
