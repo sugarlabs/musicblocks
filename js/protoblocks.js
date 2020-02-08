@@ -62,6 +62,8 @@ function ProtoBlock(name) {
     //Stores the width of the text component
     this.textWidth = 0;
     this.labelOffset = 0;
+    //Stores Help related strings
+    this.HELPSTRING = '';
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -1258,6 +1260,9 @@ class BaseBlock extends ProtoBlock {
     setPalette(palette) {
         this.palette = palettes.dict[palette]
     }
+    setHelpString(help) {
+        this.HELPSTRING = help;
+    }
 
     formBlock(style) {
         mergeDeep(this._style, style);
@@ -1268,9 +1273,9 @@ class BaseBlock extends ProtoBlock {
         this._style.flows = this._style.flows || {}
         this._style.flows.labels = this._style.flows.labels || [];
 
-	if (this._style.args > 1) {
-	    this.expandable = true;
-	}
+        if (this._style.args > 1) {
+            this.expandable = true;
+        }
 
         if (this._style.flows.labels.length > 0) {
             if (this._style.flows.type === 'arg')
