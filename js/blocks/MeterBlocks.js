@@ -85,6 +85,7 @@ class BeatValueBlock extends ValueBlock {
         //.TRANS: count of current beat in meter
         super('beatvalue', _('beat count'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
 
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString([_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'everybeathelp']);
@@ -152,6 +153,7 @@ class ElapsedNotes2Block extends LeftBlock {
         //.TRANS: number of notes th__at have been played
         super('elapsednotes2', _('notes played'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
         this.setHelpString();
         this.formBlock({
             args: 1
@@ -311,6 +313,7 @@ class EveryBeatDoBlock extends FlowBlock {
         // .TRANS: on every note played, do some action
         super('everybeatdo', _('on every note do'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
         this.setHelpString([_('The On-every-note block let you specify actions to take on every note.'), 'documentation', null, 'everybeathelp']);
         this.formBlock({
             args: 1, argTypes: ['textin'],
@@ -353,6 +356,7 @@ class SetMasterBPM2Block extends FlowBlock {
         //.TRANS: sets tempo by defniing a beat and beats per minute
         super('setmasterbpm2', _('master beats per minute'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', null, 'setmasterbpm2']);
         this.formBlock({
             args: 2, defaults: [90, 1 / 4],
@@ -437,6 +441,7 @@ class SetBPM3Block extends FlowBlock {
         //.TRANS: sets tempo by defniing a beat and beats per minute
         super('setbpm3', _('beats per minute'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', null, 'bpmhelp']);
         this.formBlock({
             args: 2, defaults: [90, 1 / 4],
@@ -622,6 +627,7 @@ class MeterBlock extends FlowBlock {
         //.TRANS: musical meter (time signature)
         super('meter', _('meter'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
         this.setHelpString([_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', null, 'meter']);
         this.extraWidth = 15;
         this.formBlock({

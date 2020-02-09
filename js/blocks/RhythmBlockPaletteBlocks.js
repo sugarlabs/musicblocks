@@ -132,6 +132,7 @@ class Rhythm2Block extends RhythmBlock {
     constructor() {
         super('rhythm2');
         this.setPalette(rhythmBlockPalette);
+        this.beginnerBlock(true);
         this.setHelpString([_('The Rhythm block is used to generate rhythm patterns.'), 'documentation', null, 'rhythm2']);
         this.formBlock({
             name: this.lang === 'ja'
@@ -527,6 +528,7 @@ class STupletBlock extends FlowBlock {
     constructor() {
         super('stuplet', _('simple tuplet'));
         this.setPalette(rhythmBlockPalette);
+        this.beginnerBlock(true);
         this.setHelpString([_('Tuplets are a collection of notes that get scaled to a specific duration.') + ' ' + _('Using tuplets makes it easy to create groups of notes that are not based on a power of 2.'), 'documentation', null, 'matrix']);
         this.formBlock({
             args: 2, defaults: [3, 1 / 2],

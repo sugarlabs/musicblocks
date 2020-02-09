@@ -91,6 +91,7 @@ class NeighborBlock extends FlowClampBlock {
 class Neighbor2Block extends NeighborBlock {
     constructor() {
         super('neighbor2');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', null, 'neighbor2help']);
         this.formBlock({
             //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
@@ -284,6 +285,7 @@ class StaccatoBlock extends FlowClampBlock {
 class NewSlurBlock extends SlurBlock {
     constructor() {
         super('newslur');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'slurhelp']);
         this.formBlock({
             //.TRANS: legato: overlap successive notes

@@ -422,6 +422,7 @@ class DoBlock extends FlowBlock {
     constructor() {
         super('do');
         this.setPalette('action');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Do block is used to initiate an action.') + ' ' + _('In the example, it is used with the One of block to choose a random phase.'), 'documentation', null, 'dohelp']);
 
         this.formBlock({
@@ -453,6 +454,7 @@ class ListenBlock extends FlowBlock {
     constructor() {
         super('listen');
         this.setPalette('action');
+        this.beginnerBlock(true);
 
         if (this.lang === 'ja') {
             this.extraWidth = 15;
@@ -502,6 +504,7 @@ class DispatchBlock extends FlowBlock {
     constructor() {
         super('dispatch');
         this.setPalette('action');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Broadcast block is used to trigger an event.'), 'documentation', null, 'broadcasthelp']);
 
         //.TRANS: dispatch an event to trigger a listener
@@ -530,6 +533,7 @@ class StartBlock extends StackClampBlock {
     constructor() {
         super('start');
         this.setPalette('action');
+        this.beginnerBlock(true);
         this.setHelpString([_('Each Start block is a separate voice.') + ' ' + _('All of the Start blocks run at the same time when the Play button is pressed.'), 'documentation', '']);
         
         this.formBlock({ name: _('start'), canCollapse: true });
@@ -561,6 +565,7 @@ class ActionBlock extends StackClampBlock {
     constructor() {
         super('action');
         this.setPalette('action');
+        this.beginnerBlock(true);
         this.setHelpString([_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', null, 'actionhelp']);
 
         this.formBlock({
