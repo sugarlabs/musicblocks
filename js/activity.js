@@ -21,6 +21,7 @@ function Activity() {
     _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
     var _ERRORMSGTIMEOUT_ = 15000;
+    var _MSGTIMEOUT_ = 60000;
     var cellSize = 55;
     var searchSuggestions = [];
     var homeButtonContainers = [];
@@ -297,7 +298,7 @@ function Activity() {
 
         searchWidget = docById('search');
         searchWidget.style.visibility = 'hidden';
-	searchWidget.placeholder = _('search for blocks');
+        searchWidget.placeholder = _('search for blocks');
 
         progressBar = docById('myProgress');
         progressBar.style.visibility = 'hidden';
@@ -2929,6 +2930,11 @@ function Activity() {
 
 
     textMsg = function (msg) {
+        if (msgTimeoutID != null) {
+            clearTimeout(msgTimeoutID);
+        }
+
+
         if (msgText == null) {
             // The container may not be ready yet, so do nothing.
             return;
@@ -2941,6 +2947,9 @@ function Activity() {
         var printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
+        msgTimeoutID = setTimeout(function () {
+            printText.style.visibility = 'hidden';
+        }, _MSGTIMEOUT_);
     };
 
     errorMsg = function (msg, blk, text, timeout) {
@@ -3929,6 +3938,7 @@ function Activity() {
 
         // Msg block
         msgText = null;
+        msgTimeoutID = null;
 
         // ErrorMsg block
         errorMsgText = null;
