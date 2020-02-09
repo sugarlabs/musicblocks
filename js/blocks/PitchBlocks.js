@@ -1332,7 +1332,7 @@ class SetScalarTranspositionBlock extends FlowClampBlock {
             [2, 'hidden', 0, 0, [0, null]]
         ]);
         // Note: Inverted to usual; only appears in beginner mode.
-        if (!beginnerMode || !this.beginnerModeBlock {
+        if (!beginnerMode || !this.beginnerModeBlock) {
             this.hidden = true;
         }
     }
