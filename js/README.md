@@ -175,7 +175,7 @@ e.g. `this.setPalette('yourPaletteName);`
 To designate a block for `beginnerMode`, add
 `this.beginnerBlock(true);` to the constructor.
 
-To add a help string, add `this.helpString([_('some block help'),
+To add a help string, add `this.setHelpString([_('some block help'),
 'documentation', null, 'macroname']);` to the constructor.
 
 The first element in the list is the help string itself. The second
