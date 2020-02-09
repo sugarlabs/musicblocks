@@ -132,7 +132,11 @@ Many students contributed to the project as part of Google Code-in
 built the Planet during GCI 2016&ndash;17. Emily Ong designed our
 mouse icon and Euan Ong redesigned the Planet code as a series of GCI
 tasks in 2017&ndash;18; Austin George refactored the toolbars as a
-series of GCI tasks in 2018.
+series of GCI tasks in 2018. In GCI 2019, Bottersnike redesigned the
+widgets and the Block API, AndreaGon made the widgets responsive,
+Pidddgy refactored the update code, resulting in an order-of-magnitude
+improvement in CPU usage, and Nepaltechguy2 updated the local storage
+mechanism to use localforage.
 
 A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
