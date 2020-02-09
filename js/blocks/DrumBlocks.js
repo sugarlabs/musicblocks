@@ -178,7 +178,12 @@ class SetDrumBlock extends FlowClampBlock {
     constructor() {
         super('setdrum');
         this.setPalette('drum');
-        this.setHelpString([_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', null, 'setdrumhelp'])
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', null, 'rhythmruler2']);
+	} else {
+            this.setHelpString([_('The Set drum block will select a drum sound to replace the pitch of any contained notes.') + ' ' + _('In the example above, a kick drum sound will be played instead of sol.'), 'documentation', null, 'setdrumhelp'])
+	}
         this.formBlock({
             //.TRANS: set the current drum sound for playback
             name: _('set drum'),

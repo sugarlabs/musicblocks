@@ -4,7 +4,12 @@ class IncrementBlock extends FlowBlock {
     constructor(name) {
         super(name || 'increment');
         this.setPalette('boxes');
-        this.setHelpString([_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks such as Color and Pen size.'), 'documentation', '']);
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString(BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', '']);
+	} else {
+            this.setHelpString([_('The Add-to block is used to add to the value stored in a box.') + ' ' + _('It can also be used with other blocks such as Color and Pen size.'), 'documentation', '']);
+	}
 
         this.formBlock({
             name: _('add'),

@@ -681,7 +681,13 @@ class SetTimbreBlock extends FlowClampBlock {
     constructor() {
         super('settimbre');
         this.setPalette('tone');
-        this.setHelpString([_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'settimbrehelp']);
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('The Set instrument block selects a voice for the synthesizer,'), 'documentation', '']);
+	} else {
+            this.setHelpString([_('The Set instrument block selects a voice for the synthesizer,') + ' ' + _('eg guitar piano violin or cello.'), 'documentation', null, 'settimbrehelp']);
+	}
+
         this.formBlock({
             //.TRANS: set the characteristics of a custom instrument
             name: _('set instrument'),

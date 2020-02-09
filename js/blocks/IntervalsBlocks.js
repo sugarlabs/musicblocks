@@ -704,7 +704,13 @@ class SetKey2Block extends FlowBlock {
         //.TRANS: set the key and mode, e.g. C Major
         super('setkey2', _('set key'));
         this.setPalette('intervals');
-        this.setHelpString([_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', null, 'movablehelp']);
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('The Set key block is used to set the key and mode,'), 'documentation', '']);
+	} else {
+            this.setHelpString([_('The Set key block is used to set the key and mode,') + ' ' + _('eg C Major'), 'documentation', null, 'movablehelp']);
+	}
+
         this.formBlock({
             args: 2, argTypes: ['anyin', 'anyin'],
             argLabels: [

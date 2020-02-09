@@ -527,7 +527,11 @@ class IfThenElseBlock extends FlowClampBlock {
     constructor() {
         super('ifthenelse');
         this.setPalette('flow');
-        this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', null, 'elifhelp']);
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'elifhelp']);
+	} else {
+            this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.'), 'documentation', null, 'elifhelp']);
+	}
 
         this.formBlock({
             name: _('if'),
@@ -550,7 +554,12 @@ class IfBlock extends FlowClampBlock {
     constructor() {
         super('if');
         this.setPalette('flow');
-        this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'ifhelp']);
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'ifhelp']);
+	} else {
+            this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'ifhelp']);
+	}
 
         this.formBlock({
             name: _('if'),

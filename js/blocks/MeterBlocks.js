@@ -85,7 +85,12 @@ class BeatValueBlock extends ValueBlock {
         //.TRANS: count of current beat in meter
         super('beatvalue', _('beat count'));
         this.setPalette('meter');
-        this.setHelpString();
+
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'everybeathelp']);
+	} else {
+            this.setHelpString([_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'beatvaluehelp']);
+	}
     }
 
     arg(logo, turtle, blk) {

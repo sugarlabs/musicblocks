@@ -577,7 +577,12 @@ class MusicKeyboardBlock extends StackClampBlock {
     constructor() {
         super('musickeyboard');
         this.setPalette('widgets');
-        this.setHelpString([_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', null, 'musickeyboard2']);
+	if (beginnerMode && this.lang === 'ja') {
+	    this.setHelpString([_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', null, 'musickeyboardja']);
+	} else {
+            this.setHelpString([_('The Music keyboard block opens a piano keyboard that can be used to create notes.'), 'documentation', null, 'musickeyboard2']);
+	}
+
         //.TRANS: widget to generate pitches using a slider
         this.formBlock({ name: _('music keyboard'), canCollapse: true });
         this.hidden = true;

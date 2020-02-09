@@ -453,10 +453,14 @@ class ListenBlock extends FlowBlock {
     constructor() {
         super('listen');
         this.setPalette('action');
-        this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', null, 'broadcasthelp']);
 
-        if (this.lang === 'ja')
+        if (this.lang === 'ja') {
             this.extraWidth = 15;
+	    this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', null, 'broadcasthelp']);
+	} else {
+	    this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', null, 'broadcasthelp']);
+	}
+
         this.formBlock({
             //.TRANS: an event, such as user actions (mouse clicks, key presses)
             name: _('on'),
