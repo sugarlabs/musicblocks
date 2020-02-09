@@ -109,7 +109,7 @@ class BeatValueBlock extends ValueBlock {
 class NoteCounterBlock extends LeftBlock {
     constructor() {
         //.TRANS: count the number of notes
-        super('notecounter', _('note counter'));
+        super('notecounter', _('sum note values'));
         this.setPalette('meter');
         this.setHelpString([_('The Note counter block can be used to count the number of contained notes.'), 'documentation', null, 'notecounterhelp']);
         this.formBlock({
