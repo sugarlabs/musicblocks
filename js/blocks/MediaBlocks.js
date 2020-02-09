@@ -6,6 +6,7 @@ class RightPosBlock extends ValueBlock {
         super('rightpos', _('right (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
     }
 
@@ -20,6 +21,7 @@ class LeftPosBlock extends ValueBlock {
         super('leftpos', _('left (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
     }
 
@@ -33,6 +35,7 @@ class TopPosBlock extends ValueBlock {
         super('toppos', _('top (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
     }
 
@@ -46,6 +49,7 @@ class BottomPosBlock extends ValueBlock {
         super('bottompos', _('bottom (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
     }
 
@@ -59,6 +63,7 @@ class WidthBlock extends ValueBlock {
         super('width', _('width'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Width block returns the width of the canvas.'), 'documentation', '']);
     }
 
@@ -72,6 +77,7 @@ class HeightBlock extends ValueBlock {
         super('height', _('height'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Height block returns the height of the canvas.'), 'documentation', '']);
     }
 
@@ -132,7 +138,9 @@ class SpeakBlock extends FlowBlock {
         super('speak', _('speak'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Speak block outputs to the text-to-speech synthesizer'), 'documentation', '']);
+
         this.formBlock({
             args: 1, defaults: ['hello'],
             argTypes: ['textin']
@@ -321,6 +329,7 @@ class TurtleShellBlock extends FlowBlock {
         super('turtleshell', _('avatar'));
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Shell block is used to change the appearance of the mouse.'), 'documentation', null, 'turtleshell']);
 
         this.formBlock({
@@ -352,6 +361,7 @@ class ShowBlock extends FlowBlock {
         super('show');
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Show block is used to display text or images on the canvas.'), 'documentation', '']);
 
         this.formBlock({
@@ -386,6 +396,7 @@ class MediaBlock extends ValueBlock {
         super('media');
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Media block is used to import an image.'), 'documentation', null, 'turtleshell']);
 
         /*
@@ -411,7 +422,9 @@ class TextBlock extends ValueBlock {
         this.extraWidth = 30;
         this.setPalette('media');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Text block holds a text string.'), 'documentation', '']);
+
         this.formBlock({
             outType: 'textout'
         });

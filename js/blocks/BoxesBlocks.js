@@ -6,6 +6,7 @@ class IncrementBlock extends FlowBlock {
         this.setPalette('boxes');
         this.beginnerBlock(true);
 
+
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString(BLOCKHELP['increment'] = [_('The Add-to block is used to add to the value stored in a box.'), 'documentation', '']);
 	} else {
@@ -47,6 +48,7 @@ class IncrementOneBlock extends IncrementBlock {
         super('incrementOne');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Add-1-to block adds one to the value stored in a box.'), 'documentation', '']);
 
         this.formBlock({ name: _('add 1 to'), args: 1, argTypes: ['anyin'], argLabels: [''] });
@@ -95,6 +97,7 @@ class NamedBoxBlock extends ValueBlock {
         super('namedbox');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Box block returns the value stored in a box.'), 'documentation', '']);
 
         this.extraWidth = 20;
@@ -143,6 +146,7 @@ class StoreInBlock extends FlowBlock {
         super('storein');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Store in block will store a value in a box.'), 'documentation', '']);
         
         this.formBlock({
@@ -167,6 +171,7 @@ class Box2Block extends ValueBlock {
         super('box2');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Box 2 block returns the value stored in Box 2.'), 'documentation', null, 'box2help']);
 
         this.formBlock({ name: _('box 2') });
@@ -181,6 +186,7 @@ class StoreBox2Block extends FlowBlock {
         super('storebox2');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Store in Box 2 block is used to store a value in Box 2.'), 'documentation', null, 'box2help']);
 
         this.formBlock({ name: _('store in box 2'), args: 1, defaults: [4] });
@@ -196,6 +202,7 @@ class Box1Block extends ValueBlock {
         super('box1');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Box 1 block returns the value stored in Box 1.'), 'documentation', null, 'box1help']);
 
         this.formBlock({ name: _('box 1') });
@@ -210,6 +217,7 @@ class StoreBox1Block extends FlowBlock {
         super('storebox1');
         this.setPalette('boxes');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Store in Box 1 block is used to store a value in Box 1.'), 'documentation', null, 'box1help']);
 
         this.formBlock({ name: _('store in box 1'), args: 1, defaults: [4] });

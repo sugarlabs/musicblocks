@@ -283,6 +283,7 @@ class MyNoteValueBlock extends ValueBlock {
         //.TRANS: the value (e.g., 1/4 note) of the note being played.
         super('mynotevalue', _('note value'));
         this.setPalette('rhythm');
+
         this.beginnerBlock(true);
         this.setHelpString([_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', null, 'everybeathelp']);
     }
@@ -524,6 +525,7 @@ class TieBlock extends FlowClampBlock {
     constructor() {
         super('tie');
         this.setPalette('rhythm');
+
         this.beginnerBlock(true);
         this.setHelpString([_('The Tie block works on pairs of notes, combining them into one note.'), 'documentation', null, 'tiehelp']);
 
@@ -714,7 +716,6 @@ class Note4Block extends FlowClampBlock {
         super('note4');
         this.setPalette('rhythm');
         this.beginnerBlock(true);
-        this.setHelpString();
 
         this.formBlock({
             name: this.lang === 'ja'

@@ -180,6 +180,7 @@ class SetDrumBlock extends FlowClampBlock {
         this.setPalette('drum');
         this.beginnerBlock(true);
 
+
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString([_('The Set drum block will select a drum sound to replace the pitch of any contained notes.'), 'documentation', null, 'rhythmruler2']);
 	} else {
@@ -252,6 +253,7 @@ class PlayDrumBlock extends FlowBlock {
         super('playdrum', _('drum'));
         this.setPalette('drum');
         this.beginnerBlock(true);
+
         this.setHelpString([_('You can use multiple Drum blocks within a Note block.'), 'documentation', null, 'note4'])
         this.formBlock({ args: 1, argTypes: ['anyin'] });
         this.makeMacro((x, y) => [

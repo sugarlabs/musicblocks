@@ -63,8 +63,6 @@ function ProtoBlock(name) {
     this.textWidth = 0;
     this.labelOffset = 0;
     this.beginnerModeBlock = false;
-    //Stores Help related strings
-    this.helpString = {};
 
     this.adjustWidthToLabel = function () {
         if (this.staticLabels.length === 0) {
@@ -1254,6 +1252,7 @@ class BaseBlock extends ProtoBlock {
         this.macroFunc = null;
         this._style = {}
         this.beginnerModeBlock = false;
+        this.helpString = [];
 
         // Just for brevity
         this.lang = localStorage.languagePreference || navigator.language;
@@ -1262,6 +1261,7 @@ class BaseBlock extends ProtoBlock {
     setPalette(palette) {
         this.palette = palettes.dict[palette]
     }
+
     setHelpString(help) {
         this.helpString = help;
     }
@@ -1440,9 +1440,11 @@ class BaseBlock extends ProtoBlock {
 
     setup() {
         blocks.protoBlockDict[this.name] = this;
+
         if (beginnerMode && !this.beginnerModeBlock) {
             this.hidden = true;
         }
+
         if (this._style.name)
             this.adjustWidthToLabel();
         if (!this.palette)

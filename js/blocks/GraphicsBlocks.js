@@ -25,6 +25,7 @@ class YBlock extends ValueBlock {
         super('y');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Y block returns the vertical position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
@@ -47,6 +48,7 @@ class XBlock extends ValueBlock {
         super('x');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The X block returns the horizontal position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
@@ -69,6 +71,7 @@ class ScrollXYBlock extends FlowBlock {
         super('scrollxy', _('scroll xy'));
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Scroll XY block moves the canvas.'), 'documentation', null, 'everybeathelp']);
 
         this.formBlock({
@@ -245,6 +248,7 @@ class ArcBlock extends FlowBlock {
         super('arc');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Arc block moves the mouse in a arc.'), 'documentation', null, 'archelp']);
         
         this.formBlock({
@@ -326,6 +330,7 @@ class SetXYBlock extends FlowBlock {
         super('setxy');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set XY block moves the mouse to a specific position on the screen.'), 'documentation', '']);
         
         this.formBlock({
@@ -372,6 +377,7 @@ class RightBlock extends FlowBlock {
         super('right');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Right block turns the mouse to the right.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
@@ -417,6 +423,7 @@ class MLeftBlock extends FlowBlock {
         super('left');
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Left block turns the mouse to the left.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
@@ -463,6 +470,7 @@ class BackBlock extends FlowBlock {
         super('back', _('back'));
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Back block moves the mouse backward.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({
@@ -507,6 +515,7 @@ class ForwardBlock extends FlowBlock {
         super('forward', _('forward'));
         this.setPalette('graphics');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Forward block moves the mouse forward.'), 'documentation', null, 'forwardhelp']);
 
         this.formBlock({

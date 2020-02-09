@@ -86,6 +86,7 @@ class GreaterBlock extends BooleanBlock {
         super('greater');
         this.setPalette('boolean');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Greater-than block returns True if the top number is greater than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({
@@ -119,6 +120,7 @@ class LessBlock extends BooleanBlock {
         super('less');
         this.setPalette('boolean');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Less-than block returns True if the top number is less than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({
@@ -151,6 +153,7 @@ class EqualBlock extends BooleanBlock {
         super('equal');
         this.setPalette('boolean');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Equal block returns True if the two numbers are equal.'), 'documentation', '']);
         this.fontsize = 14;
         this.formBlock({

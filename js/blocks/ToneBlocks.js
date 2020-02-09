@@ -374,7 +374,9 @@ class TremoloBlock extends FlowClampBlock {
         super('tremolo');
         this.setPalette('tone');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Tremolo block adds a wavering effect.'), 'documentation', null, 'tremolohelp']);
+
         this.formBlock({
             //.TRANS: a wavering effect in a musical tone
             name: _('tremolo'),
@@ -481,7 +483,9 @@ class ChorusBlock extends FlowClampBlock {
         super('chorus');
         this.setPalette('tone');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Chorus block adds a chorus effect.'), 'documentation', null, 'chorushelp']);
+
         this.formBlock({
             //.TRANS: musical effect to simulate a choral sound
             name: _('chorus'),
@@ -536,7 +540,9 @@ class VibratoBlock extends FlowClampBlock {
         super('vibrato');
         this.setPalette('tone');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Vibrato block adds a rapid, slight variation in pitch.'), 'documentation', null, 'vibratohelp']);
+
         this.formBlock({
             //.TRANS: a rapid, slight variation in pitch
             name: _('vibrato'),

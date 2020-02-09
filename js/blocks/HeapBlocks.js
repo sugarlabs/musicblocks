@@ -92,6 +92,7 @@ class ShowHeapBlock extends FlowBlock {
         super('showHeap');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Show-heap block displays the contents of the heap at the top of the screen.'), 'documentation', '']);
 
         this.formBlock({
@@ -113,6 +114,7 @@ class HeapLengthBlock extends ValueBlock {
         super('heapLength');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Heap-length block returns the length of the heap.'), 'documentation', '']);
 
         this.formBlock({
@@ -135,6 +137,7 @@ class HeapEmptyBlock extends ValueBlock {
         super('heapEmpty');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Heap-empty? block returns true if the heap is empty.'), 'documentation', '']);
 
         this.formBlock({
@@ -156,6 +159,7 @@ class EmptyHeapBlock extends FlowBlock {
         super('emptyHeap');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Empty-heap block empties the heap.'), 'documentation', '']);
 
         this.formBlock({
@@ -238,6 +242,7 @@ class ReverseHeapBlock extends FlowBlock {
         super('reverseHeap');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Reverse-heap block reverses the order of the heap.'), 'documentation', '']);
 
         this.formBlock({
@@ -256,6 +261,7 @@ class IndexHeapBlock extends LeftBlock {
         super('indexHeap');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Index-heap block returns a value in the heap at a specified location.'), 'documentation', '']);
 
         this.formBlock({
@@ -307,6 +313,7 @@ class SetHeapEntryBlock extends FlowBlock {
         super('setHeapEntry');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set-heap entry block sets a value in he heap at the specified location.'), 'documentation', '']);
 
         this.formBlock({
@@ -358,6 +365,7 @@ class PopBlock extends ValueBlock {
         super('pop');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Pop block removes the value at the top of the heap.'), 'documentation', '']);
 
         this.formBlock({
@@ -380,6 +388,7 @@ class PushBlock extends FlowBlock {
         super('push');
         this.setPalette('heap');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Push block adds a value to the top of the heap.'), 'documentation', '']);
 
         this.formBlock({

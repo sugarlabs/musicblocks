@@ -243,6 +243,7 @@ class DivideBlock extends LeftBlock {
         super('divide');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Divide block is used to divide.'), 'documentation', null, 'note1']);
 
         this.fontsize = 9;
@@ -285,6 +286,7 @@ class MultiplyBlock extends LeftBlock {
         super('multiply');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Multiply block is used to multiply.'), 'documentation', '']);
 
         this.fontsize = 14;
@@ -377,6 +379,7 @@ class MinusBlock extends LeftBlock {
         super('minus');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Minus block is used to subtract.'), 'documentation', '']);
 
         this.fontsize = 14;
@@ -432,6 +435,7 @@ class PlusBlock extends LeftBlock {
         super('plus');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Plus block is used to add.'), 'documentation', '']);
 
         this.fontsize = 14;
@@ -496,6 +500,7 @@ class OneOfBlock extends LeftBlock {
         super('oneOf');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The One-of block returns one of two choices.'), 'documentation', null, 'oneofhelp']);
 
         this.formBlock({
@@ -539,6 +544,7 @@ class RandomBlock extends LeftBlock {
         super('random');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Random block returns a random number.'), 'documentation', null, 'randomhelp']);
 
         this.formBlock({
@@ -580,6 +586,7 @@ class NumberBlock extends ValueBlock {
         super('number');
         this.setPalette('number');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Number block holds a number.'), 'documentation', '']);
     }
 

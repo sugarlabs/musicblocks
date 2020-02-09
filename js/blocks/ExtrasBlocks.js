@@ -616,7 +616,9 @@ class PrintBlock extends FlowBlock {
 
         this.beginnerBlock(true);
 
+
         this.setHelpString([_('The Print block displays text at the top of the screen.'), 'documentation', '']);
+
         this.formBlock({
             args: 1, defaults: ['Music Blocks'],
             argTypes: ['anyin']

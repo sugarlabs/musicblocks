@@ -5,6 +5,7 @@ class BackwardBlock extends FlowClampBlock {
         super('backward');
         this.setPalette('flow');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Backward block runs code in reverse order (Musical retrograde).'), 'documentation', '']);
 
         this.formBlock({
@@ -530,6 +531,7 @@ class IfThenElseBlock extends FlowClampBlock {
         this.setPalette('flow');
         this.beginnerBlock(true);
 
+
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'elifhelp']);
 	} else {
@@ -559,6 +561,7 @@ class IfBlock extends FlowClampBlock {
         this.setPalette('flow');
         this.beginnerBlock(true);
 
+
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString([_('Conditionals lets your program take different actions depending on the condition.') + ' ' + _('In this example if the mouse button is pressed a snare drum will play.'), 'documentation', null, 'ifhelp']);
 	} else {
@@ -585,6 +588,7 @@ class ForeverBlock extends FlowClampBlock {
         super('forever');
         this.setPalette('flow');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Forever block will repeat the contained blocks forever.') + ' ' + _('In this example of a simple drum machine a kick drum will play 1/4 notes forever.'), 'documentation', null, 'foreverhelp']);
 
         this.formBlock({
@@ -604,6 +608,7 @@ class RepeatBlock extends FlowClampBlock {
         super('repeat');
         this.setPalette('flow');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Repeat block will repeat the contained blocks.') + ' ' + _('In this example the note will be played 4 times.'), 'documentation', null, 'repeathelp']);
 
         this.formBlock({

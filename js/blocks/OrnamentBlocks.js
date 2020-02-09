@@ -92,7 +92,9 @@ class Neighbor2Block extends NeighborBlock {
     constructor() {
         super('neighbor2');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Neighbor block rapidly switches between neighboring pitches.'), 'documentation', null, 'neighbor2help']);
+
         this.formBlock({
             //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
             name: _('neighbor') + ' (+/–)',
@@ -286,7 +288,9 @@ class NewSlurBlock extends SlurBlock {
     constructor() {
         super('newslur');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'slurhelp']);
+
         this.formBlock({
             //.TRANS: legato: overlap successive notes
             name: _('slur'),
@@ -307,7 +311,10 @@ class NewSlurBlock extends SlurBlock {
 class NewStaccatoBlock extends StaccatoBlock {
     constructor() {
         super('newstaccato');
+        this.beginnerBlock(true);
+
         this.setHelpString([_('The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.'), 'documentation', null, 'staccatohelp']);
+
         this.formBlock({
             //.TRANS: play each note sharply detached from the others
             name: _('staccato'),

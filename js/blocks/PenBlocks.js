@@ -196,6 +196,7 @@ class ColorBlock extends ValueBlock {
         super('color', _('color'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Color block returns the current pen color.'), 'documentation', '']);
     }
 
@@ -253,6 +254,7 @@ class BackgroundBlock extends FlowBlock {
         super('background', _('background'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Background block sets the window background color.'), 'documentation', '']);
     }
 
@@ -318,6 +320,7 @@ class FillBlock extends FlowClampBlock {
         super('fill');
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Fill block fills in a shape with a color.'), 'documentation', null, 'fillhelp']);
 
         this.formBlock({
@@ -388,6 +391,7 @@ class PenUpBlock extends FlowBlock {
         super('penup', _('pen up'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Pen-up block raises the pen so that it does not draw.'), 'documentation', '']);
     }
 
@@ -409,6 +413,7 @@ class PenDownBlock extends FlowBlock {
         super('pendown', _('pen down'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Pen-down block lowers the pen so that it draws.'), 'documentation', '']);
     }
 
@@ -430,6 +435,7 @@ class SetPenSizeBlock extends FlowBlock {
         super('setpensize', _('set pen size'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set-pen-size block changes the size of the pen.'), 'documentation', '']);
 
         this.formBlock({
@@ -548,6 +554,7 @@ class SetShadeBlock extends FlowBlock {
         super('setshade', _('set shade'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set-shade block changes the pen color from dark to light.'), 'documentation', '']);
 
         this.formBlock({
@@ -626,6 +633,7 @@ class SetColorBlock extends FlowBlock {
         super('setcolor', _('set color'));
         this.setPalette('pen');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set-color block changes the pen color.'), 'documentation', '']);
 
         this.formBlock({

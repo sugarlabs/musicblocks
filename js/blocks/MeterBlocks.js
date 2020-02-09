@@ -136,6 +136,8 @@ class ElapsedNotesBlock extends ValueBlock {
         //.TRANS: number of whole notes th__at have been played
         super('elapsednotes', _('whole notes played'));
         this.setPalette('meter');
+        this.beginnerBlock(true);
+
         this.setHelpString([_('The Whole notes played block returns the total number of whole notes played.'), 'documentation', null, 'elapsedhelp']);
     }
 
@@ -314,7 +316,9 @@ class EveryBeatDoBlock extends FlowBlock {
         super('everybeatdo', _('on every note do'));
         this.setPalette('meter');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The On-every-note block let you specify actions to take on every note.'), 'documentation', null, 'everybeathelp']);
+
         this.formBlock({
             args: 1, argTypes: ['textin'],
             defaults: [_('action')]
@@ -357,7 +361,9 @@ class SetMasterBPM2Block extends FlowBlock {
         super('setmasterbpm2', _('master beats per minute'));
         this.setPalette('meter');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Master beats per minute block sets the number of 1/4 notes per minute for every voice.'), 'documentation', null, 'setmasterbpm2']);
+
         this.formBlock({
             args: 2, defaults: [90, 1 / 4],
             argLabels: [_('bpm'), _('beat value')]
@@ -442,7 +448,9 @@ class SetBPM3Block extends FlowBlock {
         super('setbpm3', _('beats per minute'));
         this.setPalette('meter');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Beats per minute block sets the number of 1/4 notes per minute.'), 'documentation', null, 'bpmhelp']);
+
         this.formBlock({
             args: 2, defaults: [90, 1 / 4],
             argLabels: [_('bpm'), _('beat value')]
@@ -628,7 +636,9 @@ class MeterBlock extends FlowBlock {
         super('meter', _('meter'));
         this.setPalette('meter');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).'), 'documentation', null, 'meter']);
+
         this.extraWidth = 15;
         this.formBlock({
             args: 2, defaults: [4, 1 / 4],

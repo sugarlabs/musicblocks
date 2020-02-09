@@ -5,6 +5,7 @@ class SetTemperamentBlock extends FlowBlock {
         super('settemperament', _('set temperament'));
         this.setPalette('intervals');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Set temperament block is used to choose the tuning system used by Music Blocks.'), 'documentation', '']);
 
         this.formBlock({
@@ -637,6 +638,7 @@ class ModeLengthBlock extends ValueBlock {
         super('modelength', _('mode length'));
         this.setPalette('intervals');
         this.beginnerBlock(true);
+
         this.setHelpString([_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', '']);
     }
 
@@ -690,7 +692,9 @@ class SetKeyBlock extends FlowBlock {
         super('setkey', _('set key'));
         this.setPalette('intervals');
         this.beginnerBlock(true);
+
         this.setHelpString();
+
         this.formBlock({
             args: 1, argTypes: ['textin'], defaults: ['C']
         });
