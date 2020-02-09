@@ -89,12 +89,10 @@ function HelpWidget () {
             }
 
             var rightArrow = document.getElementById('right-arrow');
-            // rightArrow.style.opacity = '0';
             rightArrow.style.display = 'none';
             rightArrow.classList.remove('hover');
 
             var leftArrow = document.getElementById('left-arrow');
-            // leftArrow.style.opacity = '0';
             leftArrow.style.display = 'none';
             leftArrow.classList.remove('hover');
         }
@@ -107,6 +105,10 @@ function HelpWidget () {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
+                // Each block's help entry contains a help string, the
+                // path of the help svg, an override name for the help
+                // svg file, and an optional macro name for generating
+                // the help output.
                 var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
                 // console.log(message);
                 // console.log(BLOCKHELP[name]);
