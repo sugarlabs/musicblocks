@@ -123,25 +123,31 @@ e.g. Current files are named as  `GraphicsBlocks.js` , `MediaBlocks.js`.
 
 e.g. `setupGraphicsBlocks()`.
 
-* Call that setup function in `js/basicblocks.js` inside `initBasicProtoBlocks()` function.
+* Call that setup function in `js/basicblocks.js` inside
+  `initBasicProtoBlocks()` function.
 
-After the above steps are complete, move to [defining a new block](#how-to-define-a-new-block)
+After the above steps are complete, move to [defining a new
+block](#how-to-define-a-new-block)
 
 ## How to define a new block
 
-Note: You should directly start with this step if you want to add your block to an existing palette. 
+Note: You should directly start with this step if you want to add your
+block to an existing palette.
 
-* Start with searching the file inside `js/blocks` associated with the palette you want to add your new block to.  
+* Start with searching the file inside `js/blocks` associated with the
+  palette you want to add your new block to.
 
 [basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
 is the file where setup function related to each block file is called.
 
-1. Create a new class inside the file. Block classes can also extend each other.
-Your class definition and `super()` call should follow following syntax.
+1. Create a new class inside the file. Block classes can also extend
+each other.  Your class definition and `super()` call should follow
+following syntax.
 
 e.g. 
 ``` 
-    class UniqueNameBlock extends SomeBlockClass{ // one block extending another
+    // one block extending another
+    class UniqueNameBlock extends SomeBlockClass{
       constructor() {
         super(uniquename);
       }
@@ -162,12 +168,25 @@ e.g. `this.setPalette('yourPaletteName);`
     }
   }
 ``` 
-Note: After the new update there is no requirement for a `beginnerMode` check as `setup()` defined in `BaseBlock` references the list in [`beginnerBlock()`](https://github.com/sugarlabs/musicblocks/blob/a5d65723331eb465f3fdc9142e220f0b4b5acda2/js/turtledefs.js#L58) function inside `turtledefs.js` to check if a block is beginner mode.
 
 * The palette can be any of the palettes listed in `turtledef.js`. 
 * The color of the block is defined by the palette used.
 
-3. Add a call to `new myNewBlock.setup()` in the previously defined `setup` function.
+To designate a block for `beginnerMode`, add
+`this.beginnerBlock(true);` to the constructor.
+
+To add a help string, add `this.helpString([_('some block help'),
+'documentation', null, 'macroname']);` to the constructor.
+
+The first element in the list is the help string itself. The second
+element is the subdirectory where the help artwork is found. The third
+argument is the name of the help artwork file (null indicates that the
+block name is used for the help file, e.g., blockname_block.svg). The
+final element in the list is an optional macro to be loaded when the
+download button is pressed in the help widget.
+
+3. Add a call to `new myNewBlock.setup()` in the previously defined
+`setup` function.
 
 e.g.
 ```
@@ -178,7 +197,9 @@ function setupUniqueBlocks() {`
 }
 ```
 
-* For arg blocks, define a function `arg` inside the block class definition. There are 4 arguments currently passed to this function viz. `(logo, turtle, blk, receivedArg)`.
+* For arg blocks, define a function `arg` inside the block class
+  definition. There are 4 arguments currently passed to this function
+  viz. `(logo, turtle, blk, receivedArg)`.
 
 e.g. 
 
@@ -194,7 +215,9 @@ e.g.
 }
 ```
 
-* For flow bocks define a function `flow` on the block. The same 4 arguments are passed to the flow function currently: `(logo, turtle, blk, receivedArg)`.
+* For flow bocks define a function `flow` on the block. The same 4
+  arguments are passed to the flow function currently: `(logo, turtle,
+  blk, receivedArg)`.
 
 e.g 
 ```
@@ -211,13 +234,18 @@ class UniqueNameBlock extends SomeBlockClass{
 
 Note: Trailing arguments can be neglected in both functions, if not needed.
 
-4. Write the logic for the block in either of the two functions, `arg()` or `flow()`.
+4. Write the logic for the block in either of the two functions,
+`arg()` or `flow()`.
 
 * For arg blocks value is set by using a `return` statement.
 
-* In case of flow blocks, return value should be in the form `[childFlow, childFlowCount]` or `[]` if if there is no child flow. (A child flow is, for example, the internal flow of a clamp, e.g. what is repeated in a repeat block.)
+* In case of flow blocks, return value should be in the form
+  `[childFlow, childFlowCount]` or `[]` if if there is no child
+  flow. (A child flow is, for example, the internal flow of a clamp,
+  e.g. what is repeated in a repeat block.)
 
-So changes to these variables should be checked and `return` keyword should be used.
+So changes to these variables should be checked and `return` keyword
+should be used.
 
 e.g. 
 
