@@ -55,32 +55,6 @@ function getAuxToolbarButtonNames(name) {
 };
 
 
-/*function beginnerBlock(name) {
- // Only these blocks appear on the palette in beginner mode.
-    return ['newnote', 'note4', 'rest2', 'mynotevalue',  // notes palette
-           'meter', 'setbpm3', 'setmasterbpm2', 'everybeatdo', 'beatvalue', 'elapsednotes2', // meter palette
-           'pitch', 'pitchnumber', 'hertz', 'steppitch', 'fourth', 'fifth', 'mypitch', 'pitchinhertz', // pitch palette
-           'setkey2', 'modelength', 'thirdinterval', 'sixthinterval', 'chordI', 'chordIV', 'chordV', 'settemperament', // interval palette
-           'settimbre', 'newstaccato', 'newslur', 'tie', 'vibrato', 'chorus', 'tremolo', 'neighbor2', // tone palette
-           'crescendo', 'decrescendo', 'setnotevolume', 'setsynthvolume', 'setdrumvolume', // volume palette
-           'playdrum', 'playeffect', 'setdrum', // drum palette
-           'if', 'ifthenelse', 'repeat', 'forever', 'backward', // flow palette
-           'action', 'start', 'do', 'dispatch', 'listen',  // action palette
-           'storebox1', 'box1', 'storebox2', 'box2', 'increment', 'incrementOne', 'storein', 'namedbox',  // boxes palette
-           'status', 'matrix', 'rhythmruler2', 'pitchslider', 'rhythm2', 'stuplet', 'musickeyboard', 'tempo', 'modewidget', 'matrixcmajor', 'matrixgmajor', // widgets palette
-           'forward', 'back', 'left', 'right', 'setxy', 'arc', 'x', 'y', 'heading', 'scrollxy',  // mouse palette
-            'fill', 'background', 'setpensize', 'penup', 'pendown', 'color', 'setcolor', 'setshade',  // pen palette
-           'number', 'random', 'oneOf', 'plus', 'minus', 'multiply', 'divide',  // number palette
-           'equal', 'less', 'greater',  // boolean palette
-           'text', 'media', 'show', 'turtleshell', 'speak', 'height', 'width', 'bottompos', 'toppos', 'leftpos', 'rightpos',  // media palette
-           'mousebutton', 'mousex', 'mousey', 'myclick', // sensor palette
-           'push', 'pop', 'setHeapEntry', 'indexHeap', 'reverseHeap', 'emptyHeap', 'heapEmpty', 'heapLength', 'showHeap',  // heap palette
-           'setturtlename2', 'turtlename', // mice palette
-           'print',  // extras palette
-          ].indexOf(name) !== -1
-};*/
-
-
 function createDefaultStack() {
     var language = localStorage.languagePreference;
     if (language === undefined) {
