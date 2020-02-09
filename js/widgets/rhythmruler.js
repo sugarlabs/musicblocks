@@ -1510,6 +1510,35 @@ function RhythmRuler () {
             // docById('wheelDiv').style.display = 'none';
             // docById('contextWheelDiv').style.display = 'none';
 
+            // Save the new dissect history.
+            var dissectHistory = [];
+            var drums = [];
+            for (var i = 0; i < that.Rulers.length; i++) {
+                if (that.Drums[i] === null) {
+                    continue;
+                }
+
+                var history = [];
+                for (var j = 0; j < that.Rulers[i][1].length; j++) {
+                    history.push(that.Rulers[i][1][j]);
+                }
+
+                that._dissectNumber.classList.add('hasKeyboard');
+                dissectHistory.push([history, that.Drums[i]]);
+                drums.push(that.Drums[i]);
+            }
+
+            // Look for any old entries that we may have missed.
+            for (var i = 0; i < that._dissectHistory.length; i++) {
+                var drum = that._dissectHistory[i][1];
+                if (drums.indexOf(drum) === -1) {
+                    var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
+                    dissectHistory.push([history, drum]);
+                }
+            }
+
+            that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
@@ -1592,99 +1621,65 @@ function RhythmRuler () {
             that._clear();
         };
 
-        // var cell = this._addButton(row, 'close-button.svg', iconSize, _('Close'), '');
-
-        // cell.onclick = function () {
-        //     // If the piemenu was open, close it.
-        //     // docById('wheelDiv').style.display = 'none';
-        //     // docById('contextWheelDiv').style.display = 'none';
-
-        //     // Save the new dissect history.
-        //     var dissectHistory = [];
-        //     var drums = [];
-        //     for (var i = 0; i < that.Rulers.length; i++) {
-        //         if (that.Drums[i] === null) {
-        //             continue;
-        //         }
-
-        //         var history = [];
-        //         for (var j = 0; j < that.Rulers[i][1].length; j++) {
-        //             history.push(that.Rulers[i][1][j]);
-        //         }
-
-        //         this._dissectNumber.classList.add('hasKeyboard');
-        //         dissectHistory.push([history, that.Drums[i]]);
-        //         drums.push(that.Drums[i]);
-        //     }
-
-        //     // Look for any old entries that we may have missed.
-        //     for (var i = 0; i < that._dissectHistory.length; i++) {
-        //         var drum = that._dissectHistory[i][1];
-        //         if (drums.indexOf(drum) === -1) {
-        //             var history = JSON.parse(JSON.stringify(that._dissectHistory[i][0]));
-        //             dissectHistory.push([history, drum]);
-        //         }
-        //     }
-
-        //     that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
-
-        //     rulerTableDiv.style.visibility = 'hidden';
-        //     widgetButtonsDiv.style.visibility = 'hidden';
-        //     rulerDiv.style.visibility = 'hidden';
-
-        //     that._playing = false;
-        //     that._playingOne = false;
-        //     that._playingAll = false;
-        //     that._logo.hideMsgs();
-        // };
-
         // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
         var rhythmRulerTable = document.createElement("table");
         widgetWindow.getWidgetBody().append(rhythmRulerTable);
 
+        var wMax = 0;
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
         for (var i = 0; i < this.Rulers.length; i++) {
             var rhythmRulerTableRow = rhythmRulerTable.insertRow();
 
-            var drumcell = rhythmRulerTableRow.insertCell();
-            drumcell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" />';
-            drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
-
-            drumcell.onclick = (function(id) {
-                return function () {
-                    if (that._playing) {
-                        if (that._rulerPlaying === id) {
-                            this.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
-                            that._playing = false;
-                            that._playingOne = false;
-                            that._playingAll = false;
-                            that._rulerPlaying = -1;
-                            that._startingTime = null;
-                            that._elapsedTimes[id] = 0;
-                            that._offsets[id] = 0;
-                            setTimeout(that._calculateZebraStripes(id), 1000);
-                        }
-                    }
-                    else {
-                        if (that._playingOne === false) {
-                            that._rulerSelected = id;
-                            that._logo.setTurtleDelay(0);
-                            that._playing = true;
-                            that._playingOne = true;
-                            that._playingAll = false;
-                            that._cellCounter = 0;
-                            that._startingTime = null;
-                            that._rulerPlaying = id;
-                            this.innerHTML = '<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
-                            that._elapsedTimes[id] = 0;
-                            that._offsets[id] = 0;
-                            that._playOne();
-                        }
-                    }
+            if (beginnerMode) {
+                var w = 0;
+                for (var r = 0; r < this.Rulers[i][0].length; r++) {
+                    w += 580 / this.Rulers[i][0][r];
                 }
-            })(i);
+
+                if (w > wMax) {
+                    rhythmRulerTable.style.width = w + 'px';
+                    wMax = w;
+                }
+            } else {
+                var drumcell = rhythmRulerTableRow.insertCell();
+                drumcell.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" />';
+                drumcell.className = 'headcol';  // Position fixed when scrolling horizontally
+
+                drumcell.onclick = (function(id) {
+                    return function () {
+                        if (that._playing) {
+                            if (that._rulerPlaying === id) {
+                                this.innerHTML = '<img src="header-icons/play-button.svg" title="' + _('Play') + '" alt="' + _('Play') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
+                                that._playing = false;
+                                that._playingOne = false;
+                                that._playingAll = false;
+                                that._rulerPlaying = -1;
+                                that._startingTime = null;
+                                that._elapsedTimes[id] = 0;
+                                that._offsets[id] = 0;
+                                setTimeout(that._calculateZebraStripes(id), 1000);
+                            }
+                        } else {
+                            if (that._playingOne === false) {
+                                that._rulerSelected = id;
+                                that._logo.setTurtleDelay(0);
+                                that._playing = true;
+                                that._playingOne = true;
+                                that._playingAll = false;
+                                that._cellCounter = 0;
+                                that._startingTime = null;
+                                that._rulerPlaying = id;
+                                this.innerHTML = '<img src="header-icons/pause-button.svg" title="' + _('Pause') + '" alt="' + _('Pause') + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle">';
+                                that._elapsedTimes[id] = 0;
+                                that._offsets[id] = 0;
+                                that._playOne();
+                            }
+                        }
+                    }
+                })(i);
+            }
 
             var rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
