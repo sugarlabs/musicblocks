@@ -1562,7 +1562,6 @@ class HertzBlock extends FlowBlock {
         super('hertz', _('hertz'));
         this.setPalette('pitch');
         this.beginnerBlock(true);
-        this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: [
                 this.lang === 'ja' ? 440 : 392
@@ -1693,7 +1692,6 @@ class PitchNumberBlock extends FlowBlock {
         //.TRANS: a mapping of pitch to the 88 piano keys
         super('pitchnumber', _('pitch number'));
         this.setPalette('pitch');
-        this.beginnerBlock(true);
         this.beginnerBlock(true);
         this.formBlock({
             args: 1, defaults: [7]
@@ -1901,7 +1899,6 @@ class PitchBlock extends FlowBlock {
         //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
         super('pitch', _('pitch'));
         this.setPalette('pitch');
-        this.beginnerBlock(true);
         this.beginnerBlock(true);
         this.formBlock({
             args: 2, defaults: ['sol', 4],
