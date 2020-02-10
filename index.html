@@ -354,7 +354,7 @@
             <li><a id="newFile" class="tooltipped dropdown-trigger" data-position="left" data-activates='newdropdown'><i
                   class="material-icons md-48">note_add</i></a></li>
             <li><a id="load" class="tooltipped" data-position="bottom"><i class="material-icons md-48">folder</i></a></li>
-            <li><a id="saveButton" class="tooltipped" data-position="bottom"><i id="save" class="material-icons md-48">save_alt</i></a></li>
+            <li><a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom" data-activates='saveddropdownbeg'><i id="save" class="material-icons md-48">save_alt</i></a></li>
             <li><a style="display: none;" id="saveButtonAdvanced" class="tooltipped dropdown-trigger" data-position="bottom"
                 data-activates='saveddropdown'><i id="save" class="material-icons md-48">save_alt</i></a></li>
             <li><a id="planetIcon" class="tooltipped" data-position="bottom"><i class="material-icons md-48">public</i></a></li>
@@ -389,6 +389,11 @@
           </div>
         </div>
       </nav>
+
+      <ul id="saveddropdownbeg" class="dropdown-content">
+        <li><a id="save-html-beg"></a></li>
+        <li><a id="save-png-beg"></a></li>
+      </ul>
 
       <ul id="saveddropdown" class="dropdown-content">
         <li><a id="save-html"></a></li>
