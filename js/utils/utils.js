@@ -227,6 +227,11 @@ function fileBasename (file) {
 
 
 function _ (text) {
+    if (text === null) {
+	console.debug('null string passed to _');
+	return '';
+    }
+
     var replaced = text;
     var replace = [',', '(', ')', '?', '¿', '<', '>', '.', '\n', '"', ':', '%s', '%d', '/', "'", ';', '×', '!', '¡'];
     for (var p = 0; p < replace.length; p++) {
