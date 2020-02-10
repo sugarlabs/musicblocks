@@ -78,11 +78,31 @@ function Toolbar() {
         var saveButton = docById('saveButton');
         var saveButtonAdvanced = docById('saveButtonAdvanced');
         if (beginnerMode) {
-            saveButtonAdvanced.style.display = 'block';
+            saveButton.style.display = 'block';
             saveButtonAdvanced.style.display = 'none';
 
             saveButton.onclick = function () {
-                html_onclick();
+                //html_onclick();
+                var saveHTML = docById('save-html-beg');
+                console.debug(saveHTML);
+                saveHTML.onclick = function () {
+                    html_onclick();
+                };
+
+                var savePNG = docById('save-png-beg');
+                console.debug(savePNG);
+                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+
+                if (svgData == '') {
+                    savePNG.disabled = true;
+                    savePNG.className = 'grey-text inactiveLink';
+                } else {
+                    savePNG.disabled = false;
+                    savePNG.className = '';
+                    savePNG.onclick = function () {
+                        png_onclick();
+                    };
+                }      
             };
         } else {
 	    console.debug('ADVANCED MODE BUTTONS')
@@ -90,6 +110,7 @@ function Toolbar() {
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = function () {
                 var saveHTML = docById('save-html');
+                console.debug(saveHTML);
 
                 saveHTML.onclick = function () {
                     html_onclick();
@@ -97,6 +118,7 @@ function Toolbar() {
 
                 var saveSVG = docById('save-svg');
                 var savePNG = docById('save-png');
+                console.debug(savePNG);
                 var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
 
                 // if there is no mouse artwork to save then grey out
@@ -423,6 +445,8 @@ function Toolbar() {
             ['beginnerMode', _('Switch to beginner mode')],
             ['advancedMode', _('Switch to advanced mode')],
             ['languageSelectIcon', _('Select language')],
+            ['save-html-beg', _('Save project as HTML'), 'innerHTML'],
+            ['save-png-beg', _('Save mouse artwork as PNG'), 'innerHTML'],
             ['save-html', _('Save project as HTML'), 'innerHTML'],
             ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
             ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
@@ -506,6 +530,8 @@ function Toolbar() {
             ['mergeWithCurrentIcon', _('Merge with current project')],
             ['restoreIcon', _('Restore')],
             ['languageSelectIcon', _('Select language')],
+            ['save-html-beg', _('Save project as HTML'), 'innerHTML'],
+            ['save-png-beg', _('Save mouse artwork as PNG'), 'innerHTML'],
             ['save-html', _('Save project as HTML'), 'innerHTML'],
             ['save-svg', _('Save mouse artwork as SVG'), 'innerHTML'],
             ['save-png', _('Save mouse artwork as PNG'), 'innerHTML'],
