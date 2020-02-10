@@ -1809,7 +1809,6 @@ function Activity() {
         if (docById('labelDiv').classList.contains('hasKeyboard')) {
             return;
         }
-        console.log(keyboardEnableFlag);
         if (_THIS_IS_MUSIC_BLOCKS_ && keyboardEnableFlag) {
             if (docById('BPMInput') !== null && docById('BPMInput').classList.contains('hasKeyboard')) {
                 return;
