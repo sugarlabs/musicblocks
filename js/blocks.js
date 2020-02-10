@@ -1037,7 +1037,7 @@ function Blocks (activity) {
                         label = label.substr(0, STRINGLEN) + '...';
                     }
                     that.blockList[blk].text.text = label;
-		    // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
+                    // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
 
 
@@ -2082,11 +2082,12 @@ function Blocks (activity) {
             maxLength = 10;
             break;
         case 'solfege':
+            if (myBlock.value === null) myBlock.value = 'sol';
             var obj = splitSolfege(myBlock.value);
             var label = i18nSolfege(obj[0]);
             var attr = obj[1];
 
-            if (attr !== 'â™®') {
+            if (attr !== NATURAL) {
                 label += attr;
             }
             break;
@@ -2094,19 +2095,31 @@ function Blocks (activity) {
             var label = _(myBlock.value);
             break;
         case 'eastindiansolfege':
+            if (myBlock.value === null) myBlock.value = 'sol';
             var obj = splitSolfege(myBlock.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
             var attr = obj[1];
 
-            if (attr !== 'â™®') {
+            if (attr !== NATURAL) {
                 label += attr;
             }
             break;
         case 'modename':
+            if (myBlock.value === null) myBlock.value = DEFAULTMODE;
             var label = _(myBlock.value);  // + ' ' + getModeNumbers(myBlock.value);
             break;
         case 'accidentalname':
         case 'intervalname':
+            if (myBlock.value === null) {
+                switch(myBlock.name) {
+                case 'accidentalname':
+                    myBlock.value = DEFAULTACCIDENTAL;
+                    break;
+                case 'intervalname':
+                    myBlock.value = DEFAULTINTERVAL;
+                    break;
+                }
+            }
             var obj = myBlock.value.split(' ');
             var label = _(obj[0]) + ' ' + obj[1];
             break;
@@ -2116,6 +2129,28 @@ function Blocks (activity) {
         case 'voicename':
         case 'oscillatortype':
         case 'invertmode':
+            if (myBlock.value === null) {
+                switch(myBlock.name) {
+                case 'filtertype':
+                    myBlock.value = DEFAULTFILTERTYPE;
+                    break;
+                case 'drumname':
+                    myBlock.value = DEFAULTDRUM;
+                    break;
+                case 'effectsname':
+                    myBlock.value = DEFAULTEFFECT;
+                    break;
+                case 'voicename':
+                    myBlock.value = DEFAULTVOICE;
+                    break;
+                case 'oscillatortype':
+                    myBlock.value = DEFAULTOSCILLATORTYPE;
+                    break;
+                case 'invertmode':
+                    myBlock.value = DEFAULTINVERT;
+                    break;
+                }
+            }
             var label = _(myBlock.value);
             break;
         case 'noisename':
@@ -2163,7 +2198,7 @@ function Blocks (activity) {
         var z = myBlock.container.children.length - 1;
         myBlock.container.setChildIndex(myBlock.text, z);
 
-	if (myBlock.loadComplete) {
+        if (myBlock.loadComplete) {
             myBlock.container.updateCache();
         } else {
             console.debug('Load not yet complete for (' + blk + ') ' + myBlock.name);
@@ -4432,16 +4467,16 @@ function Blocks (activity) {
                 y = 0;
             }
 
-	    console.log(myBlock.name + ' ' + myBlock.isValueBlock());
+            console.log(myBlock.name + ' ' + myBlock.isValueBlock());
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
                 case 'media':
                     blockItem = [b, [myBlock.name, null], x, y, []];
                     break;
-		case 'namedbox':
-		case 'namedarg':
+                case 'namedbox':
+                case 'namedarg':
                     blockItem = [b, [myBlock.name, {'value': myBlock.privateData}], x, y, []];
-		    break;
+                    break;
                 default:
                     blockItem = [b, [myBlock.name, {'value': myBlock.value}], x, y, []];
                     break;
@@ -5232,6 +5267,7 @@ function Blocks (activity) {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
+                    if (value === null) value = DEFAULTDRUM;
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
                 break;
@@ -5247,6 +5283,7 @@ function Blocks (activity) {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
+                    if (value === null) value = DEFAULTEFFECT;
                     this.logo.synth.loadSynth(0, getDrumSynthName(value));
                 }
                 break;
@@ -5267,6 +5304,7 @@ function Blocks (activity) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this voice
                     try {
+                        if (value === null) value = DEFAULTVOICE;
                         this.logo.synth.loadSynth(0, getVoiceSynthName(value));
                     } catch (e) {
                         console.debug(e)
@@ -5287,6 +5325,7 @@ function Blocks (activity) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this noise
                     try {
+                        if (value === null) value = DEFAULTNOISE;
                         this.logo.synth.loadSynth(0, getNoiseSynthName(value));
                     } catch (e) {
                         console.debug(e)
