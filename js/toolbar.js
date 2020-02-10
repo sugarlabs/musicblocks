@@ -78,31 +78,38 @@ function Toolbar() {
         var saveButton = docById('saveButton');
         var saveButtonAdvanced = docById('saveButtonAdvanced');
         if (beginnerMode) {
-            saveButton.style.display = 'block';
-            saveButtonAdvanced.style.display = 'none';
-
-            saveButton.onclick = function () {
-                //html_onclick();
-                var saveHTML = docById('save-html-beg');
-                console.debug(saveHTML);
-                saveHTML.onclick = function () {
+            if(_THIS_IS_MUSIC_BLOCKS_ && language === 'ja'){
+                saveButton.onclick = function() {
                     html_onclick();
-                };
+                }
+            }
+            else{
+            saveButton.style.display = 'block';
+                saveButtonAdvanced.style.display = 'none';
 
-                var savePNG = docById('save-png-beg');
-                console.debug(savePNG);
-                var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
-
-                if (svgData == '') {
-                    savePNG.disabled = true;
-                    savePNG.className = 'grey-text inactiveLink';
-                } else {
-                    savePNG.disabled = false;
-                    savePNG.className = '';
-                    savePNG.onclick = function () {
-                        png_onclick();
+                saveButton.onclick = function () {
+                    //html_onclick();
+                    var saveHTML = docById('save-html-beg');
+                    console.debug(saveHTML);
+                    saveHTML.onclick = function () {
+                        html_onclick();
                     };
-                }      
+
+                    var savePNG = docById('save-png-beg');
+                    console.debug(savePNG);
+                    var svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+
+                    if (svgData == '') {
+                        savePNG.disabled = true;
+                        savePNG.className = 'grey-text inactiveLink';
+                    } else {
+                        savePNG.disabled = false;
+                        savePNG.className = '';
+                        savePNG.onclick = function () {
+                            png_onclick();
+                        };
+                    }  
+                }    
             };
         } else {
 	    console.debug('ADVANCED MODE BUTTONS')
