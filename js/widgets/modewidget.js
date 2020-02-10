@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -43,10 +43,6 @@ function ModeWidget() {
 
 
         widgetWindow.onclose=function() {
-            // docById('modeDiv').style.visibility = 'hidden';
-            // docById('modeButtonsDiv').style.visibility = 'hidden';
-            // docById('modeTableDiv').style.visibility = 'hidden';
-            // docById('modePianoDiv').style.visibility = 'hidden';
             that._logo.hideMsgs();
             this.destroy();
         }
@@ -71,18 +67,13 @@ function ModeWidget() {
           that._save();
         }
 
-
         widgetWindow.addButton('erase-button.svg', ICONSIZE, _('Clear')).onclick = function() {
             that._clear();
         }
 
-
-
         widgetWindow.addButton('rotate-left.svg', ICONSIZE, _('Rotate counter clockwise')).onclick = function() {
             that._rotateLeft();
         }
-
-
 
         widgetWindow.addButton('rotate-right.svg', ICONSIZE, _('Rotate clockwise')).onclick = function() {
             that._rotateRight();
@@ -96,15 +87,6 @@ function ModeWidget() {
             that._undo();
         }
 
-        // var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-
-        // cell.onclick=function() {
-        //     docById('modeDiv').style.visibility = 'hidden';
-        //     docById('modeButtonsDiv').style.visibility = 'hidden';
-        //     docById('modeTableDiv').style.visibility = 'hidden';
-        //     that._logo.hideMsgs();
-        // }
-
         // The mode table (holds a pie menu and a label)
         var modeTableDiv = this.modeTableDiv;
         modeTableDiv.style.display = 'inline';
@@ -113,7 +95,7 @@ function ModeWidget() {
         // modeTableDiv.innerHTML = '<table id="modeTable"></table>';
         modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
         modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
-		    modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+                    modeTableDiv.innerHTML += '<table id="modeTable"></table>';
 
         this._piemenuMode();
 
@@ -176,7 +158,9 @@ function ModeWidget() {
         var n = table.rows.length - 1;
 
         console.debug(_(currentModeName[1]));
-        table.rows[n].cells[0].innerHTML = currentModeName[0] + ' ' + _(currentModeName[1]);
+        var name = currentModeName[0] + ' ' + _(currentModeName[1]);
+        table.rows[n].cells[0].innerHTML = name;
+        this.widgetWindow.updateTitle(name);
 
         // Set the notes for this mode.
         var that = this;
@@ -196,60 +180,60 @@ function ModeWidget() {
     };
 
     this._showPiano = function() {
-		var modePianoDiv = docById('modePianoDiv');
-		modePianoDiv.style.display = 'inline';
+                var modePianoDiv = docById('modePianoDiv');
+                modePianoDiv.style.display = 'inline';
         modePianoDiv.style.visibility = 'visible';
         modePianoDiv.style.border = '0px';
-		modePianoDiv.style.top = '0px';
-		modePianoDiv.style.left = '0px';
-		modePianoDiv.innerHTML = '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+                modePianoDiv.style.top = '0px';
+                modePianoDiv.style.left = '0px';
+                modePianoDiv.innerHTML = '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
         var highlightImgs = ['images/highlights/sel_c.png', 'images/highlights/sel_c_sharp.png', 'images/highlights/sel_d.png', 'images/highlights/sel_d_sharp.png', 'images/highlights/sel_e.png', 'images/highlights/sel_f.png', 'images/highlights/sel_f_sharp.png', 'images/highlights/sel_g.png', 'images/highlights/sel_g_sharp.png', 'images/highlights/sel_a.png', 'images/highlights/sel_a_sharp.png', 'images/highlights/sel_b.png'];
         var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
         var letterName = currentModeName[0];
         var modeName = currentModeName[1];
 
-		var startingposition; // relative to keyboard
-		switch(letterName) { // sharp|flats included
-			case "C♭": startingposition = 11; break;
-			case "C": startingposition = 0; break;
-			case "C♯":
-			case "D♭": startingposition = 1; break;
-			case "D": startingposition = 2; break;
-			case "D♯":
-			case "E♭": startingposition = 3; break;
-			case "E": startingposition = 4; break;
-			case "E♯": startingposition = 5; break;
-			case "F♭": startingposition = 4; break;
-			case "F": startingposition = 5; break;
-			case "F♯":
-			case "G♭": startingposition = 6; break;
-			case "G": startingposition = 7; break;
-			case "G♯":
-			case "A♭": startingposition = 8; break;
-			case "A": startingposition = 9; break;
-			case "A♯":
-			case "A♭": startingposition = 10; break;
-			case "B": startingposition = 11; break;
-			case "B♯": startingposition = 0; break;
-			default: startingposition = 0;
-		}
-		modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
-		modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+                var startingposition; // relative to keyboard
+                switch(letterName) { // sharp|flats included
+                        case "C♭": startingposition = 11; break;
+                        case "C": startingposition = 0; break;
+                        case "C♯":
+                        case "D♭": startingposition = 1; break;
+                        case "D": startingposition = 2; break;
+                        case "D♯":
+                        case "E♭": startingposition = 3; break;
+                        case "E": startingposition = 4; break;
+                        case "E♯": startingposition = 5; break;
+                        case "F♭": startingposition = 4; break;
+                        case "F": startingposition = 5; break;
+                        case "F♯":
+                        case "G♭": startingposition = 6; break;
+                        case "G": startingposition = 7; break;
+                        case "G♯":
+                        case "A♭": startingposition = 8; break;
+                        case "A": startingposition = 9; break;
+                        case "A♯":
+                        case "A♭": startingposition = 10; break;
+                        case "B": startingposition = 11; break;
+                        case "B♯": startingposition = 0; break;
+                        default: startingposition = 0;
+                }
+                modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+                modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
 
-		for(var i = 0; i < 12; ++i) {
-			if(this._selectedNotes[i])
-				document.getElementById('pkey_'+i).src = highlightImgs[(i+startingposition)%12];
-		}
+                for(var i = 0; i < 12; ++i) {
+                        if(this._selectedNotes[i])
+                                document.getElementById('pkey_'+i).src = highlightImgs[(i+startingposition)%12];
+                }
     };
 
     this._invert = function() {
@@ -562,13 +546,16 @@ function ModeWidget() {
                     this._logo.refreshCanvas();
                 }
 
-                table.rows[n].cells[0].innerHTML = currentKey + ' ' + _(mode);
+                var name = currentKey + ' ' + _(mode);
+                table.rows[n].cells[0].innerHTML = name;
+                this.widgetWindow.updateTitle(name);
                 return;
             }
         }
 
         // console.debug('setModeName:' + 'not found');
         table.rows[n].cells[0].innerHTML = '';
+        this.widgetWindow.updateTitle('');
     };
 
     this._save = function() {
