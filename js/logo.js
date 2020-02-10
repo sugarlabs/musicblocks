@@ -812,66 +812,9 @@ function Logo () {
      */
     this._clearParameterBlocks = function () {
         for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
-            switch (this.blocks.blockList[blk].name) {
-            case 'and':
-            case 'or':
-            case 'not':
-            case 'less':
-            case 'greater':
-            case 'equal':
-            case 'random':
-            case 'mod':
-            case 'sqrt':
-            case 'abs':
-            case 'int':
-            case 'plus':
-            case 'minus':
-            case 'multiply':
-            case 'power':
-            case 'distance':
-            case 'divide':
-            case 'namedbox':
-            case 'box':
-            case 'x':
-            case 'y':
-            case 'heading':
-            case 'color':
-            case 'hue':
-            case 'shade':
-            case 'grey':
-            case 'pensize':
-            case 'time':
-            case 'mousex':
-            case 'mousey':
-            case 'toppos':
-            case 'rightpos':
-            case 'leftpos':
-            case 'bottompos':
-            case 'width':
-            case 'height':
-            case 'keyboard':
-            case 'loudness':
-            case 'consonantstepsizeup':
-            case 'consonantstepsizedown':
-            case 'transpositionfactor':
-            case 'staccatofactor':
-            case 'slurfactor':
-            case 'beatfactor':
-            case 'elapsednotes':
-            case 'duplicatefactor':
-            case 'skipfactor':
-            case 'notevolumefactor':
-            case 'currentnote':
-            case 'currentoctave':
-            case 'bpmfactor':
-            case 'beatvalue':
-            case 'measurevalue':
-            case 'deltapitch':
-            case 'mypitch':
-            case 'mynotevalue':
+	    if (this.blocks.blockList[blk].protoblock.parameter) {
                 this.blocks.blockList[blk].text.text = '';
                 this.blocks.blockList[blk].container.updateCache();
-                break;
             }
         }
         this.refreshCanvas();
