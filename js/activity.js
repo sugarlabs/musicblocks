@@ -1797,13 +1797,20 @@ function Activity() {
     /*
      * Handles keyboard shortcuts in MB
      */
+    // Flag to disable keyboard during loading of MB
+    var keyboardEnableFlag;
+
     function __keyPressed(event) {
         var that = this;
+
+        if(!keyboardEnableFlag){
+            return;
+        }
         if (docById('labelDiv').classList.contains('hasKeyboard')) {
             return;
         }
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        console.log(keyboardEnableFlag);
+        if (_THIS_IS_MUSIC_BLOCKS_ && keyboardEnableFlag) {
             if (docById('BPMInput') !== null && docById('BPMInput').classList.contains('hasKeyboard')) {
                 return;
             }
@@ -2826,16 +2833,13 @@ function Activity() {
 
     this._loadStart = async function () {
         console.debug('LOAD START');
-        
+
+        // Set the flag to zero to disable keyboard
+        keyboardEnableFlag = 0;
+
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
-
-        // Disable keyboard input when MB starts loading
-            document.onkeydown = (e) => {
-                return false;
-            }
-
             console.debug('Loading start');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
@@ -2870,10 +2874,9 @@ function Activity() {
                     console.log("%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
                         "font-size: 16px; font-family: sans-serif; font-weight: bold;")
 
-                    // Enable keyboard input when MB finishes loading
-                    document.onkeydown = (e) => {
-                        return true;
-                    }  
+                    // Set flag to 1 to enable keyboard after MB finishes loading    
+                    keyboardEnableFlag = 1;
+
                     // playbackOnLoad();
                 }, 1000);
             }
