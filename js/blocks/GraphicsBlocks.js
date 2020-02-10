@@ -11,6 +11,14 @@ class HeadingBlock extends ValueBlock {
 
     }
 
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetHeading(value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setheading', value]);
+        }
+    }
+
     updateParameter(logo, turtle, blk) {
 	return toFixed2(logo.turtles.turtleList[turtle].orientation);
     }
@@ -38,6 +46,14 @@ class YBlock extends ValueBlock {
         });
     }
 
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetXY(turtleObj.x, value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setxy', turtleObj.x, value]);
+        }
+    }
+
     updateParameter(logo, turtle, blk) {
 	return toFixed2(logo.turtles.turtleList[turtle].y);
     }
@@ -63,6 +79,14 @@ class XBlock extends ValueBlock {
         this.formBlock({
             name: this.lang === 'ja' ? _('x3') : _('x')
         });
+    }
+
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetXY(value, turtleObj.y);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setxy', value, turtleObj.y]);
+        }
     }
 
     updateParameter(logo, turtle, blk) {

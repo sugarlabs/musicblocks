@@ -171,6 +171,14 @@ class GreyBlock extends ValueBlock {
 	return toFixed2(logo.turtles.turtleList[turtle].chroma);
     }
 
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetChroma(value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setgrey', value]);
+        }
+    }
+
     arg(logo, turtle, blk) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'grey']);
@@ -190,6 +198,14 @@ class ShadeBlock extends ValueBlock {
 
     updateParameter(logo, turtle, blk) {
 	return toFixed2(logo.turtles.turtleList[turtle].value);
+    }
+
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetValue(value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setshade', value]);
+        }
     }
 
     arg(logo, turtle, blk) {
@@ -214,6 +230,14 @@ class ColorBlock extends ValueBlock {
 	return toFixed2(logo.turtles.turtleList[turtle].color);
     }
 
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetColor(value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setcolor', value]);
+        }
+    }
+
     arg(logo, turtle, blk) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
 	    logo.statusFields.push([blk, 'color']);
@@ -233,6 +257,14 @@ class PenSizeBlock extends ValueBlock {
 
     updateParameter(logo, turtle, blk) {
 	return toFixed2(logo.turtles.turtleList[turtle].stroke);
+    }
+
+    setter(logo, value, turtle, blk) {
+        var turtleObj = logo.turtles.turtleList[turtle];
+        turtleObj.doSetPensize(value);
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setpensize', value]);
+        }
     }
 
     arg(logo, turtle, blk) {

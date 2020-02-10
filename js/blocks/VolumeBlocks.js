@@ -49,6 +49,18 @@ class MasterVolumeBlock extends ValueBlock {
         this.setHelpString([_('The Master volume block returns the master volume.'), 'documentation', '']);
     }
 
+    setter(logo, value, turtle, blk) {
+        var len = logo.masterVolume.length;
+        logo.masterVolume[len - 1] = value;
+        if (!logo.suppressOutput[turtle]) {
+            logo._setMasterVolume(value);
+        }
+
+        if (logo.justCounting[turtle].length === 0) {
+            logo._playbackPush(turtle, [logo.previousTurtleTime[turtle], 'setvolume', value]);
+        }
+    }
+
     updateParameter(logo, turtle, blk) {
 	return logo.blocks.blockList[blk].value;
     }

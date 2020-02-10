@@ -749,6 +749,12 @@ class MyPitchBlock extends ValueBlock {
 	return logo.blocks.blockList[blk].value;
     }
 
+    setter(logo, value, turtle, blk) {
+        logo.previousNotePlayed[turtle] = logo.lastNotePlayed[turtle];
+        var obj = numberToPitch(value + logo.pitchNumberOffset[turtle]);
+        logo.lastNotePlayed[turtle] = [obj[0] + obj[1], logo.lastNotePlayed[turtle][1]];
+    }
+
     arg(logo, turtle, blk) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'mypitch']);

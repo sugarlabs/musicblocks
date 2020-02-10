@@ -35,6 +35,10 @@ class BeatFactorBlock extends ValueBlock {
 	return logo.blocks.blockList[blk].value;
     }
 
+    setter(logo, value, turtle, blk) {
+        logo.beatFactor[turtle] = value;
+    }
+
     arg(logo, turtle, blk) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'beatfactor']);
@@ -61,6 +65,15 @@ class BPMFactorBlock extends ValueBlock {
 
     updateParameter(logo, turtle, blk) {
 	return logo.blocks.blockList[blk].value;
+    }
+
+    setter(logo, value, turtle, blk) {
+        var len = logo.bpm[turtle].length;
+        if (len > 0) {
+            logo.bpm[turtle][len - 1] = value;
+        } else {
+            logo.bpm[turtle].push(value);
+        }
     }
 
     arg(logo, turtle, blk) {

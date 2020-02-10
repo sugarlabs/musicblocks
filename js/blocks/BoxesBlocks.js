@@ -87,6 +87,16 @@ class BoxBlock extends LeftBlock {
         }
     }
 
+    setter(logo, value, turtle, blk) {
+        var cblk = logo.blocks.blockList[blk].connections[1];
+        var name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
+        if (name in logo.boxes) {
+            logo.boxes[name] = value;
+        } else {
+            logo.errorMsg(NOBOXERRORMSG, blk, name);
+        }
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         var cblk = logo.blocks.blockList[blk].connections[1];
         if (cblk === null) {
@@ -126,6 +136,15 @@ class NamedBoxBlock extends ValueBlock {
         } else {
             logo.errorMsg(NOBOXERRORMSG, blk, name);
 	    return 0;
+        }
+    }
+
+    setter(logo, value, turtle, blk) {
+        var name = logo.blocks.blockList[blk].privateData;
+        if (name in logo.boxes) {
+            logo.boxes[name] = value;
+        } else {
+            logo.errorMsg(NOBOXERRORMSG, blk, name);
         }
     }
 
