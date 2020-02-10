@@ -2826,10 +2826,16 @@ function Activity() {
 
     this._loadStart = async function () {
         console.debug('LOAD START');
-
+        
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
+
+        // Disable keyboard input when MB starts loading
+            document.onkeydown = (e) => {
+                return false;
+            }
+
             console.debug('Loading start');
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
@@ -2863,6 +2869,11 @@ function Activity() {
                         "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" + imgUrl + ") no-repeat;");
                     console.log("%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
                         "font-size: 16px; font-family: sans-serif; font-weight: bold;")
+
+                    // Enable keyboard input when MB finishes loading
+                    document.onkeydown = (e) => {
+                        return true;
+                    }  
                     // playbackOnLoad();
                 }, 1000);
             }
