@@ -5,11 +5,19 @@ class NotBlock extends BooleanBlock {
         super('not');
         this.setPalette('boolean');
         this.setHelpString([_('The Not block is the logical not operator.'), 'documentation', '']);
-
+	this.parameter = true;
         this.formBlock({
             name: _('not'),
             args: 1, argTypes: ['booleanin']
         })
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -34,11 +42,19 @@ class AndBlock extends BooleanBlock {
         super('and');
         this.setPalette('boolean');
         this.setHelpString([_('The And block is the logical and operator.'), 'documentation', '']);
-
+	this.parameter = true;
         this.formBlock({
             name: _('and'),
             args: 2, argTypes: ['booleanin', 'booleanin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -60,11 +76,19 @@ class OrBlock extends BooleanBlock {
         super('or');
         this.setPalette('boolean');
         this.setHelpString([_('The Or block is the logical or operator.'), 'documentation', '']);
-
+	this.parameter = true;
         this.formBlock({
             name: _('or'),
             args: 2, argTypes: ['booleanin', 'booleanin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -89,10 +113,19 @@ class GreaterBlock extends BooleanBlock {
 
         this.setHelpString([_('The Greater-than block returns True if the top number is greater than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
+	this.parameter = true;
         this.formBlock({
             name: '>',
             args: 2, argTypes: ['numberin', 'numberin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -123,10 +156,19 @@ class LessBlock extends BooleanBlock {
 
         this.setHelpString([_('The Less-than block returns True if the top number is less than the bottom number.'), 'documentation', '']);
         this.fontsize = 14;
+	this.parameter = true;
         this.formBlock({
             name: '<',
             args: 2, argTypes: ['numberin', 'numberin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -156,10 +198,19 @@ class EqualBlock extends BooleanBlock {
 
         this.setHelpString([_('The Equal block returns True if the two numbers are equal.'), 'documentation', '']);
         this.fontsize = 14;
+	this.parameter = true;
         this.formBlock({
             name: '=',
             args: 2, argTypes: ['anyin', 'anyin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {

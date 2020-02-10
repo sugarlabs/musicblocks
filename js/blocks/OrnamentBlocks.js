@@ -4,9 +4,14 @@ class StaccatoFactorBlock extends ValueBlock {
     constructor() {
         //.TRANS: the duration of a note played as staccato
         super('staccatofactor', _('staccato factor'));
+	this.parameter = true;
         this.setPalette('ornament');
         this.setHelpString();
         this.hidden = true;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -26,7 +31,12 @@ class SlurFactorBlock extends ValueBlock {
         super('slurfactor', _('slur factor'));
         this.setPalette('ornament');
         this.setHelpString();
+	this.parameter = true;
         this.hidden = true;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {

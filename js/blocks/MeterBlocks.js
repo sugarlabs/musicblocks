@@ -5,7 +5,12 @@ class CurrentMeterBlock extends ValueBlock {
         //.TRANS: musical meter, e.g., 4:4
         super('currentmeter', _('current meter'));
         this.setPalette('meter');
+	this.parameter = true;
         this.setHelpString();
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -22,7 +27,12 @@ class BeatFactorBlock extends ValueBlock {
         //.TRANS: number of beats per minute
         super('beatfactor', _('beat factor'));
         this.setPalette('meter');
+	this.parameter = true;
         this.setHelpString();
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -38,6 +48,7 @@ class BPMFactorBlock extends ValueBlock {
     constructor() {
         super('bpmfactor');
         this.setPalette('meter');
+	this.parameter = true;
         this.setHelpString([_('The Beats per minute block returns the current beats per minute.'), 'documentation', '']);
 
         this.formBlock({
@@ -46,6 +57,10 @@ class BPMFactorBlock extends ValueBlock {
                 ? _('beats per minute2')
                 : _('beats per minute')
         })
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -64,7 +79,12 @@ class MeasureValueBlock extends ValueBlock {
         //.TRANS: count of current measure in meter
         super('measurevalue', _('measure count'));
         this.setPalette('meter');
+	this.parameter = true;
         this.setHelpString([_('The Measure count block returns the current measure.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -86,12 +106,16 @@ class BeatValueBlock extends ValueBlock {
         super('beatvalue', _('beat count'));
         this.setPalette('meter');
         this.beginnerBlock(true);
-
+	this.parameter = true;
 	if (beginnerMode && this.lang === 'ja') {
 	    this.setHelpString([_('The Beat count block is the number of the current beat,') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'everybeathelp']);
 	} else {
             this.setHelpString([_('The Beat count block is the number of the current beat,') + ' ' + _('eg 1, 2, 3, or 4.') + ' ' + _('In the figure, it is used to take an action on the first beat of each measure.'), 'documentation', null, 'beatvaluehelp']);
 	}
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -112,12 +136,17 @@ class NoteCounterBlock extends LeftBlock {
         //.TRANS: count the number of notes
         super('notecounter', _('sum note values'));
         this.setPalette('meter');
+	this.parameter = true;
         this.setHelpString([_('The Note counter block can be used to count the number of contained notes.'), 'documentation', null, 'notecounterhelp']);
         this.formBlock({
             flows: {
                 labels: [''], type: 'flow'
             }
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -133,12 +162,16 @@ class NoteCounterBlock extends LeftBlock {
 
 class ElapsedNotesBlock extends ValueBlock {
     constructor() {
-        //.TRANS: number of whole notes th__at have been played
+        //.TRANS: number of whole notes that have been played
         super('elapsednotes', _('whole notes played'));
         this.setPalette('meter');
+	this.parameter = true;
         this.beginnerBlock(true);
-
         this.setHelpString([_('The Whole notes played block returns the total number of whole notes played.'), 'documentation', null, 'elapsedhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -152,20 +185,26 @@ class ElapsedNotesBlock extends ValueBlock {
 
 class ElapsedNotes2Block extends LeftBlock {
     constructor() {
-        //.TRANS: number of notes th__at have been played
+        //.TRANS: number of notes that have been played
         super('elapsednotes2', _('notes played'));
         this.setPalette('meter');
         this.beginnerBlock(true);
-        this.setHelpString();
+        this.setHelpString([_('The Notes played block is the number of notes that have been played.') + ' ' + _('(By default, it counts quarter notes.)'), 'documentation', null, 'everybeathelp']);
+	this.parameter = true;
         this.formBlock({
             args: 1
         });
+
         this.makeMacro((x, y) => [
             [0, 'elapsednotes2', x, y, [null, 1]],
             [1, 'divide', 0, 0, [0, 2, 3]],
             [2, ['number', {'value': 1}], 0, 0, [1]],
             [3, ['number', {'value': 4}], 0, 0, [1]]
         ]);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk, receivedArg) {

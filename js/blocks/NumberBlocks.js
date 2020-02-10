@@ -51,6 +51,10 @@ class ModBlock extends LeftBlock {
         });
     }
 
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'mod']);
@@ -84,6 +88,10 @@ class PowerBlock extends LeftBlock {
         this.formBlock({
             name: '^', args: 2, defaults: [2, 4]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -126,6 +134,10 @@ class SqrtBlock extends LeftBlock {
         });
     }
 
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
@@ -161,6 +173,10 @@ class AbsBlock extends LeftBlock {
         this.formBlock({
             name: _('abs'), args: 1
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -210,6 +226,10 @@ class DistanceBlock extends LeftBlock {
         ]);
     }
 
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'distance']);
@@ -251,6 +271,10 @@ class DivideBlock extends LeftBlock {
             name: this.lang === 'ja' ? '➗' : '/', args: 2,
             defaults: [1, 4]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -295,6 +319,10 @@ class MultiplyBlock extends LeftBlock {
             argTypes: ['anyin', 'anyin'],
             defaults: [1, 12]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -351,6 +379,10 @@ class NegBlock extends LeftBlock {
         });
     }
 
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'neg']);
@@ -387,6 +419,10 @@ class MinusBlock extends LeftBlock {
             name: '–', args: 2, defaults: [8, 4],
             argTypes: ['anyin', 'anyin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -443,6 +479,14 @@ class PlusBlock extends LeftBlock {
             name: '+', outType: 'anyout', args: 2,
             defaults: [2, 2], argTypes: ['anyin', 'anyin']
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (typeof(logo.blocks.blockList[blk].value) === 'string') {
+	    return logo.blocks.blockList[blk].value;
+	} else {
+	    return toFixed2(logo.blocks.blockList[blk].value);
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -517,6 +561,14 @@ class OneOfBlock extends LeftBlock {
         ]);
     }
 
+    updateParameter(logo, turtle, blk) {
+	if (typeof(logo.blocks.blockList[blk].value) === 'string') {
+	    return logo.blocks.blockList[blk].value;
+	} else {
+	    return toFixed2(logo.blocks.blockList[blk].value);
+	}
+    }
+
     arg(logo, turtle, blk, receivedArg) {
         var cblk1 = logo.blocks.blockList[blk].connections[1];
         var cblk2 = logo.blocks.blockList[blk].connections[2];
@@ -552,6 +604,14 @@ class RandomBlock extends LeftBlock {
             argLabels: [_('min'), _('max')],
             argTypes: ['anyin', 'anyin'], defaults: [0, 12]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (typeof(logo.blocks.blockList[blk].value) === 'string') {
+	    return logo.blocks.blockList[blk].value;
+	} else {
+	    return toFixed2(logo.blocks.blockList[blk].value);
+	}
     }
 
     arg(logo, turtle, blk, receivedArg) {

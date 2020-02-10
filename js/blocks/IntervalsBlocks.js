@@ -638,8 +638,12 @@ class ModeLengthBlock extends ValueBlock {
         super('modelength', _('mode length'));
         this.setPalette('intervals');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Mode length block is the number of notes in the current scale.') + ' ' + _('Most Western scales have 7 notes.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -656,7 +660,12 @@ class CurrentModeBlock extends ValueBlock {
         //.TRANS: the mode in music is 'major', 'minor', etc.
         super('currentmode', _('current mode'));
         this.setPalette('intervals');
+	this.parameter = true;
         this.setHelpString();
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -674,7 +683,12 @@ class KeyBlock extends ValueBlock {
         //.TRANS: the key is a group of pitches with which a music composition is created
         super('key', _('current key'));
         this.setPalette('intervals');
+	this.parameter = true;
         this.setHelpString();
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {

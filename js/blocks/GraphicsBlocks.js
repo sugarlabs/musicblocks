@@ -6,8 +6,13 @@ class HeadingBlock extends ValueBlock {
         super('heading', _('heading'));
         this.setPalette('graphics');
         this.beginnerBlock(true);
+	this.parameter = true;
         this.setHelpString([_('The Heading block returns the orientation of the mouse.'), 'documentation', '']);
 
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].orientation);
     }
 
     arg(logo, turtle, blk) {
@@ -25,12 +30,16 @@ class YBlock extends ValueBlock {
         super('y');
         this.setPalette('graphics');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Y block returns the vertical position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('y3') : _('y')
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].y);
     }
 
     arg(logo, turtle, blk) {
@@ -48,12 +57,16 @@ class XBlock extends ValueBlock {
         super('x');
         this.setPalette('graphics');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The X block returns the horizontal position of the mouse.'), 'documentation', null, 'xyhelp']);
 
         this.formBlock({
             name: this.lang === 'ja' ? _('x3') : _('x')
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].x);
     }
 
     arg(logo, turtle, blk) {

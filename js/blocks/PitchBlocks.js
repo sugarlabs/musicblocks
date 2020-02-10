@@ -595,6 +595,11 @@ class TranspositionFactorBlock extends ValueBlock {
         super('transpositionfactor', _('transposition'));
         this.setPalette('pitch');
         this.hidden = true;
+	this.parameter = true;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -611,6 +616,12 @@ class ConsonantStepSizeDownBlock extends ValueBlock {
         //.TRANS: step down one note in current musical scale
         super('consonantstepsizedown', _('scalar step down'));
         this.setPalette('pitch');
+	this.parameter = true;
+	this.setHelpString([_('The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle) {
@@ -618,7 +629,7 @@ class ConsonantStepSizeDownBlock extends ValueBlock {
             var len = logo.lastNotePlayed[turtle][0].length;
             return getStepSizeDown(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
         } else {
-            return getStepSizeDown(logo.keySignature[turtle], 'A');
+            return getStepSizeDown(logo.keySignature[turtle], 'G');
         }
     }
 }
@@ -628,6 +639,12 @@ class ConsonantStepSizeUpBlock extends ValueBlock {
         //.TRANS: step up one note in current musical scale
         super('consonantstepsizeup', _('scalar step up'));
         this.setPalette('pitch');
+	this.parameter = true;
+	this.setHelpString([_('The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle) {
@@ -635,7 +652,7 @@ class ConsonantStepSizeUpBlock extends ValueBlock {
             var len = logo.lastNotePlayed[turtle][0].length;
             return getStepSizeUp(logo.keySignature[turtle], logo.lastNotePlayed[turtle][0].slice(0, len - 1));
         } else {
-            return getStepSizeUp(logo.keySignature[turtle], 'A');
+            return getStepSizeUp(logo.keySignature[turtle], 'G');
         }
     }
 }
@@ -645,6 +662,12 @@ class DeltaPitchBlock extends ValueBlock {
         //.TRANS: the change measured in half-steps between the current pitch and the previous pitch
         super(name || 'deltapitch', displayName || _('change in pitch'));
         this.setPalette('pitch');
+	this.parameter = true;
+	this.setHelpString([_('The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.'), 'documentation', null, 'deltapitchhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -718,6 +741,12 @@ class MyPitchBlock extends ValueBlock {
         super('mypitch', _('pitch number'));
         this.setPalette('pitch');
         this.beginnerBlock(true);
+	this.parameter = true;
+	this.setHelpString([_('The Pitch number block is the value of the pitch of the note currently being played.'), 'documentation', null, 'everybeathelp'])
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -757,7 +786,13 @@ class PitchInHertzBlock extends ValueBlock {
         //.TRANS: the current pitch expressed in Hertz
         super('pitchinhertz', _('pitch in hertz'));
         this.setPalette('pitch');
+	this.parameter = true;
+	this.setHelpString([_('The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played.'), 'documentation', '']);
         this.beginnerBlock(true);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {
@@ -789,6 +824,7 @@ class SetPitchNumberOffsetBlock extends FlowBlock {
         //.TRANS: set an offset associated with the numeric piano keyboard mapping
         super('setpitchnumberoffset', _('set pitch number offset'));
         this.setPalette('pitch');
+	this.setHelpString([_('The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave.'), 'documentation', null, 'pitchnumberhelp']);
         this.formBlock({
             args: 2, defaults: ['C', 4],
             argTypes: ['notein', 'anyin'],
@@ -825,6 +861,7 @@ class Number2PitchBlock extends LeftBlock {
         //.TRANS: convert piano key number (1-88) to pitch
         super(name || 'number2pitch', displayName || _('number to pitch'));
         this.setPalette('pitch');
+	this.setHelpString([_('The Number to pitch block will convert a pitch number to a pich name.'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: [55]
         });
@@ -851,6 +888,7 @@ class Number2OctaveBlock extends Number2PitchBlock {
     constructor() {
         //.TRANS: convert piano key number (1-88) to octave
         super('number2octave', _('number to octave'));
+	this.setHelpString([_('The Number to octave block will convert a pitch number to an octave.'), 'documentation', '']);
     }
 }
 
@@ -858,6 +896,7 @@ class AccidentalNameBlock extends ValueBlock {
     constructor() {
         super('accidentalname');
         this.setPalette('pitch');
+	this.setHelpString([_('The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat.'), 'documentation', '']);
         this.formBlock({ outType: 'textout' });
     }
 }
@@ -866,6 +905,7 @@ class EastIndianSolfegeBlock extends ValueBlock {
     constructor() {
         super('eastindiansolfege');
         this.setPalette('pitch');
+	this.setHelpString([_('Pitch can be specified in terms of ni dha pa ma ga re sa.'), 'documentation', null, 'eihelp']);
         this.formBlock({ outType: 'solfegeout' });
     }
 }
@@ -874,6 +914,7 @@ class NoteNameBlock extends ValueBlock {
     constructor() {
         super('notename');
         this.setPalette('pitch');
+	this.setHelpString([_('Pitch can be specified in terms of C D E F G A B.'), 'documentation', null, 'note2']);
         this.formBlock({ outType: 'noteout' });
     }
 }
@@ -882,6 +923,7 @@ class SolfegeBlock extends ValueBlock {
     constructor() {
         super('solfege');
         this.setPalette('pitch');
+	this.setHelpString([_('Pitch can be specified in terms of do re mi fa sol la ti.'), 'documentation', null, 'note1']);
         this.formBlock({ outType: 'solfegeout' });
     }
 }
@@ -898,6 +940,7 @@ class Invert1Block extends FlowClampBlock {
     constructor() {
         super('invert1');
         this.setPalette('pitch');
+	this.setHelpString([_('The Invert block rotates any contained notes around a target note.'), 'documentation', null, 'inverthelp']);
         this.formBlock({
             //.TRANS: pitch inversion rotates a pitch around another pitch
             name: _('invert'), args: 3,
@@ -1038,6 +1081,7 @@ class RegisterBlock extends FlowBlock {
         //.TRANS: register is the octave of the current pitch
         super('register', _('register'));
         this.setPalette('pitch');
+	this.setHelpString([_('The Register block provides an easy way to modify the register (octave) of the notes that follow it.'), 'documentation', null, 'registerhelp']);
         this.formBlock({
             args: 1, defaults: [0]
         });
@@ -1054,6 +1098,7 @@ class SetTranspositionBlock extends FlowClampBlock {
     constructor() {
         super('settransposition');
         this.setPalette('pitch');
+	this.setHelpString([_('The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.') + ' ' + _('In the example shown above, sol is shifted up to sol#.'), 'documentation', '']);
         this.formBlock({
             //.TRANS: adjust the amount of shift (up or down) of a pitch
             name: _('semi-tone transpose'),
@@ -1321,6 +1366,7 @@ class SetScalarTranspositionBlock extends FlowClampBlock {
     constructor() {
         super('setscalartransposition');
         this.setPalette('pitch');
+	this.setHelpString([_('The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.') + ' ' + _('In the example shown above, sol is shifted up to la.'), 'documentation', null, 'scalartranshelp']);
         this.formBlock({
             //.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
             name: _('scalar transpose') + ' (+/–)',
@@ -1380,6 +1426,7 @@ class AccidentalBlock extends FlowClampBlock {
     constructor() {
         super('accidental');
         this.setPalette('pitch');
+	this.setHelpString([_('The Accidental block is used to create sharps and flats'), 'documentation', null, 'accidental']);
         this.formBlock({
             //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
             name: _('accidental'),
@@ -1562,6 +1609,7 @@ class HertzBlock extends FlowBlock {
         super('hertz', _('hertz'));
         this.setPalette('pitch');
         this.beginnerBlock(true);
+	this.setHelpString([_('The Hertz block (in combination with a Number block) will play a sound at the specified frequency.'), 'documentation', null, 'note3']);
         this.formBlock({
             args: 1, defaults: [
                 this.lang === 'ja' ? 440 : 392
@@ -1693,6 +1741,7 @@ class PitchNumberBlock extends FlowBlock {
         super('pitchnumber', _('pitch number'));
         this.setPalette('pitch');
         this.beginnerBlock(true);
+	this.setHelpString([_('The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G.'), 'documentation', null, 'note5']);
         this.formBlock({
             args: 1, defaults: [7]
         });
@@ -1726,6 +1775,7 @@ class StepPitchBlock extends FlowBlock {
         super('steppitch', _('scalar step') + ' (+/–)');
         this.setPalette('pitch');
         this.beginnerBlock(true);
+	this.setHelpString([_('The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,') + ' ' + _('eg if the last note played was sol, Scalar Step 1 will play la.'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: [1],
             argTypes: ['anyin']
@@ -1900,6 +1950,7 @@ class PitchBlock extends FlowBlock {
         super('pitch', _('pitch'));
         this.setPalette('pitch');
         this.beginnerBlock(true);
+	this.setHelpString([_('The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.'), 'documentation', null, 'note1']);
         this.formBlock({
             args: 2, defaults: ['sol', 4],
             argTypes: ['solfegein', 'anyin'],

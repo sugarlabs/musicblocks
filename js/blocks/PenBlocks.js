@@ -163,7 +163,12 @@ class GreyBlock extends ValueBlock {
     constructor() {
         super('grey', _('grey'));
         this.setPalette('pen');
+	this.parameter = true;
         this.setHelpString([_('The Grey block returns the current pen grey value.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].chroma);
     }
 
     arg(logo, turtle, blk) {
@@ -179,7 +184,12 @@ class ShadeBlock extends ValueBlock {
     constructor() {
         super('shade', _('shade'));
         this.setPalette('pen');
+	this.parameter = true;
         this.setHelpString([_('The Shade block returns the current pen shade value.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].value);
     }
 
     arg(logo, turtle, blk) {
@@ -196,13 +206,17 @@ class ColorBlock extends ValueBlock {
         super('color', _('color'));
         this.setPalette('pen');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Color block returns the current pen color.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].color);
     }
 
     arg(logo, turtle, blk) {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
-            logo.statusFields.push([blk, 'color']);
+	    logo.statusFields.push([blk, 'color']);
         } else {
             return logo.turtles.turtleList[turtle].color;
         }
@@ -213,7 +227,12 @@ class PenSizeBlock extends ValueBlock {
     constructor() {
         super('pensize', _('pen size'));
         this.setPalette('pen');
+	this.parameter = true;
         this.setHelpString([_('The Pen size block returns the current pen size value.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.turtles.turtleList[turtle].stroke);
     }
 
     arg(logo, turtle, blk) {

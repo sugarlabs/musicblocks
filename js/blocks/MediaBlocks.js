@@ -6,8 +6,12 @@ class RightPosBlock extends ValueBlock {
         super('rightpos', _('right (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Right block returns the position of the right of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2((logo.turtles._canvas.width / (2.0 * logo.turtles.scale)));
     }
 
     arg(logo) {
@@ -21,8 +25,12 @@ class LeftPosBlock extends ValueBlock {
         super('leftpos', _('left (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Left block returns the position of the left of the canvas.') + ' ' + _('In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.'), 'documentation', null, 'lrhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(-1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale)));
     }
 
     arg(logo) {
@@ -35,8 +43,12 @@ class TopPosBlock extends ValueBlock {
         super('toppos', _('top (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Top block returns the position of the top of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+        return toFixed2((logo.turtles._canvas.height / (2.0 * logo.turtles.scale)));
     }
 
     arg(logo) {
@@ -49,8 +61,12 @@ class BottomPosBlock extends ValueBlock {
         super('bottompos', _('bottom (screen)'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Bottom block returns the position of the bottom of the canvas.') + ' ' + _('In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.'), 'documentation', null, 'bottomposhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+        return toFixed2(-1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale)));
     }
 
     arg(logo) {
@@ -63,12 +79,16 @@ class WidthBlock extends ValueBlock {
         super('width', _('width'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Width block returns the width of the canvas.'), 'documentation', '']);
     }
 
+    updateParameter(logo, turtle, blk) {
+        return toFixed2(logo.turtles._canvas.width / logo.turtles.scale);
+    }
+
     arg(logo) {
-        return (logo.turtles._canvas.width / (logo.turtles.scale));
+        return (logo.turtles._canvas.width / logo.turtles.scale);
     }
 }
 
@@ -77,12 +97,16 @@ class HeightBlock extends ValueBlock {
         super('height', _('height'));
         this.setPalette('media');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Height block returns the height of the canvas.'), 'documentation', '']);
     }
 
+    updateParameter(logo, turtle, blk) {
+        return toFixed2(logo.turtles._canvas.height / logo.turtles.scale);
+    }
+
     arg(logo) {
-        return (logo.turtles._canvas.height / (logo.turtles.scale));
+        return (logo.turtles._canvas.height / logo.turtles.scale);
     }
 }
 
@@ -250,6 +274,7 @@ class ToFrequencyBlock extends LeftBlock {
         super('tofrequency', _('note to frequency'));
         //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
         this.setPalette('media');
+	this.parameter = true;
         this.setHelpString([_('The To frequency block converts a pitch name and octave to Hertz.'), 'documentation', '']);
 
         this.formBlock({
@@ -261,6 +286,10 @@ class ToFrequencyBlock extends LeftBlock {
                 _('octave')
             ]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk, receivedArg) {

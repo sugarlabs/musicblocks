@@ -64,6 +64,7 @@ class BoxBlock extends LeftBlock {
     constructor() {
         super('box');
         this.setPalette('boxes');
+	this.parameter = true;
         this.setHelpString([_('The Box 1 block returns the value stored in Box 1.'), 'documentation', null, 'box1help']);
 
         this.formBlock({
@@ -73,6 +74,17 @@ class BoxBlock extends LeftBlock {
             args: 1, defaults: [_('box')],
             argTypes: ['anyin'],
         })
+    }
+
+    updateParameter(logo, turtle, blk) {
+        var cblk = logo.blocks.blockList[blk].connections[1];
+        var boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
+        if (boxname in logo.boxes) {
+            return logo.boxes[boxname];
+        } else {
+            logo.errorMsg(NOBOXERRORMSG, blk, boxname);
+	    return 0
+        }
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -97,7 +109,7 @@ class NamedBoxBlock extends ValueBlock {
         super('namedbox');
         this.setPalette('boxes');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Box block returns the value stored in a box.'), 'documentation', '']);
 
         this.extraWidth = 20;
@@ -105,6 +117,16 @@ class NamedBoxBlock extends ValueBlock {
             name: _('box'),
             outType: 'anyout'
         })
+    }
+
+    updateParameter(logo, turtle, blk) {
+        var name = logo.blocks.blockList[blk].privateData;
+        if (name in logo.boxes) {
+            return logo.boxes[name];
+        } else {
+            logo.errorMsg(NOBOXERRORMSG, blk, name);
+	    return 0;
+        }
     }
 
     arg(logo, turtle, blk, receivedArg) {

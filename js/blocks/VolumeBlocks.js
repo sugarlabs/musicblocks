@@ -5,6 +5,7 @@ class SynthVolumeBlock extends LeftBlock {
         //.TRANS: the volume for this synth
         super('synthvolumefactor', _('synth volume'));
         this.setPalette('volume');
+	this.parameter = true;
         this.setHelpString([_('The Synth volume block returns the current volume of the current synthesizer.'), 'documentation', '']);
 
         this.formBlock({
@@ -15,6 +16,10 @@ class SynthVolumeBlock extends LeftBlock {
 	    [0, 'synthvolumefactor', x, y, [null, 1]],
 	    [1, ['voicename', {'value': DEFAULTVOICE}], 0, 0, [0]]
 	]);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -40,7 +45,12 @@ class MasterVolumeBlock extends ValueBlock {
         //.TRANS: the volume at which notes are played
         super('notevolumefactor', _('master volume'));
         this.setPalette('volume');
+	this.parameter = true;
         this.setHelpString([_('The Master volume block returns the master volume.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {

@@ -283,9 +283,13 @@ class MyNoteValueBlock extends ValueBlock {
         //.TRANS: the value (e.g., 1/4 note) of the note being played.
         super('mynotevalue', _('note value'));
         this.setPalette('rhythm');
-
+	this.parameter = true;
         this.beginnerBlock(true);
         this.setHelpString([_('The Note value block is the value of the duration of the note currently being played.'), 'documentation', null, 'everybeathelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return mixedNumber(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk) {
@@ -320,7 +324,12 @@ class SkipFactorBlock extends ValueBlock {
         super('skipfactor', 'skip factor');
         this.setPalette('rhythm');
         this.setHelpString();
+	this.parameter = true;
         this.hidden = true;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk) {

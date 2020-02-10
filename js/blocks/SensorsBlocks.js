@@ -4,7 +4,11 @@ class PitchnessBlock extends ValueBlock {
     constructor() {
         super('pitchness', _('pitch'));
         this.setPalette('sensors');
-        this.setHelpString();
+	this.parameter = true;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle, blk) {
@@ -39,7 +43,12 @@ class LoudnessBlock extends ValueBlock {
     constructor() {
         super('loudness', _('loudness'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Loudness block returns the volume detected by the microphone.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo) {
@@ -87,7 +96,12 @@ class GetBlueBlock extends ValueBlock {
     constructor() {
         super('getblue', _('blue'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Get blue block returns the blue component of the pixel under the mouse.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle) {
@@ -104,7 +118,12 @@ class GetGreenBlock extends ValueBlock {
     constructor() {
         super('getgreen', _('green'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Get green block returns the green component of the pixel under the mouse.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle) {
@@ -121,7 +140,12 @@ class GetRedBlock extends ValueBlock {
     constructor() {
         super('getred', _('red'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Get red block returns the red component of the pixel under the mouse.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle) {
@@ -137,7 +161,12 @@ class GetColorPixelBlock extends ValueBlock {
     constructor() {
         super('getcolorpixel', _('pixel color'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Get pixel block returns the color of the pixel under the mouse.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
     }
 
     arg(logo, turtle) {
@@ -167,7 +196,12 @@ class TimeBlock extends ValueBlock {
     constructor() {
         super('time', _('time'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Time block returns the number of seconds that the program has been running.'), 'documentation', '']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo) {
@@ -181,8 +215,12 @@ class MouseYBlock extends ValueBlock {
         super('mousey', _('cursor y'));
         this.setPalette('sensors');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Cursor Y block returns the vertical position of the mouse.'), 'documentation', null, 'mousebuttonhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo) {
@@ -195,8 +233,12 @@ class MouseXBlock extends ValueBlock {
         super('mousex', _('cursor x'));
         this.setPalette('sensors');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Cursor X block returns the horizontal position of the mouse.'), 'documentation', null, 'mousebuttonhelp']);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo) {
@@ -209,9 +251,17 @@ class MouseButtonBlock extends BooleanSensorBlock {
         super('mousebutton', _('mouse button'));
         this.setPalette('sensors');
         this.beginnerBlock(true);
-
+	this.parameter = true;
         this.setHelpString([_('The Mouse-button block returns True if the mouse button is pressed.'), 'documentation', null, 'mousebuttonhelp']);
         this.extraWidth = 20;
+    }
+
+    updateParameter(logo, turtle, blk) {
+	if (logo.blocks.blockList[blk].value) {
+	    return _('true')
+	} else {
+	    return _('false')
+	}
     }
 
     arg(logo) {
@@ -223,10 +273,15 @@ class ToASCIIBlock extends LeftBlock {
     constructor() {
         super('toascii', _('to ASCII'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The To ASCII block converts numbers to letters.'), 'documentation', '']);
         this.formBlock({
             args: 1, defaults: [65]
         });
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo, turtle, blk, receivedArg) {
@@ -256,11 +311,16 @@ class KeyboardBlock extends ValueBlock {
     constructor() {
         super('keyboard', _('keyboard'));
         this.setPalette('sensors');
+	this.parameter = true;
         this.setHelpString([_('The Keyboard block returns computer keyboard input.'), 'documentation', '']);
         this.makeMacro((x, y) => [
             [0, 'toascii', x, y, [null, 1]],
             [1, 'keyboard', 0, 0, [0, null]]
         ]);
+    }
+
+    updateParameter(logo, turtle, blk) {
+	return logo.blocks.blockList[blk].value;
     }
 
     arg(logo) {
