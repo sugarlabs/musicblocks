@@ -100,51 +100,48 @@ Subdirectories with additional utilities
 This section describes how to add new blocks to Music Blocks in order
 to add functionality.
 
-Note: All block related code is located inside `js/blocks`
+Note: Almost all block related code is located inside `js/blocks`
 
-* To add a new block you first need to determine if you want to create a new palette or add it to an existing palette. 
+To add a new block you first need to determine if you want to add it
+to an existing palette or to create a new palette.
 
-    * If you want a new palette, you need to declare a new file corresponding to that palette inside `js/blocks`. Steps for the same are defined [here](#how-to-define-a-new-palette-for-adding-blocks).
+* If you want to add the block to an existing palette, skip the
+  following section and jump right to [How to define a new
+  block](#how-to-define-a-new-block).
 
-    * If you want to add the block to an existing palette, skip the following section and jump right to [How to define a new block](#how-to-define-a-new-block).
-
+* If you need a new palette (uncommon), you need to declare a new file
+  corresponding to that palette inside `js/blocks`. Steps for the same
+  are defined [here](#how-to-define-a-new-palette-for-adding-blocks).
 
 ## How to define a new palette for adding blocks
 
-Note: You may skip this section if the block you are adding doesn't require a new palette.
+You may skip this section if the block you are adding doesn't require
+a new palette.
 
-* Make a new file in `js/blocks` with a meaningful name.
+1. Make a new file in `js/blocks` with a meaningful name. Current
+files are `GraphicsBlocks.js`, `MediaBlocks.js`, et al.
 
-e.g. Current files are named as  `GraphicsBlocks.js` , `MediaBlocks.js`.
+2. Add the new file to `MUSICBLOCKS_EXTRAS` in `js/activity.js`.
 
-* Add that file to `MUSICBLOCKS_EXTRAS` in `js/activity.js`.
+3. Create a `setup` function in your new file at the end, with a
+meaningful name, e.g. `setupGraphicsBlocks()`.
 
-* Create a `setup` function in your new file at the end, with a meaningful name.
-
-e.g. `setupGraphicsBlocks()`.
-
-* Call that setup function in `js/basicblocks.js` inside
-  `initBasicProtoBlocks()` function.
+4. Call that setup function in `js/basicblocks.js` from the
+`initBasicProtoBlocks()` function.
 
 After the above steps are complete, move to [defining a new
 block](#how-to-define-a-new-block)
 
 ## How to define a new block
 
-Note: You should directly start with this step if you want to add your
-block to an existing palette.
+1. Find the file in `js/blocks` associated with the palette to which
+you want to add your new block.
 
-* Start with searching the file inside `js/blocks` associated with the
-  palette you want to add your new block to.
+2. Create a new class inside that file for your block.
 
-[basicblocks.js](https://github.com/sugarlabs/musicblocks/blob/master/js/basicblocks.js)
-is the file where setup function related to each block file is called.
+Block classes can also extend each other. Your class definition and
+`super()` call should follow this syntax:
 
-1. Create a new class inside the file. Block classes can also extend
-each other.  Your class definition and `super()` call should follow
-following syntax.
-
-e.g. 
 ``` 
     // one block extending another
     class UniqueNameBlock extends SomeBlockClass{
@@ -154,11 +151,9 @@ e.g.
     }
 ```
 
-2. Assign a palette to the block.
+3. Assign a palette to the block, e.g. `this.setPalette('yourPaletteName);`
 
-e.g. `this.setPalette('yourPaletteName);`
-
-* At this point your class definition should look similar to this:
+At this point your class definition should look similar to this:
 
 ```
   class UniqueNameBlock extends SomeBlockClass{
@@ -169,39 +164,51 @@ e.g. `this.setPalette('yourPaletteName);`
   }
 ``` 
 
-* The palette can be any of the palettes listed in `turtledef.js`. 
-* The color of the block is defined by the palette used.
+The color of the block is defined by the palette used.
 
-To designate a block for `beginnerMode`, add
+4. To designate a block for `beginnerMode`, add
 `this.beginnerBlock(true);` to the constructor.
 
-To add a help string, add `this.setHelpString([_('some block help'),
-'documentation', null, 'macroname']);` to the constructor.
-
-The first element in the list is the help string itself. The second
+5. To add a help string, add `this.setHelpString([_('some block
+help'), 'documentation', null, 'macroname']);` to the constructor. The
+first element in the list is the help string itself. The second
 element is the subdirectory where the help artwork is found. The third
 argument is the name of the help artwork file (null indicates that the
 block name is used for the help file, e.g., blockname_block.svg). The
 final element in the list is an optional macro to be loaded when the
 download button is pressed in the help widget.
 
-3. Add a call to `new myNewBlock.setup()` in the previously defined
-`setup` function.
+6. If your block is a `parameter` block, you may want to add a
+function for updating the display of the parameter value during debug
+mode. Typically something like this:
 
-e.g.
+```
+    updateParameter(logo, turtle, blk) {
+	return toFixed2(logo.blocks.blockList[blk].value);
+    }
+```
+
+7. You may also want to add a `setter` function so your block can be
+used with the `Add-1` and `Add to` blocks.
+
+```
+    setter(logo, value, turtle, blk) {
+        logo.turtles.turtleList[turtle].doSetHeading(value);
+    }
+```
+
+8. Add a call to `new myNewBlock.setup()` in the previously defined
+`setup` function, e.g.
+
 ```
 function setupUniqueBlocks() {`
-
   new UniqueNameBlock().setup();
-
 }
 ```
 
-* For arg blocks, define a function `arg` inside the block class
-  definition. There are 4 arguments currently passed to this function
-  viz. `(logo, turtle, blk, receivedArg)`.
-
-e.g. 
+For arg blocks, define a function `arg` inside the block class
+definition. There are four arguments currently passed to this function
+viz. `(logo, turtle, blk, receivedArg)`, e.g.
 
 ```
  class UniqueNameBlock extends SomeBlockClass{
@@ -215,11 +222,10 @@ e.g.
 }
 ```
 
-* For flow bocks define a function `flow` on the block. The same 4
-  arguments are passed to the flow function currently: `(logo, turtle,
-  blk, receivedArg)`.
+For flow bocks define a function `flow` on the block. The same four
+arguments are passed to the flow function currently: `(logo, turtle,
+blk, receivedArg)`, e.g
 
-e.g 
 ```
 class UniqueNameBlock extends SomeBlockClass{
     constructor() {
@@ -234,7 +240,7 @@ class UniqueNameBlock extends SomeBlockClass{
 
 Note: Trailing arguments can be neglected in both functions, if not needed.
 
-4. Write the logic for the block in either of the two functions,
+9. Write the logic for the block in either of the two functions,
 `arg()` or `flow()`.
 
 * For arg blocks value is set by using a `return` statement.
@@ -244,12 +250,10 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
   flow. (A child flow is, for example, the internal flow of a clamp,
   e.g. what is repeated in a repeat block.)
 
-So changes to these variables should be checked and `return` keyword
+Changes to these variables should be checked and `return` keyword
 should be used.
 
-e.g. 
-
-* An arg block:
+An arg block:
 
 ```
   class TranspositionFactorBlock extends ValueBlock {
@@ -270,7 +274,7 @@ e.g.
 }
 ```
 
-* A flow block:
+A flow block:
 
 ```
 class UniqueNameBlock extends SomeBlockClass{
@@ -295,9 +299,8 @@ Note: Macro related code is no longed written in `macros.js`
 
 To add a macro:
 
-1. Write definition using `this.makeMacro((x, y) => [....])`
+Write definition using `this.makeMacro((x, y) => [....])`
 
-e.g. 
 ```
 class StartDrumBlock extends StartBlock {
     constructor() {
@@ -386,8 +389,7 @@ class StartDrumBlock extends StartBlock {
 
 ## Working with formBlock function
 
-  `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that
-  object is as follows:
+`formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that object is as follows:
 
 1. `name` : This specifies the display name on the block. Typically it is of the format  `_('...')`. 
 
@@ -445,7 +447,11 @@ class MakeBlockBlock extends LeftBlock {
 
 ```
 
-Note: The call to `formBlock` will attempt further call `adjustWidthToLabel`. This behaviour by passing a false value as the second argument. There is currently no way to define left-hand output as a boolean. Though it can be done by passing a third option of `bool` to `flows.left`
+Note: The call to `formBlock` will attempt further call
+`adjustWidthToLabel`. This behaviour by passing a false value as the
+second argument. There is currently no way to define left-hand output
+as a boolean. Though it can be done by passing a third option of
+`bool` to `flows.left`
   
 ### Setting up listeners in clamp blocks
 
@@ -454,7 +460,8 @@ need to trigger a listener when that flow completes its execution.
 
 1. ChildFlow and ChildFlowCount
 
-`childFlow = args[n + 1]`, where n is the number of arguments passed to the blocks.
+`childFlow = args[n + 1]`, where n is the number of arguments passed
+to the blocks.
 
 If there are no arguments, `childFlow = args[1]`. (Some blocks, such
 as the *Start* block, do not have any external flow, so their
