@@ -1,5 +1,37 @@
 function setupExtrasBlocks() {
 
+class FloatToStringBlock extends LeftBlock {
+    constructor() {
+        super('float2string', _('fraction'));
+        this.setPalette('extras');
+        this.setHelpString([_('Convert a float to a fraction') + ' 0.5 -> 1/2', 'documentation', null, 'float2string']);
+	this.parameter = true;
+
+        this.formBlock({
+            args: 1, argTypes: ['anyin'],
+        });
+    }
+
+    arg(logo, turtle, blk, receivedArg) {
+        var cblk = logo.blocks.blockList[blk].connections[1];
+        if (cblk === null) {
+            logo.errorMsg(NOINPUTERRORMSG, blk);
+            return '0';
+        } else {
+            var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            if (typeof(a) === 'number') {
+                if (a < 0) {
+                    a = a * -1;
+                    return '-' + mixedNumber(a);
+		}
+                return mixedNumber(a);
+            }
+            logo.errorMsg(NANERRORMSG, blk);
+            return '0';
+        }
+    }
+}
+
 class OpenPaletteBlock extends FlowBlock {
     constructor() {
         super('openpalette');
@@ -763,6 +795,7 @@ class NOPFourArgBlock extends FlowBlock {
     new ShowBlocksBlock().setup();
     new HideBlocksBlock().setup();
     new OpenProjectBlock().setup();
+    new FloatToStringBlock().setup();
     new VSpaceBlock().setup();
     new HSpaceBlock().setup();
     new WaitBlock().setup();
