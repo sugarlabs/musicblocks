@@ -1413,6 +1413,7 @@ input.timbreName {
 
  #printText {
     border: 2px solid rgb(150, 150, 150);
+    z-index: 100;
   }
 
   #errorText {
