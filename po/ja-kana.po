@@ -12,6 +12,9 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "search for blocks"
+msgstr "ブロックをさがす"
+
 #: js/block.js:1165
 #: js/block.js:5575
 #: js/block.js:5584
