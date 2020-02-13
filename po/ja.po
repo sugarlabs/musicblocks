@@ -12,6 +12,12 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "fraction"
+msgstr "分数"
+
+msgid "Convert a float to a fraction"
+msgstr "小数から分数"
+
 msgid "search for blocks"
 msgstr "ブロックをさがす"
 
