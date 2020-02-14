@@ -287,6 +287,10 @@ function Toolbar() {
         var disableHorizScrollIcon = docById('disableHorizScrollIcon');
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
+            displayStatsIcon.style.display = 'block';
+            loadPluginIcon.style.display = 'block';
+            delPluginIcon.style.display = 'block';
+            enableHorizScrollIcon.style.display = 'block';
             displayStatsIcon.onclick = function () {
                 analytics_onclick();
             };
