@@ -951,9 +951,14 @@ function Activity() {
             beginnerMode = true;
         }
         console.log(beginnerMode);
+        // Change toolbar as per beginner/Advanced Mode
         toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveMxml.bind(save), save.saveBlockArtwork.bind(save));
         toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller, that._setupBlocksContainerEvents, beginnerMode);
         toolbar.renderModeSelectIcon(doSwitchMode, beginnerMode);
+
+        //Change palettes and blocks as per beginner/Advanced mode
+        initBasicProtoBlocks(palettes, blocks, beginnerMode);
+        palettes.updatePalettes();
         refreshCanvas();
     };
 
