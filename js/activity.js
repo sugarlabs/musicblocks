@@ -944,10 +944,13 @@ function Activity() {
         if (mode === null || mode === undefined || mode === 'true') {
             // textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
+            beginnerMode = false;
         } else {
             // textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', true);
+            beginnerMode = true;
         }
+        console.log(beginnerMode);
 
         refreshCanvas();
     };
