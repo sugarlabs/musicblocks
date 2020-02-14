@@ -237,11 +237,15 @@ function Toolbar() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             var begIcon = docById('beginnerMode');
             var advIcon = docById('advancedMode');
-            if (begIcon.style.display === 'none') {
+            if (beginnerMode) {
+                begIcon.style.display = 'none';
+                advIcon.style.display = 'block';
                 advIcon.onclick = function () {
                     onclick();
                 };
             } else {
+                begIcon.style.display = 'block';
+                advIcon.style.display = 'none';
                 begIcon.onclick = function () {
                     onclick();
                 };

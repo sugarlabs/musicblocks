@@ -952,6 +952,7 @@ function Activity() {
         }
         console.log(beginnerMode);
         toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveMxml.bind(save), save.saveBlockArtwork.bind(save));
+        toolbar.renderModeSelectIcon(doSwitchMode, beginnerMode);
         refreshCanvas();
     };
 
