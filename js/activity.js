@@ -935,17 +935,17 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
-        const MSGPrefix = '<a href=\'#\' ' +
-        'onClick=\'window.location.reload()\'' +
-        'onMouseOver=\'this.style.opacity = 0.5\'' +
-        'onMouseOut=\'this.style.opacity = 1\'>';
-        const MSGSuffix = '</a>';
+        // const MSGPrefix = '<a href=\'#\' ' +
+        // 'onClick=\'window.location.reload()\'' +
+        // 'onMouseOver=\'this.style.opacity = 0.5\'' +
+        // 'onMouseOut=\'this.style.opacity = 1\'>';
+        // const MSGSuffix = '</a>';
 
         if (mode === null || mode === undefined || mode === 'true') {
-            textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
+            // textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
         } else {
-            textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
+            // textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', true);
         }
 
