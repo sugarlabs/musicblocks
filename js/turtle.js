@@ -685,6 +685,7 @@ function Turtle (name, turtles, drum) {
             }
         }
 
+        this.container.rotation = this.orientation;
         this.bitmap.rotation = this.orientation;
         this.updateCache();
 
