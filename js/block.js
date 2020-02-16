@@ -866,7 +866,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         if (this.overrideName) {
-            if (['storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
+            if (['namedbox', 'storein2', 'nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, 'bold 20pt Sans') > TEXTWIDTH) {
                     block_label = ' ' + block_label.substr(0, STRINGLEN) + '...';
