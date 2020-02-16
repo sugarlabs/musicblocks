@@ -26,6 +26,19 @@ function Activity() {
     var searchSuggestions = [];
     var homeButtonContainers = [];
 
+    var msgTimeoutID = null;
+    var msgText = null;
+    var errorMsgTimeoutID = null;
+    var errorMsgText = null;
+    var errorMsgArrow = null;
+    var errorArtwork = {};
+
+    var cartesianBitmap = null;
+    var polarBitmap = null;
+
+
+    var ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
+    
     var that = this;
 
     _doFastButton = this._doFastButton;
@@ -3059,7 +3072,7 @@ function Activity() {
                 stage.setChildIndex(errorArtwork['noinput'], stage.children.length - 1);
                 break;
             default:
-                // Show and populate errorText div
+            // Show and populate errorText div
                 var errorText = document.getElementById("errorText");
                 errorText.classList.add("show");
                 var errorTextContent = document.getElementById("errorTextContent");
@@ -3942,23 +3955,6 @@ function Activity() {
 
         // Do we need to update the stage?
         update = true;
-
-        // Coordinate grid
-        cartesianBitmap = null;
-
-        // Polar grid
-        polarBitmap = null;
-
-        // Msg block
-        msgText = null;
-        msgTimeoutID = null;
-
-        // ErrorMsg block
-        errorMsgText = null;
-        errorMsgArrow = null;
-        errorMsgTimeoutID = null;
-        errorArtwork = {};
-        ERRORARTWORK = ['emptybox', 'emptyheap', 'negroot', 'noinput', 'zerodivide', 'notanumber', 'nostack', 'notastring', 'nomicrophone'];
 
         // Get things started
         await this.init();
