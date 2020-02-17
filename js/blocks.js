@@ -2946,7 +2946,13 @@ function Blocks (activity) {
                             that.blockList[c].privateData = _('box');
                         } else {
                             that.blockList[c].privateData = args[1];
-                            that.blockList[c].overrideName = args[1];
+                            if (args[1] === 'box1') {
+                                that.blockList[c].overrideName = _('box 1');
+                            } else if (args[1] === 'box2') {
+                                that.blockList[c].overrideName = _('box 2');
+                            } else {
+                                that.blockList[c].overrideName = args[1];
+                            }
                             that.blockList[c].regenerateArtwork(false);
                         }
                     };
@@ -3348,7 +3354,13 @@ function Blocks (activity) {
             } else if (this.blockList[blk].name === 'storein2') {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
-                    this.blockList[blk].overrideName = newName;
+                    if (newName === 'box1') {
+                        this.blockList[blk].overrideName = _('box 1');
+                    } else if (newName === 'box2') {
+                        this.blockList[blk].overrideName = _('box 2');
+                    } else {
+                        this.blockList[blk].overrideName = newName;
+                    }
                     this.blockList[blk].regenerateArtwork();
                     try {
                         this.blockList[blk].container.updateCache();
@@ -3376,7 +3388,13 @@ function Blocks (activity) {
             if (this.blockList[blk].name === 'storein2') {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
-                    this.blockList[blk].overrideName = newName;
+                    if (newName === 'box1') {
+                        this.blockList[blk].overrideName = _('box 1');
+                    } else if (newName === 'box2') {
+                        this.blockList[blk].overrideName = _('box 2');
+                    } else {
+                        this.blockList[blk].overrideName = newName;
+                    }
                     this.blockList[blk].regenerateArtwork();
                     try {
                         this.blockList[blk].container.updateCache();
@@ -3404,7 +3422,13 @@ function Blocks (activity) {
             if (this.blockList[blk].name === 'namedbox') {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
-                    this.blockList[blk].overrideName = newName;
+                    if (newName === 'box1') {
+                        this.blockList[blk].overrideName = _('box 1');
+                    } else if (newName === 'box2') {
+                        this.blockList[blk].overrideName = _('box 2');
+                    } else {
+                        this.blockList[blk].overrideName = newName;
+                    }
                     this.blockList[blk].regenerateArtwork();
                     // Update label...
                     try {
@@ -5069,7 +5093,13 @@ function Blocks (activity) {
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
                     that.blockList[thisBlock].value = null;
-                    that.blockList[thisBlock].overrideName = value;
+                    if (value === 'box1') {
+                        that.blockList[thisBlock].overrideName = _('box 1');
+                    } else if (value === 'box2') {
+                        that.blockList[thisBlock].overrideName = _('box 2');
+                    } else {
+                        that.blockList[thisBlock].overrideName = value;
+                    }
                     that.blockList[thisBlock].regenerateArtwork();
                 };
 
@@ -5077,6 +5107,26 @@ function Blocks (activity) {
                 break;
 
             case 'namedbox':
+                var postProcess = function (args) {
+                    var thisBlock = args[0];
+                    var value = args[1];
+                    that.blockList[thisBlock].privateData = value;
+                    console.log(value);
+                    if (value === 'box1') {
+                        that.blockList[thisBlock].overrideName = _('box 1');
+                    } else if (value === 'box2') {
+                        that.blockList[thisBlock].overrideName = _('box 2');
+                    } else {
+                        that.blockList[thisBlock].overrideName = value;
+                    }
+                    console.log(that.blockList[thisBlock].overrideName);
+                    that.blockList[thisBlock].value = null;
+                    that.blockList[thisBlock].regenerateArtwork();
+                };
+
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                break;
+
             case 'namedarg':
             case 'namedcalc':
             case 'nameddo':
