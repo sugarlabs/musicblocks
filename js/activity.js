@@ -3690,6 +3690,7 @@ function Activity() {
         var isLongHover = false;
 
         container.on('mouseover', function (event) {
+            console.log("Button is hovering");
             if (!loading) {
                 document.body.style.cursor = 'pointer';
             }
@@ -3706,14 +3707,14 @@ function Activity() {
                     locked = false;
 
                     clearTimeout(hoverTimer);
-                }, 2000);
+                }, 0);
             }
 
             hoverTimer = setTimeout(function () {
                 isLongHover = true;
                 console.debug('HOVER ACTION');
                 hoverAction(false);
-            }, 1500);
+            }, 0);
         });
 
         container.on('mouseout', function (event) {
@@ -3728,43 +3729,43 @@ function Activity() {
 
         container.removeAllEventListeners('mousedown');
         container.on('mousedown', function (event) {
-            /*
-            if (locked) {
-                return;
-            } else {
-                locked = true;
+            
+            // if (locked) {
+            //     return;
+            // } else {
+            //     locked = true;
 
-                lockTimer = setTimeout(function () {
-                    locked = false;
+            //     lockTimer = setTimeout(function () {
+            //         locked = false;
 
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-                    if (longImg !== null || extraLongImg !== null) {
-                        container.visible = false;
-                        container = formerContainer;
-                        container.visible = true;
-                    }
-                }, 1500);
-            }
+            //         clearTimeout(pressTimer);
+            //         clearTimeout(pressTimerExtra);
+            //         if (longImg !== null || extraLongImg !== null) {
+            //             container.visible = false;
+            //             container = formerContainer;
+            //             container.visible = true;
+            //         }
+            //     }, 1500);
+            // }
 
-            var mousedown = true;
+            // var mousedown = true;
 
-            pressTimer = setTimeout(function () {
-                isLong = true;
-                if (longImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
-                }
-            }, 500);
+            // pressTimer = setTimeout(function () {
+            //     isLong = true;
+            //     if (longImg !== null) {
+            //         container.visible = false;
+            //         container = _makeButton(longImg, '', ox, oy, cellSize, 0);
+            //     }
+            // }, 500);
 
-            pressTimerExtra = setTimeout(function () {
-                isExtraLong = true;
-                if (extraLongImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
-                }
-            }, 1000);
-            */
+            // pressTimerExtra = setTimeout(function () {
+            //     isExtraLong = true;
+            //     if (extraLongImg !== null) {
+            //         container.visible = false;
+            //         container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
+            //     }
+            // }, 1000);
+            
             var circles = showButtonHighlight(ox, oy, cellSize / 2, event, turtleBlocksScale, stage);
 
             function __pressupFunction(event) {

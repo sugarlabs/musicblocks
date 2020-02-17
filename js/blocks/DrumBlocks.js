@@ -345,7 +345,7 @@ class PlayDrumBlock extends FlowBlock {
 }
 
     new NoiseNameBlock().setup();
-    new DrumNameBlock().setup();
+    // new DrumNameBlock().setup();
     new EffectsNameBlock().setup();
     new PlayNoiseBlock().setup();
     _createPlayDrumMacros();
