@@ -3208,7 +3208,7 @@ function Activity() {
                                 'shade': turtle.value,
                                 'pensize': turtle.stroke,
                                 'grey': turtle.chroma,
-                                'name': turtle.name
+                                // 'name': turtle.name
                             };
                         }
                         break;
