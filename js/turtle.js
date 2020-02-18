@@ -2117,13 +2117,16 @@ function Turtles () {
             }
         }
 
+	/*
         var i = this.turtleList.length;
         if (blkInfoAvailable && 'name' in infoDict) {
             turtleName = infoDict['name'];
         } else {
             var turtleName = _('start'); // i.toString();
         }
+        */
 
+	var turtleName = _('start');
         var newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
