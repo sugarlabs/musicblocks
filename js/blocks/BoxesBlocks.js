@@ -65,7 +65,7 @@ class BoxBlock extends LeftBlock {
         super('box');
         this.setPalette('boxes');
 	this.parameter = true;
-        this.setHelpString([_('The Box 1 block returns the value stored in Box 1.'), 'documentation', null, 'box1help']);
+        this.setHelpString([_('The Box block returns the value stored in a box.'), 'documentation', null, 'box1help']);
 
         this.formBlock({
             //.TRANS: a container into which to put something
@@ -217,7 +217,7 @@ class Box2Block extends ValueBlock {
 
         this.formBlock({ name: _('box 2') });
         this.makeMacro((x, y) => [
-            [0, ['namedbox', {'value': _('box2')}], x, y, [null]]
+            [0, ['namedbox', {'value': 'box2'}], x, y, [null]]
         ]);
     }
 }
@@ -232,7 +232,7 @@ class StoreBox2Block extends FlowBlock {
 
         this.formBlock({ name: _('store in box 2'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [
-            [0, ['storein2', {'value': _('box2')}], x, y, [null, 1, null]],
+            [0, ['storein2', {'value': 'box2'}], x, y, [null, 1, null]],
             [1, ['number', {'value': 4}], x, y, [0]]
         ]);
     }
@@ -248,7 +248,7 @@ class Box1Block extends ValueBlock {
 
         this.formBlock({ name: _('box 1') });
         this.makeMacro((x, y) => [
-            [0, ['namedbox', {'value': _('box1')}], x, y, [null]]
+            [0, ['namedbox', {'value': 'box1'}], x, y, [null]]
         ]);
     }
 }
@@ -263,7 +263,7 @@ class StoreBox1Block extends FlowBlock {
 
         this.formBlock({ name: _('store in box 1'), args: 1, defaults: [4] });
         this.makeMacro((x, y) => [
-            [0, ['storein2', {'value': _('box1')}], x, y, [null, 1, null]],
+            [0, ['storein2', {'value': 'box1'}], x, y, [null, 1, null]],
             [1, ['number', {'value': 4}], x, y, [0]]
         ]);
     }
