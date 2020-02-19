@@ -396,9 +396,6 @@ class NamedArgBlock extends LeftBlock {
         var name = logo.blocks.blockList[blk].privateData;
         var actionArgs = receivedArg;
 
-	console.debug('NAMED ARG BLOCK: ' + name)
-	console.debug(actionArgs);
-
         // If an action block with an arg is clicked,
         // the arg will have no value.
         if (actionArgs == null) {
@@ -414,7 +411,7 @@ class NamedArgBlock extends LeftBlock {
             return 0
         }
 
-        // return [0, 0, logo.blocks.blockList[blk].value];
+        return logo.blocks.blockList[blk].value;
     }
 }
 
@@ -442,7 +439,6 @@ class DoBlock extends FlowBlock {
                 logo.notationLineBreak(turtle);
             }
 
-            console.debug('action: ' + args[0]);
             return [logo.actions[args[0]], 1];
         }
 
@@ -459,10 +455,10 @@ class ListenBlock extends FlowBlock {
 
         if (this.lang === 'ja') {
             this.extraWidth = 15;
-	    this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', null, 'broadcasthelp']);
-	} else {
-	    this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', null, 'broadcasthelp']);
-	}
+            this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.'), 'documentation', null, 'broadcasthelp']);
+        } else {
+            this.setHelpString([_('The Listen block is used to listen for an event such as a mouse click.') + ' ' + _('When the event happens, an action is taken.'), 'documentation', null, 'broadcasthelp']);
+        }
 
         this.formBlock({
             //.TRANS: an event, such as user actions (mouse clicks, key presses)
@@ -490,7 +486,7 @@ class ListenBlock extends FlowBlock {
                     // Since the turtle has stopped
                     // running, we must run the stack
                     // from here.
-                    logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], true, receivedArg);
+                    logo._runFromBlockNow(logo, turtle, logo.actions[args[1]], false, receivedArg);
                 }
             };
 
@@ -573,7 +569,7 @@ class ActionBlock extends StackClampBlock {
         this.setHelpString([_('The Action block is used to group together blocks so that they can be used more than once.') + ' ' + _('It is often used for storing a phrase of music that is repeated.'), 'documentation', null, 'actionhelp']);
 
         this.formBlock({
-	    canCollapse: true,
+            canCollapse: true,
             name: _('action'),
             args: 1,
             argLabels: [''],
@@ -594,7 +590,6 @@ class ActionBlock extends StackClampBlock {
                 logo.notationLineBreak(turtle);
             }
 
-            console.debug('action: ' + args[0]);
             return [logo.actions[args[0]], 1];
         }
 

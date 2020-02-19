@@ -1701,10 +1701,8 @@ function Logo () {
             }
 
             if (isflow) {
-                // that._runFromBlockNow(that, turtle, nextBlock, isflow, passArg, queueStart);
-                that._runFromBlock(that, turtle, nextBlock, isflow, passArg, queueStart);
-            }
-            else{
+                that._runFromBlockNow(that, turtle, nextBlock, isflow, passArg, queueStart);
+            } else{
                 that._runFromBlock(that, turtle, nextBlock, isflow, passArg);
             }
         } else {
@@ -3981,6 +3979,7 @@ function Logo () {
                 }
                 break;
             case 'returnValue':
+                // deprecated
                 if (that.returns.length > 0) {
                     that.blocks.blockList[blk].value = that.returns.pop();
                 } else {
