@@ -17,7 +17,7 @@
 #floatingWindows > .windowFrame > .wfTopBar {
     height: 29px;
     border-bottom: 1px solid #666;
-    min-width: 400px;
+    min-width: 425px;
     display: flex;
     padding: 4px;
     position: relative;
