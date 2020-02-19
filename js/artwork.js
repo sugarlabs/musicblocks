@@ -56,6 +56,7 @@ const ACTIVECOLOR = '#212121';
 
 
 function showMaterialHighlight(x, y, r, event, scale, stage) {
+    console.log(event);
     var circles = {
         highlight: new createjs.Shape(),
         active: new createjs.Shape()
@@ -71,9 +72,9 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
 
     stage.addChild(circles.highlight, circles.active);
 
-    createjs.Tween.get(circles.active).to({scaleX: 0.3, scaleY: 0.3, x: event.rawX / scale, y: event.rawY / scale}).to({scaleX: 1, scaleY: 1, x: x, y: y}, 100, createjs.Ease.circInOut);
+    createjs.Tween.get(circles.active).to({scaleX: 0.3, scaleY: 0.3, x: event.rawX / scale, y: event.rawY / scale}).to({scaleX: 1, scaleY: 1, x: x, y: y}, 150, createjs.Ease.circInOut);
 
-    createjs.Tween.get(circles.active).to({alpha: 0.05}).to({alpha: 0.3}, 200);
+    createjs.Tween.get(circles.active).to({alpha: 0.05}).to({alpha: 0.3}, 300);
     return circles;
 }
 
@@ -88,7 +89,7 @@ function hideButtonHighlight(circles, stage) {
     createjs.Tween.get(circles.highlight).to({alpha: 0}, 300);
     setTimeout(function() {
         stage.removeChild(circles.active, circles.highlight);
-    }, 0);
+    }, 300);
 }
 
 function hidePaletteNameDisplay(palette_text, stage){
