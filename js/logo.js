@@ -94,7 +94,7 @@ function Logo () {
 
     this.boxes = {};
     this.actions = {};
-    this.returns = [];
+    this.returns = {};
     this.turtleHeaps = {};
     this.invertList = {};
     this.beatList = {};
@@ -1021,6 +1021,7 @@ function Logo () {
         this.neighborNoteValue[turtle] = [];
         this.inHarmonic[turtle] = [];
         this.partials[turtle] = [];
+        this.returns[turtle] = [];
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.playbackQueue[turtle] = [];
@@ -3980,8 +3981,8 @@ function Logo () {
                 break;
             case 'returnValue':
                 // deprecated
-                if (that.returns.length > 0) {
-                    that.blocks.blockList[blk].value = that.returns.pop();
+                if (that.returns[turtle].length > 0) {
+                    that.blocks.blockList[blk].value = that.returns[turtle].pop();
                 } else {
                     console.debug('WARNING: No return value.');
                     that.blocks.blockList[blk].value = 0;

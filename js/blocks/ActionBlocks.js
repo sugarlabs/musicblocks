@@ -13,9 +13,9 @@ class ReturnBlock extends FlowBlock {
         });
     }
 
-    flow(args, logo) {
+    flow(args, logo, turtle) {
         if (args.length === 1) {
-            logo.returns.push(args[0]);
+            logo.returns[turtle].push(args[0]);
         }
     }
 }
@@ -101,7 +101,7 @@ class CalcBlock extends LeftBlock {
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-                return logo.returns.shift();
+                return logo.returns[turtle].shift();
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
                 return 0;
@@ -131,7 +131,7 @@ class NamedCalcBlock extends ValueBlock {
         if (name in logo.actions) {
             logo.turtles.turtleList[turtle].running = true;
             logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-            return logo.returns.shift();
+            return logo.returns[turtle].shift();
         } else {
             logo.errorMsg(NOACTIONERRORMSG, blk, name);
             return 0;
@@ -243,7 +243,7 @@ class NamedCalcArgBlock extends LeftBlock {
             // Just run the stack.
             logo.turtles.turtleList[turtle].running = true;
             logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-            return logo.returns.pop();
+            return logo.returns[turtle].pop();
         } else {
             logo.errorMsg(NOACTIONERRORMSG, blk, name);
             return 0;
@@ -333,7 +333,7 @@ class CalcArgBlock extends LeftBlock {
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(logo, turtle, logo.actions[name], true, actionArgs, logo.turtles.turtleList[turtle].queue.length);
-                return logo.returns.pop();
+                return logo.returns[turtle].pop();
             } else {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
                 return 0;
