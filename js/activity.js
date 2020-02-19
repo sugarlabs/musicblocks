@@ -3703,7 +3703,7 @@ function Activity() {
         var isLongHover = false;
 
         container.on('mouseover', function (event) {
-            console.log("Button is hovering");
+            // console.log("Button is hovering");
             if (!loading) {
                 document.body.style.cursor = 'pointer';
             }
@@ -3720,14 +3720,14 @@ function Activity() {
                     locked = false;
 
                     clearTimeout(hoverTimer);
-                }, 0);
+                }, 1500);
             }
 
             hoverTimer = setTimeout(function () {
                 isLongHover = true;
                 console.debug('HOVER ACTION');
                 hoverAction(false);
-            }, 0);
+            }, 2000);
         });
 
         container.on('mouseout', function (event) {
