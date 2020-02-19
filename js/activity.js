@@ -3611,6 +3611,8 @@ function Activity() {
                         container.addChildAt(bg, 0);
                     }
 
+                    console.log(event)
+
                     container.children[0].visible = true;
                     stage.update();
                     break;
