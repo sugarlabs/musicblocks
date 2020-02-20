@@ -1434,8 +1434,8 @@ function PitchTimeMatrix () {
                     // give the synth time to load
                     var timeout = 500;
                 } else {
-		    var timeout = 0;
-		}
+                    var timeout = 0;
+                }
 
                 setTimeout(function () {
                     that._logo.synth.setMasterVolume(DEFAULTVOLUME);
@@ -2442,7 +2442,7 @@ function PitchTimeMatrix () {
     this._tieNotes = function(mouseDownCell, mouseUpCell) {
         var downCellId = null;
         var upCellId = null;
-        if (mouseDownCell.id<mouseUpCell.id) {
+        if (mouseDownCell.id < mouseUpCell.id) {
             downCellId = mouseDownCell.id;
             upCellId = mouseUpCell.id;
         } else {
@@ -2466,7 +2466,7 @@ function PitchTimeMatrix () {
 
         var newNote = 0;
         for (var i = downCellId; i <= upCellId; i++) {
-            newNote = newNote+(1/parseFloat(this._logo.tupletRhythms[i][2]));
+            newNote = newNote + (1 / parseFloat(this._logo.tupletRhythms[i][2]));
         }
 
         this._logo.tupletRhythms = this._logo.tupletRhythms.slice(0, downCellId).concat([[this._logo.tupletRhythms[downCellId][0], this._logo.tupletRhythms[downCellId][1], 1 / newNote]]).concat(this._logo.tupletRhythms.slice(parseInt(upCellId) + 1))
@@ -2786,6 +2786,7 @@ function PitchTimeMatrix () {
         var rowTuplet = this._tupletValueRow;
         for (var j = 0; j < rowNote.cells.length; j++) {
             var cell = rowNote.cells[j];
+            cell.setAttribute('id',  j);
 
             var cellTuplet = rowTuplet.cells[j];
             if (cellTuplet !== undefined) {
