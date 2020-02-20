@@ -71,9 +71,9 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
 
     stage.addChild(circles.highlight, circles.active);
 
-    createjs.Tween.get(circles.active).to({scaleX: 0.3, scaleY: 0.3, x: event.rawX / scale, y: event.rawY / scale}).to({scaleX: 1, scaleY: 1, x: x, y: y}, 650, createjs.Ease.circInOut);
+    createjs.Tween.get(circles.active).to({scaleX: 0.3, scaleY: 0.3, x: event.rawX / scale, y: event.rawY / scale}).to({scaleX: 1, scaleY: 1, x: x, y: y}, 200, createjs.Ease.circInOut);
 
-    createjs.Tween.get(circles.active).to({alpha: 0.05}).to({alpha: 0.3}, 400);
+    createjs.Tween.get(circles.active).to({alpha: 0.05}).to({alpha: 0.3}, 150);
     return circles;
 }
 
@@ -84,11 +84,11 @@ function hideButtonHighlight(circles, stage) {
         return;
     }
 
-    createjs.Tween.get(circles.active).to({alpha: 0}, 400);
+    createjs.Tween.get(circles.active).to({alpha: 0}, 200);
     createjs.Tween.get(circles.highlight).to({alpha: 0}, 400);
     setTimeout(function() {
         stage.removeChild(circles.active, circles.highlight);
-    }, 650);
+    }, 410);
 }
 
 function hidePaletteNameDisplay(palette_text, stage){
