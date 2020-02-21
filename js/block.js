@@ -5734,7 +5734,11 @@ function Block(protoblock, blocks, overrideName) {
             __exitMenu();
         };
 
-        this._exitWheel.navItems[1].navigateFunction = function() {
+        this._exitWheel.navItems[1].navigateFunction = function () {
+            if(that.value == 1) {
+                errorMsg(_("Note value must be greater than 0"));
+                return false;
+            }
             that.value -= 1;
             that.text.text = that.value.toString();
 
@@ -7295,6 +7299,12 @@ function Block(protoblock, blocks, overrideName) {
 
         var oldValue = this.value;
         var newValue = this.label.value;
+
+        if(newValue < 1)
+        {
+          errorMsg(_("Note value must be greater than 0"));
+          return false;
+        }
 
         if (this.labelattr != null) {
             var attrValue = this.labelattr.value;
