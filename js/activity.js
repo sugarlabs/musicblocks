@@ -2337,7 +2337,8 @@ function Activity() {
     window.onresize = function () {
         _onResize(false);
     };
-
+    var pasteDx = 0;
+    var pasteDy = 0;
     _redoIcon = function () {
         var thisBlock = blocks.stackList.pop();
         console.log(thisBlock);
@@ -2348,8 +2349,15 @@ function Activity() {
         for(var name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
-        
+                
+        selectedBlockObj[0][2] = pasteDx;
+        selectedBlockObj[0][3] = pasteDy;
+        console.log(blocks.pasteDx);
+        console.log(blocks.pasteDy);
         blocks.loadNewBlocks(selectedBlockObj);
+        
+        pasteDx += 21;
+        pasteDy += 21;
     }
 
     /*
