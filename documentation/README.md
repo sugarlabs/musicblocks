@@ -36,7 +36,8 @@ https://github.com/sugarlabs/
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
-Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
+Try clicking on the *Start* block or click on the *Play* button. You
+should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
 To write your own programs, drag blocks from their respective palettes
 on the left side of the screen. Use multiple blocks in stack(s) to
@@ -70,28 +71,34 @@ hidden at any time while running the program.
 Toolbars
 --------
 
-There are four toolbars:
+There are five toolbars:
 
 (1) The *Main* toolbar across the top of the screen. There you will
 find the *Play* button, the *Stop* button, the *New Project* button,
-buttons for loading and saving projects and the *Find and Share
-projects* button.
+buttons for loading and saving projects, the *Planet* button, where
+you can access community projects, the *hamburger* button, which opens
+the secondary toolbar, and the *help* button.
 
-(2) The *Secondary* toolbar, in the lower-right corner of the
-screen. There you will find the *Home* button, buttons for show/hide
-blocks, expand/collapse blocks and decrease/increase block size.
-
-(3) The *Auxilary* toolbar below the *main* toolbar. It appears when
-*auxilary menu* button is clicked. There you will find the buttons *Run
-slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*,
+(2) On the *Secondary* toolbar you will find the buttons *Run slowly*,
+*Run step by step*, *Display Statistics*, *beginner/advanced mode*,
 etc. and also the button for selecting language.
 
-(4) the *Palette* toolbar on the left side of the screen. (An
-additional menu appears when a "right click" is applied to a stack of
-blocks).
+(3) The *Palette* toolbar is on the left side of the screen. New
+blocks are dragged from the palette.
+
+(4) On the upper right of the canvas is a small toolbar for showing grids, clearing the screen, and toggling the display size.
+
+(5) On the lower right of the canvas is a small toolbar where you will
+find the *Home* button, buttons for show/hide blocks, expand/collapse
+blocks and decrease/increase block size.
 
 These toolbars are described in detail in the
 [Turtle Blocks documentation pages](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+
+An additional "contextual" menu appears whenever you *right click* on
+a block.
+
+Many blocks also incorporate "pie menus" for changing block parameters.
 
 Keyboard shortcuts
 ------------------
