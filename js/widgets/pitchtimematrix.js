@@ -2081,7 +2081,7 @@ function PitchTimeMatrix () {
                 var cell = row.insertCell();
 
                 cell.setAttribute('cellColor', cellColor);
-
+                cell.style.borderRadius = '6px';
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 'px';
                 cell.style.width = this._noteWidth(noteValue) + 'px';
                 cell.style.minWidth = cell.style.width;
