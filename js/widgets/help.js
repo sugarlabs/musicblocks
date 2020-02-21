@@ -41,7 +41,7 @@ function HelpWidget () {
         // Which help page are we on?
         var page = 0;
 
-        this._helpDiv.style.width = iconSize * 2 + 400 + 'px';
+        this._helpDiv.style.width = iconSize * 2 + 425 + 'px';
         this._helpDiv.style.backgroundColor = '#e8e8e8';
         this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
@@ -100,6 +100,7 @@ function HelpWidget () {
         if (blocks === null) {
             // display help menu
             docById('helpBodyDiv').style.height = '325px';
+            docById('helpBodyDiv').style.width = '400px';
             this._showPage(0);
         } else {
             // display help for this block
