@@ -2339,7 +2339,17 @@ function Activity() {
     };
 
     _redoIcon = function () {
-        alert("redo clicked");
+        var thisBlock = blocks.stackList.pop();
+        console.log(thisBlock);
+        var selectedStack = thisBlock;
+        var selectedBlockObj = JSON.parse(JSON.stringify(blocks._copyBlocksToObj()));
+        console.log(selectedBlockObj);
+
+        for(var name in blocks.palettes.dict) {
+            blocks.palettes.dict[name].hideMenu(true);
+        }
+        
+        blocks.loadNewBlocks(selectedBlockObj);
     }
 
     /*
