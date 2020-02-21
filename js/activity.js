@@ -2338,6 +2338,10 @@ function Activity() {
         _onResize(false);
     };
 
+    _redoIcon = function () {
+        alert("redo clicked");
+    }
+
     /*
      * Restore last stack pushed to trashStack back onto canvas.
      * Hides palettes before update
@@ -4399,6 +4403,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller, that._setupBlocksContainerEvents);
         toolbar.renderMergeIcon(_doMergeLoad);
+        toolbar.renderRedoIcon(_redoIcon);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
 

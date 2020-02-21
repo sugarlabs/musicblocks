@@ -330,6 +330,14 @@ function Toolbar() {
         };
     };
 
+    this.renderRedoIcon = function (onclick) {
+        var redoIcon = docById('redoIcon');
+        
+        redoIcon.onclick = function () {
+            onclick();
+        }
+    }
+
     this.renderRestoreIcon = function (onclick) {
         var restoreIcon = docById('restoreIcon');
 
