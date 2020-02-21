@@ -212,9 +212,7 @@ class DistanceBlock extends LeftBlock {
             defaults: [0, 0, 100, 100],
             argTypes: ['anyin', 'anyin', 'anyin', 'anyin'],
 	    outType: 'anyout',
-            argLabels: [
-		_('x1'), _('y1'), _('x2'), _('y2')
-            ]
+            argLabels: [('x1'), ('y1'), ('x2'), ('y2')]
         });
 
         this.makeMacro((x, y) => [
