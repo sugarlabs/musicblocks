@@ -23,6 +23,7 @@
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.2.0",
     "gulp-minify-css": "^1.2.4",
+    "gulp-prettier": "^2.3.0",
     "gulp-uglify": "^3.0.2"
   },
   "dependencies": {

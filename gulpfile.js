@@ -12,8 +12,8 @@ const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const replace = require('gulp-replace');
 const minifyCSS = require("gulp-minify-css");
-const cleanCSS = require('gulp-clean-css');
 const gulp = require('gulp'); 
+const prettier = require('gulp-prettier');
 
 
 // File paths
@@ -67,6 +67,15 @@ function cacheBustTask(){
         .pipe(dest('.'));
 }
 
+//This gulp task formats the js files
+
+gulp.task('prettiertask', () => {
+    return gulp.src(files.jsPath)
+      .pipe(prettier({ singleQuote: true }))
+      .pipe(gulp.dest('./dist'));
+  });
+
+
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 function watchTask(){
@@ -78,7 +87,7 @@ function watchTask(){
 // Runs the sass ,css and js tasks simultaneously
 // then runs cacheBust, then watch task
 exports.default = series(
-    parallel( jsTask, cssTask , sassTask ), 
+    parallel( jsTask, cssTask , sassTask ), prettiertask,
     cacheBustTask,
     watchTask
 );
