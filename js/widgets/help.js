@@ -46,7 +46,9 @@ function HelpWidget () {
         this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.setPosition(100, 100);
+
+        // Make help div apeear in center of screen
+        this.widgetWindow.sendToCenter();
 
         if (blocks === null) {
             var that = this;
