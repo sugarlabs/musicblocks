@@ -416,32 +416,37 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
+Planet View 
+-----------
+
+Music Blocks also provide a planet view to find and share projects
+both locally as well as globally. It has options to load project from
+file locally and make new projects from scratch. The third button
+from the top right corner in Music blocks takes you to the planet
+view.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet_view_icon.png "Planet button")
+
+There are LOCAL and GLOBAL options to choose from. LOCAL lists the
+projects saved on your local machine. GLOBAL lets you explore projects
+shared by the community. You can filter these projects by tags such as
+Art, Math, Interactive, Design, Game, etc.
+
+Projects are shown with a thumbnail image and a title.  To get more
+details, click on thumbnail image. A short description is provided.
+
+You can open a project in Music Blocks directly from the planet or you
+can download.
+
+ ![alt
+tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet-3.png)
+
+![alt
+tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet-4.png)
+
 Creating help artwork
 ---------------------
 
 The artwork used by the help widget (and used in this README file) can
 be created by typing *Alt-H* into Music Blocks. Artwork for each block
 will be generated and saved by the browser.
-
-Planet View 
------------
-
-Music blocks also provide a planet view to find and share projects both locally as well as globally.
-It has options to load project from file locally and make new projects from scratch.
-The third button from the top right corner in Music blocks takes you to the planet view.
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet_view_icon.png "Planet button")
-You get two buttons LOCAL and GLOBAL to choose project. LOCAL button lists out all the projects saved on your
-local machine . GLOBAL lets you explore projects using different tags like Art , Math , Interactive,
-Design, Game etc. and some examples too. You can search for different projects using tags .
-Projects can be sorted by most recent, most liked , most downloaded etc .
-So, the projects are shown using images and title associated with them having options to share ,get more details.
-To load a project from planet , you just need to click on the image of the project and you get
-a short description of the project. You can view latest update , creation date, number of downloads ,
-number of likes etc. of the project. You can open the project in Music blocks directly or you can download it as a file. 
-You can click on the close button to come back to Music blocks.
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/Screenshot-3.png)
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/Screenshot-4.png)
-
-
-
-
