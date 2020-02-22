@@ -1,4 +1,3 @@
-
 #keyboard {
     height: 135px;
     overflow-x: scroll;
@@ -9,9 +8,11 @@
     cursor: pointer;
     position: relative;
 }
+
 table {
     table-layout:fixed;
 }
+
 table.white {
     /* position: absolute; */
     top: 0px;
@@ -19,6 +20,7 @@ table.white {
     height: 120px;
     border-spacing: 0px 0px;
 }
+
 table.black {
     position: absolute;
     border-collapse: separate;
@@ -27,9 +29,11 @@ table.black {
     top: 17px;
     left: 30px;
 }
+
 table.white > tbody > tr {
     position: relative;
 }
+
 table.white > tbody > tr > td {
     min-width: 80px;
     width: 80px;
@@ -38,6 +42,7 @@ table.white > tbody > tr > td {
     vertical-align: bottom;
     border: 1px solid black;
 }
+
 table.black > tbody > tr > td {
     min-width: 60px;
     width: 60px;
@@ -49,6 +54,7 @@ table.black > tbody > tr > td {
     color: white;
     z-index: 100;
 }
+
 select.keySelect {
     background-color: white;
     display: inline-block;
