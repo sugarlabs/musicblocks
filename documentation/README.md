@@ -419,11 +419,9 @@ More details about all of the widgets are available in the
 Planet View 
 -----------
 
-Music Blocks also provide a planet view to find and share projects
-both locally as well as globally. It has options to load project from
-file locally and make new projects from scratch. The third button
-from the top right corner in Music blocks takes you to the planet
-view.
+Music Blocks also provides a Planet view to find and share
+projects. It has options to load project from file locally and make
+new projects from scratch.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet_view_icon.png "Planet button")
 
@@ -432,13 +430,13 @@ projects saved on your local machine. GLOBAL lets you explore projects
 shared by the community. You can filter these projects by tags such as
 Art, Math, Interactive, Design, Game, etc.
 
-Projects are shown with a thumbnail image and a title.  To get more
+Projects are shown with a thumbnail image and a title. To get more
 details, click on thumbnail image. A short description is provided.
 
-You can open a project in Music Blocks directly from the planet or you
+You can open a project in Music Blocks directly from the Planet or you
 can download.
 
- ![alt
+![alt
 tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/planet-3.png)
 
 ![alt
