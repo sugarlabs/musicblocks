@@ -3,6 +3,9 @@ MUSIC BLOCKS
 
 “All musicians are subconsciously mathematicians” – Monk
 
+“Music is a hidden arithmetic exercise of the soul, which does not
+know that it is counting.” ~ Leibniz
+
 Music Blocks is a programming language and collection of manipulative
 tools for exploring musical and mathematical concepts in an
 integrative and fun way.
