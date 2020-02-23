@@ -176,7 +176,10 @@ function ModeWidget() {
                 this._noteWheel.navItems[i].navItem.hide();
             }
         }
-        this._showPiano();
+
+        if (currentModeName[0] === 'C') {
+            this._showPiano();
+        }
     };
 
     this._showPiano = function() {
@@ -227,7 +230,10 @@ function ModeWidget() {
 
         this._saveState();
         this.__invertOnePair(1);
-        this._showPiano();
+        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+        if (currentModeName[0] === 'C') {
+            this._showPiano();
+        }
     };
 
     this.__invertOnePair = function(i) {
@@ -246,14 +252,17 @@ function ModeWidget() {
             this._noteWheel.navItems[12 - i].navItem.hide()
         }
 
-        var that = this;
-
         if (i === 5) {
-            that._saveState();
-            that._setModeName();
-            that._showPiano();
-            that._locked = false;
+            this._saveState();
+            this._setModeName();
+            var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+            if (currentModeName[0] === 'C') {
+                this._showPiano();
+            }
+            this._locked = false;
         } else {
+            var that = this;
+
             setTimeout(function() {
                 that.__invertOnePair(i + 1);
             }, ROTATESPEED);
@@ -307,7 +316,10 @@ function ModeWidget() {
                     // We are done.
                     that._saveState();
                     that._setModeName();
-                    that._showPiano();
+                    var currentModeName = keySignatureToMode(that._logo.keySignature[0]);
+                    if (currentModeName[0] === 'C') {
+                        that._showPiano();
+                    }
                     that._locked = false;
                 } else {
                     // Keep going until first note is selected.
@@ -356,7 +368,10 @@ function ModeWidget() {
                     // We are done.
                     that._saveState();
                     that._setModeName();
-                    that._showPiano();
+                    var currentModeName = keySignatureToMode(that._logo.keySignature[0]);
+                    if (currentModeName[0] === 'C') {
+                        that._showPiano();
+                    }
                     that._locked = false;
                 } else {
                     // Keep going until first note is selected.
@@ -418,7 +433,7 @@ function ModeWidget() {
         
 
         var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
-        if(currentKey === 'C'){
+        if (currentKey === 'C') {
             if (i > this._notesToPlay.length - 1) {
                 setTimeout(function() {
                 // Did we just play the last note?
@@ -468,9 +483,7 @@ function ModeWidget() {
                     return;
                 }
             }, 1000 * time);
-        }
-
-        else {
+        } else {
             if (i > this._notesToPlay.length - 1) {
                 setTimeout(function() {
                     // Did we just play the last note?
@@ -486,7 +499,6 @@ function ModeWidget() {
             setTimeout(function() {
                 if (that._lastNotePlayed !== null) {
                     that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
-                        
                 }
 
                 note = that._notesToPlay[i];
@@ -506,7 +518,6 @@ function ModeWidget() {
             }, 1000 * time);
 
         }
-    
     };
 
     this._playNote = function(i) {
@@ -532,7 +543,10 @@ function ModeWidget() {
 
             this._resetNotes();
             this._setModeName()
-            this._showPiano();
+            var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+            if (currentModeName[0] === 'C') {
+                this._showPiano();
+            }
         }
     };
 
@@ -547,7 +561,10 @@ function ModeWidget() {
 
         this._resetNotes();
         this._setModeName();
-        this._showPiano();
+        var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+        if (currentModeName[0] === 'C') {
+            this._showPiano();
+        }
     };
 
     this._calculateMode = function() {
@@ -786,7 +803,10 @@ function ModeWidget() {
             that._noteWheel.navItems[i].navItem.show();
             that._playNote(i);
             that._setModeName();
-            that._showPiano();
+            var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+            if (currentModeName[0] === 'C') {
+                this._showPiano();
+            }
         };
 
         // If a noteWheel sector is selected, hide it.
@@ -800,7 +820,10 @@ function ModeWidget() {
             that._saveState();
             that._selectedNotes[i] = false;
             that._setModeName();
-            that._showPiano();
+            var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+            if (currentModeName[0] === 'C') {
+                this._showPiano();
+            }
         };
 
         for (var i = 0; i < 12; i++) {
