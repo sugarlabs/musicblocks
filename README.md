@@ -164,6 +164,14 @@ music, your lesson plans, your artwork, and your code.
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
+Please note there is no need to ask permission to work on an issue. You
+should check for pull requests linked to an issue you are addressing; if
+there are none, then assume nobody has done anything. Begin to fix the
+problem, test, make your commits, push your commits, then make a pull
+request. Mention an issue number in the pull request, but not the commit
+message. These practices allow the competition of ideas (Sugar Labs is a
+meritocracy).
+
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
