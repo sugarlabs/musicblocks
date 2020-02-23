@@ -14,40 +14,39 @@
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
 var NAMEDICT = {
-    'fullscreen': 'vspace',
-    'fillscreen2': 'fillscreen',
-    'sandwichclampcollapsed': 'clamp',
-    'ifelse': 'ifthenelse',
-    'xcor': 'x',
-    'ycor': 'y',
-    'seth': 'setheading',
-    'remainder2': 'mod',
-    'plus2': 'plus',
-    'product2': 'multiply',
-    'division2': 'divide',
-    'minus2': 'minus',
-    'stack': 'do',
-    'hat': 'action',
-    'stopstack': 'break',
-    'clean': 'clear',
-    'setxy2': 'setxy',
-    'greater2': 'greater',
-    'less2': 'less',
-    'equal2': 'equal',
-    'random2': 'random',
-    'setvalue': 'setshade',
-    'setchroma': 'setgrey',
-    'setgray': 'setgrey',
-    'gray': 'grey',
-    'chroma': 'grey',
-    'value': 'shade',
-    'hue': 'color',
-    'startfill': 'beginfill',
-    'stopfill': 'endfill',
-    'string': 'text',
-    'shell': 'turtleshell'
+    fullscreen: "vspace",
+    fillscreen2: "fillscreen",
+    sandwichclampcollapsed: "clamp",
+    ifelse: "ifthenelse",
+    xcor: "x",
+    ycor: "y",
+    seth: "setheading",
+    remainder2: "mod",
+    plus2: "plus",
+    product2: "multiply",
+    division2: "divide",
+    minus2: "minus",
+    stack: "do",
+    hat: "action",
+    stopstack: "break",
+    clean: "clear",
+    setxy2: "setxy",
+    greater2: "greater",
+    less2: "less",
+    equal2: "equal",
+    random2: "random",
+    setvalue: "setshade",
+    setchroma: "setgrey",
+    setgray: "setgrey",
+    gray: "grey",
+    chroma: "grey",
+    value: "shade",
+    hue: "color",
+    startfill: "beginfill",
+    stopfill: "endfill",
+    string: "text",
+    shell: "turtleshell"
 };
-
 
 // Define blocks here. Note: The blocks are placed on the palettes
 // from bottom to top, i.e., the block at the top of a palette will be
@@ -82,7 +81,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     // Push protoblocks onto their palettes.
     for (var protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette != null) {
-            blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+            blocks.protoBlockDict[protoblock].palette.add(
+                blocks.protoBlockDict[protoblock]
+            );
         }
     }
 }

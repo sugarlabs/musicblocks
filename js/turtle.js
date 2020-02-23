@@ -14,20 +14,20 @@ const DEFAULTCOLOR = 0;
 const DEFAULTVALUE = 50;
 const DEFAULTCHROMA = 100;
 const DEFAULTSTROKE = 5;
-const DEFAULTFONT = 'sans-serif';
+const DEFAULTFONT = "sans-serif";
 // What is the scale factor when stage is shrunk?
-const SCALEFACTOR = 4
+const SCALEFACTOR = 4;
 
 // Turtle sprite
-const TURTLEBASEPATH = 'images/';
+const TURTLEBASEPATH = "images/";
 
-function Turtle (name, turtles, drum) {
+function Turtle(name, turtles, drum) {
     this.name = name;
     this.turtles = turtles;
     this.drum = drum;
 
     if (drum) {
-        console.debug('turtle ' + name + ' is a drum.');
+        console.debug("turtle " + name + " is a drum.");
     }
     // Is the turtle running?
     this.running = false;
@@ -61,14 +61,14 @@ function Turtle (name, turtles, drum) {
     // Things used for what the turtle draws.
     this.penstrokes = null;
     this.imageContainer = null;
-    this.svgOutput = '';
+    this.svgOutput = "";
     // Are we currently drawing a path?
     this.svgPath = false;
     this.color = DEFAULTCOLOR;
     this.value = DEFAULTVALUE;
     this.chroma = DEFAULTCHROMA;
     this.stroke = DEFAULTSTROKE;
-    this.canvasColor = 'rgba(255,0,49,1)'; // '#ff0031';
+    this.canvasColor = "rgba(255,0,49,1)"; // '#ff0031';
     this.canvasAlpha = 1.0;
     this.orientation = 0;
     this.fillState = false;
@@ -76,9 +76,9 @@ function Turtle (name, turtles, drum) {
     this.penState = true;
     this.font = DEFAULTFONT;
     this.media = []; // Media (text, images) we need to remove on clear.
-    var canvas = document.getElementById('overlayCanvas');
-    var ctx = canvas.getContext('2d');
-    console.debug(ctx.canvas.width + ' x ' + ctx.canvas.height);
+    var canvas = document.getElementById("overlayCanvas");
+    var ctx = canvas.getContext("2d");
+    console.debug(ctx.canvas.width + " x " + ctx.canvas.height);
 
     /**
      *  As the canvas scrolls the turtle is drawn under
@@ -86,9 +86,14 @@ function Turtle (name, turtles, drum) {
      * @param  dx - change in x coordinate
      * @param  dy - change in y coordinate
      */
-    this.doScrollXY = function (dx, dy) {
+    this.doScrollXY = function(dx, dy) {
         // FIXME: how big?
-        var imgData = ctx.getImageData(0, 0, ctx.canvas.width + dx, ctx.canvas.height + dx);
+        var imgData = ctx.getImageData(
+            0,
+            0,
+            ctx.canvas.width + dx,
+            ctx.canvas.height + dx
+        );
         ctx.putImageData(imgData, dx, dy);
 
         // Draw under the turtle as the canvas moves.
@@ -100,10 +105,16 @@ function Turtle (name, turtles, drum) {
             if (this.turtles.turtleList[t].penState) {
                 this.turtles.turtleList[t].processColor();
                 ctx.lineWidth = this.turtles.turtleList[t].stroke;
-                ctx.lineCap = 'round';
+                ctx.lineCap = "round";
                 ctx.beginPath();
-                ctx.moveTo(this.turtles.turtleList[t].container.x + dx, this.turtles.turtleList[t].container.y + dy);
-                ctx.lineTo(this.turtles.turtleList[t].container.x, this.turtles.turtleList[t].container.y);
+                ctx.moveTo(
+                    this.turtles.turtleList[t].container.x + dx,
+                    this.turtles.turtleList[t].container.y + dy
+                );
+                ctx.lineTo(
+                    this.turtles.turtleList[t].container.x,
+                    this.turtles.turtleList[t].container.y
+                );
                 ctx.stroke();
                 ctx.closePath();
             }
@@ -123,7 +134,7 @@ function Turtle (name, turtles, drum) {
      * @param  ea - end angle
      *
      */
-    this._svgArc = function (nsteps, cx, cy, radius, sa, ea) {
+    this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
         // import SVG arcs reliably.
         var a = sa;
         if (ea == null) {
@@ -134,7 +145,7 @@ function Turtle (name, turtles, drum) {
         for (var i = 0; i < nsteps; i++) {
             var nx = cx + radius * Math.cos(a);
             var ny = cy + radius * Math.sin(a);
-            this.svgOutput += nx + ',' + ny + ' ';
+            this.svgOutput += nx + "," + ny + " ";
             a += da;
         }
     };
@@ -150,7 +161,7 @@ function Turtle (name, turtles, drum) {
      * @param  y2 - the y-coordinate of the ending point
      *
      */
-    this.doBezier = function (cp1x, cp1y, cp2x, cp2y, x2, y2) {
+    this.doBezier = function(cp1x, cp1y, cp2x, cp2y, x2, y2) {
         // FIXME: Add SVG output
         if (this.penState && this.hollowState) {
             // Convert from turtle coordinates to screen coordinates.
@@ -172,12 +183,12 @@ function Turtle (name, turtles, drum) {
             var savedStroke = this.stroke;
             this.stroke = 1;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             // Draw a hollow line.
             if (savedStroke < 3) {
                 var step = 0.5;
             } else {
-                var step = (savedStroke - 2) / 2.;
+                var step = (savedStroke - 2) / 2;
             }
 
             steps = Math.max(Math.floor(savedStroke, 1));
@@ -185,22 +196,23 @@ function Turtle (name, turtles, drum) {
             // We need both the initial and final headings.
             // The initial heading is the angle between (cp1x, cp1y) and (this.x, this.y).
             var degreesInitial = Math.atan2(cp1x - this.x, cp1y - this.y);
-            degreesInitial = (180 * degreesInitial / Math.PI);
+            degreesInitial = (180 * degreesInitial) / Math.PI;
             if (degreesInitial < 0) {
                 degreesInitial += 360;
             }
             // The final heading is the angle between (cp2x, cp2y) and (fx, fy).
             var degreesFinal = Math.atan2(nx - cp2x, ny - cp2y);
-            degreesFinal = 180 * degreesFinal / Math.PI;
+            degreesFinal = (180 * degreesFinal) / Math.PI;
             if (degreesFinal < 0) {
                 degreesFinal += 360;
             }
 
             // We also need to calculate the deltas for the 'caps' at each end.
-            var capAngleRadiansInitial = (degreesInitial - 90) * Math.PI / 180.0;
+            var capAngleRadiansInitial =
+                ((degreesInitial - 90) * Math.PI) / 180.0;
             var dxi = step * Math.sin(capAngleRadiansInitial);
             var dyi = -step * Math.cos(capAngleRadiansInitial);
-            var capAngleRadiansFinal = (degreesFinal - 90) * Math.PI / 180.0;
+            var capAngleRadiansFinal = ((degreesFinal - 90) * Math.PI) / 180.0;
             var dxf = step * Math.sin(capAngleRadiansFinal);
             var dyf = -step * Math.cos(capAngleRadiansFinal);
 
@@ -237,7 +249,14 @@ function Turtle (name, turtles, drum) {
             var sa = oAngleRadians - Math.PI;
             var ea = oAngleRadians;
             ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(steps, arccx * this.turtles.scale, arccy * this.turtles.scale, step * this.turtles.scale, sa, ea);
+            this._svgArc(
+                steps,
+                arccx * this.turtles.scale,
+                arccy * this.turtles.scale,
+                step * this.turtles.scale,
+                sa,
+                ea
+            );
 
             // Final arc
             var oAngleRadians = (degreesFinal / 180) * Math.PI;
@@ -246,7 +265,14 @@ function Turtle (name, turtles, drum) {
             var sa = oAngleRadians - Math.PI;
             var ea = oAngleRadians;
             ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(steps, arccx * this.turtles.scale, arccy * this.turtles.scale, step * this.turtles.scale, sa, ea);
+            this._svgArc(
+                steps,
+                arccx * this.turtles.scale,
+                arccy * this.turtles.scale,
+                step * this.turtles.scale,
+                sa,
+                ea
+            );
 
             var fx = this.turtles.turtleX2screenX(x2);
             var fy = this.turtles.turtleY2screenY(y2);
@@ -258,15 +284,15 @@ function Turtle (name, turtles, drum) {
             // restore stroke.
             this.stroke = savedStroke;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.moveTo(fx, fy);
-            this.svgOutput += 'M ' + fxScaled + ',' + fyScaled + ' ';
+            this.svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.x = x2;
             this.y = y2;
         } else if (this.penState) {
             this.processColor();
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(this.container.x, this.container.y);
 
@@ -278,8 +304,22 @@ function Turtle (name, turtles, drum) {
             var cx2 = this.turtles.turtleX2screenX(cp2x);
             var cy2 = this.turtles.turtleY2screenY(cp2y);
 
-            ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi, cx2 + dxf, cy2 + dyf, cx, cy);
-            ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
+            ctx.bezierCurveTo(
+                cx1 + dxi,
+                cy1 + dyi,
+                cx2 + dxf,
+                cy2 + dyf,
+                cx,
+                cy
+            );
+            ctx.bezierCurveTo(
+                cx2 - dxf,
+                cy2 - dyf,
+                cx1 - dxi,
+                cy1 - dyi,
+                ax,
+                ay
+            );
             ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
             if (!this.svgPath) {
@@ -288,7 +328,8 @@ function Turtle (name, turtles, drum) {
                 var iy = this.turtles.turtleY2screenY(this.y);
                 var ixScaled = ix * this.turtles.scale;
                 var iyScaled = iy * this.turtles.scale;
-                this.svgOutput += '<path d="M ' + ixScaled + ',' + iyScaled + ' ';
+                this.svgOutput +=
+                    '<path d="M ' + ixScaled + "," + iyScaled + " ";
             }
 
             var cx1Scaled = cx1 * this.turtles.scale;
@@ -299,7 +340,19 @@ function Turtle (name, turtles, drum) {
             var fyScaled = fy * this.turtles.scale;
 
             //Curve to: ControlPointX1, ControlPointY1 >> ControlPointX2, ControlPointY2 >> X, Y
-            this.svgOutput += 'C ' + cx1Scaled + ',' + cy1Scaled + ' ' + cx2Scaled + ',' + cy2Scaled + ' ' + fxScaled + ',' + fyScaled;
+            this.svgOutput +=
+                "C " +
+                cx1Scaled +
+                "," +
+                cy1Scaled +
+                " " +
+                cx2Scaled +
+                "," +
+                cy2Scaled +
+                " " +
+                fxScaled +
+                "," +
+                fyScaled;
             this.closeSVG();
 
             this.x = x2;
@@ -321,7 +374,7 @@ function Turtle (name, turtles, drum) {
 
         // The new heading is the angle between (cp2x, cp2y) and (nx, ny).
         var degrees = Math.atan2(nx - cp2x, ny - cp2y);
-        degrees = 180 * degrees / Math.PI;
+        degrees = (180 * degrees) / Math.PI;
         this.doSetHeading(degrees);
     };
 
@@ -335,7 +388,7 @@ function Turtle (name, turtles, drum) {
      * @param  invert - boolean value regarding whether coordinates are inverted or not
      *
      */
-    this.move = function (ox, oy, x, y, invert) {
+    this.move = function(ox, oy, x, y, invert) {
         if (invert) {
             ox = this.turtles.turtleX2screenX(ox);
             oy = this.turtles.turtleY2screenY(oy);
@@ -355,29 +408,29 @@ function Turtle (name, turtles, drum) {
             var savedStroke = this.stroke;
             this.stroke = 1;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             // Draw a hollow line.
             if (savedStroke < 3) {
                 var step = 0.5;
             } else {
-                var step = (savedStroke - 2) / 2.;
+                var step = (savedStroke - 2) / 2;
             }
 
-            var capAngleRadians = (this.orientation - 90) * Math.PI / 180.0;
+            var capAngleRadians = ((this.orientation - 90) * Math.PI) / 180.0;
             var dx = step * Math.sin(capAngleRadians);
             var dy = -step * Math.cos(capAngleRadians);
 
             ctx.moveTo(ox + dx, oy + dy);
             var oxScaled = (ox + dx) * this.turtles.scale;
             var oyScaled = (oy + dy) * this.turtles.scale;
-            this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+            this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
             ctx.lineTo(nx + dx, ny + dy);
             var nxScaled = (nx + dx) * this.turtles.scale;
             var nyScaled = (ny + dy) * this.turtles.scale;
-            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+            this.svgOutput += nxScaled + "," + nyScaled + " ";
 
-            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var capAngleRadians = ((this.orientation + 90) * Math.PI) / 180.0;
             var dx = step * Math.sin(capAngleRadians);
             var dy = -step * Math.cos(capAngleRadians);
 
@@ -400,15 +453,21 @@ function Turtle (name, turtles, drum) {
             // this.svgOutput += 'M ' + nxScaled + ',' + nyScaled + ' ';
 
             steps = Math.max(Math.floor(savedStroke, 1));
-            this._svgArc(steps, cx * this.turtles.scale, cy * this.turtles.scale, radiusScaled, sa);
-            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+            this._svgArc(
+                steps,
+                cx * this.turtles.scale,
+                cy * this.turtles.scale,
+                radiusScaled,
+                sa
+            );
+            this.svgOutput += nxScaled + "," + nyScaled + " ";
 
             ctx.lineTo(ox + dx, oy + dy);
             var nxScaled = (ox + dx) * this.turtles.scale;
             var nyScaled = (oy + dy) * this.turtles.scale;
-            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+            this.svgOutput += nxScaled + "," + nyScaled + " ";
 
-            var capAngleRadians = (this.orientation - 90) * Math.PI / 180.0;
+            var capAngleRadians = ((this.orientation - 90) * Math.PI) / 180.0;
             var dx = step * Math.sin(capAngleRadians);
             var dy = -step * Math.cos(capAngleRadians);
 
@@ -423,8 +482,14 @@ function Turtle (name, turtles, drum) {
             var nyScaled = (oy + dy) * this.turtles.scale;
 
             var radiusScaled = step * this.turtles.scale;
-            this._svgArc(steps, cx * this.turtles.scale, cy * this.turtles.scale, radiusScaled, sa);
-            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+            this._svgArc(
+                steps,
+                cx * this.turtles.scale,
+                cy * this.turtles.scale,
+                radiusScaled,
+                sa
+            );
+            this.svgOutput += nxScaled + "," + nyScaled + " ";
 
             this.closeSVG();
 
@@ -433,7 +498,7 @@ function Turtle (name, turtles, drum) {
             // restore stroke.
             this.stroke = savedStroke;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.moveTo(nx, ny);
         } else if (this.penState) {
             ctx.lineTo(nx, ny);
@@ -441,11 +506,12 @@ function Turtle (name, turtles, drum) {
                 this.svgPath = true;
                 var oxScaled = ox * this.turtles.scale;
                 var oyScaled = oy * this.turtles.scale;
-                this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+                this.svgOutput +=
+                    '<path d="M ' + oxScaled + "," + oyScaled + " ";
             }
             var nxScaled = nx * this.turtles.scale;
             var nyScaled = ny * this.turtles.scale;
-            this.svgOutput += nxScaled + ',' + nyScaled + ' ';
+            this.svgOutput += nxScaled + "," + nyScaled + " ";
             ctx.stroke();
             if (!this.fillState) {
                 ctx.closePath();
@@ -469,7 +535,7 @@ function Turtle (name, turtles, drum) {
     /**
      * @return {Number} {the turtle's index in turtleList (the turtle's number)}
      */
-    this.getNumber = function () {
+    this.getNumber = function() {
         return this.turtles.turtleList.indexOf(this);
     };
 
@@ -479,14 +545,14 @@ function Turtle (name, turtles, drum) {
      * @param name - name string which is assigned to startBlock
      *
      */
-    this.rename = function (name) {
+    this.rename = function(name) {
         this.name = name;
 
         // Use the name on the label of the start block.
         if (this.startBlock != null) {
             this.startBlock.overrideName = this.name;
-            if (this.name === _('start drum')) {
-                this.startBlock.collapseText.text = _('drum');
+            if (this.name === _("start drum")) {
+                this.startBlock.collapseText.text = _("drum");
             } else {
                 this.startBlock.collapseText.text = this.name;
             }
@@ -511,7 +577,19 @@ function Turtle (name, turtles, drum) {
      * @param  invert - boolean value regarding whether coordinates are inverted or not
      *
      */
-    this.arc = function (cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
+    this.arc = function(
+        cx,
+        cy,
+        ox,
+        oy,
+        x,
+        y,
+        radius,
+        start,
+        end,
+        anticlockwise,
+        invert
+    ) {
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);
             cy = this.turtles.turtleY2screenY(cy);
@@ -541,15 +619,15 @@ function Turtle (name, turtles, drum) {
             var savedStroke = this.stroke;
             this.stroke = 1;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             // Draw a hollow line.
             if (savedStroke < 3) {
                 var step = 0.5;
             } else {
-                var step = (savedStroke - 2) / 2.;
+                var step = (savedStroke - 2) / 2;
             }
 
-            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var capAngleRadians = ((this.orientation + 90) * Math.PI) / 180.0;
             var dx = step * Math.sin(capAngleRadians);
             var dy = -step * Math.cos(capAngleRadians);
 
@@ -562,15 +640,22 @@ function Turtle (name, turtles, drum) {
                 var oxScaled = (ox - dx) * this.turtles.scale;
                 var oyScaled = (oy - dy) * this.turtles.scale;
             }
-            this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+            this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
             ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
-            nsteps = Math.max(Math.floor(radius * Math.abs(sa - ea) / 2), 2);
+            nsteps = Math.max(Math.floor((radius * Math.abs(sa - ea)) / 2), 2);
             steps = Math.max(Math.floor(savedStroke, 1));
 
-            this._svgArc(nsteps, cx * this.turtles.scale, cy * this.turtles.scale, (radius + step) * this.turtles.scale, sa, ea);
+            this._svgArc(
+                nsteps,
+                cx * this.turtles.scale,
+                cy * this.turtles.scale,
+                (radius + step) * this.turtles.scale,
+                sa,
+                ea
+            );
 
-            var capAngleRadians = (this.orientation + 90) * Math.PI / 180.0;
+            var capAngleRadians = ((this.orientation + 90) * Math.PI) / 180.0;
             var dx = step * Math.sin(capAngleRadians);
             var dy = -step * Math.cos(capAngleRadians);
 
@@ -579,15 +664,36 @@ function Turtle (name, turtles, drum) {
             var sa1 = ea;
             var ea1 = ea + Math.PI;
             ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
-            this._svgArc(steps, cx1 * this.turtles.scale, cy1 * this.turtles.scale, step * this.turtles.scale, sa1, ea1);
+            this._svgArc(
+                steps,
+                cx1 * this.turtles.scale,
+                cy1 * this.turtles.scale,
+                step * this.turtles.scale,
+                sa1,
+                ea1
+            );
             ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
-            this._svgArc(nsteps, cx * this.turtles.scale, cy * this.turtles.scale, (radius - step) * this.turtles.scale, ea, sa);
+            this._svgArc(
+                nsteps,
+                cx * this.turtles.scale,
+                cy * this.turtles.scale,
+                (radius - step) * this.turtles.scale,
+                ea,
+                sa
+            );
             var cx2 = ox;
             var cy2 = oy;
             var sa2 = sa - Math.PI;
             var ea2 = sa;
             ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
-            this._svgArc(steps, cx2 * this.turtles.scale, cy2 * this.turtles.scale, step * this.turtles.scale, sa2, ea2);
+            this._svgArc(
+                steps,
+                cx2 * this.turtles.scale,
+                cy2 * this.turtles.scale,
+                step * this.turtles.scale,
+                sa2,
+                ea2
+            );
             this.closeSVG();
 
             ctx.stroke();
@@ -595,7 +701,7 @@ function Turtle (name, turtles, drum) {
             // restore stroke.
             this.stroke = savedStroke;
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.moveTo(nx, ny);
         } else if (this.penState) {
             ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
@@ -603,7 +709,8 @@ function Turtle (name, turtles, drum) {
                 this.svgPath = true;
                 var oxScaled = ox * this.turtles.scale;
                 var oyScaled = oy * this.turtles.scale;
-                this.svgOutput += '<path d="M ' + oxScaled + ',' + oyScaled + ' ';
+                this.svgOutput +=
+                    '<path d="M ' + oxScaled + "," + oyScaled + " ";
             }
             if (anticlockwise) {
                 var sweep = 0;
@@ -613,7 +720,18 @@ function Turtle (name, turtles, drum) {
             var nxScaled = nx * this.turtles.scale;
             var nyScaled = ny * this.turtles.scale;
             var radiusScaled = radius * this.turtles.scale;
-            this.svgOutput += 'A ' + radiusScaled + ',' + radiusScaled + ' 0 0 ' + sweep + ' ' + nxScaled + ',' + nyScaled + ' ';
+            this.svgOutput +=
+                "A " +
+                radiusScaled +
+                "," +
+                radiusScaled +
+                " 0 0 " +
+                sweep +
+                " " +
+                nxScaled +
+                "," +
+                nyScaled +
+                " ";
             ctx.stroke();
             if (!this.fillState) {
                 ctx.closePath();
@@ -641,7 +759,7 @@ function Turtle (name, turtles, drum) {
      * @param  resetPosition - boolean value regarding whether the turtle's position (orientation, x, y etc) should be reset
      *
      */
-    this.doClear = function (resetPen, resetSkin, resetPosition) {
+    this.doClear = function(resetPen, resetSkin, resetPosition) {
         // Reset turtle.
         if (resetPosition) {
             this.x = 0;
@@ -663,24 +781,38 @@ function Turtle (name, turtles, drum) {
 
         if (resetSkin) {
             if (this.drum) {
-                if (this.name !== _('start drum')) {
-                    this.rename(_('start drum'));
+                if (this.name !== _("start drum")) {
+                    this.rename(_("start drum"));
                 }
             } else {
-                if (this.name !== _('start')) {
-                    this.rename(_('start'));
+                if (this.name !== _("start")) {
+                    this.rename(_("start"));
                 }
             }
 
             if (this.skinChanged) {
                 var artwork = TURTLESVG;
                 if (sugarizerCompatibility.isInsideSugarizer()) {
-                    artwork = artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
+                    artwork = artwork
+                        .replace(
+                            /fill_color/g,
+                            sugarizerCompatibility.xoColor.fill
+                        )
+                        .replace(
+                            /stroke_color/g,
+                            sugarizerCompatibility.xoColor.stroke
+                        );
                 } else {
-                    artwork = artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]);
+                    artwork = artwork
+                        .replace(/fill_color/g, FILLCOLORS[i])
+                        .replace(/stroke_color/g, STROKECOLORS[i]);
                 }
 
-                this.doTurtleShell(55, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))));
+                this.doTurtleShell(
+                    55,
+                    "data:image/svg+xml;base64," +
+                        window.btoa(unescape(encodeURIComponent(artwork)))
+                );
                 this.skinChanged = false;
             }
         }
@@ -705,11 +837,11 @@ function Turtle (name, turtles, drum) {
         this.hollowState = false;
 
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
+        if (this.canvasColor[0] === "#") {
+            this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
-        this.svgOutput = '';
+        this.svgOutput = "";
         this.svgPath = false;
         this.penstrokes.image = null;
         ctx.beginPath();
@@ -721,24 +853,24 @@ function Turtle (name, turtles, drum) {
     /**
      * Removes penstrokes and clears canvas
      */
-    this.clearPenStrokes = function () {
+    this.clearPenStrokes = function() {
         this.penState = true;
         this.fillState = false;
         this.hollowState = false;
 
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
+        if (this.canvasColor[0] === "#") {
+            this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
         ctx.beginPath();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.processColor();
         ctx.lineWidth = this.stroke;
-        ctx.lineCap = 'round';
+        ctx.lineCap = "round";
         ctx.beginPath();
         this.penstrokes.image = canvas;
-        this.svgOutput = '';
+        this.svgOutput = "";
         this.svgPath = false;
         this.turtles.refreshCanvas();
     };
@@ -749,12 +881,11 @@ function Turtle (name, turtles, drum) {
      * @param  steps - the number of steps the turtle goes forward by
      *
      */
-    this.doForward = function (steps) {
-
+    this.doForward = function(steps) {
         this.processColor();
         if (!this.fillState) {
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(this.container.x, this.container.y);
         }
@@ -764,7 +895,7 @@ function Turtle (name, turtles, drum) {
         var oy = this.turtles.screenY2turtleY(this.container.y);
 
         // new turtle point
-        var angleRadians = this.orientation * Math.PI / 180.0;
+        var angleRadians = (this.orientation * Math.PI) / 180.0;
         var nx = ox + Number(steps) * Math.sin(angleRadians);
         var ny = oy + Number(steps) * Math.cos(angleRadians);
 
@@ -779,11 +910,11 @@ function Turtle (name, turtles, drum) {
      * @param  y - on-screen y coordinate of the point to where the turtle is moved
      *
      */
-    this.doSetXY = function (x, y) {
+    this.doSetXY = function(x, y) {
         this.processColor();
         if (!this.fillState) {
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(this.container.x, this.container.y);
         }
@@ -793,7 +924,7 @@ function Turtle (name, turtles, drum) {
         var oy = this.turtles.screenY2turtleY(this.container.y);
 
         // new turtle point
-        var nx = Number(x)
+        var nx = Number(x);
         var ny = Number(y);
 
         this.move(ox, oy, nx, ny, true);
@@ -809,7 +940,7 @@ function Turtle (name, turtles, drum) {
      * @param  radius - radius of arc
      *
      */
-    this.doArc = function (angle, radius) {
+    this.doArc = function(angle, radius) {
         if (radius < 0) {
             radius = -radius;
         }
@@ -837,11 +968,11 @@ function Turtle (name, turtles, drum) {
      * @param  radius - radius of arc
      *
      */
-    this._doArcPart = function (angle, radius) {
+    this._doArcPart = function(angle, radius) {
         this.processColor();
         if (!this.fillState) {
             ctx.lineWidth = this.stroke;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(this.container.x, this.container.y);
         }
@@ -874,7 +1005,19 @@ function Turtle (name, turtles, drum) {
             var ny = cy + Math.sin(oAngleRadians + angleRadians) * r;
         }
 
-        this.arc(cx, cy, ox, oy, nx, ny, r, oAngleRadians, oAngleRadians + angleRadians, anticlockwise, true);
+        this.arc(
+            cx,
+            cy,
+            ox,
+            oy,
+            nx,
+            ny,
+            r,
+            oAngleRadians,
+            oAngleRadians + angleRadians,
+            anticlockwise,
+            true
+        );
 
         if (anticlockwise) {
             this.doRight(-adeg);
@@ -891,7 +1034,7 @@ function Turtle (name, turtles, drum) {
      * @param  myImage - image path
      *
      */
-    this.doShowImage = function (size, myImage) {
+    this.doShowImage = function(size, myImage) {
         // Is there a JS test for a valid image path?
         if (myImage === null) {
             return;
@@ -900,7 +1043,7 @@ function Turtle (name, turtles, drum) {
         var image = new Image();
         var that = this;
 
-        image.onload = function () {
+        image.onload = function() {
             var bitmap = new createjs.Bitmap(image);
             that.imageContainer.addChild(bitmap);
             that.media.push(bitmap);
@@ -925,7 +1068,7 @@ function Turtle (name, turtles, drum) {
      * @param  myImage - URL of image (image address)
      *
      */
-    this.doShowURL = function (size, myURL) {
+    this.doShowURL = function(size, myURL) {
         if (myURL === null) {
             return;
         }
@@ -933,7 +1076,7 @@ function Turtle (name, turtles, drum) {
         image.src = myURL;
         var turtle = this;
 
-        image.onload = function () {
+        image.onload = function() {
             var bitmap = new createjs.Bitmap(image);
             turtle.imageContainer.addChild(bitmap);
             turtle.media.push(bitmap);
@@ -956,7 +1099,7 @@ function Turtle (name, turtles, drum) {
      * @param  myImage - path of image
      *
      */
-    this.doTurtleShell = function (size, myImage) {
+    this.doTurtleShell = function(size, myImage) {
         if (myImage === null) {
             return;
         }
@@ -966,7 +1109,7 @@ function Turtle (name, turtles, drum) {
         var that = this;
         this.shellSize = Number(size);
 
-        image.onload = function () {
+        image.onload = function() {
             that.container.removeChild(that.bitmap);
             that.bitmap = new createjs.Bitmap(image);
             that.container.addChild(that.bitmap);
@@ -982,11 +1125,18 @@ function Turtle (name, turtles, drum) {
 
             that.container.uncache();
             var bounds = that.container.getBounds();
-            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            that.container.cache(
+                bounds.x,
+                bounds.y,
+                bounds.width,
+                bounds.height
+            );
 
             // Recalculate the hit area as well.
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, bounds.width, bounds.height);
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
             that.container.hitArea = hitArea;
@@ -995,15 +1145,23 @@ function Turtle (name, turtles, drum) {
                 that.startBlock.container.removeChild(that.decorationBitmap);
                 that.decorationBitmap = new createjs.Bitmap(myImage);
                 that.startBlock.container.addChild(that.decorationBitmap);
-                that.decorationBitmap.name = 'decoration';
+                that.decorationBitmap.name = "decoration";
 
                 var width = that.startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                that.decorationBitmap.x = width - 30 * that.startBlock.protoblock.scale / 2;
-                that.decorationBitmap.y = 20 * that.startBlock.protoblock.scale / 2;
-                that.decorationBitmap.scaleX = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
-                that.decorationBitmap.scaleY = (27.5 / image.height) * that.startBlock.protoblock.scale / 2;
-                that.decorationBitmap.scale = (27.5 / image.width) * that.startBlock.protoblock.scale / 2;
+                that.decorationBitmap.x =
+                    width - (30 * that.startBlock.protoblock.scale) / 2;
+                that.decorationBitmap.y =
+                    (20 * that.startBlock.protoblock.scale) / 2;
+                that.decorationBitmap.scaleX =
+                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                    2;
+                that.decorationBitmap.scaleY =
+                    ((27.5 / image.height) * that.startBlock.protoblock.scale) /
+                    2;
+                that.decorationBitmap.scale =
+                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                    2;
                 that.startBlock.updateCache();
             }
 
@@ -1018,10 +1176,11 @@ function Turtle (name, turtles, drum) {
      * @param  width - resize decoration by width
      *
      */
-    this.resizeDecoration = function (scale, width) {
-        this.decorationBitmap.x = width - 30 * scale / 2;
-        this.decorationBitmap.y = 35 * scale / 2;
-        this.decorationBitmap.scaleX = this.decorationBitmap.scaleY = this.decorationBitmap.scale = 0.5 * scale / 2
+    this.resizeDecoration = function(scale, width) {
+        this.decorationBitmap.x = width - (30 * scale) / 2;
+        this.decorationBitmap.y = (35 * scale) / 2;
+        this.decorationBitmap.scaleX = this.decorationBitmap.scaleY = this.decorationBitmap.scale =
+            (0.5 * scale) / 2;
     };
 
     /**
@@ -1031,22 +1190,26 @@ function Turtle (name, turtles, drum) {
      * @param  myText - string of text to be displayed
      *
      */
-    this.doShowText = function (size, myText) {
+    this.doShowText = function(size, myText) {
         if (myText === null) {
             return;
         }
 
-        if (typeof (myText) !== 'string') {
+        if (typeof myText !== "string") {
             var textList = [myText.toString()];
         } else {
-            var textList = myText.split('\\n');
+            var textList = myText.split("\\n");
         }
 
-        var textSize = size.toString() + 'px ' + this.font;
+        var textSize = size.toString() + "px " + this.font;
         for (i = 0; i < textList.length; i++) {
-            var text = new createjs.Text(textList[i], textSize, this.canvasColor);
-            text.textAlign = 'left';
-            text.textBaseline = 'alphabetic';
+            var text = new createjs.Text(
+                textList[i],
+                textSize,
+                this.canvasColor
+            );
+            text.textAlign = "left";
+            text.textBaseline = "alphabetic";
             this.turtles.stage.addChild(text);
             this.media.push(text);
             text.x = this.container.x;
@@ -1055,7 +1218,20 @@ function Turtle (name, turtles, drum) {
             var xScaled = text.x * this.turtles.scale;
             var yScaled = text.y * this.turtles.scale;
             var sizeScaled = size * this.turtles.scale;
-            this.svgOutput += '<text x="' + xScaled + '" y = "' + yScaled + '" fill="' + this.canvasColor + '" font-family = "' + this.font + '" font-size = "' + sizeScaled + '">' + myText + '</text>';
+            this.svgOutput +=
+                '<text x="' +
+                xScaled +
+                '" y = "' +
+                yScaled +
+                '" fill="' +
+                this.canvasColor +
+                '" font-family = "' +
+                this.font +
+                '" font-size = "' +
+                sizeScaled +
+                '">' +
+                myText +
+                "</text>";
             this.turtles.refreshCanvas();
         }
     };
@@ -1066,7 +1242,7 @@ function Turtle (name, turtles, drum) {
      * @param  degrees - degrees for right turn
      *
      */
-    this.doRight = function (degrees) {
+    this.doRight = function(degrees) {
         this.orientation += Number(degrees);
         while (this.orientation < 0) {
             this.orientation += 360;
@@ -1086,7 +1262,7 @@ function Turtle (name, turtles, drum) {
      * @param  degrees -  degrees turned to set the 'heading' of turtle
      *
      */
-    this.doSetHeading = function (degrees) {
+    this.doSetHeading = function(degrees) {
         this.orientation = Number(degrees);
         while (this.orientation < 0) {
             this.orientation += 360;
@@ -1106,7 +1282,7 @@ function Turtle (name, turtles, drum) {
      * @param  font - font object
      *
      */
-    this.doSetFont = function (font) {
+    this.doSetFont = function(font) {
         this.font = font;
         this.updateCache();
     };
@@ -1118,7 +1294,7 @@ function Turtle (name, turtles, drum) {
      * @param  color - hex code specifying color
      *
      */
-    this.doSetColor = function (color) {
+    this.doSetColor = function(color) {
         this.closeSVG();
         this.color = Number(color);
         var results = getcolor(this.color);
@@ -1136,7 +1312,7 @@ function Turtle (name, turtles, drum) {
      * @param  alpha - alpha value
      *
      */
-    this.doSetPenAlpha = function (alpha) {
+    this.doSetPenAlpha = function(alpha) {
         this.canvasAlpha = alpha;
     };
 
@@ -1144,14 +1320,14 @@ function Turtle (name, turtles, drum) {
      * Splits hex code for rgb number values.
      *
      */
-    this.processColor = function () {
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
+    this.processColor = function() {
+        if (this.canvasColor[0] === "#") {
+            this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
         var subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ')';
-        ctx.fillStyle = subrgb + this.canvasAlpha + ')';
+        ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
+        ctx.fillStyle = subrgb + this.canvasAlpha + ")";
     };
 
     /**
@@ -1160,7 +1336,7 @@ function Turtle (name, turtles, drum) {
      *  @param  hue - hue hex code
      *
      */
-    this.doSetHue = function (hue) {
+    this.doSetHue = function(hue) {
         this.closeSVG();
         this.color = Number(hue);
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1173,7 +1349,7 @@ function Turtle (name, turtles, drum) {
      *  @param  shade - shade hex code
      *
      */
-    this.doSetValue = function (shade) {
+    this.doSetValue = function(shade) {
         this.closeSVG();
         this.value = Number(shade);
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1186,7 +1362,7 @@ function Turtle (name, turtles, drum) {
      *  @param  chroma - chroma hex code
      *
      */
-    this.doSetChroma = function (chroma) {
+    this.doSetChroma = function(chroma) {
         this.closeSVG();
         this.chroma = Number(chroma);
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1199,7 +1375,7 @@ function Turtle (name, turtles, drum) {
      *  @param  size - pen size which is assigned to pen stroke
      *
      */
-    this.doSetPensize = function (size) {
+    this.doSetPensize = function(size) {
         this.closeSVG();
         this.stroke = size;
         ctx.lineWidth = this.stroke;
@@ -1209,7 +1385,7 @@ function Turtle (name, turtles, drum) {
      * Toggles penState - puts pen 'up'
      *
      */
-    this.doPenUp = function () {
+    this.doPenUp = function() {
         this.closeSVG();
         this.penState = false;
     };
@@ -1218,7 +1394,7 @@ function Turtle (name, turtles, drum) {
      * Toggles penState - puts pen 'down'
      *
      */
-    this.doPenDown = function () {
+    this.doPenDown = function() {
         this.penState = true;
     };
 
@@ -1226,7 +1402,7 @@ function Turtle (name, turtles, drum) {
      * Begins fill path
      *
      */
-    this.doStartFill = function () {
+    this.doStartFill = function() {
         /// start tracking points here
         ctx.beginPath();
         this.fillState = true;
@@ -1236,7 +1412,7 @@ function Turtle (name, turtles, drum) {
      * Ends fill path
      *
      */
-    this.doEndFill = function () {
+    this.doEndFill = function() {
         /// redraw the points with fill enabled
         ctx.fill();
         ctx.closePath();
@@ -1248,7 +1424,7 @@ function Turtle (name, turtles, drum) {
      * Begins hollow line by toggling hollowState (to true)
      *
      */
-    this.doStartHollowLine = function () {
+    this.doStartHollowLine = function() {
         /// start tracking points here
         this.hollowState = true;
     };
@@ -1257,7 +1433,7 @@ function Turtle (name, turtles, drum) {
      * Ends hollow line by toggling hollowState (to false)
      *
      */
-    this.doEndHollowLine = function () {
+    this.doEndHollowLine = function() {
         /// redraw the points with fill enabled
         this.hollowState = false;
     };
@@ -1266,24 +1442,30 @@ function Turtle (name, turtles, drum) {
      * Function for closing SVG by changing SVG output to the canvas
      *
      */
-    this.closeSVG = function () {
+    this.closeSVG = function() {
         if (this.svgPath) {
             // For the SVG output, we need to replace rgba() with
             // rgb();fill-opacity:1 and rgb();stroke-opacity:1
 
-            var svgColor = this.canvasColor.replace(/rgba/g, 'rgb');
-            svgColor = svgColor.substr(0, this.canvasColor.length - 4) + ');';
+            var svgColor = this.canvasColor.replace(/rgba/g, "rgb");
+            svgColor = svgColor.substr(0, this.canvasColor.length - 4) + ");";
 
             this.svgOutput += '" style="stroke-linecap:round;fill:';
             if (this.fillState) {
-                this.svgOutput += svgColor + 'fill-opacity:' + this.canvasAlpha + ';';
+                this.svgOutput +=
+                    svgColor + "fill-opacity:" + this.canvasAlpha + ";";
             } else {
-                this.svgOutput += 'none;';
+                this.svgOutput += "none;";
             }
 
-            this.svgOutput += 'stroke:' + svgColor + 'stroke-opacity:' + this.canvasAlpha + ';';
+            this.svgOutput +=
+                "stroke:" +
+                svgColor +
+                "stroke-opacity:" +
+                this.canvasAlpha +
+                ";";
             var strokeScaled = this.stroke * this.turtles.scale;
-            this.svgOutput += 'stroke-width:' + strokeScaled + 'pt;" />';
+            this.svgOutput += "stroke-width:" + strokeScaled + 'pt;" />';
             this.svgPath = false;
         }
     };
@@ -1293,16 +1475,21 @@ function Turtle (name, turtles, drum) {
      * Includes workaround for a race condition.
      *
      */
-    this.createCache = function () {
+    this.createCache = function() {
         var that = this;
         that.bounds = that.container.getBounds();
 
         if (that.bounds == null) {
-            setTimeout(function () {
+            setTimeout(function() {
                 that.createCache();
             }, 200);
         } else {
-            that.container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+            that.container.cache(
+                that.bounds.x,
+                that.bounds.y,
+                that.bounds.width,
+                that.bounds.height
+            );
         }
     };
 
@@ -1312,13 +1499,15 @@ function Turtle (name, turtles, drum) {
      *
      */
 
-    this.updateCache = async function () {
+    this.updateCache = async function() {
         var that = this;
 
         if (that.bounds == null) {
-            console.debug('Block container for ' + that.name + ' not yet ready.');
-            await delayExecution(300)
-                that.updateCache();
+            console.debug(
+                "Block container for " + that.name + " not yet ready."
+            );
+            await delayExecution(300);
+            that.updateCache();
         } else {
             that.container.updateCache();
             that.turtles.refreshCanvas();
@@ -1330,7 +1519,7 @@ function Turtle (name, turtles, drum) {
      * to null and blinkFinished boolean to true (if they have not
      * been already changed)
      */
-    this.stopBlink = function () {
+    this.stopBlink = function() {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
@@ -1358,7 +1547,7 @@ function Turtle (name, turtles, drum) {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    this.blink =  async function (duration, volume) {
+    this.blink = async function(duration, volume) {
         var that = this;
         // this._sizeInUse = that.bitmap.scaleX;
         this._blinkTimeout = null;
@@ -1373,10 +1562,10 @@ function Turtle (name, turtles, drum) {
 
         this.container.visible = false;
         this.turtles.refreshCanvas();
-        this._blinkTimeout = await delayExecution(100)
-            this.blinkFinished = true;
-            that.container.visible = true;
-            that.turtles.refreshCanvas();
+        this._blinkTimeout = await delayExecution(100);
+        this.blinkFinished = true;
+        that.container.visible = true;
+        that.turtles.refreshCanvas();
 
         /*
 
@@ -1418,10 +1607,9 @@ function Turtle (name, turtles, drum) {
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
         */
     };
-};
+}
 
-
-function Turtles () {
+function Turtles() {
     this.masterStage = null;
     this.doClear = null;
     this.hideMenu = null;
@@ -1437,7 +1625,7 @@ function Turtles () {
     this._rotating = false;
     this._drum = false;
 
-    console.debug('Creating border container');
+    console.debug("Creating border container");
     this._borderContainer = new createjs.Container();
     this._expandedBoundary = null;
     this._collapsedBoundary = null;
@@ -1460,60 +1648,60 @@ function Turtles () {
     // The list of all of our turtles, one for each start block.
     this.turtleList = [];
 
-    this.setGridLabel = function (text) {
+    this.setGridLabel = function(text) {
         if (this._gridLabel !== null) {
             this._gridLabel.text = text;
         }
     };
 
-    this.setMasterStage = function (stage) {
+    this.setMasterStage = function(stage) {
         this.masterStage = stage;
         return this;
     };
 
-    this.setClear = function (doClear) {
+    this.setClear = function(doClear) {
         this.doClear = doClear;
         return this;
     };
 
-    this.setDoGrid = function (doGrid) {
+    this.setDoGrid = function(doGrid) {
         this.doGrid = doGrid;
         return this;
     };
 
-    this.setHideGrids = function (hideGrids) {
+    this.setHideGrids = function(hideGrids) {
         this.hideGrids = hideGrids;
         return this;
     };
 
-    this.setHideMenu = function (hideMenu) {
+    this.setHideMenu = function(hideMenu) {
         this.hideMenu = hideMenu;
         return this;
     };
 
-    this.setCanvas = function (canvas) {
+    this.setCanvas = function(canvas) {
         this._canvas = canvas;
         return this;
     };
 
-    this.setStage = function (stage) {
+    this.setStage = function(stage) {
         this.stage = stage;
         this.stage.addChild(this._borderContainer);
         return this;
     };
 
-    this.scaleStage = function (scale) {
+    this.scaleStage = function(scale) {
         this.stage.scaleX = scale;
         this.stage.scaleY = scale;
         this.refreshCanvas();
     };
 
-    this.setRefreshCanvas = function (refreshCanvas) {
+    this.setRefreshCanvas = function(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
 
-    this.setScale = function (w, h, scale) {
+    this.setScale = function(w, h, scale) {
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
@@ -1525,7 +1713,7 @@ function Turtles () {
         this.makeBackground();
     };
 
-    this.deltaY = function (dy) {
+    this.deltaY = function(dy) {
         this.stage.y += dy;
     };
 
@@ -1536,7 +1724,7 @@ function Turtles () {
      * @param  setCollapsed used to specified whether the background should be collapsed
      *
      */
-    this.makeBackground = function (setCollapsed) {
+    this.makeBackground = function(setCollapsed) {
         if (setCollapsed === undefined) {
             var doCollapse = false;
         } else {
@@ -1546,7 +1734,9 @@ function Turtles () {
         // Remove any old background containers.
         for (var i = 0; i < this._borderContainer.children.length; i++) {
             this._borderContainer.children[i].visible = false;
-            this._borderContainer.removeChild(this._borderContainer.children[i]);
+            this._borderContainer.removeChild(
+                this._borderContainer.children[i]
+            );
         }
 
         // We put the buttons on the stage so they will be on top.
@@ -1576,7 +1766,7 @@ function Turtles () {
         function __makeBoundary() {
             that._locked = true;
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 if (that._expandedBoundary !== null) {
                     that._expandedBoundary.visible = false;
                 }
@@ -1590,9 +1780,27 @@ function Turtles () {
 
             var dx = that.w - 5;
             var dy = that.h - 55 - LEADING;
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10 / SCALEFACTOR).replace('X', 10 / SCALEFACTOR).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20 / SCALEFACTOR))));
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", that.h)
+                                .replace("WIDTH", that.w)
+                                .replace("Y", 10 / SCALEFACTOR)
+                                .replace("X", 10 / SCALEFACTOR)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", that.backgroundColor)
+                                .replace("STROKE", 20 / SCALEFACTOR)
+                        )
+                    )
+                );
+        }
 
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
@@ -1600,7 +1808,7 @@ function Turtles () {
          */
         function __makeBoundary2() {
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 if (that._collapsedBoundary !== null) {
                     that._collapsedBoundary.visible = false;
                 }
@@ -1616,9 +1824,27 @@ function Turtles () {
 
             var dx = that.w - 20;
             var dy = that.h - 55 - LEADING;
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(MBOUNDARY.replace('HEIGHT', that.h).replace('WIDTH', that.w).replace('Y', 10).replace('X', 10).replace('DY', dy).replace('DX', dx).replace('stroke_color', platformColor.ruleColor).replace('fill_color', that.backgroundColor).replace('STROKE', 20))));
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", that.h)
+                                .replace("WIDTH", that.w)
+                                .replace("Y", 10)
+                                .replace("X", 10)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", that.backgroundColor)
+                                .replace("STROKE", 20)
+                        )
+                    )
+                );
+        }
 
         /**
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
@@ -1630,14 +1856,18 @@ function Turtles () {
             that._expandLabel = null;
             that._expandLabelBG = null;
 
-            that._expandLabel = new createjs.Text(_('Expand'), '14px Sans', '#282828');
-            that._expandLabel.textAlign = 'center';
+            that._expandLabel = new createjs.Text(
+                _("Expand"),
+                "14px Sans",
+                "#282828"
+            );
+            that._expandLabel.textAlign = "center";
             that._expandLabel.x = 11.5;
             that._expandLabel.y = 55;
             that._expandLabel.visible = false;
 
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 if (that._expandButton !== null) {
                     that._expandButton.visible = false;
                 }
@@ -1656,16 +1886,30 @@ function Turtles () {
                 // that._borderContainer.addChild(that._expandButton);
                 that.stage.addChild(that._expandButton);
 
-                that._expandButton.removeAllEventListeners('mouseover');
-                that._expandButton.on('mouseover', function (event) {
+                that._expandButton.removeAllEventListeners("mouseover");
+                that._expandButton.on("mouseover", function(event) {
                     if (that._expandLabel !== null) {
                         that._expandLabel.visible = true;
 
                         if (that._expandLabelBG === null) {
                             var b = that._expandLabel.getBounds();
                             that._expandLabelBG = new createjs.Shape();
-                            that._expandLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._expandLabel.x + b.x - 8, that._expandLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                            that._expandButton.addChildAt(that._expandLabelBG, 0);
+                            that._expandLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    that._expandLabel.x + b.x - 8,
+                                    that._expandLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
+                            that._expandButton.addChildAt(
+                                that._expandLabelBG,
+                                0
+                            );
                         } else {
                             that._expandLabelBG.visible = true;
                         }
@@ -1674,8 +1918,8 @@ function Turtles () {
                     that.refreshCanvas();
                 });
 
-                that._expandButton.removeAllEventListeners('mouseout');
-                that._expandButton.on('mouseout', function (event) {
+                that._expandButton.removeAllEventListeners("mouseout");
+                that._expandButton.on("mouseout", function(event) {
                     if (that._expandLabel !== null) {
                         that._expandLabel.visible = false;
                         that._expandLabelBG.visible = false;
@@ -1683,25 +1927,25 @@ function Turtles () {
                     }
                 });
 
-                that._expandButton.removeAllEventListeners('pressmove');
-                that._expandButton.on('pressmove', function (event) {
+                that._expandButton.removeAllEventListeners("pressmove");
+                that._expandButton.on("pressmove", function(event) {
                     var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
                     var x = event.stageX / that.scale - w;
                     var y = event.stageY / that.scale - 16;
-                    that.stage.x = Math.max(0, Math.min(that.w * 3 / 4, x));
-                    that.stage.y = Math.max(55, Math.min(that.h * 3 / 4, y));
+                    that.stage.x = Math.max(0, Math.min((that.w * 3) / 4, x));
+                    that.stage.y = Math.max(55, Math.min((that.h * 3) / 4, y));
                     that.refreshCanvas();
                 });
 
-                that._expandButton.removeAllEventListeners('click');
-                that._expandButton.on('click', function (event) {
+                that._expandButton.removeAllEventListeners("click");
+                that._expandButton.on("click", function(event) {
                     // If the aux toolbar is open, close it.
-                    var auxToolbar = docById('aux-toolbar');
-                    if (auxToolbar.style.display === 'block') {
-                        var menuIcon = docById('menu');
-                        auxToolbar.style.display = 'none';
-                        menuIcon.innerHTML = 'menu';
-                        docById('toggleAuxBtn').className -= 'blue darken-1';
+                    var auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        var menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
                     }
                     that.hideMenu();
                     that.scaleStage(1.0);
@@ -1739,9 +1983,10 @@ function Turtles () {
                 __makeCollapseButton();
             };
 
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(EXPANDBUTTON)));
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+        }
 
         /**
          * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
@@ -1753,14 +1998,18 @@ function Turtles () {
             that._collapseLabel = null;
             that._collapseLabelBG = null;
 
-            that._collapseLabel = new createjs.Text(_('Collapse'), '14px Sans', '#282828');
-            that._collapseLabel.textAlign = 'center';
+            that._collapseLabel = new createjs.Text(
+                _("Collapse"),
+                "14px Sans",
+                "#282828"
+            );
+            that._collapseLabel.textAlign = "center";
             that._collapseLabel.x = 11.5;
             that._collapseLabel.y = 55;
             that._collapseLabel.visible = false;
 
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 if (that._collapseButton !== null) {
                     that._collapseButton.visible = false;
                 }
@@ -1778,42 +2027,63 @@ function Turtles () {
                 that._collapseButton.y = 70 + LEADING + 6;
                 that.refreshCanvas();
 
-                that._collapseButton.removeAllEventListeners('click');
-                that._collapseButton.on('click', function (event) {
+                that._collapseButton.removeAllEventListeners("click");
+                that._collapseButton.on("click", function(event) {
                     // If the aux toolbar is open, close it.
-                    var auxToolbar = docById('aux-toolbar');
-                    if (auxToolbar.style.display === 'block') {
-                        var menuIcon = docById('menu');
-                        auxToolbar.style.display = 'none';
-                        menuIcon.innerHTML = 'menu';
-                        docById('toggleAuxBtn').className -= 'blue darken-1';
+                    var auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        var menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
                     }
                     that.collapse();
                 });
 
-                that._collapseButton.removeAllEventListeners('mouseover');
-                that._collapseButton.on('mouseover', function (event) {
+                that._collapseButton.removeAllEventListeners("mouseover");
+                that._collapseButton.on("mouseover", function(event) {
                     if (that._collapseLabel !== null) {
                         that._collapseLabel.visible = true;
 
                         if (that._collapseLabelBG === null) {
                             var b = that._collapseLabel.getBounds();
                             that._collapseLabelBG = new createjs.Shape();
-                            that._collapseLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._collapseLabel.x + b.x - 8, that._collapseLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
-                            that._collapseButton.addChildAt(that._collapseLabelBG, 0);
+                            that._collapseLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    that._collapseLabel.x + b.x - 8,
+                                    that._collapseLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
+                            that._collapseButton.addChildAt(
+                                that._collapseLabelBG,
+                                0
+                            );
                         } else {
                             that._collapseLabelBG.visible = true;
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._collapseButton.x + 28, that._collapseButton.y + 28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(
+                            that._collapseButton.x + 28,
+                            that._collapseButton.y + 28,
+                            r,
+                            event,
+                            palettes.scale,
+                            that.stage
+                        );
                     }
 
                     that.refreshCanvas();
                 });
 
-                that._collapseButton.removeAllEventListeners('mouseout');
-                that._collapseButton.on('mouseout', function (event) {
+                that._collapseButton.removeAllEventListeners("mouseout");
+                that._collapseButton.on("mouseout", function(event) {
                     hideButtonHighlight(circles, that.stage);
                     if (that._collapseLabel !== null) {
                         that._collapseLabel.visible = false;
@@ -1825,9 +2095,10 @@ function Turtles () {
                 __makeClearButton();
             };
 
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(COLLAPSEBUTTON)))
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+        }
 
         /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
@@ -1839,19 +2110,23 @@ function Turtles () {
             that._clearLabel = null;
             that._clearLabelBG = null;
 
-            that._clearButton.removeAllEventListeners('click');
-            that._clearButton.on('click', function (event) {
+            that._clearButton.removeAllEventListeners("click");
+            that._clearButton.on("click", function(event) {
                 that.doClear();
             });
 
-            that._clearLabel = new createjs.Text(_('Clean'), '14px Sans', '#282828');
-            that._clearLabel.textAlign = 'center';
+            that._clearLabel = new createjs.Text(
+                _("Clean"),
+                "14px Sans",
+                "#282828"
+            );
+            that._clearLabel.textAlign = "center";
             that._clearLabel.x = 27.5;
             that._clearLabel.y = 55;
             that._clearLabel.visible = false;
 
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 var bitmap = new createjs.Bitmap(img);
                 that._clearButton.addChild(bitmap);
                 that._clearButton.addChild(that._clearLabel);
@@ -1865,29 +2140,47 @@ function Turtles () {
                 that.stage.addChild(that._clearButton);
                 that.refreshCanvas();
 
-                that._clearButton.removeAllEventListeners('mouseover');
-                that._clearButton.on('mouseover', function (event) {
+                that._clearButton.removeAllEventListeners("mouseover");
+                that._clearButton.on("mouseover", function(event) {
                     if (that._clearLabel !== null) {
                         that._clearLabel.visible = true;
 
                         if (that._clearLabelBG === null) {
                             var b = that._clearLabel.getBounds();
                             that._clearLabelBG = new createjs.Shape();
-                            that._clearLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._clearLabel.x + b.x - 8, that._clearLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._clearLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    that._clearLabel.x + b.x - 8,
+                                    that._clearLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
                             that._clearButton.addChildAt(that._clearLabelBG, 0);
                         } else {
                             that._clearLabelBG.visible = true;
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._clearButton.x + 28, that._clearButton.y + 28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(
+                            that._clearButton.x + 28,
+                            that._clearButton.y + 28,
+                            r,
+                            event,
+                            palettes.scale,
+                            that.stage
+                        );
                     }
 
                     that.refreshCanvas();
                 });
 
-                that._clearButton.removeAllEventListeners('mouseout');
-                that._clearButton.on('mouseout', function (event) {
+                that._clearButton.removeAllEventListeners("mouseout");
+                that._clearButton.on("mouseout", function(event) {
                     hideButtonHighlight(circles, that.stage);
                     if (that._clearLabel !== null) {
                         that._clearLabel.visible = false;
@@ -1910,9 +2203,10 @@ function Turtles () {
                 // }
             };
 
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(CLEARBUTTON)));
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(CLEARBUTTON)));
+        }
 
         /**
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
@@ -1924,19 +2218,23 @@ function Turtles () {
             that._gridLabel = null;
             that._gridLabelBG = null;
 
-            that._gridButton.removeAllEventListeners('click');
-            that._gridButton.on('click', function (event) {
+            that._gridButton.removeAllEventListeners("click");
+            that._gridButton.on("click", function(event) {
                 that.doGrid();
             });
 
-            that._gridLabel = new createjs.Text(_('show Cartesian'), '14px Sans', '#282828');
-            that._gridLabel.textAlign = 'center';
+            that._gridLabel = new createjs.Text(
+                _("show Cartesian"),
+                "14px Sans",
+                "#282828"
+            );
+            that._gridLabel.textAlign = "center";
             that._gridLabel.x = 27.5;
             that._gridLabel.y = 55;
             that._gridLabel.visible = false;
 
             var img = new Image();
-            img.onload = function () {
+            img.onload = function() {
                 var bitmap = new createjs.Bitmap(img);
                 that._gridButton.addChild(bitmap);
                 that._gridButton.addChild(that._gridLabel);
@@ -1950,29 +2248,47 @@ function Turtles () {
                 that.stage.addChild(that._gridButton);
                 that.refreshCanvas();
 
-                that._gridButton.removeAllEventListeners('mouseover');
-                that._gridButton.on('mouseover', function (event) {
+                that._gridButton.removeAllEventListeners("mouseover");
+                that._gridButton.on("mouseover", function(event) {
                     if (that._gridLabel !== null) {
                         that._gridLabel.visible = true;
 
                         if (that._gridLabelBG === null) {
                             var b = that._gridLabel.getBounds();
                             that._gridLabelBG = new createjs.Shape();
-                            that._gridLabelBG.graphics.beginFill('#FFF').drawRoundRect(that._gridLabel.x + b.x - 8, that._gridLabel.y + b.y - 2, b.width + 16, b.height + 8, 10, 10, 10, 10);
+                            that._gridLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    that._gridLabel.x + b.x - 8,
+                                    that._gridLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
                             that._gridButton.addChildAt(that._gridLabelBG, 0);
                         } else {
                             that._gridLabelBG.visible = true;
                         }
 
                         var r = 55 / 2;
-                        circles = showButtonHighlight(that._gridButton.x + 28, that._gridButton.y + 28, r, event, palettes.scale, that.stage);
+                        circles = showButtonHighlight(
+                            that._gridButton.x + 28,
+                            that._gridButton.y + 28,
+                            r,
+                            event,
+                            palettes.scale,
+                            that.stage
+                        );
                     }
 
                     that.refreshCanvas();
                 });
 
-                that._gridButton.removeAllEventListeners('mouseout');
-                that._gridButton.on('mouseout', function (event) {
+                that._gridButton.removeAllEventListeners("mouseout");
+                that._gridButton.on("mouseout", function(event) {
                     hideButtonHighlight(circles, that.stage);
                     if (that._gridLabel !== null) {
                         that._gridLabel.visible = false;
@@ -1995,9 +2311,10 @@ function Turtles () {
                 }
             };
 
-            img.src = 'data:image/svg+xml;base64,' + window.btoa(
-                unescape(encodeURIComponent(CARTESIANBUTTON)));
-        };
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
+        }
 
         if (!this._locked) {
             __makeBoundary();
@@ -2012,7 +2329,7 @@ function Turtles () {
      * Removes the stage and adds it back at the top
      *
      */
-    this.collapse = function () {
+    this.collapse = function() {
         this.hideMenu();
         this.hideGrids();
         this.scaleStage(0.25);
@@ -2020,7 +2337,7 @@ function Turtles () {
         this._expandButton.visible = true;
         this._expandedBoundary.visible = false;
         this._collapseButton.visible = false;
-        this.stage.x = (this.w * 3 / 4) - 10;
+        this.stage.x = (this.w * 3) / 4 - 10;
         this.stage.y = 55 + LEADING + 6;
         this.isShrunk = true;
         for (var i = 0; i < this.turtleList.length; i++) {
@@ -2056,7 +2373,7 @@ function Turtles () {
      * @param  blocks
      * @return blocks object
      */
-    this.setBlocks = function (blocks) {
+    this.setBlocks = function(blocks) {
         this.blocks = blocks;
         return this;
     };
@@ -2068,7 +2385,7 @@ function Turtles () {
      * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
      *
      */
-    this.addDrum = function (startBlock, infoDict) {
+    this.addDrum = function(startBlock, infoDict) {
         this._drum = true;
         this.add(startBlock, infoDict);
     };
@@ -2080,7 +2397,7 @@ function Turtles () {
      * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
      *
      */
-    this.addTurtle = function (startBlock, infoDict) {
+    this.addTurtle = function(startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
@@ -2098,42 +2415,41 @@ function Turtles () {
      * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
      *
      */
-    this.add = function (startBlock, infoDict) {
+    this.add = function(startBlock, infoDict) {
         if (startBlock != null) {
-            console.debug('adding a new turtle ' + startBlock.name);
+            console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
                 startBlock.value = this.turtleList.length;
-                console.debug('turtle #' + startBlock.value);
+                console.debug("turtle #" + startBlock.value);
             }
         } else {
-            console.debug('adding a new turtle startBlock is null');
+            console.debug("adding a new turtle startBlock is null");
         }
 
         var blkInfoAvailable = false;
 
-        if (typeof (infoDict) === 'object') {
+        if (typeof infoDict === "object") {
             if (Object.keys(infoDict).length > 0) {
                 blkInfoAvailable = true;
             }
         }
 
-
         var i = this.turtleList.length;
-        if (blkInfoAvailable && 'name' in infoDict) {
-            turtleName = infoDict['name'];
+        if (blkInfoAvailable && "name" in infoDict) {
+            turtleName = infoDict["name"];
         } else {
-            var turtleName = _('start'); // i.toString();
+            var turtleName = _("start"); // i.toString();
         }
 
         var newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
-            if ('xcor' in infoDict) {
-                newTurtle.x = infoDict['xcor'];
+            if ("xcor" in infoDict) {
+                newTurtle.x = infoDict["xcor"];
             }
 
-            if ('ycor' in infoDict) {
-                newTurtle.y = infoDict['ycor'];
+            if ("ycor" in infoDict) {
+                newTurtle.y = infoDict["ycor"];
             }
         }
 
@@ -2165,7 +2481,7 @@ function Turtles () {
         }
 
         var hitArea = new createjs.Shape();
-        hitArea.graphics.beginFill('#FFF').drawEllipse(-27, -27, 55, 55);
+        hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
         hitArea.x = 0;
         hitArea.y = 0;
         newTurtle.container.hitArea = hitArea;
@@ -2174,7 +2490,7 @@ function Turtles () {
             newTurtle.bitmap = bitmap;
             newTurtle.bitmap.regX = 27 | 0;
             newTurtle.bitmap.regY = 27 | 0;
-            newTurtle.bitmap.cursor = 'pointer';
+            newTurtle.bitmap.cursor = "pointer";
             newTurtle.container.addChild(newTurtle.bitmap);
             newTurtle.createCache();
 
@@ -2183,19 +2499,22 @@ function Turtles () {
                 startBlock.updateCache();
                 newTurtle.decorationBitmap = newTurtle.bitmap.clone();
                 startBlock.container.addChild(newTurtle.decorationBitmap);
-                newTurtle.decorationBitmap.name = 'decoration';
+                newTurtle.decorationBitmap.name = "decoration";
                 var width = startBlock.width;
                 var offset = 40;
 
-                newTurtle.decorationBitmap.x = width - offset * startBlock.protoblock.scale / 2;
+                newTurtle.decorationBitmap.x =
+                    width - (offset * startBlock.protoblock.scale) / 2;
 
-                newTurtle.decorationBitmap.y = 35 * startBlock.protoblock.scale / 2;
-                newTurtle.decorationBitmap.scaleX = newTurtle.decorationBitmap.scaleY = newTurtle.decorationBitmap.scale = 0.5 * startBlock.protoblock.scale / 2
+                newTurtle.decorationBitmap.y =
+                    (35 * startBlock.protoblock.scale) / 2;
+                newTurtle.decorationBitmap.scaleX = newTurtle.decorationBitmap.scaleY = newTurtle.decorationBitmap.scale =
+                    (0.5 * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
             that.refreshCanvas();
-        };
+        }
 
         if (this._drum) {
             var artwork = DRUMSVG;
@@ -2204,46 +2523,67 @@ function Turtles () {
         }
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
-            this._makeTurtleBitmap(artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke), 'turtle', __processTurtleBitmap, startBlock);
+            this._makeTurtleBitmap(
+                artwork
+                    .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                    .replace(
+                        /stroke_color/g,
+                        sugarizerCompatibility.xoColor.stroke
+                    ),
+                "turtle",
+                __processTurtleBitmap,
+                startBlock
+            );
         } else {
-            this._makeTurtleBitmap(artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]), 'turtle', __processTurtleBitmap, startBlock);
+            this._makeTurtleBitmap(
+                artwork
+                    .replace(/fill_color/g, FILLCOLORS[i])
+                    .replace(/stroke_color/g, STROKECOLORS[i]),
+                "turtle",
+                __processTurtleBitmap,
+                startBlock
+            );
         }
 
         newTurtle.color = i * 10;
-        newTurtle.canvasColor = getMunsellColor(newTurtle.color, DEFAULTVALUE, DEFAULTCHROMA);
+        newTurtle.canvasColor = getMunsellColor(
+            newTurtle.color,
+            DEFAULTVALUE,
+            DEFAULTCHROMA
+        );
         var that = this;
 
-        newTurtle.container.on('mousedown', function (event) {
+        newTurtle.container.on("mousedown", function(event) {
             if (that._rotating) {
                 return;
             }
 
             var offset = {
-                x: newTurtle.container.x - (event.stageX / that.scale),
-                y: newTurtle.container.y - (event.stageY / that.scale)
-            }
+                x: newTurtle.container.x - event.stageX / that.scale,
+                y: newTurtle.container.y - event.stageY / that.scale
+            };
 
-            newTurtle.container.removeAllEventListeners('pressmove');
-            newTurtle.container.on('pressmove', function (event) {
+            newTurtle.container.removeAllEventListeners("pressmove");
+            newTurtle.container.on("pressmove", function(event) {
                 if (newTurtle.running) {
                     return;
                 }
 
-                newTurtle.container.x = (event.stageX / that.scale) + offset.x;
-                newTurtle.container.y = (event.stageY / that.scale) + offset.y;
+                newTurtle.container.x = event.stageX / that.scale + offset.x;
+                newTurtle.container.y = event.stageY / that.scale + offset.y;
                 newTurtle.x = that.screenX2turtleX(newTurtle.container.x);
                 newTurtle.y = that.screenY2turtleY(newTurtle.container.y);
                 that.refreshCanvas();
             });
         });
 
-        newTurtle.container.on('click', function (event) {
+        newTurtle.container.on("click", function(event) {
             // If turtles listen for clicks then they can be used as buttons.
-            console.debug('--> [click ' + newTurtle.name + ']');
-            that.stage.dispatchEvent('click' + newTurtle.name);
+            console.debug("--> [click " + newTurtle.name + "]");
+            that.stage.dispatchEvent("click" + newTurtle.name);
         });
 
-        newTurtle.container.on('mouseover', function (event) {
+        newTurtle.container.on("mouseover", function(event) {
             if (newTurtle.running) {
                 return;
             }
@@ -2254,7 +2594,7 @@ function Turtles () {
             that.refreshCanvas();
         });
 
-        newTurtle.container.on('mouseout', function (event) {
+        newTurtle.container.on("mouseout", function(event) {
             if (newTurtle.running) {
                 return;
             }
@@ -2265,32 +2605,32 @@ function Turtles () {
             that.refreshCanvas();
         });
 
-        document.getElementById('loader').className = '';
+        document.getElementById("loader").className = "";
 
-        setTimeout(function () {
+        setTimeout(function() {
             if (blkInfoAvailable) {
-                if ('heading' in infoDict) {
-                    newTurtle.doSetHeading(infoDict['heading']);
+                if ("heading" in infoDict) {
+                    newTurtle.doSetHeading(infoDict["heading"]);
                 }
 
-                if ('pensize' in infoDict) {
-                    newTurtle.doSetPensize(infoDict['pensize']);
+                if ("pensize" in infoDict) {
+                    newTurtle.doSetPensize(infoDict["pensize"]);
                 }
 
-                if ('grey' in infoDict) {
-                    newTurtle.doSetChroma(infoDict['grey']);
+                if ("grey" in infoDict) {
+                    newTurtle.doSetChroma(infoDict["grey"]);
                 }
 
-                if ('shade' in infoDict) {
-                    newTurtle.doSetValue(infoDict['shade']);
+                if ("shade" in infoDict) {
+                    newTurtle.doSetValue(infoDict["shade"]);
                 }
 
-                if ('color' in infoDict) {
-                    newTurtle.doSetColor(infoDict['color']);
+                if ("color" in infoDict) {
+                    newTurtle.doSetColor(infoDict["color"]);
                 }
 
-                if ('name' in infoDict) {
-                    newTurtle.rename(infoDict['name'])
+                if ("name" in infoDict) {
+                    newTurtle.rename(infoDict["name"]);
                 }
             }
         }, 6000);
@@ -2307,19 +2647,20 @@ function Turtles () {
      * @param  extras
      *
      */
-    this._makeTurtleBitmap = function (data, name, callback, extras) {
-
+    this._makeTurtleBitmap = function(data, name, callback, extras) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
         var that = this;
 
-        img.onload = function () {
+        img.onload = function() {
             complete = true;
             var bitmap = new createjs.Bitmap(img);
             callback(that, name, bitmap, extras);
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(data)));
     };
 
     /**
@@ -2327,15 +2668,15 @@ function Turtles () {
      * @param x x coordinate
      *
      */
-    this.screenX2turtleX = function (x) {
-        return x - (this._canvas.width / (2.0 * this.scale));
+    this.screenX2turtleX = function(x) {
+        return x - this._canvas.width / (2.0 * this.scale);
     };
 
     /**
      * Convert on screen y coordinate to turtle y coordinate
      * @param y y coordinate
      */
-    this.screenY2turtleY = function (y) {
+    this.screenY2turtleY = function(y) {
         return this.invertY(y);
     };
 
@@ -2343,29 +2684,29 @@ function Turtles () {
      * Convert turtle x coordinate to on screen x coordinate
      * @param x x coordinate
      */
-    this.turtleX2screenX = function (x) {
-        return (this._canvas.width / (2.0 * this.scale)) + x;
+    this.turtleX2screenX = function(x) {
+        return this._canvas.width / (2.0 * this.scale) + x;
     };
 
     /**
      * Convert turtle y coordinate to on screen y coordinate
      * @param y y coordinate
      */
-    this.turtleY2screenY = function (y) {
+    this.turtleY2screenY = function(y) {
         return this.invertY(y);
     };
 
     /**
      * Invert y coordinate
      */
-    this.invertY = function (y) {
+    this.invertY = function(y) {
         return this._canvas.height / (2.0 * this.scale) - y;
     };
 
     /**
      * Toggles 'running' boolean value for all turtles
      */
-    this.markAsStopped = function () {
+    this.markAsStopped = function() {
         for (var turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
             // Make sure the blink is really stopped.
@@ -2380,7 +2721,7 @@ function Turtles () {
      *
      * @return {boolean} running
      */
-    this.running = function () {
+    this.running = function() {
         for (var turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
@@ -2388,8 +2729,7 @@ function Turtles () {
         }
         return false;
     };
-};
-
+}
 
 /**
  * Queue entry for managing running blocks.
@@ -2399,12 +2739,12 @@ function Turtles () {
  * @param  parentBlk parent block
  * @param  args      arguments
  */
-function Queue (blk, count, parentBlk, args) {
+function Queue(blk, count, parentBlk, args) {
     this.blk = blk;
     this.count = count;
     this.parentBlk = parentBlk;
-    this.args = args
-};
+    this.args = args;
+}
 
 /**
  * Converts hexcode to rgb
@@ -2412,11 +2752,11 @@ function Queue (blk, count, parentBlk, args) {
  * @param  {Number} hex hexcode
  * @return {String} rgb values of hexcode + alpha which is 1
  */
-function hex2rgb (hex) {
+function hex2rgb(hex) {
     var bigint = parseInt(hex, 16);
     var r = (bigint >> 16) & 255;
     var g = (bigint >> 8) & 255;
     var b = bigint & 255;
 
-    return 'rgba(' + r + ',' + g + ',' + b + ',1)';
-};
+    return "rgba(" + r + "," + g + "," + b + ",1)";
+}

@@ -58,18 +58,22 @@ function ProtoBlock(name) {
     // Disabled: use inactive colors
     this.disabled = false;
     // Deprecated
-    this.deprecated = false
+    this.deprecated = false;
     //Stores the width of the text component
     this.textWidth = 0;
     this.labelOffset = 0;
     this.beginnerModeBlock = false;
 
-    this.adjustWidthToLabel = function () {
+    this.adjustWidthToLabel = function() {
         if (this.staticLabels.length === 0) {
             return;
         }
         var c = new createjs.Container();
-        var text = new createjs.Text(this.staticLabels[0], this.fontSize + 'px Sans', '#000000');
+        var text = new createjs.Text(
+            this.staticLabels[0],
+            this.fontSize + "px Sans",
+            "#000000"
+        );
         c.addChild(text);
         var b = c.getBounds();
         this.textWidth = b.width;
@@ -85,14 +89,14 @@ function ProtoBlock(name) {
     // only extend their hit area to the top of the clamp.)
 
     // E.g., penup, pendown
-    this.zeroArgBlock = function () {
+    this.zeroArgBlock = function() {
         this.args = 0;
-        this.dockTypes.push('out');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("in");
         this.generator = this.zeroArgBlockGenerator;
     };
 
-    this.zeroArgBlockGenerator = function () {
+    this.zeroArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -103,28 +107,34 @@ function ProtoBlock(name) {
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., hidden (used at end of clamp)
-    this.hiddenBlockFlow = function () {
+    this.hiddenBlockFlow = function() {
         this.args = 0;
         this.size = 0;
-        this.dockTypes.push('out');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("in");
         this.generator = this.hiddenBlockFlowGenerator;
     };
 
     // E.g., hidden (used at end of no flow clamp)
-    this.hiddenBlockNoFlow = function () {
+    this.hiddenBlockNoFlow = function() {
         this.args = 0;
         this.size = 0;
-        this.dockTypes.push('out');
-        this.dockTypes.push('unavailable');
+        this.dockTypes.push("out");
+        this.dockTypes.push("unavailable");
         this.generator = this.hiddenBlockFlowGenerator;
     };
 
-    this.hiddenBlockFlowGenerator = function () {
+    this.hiddenBlockFlowGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -136,21 +146,22 @@ function ProtoBlock(name) {
         // We need to generate the artwork in order to generate the dock.
         var artwork = svg.basicBlock();
         // Then we replace the artwork with a single pixel.
-        var artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
+        var artwork =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
         return [artwork, svg.docks, 0, 0, 0];
     };
 
     // E.g., break
-    this.basicBlockNoFlow = function () {
+    this.basicBlockNoFlow = function() {
         this.args = 0;
-        this.dockTypes.push('out');
-        this.dockTypes.push('unavailable');
+        this.dockTypes.push("out");
+        this.dockTypes.push("unavailable");
         this.generator = this.basicBlockNoFlowGenerator;
     };
 
-    this.basicBlockNoFlowGenerator = function () {
+    this.basicBlockNoFlowGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -163,18 +174,24 @@ function ProtoBlock(name) {
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., collapsed
-    this.basicBlockCollapsed = function () {
+    this.basicBlockCollapsed = function() {
         this.args = 0;
-        this.dockTypes.push('unavailable');
-        this.dockTypes.push('unavailable');
+        this.dockTypes.push("unavailable");
+        this.dockTypes.push("unavailable");
         this.generator = this.basicBlockCollapsedGenerator;
     };
 
-    this.basicBlockCollapsedGenerator = function () {
+    this.basicBlockCollapsedGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -187,19 +204,25 @@ function ProtoBlock(name) {
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., forward, right
-    this.oneArgBlock = function () {
+    this.oneArgBlock = function() {
         this.args = 1;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
         this.generator = this.oneArgBlockGenerator;
     };
 
-    this.oneArgBlockGenerator = function () {
+    this.oneArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -213,20 +236,26 @@ function ProtoBlock(name) {
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., wait for
-    this.oneBooleanArgBlock = function () {
+    this.oneBooleanArgBlock = function() {
         this.args = 1;
         this.size = 1;
-        this.dockTypes.push('out');
-        this.dockTypes.push('booleanin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("booleanin");
+        this.dockTypes.push("in");
         this.generator = this.oneBooleanArgBlockGenerator;
     };
 
-    this.oneBooleanArgBlockGenerator = function () {
+    this.oneBooleanArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -241,23 +270,29 @@ function ProtoBlock(name) {
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., setxy. These are expandable.
-    this.twoArgBlock = function () {
+    this.twoArgBlock = function() {
         this.expandable = true;
-        this.style = 'twoarg';
+        this.style = "twoarg";
         this.size = 2;
         this.args = 2;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
         this.generator = this.twoArgBlockGenerator;
     };
 
-    this.twoArgBlockGenerator = function (expandY) {
+    this.twoArgBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -266,7 +301,12 @@ function ProtoBlock(name) {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -276,24 +316,30 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., ??? These are expandable.
-    this.threeArgBlock = function () {
+    this.threeArgBlock = function() {
         this.expandable = true;
-        this.style = 'twoarg';
+        this.style = "twoarg";
         this.size = 3;
         this.args = 3;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
         this.generator = this.threeArgBlockGenerator;
     };
 
-    this.threeArgBlockGenerator = function (expandY) {
+    this.threeArgBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -302,7 +348,12 @@ function ProtoBlock(name) {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -312,24 +363,30 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
-    this.fourArgBlock = function () {
+    this.fourArgBlock = function() {
         this.expandable = true;
-        this.style = 'twoarg';
+        this.style = "twoarg";
         this.size = 4;
         this.args = 4;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
         this.generator = this.fourArgBlockGenerator;
     };
 
-    this.fourArgBlockGenerator = function (expandY) {
+    this.fourArgBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -338,7 +395,12 @@ function ProtoBlock(name) {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -348,21 +410,27 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., sqrt, box
-    this.oneArgMathBlock = function () {
-        this.style = 'arg';
+    this.oneArgMathBlock = function() {
+        this.style = "arg";
         this.size = 1;
         this.args = 1;
         this.parameter = true;
-        this.dockTypes.push('numberout');
-        this.dockTypes.push('numberin');
+        this.dockTypes.push("numberout");
+        this.dockTypes.push("numberin");
         this.generator = this.oneArgMathBlockGenerator;
     };
 
-    this.oneArgMathBlockGenerator = function () {
+    this.oneArgMathBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -377,23 +445,29 @@ function ProtoBlock(name) {
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., plus, minus, multiply, divide, power,distance. These are also expandable.
-    this.twoArgMathBlock = function () {
+    this.twoArgMathBlock = function() {
         this.expandable = true;
-        this.style = 'arg';
+        this.style = "arg";
         this.size = 2;
         this.args = 2;
         this.parameter = true;
-        this.dockTypes.push('numberout');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
+        this.dockTypes.push("numberout");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
         this.generator = this.twoArgMathBlockGenerator;
     };
 
-    this.twoArgMathBlockGenerator = function (expandY) {
+    this.twoArgMathBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -403,7 +477,12 @@ function ProtoBlock(name) {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -413,24 +492,30 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     //
-    this.threeArgMathBlock = function () {
+    this.threeArgMathBlock = function() {
         this.expandable = true;
-        this.style = 'arg';
+        this.style = "arg";
         this.size = 3;
         this.args = 3;
         this.parameter = true;
-        this.dockTypes.push('numberout');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
+        this.dockTypes.push("numberout");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
         this.generator = this.threeArgMathBlockGenerator;
     };
 
-    this.threeArgMathBlockGenerator = function (expandY) {
+    this.threeArgMathBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -440,7 +525,12 @@ function ProtoBlock(name) {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -450,25 +540,31 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
     // E.g., distance . Distance block will calculate geometrical distance between two pointa
     // by default (cursor x ,cursor y ) and x and y
-    this.fourArgMathBlock = function () {
+    this.fourArgMathBlock = function() {
         this.expandable = true;
-        this.style = 'arg';
+        this.style = "arg";
         this.size = 4;
         this.args = 4;
         this.parameter = true;
-        this.dockTypes.push('numberout');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
+        this.dockTypes.push("numberout");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
         this.generator = this.fourArgMathBlockGenerator;
     };
 
-    this.fourArgMathBlockGenerator = function (expandY) {
+    this.fourArgMathBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -478,7 +574,12 @@ function ProtoBlock(name) {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(30 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                30 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -488,20 +589,26 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBlock();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., number, string. Value blocks get DOM textareas associated
     // with them so their values can be edited by the user.
-    this.valueBlock = function () {
-        this.style = 'value';
+    this.valueBlock = function() {
+        this.style = "value";
         this.size = 1;
         this.args = 0;
-        this.dockTypes.push('numberout');
+        this.dockTypes.push("numberout");
         this.generator = this.valueBlockGenerator;
     };
 
-    this.valueBlockGenerator = function () {
+    this.valueBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -514,21 +621,27 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBox();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., media. Media blocks invoke a chooser and a thumbnail
     // image is overlayed to represent the data associated with the
     // block.
-    this.mediaBlock = function () {
-        this.style = 'value';
+    this.mediaBlock = function() {
+        this.style = "value";
         this.size = 2;
         this.args = 0;
-        this.dockTypes.push('mediaout');
+        this.dockTypes.push("mediaout");
         this.generator = this.mediaBlockGenerator;
     };
 
-    this.mediaBlockGenerator = function () {
+    this.mediaBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -541,23 +654,29 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBox();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., start. A "child" flow is docked in an expandable clamp.
     // There are no additional arguments and no flow above or below.
-    this.stackClampZeroArgBlock = function () {
-        this.style = 'clamp';
+    this.stackClampZeroArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 3;
         this.args = 1;
-        this.dockTypes.push('unavailable');
-        this.dockTypes.push('in');
-        this.dockTypes.push('unavailable');
+        this.dockTypes.push("unavailable");
+        this.dockTypes.push("in");
+        this.dockTypes.push("unavailable");
         this.generator = this.stackClampZeroArgBlockGenerator;
     };
 
-    this.stackClampZeroArgBlockGenerator = function (slots) {
+    this.stackClampZeroArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -577,22 +696,28 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[1][1]
+        ];
     };
 
     // E.g., emptyclamp. Unlike start, there is a flow above and below.
-    this.flowClampBlock = function () {
-        this.style = 'clamp';
+    this.flowClampBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 2;
         this.args = 1;
-        this.dockTypes.push('out');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampBlockGenerator;
     };
 
-    this.flowClampBlockGenerator = function (slots) {
+    this.flowClampBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -612,23 +737,29 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[1][1]
+        ];
     };
 
     // E.g., repeat. Unlike action, there is a flow above and below.
-    this.flowClampOneArgBlock = function () {
-        this.style = 'clamp';
+    this.flowClampOneArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 2;
         this.args = 2;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampOneArgBlockGenerator;
     };
 
-    this.flowClampOneArgBlockGenerator = function (slots) {
+    this.flowClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -649,25 +780,31 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[2][1]
+        ];
     };
 
     // E.g., tuplet, which takes two args plus an interior flow.
     // There is a flow above and below.
-    this.flowClampTwoArgBlock = function () {
-        this.style = 'clamp';
+    this.flowClampTwoArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 3;
         this.args = 3;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampTwoArgBlockGenerator;
     };
 
-    this.flowClampTwoArgBlockGenerator = function (slots) {
+    this.flowClampTwoArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -687,30 +824,36 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[3][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[3][1]
+        ];
     };
 
-    this.flowClampThreeArgBlock = function (){
-        this.style = 'clamp';
+    this.flowClampThreeArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 4;
         this.args = 4;
-        this.dockTypes.push('out');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('textin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("textin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampThreeArgBlockGenerator;
     };
 
-    this.flowClampThreeArgBlockGenerator = function (slots) {
+    this.flowClampThreeArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
-        svg.setInnies([true, true,true]);
+        svg.setInnies([true, true, true]);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
 
         if (slots) {
@@ -724,23 +867,29 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[4][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[4][1]
+        ];
     };
 
     // E.g., do with args: innies instead of interior slots.
-    this.argClampOneArgBlock = function () {
-        this.style = 'argclamp';
+    this.argClampOneArgBlock = function() {
+        this.style = "argclamp";
         this.expandable = true;
         this.size = 3;
         this.args = 2;
-        this.dockTypes.push('out');
-        this.dockTypes.push('textin');
-        this.dockTypes.push('anyin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("textin");
+        this.dockTypes.push("anyin");
+        this.dockTypes.push("in");
         this.generator = this.argClampOneArgBlockGenerator;
     };
 
-    this.argClampOneArgBlockGenerator = function (slots) {
+    this.argClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -762,22 +911,28 @@ function ProtoBlock(name) {
         var artwork = svg.argClamp();
         // The hit area extends halfway between the label dock and the
         // first innie arg dock.
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), (svg.docks[1][1] + svg.docks[2][1]) / 2];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            (svg.docks[1][1] + svg.docks[2][1]) / 2
+        ];
     };
 
     // E.g., calculate with args: innies instead of interior slots.
-    this.argClampOneArgMathBlock = function () {
-        this.style = 'argclamparg';
+    this.argClampOneArgMathBlock = function() {
+        this.style = "argclamparg";
         this.expandable = true;
         this.size = 3;
         this.args = 2;
-        this.dockTypes.push('anyout');
-        this.dockTypes.push('textin');
-        this.dockTypes.push('anyin');
+        this.dockTypes.push("anyout");
+        this.dockTypes.push("textin");
+        this.dockTypes.push("anyin");
         this.generator = this.argClampOneArgMathBlockGenerator;
     };
 
-    this.argClampOneArgMathBlockGenerator = function (slots) {
+    this.argClampOneArgMathBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -800,22 +955,28 @@ function ProtoBlock(name) {
         var artwork = svg.argClamp();
         // The hit area extends halfway between the label dock and the
         // first innie arg dock.
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), (svg.docks[1][1] + svg.docks[2][1]) / 2];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            (svg.docks[1][1] + svg.docks[2][1]) / 2
+        ];
     };
 
     // E.g., named do with args: innies instead of interior slots.
-    this.argClampBlock = function () {
-        this.style = 'argclamp';
+    this.argClampBlock = function() {
+        this.style = "argclamp";
         this.expandable = true;
         this.size = 3;
         this.args = 1;
-        this.dockTypes.push('out');
-        this.dockTypes.push('anyin');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("anyin");
+        this.dockTypes.push("in");
         this.generator = this.argClampBlockGenerator;
     };
 
-    this.argClampBlockGenerator = function (slots) {
+    this.argClampBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -833,21 +994,27 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.argClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1] * 2 / 3];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            (svg.docks[1][1] * 2) / 3
+        ];
     };
 
     // E.g., named calculate with args: innies instead of interior slots.
-    this.argClampMathBlock = function () {
-        this.style = 'argclamparg';
+    this.argClampMathBlock = function() {
+        this.style = "argclamparg";
         this.expandable = true;
         this.size = 3;
         this.args = 1;
-        this.dockTypes.push('anyout');
-        this.dockTypes.push('anyin');
+        this.dockTypes.push("anyout");
+        this.dockTypes.push("anyin");
         this.generator = this.argClampMathBlockGenerator;
     };
 
-    this.argClampMathBlockGenerator = function (slots) {
+    this.argClampMathBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -867,24 +1034,30 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.argClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1] * 2 / 3];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            (svg.docks[1][1] * 2) / 3
+        ];
     };
 
     // E.g., if.  A "child" flow is docked in an expandable clamp. The
     // additional argument is a boolean. There is flow above and below.
-    this.flowClampBooleanArgBlock = function () {
-        this.style = 'clamp';
+    this.flowClampBooleanArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 3;
         this.args = 2;
-        this.dockTypes.push('out');
-        this.dockTypes.push('booleanin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("booleanin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampBooleanArgBlockGenerator;
     };
 
-    this.flowClampBooleanArgBlockGenerator = function (slots) {
+    this.flowClampBooleanArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -904,26 +1077,35 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[2][1]
+        ];
     };
 
     // E.g., if then else.  Two "child" flows are docked in expandable
     // clamps. The additional argument is a boolean. There is flow
     // above and below.
-    this.doubleFlowClampBooleanArgBlock = function () {
-        this.style = 'doubleclamp';
+    this.doubleFlowClampBooleanArgBlock = function() {
+        this.style = "doubleclamp";
         this.expandable = true;
         this.size = 4;
         this.args = 3;
-        this.dockTypes.push('out');
-        this.dockTypes.push('booleanin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("booleanin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
     };
 
-    this.doubleFlowClampBooleanArgBlockGenerator = function (bottomSlots, topSlots) {
+    this.doubleFlowClampBooleanArgBlockGenerator = function(
+        bottomSlots,
+        topSlots
+    ) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -951,22 +1133,28 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[2][1]
+        ];
     };
 
     // E.g., forever. Unlike start, there is flow above and below.
-    this.flowClampZeroArgBlock = function () {
-        this.style = 'clamp';
+    this.flowClampZeroArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 2;
         this.args = 1;
-        this.dockTypes.push('out');
-        this.dockTypes.push('in');
-        this.dockTypes.push('in');
+        this.dockTypes.push("out");
+        this.dockTypes.push("in");
+        this.dockTypes.push("in");
         this.generator = this.flowClampZeroArgBlockGenerator;
     };
 
-    this.flowClampZeroArgBlockGenerator = function (slots) {
+    this.flowClampZeroArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -985,21 +1173,27 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[1][1]
+        ];
     };
 
     // E.g., count clamp: math block with interior slots
-    this.argFlowClampBlock = function () {
-        this.style = 'argflowclamp';
+    this.argFlowClampBlock = function() {
+        this.style = "argflowclamp";
         this.expandable = true;
         this.size = 3;
         this.args = 1;
-        this.dockTypes.push('anyout');
-        this.dockTypes.push('in');
+        this.dockTypes.push("anyout");
+        this.dockTypes.push("in");
         this.generator = this.argFlowClampGenerator;
     };
 
-    this.argFlowClampGenerator = function (slots) {
+    this.argFlowClampGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1018,24 +1212,30 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[1][1]
+        ];
     };
 
     // E.g., action. A "child" flow is docked in an expandable clamp.
     // The additional argument is a name. Again, no flow above or below.
-    this.stackClampOneArgBlock = function () {
-        this.style = 'clamp';
+    this.stackClampOneArgBlock = function() {
+        this.style = "clamp";
         this.expandable = true;
         this.size = 3;
         this.args = 2;
-        this.dockTypes.push('unavailable');
-        this.dockTypes.push('anyin');
-        this.dockTypes.push('in');
-        this.dockTypes.push('unavailable');
+        this.dockTypes.push("unavailable");
+        this.dockTypes.push("anyin");
+        this.dockTypes.push("in");
+        this.dockTypes.push("unavailable");
         this.generator = this.stackClampOneArgBlockGenerator;
     };
 
-    this.stackClampOneArgBlockGenerator = function (slots) {
+    this.stackClampOneArgBlockGenerator = function(slots) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1056,19 +1256,25 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicClamp();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.docks[2][1]
+        ];
     };
 
     // E.g., mouse button.
-    this.booleanZeroArgBlock = function () {
-        this.style = 'arg';
+    this.booleanZeroArgBlock = function() {
+        this.style = "arg";
         this.size = 1;
         this.args = 0;
-        this.dockTypes.push('booleanout');
+        this.dockTypes.push("booleanout");
         this.generator = this.booleanZeroArgBlockGenerator;
     };
 
-    this.booleanZeroArgBlockGenerator = function () {
+    this.booleanZeroArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1079,21 +1285,27 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.booleanNot(true);
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., named sensor blocks
-    this.booleanOneArgBlock = function () {
-        this.style = 'arg';
+    this.booleanOneArgBlock = function() {
+        this.style = "arg";
         this.size = 2;
         this.args = 1;
         this.parameter = true;
-        this.dockTypes.push('booleanout');
-        this.dockTypes.push('textin');
+        this.dockTypes.push("booleanout");
+        this.dockTypes.push("textin");
         this.generator = this.booleanOneArgBlockGenerator;
     };
 
-    this.booleanOneArgBlockGenerator = function () {
+    this.booleanOneArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1104,22 +1316,28 @@ function ProtoBlock(name) {
         }
 
         svg.setInnies([true]);
-        var artwork = svg.booleanNot(true);  // OneArg
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        var artwork = svg.booleanNot(true); // OneArg
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., not
-    this.booleanOneBooleanArgBlock = function () {
-        this.style = 'arg';
+    this.booleanOneBooleanArgBlock = function() {
+        this.style = "arg";
         this.size = 2;
         this.args = 1;
         this.parameter = true;
-        this.dockTypes.push('booleanout');
-        this.dockTypes.push('booleanin');
+        this.dockTypes.push("booleanout");
+        this.dockTypes.push("booleanin");
         this.generator = this.booleanOneBooleanArgBlockGenerator;
     };
 
-    this.booleanOneBooleanArgBlockGenerator = function () {
+    this.booleanOneBooleanArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1130,22 +1348,28 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.booleanNot(false);
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., and, or
-    this.booleanTwoBooleanArgBlock = function () {
-        this.style = 'arg';
+    this.booleanTwoBooleanArgBlock = function() {
+        this.style = "arg";
         this.size = 3;
         this.args = 2;
         this.parameter = true;
-        this.dockTypes.push('booleanout');
-        this.dockTypes.push('booleanin');
-        this.dockTypes.push('booleanin');
+        this.dockTypes.push("booleanout");
+        this.dockTypes.push("booleanin");
+        this.dockTypes.push("booleanin");
         this.generator = this.booleanTwoBooleanArgBlockGenerator;
     };
 
-    this.booleanTwoBooleanArgBlockGenerator = function () {
+    this.booleanTwoBooleanArgBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1156,29 +1380,40 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.booleanAndOr();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., greater, less, equal
-    this.booleanTwoArgBlock = function () {
-        this.style = 'arg';
+    this.booleanTwoArgBlock = function() {
+        this.style = "arg";
         this.size = 2;
         this.args = 2;
         this.parameter = true;
         this.expandable = true;
-        this.dockTypes.push('booleanout');
-        this.dockTypes.push('numberin');
-        this.dockTypes.push('numberin');
+        this.dockTypes.push("booleanout");
+        this.dockTypes.push("numberin");
+        this.dockTypes.push("numberin");
         this.generator = this.booleanTwoArgBlockGenerator;
     };
 
-    this.booleanTwoArgBlockGenerator = function (expandY) {
+    this.booleanTwoArgBlockGenerator = function(expandY) {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
 
         if (expandY) {
-            svg.setExpand(10 + this.extraWidth, (expandY - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
+            svg.setExpand(
+                10 + this.extraWidth,
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
+                0,
+                0
+            );
         } else {
             svg.setExpand(10 + this.extraWidth, 0, 0, 0);
         }
@@ -1188,20 +1423,26 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.booleanCompare();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
 
     // E.g., color, shade, pensize, ...
-    this.parameterBlock = function () {
-        this.style = 'arg';
+    this.parameterBlock = function() {
+        this.style = "arg";
         this.parameter = true;
         this.size = 1;
         this.args = 0;
-        this.dockTypes.push('numberout');
+        this.dockTypes.push("numberout");
         this.generator = this.parameterBlockGenerator;
     };
 
-    this.parameterBlockGenerator = function () {
+    this.parameterBlockGenerator = function() {
         var svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
@@ -1214,16 +1455,19 @@ function ProtoBlock(name) {
         }
 
         var artwork = svg.basicBox();
-        return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
+        return [
+            artwork,
+            svg.docks,
+            svg.getWidth(),
+            svg.getHeight(),
+            svg.getHeight()
+        ];
     };
-
-};
-
+}
 
 function isObject(item) {
-    return (item && typeof item === 'object' && !Array.isArray(item));
-};
-
+    return item && typeof item === "object" && !Array.isArray(item);
+}
 
 function mergeDeep(target, ...sources) {
     // From https://stackoverflow.com/a/34749873
@@ -1242,15 +1486,14 @@ function mergeDeep(target, ...sources) {
     }
 
     return mergeDeep(target, ...sources);
-};
-
+}
 
 class BaseBlock extends ProtoBlock {
     constructor(name) {
         super(name);
 
         this.macroFunc = null;
-        this._style = {}
+        this._style = {};
         this.beginnerModeBlock = false;
         this.helpString = [];
 
@@ -1259,7 +1502,7 @@ class BaseBlock extends ProtoBlock {
     }
 
     setPalette(palette) {
-        this.palette = palettes.dict[palette]
+        this.palette = palettes.dict[palette];
     }
 
     setHelpString(help) {
@@ -1272,7 +1515,7 @@ class BaseBlock extends ProtoBlock {
         this._style.argTypes = this._style.argTypes || [];
         this._style.argLabels = this._style.argLabels || [];
         this._style.defaults = this._style.defaults || [];
-        this._style.flows = this._style.flows || {}
+        this._style.flows = this._style.flows || {};
         this._style.flows.labels = this._style.flows.labels || [];
 
         if (this._style.args > 1) {
@@ -1280,150 +1523,178 @@ class BaseBlock extends ProtoBlock {
         }
 
         if (this._style.flows.labels.length > 0) {
-            if (this._style.flows.type === 'arg')
-                this.style = 'argclamp';
-            else if (this._style.flows.type === 'value')
-                this.style = 'value';
+            if (this._style.flows.type === "arg") this.style = "argclamp";
+            else if (this._style.flows.type === "value") this.style = "value";
             else if (this._style.flows.labels.length == 2)
-                this.style = 'doubleclamp';
-            else
-                this.style = 'clamp';
+                this.style = "doubleclamp";
+            else this.style = "clamp";
             this.expandable = true;
         } else {
-            if (this._style.flows.type === 'value')
-                this.style = 'value';
+            if (this._style.flows.type === "value") this.style = "value";
             else if (this._style.flows.left) {
-                this.style = 'arg';
+                this.style = "arg";
                 this.parameter = true;
-            } else if (this._style.args === 2)
-                this.style = 'twoarg';
+            } else if (this._style.args === 2) this.style = "twoarg";
         }
 
-	if (this._style.flows.type === 'value' && this._style.args === 2)
-	    this.expandable = true;
+        if (this._style.flows.type === "value" && this._style.args === 2)
+            this.expandable = true;
 
         this.args = this._style.flows.labels.length + this._style.args;
-	if (this.size === 0) {
-	} else {
+        if (this.size === 0) {
+        } else {
             this.size = 1 + this._style.flows.labels.length;
-	}
-        if (this._style.argTypes[0] === 'booleanin') this.size++;
-        else if (this._style.argTypes[1] === 'booleanin') this.size++;
+        }
+        if (this._style.argTypes[0] === "booleanin") this.size++;
+        else if (this._style.argTypes[1] === "booleanin") this.size++;
         else this.size += Math.max(0, this._style.args - 1);
-        if (this._style.flows.type === 'arg') this.size++;
+        if (this._style.flows.type === "arg") this.size++;
         if (this._style.image) {
             this.size++;
             this.image = this._style.image;
         }
 
-        this.staticLabels = [this._style.name || ''];
+        this.staticLabels = [this._style.name || ""];
         this.dockTypes = [];
         this.defaults = [];
         this._style.argLabels.forEach(i => this.staticLabels.push(i));
         this._style.flows.labels.forEach(i => this.staticLabels.push(i));
 
         if (this._style.flows.left)
-            this.dockTypes.push(this._style.outType || 'numberout');
+            this.dockTypes.push(this._style.outType || "numberout");
         if (this._style.flows.top)
-            this.dockTypes.push(this._style.flows.top === 'cap' ? 'unavailable' : 'out');
-        if (typeof this._style.args === 'number')
+            this.dockTypes.push(
+                this._style.flows.top === "cap" ? "unavailable" : "out"
+            );
+        if (typeof this._style.args === "number")
             for (let i = 0; i < this._style.args; i++) {
-                this.dockTypes.push(this._style.argTypes[i] || 'numberin');
+                this.dockTypes.push(this._style.argTypes[i] || "numberin");
                 if (i < this._style.defaults.length)
                     this.defaults.push(this._style.defaults[i]);
             }
-        if (this._style.flows.type === 'arg')
+        if (this._style.flows.type === "arg")
             for (let i = 0; i < this._style.flows.labels.length; i++)
-                this.dockTypes.push(this._style.flows.types[i] || 'numberin');
+                this.dockTypes.push(this._style.flows.types[i] || "numberin");
         for (let i = 0; i < this._style.flows.labels.length; i++)
-            this.dockTypes.push('in');
+            this.dockTypes.push("in");
         if (this._style.flows.bottom)
-            this.dockTypes.push(this._style.flows.bottom === 'tail' ? 'unavailable' : 'in');
+            this.dockTypes.push(
+                this._style.flows.bottom === "tail" ? "unavailable" : "in"
+            );
 
-        this.generator = function () {
+        this.generator = function() {
             var svg = new SVG();
             svg.init();
             svg.setScale(this.scale);
 
-            if (this._style.flows.top === 'cap')
-                svg.setCap(true);
-            else
-                svg.setSlot(this._style.flows.top);
+            if (this._style.flows.top === "cap") svg.setCap(true);
+            else svg.setSlot(this._style.flows.top);
 
-            if (this._style.flows.bottom === 'tail')
-                svg.setTail(true);
-            else if (this._style.flows.bottom)
-                svg.setTab(true);
-            if (this._style.flows.left)
-                svg.setOutie(true);
+            if (this._style.flows.bottom === "tail") svg.setTail(true);
+            else if (this._style.flows.bottom) svg.setTab(true);
+            if (this._style.flows.left) svg.setOutie(true);
 
-            let pad = (this._style.flows.type === 'value') ? 60 : 20;
+            let pad = this._style.flows.type === "value" ? 60 : 20;
             if (!this._style.flows.type) pad += 10;
-            if (this._style.outType === 'booleanout' && this._style.args === 2) pad -= 30;
-            else if (this._style.argTypes[0] === 'booleanin') pad -= 5;
+            if (this._style.outType === "booleanout" && this._style.args === 2)
+                pad -= 30;
+            else if (this._style.argTypes[0] === "booleanin") pad -= 5;
             if (this.size !== 0)
-                svg.setExpand(pad + this.extraWidth, this.image ? 23 : 0, 0,
-                    this._style.outType === 'booleanout' && !this._style.args ? 4 : 0);
+                svg.setExpand(
+                    pad + this.extraWidth,
+                    this.image ? 23 : 0,
+                    0,
+                    this._style.outType === "booleanout" && !this._style.args
+                        ? 4
+                        : 0
+                );
 
-            for (let i = arguments.length; i < this._style.flows.labels.length; i++)
+            for (
+                let i = arguments.length;
+                i < this._style.flows.labels.length;
+                i++
+            )
                 svg.setClampSlots(i, 1);
             svg.setClampCount(this._style.flows.labels.length);
 
             for (let i = 0; i < arguments.length; i++) {
-		if (this._style.flows.type == undefined) {
-		    svg.setExpand(30 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
-		} else if (this._style.flows.type == 'value') {
-		    svg.setExpand(60 + this.extraWidth, (arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT / 2, 0, 0);
-		} else {
-                    svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
-		}
-	    }
+                if (this._style.flows.type == undefined) {
+                    svg.setExpand(
+                        30 + this.extraWidth,
+                        ((arguments[arguments.length - i - 1] - 1) *
+                            STANDARDBLOCKHEIGHT) /
+                            2,
+                        0,
+                        0
+                    );
+                } else if (this._style.flows.type == "value") {
+                    svg.setExpand(
+                        60 + this.extraWidth,
+                        ((arguments[arguments.length - i - 1] - 1) *
+                            STANDARDBLOCKHEIGHT) /
+                            2,
+                        0,
+                        0
+                    );
+                } else {
+                    svg.setClampSlots(
+                        i,
+                        arguments[arguments.length - i - 1] || 1
+                    );
+                }
+            }
 
-            if (this._style.argTypes[0] === 'booleanin') {
-                svg.setBoolean(true)
-            } else if (typeof this._style.args === 'number') {
+            if (this._style.argTypes[0] === "booleanin") {
+                svg.setBoolean(true);
+            } else if (typeof this._style.args === "number") {
                 svg.setInnies(Array(this._style.args).fill(true));
             }
 
             // Make space for the expand icon
-            if (this._style.canCollapse)
-                svg.setLabelOffset(15);
+            if (this._style.canCollapse) svg.setLabelOffset(15);
 
-            if (this.fontsize)
-                svg.setFontSize(this.fontsize);
+            if (this.fontsize) svg.setFontSize(this.fontsize);
 
             let artwork;
-            if (this._style.flows.type === 'arg') {
+            if (this._style.flows.type === "arg") {
                 artwork = svg.argClamp();
-            } else if (this._style.flows.type === 'flow') {
+            } else if (this._style.flows.type === "flow") {
                 artwork = svg.basicClamp();
-            } else if (this._style.outType === 'booleanout') {
+            } else if (this._style.outType === "booleanout") {
                 if (this._style.args === 1 || !this._style.args) {
                     artwork = svg.booleanNot(!this._style.args);
-                } else if (this._style.argTypes[0] === 'booleanin') {
+                } else if (this._style.argTypes[0] === "booleanin") {
                     artwork = svg.booleanAndOr();
                 } else {
                     artwork = svg.booleanCompare();
                 }
-            } else if (this._style.flows.type === 'value') {
+            } else if (this._style.flows.type === "value") {
                 artwork = svg.basicBox();
             } else {
                 artwork = svg.basicBlock();
             }
             // If the block has 0 size, clear out the artwork
             if (this.size === 0) {
-                artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
+                artwork =
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
                 svg.docks[1][1] = svg.docks[0][1];
-	    }
+            }
             let clickHeight;
             if (this._style.flows.top || this._style.flows.bottom)
-                clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length - 1][1];
-            else
-                clickHeight = svg.getHeight();
+                clickHeight =
+                    svg.docks[
+                        svg.docks.length - this._style.flows.labels.length - 1
+                    ][1];
+            else clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
-            return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
+            return [
+                artwork,
+                svg.docks,
+                svg.getWidth(),
+                svg.getHeight(),
+                clickHeight
+            ];
         };
-
     }
 
     makeMacro(macroFunc) {
@@ -1445,30 +1716,30 @@ class BaseBlock extends ProtoBlock {
             this.hidden = true;
         }
 
-        if (this._style.name)
-            this.adjustWidthToLabel();
+        if (this._style.name) this.adjustWidthToLabel();
         if (!this.palette)
-            console.warn('Block ' + this.name + ' was not added to a palette!');
-        else
-            this.palette.add(this);
+            console.warn("Block " + this.name + " was not added to a palette!");
+        else this.palette.add(this);
     }
 }
-
 
 class ValueBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
         displayName = displayName || undefined;
 
-        this.formBlock({
-            name: displayName,
-            flows: {
-                left: true, type: 'value'
-            }
-        }, !!displayName);
+        this.formBlock(
+            {
+                name: displayName,
+                flows: {
+                    left: true,
+                    type: "value"
+                }
+            },
+            !!displayName
+        );
     }
 }
-
 
 class BooleanBlock extends BaseBlock {
     constructor(name) {
@@ -1476,13 +1747,13 @@ class BooleanBlock extends BaseBlock {
 
         this.formBlock({
             flows: {
-                left: true, type: 'value'
+                left: true,
+                type: "value"
             },
-            outType: 'booleanout'
+            outType: "booleanout"
         });
     }
 }
-
 
 class BooleanSensorBlock extends BaseBlock {
     constructor(name, displayName) {
@@ -1492,43 +1763,49 @@ class BooleanSensorBlock extends BaseBlock {
         this.formBlock({
             name: displayName,
             flows: {
-                left: true, type: 'value'
+                left: true,
+                type: "value"
             },
-            outType: 'booleanout'
+            outType: "booleanout"
         });
     }
 }
-
 
 class FlowBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
         displayName = displayName || undefined;
 
-        this.formBlock({
-            name: displayName,
-            flows: {
-                top: true, bottom: true
-            }
-        }, !!displayName);
+        this.formBlock(
+            {
+                name: displayName,
+                flows: {
+                    top: true,
+                    bottom: true
+                }
+            },
+            !!displayName
+        );
     }
 }
-
 
 class LeftBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
         displayName = displayName || undefined;
 
-        this.formBlock({
-            name: displayName,
-            flows: {
-                left: true, type: null
-            }
-        }, !!displayName);
+        this.formBlock(
+            {
+                name: displayName,
+                flows: {
+                    left: true,
+                    type: null
+                }
+            },
+            !!displayName
+        );
     }
 }
-
 
 class FlowClampBlock extends FlowBlock {
     constructor(name) {
@@ -1537,12 +1814,12 @@ class FlowClampBlock extends FlowBlock {
         this.extraWidth = 20;
         this.formBlock({
             flows: {
-                type: 'flow', labels: ['']
+                type: "flow",
+                labels: [""]
             }
         });
     }
 }
-
 
 class StackClampBlock extends BaseBlock {
     constructor(name) {
@@ -1551,8 +1828,10 @@ class StackClampBlock extends BaseBlock {
         this.extraWidth = 40;
         this.formBlock({
             flows: {
-                top: 'cap', bottom: 'tail',
-                type: 'flow', labels: ['']
+                top: "cap",
+                bottom: "tail",
+                type: "flow",
+                labels: [""]
             }
         });
     }

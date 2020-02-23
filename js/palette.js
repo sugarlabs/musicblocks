@@ -22,16 +22,14 @@ function maxPaletteHeight(menuSize, scale) {
     // hence - 2 * menuSize.
 
     // var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
-    var h = windowHeight() / scale - (2 * menuSize);
-    return h - (h % STANDARDBLOCKHEIGHT) + (STANDARDBLOCKHEIGHT / 2);
-};
-
+    var h = windowHeight() / scale - 2 * menuSize;
+    return h - (h % STANDARDBLOCKHEIGHT) + STANDARDBLOCKHEIGHT / 2;
+}
 
 function paletteBlockButtonPush(blocks, name, arg) {
     var blk = blocks.makeBlock(name, arg);
     return blk;
-};
-
+}
 
 // There are several components to the palette system:
 //
@@ -51,8 +49,7 @@ function paletteBlockButtonPush(blocks, name, arg) {
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 const NPALETTES = 3;
 
-
-function Palettes () {
+function Palettes() {
     this.canvas = null;
     this.blocks = null;
     this.refreshCanvas = null;
@@ -60,13 +57,17 @@ function Palettes () {
     this.cellSize = null;
     this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
     this.scrollDiff = 0;
-    this.originalSize = 55;  // this is the original svg size
+    this.originalSize = 55; // this is the original svg size
     this.trashcan = null;
     this.firstTime = true;
     this.background = null;
     this.circles = {};
     // paletteText is used for the highlighted tooltip
-    this.paletteText = new createjs.Text('', '20px Sans', platformColor.paletteText);
+    this.paletteText = new createjs.Text(
+        "",
+        "20px Sans",
+        platformColor.paletteText
+    );
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -78,33 +79,32 @@ function Palettes () {
     // Top of the palette
     this.top = 55 + 20 + LEADING;
     this.current = DEFAULTPALETTE;
-    this.x = [];  // We track x and y for each of the multipalettes
+    this.x = []; // We track x and y for each of the multipalettes
     this.y = [];
     this.showSearchWidget = null;
     this.hideSearchWidget = null;
 
-    this.pluginMacros = {};  // some macros are defined in plugins
+    this.pluginMacros = {}; // some macros are defined in plugins
 
     if (sugarizerCompatibility.isInsideSugarizer()) {
         storage = sugarizerCompatibility.data;
     } else {
         storage = localStorage;
     }
-    
+
     // The collection of palettes.
     this.dict = {};
-    this.selectorButtonsOff = [];  // Select between palettes
-    this.selectorButtonsOn = [];  // Select between palettes in their on state
-    this.buttons = {};  // The toolbar button for each palette.
-    this.labels = {};  // The label for each button.
-    this.pluginPalettes = [];  // List of palettes not in multipalette list
+    this.selectorButtonsOff = []; // Select between palettes
+    this.selectorButtonsOn = []; // Select between palettes in their on state
+    this.buttons = {}; // The toolbar button for each palette.
+    this.labels = {}; // The label for each button.
+    this.pluginPalettes = []; // List of palettes not in multipalette list
 
-    this.init = function () {
+    this.init = function() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
-
     };
 
-    this.init_selectors = function () {
+    this.init_selectors = function() {
         for (var i = 0; i < MULTIPALETTES.length; i++) {
             this._makeSelectorButton(i);
             this.x.push(0);
@@ -113,7 +113,7 @@ function Palettes () {
         }
     };
 
-    this.deltaY = function (dy) {
+    this.deltaY = function(dy) {
         for (var i = 0; i < this.selectorButtonsOff.length; i++) {
             this.selectorButtonsOff[i].y += dy;
             this.selectorButtonsOn[i].y += dy;
@@ -139,11 +139,11 @@ function Palettes () {
         this.background.y += dy;
     };
 
-    this._makeSelectorButton = function (i) {
-        console.debug('makeSelectorButton ' + i);
+    this._makeSelectorButton = function(i) {
+        console.debug("makeSelectorButton " + i);
 
-        __processSelectButtonOff = function (that, name, bitmap, arg) {
-            var scale = 1.5 * that.cellSize / that.originalSize;
+        __processSelectButtonOff = function(that, name, bitmap, arg) {
+            var scale = (1.5 * that.cellSize) / that.originalSize;
             bitmap.x = arg * scale * 55;
             bitmap.y = that.top;
             bitmap.scaleX = scale;
@@ -151,18 +151,18 @@ function Palettes () {
             // FIXME: rescale needs to reset all of this.
             that.stage.addChild(bitmap);
             that.selectorButtonsOff.push(bitmap);
-            that.selectorButtonsOff[i].on('click', function (event) {
+            that.selectorButtonsOff[i].on("click", function(event) {
                 // console.debug('SHOWING ' + i + ' via mouse click');
                 that.showSelection(i);
             });
 
-            that.selectorButtonsOff[i].on('mouseover', function (event) {
+            that.selectorButtonsOff[i].on("mouseover", function(event) {
                 that.showSelection(i);
             });
         };
 
-        __processSelectButtonOn = function (that, name, bitmap, arg) {
-            var scale = 1.5 * that.cellSize / that.originalSize;
+        __processSelectButtonOn = function(that, name, bitmap, arg) {
+            var scale = (1.5 * that.cellSize) / that.originalSize;
             bitmap.x = arg * scale * 55;
             bitmap.y = that.top;
             bitmap.scaleX = scale;
@@ -172,12 +172,36 @@ function Palettes () {
             that.selectorButtonsOn.push(bitmap);
         };
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorBackground).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOff, i);
+        makePaletteBitmap(
+            this,
+            PALETTEICONS[MULTIPALETTEICONS[i]]
+                .replace(
+                    "background_fill_color",
+                    platformColor.selectorBackground
+                )
+                .replace(/stroke_color/g, platformColor.ruleColor)
+                .replace(/fill_color/g, platformColor.background),
+            MULTIPALETTENAMES[i],
+            __processSelectButtonOff,
+            i
+        );
 
-        makePaletteBitmap(this, PALETTEICONS[MULTIPALETTEICONS[i]].replace('background_fill_color', platformColor.selectorSelected).replace(/stroke_color/g, platformColor.ruleColor).replace(/fill_color/g, platformColor.background), MULTIPALETTENAMES[i], __processSelectButtonOn, i);
+        makePaletteBitmap(
+            this,
+            PALETTEICONS[MULTIPALETTEICONS[i]]
+                .replace(
+                    "background_fill_color",
+                    platformColor.selectorSelected
+                )
+                .replace(/stroke_color/g, platformColor.ruleColor)
+                .replace(/fill_color/g, platformColor.background),
+            MULTIPALETTENAMES[i],
+            __processSelectButtonOn,
+            i
+        );
     };
 
-    this.showSelection = function (i) {
+    this.showSelection = function(i) {
         for (var j = 0; j < this.selectorButtonsOn.length; j++) {
             if (j === i) {
                 this.selectorButtonsOn[j].visible = true;
@@ -195,22 +219,23 @@ function Palettes () {
                 continue;
             }
 
-            if (name === 'search') {
+            if (name === "search") {
                 this.buttons[name].visible = true;
                 this.labels[name].visible = true;
             } else if (MULTIPALETTES[i].indexOf(name) === -1) {
                 this.buttons[name].visible = false;
                 this.labels[name].visible = false;
-                if (i === MULTIPALETTES.length - 1) { // last selector
+                if (i === MULTIPALETTES.length - 1) {
+                    // last selector
                     if (this.pluginPalettes.indexOf(name) > -1) {
-                        console.debug('Showing ' + name);
+                        console.debug("Showing " + name);
                         this.buttons[name].visible = true;
                         this.labels[name].visible = true;
                     }
                 }
             } else {
-                if (name === 'myblocks') {
-                    var n = palettes.countProtoBlocks('myblocks');
+                if (name === "myblocks") {
+                    var n = palettes.countProtoBlocks("myblocks");
                     if (n === 0) {
                         this.buttons[name].visible = false;
                         this.labels[name].visible = false;
@@ -228,32 +253,32 @@ function Palettes () {
         this.refreshCanvas();
     };
 
-    this.setCanvas = function (canvas) {
+    this.setCanvas = function(canvas) {
         this.canvas = canvas;
         return this;
     };
 
-    this.setStage = function (stage) {
+    this.setStage = function(stage) {
         this.stage = stage;
         return this;
     };
 
-    this.setRefreshCanvas = function (refreshCanvas) {
+    this.setRefreshCanvas = function(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
 
-    this.setTrashcan = function (trashcan) {
+    this.setTrashcan = function(trashcan) {
         this.trashcan = trashcan;
         return this;
     };
 
-    this.setSize = function (size) {
-        this.cellSize = Math.floor((size * PALETTE_SCALE_FACTOR) + 0.5);
+    this.setSize = function(size) {
+        this.cellSize = Math.floor(size * PALETTE_SCALE_FACTOR + 0.5);
         return this;
     };
 
-    this.setMobile = function (mobile) {
+    this.setMobile = function(mobile) {
         this.mobile = mobile;
         if (mobile) {
             this._hideMenus();
@@ -262,7 +287,7 @@ function Palettes () {
         return this;
     };
 
-    this.setScale = function (scale) {
+    this.setScale = function(scale) {
         this.scale = scale;
 
         this._updateButtonMasks();
@@ -272,29 +297,29 @@ function Palettes () {
         }
 
         if (this.downIndicator != null) {
-            this.downIndicator.y = (windowHeight() / scale) - 27;
+            this.downIndicator.y = windowHeight() / scale - 27;
         }
 
         return this;
     };
 
     // We need access to the macro dictionary because we load them.
-    this.setMacroDictionary = function (obj) {
+    this.setMacroDictionary = function(obj) {
         this.macroDict = obj;
         return this;
     };
 
-    this.setSearch = function (show, hide) {
+    this.setSearch = function(show, hide) {
         this.showSearchWidget = show;
         this.hideSearchWidget = hide;
         return this;
-    }
-
-    this.getSearchPos = function () {
-        return [this.cellSize, this.top + this.cellSize * 1.75]
     };
 
-    this.getPluginMacroExpansion = function (blkname, x, y) {
+    this.getSearchPos = function() {
+        return [this.cellSize, this.top + this.cellSize * 1.75];
+    };
+
+    this.getPluginMacroExpansion = function(blkname, x, y) {
         console.debug(this.pluginMacros[blkname]);
         var obj = this.pluginMacros[blkname];
         if (obj != null) {
@@ -302,14 +327,17 @@ function Palettes () {
             obj[0][3] = y;
         }
 
-        return (obj);
+        return obj;
     };
 
-    this.countProtoBlocks = function (name) {
+    this.countProtoBlocks = function(name) {
         // How many protoblocks are in palette name?
         var n = 0;
         for (var b in this.blocks.protoBlockDict) {
-            if (this.blocks.protoBlockDict[b].palette !== null && this.blocks.protoBlockDict[b].palette.name === name) {
+            if (
+                this.blocks.protoBlockDict[b].palette !== null &&
+                this.blocks.protoBlockDict[b].palette.name === name
+            ) {
                 n += 1;
             }
         }
@@ -317,7 +345,7 @@ function Palettes () {
         return n;
     };
 
-    this._updateButtonMasks = function () {
+    this._updateButtonMasks = function() {
         for (var name in this.buttons) {
             var s = new createjs.Shape();
             s.graphics.r(0, 0, this.cellSize, windowHeight() / this.scale);
@@ -327,7 +355,7 @@ function Palettes () {
         }
     };
 
-    this.hidePaletteIconCircles = function () {
+    this.hidePaletteIconCircles = function() {
         // paletteText might not be defined yet.
         if (!sugarizerCompatibility.isInsideSugarizer()) {
             hidePaletteNameDisplay(this.paletteText, this.stage);
@@ -336,23 +364,50 @@ function Palettes () {
         hideButtonHighlight(this.circles, this.stage);
     };
 
-    this.getProtoNameAndPalette = function (name) {
+    this.getProtoNameAndPalette = function(name) {
         for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
-            if (name === this.blocks.protoBlockDict[b].staticLabels[0] && !this.blocks.protoBlockDict[b].hidden) {
-                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+            if (
+                name === this.blocks.protoBlockDict[b].staticLabels[0] &&
+                !this.blocks.protoBlockDict[b].hidden
+            ) {
+                return [
+                    b,
+                    this.blocks.protoBlockDict[b].palette.name,
+                    this.blocks.protoBlockDict[b].name
+                ];
             } else if (name === b && !this.blocks.protoBlockDict[b].hidden) {
-                return [b, this.blocks.protoBlockDict[b].palette.name, this.blocks.protoBlockDict[b].name];
+                return [
+                    b,
+                    this.blocks.protoBlockDict[b].palette.name,
+                    this.blocks.protoBlockDict[b].name
+                ];
             }
         }
 
         return [null, null, null];
     };
 
-    this.makePalettes = function (hide) {
+    this.makePalettes = function(hide) {
         if (this.firstTime) {
             var shape = new createjs.Shape();
-            shape.graphics.f(platformColor.ruleColor).r(0, this.top, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, 8 * STANDARDBLOCKHEIGHT).ef().f(platformColor.paletteBackground).r(2, this.top + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, 8 * STANDARDBLOCKHEIGHT - 4).ef();
+            shape.graphics
+                .f(platformColor.ruleColor)
+                .r(
+                    0,
+                    this.top,
+                    Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT,
+                    8 * STANDARDBLOCKHEIGHT
+                )
+                .ef()
+                .f(platformColor.paletteBackground)
+                .r(
+                    2,
+                    this.top + 2,
+                    Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4,
+                    8 * STANDARDBLOCKHEIGHT - 4
+                )
+                .ef();
             shape.width = this.paletteWidth;
             shape.height = windowHeight();
             this.stage.addChild(shape);
@@ -373,19 +428,37 @@ function Palettes () {
             }
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, that.cellSize * PALETTE_WIDTH_FACTOR, that.cellSize);
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawEllipse(
+                    0,
+                    0,
+                    that.cellSize * PALETTE_WIDTH_FACTOR,
+                    that.cellSize
+                );
             that.buttons[name].hitArea = hitArea;
             that.buttons[name].visible = false;
 
             that.dict[name].makeMenu(true);
-            that.dict[name]._moveMenu( Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT, that.top);
+            that.dict[name]._moveMenu(
+                Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT,
+                that.top
+            );
             that.dict[name]._updateMenu(false);
 
             // Add tooltip for palette buttons
-            if (localStorage.kanaPreference === 'kana') {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '12px Sans', platformColor.paletteText);
+            if (localStorage.kanaPreference === "kana") {
+                that.labels[name] = new createjs.Text(
+                    toTitleCase(_(name)),
+                    "12px Sans",
+                    platformColor.paletteText
+                );
             } else {
-                that.labels[name] = new createjs.Text(toTitleCase(_(name)), '16px Sans', platformColor.paletteText);
+                that.labels[name] = new createjs.Text(
+                    toTitleCase(_(name)),
+                    "16px Sans",
+                    platformColor.paletteText
+                );
             }
 
             var r = that.cellSize / 2;
@@ -394,7 +467,7 @@ function Palettes () {
             that.stage.addChild(that.labels[name]);
 
             that._loadPaletteButtonHandler(name);
-        };
+        }
 
         for (var name in this.dict) {
             if (name in this.buttons) {
@@ -404,7 +477,7 @@ function Palettes () {
                 this.buttons[name].snapToPixelEnabled = true;
                 this.stage.addChild(this.buttons[name]);
                 // Which multipalette are we in?
-                if (name === 'search') {
+                if (name === "search") {
                     this.buttons[name].x = 0;
                     this.buttons[name].y = this.top + this.cellSize * 1.75;
                 } else if (!beginnerMode || SKIPPALETTES.indexOf(name) === -1) {
@@ -420,7 +493,9 @@ function Palettes () {
                     if (i === MULTIPALETTES.length) {
                         // Put plugins in last multipalette selector
                         i = MULTIPALETTES.length - 1;
-                        console.debug("We didn't find a multipalette for " + name);
+                        console.debug(
+                            "We didn't find a multipalette for " + name
+                        );
                         this.buttons[name].x = this.x[i];
                         this.buttons[name].y = this.y[i] + this.scrollDiff;
                         this.y[i] += this.cellSize;
@@ -430,17 +505,23 @@ function Palettes () {
                     }
                 }
 
-                makePaletteBitmap(this, PALETTEICONS[name], name, __processButtonIcon, null);
+                makePaletteBitmap(
+                    this,
+                    PALETTEICONS[name],
+                    name,
+                    __processButtonIcon,
+                    null
+                );
             }
         }
     };
 
-    this.showPalette = function (name) {
+    this.showPalette = function(name) {
         if (this.mobile) {
             return;
         }
 
-        if (name=='search' && this.showSearchWidget !== null) {
+        if (name == "search" && this.showSearchWidget !== null) {
             for (var i in this.dict) {
                 if (this.dict[i].visible) {
                     this.dict[i].hideMenu();
@@ -448,7 +529,7 @@ function Palettes () {
                 }
             }
 
-            console.debug('searching');
+            console.debug("searching");
             this.dict[name].visible = true;
             this.showSearchWidget(true);
             return;
@@ -470,7 +551,7 @@ function Palettes () {
         }
     };
 
-    this._showMenus = function () {
+    this._showMenus = function() {
         // Show the menu buttons, but not the palettes.
         if (this.mobile) {
             return;
@@ -489,7 +570,7 @@ function Palettes () {
         this.refreshCanvas();
     };
 
-    this._hideMenus = function () {
+    this._hideMenus = function() {
         // Hide the menu buttons and the palettes themselves.
         for (var name in this.buttons) {
             this.buttons[name].visible = false;
@@ -514,17 +595,17 @@ function Palettes () {
         this.refreshCanvas();
     };
 
-    this.getInfo = function () {
+    this.getInfo = function() {
         for (var key in this.dict) {
             console.debug(this.dict[key].getInfo());
         }
     };
 
-    this.updatePalettes = function (showPalette) {
+    this.updatePalettes = function(showPalette) {
         if (showPalette != null) {
             this.makePalettes(false);
             var myPalettes = this;
-            setTimeout(function () {
+            setTimeout(function() {
                 myPalettes.dict[showPalette]._resetLayout();
                 // Show the action palette after adding/deleting new
                 // nameddo blocks.
@@ -541,7 +622,7 @@ function Palettes () {
 
         if (this.mobile) {
             var that = this;
-            setTimeout(function () {
+            setTimeout(function() {
                 that.hide();
 
                 for (var i in that.dict) {
@@ -554,12 +635,12 @@ function Palettes () {
         }
     };
 
-    this.hide = function () {
+    this.hide = function() {
         this._hideMenus();
         this.visible = false;
     };
 
-    this.show = function () {
+    this.show = function() {
         if (this.mobile) {
             this._hideMenus();
             this.visible = false;
@@ -569,19 +650,19 @@ function Palettes () {
         }
     };
 
-    this.setBlocks = function (blocks) {
+    this.setBlocks = function(blocks) {
         this.blocks = blocks;
         return this;
     };
 
-    this.add = function (name) {
+    this.add = function(name) {
         this.dict[name] = new Palette(this, name);
         return this;
     };
 
-    this.remove = function (name) {
+    this.remove = function(name) {
         if (!(name in this.buttons)) {
-            console.debug('Palette.remove: Cannot find palette ' + name);
+            console.debug("Palette.remove: Cannot find palette " + name);
             return;
         }
 
@@ -592,7 +673,11 @@ function Palettes () {
         this.buttons[name].removeAllChildren();
         this.stage.removeChild(this.buttons[name]);
         var btnKeys = Object.keys(this.dict);
-        for (var btnKey = btnKeys.indexOf(name) + 1; btnKey < btnKeys.length; btnKey++) {
+        for (
+            var btnKey = btnKeys.indexOf(name) + 1;
+            btnKey < btnKeys.length;
+            btnKey++
+        ) {
             this.buttons[btnKeys[btnKey]].y -= this.cellSize;
         }
         delete this.buttons[name];
@@ -602,7 +687,7 @@ function Palettes () {
         this.makePalettes(true);
     };
 
-    this.bringToTop = function () {
+    this.bringToTop = function() {
         // Move all the palettes to the top layer of the stage
         for (var name in this.dict) {
             this.stage.removeChild(this.dict[name].menuContainer);
@@ -617,13 +702,21 @@ function Palettes () {
         this.refreshCanvas();
     };
 
-    this.findPalette = function (x, y) {
+    this.findPalette = function(x, y) {
         for (var name in this.dict) {
             var px = this.dict[name].menuContainer.x;
             var py = this.dict[name].menuContainer.y;
-            var height = Math.min(maxPaletteHeight(this.cellSize, this.scale), this.dict[name].y);
-            if (this.dict[name].menuContainer.visible && px < x &&
-                x < px + MENUWIDTH * PROTOBLOCKSCALE && py < y && y < py + height) {
+            var height = Math.min(
+                maxPaletteHeight(this.cellSize, this.scale),
+                this.dict[name].y
+            );
+            if (
+                this.dict[name].menuContainer.visible &&
+                px < x &&
+                x < px + MENUWIDTH * PROTOBLOCKSCALE &&
+                py < y &&
+                y < py + height
+            ) {
                 return this.dict[name];
             }
         }
@@ -631,54 +724,68 @@ function Palettes () {
     };
 
     // Palette Button event handlers
-    this._loadPaletteButtonHandler = function (name) {
+    this._loadPaletteButtonHandler = function(name) {
         var locked = false;
         var searchlocked = false;
         var scrolling = false;
         var that = this;
 
         // A palette button opens or closes a palette.
-        this.buttons[name].on('mouseover', function (event) {
-            document.body.style.cursor = 'pointer';
+        this.buttons[name].on("mouseover", function(event) {
+            document.body.style.cursor = "pointer";
             that.mouseOver = true;
             var r = 1;
-            that.circles = showButtonHighlight(that.buttons[name].x + r, that.buttons[name].y + r, r, event, that.scale, that.stage);
+            that.circles = showButtonHighlight(
+                that.buttons[name].x + r,
+                that.buttons[name].y + r,
+                r,
+                event,
+                that.scale,
+                that.stage
+            );
 
             // Add a background
             that.paletteHighlight = new createjs.Shape();
-            that.paletteHighlight.graphics.f(platformColor.paletteSelected).r(that.buttons[name].x + 2, that.buttons[name].y + 2, Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4, that.cellSize).ef();
-            if (name === 'search') {
+            that.paletteHighlight.graphics
+                .f(platformColor.paletteSelected)
+                .r(
+                    that.buttons[name].x + 2,
+                    that.buttons[name].y + 2,
+                    Math.max(3, MULTIPALETTES.length) * STANDARDBLOCKHEIGHT - 4,
+                    that.cellSize
+                )
+                .ef();
+            if (name === "search") {
                 that.stage.addChildAt(that.paletteHighlight, 1);
             } else {
                 that.stage.addChildAt(that.paletteHighlight, 2);
             }
         });
 
-        this.buttons[name].on('pressup', function (event) {
-            document.body.style.cursor = 'default';
+        this.buttons[name].on("pressup", function(event) {
+            document.body.style.cursor = "default";
             that.mouseOver = false;
             hideButtonHighlight(that.circles, that.stage);
         });
 
-        this.buttons[name].on('mouseout', function (event) {
-            document.body.style.cursor = 'default';
+        this.buttons[name].on("mouseout", function(event) {
+            document.body.style.cursor = "default";
             that.mouseOver = false;
             hideButtonHighlight(that.circles, that.stage);
             that.stage.removeChild(that.paletteHighlight);
         });
 
-
-        this.buttons[name].on('click', function (event) {
+        this.buttons[name].on("click", function(event) {
             var clickOutside = function(event) {
-                setTimeout(function () {
+                setTimeout(function() {
                     searchlocked = false;
                 }, 500);
 
-                if (!that.dict['search'].visible && searchlocked) {
-                    that.showPalette('search');
+                if (!that.dict["search"].visible && searchlocked) {
+                    that.showPalette("search");
                 } else {
-                    document.removeEventListener('click', clickOutside);
-                    that.dict['search'].hide();
+                    document.removeEventListener("click", clickOutside);
+                    that.dict["search"].hide();
                 }
 
                 that.refreshCanvas();
@@ -695,12 +802,12 @@ function Palettes () {
                 locked = true;
                 searchlocked = false;
 
-                setTimeout(function () {
+                setTimeout(function() {
                     locked = false;
                 }, 500);
 
-                if (!that.dict[name].visible && name !== 'search') {
-                    that.dict['search'].hide();
+                if (!that.dict[name].visible && name !== "search") {
+                    that.dict["search"].hide();
                     if (!searchlocked) {
                         that.showPalette(name);
                     }
@@ -713,29 +820,40 @@ function Palettes () {
         });
     };
 
-    this.removeActionPrototype = function (actionName) {
+    this.removeActionPrototype = function(actionName) {
         var blockRemoved = false;
-        for (var blk = 0; blk < this.dict['action'].protoList.length; blk++) {
-            var actionBlock = this.dict['action'].protoList[blk];
-            if (['nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(actionBlock.name) !== -1 && (actionBlock.defaults[0] === actionName)) {
+        for (var blk = 0; blk < this.dict["action"].protoList.length; blk++) {
+            var actionBlock = this.dict["action"].protoList[blk];
+            if (
+                ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                    actionBlock.name
+                ) !== -1 &&
+                actionBlock.defaults[0] === actionName
+            ) {
                 // Remove the palette protoList entry for this block.
-                this.dict['action'].remove(actionBlock, actionName);
+                this.dict["action"].remove(actionBlock, actionName);
 
                 // And remove it from the protoBlock dictionary.
-                if (this.blocks.protoBlockDict['myDo_' + actionName]) {
+                if (this.blocks.protoBlockDict["myDo_" + actionName]) {
                     // console.debug('DELETING PROTOBLOCKS FOR ACTION ' + actionName);
-                    delete this.blocks.protoBlockDict['myDo_' + actionName];
-                } else if (this.blocks.protoBlockDict['myCalc_' + actionName]) {
+                    delete this.blocks.protoBlockDict["myDo_" + actionName];
+                } else if (this.blocks.protoBlockDict["myCalc_" + actionName]) {
                     // console.debug('deleting protoblocks for action ' + actionName);
-                    delete this.blocks.protoBlockDict['myCalc_' + actionName];
-                } else if (this.blocks.protoBlockDict['myDoArg_' + actionName]) {
+                    delete this.blocks.protoBlockDict["myCalc_" + actionName];
+                } else if (
+                    this.blocks.protoBlockDict["myDoArg_" + actionName]
+                ) {
                     // console.debug('deleting protoblocks for action ' + actionName);
-                    delete this.blocks.protoBlockDict['myDoArg_' + actionName];
-                } else if (this.blocks.protoBlockDict['myCalcArg_' + actionName]) {
+                    delete this.blocks.protoBlockDict["myDoArg_" + actionName];
+                } else if (
+                    this.blocks.protoBlockDict["myCalcArg_" + actionName]
+                ) {
                     // console.debug('deleting protoblocks for action ' + actionName);
-                    delete this.blocks.protoBlockDict['myCalcArg_' + actionName];
+                    delete this.blocks.protoBlockDict[
+                        "myCalcArg_" + actionName
+                    ];
                 }
-                this.dict['action'].y = 0;
+                this.dict["action"].y = 0;
                 blockRemoved = true;
                 break;
             }
@@ -744,7 +862,7 @@ function Palettes () {
         // Force an update if a block was removed.
         if (blockRemoved) {
             // this.hide();
-            this.updatePalettes('action');
+            this.updatePalettes("action");
             // if (this.mobile) {
             //     this.hide();
             // } else {
@@ -754,8 +872,7 @@ function Palettes () {
     };
 
     return this;
-};
-
+}
 
 // Kind of a model, but it only keeps a list of SVGs
 function PaletteModel(palette, palettes, name) {
@@ -764,7 +881,7 @@ function PaletteModel(palette, palettes, name) {
     this.name = name;
     this.blocks = [];
 
-    this.update = function () {
+    this.update = function() {
         this.blocks = [];
         for (var blk in this.palette.protoList) {
             var block = this.palette.protoList[blk];
@@ -780,173 +897,189 @@ function PaletteModel(palette, palettes, name) {
 
             switch (blkname) {
                 // Use the name of the action in the label
-            case 'storein':
-                modname = 'store in ' + block.defaults[0];
-                var arg = block.defaults[0];
-                break;
-            case 'storein2':
-                modname = 'store in2 ' + block.staticLabels[0];
-                var arg = block.staticLabels[0];
-                break;
-            case 'box':
-                modname = block.defaults[0];
-                var arg = block.defaults[0];
-                break;
-            case 'namedbox':
-                if (block.defaults[0] === undefined) {
-                    modname = 'namedbox';
-                    var arg = _('box');
-                } else {
+                case "storein":
+                    modname = "store in " + block.defaults[0];
+                    var arg = block.defaults[0];
+                    break;
+                case "storein2":
+                    modname = "store in2 " + block.staticLabels[0];
+                    var arg = block.staticLabels[0];
+                    break;
+                case "box":
                     modname = block.defaults[0];
                     var arg = block.defaults[0];
-                }
-                break;
-            case 'namedarg':
-                if (block.defaults[0] === undefined) {
-                    modname = 'namedarg';
-                    var arg = '1';
-                } else {
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                }
-                break;
-            case 'nameddo':
-                if (block.defaults[0] === undefined) {
-                    modname = 'nameddo';
-                    var arg = _('action');
-                } else {
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                }
-                break;
-            case 'nameddoArg':
-                if (block.defaults[0] === undefined) {
-                    modname = 'nameddoArg';
-                    var arg = _('action');
-                } else {
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                }
-                break;
-            case 'namedcalc':
-                if (block.defaults[0] === undefined) {
-                    modname = 'namedcalc';
-                    var arg = _('action');
-                } else {
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                }
-                break;
-            case 'namedcalcArg':
-                if (block.defaults[0] === undefined) {
-                    modname = 'namedcalcArg';
-                    var arg = _('action');
-                } else {
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                }
-                break;
+                    break;
+                case "namedbox":
+                    if (block.defaults[0] === undefined) {
+                        modname = "namedbox";
+                        var arg = _("box");
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
+                case "namedarg":
+                    if (block.defaults[0] === undefined) {
+                        modname = "namedarg";
+                        var arg = "1";
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
+                case "nameddo":
+                    if (block.defaults[0] === undefined) {
+                        modname = "nameddo";
+                        var arg = _("action");
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
+                case "nameddoArg":
+                    if (block.defaults[0] === undefined) {
+                        modname = "nameddoArg";
+                        var arg = _("action");
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
+                case "namedcalc":
+                    if (block.defaults[0] === undefined) {
+                        modname = "namedcalc";
+                        var arg = _("action");
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
+                case "namedcalcArg":
+                    if (block.defaults[0] === undefined) {
+                        modname = "namedcalcArg";
+                        var arg = _("action");
+                    } else {
+                        modname = block.defaults[0];
+                        var arg = block.defaults[0];
+                    }
+                    break;
             }
 
             var protoBlock = this.palettes.blocks.protoBlockDict[blkname];
             if (protoBlock === null) {
-                console.debug('Could not find block ' + blkname);
+                console.debug("Could not find block " + blkname);
                 continue;
             }
 
-            var label = '';
+            var label = "";
             // console.debug(protoBlock.name);
             switch (protoBlock.name) {
-            case 'text':
-                label = _('text');
-                break;
-            case 'drumname':
-                label = _('drum');
-                break;
-            case 'effectsname':
-                label = _('effect');
-                break;
-            case 'solfege':
-                label = i18nSolfege('sol');
-                break;
-            case 'eastindiansolfege':
-                label = 'sargam';
-                break;
-            case 'modename':
-                label = _('mode name');
-                break;
-            case 'invertmode':
-                label = _('invert mode');
-                break;
-            case 'voicename':
-                label = _('voice name');
-                break;
-            case 'temperamentname':
-                //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
-                label = _('temperament');
-                break;
-            case 'accidentalname':
-                //TRANS: accidental refers to sharps, flats, etc.
-                label = _('accidental');
-                break;
-            case 'notename':
-                label = 'G';
-                break;
-            case 'intervalname':
-                label = _('interval name');
-                break;
-            case 'boolean':
-                label = _('true');
-                break;
-            case 'number':
-                label = NUMBERBLOCKDEFAULT.toString();
-                break;
-            case 'less':
-            case 'greater':
-            case 'equal':
-                // Label should be inside _() when defined.
-                label = protoBlock.staticLabels[0];
-                break;
-            case 'namedarg':
-                label = 'arg ' +  arg;
-                break;
-            default:
-                if (blkname != modname) {
-                    // Override label for do, storein, box, and namedarg
-                    if (blkname === 'storein'  && block.defaults[0] === _('box')) {
-                        label = _('store in');
-                    } else if (blkname === 'storein2') {
-                        if (block.staticLabels[0] === _('store in box')) {
-                            label = _('store in box');
+                case "text":
+                    label = _("text");
+                    break;
+                case "drumname":
+                    label = _("drum");
+                    break;
+                case "effectsname":
+                    label = _("effect");
+                    break;
+                case "solfege":
+                    label = i18nSolfege("sol");
+                    break;
+                case "eastindiansolfege":
+                    label = "sargam";
+                    break;
+                case "modename":
+                    label = _("mode name");
+                    break;
+                case "invertmode":
+                    label = _("invert mode");
+                    break;
+                case "voicename":
+                    label = _("voice name");
+                    break;
+                case "temperamentname":
+                    //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
+                    label = _("temperament");
+                    break;
+                case "accidentalname":
+                    //TRANS: accidental refers to sharps, flats, etc.
+                    label = _("accidental");
+                    break;
+                case "notename":
+                    label = "G";
+                    break;
+                case "intervalname":
+                    label = _("interval name");
+                    break;
+                case "boolean":
+                    label = _("true");
+                    break;
+                case "number":
+                    label = NUMBERBLOCKDEFAULT.toString();
+                    break;
+                case "less":
+                case "greater":
+                case "equal":
+                    // Label should be inside _() when defined.
+                    label = protoBlock.staticLabels[0];
+                    break;
+                case "namedarg":
+                    label = "arg " + arg;
+                    break;
+                default:
+                    if (blkname != modname) {
+                        // Override label for do, storein, box, and namedarg
+                        if (
+                            blkname === "storein" &&
+                            block.defaults[0] === _("box")
+                        ) {
+                            label = _("store in");
+                        } else if (blkname === "storein2") {
+                            if (block.staticLabels[0] === _("store in box")) {
+                                label = _("store in box");
+                            } else {
+                                label =
+                                    _("store in") + " " + block.staticLabels[0];
+                            }
                         } else {
-                            label = _('store in') + ' ' + block.staticLabels[0];
+                            label = block.defaults[0];
+                        }
+                    } else if (protoBlock.staticLabels.length > 0) {
+                        label = protoBlock.staticLabels[0];
+                        if (label === "") {
+                            if (blkname === "loadFile") {
+                                label = _("open file");
+                            } else {
+                                label = blkname;
+                            }
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = blkname;
                     }
-                } else if (protoBlock.staticLabels.length > 0) {
-                    label = protoBlock.staticLabels[0];
-                    if (label === '') {
-                        if (blkname === 'loadFile') {
-                            label = _('open file')
-                        } else {
-                            label = blkname;
-                        }
-                    }
-                } else {
-                    label = blkname;
-                }
             }
 
-            if (['do', 'nameddo', 'namedbox', 'namedcalc', 'doArg', 'calcArg', 'nameddoArg', 'namedcalcArg'].indexOf(protoBlock.name) != -1 && label != null) {
-                if (getTextWidth(label, 'bold 20pt Sans') > TEXTWIDTH) {
-                    label = label.substr(0, STRINGLEN) + '...';
+            if (
+                [
+                    "do",
+                    "nameddo",
+                    "namedbox",
+                    "namedcalc",
+                    "doArg",
+                    "calcArg",
+                    "nameddoArg",
+                    "namedcalcArg"
+                ].indexOf(protoBlock.name) != -1 &&
+                label != null
+            ) {
+                if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                    label = label.substr(0, STRINGLEN) + "...";
                 }
             }
 
             // Don't display the label on image blocks.
             if (protoBlock.image) {
-                label = '';
+                label = "";
             }
 
             var saveScale = protoBlock.scale;
@@ -954,34 +1087,34 @@ function PaletteModel(palette, palettes, name) {
 
             // Finally, the SVGs!
             switch (protoBlock.name) {
-            case 'namedbox':
-            case 'namedarg':
-                // so the label will fit
-                var svg = new SVG();
-                svg.init();
-                svg.setScale(protoBlock.scale);
-                svg.setExpand(60, 0, 0, 0);
-                svg.setOutie(true);
-                var artwork = svg.basicBox();
-                var docks = svg.docks;
-                var height = svg.getHeight();
-                break;
-            case 'nameddo':
-                // so the label will fit
-                var svg = new SVG();
-                svg.init();
-                svg.setScale(protoBlock.scale);
-                svg.setExpand(60, 0, 0, 0);
-                var artwork = svg.basicBlock();
-                var docks = svg.docks;
-                var height = svg.getHeight();
-                break;
-            default:
-                var obj = protoBlock.generator();
-                var artwork = obj[0];
-                var docks = obj[1];
-                var height = obj[3];
-                break;
+                case "namedbox":
+                case "namedarg":
+                    // so the label will fit
+                    var svg = new SVG();
+                    svg.init();
+                    svg.setScale(protoBlock.scale);
+                    svg.setExpand(60, 0, 0, 0);
+                    svg.setOutie(true);
+                    var artwork = svg.basicBox();
+                    var docks = svg.docks;
+                    var height = svg.getHeight();
+                    break;
+                case "nameddo":
+                    // so the label will fit
+                    var svg = new SVG();
+                    svg.init();
+                    svg.setScale(protoBlock.scale);
+                    svg.setExpand(60, 0, 0, 0);
+                    var artwork = svg.basicBlock();
+                    var docks = svg.docks;
+                    var height = svg.getHeight();
+                    break;
+                default:
+                    var obj = protoBlock.generator();
+                    var artwork = obj[0];
+                    var docks = obj[1];
+                    var height = obj[3];
+                    break;
             }
 
             protoBlock.scale = saveScale;
@@ -990,18 +1123,25 @@ function PaletteModel(palette, palettes, name) {
                 artwork = artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
-                    .replace('block_label', safeSVG(label));
+                    .replace("block_label", safeSVG(label));
             } else {
                 artwork = artwork
-                    .replace(/fill_color/g,
-                         PALETTEFILLCOLORS[protoBlock.palette.name])
-                    .replace(/stroke_color/g,
-                         PALETTESTROKECOLORS[protoBlock.palette.name])
-                    .replace('block_label', safeSVG(label));
+                    .replace(
+                        /fill_color/g,
+                        PALETTEFILLCOLORS[protoBlock.palette.name]
+                    )
+                    .replace(
+                        /stroke_color/g,
+                        PALETTESTROKECOLORS[protoBlock.palette.name]
+                    )
+                    .replace("block_label", safeSVG(label));
             }
 
             for (var i = 0; i <= protoBlock.args; i++) {
-                artwork = artwork.replace('arg_label_' + i, protoBlock.staticLabels[i] || '');
+                artwork = artwork.replace(
+                    "arg_label_" + i,
+                    protoBlock.staticLabels[i] || ""
+                );
             }
 
             this.blocks.push({
@@ -1012,7 +1152,9 @@ function PaletteModel(palette, palettes, name) {
                 actualHeight: height,
                 label,
                 artwork,
-                artwork64: 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))),
+                artwork64:
+                    "data:image/svg+xml;base64," +
+                    window.btoa(unescape(encodeURIComponent(artwork))),
                 docks,
                 image: block.image,
                 scale: block.scale,
@@ -1021,127 +1163,185 @@ function PaletteModel(palette, palettes, name) {
             });
         }
     };
-};
-
+}
 
 function PopdownPalette(palettes) {
     this.palettes = palettes;
     this.models = {};
 
     for (var name in this.palettes.dict) {
-        this.models[name] = new PaletteModel(this.palettes.dict[name],
-                                             this.palettes, name);
-    };
+        this.models[name] = new PaletteModel(
+            this.palettes.dict[name],
+            this.palettes,
+            name
+        );
+    }
 
-    this.update = function () {
-        var html = '<div>' + _('Click to select a block.') + '</div><div class="back"><h2>' + _('back') + '</h2></div>';
+    this.update = function() {
+        var html =
+            "<div>" +
+            _("Click to select a block.") +
+            '</div><div class="back"><h2>' +
+            _("back") +
+            "</h2></div>";
         for (var name in this.models) {
             html += '<div class="palette">';
-            var icon = PALETTEICONS[name].replace(/#f{3,6}/gi, PALETTEFILLCOLORS[name]);
+            var icon = PALETTEICONS[name].replace(
+                /#f{3,6}/gi,
+                PALETTEFILLCOLORS[name]
+            );
             //.TRANS: popout: to detach as a separate window
             var language = localStorage.languagePreference;
-            if (language === 'ja') {
+            if (language === "ja") {
                 //.TRANS: show2 is show as in make visible (the opposite of hide)
-                html += format('<h2 data-name="{n}"> \
+                html += format(
+                    '<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
-                                     alt="{' + _('hide') + '}" \
-                                     title="{' + _('hide') + '}" /> \
+                                     alt="{' +
+                        _("hide") +
+                        '}" \
+                                     title="{' +
+                        _("hide") +
+                        '}" /> \
                                 <img class="show-button" src="header-icons/show.svg" \
-                                     alt="{' + _('show2') + '}" \
-                                     title="{' + _('show2') + '}" /> \
+                                     alt="{' +
+                        _("show2") +
+                        '}" \
+                                     title="{' +
+                        _("show2") +
+                        '}" /> \
                                 <img class="popout-button" src="header-icons/popout.svg" \
-                                     alt="{' + _('popout') + '}" \
-                                     title="{' + _('popout') + '}" /> \
+                                     alt="{' +
+                        _("popout") +
+                        '}" \
+                                     title="{' +
+                        _("popout") +
+                        '}" /> \
                             </h2>',
-                               {i: icon, n: toTitleCase(_(name))});
+                    { i: icon, n: toTitleCase(_(name)) }
+                );
             } else {
-                html += format('<h2 data-name="{n}"> \
+                html += format(
+                    '<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
                                 <img class="hide-button" src="header-icons/hide.svg" \
-                                     alt="{' + _('hide') + '}" \
-                                     title="{' + _('hide') + '}" /> \
+                                     alt="{' +
+                        _("hide") +
+                        '}" \
+                                     title="{' +
+                        _("hide") +
+                        '}" /> \
                                 <img class="show-button" src="header-icons/show.svg" \
-                                     alt="{' + _('show') + '}" \
-                                     title="{' + _('show') + '}" /> \
+                                     alt="{' +
+                        _("show") +
+                        '}" \
+                                     title="{' +
+                        _("show") +
+                        '}" /> \
                                 <img class="popout-button" src="header-icons/popout.svg" \
-                                     alt="{' + _('popout') + '}" \
-                                     title="{' + _('popout') + '}" /> \
+                                     alt="{' +
+                        _("popout") +
+                        '}" \
+                                     title="{' +
+                        _("popout") +
+                        '}" /> \
                             </h2>',
-                               {i: icon, n: toTitleCase(_(name))});
-             }
-            html += '<ul>';
+                    { i: icon, n: toTitleCase(_(name)) }
+                );
+            }
+            html += "<ul>";
             this.models[name].update();
 
             var blocks = this.models[name].blocks;
-            if (BUILTINPALETTES.indexOf(name) > -1)
-                blocks.reverse();
+            if (BUILTINPALETTES.indexOf(name) > -1) blocks.reverse();
 
             for (var blk in blocks) {
-                html += format('<li title="{label}" \
+                html += format(
+                    '<li title="{label}" \
                                     data-blk="{blk}" \
                                     data-palettename="{palettename}" \
                                     data-modname="{modname}"> \
                                     <img src="{artwork64}" alt="{label}" /> \
-                                </li>', blocks[blk]);
+                                </li>',
+                    blocks[blk]
+                );
             }
-            html += '</div>';
+            html += "</div>";
         }
 
-        document.querySelector('#popdown-palette').innerHTML = html;
+        document.querySelector("#popdown-palette").innerHTML = html;
 
         var that = this;
 
-        document.querySelector('#popdown-palette .back').addEventListener('click', function () {
-            that.popup();
-        });
+        document
+            .querySelector("#popdown-palette .back")
+            .addEventListener("click", function() {
+                that.popup();
+            });
 
-        var eles = document.querySelectorAll('#popdown-palette > .palette');
-        Array.prototype.forEach.call(eles, function (d) {
-            d.querySelector('h2').addEventListener('click', function () {
-                if (d.classList.contains('show')) {
-                    d.classList.remove('show');
+        var eles = document.querySelectorAll("#popdown-palette > .palette");
+        Array.prototype.forEach.call(eles, function(d) {
+            d.querySelector("h2").addEventListener("click", function() {
+                if (d.classList.contains("show")) {
+                    d.classList.remove("show");
                 } else {
-                    d.classList.add('show');
+                    d.classList.add("show");
                 }
             });
 
-            d.querySelector('.popout-button').addEventListener('click', function () {
-                that.popup();
-                that.palettes.showPalette(d.querySelector('h2').dataset.name);
-            });
+            d.querySelector(".popout-button").addEventListener(
+                "click",
+                function() {
+                    that.popup();
+                    that.palettes.showPalette(
+                        d.querySelector("h2").dataset.name
+                    );
+                }
+            );
         });
 
-        var eles = document.querySelectorAll('#popdown-palette li');
-        Array.prototype.forEach.call(eles, function (e) {
-            e.addEventListener('click', function (event) {
+        var eles = document.querySelectorAll("#popdown-palette li");
+        Array.prototype.forEach.call(eles, function(e) {
+            e.addEventListener("click", function(event) {
                 that.popup();
                 var palette = that.palettes.dict[e.dataset.palettename];
                 var container = palette.protoContainers[e.dataset.modname];
 
                 // console.debug(e.dataset.blk + ' ' + e.dataset.modname);
-                var newBlock = palette._makeBlockFromPalette(palette.protoList[e.dataset.blk], e.dataset.modname, function (newBlock) {
-                    // Move the block and the drag group.
-                    that.palettes.blocks._moveBlock(newBlock, Math.floor(75 - that.palettes.blocks.stage.x), Math.floor(75 - that.palettes.blocks.stage.y));
-                    that.palettes.blocks.findDragGroup(newBlock);
-                    for (var i in that.palettes.blocks.dragGroup) {
-                        that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], 0, 0);
-
+                var newBlock = palette._makeBlockFromPalette(
+                    palette.protoList[e.dataset.blk],
+                    e.dataset.modname,
+                    function(newBlock) {
+                        // Move the block and the drag group.
+                        that.palettes.blocks._moveBlock(
+                            newBlock,
+                            Math.floor(75 - that.palettes.blocks.stage.x),
+                            Math.floor(75 - that.palettes.blocks.stage.y)
+                        );
+                        that.palettes.blocks.findDragGroup(newBlock);
+                        for (var i in that.palettes.blocks.dragGroup) {
+                            that.palettes.blocks.moveBlockRelative(
+                                that.palettes.blocks.dragGroup[i],
+                                0,
+                                0
+                            );
+                        }
                     }
-                });
+                );
             });
         });
     };
 
-    this.popdown = function () {
+    this.popdown = function() {
         this.update();
-        document.querySelector('#popdown-palette').classList.add('show');
+        document.querySelector("#popdown-palette").classList.add("show");
     };
 
-    this.popup = function () {
-        document.querySelector('#popdown-palette').classList.remove('show');
+    this.popup = function() {
+        document.querySelector("#popdown-palette").classList.remove("show");
     };
-};
+}
 
 // Define objects for individual palettes.
 function Palette(palettes, name) {
@@ -1154,7 +1354,7 @@ function Palette(palettes, name) {
     this.protoContainers = {};
     this.protoHeights = {};
     this.background = null;
-    this.scrollDiff = 0
+    this.scrollDiff = 0;
     this.y = 0;
     this.size = 0;
     this.columns = 0;
@@ -1166,7 +1366,7 @@ function Palette(palettes, name) {
     this.fadedDownButton = null;
     this.count = 0;
 
-    this.makeMenu = function (createHeader) {
+    this.makeMenu = function(createHeader) {
         var that = this;
 
         function __processButtonIcon(palette, name, bitmap, args) {
@@ -1174,19 +1374,21 @@ function Palette(palettes, name) {
             bitmap.y = 6;
             that.menuContainer.addChild(bitmap);
             // that.palettes.container.addChild(that.menuContainer);
-        };
+        }
 
         function __processCloseIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.5;
             that.menuContainer.addChild(bitmap);
-            bitmap.x = paletteWidth - STANDARDBLOCKHEIGHT * 2 / 3;
+            bitmap.x = paletteWidth - (STANDARDBLOCKHEIGHT * 2) / 3;
             bitmap.y = 8;
 
             // Define the hit area for the entire header area; the
             // left half is for draggging, the right half is for the
             // close button.
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawEllipse(0, 0, paletteWidth * 1 / 4, STANDARDBLOCKHEIGHT);
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawEllipse(0, 0, (paletteWidth * 1) / 4, STANDARDBLOCKHEIGHT);
             hitArea.x = paletteWidth - STANDARDBLOCKHEIGHT;
             hitArea.y = 0;
             that.menuContainer.hitArea = hitArea;
@@ -1196,7 +1398,7 @@ function Palette(palettes, name) {
                 that._loadPaletteMenuHandler();
                 that.mouseHandled = true;
             }
-        };
+        }
 
         function __processUpIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
@@ -1208,10 +1410,10 @@ function Palette(palettes, name) {
             bitmap.visible = false;
             that.upButton = bitmap;
 
-            that.upButton.on('click', function (event) {
+            that.upButton.on("click", function(event) {
                 that.scrollEvent(STANDARDBLOCKHEIGHT, 10);
             });
-        };
+        }
 
         function __processDownIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
@@ -1221,10 +1423,10 @@ function Palette(palettes, name) {
             __calculateHitArea(bitmap);
             that.downButton = bitmap;
 
-            that.downButton.on('click', function (event) {
+            that.downButton.on("click", function(event) {
                 that.scrollEvent(-STANDARDBLOCKHEIGHT, 10);
             });
-        };
+        }
 
         function __makeFadedDownIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
@@ -1234,9 +1436,8 @@ function Palette(palettes, name) {
             __calculateHitArea(bitmap);
             that.fadedDownButton = bitmap;
 
-            that.fadedDownButton.on('click', function (event) {
-            });
-        };
+            that.fadedDownButton.on("click", function(event) {});
+        }
 
         function __makeFadedUpIcon(palette, name, bitmap, args) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 0.7;
@@ -1246,29 +1447,54 @@ function Palette(palettes, name) {
             __calculateHitArea(bitmap);
             that.fadedUpButton = bitmap;
 
-            that.fadedUpButton.on('click', function (event) {
-            });
-        };
+            that.fadedUpButton.on("click", function(event) {});
+        }
 
         function __calculateHitArea(bitmap) {
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, STANDARDBLOCKHEIGHT, STANDARDBLOCKHEIGHT);
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawRect(0, 0, STANDARDBLOCKHEIGHT, STANDARDBLOCKHEIGHT);
             hitArea.x = 0;
             hitArea.y = 0;
             bitmap.hitArea = hitArea;
             bitmap.visible = false;
-        };
+        }
 
         function __processHeader(palette, name, bitmap, args) {
             that.menuContainer.addChild(bitmap);
 
             makePaletteBitmap(palette, DOWNICON, name, __processDownIcon, null);
-            makePaletteBitmap(palette, FADEDDOWNICON, name, __makeFadedDownIcon, null);
-            makePaletteBitmap(palette, FADEDUPICON, name, __makeFadedUpIcon, null);
+            makePaletteBitmap(
+                palette,
+                FADEDDOWNICON,
+                name,
+                __makeFadedDownIcon,
+                null
+            );
+            makePaletteBitmap(
+                palette,
+                FADEDUPICON,
+                name,
+                __makeFadedUpIcon,
+                null
+            );
             makePaletteBitmap(palette, UPICON, name, __processUpIcon, null);
-            makePaletteBitmap(palette, CLOSEICON.replace('fill_color', platformColor.selectorSelected), name, __processCloseIcon, null);
-            makePaletteBitmap(palette, PALETTEICONS[name], name, __processButtonIcon, null);
-        };
+            makePaletteBitmap(
+                palette,
+                CLOSEICON.replace("fill_color", platformColor.selectorSelected),
+                name,
+                __processCloseIcon,
+                null
+            );
+            makePaletteBitmap(
+                palette,
+                PALETTEICONS[name],
+                name,
+                __processButtonIcon,
+                null
+            );
+        }
 
         if (this.menuContainer === null) {
             this.menuContainer = new createjs.Container();
@@ -1279,19 +1505,28 @@ function Palette(palettes, name) {
             return;
         }
 
-        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
+        var paletteWidth =
+            MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         this.menuContainer.removeAllChildren();
 
         // Create the menu button
-        makePaletteBitmap(this, PALETTEHEADER.replace('fill_color', platformColor.selectorSelected).replace('palette_label', toTitleCase(_(this.name))).replace(/header_width/g, paletteWidth), this.name, __processHeader, null);
+        makePaletteBitmap(
+            this,
+            PALETTEHEADER.replace("fill_color", platformColor.selectorSelected)
+                .replace("palette_label", toTitleCase(_(this.name)))
+                .replace(/header_width/g, paletteWidth),
+            this.name,
+            __processHeader,
+            null
+        );
     };
 
-    this._getDownButtonY = function () {
+    this._getDownButtonY = function() {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
         return h + STANDARDBLOCKHEIGHT / 2;
     };
 
-    this._resizeEvent = function () {
+    this._resizeEvent = function() {
         this.hide();
         this._updateBackground();
         this._updateBlockMasks();
@@ -1302,8 +1537,11 @@ function Palette(palettes, name) {
         }
     };
 
-    this._updateBlockMasks = function () {
-        var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
+    this._updateBlockMasks = function() {
+        var h = Math.min(
+            maxPaletteHeight(this.palettes.cellSize, this.palettes.scale),
+            this.y
+        );
         var w = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         for (var i in this.protoContainers) {
             var s = new createjs.Shape();
@@ -1316,7 +1554,7 @@ function Palette(palettes, name) {
 
     this._getOverflowWidth = function() {
         var maxWidth = 0;
-        for(var i in this.protoList) {
+        for (var i in this.protoList) {
             if (this.protoList[i].hidden) {
                 continue;
             }
@@ -1324,10 +1562,10 @@ function Palette(palettes, name) {
             maxWidth = Math.max(maxWidth, this.protoList[i].textWidth);
         }
 
-        return (maxWidth  > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0);
-    }
+        return maxWidth > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0;
+    };
 
-    this._updateBackground = function () {
+    this._updateBackground = function() {
         if (this.menuContainer === null) {
             return;
         }
@@ -1350,7 +1588,18 @@ function Palette(palettes, name) {
         var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
 
         var shape = new createjs.Shape();
-        shape.graphics.f(platformColor.ruleColor).r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h).ef().f(platformColor.paletteBackground).r(2, 2, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth() - 4, h - 4).ef();
+        shape.graphics
+            .f(platformColor.ruleColor)
+            .r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h)
+            .ef()
+            .f(platformColor.paletteBackground)
+            .r(
+                2,
+                2,
+                MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth() - 4,
+                h - 4
+            )
+            .ef();
         shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
         shape.height = h;
         this.background.addChild(shape);
@@ -1359,10 +1608,10 @@ function Palette(palettes, name) {
         this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
     };
 
-    this._resetLayout = function () {
+    this._resetLayout = function() {
         // Account for menu toolbar
         if (this.menuContainer === null) {
-            console.debug('menuContainer is null');
+            console.debug("menuContainer is null");
             return;
         }
 
@@ -1392,7 +1641,9 @@ function Palette(palettes, name) {
             }
 
             i.y = this.y;
-            this.y += Math.floor(h + (STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1));
+            this.y += Math.floor(
+                h + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE * 0.1
+            );
         }
 
         for (var i in this.protoContainers) {
@@ -1400,17 +1651,29 @@ function Palette(palettes, name) {
         }
     };
 
-    this._updateMenu = function (hide) {
+    this._updateMenu = function(hide) {
         var that = this;
 
         function __calculateBounds(palette, blk, modname, protoListBlk) {
             var bounds = that.protoContainers[modname].getBounds();
-            that.protoContainers[modname].cache(bounds.x, bounds.y, Math.ceil(bounds.width), Math.ceil(bounds.height));
+            that.protoContainers[modname].cache(
+                bounds.x,
+                bounds.y,
+                Math.ceil(bounds.width),
+                Math.ceil(bounds.height)
+            );
 
             var hitArea = new createjs.Shape();
             // Trim the hitArea height slightly to make it easier to
             // select single-height blocks below double-height blocks.
-            hitArea.graphics.beginFill('#FFF').drawRect(0, 0, Math.ceil(bounds.width), Math.ceil(bounds.height * 0.75));
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawRect(
+                    0,
+                    0,
+                    Math.ceil(bounds.width),
+                    Math.ceil(bounds.height * 0.75)
+                );
             that.protoContainers[modname].hitArea = hitArea;
             that._loadPaletteMenuItemHandler(protoListBlk, modname);
             that.palettes.refreshCanvas();
@@ -1419,11 +1682,12 @@ function Palette(palettes, name) {
                 if (that.model.blocks[b].modname === modname) {
                     if (that.protoHeights[modname] === undefined) {
                         // console.debug('assigning height to ' + modname);
-                        that.protoHeights[modname] = that.model.blocks[b].actualHeight;
+                        that.protoHeights[modname] =
+                            that.model.blocks[b].actualHeight;
                     }
                 }
             }
-        };
+        }
 
         function __processBitmap(palette, modname, bitmap, args) {
             var b = args[0];
@@ -1431,7 +1695,7 @@ function Palette(palettes, name) {
             var protoListBlk = args[2];
 
             if (that.protoContainers[modname] === undefined) {
-                console.debug('no protoContainer for ' + modname);
+                console.debug("no protoContainer for " + modname);
                 return;
             }
 
@@ -1444,17 +1708,27 @@ function Palette(palettes, name) {
 
             if (b.image) {
                 var image = new Image();
-                image.onload = function () {
+                image.onload = function() {
                     var bitmap = new createjs.Bitmap(image);
                     if (image.width > image.height) {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[2] / image.width * (b.scale / 2) * PROTOBLOCKSCALE;
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale =
+                            (MEDIASAFEAREA[2] / image.width) *
+                            (b.scale / 2) *
+                            PROTOBLOCKSCALE;
                     } else {
-                        bitmap.scaleX = bitmap.scaleY = bitmap.scale = MEDIASAFEAREA[3] / image.height * (b.scale / 2) * PROTOBLOCKSCALE;
+                        bitmap.scaleX = bitmap.scaleY = bitmap.scale =
+                            (MEDIASAFEAREA[3] / image.height) *
+                            (b.scale / 2) *
+                            PROTOBLOCKSCALE;
                     }
                     that.protoContainers[modname].addChild(bitmap);
-                    bitmap.x = Math.floor((MEDIASAFEAREA[0] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
+                    bitmap.x =
+                        Math.floor(MEDIASAFEAREA[0] * (b.scale / 2) + 0.5) *
+                        PROTOBLOCKSCALE;
 
-                    bitmap.y = Math.floor((MEDIASAFEAREA[1] * (b.scale / 2)) + 0.5) * PROTOBLOCKSCALE;
+                    bitmap.y =
+                        Math.floor(MEDIASAFEAREA[1] * (b.scale / 2) + 0.5) *
+                        PROTOBLOCKSCALE;
                     __calculateBounds(palette, blk, modname, protoListBlk);
                 };
 
@@ -1462,12 +1736,18 @@ function Palette(palettes, name) {
             } else {
                 __calculateBounds(palette, blk, modname, protoListBlk);
             }
-        };
+        }
 
         function __processFiller(palette, modname, bitmap, args) {
             var b = args[0];
-            makePaletteBitmap(palette, b.artwork, b.modname, __processBitmap, args);
-        };
+            makePaletteBitmap(
+                palette,
+                b.artwork,
+                b.modname,
+                __processBitmap,
+                args
+            );
+        }
 
         if (this.menuContainer === null) {
             this.makeMenu(true);
@@ -1484,8 +1764,7 @@ function Palette(palettes, name) {
         this.model.update();
 
         var blocks = this.model.blocks;
-        if (BUILTINPALETTES.indexOf(name) === -1)
-            blocks.reverse();
+        if (BUILTINPALETTES.indexOf(name) === -1) blocks.reverse();
 
         for (var blk in blocks) {
             var b = blocks[blk];
@@ -1499,8 +1778,16 @@ function Palette(palettes, name) {
                 this.protoContainers[b.modname] = new createjs.Container();
                 this.protoContainers[b.modname].snapToPixelEnabled = true;
 
-                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
-                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
+                this.protoContainers[b.modname].x = Math.floor(
+                    this.menuContainer.x + 0.5
+                );
+                this.protoContainers[b.modname].y = Math.floor(
+                    this.menuContainer.y +
+                        this.y +
+                        this.scrollDiff +
+                        STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE +
+                        0.5
+                );
                 this.palettes.stage.addChild(this.protoContainers[b.modname]);
                 this.protoContainers[b.modname].visible = false;
 
@@ -1512,10 +1799,27 @@ function Palette(palettes, name) {
                 // is being created, we cannot rely on blk to be the
                 // proper index, so pass the entry itself as an
                 // argument.
-                makePaletteBitmap(this, PALETTEFILLER.replace(/filler_height/g, b.height.toString()), b.modname, __processFiller, [b, blk, this.protoList[blk]]);
+                makePaletteBitmap(
+                    this,
+                    PALETTEFILLER.replace(
+                        /filler_height/g,
+                        b.height.toString()
+                    ),
+                    b.modname,
+                    __processFiller,
+                    [b, blk, this.protoList[blk]]
+                );
             } else {
-                this.protoContainers[b.modname].x = Math.floor(this.menuContainer.x + 0.5);
-                this.protoContainers[b.modname].y = Math.floor(this.menuContainer.y + this.y + this.scrollDiff + STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE + 0.5);
+                this.protoContainers[b.modname].x = Math.floor(
+                    this.menuContainer.x + 0.5
+                );
+                this.protoContainers[b.modname].y = Math.floor(
+                    this.menuContainer.y +
+                        this.y +
+                        this.scrollDiff +
+                        STANDARDBLOCKHEIGHT * PROTOBLOCKSCALE +
+                        0.5
+                );
                 this.protoHeights[b.modname] = b.actualHeight;
                 this.y += Math.ceil(b.actualHeight * PROTOBLOCKSCALE);
             }
@@ -1528,7 +1832,7 @@ function Palette(palettes, name) {
         }
     };
 
-    this._moveMenu = function (x, y) {
+    this._moveMenu = function(x, y) {
         // :sigh: race condition on iOS 7.1.2
         if (this.menuContainer === null) {
             return;
@@ -1541,17 +1845,17 @@ function Palette(palettes, name) {
         this._moveMenuItemsRelative(dx, dy);
     };
 
-    this._moveMenuRelative = function (dx, dy) {
+    this._moveMenuRelative = function(dx, dy) {
         this.menuContainer.x += dx;
         this.menuContainer.y += dy;
         this._moveMenuItemsRelative(dx, dy);
     };
 
-    this.hide = function () {
+    this.hide = function() {
         this.hideMenu();
     };
 
-    this.show = function () {
+    this.show = function() {
         if (this.palettes.mobile) {
             this.hideMenu();
         } else {
@@ -1567,8 +1871,8 @@ function Palette(palettes, name) {
         }
     };
 
-    this.hideMenu = function () {
-        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+    this.hideMenu = function() {
+        if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
             this.palettes.hideSearchWidget(true);
         }
 
@@ -1581,7 +1885,7 @@ function Palette(palettes, name) {
         this.palettes.pluginsDeleteStatus = false;
     };
 
-    this.showMenu = function () {
+    this.showMenu = function() {
         this.palettes.paletteVisible = true;
         if (this.palettes.mobile) {
             this.menuContainer.visible = false;
@@ -1598,8 +1902,8 @@ function Palette(palettes, name) {
         }
     };
 
-    this._hideMenuItems = function () {
-        if (this.name === 'search' && this.palettes.hideSearchWidget !== null) {
+    this._hideMenuItems = function() {
+        if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
             this.palettes.hideSearchWidget(true);
         }
 
@@ -1621,7 +1925,7 @@ function Palette(palettes, name) {
         this.visible = false;
     };
 
-    this._showMenuItems = function () {
+    this._showMenuItems = function() {
         if (this.scrollDiff === 0) {
             this.count = 0;
         }
@@ -1640,7 +1944,7 @@ function Palette(palettes, name) {
         this.visible = true;
     };
 
-    this._moveMenuItems = function (x, y) {
+    this._moveMenuItems = function(x, y) {
         for (var i in this.protoContainers) {
             this.protoContainers[i].x = x;
             this.protoContainers[i].y = y;
@@ -1652,7 +1956,7 @@ function Palette(palettes, name) {
         }
     };
 
-    this._moveMenuItemsRelative = function (dx, dy) {
+    this._moveMenuItemsRelative = function(dx, dy) {
         for (var i in this.protoContainers) {
             this.protoContainers[i].x += dx;
             this.protoContainers[i].y += dy;
@@ -1675,11 +1979,17 @@ function Palette(palettes, name) {
         }
     };
 
-    this.scrollEvent = function (direction, scrollSpeed) {
+    this.scrollEvent = function(direction, scrollSpeed) {
         var diff = direction * scrollSpeed;
-        var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
+        var h = Math.min(
+            maxPaletteHeight(this.palettes.cellSize, this.palettes.scale),
+            this.y
+        );
 
-        if (this.y < maxPaletteHeight(this.palettes.cellSize, this.palettes.scale)) {
+        if (
+            this.y <
+            maxPaletteHeight(this.palettes.cellSize, this.palettes.scale)
+        ) {
             this.upButton.visible = false;
             this.downButton.visible = false;
             this.fadedUpButton.visible = false;
@@ -1731,13 +2041,12 @@ function Palette(palettes, name) {
                 this.protoContainers[i].visible = true;
             }
 
-            if(-this.y + h - this.scrollDiff === 0) {
-                this.upButton.visible   = true;
+            if (-this.y + h - this.scrollDiff === 0) {
+                this.upButton.visible = true;
                 this.downButton.visible = false;
                 this.fadedDownButton.visible = true;
                 this.fadedUpButton.visible = false;
             }
-
         } else if (this.count === 0) {
             this.fadedUpButton.visible = true;
             this.fadedDownButton.visible = false;
@@ -1763,15 +2072,15 @@ function Palette(palettes, name) {
         this.count += 1;
     };
 
-    this.getInfo = function () {
-        var returnString = this.name + ' palette:';
+    this.getInfo = function() {
+        var returnString = this.name + " palette:";
         for (var thisBlock in this.protoList) {
-            returnString += ' ' + this.protoList[thisBlock].name;
+            returnString += " " + this.protoList[thisBlock].name;
         }
         return returnString;
     };
 
-    this.remove = function (protoblock, name) {
+    this.remove = function(protoblock, name) {
         // Remove the protoblock and its associated artwork container.
         var i = this.protoList.indexOf(protoblock);
         if (i !== -1) {
@@ -1779,10 +2088,18 @@ function Palette(palettes, name) {
         }
 
         for (var i = 0; i < this.model.blocks.length; i++) {
-            if (['nameddo', 'nameddoArg', 'namedcalc', 'namedcalcArg'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === name) {
+            if (
+                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
+                    this.model.blocks[i].blkname
+                ) !== -1 &&
+                this.model.blocks[i].modname === name
+            ) {
                 this.model.blocks.splice(i, 1);
                 break;
-            } else if (['storein'].indexOf(this.model.blocks[i].blkname) !== -1 && this.model.blocks[i].modname === _('store in') + ' ' + name) {
+            } else if (
+                ["storein"].indexOf(this.model.blocks[i].blkname) !== -1 &&
+                this.model.blocks[i].modname === _("store in") + " " + name
+            ) {
                 this.model.blocks.splice(i, 1);
                 break;
             }
@@ -1792,7 +2109,7 @@ function Palette(palettes, name) {
         delete this.protoContainers[name];
     };
 
-    this.add = function (protoblock, top) {
+    this.add = function(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
         // to the top.
         if (this.protoList.indexOf(protoblock) === -1) {
@@ -1805,29 +2122,29 @@ function Palette(palettes, name) {
         return this;
     };
 
-    this._setupBackgroundEvents = function () {
+    this._setupBackgroundEvents = function() {
         var that = this;
         var scrolling = false;
 
         // Ensure we don't end up with duplicate event handlers.
-        this.background.removeAllEventListeners('mouseover');
-        this.background.removeAllEventListeners('mouseout');
-        this.background.removeAllEventListeners('mousedown');
+        this.background.removeAllEventListeners("mouseover");
+        this.background.removeAllEventListeners("mouseout");
+        this.background.removeAllEventListeners("mousedown");
 
-        this.background.on('mouseover', function (event) {
+        this.background.on("mouseover", function(event) {
             that.palettes.activePalette = that;
         });
 
-        this.background.on('mouseout', function (event) {
+        this.background.on("mouseout", function(event) {
             that.palettes.activePalette = null;
         });
 
-        this.background.on('mousedown', function (event) {
+        this.background.on("mousedown", function(event) {
             scrolling = true;
             var lastY = event.stageY;
 
-            that.background.removeAllEventListeners('pressmove');
-            that.background.on('pressmove', function (event) {
+            that.background.removeAllEventListeners("pressmove");
+            that.background.on("pressmove", function(event) {
                 if (!scrolling) {
                     return;
                 }
@@ -1837,26 +2154,35 @@ function Palette(palettes, name) {
                 lastY = event.stageY;
             });
 
-            that.background.removeAllEventListeners('pressup');
-            that.background.on('pressup', function (event) {
-                that.palettes.activePalette = null;
-                scrolling = false;
-            }, null, true);  // once = true
+            that.background.removeAllEventListeners("pressup");
+            that.background.on(
+                "pressup",
+                function(event) {
+                    that.palettes.activePalette = null;
+                    scrolling = false;
+                },
+                null,
+                true
+            ); // once = true
         });
     };
 
     // Palette Menu event handlers
-    this._loadPaletteMenuHandler = function () {
+    this._loadPaletteMenuHandler = function() {
         // The palette menu is the container for the protoblocks. One
         // palette per palette button.
 
         var that = this;
         var locked = false;
         var trashcan = this.palettes.trashcan;
-        var paletteWidth = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
+        var paletteWidth =
+            MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
 
-        this.menuContainer.on('click', function (event) {
-            if (Math.round(event.stageX / that.palettes.scale) > that.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT) {
+        this.menuContainer.on("click", function(event) {
+            if (
+                Math.round(event.stageX / that.palettes.scale) >
+                that.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT
+            ) {
                 that.hide();
                 that.palettes.refreshCanvas();
                 return;
@@ -1867,7 +2193,7 @@ function Palette(palettes, name) {
             }
 
             locked = true;
-            setTimeout(function () {
+            setTimeout(function() {
                 locked = false;
             }, 500);
 
@@ -1887,17 +2213,17 @@ function Palette(palettes, name) {
             that.palettes.refreshCanvas();
         });
 
-        this.menuContainer.on('mouseover', function(event) {
-            document.body.style.cursor = 'pointer';
+        this.menuContainer.on("mouseover", function(event) {
+            document.body.style.cursor = "pointer";
         });
 
-        this.menuContainer.on('mouseout', function(event) {
-            document.body.style.cursor = 'default';
+        this.menuContainer.on("mouseout", function(event) {
+            document.body.style.cursor = "default";
         });
     };
 
     // Menu Item event handlers
-    this._loadPaletteMenuItemHandler = function (protoblk, blkname) {
+    this._loadPaletteMenuItemHandler = function(protoblk, blkname) {
         // A menu item is a protoblock that is used to create a new block.
         var that = this;
         var pressupLock = false;
@@ -1907,17 +2233,23 @@ function Palette(palettes, name) {
         var saveY = this.protoContainers[blkname].y;
         var bgScrolling = false;
 
-        this.protoContainers[blkname].on('mouseover', function (event) {
-            document.body.style.cursor = 'pointer';
+        this.protoContainers[blkname].on("mouseover", function(event) {
+            document.body.style.cursor = "pointer";
             that.palettes.activePalette = that;
         });
 
-        this.protoContainers[blkname].on('mousedown', function (event) {
+        this.protoContainers[blkname].on("mousedown", function(event) {
             var stage = that.palettes.stage;
-            stage.setChildIndex(that.protoContainers[blkname], stage.children.length - 1);
+            stage.setChildIndex(
+                that.protoContainers[blkname],
+                stage.children.length - 1
+            );
 
-            var h = Math.min(maxPaletteHeight(that.palettes.cellSize, that.palettes.scale), that.palettes.y);
-            var clickY = event.stageY/that.palettes.scale;
+            var h = Math.min(
+                maxPaletteHeight(that.palettes.cellSize, that.palettes.scale),
+                that.palettes.y
+            );
+            var clickY = event.stageY / that.palettes.scale;
             var paletteEndY = that.menuContainer.y + h + STANDARDBLOCKHEIGHT;
 
             // if(clickY < paletteEndY)
@@ -1937,14 +2269,18 @@ function Palette(palettes, name) {
 
             var mode = window.hasMouse ? MODEDRAG : MODEUNSURE;
 
-            that.protoContainers[blkname].removeAllEventListeners('pressmove');
-            that.protoContainers[blkname].on('pressmove', function (event) {
+            that.protoContainers[blkname].removeAllEventListeners("pressmove");
+            that.protoContainers[blkname].on("pressmove", function(event) {
                 if (mode === MODEDRAG) {
                     // if(clickY < paletteEndY)
                     moved = true;
                     that.draggingProtoBlock = true;
-                    that.protoContainers[blkname].x = Math.round(event.stageX / that.palettes.scale) - PALETTELEFTMARGIN;
-                    that.protoContainers[blkname].y = Math.round(event.stageY / that.palettes.scale);
+                    that.protoContainers[blkname].x =
+                        Math.round(event.stageX / that.palettes.scale) -
+                        PALETTELEFTMARGIN;
+                    that.protoContainers[blkname].y = Math.round(
+                        event.stageY / that.palettes.scale
+                    );
                     that.palettes.refreshCanvas();
                     return;
                 }
@@ -1965,37 +2301,48 @@ function Palette(palettes, name) {
             });
         });
 
-        this.protoContainers[blkname].on('mouseout', function (event) {
+        this.protoContainers[blkname].on("mouseout", function(event) {
             // Catch case when pressup event is missed.
             // Put the protoblock back on the palette...
-            document.body.style.cursor = 'default';
+            document.body.style.cursor = "default";
             that.palettes.activePalette = null;
 
             if (pressed && moved) {
-                that._restoreProtoblock(blkname, saveX, saveY + that.scrollDiff);
+                that._restoreProtoblock(
+                    blkname,
+                    saveX,
+                    saveY + that.scrollDiff
+                );
                 pressed = false;
                 moved = false;
             }
         });
 
-        this.protoContainers[blkname].on('pressup', function (event) {
-            document.body.style.cursor = 'default';
+        this.protoContainers[blkname].on("pressup", function(event) {
+            document.body.style.cursor = "default";
             that.palettes.activePalette = null;
 
             if (pressupLock) {
                 return;
             } else {
                 pressupLock = true;
-                setTimeout(function () {
+                setTimeout(function() {
                     pressupLock = false;
                 }, 1000);
             }
 
-            that._makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY);
+            that._makeBlockFromProtoblock(
+                protoblk,
+                moved,
+                blkname,
+                event,
+                saveX,
+                saveY
+            );
         });
     };
 
-    this._restoreProtoblock = function (name, x, y) {
+    this._restoreProtoblock = function(name, x, y) {
         // Return protoblock we've been dragging back to the palette.
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
@@ -2003,53 +2350,55 @@ function Palette(palettes, name) {
         this._resetLayout();
     };
 
-    this.promptPaletteDelete = function () {
+    this.promptPaletteDelete = function() {
         console.debug(this.name);
         // .TRANS: "%s" will be replaced by the palette name.
-        var msg = _('Do you want to remove all the stacks from your "%s" palette?').replace('%s', _(this.name));
+        var msg = _(
+            'Do you want to remove all the stacks from your "%s" palette?'
+        ).replace("%s", _(this.name));
         if (!confirm(msg)) {
             return;
         }
 
         this.palettes.remove(this.name);
 
-        delete pluginObjs['PALETTEHIGHLIGHTCOLORS'][this.name];
-        delete pluginObjs['PALETTESTROKECOLORS'][this.name];
-        delete pluginObjs['PALETTEFILLCOLORS'][this.name];
-        delete pluginObjs['PALETTEPLUGINS'][this.name];
+        delete pluginObjs["PALETTEHIGHLIGHTCOLORS"][this.name];
+        delete pluginObjs["PALETTESTROKECOLORS"][this.name];
+        delete pluginObjs["PALETTEFILLCOLORS"][this.name];
+        delete pluginObjs["PALETTEPLUGINS"][this.name];
 
-        if ('GLOBALS' in pluginObjs) {
-            delete pluginObjs['GLOBALS'][this.name];
+        if ("GLOBALS" in pluginObjs) {
+            delete pluginObjs["GLOBALS"][this.name];
         }
 
-        if ('IMAGES' in pluginObjs) {
-            delete pluginObjs['IMAGES'][this.name];
+        if ("IMAGES" in pluginObjs) {
+            delete pluginObjs["IMAGES"][this.name];
         }
 
-        if ('ONLOAD' in pluginObjs) {
-            delete pluginObjs['ONLOAD'][this.name];
+        if ("ONLOAD" in pluginObjs) {
+            delete pluginObjs["ONLOAD"][this.name];
         }
 
-        if ('ONSTART' in pluginObjs) {
-            delete pluginObjs['ONSTART'][this.name];
+        if ("ONSTART" in pluginObjs) {
+            delete pluginObjs["ONSTART"][this.name];
         }
 
-        if ('ONSTOP' in pluginObjs) {
-            delete pluginObjs['ONSTOP'][this.name];
+        if ("ONSTOP" in pluginObjs) {
+            delete pluginObjs["ONSTOP"][this.name];
         }
 
         for (var i = 0; i < this.protoList.length; i++) {
             var name = this.protoList[i].name;
-            delete pluginObjs['FLOWPLUGINS'][name];
-            delete pluginObjs['ARGPLUGINS'][name];
-            delete pluginObjs['BLOCKPLUGINS'][name];
+            delete pluginObjs["FLOWPLUGINS"][name];
+            delete pluginObjs["ARGPLUGINS"][name];
+            delete pluginObjs["BLOCKPLUGINS"][name];
         }
 
         // FIXME: We really only want to remove macros associated with
         // this palette.
-        if ('MACROPLUGINS' in pluginObjs) {
-            for (name in pluginObjs['MACROPLUGINS']) {
-                      delete pluginObjs['MACROPLUGINS'][name];
+        if ("MACROPLUGINS" in pluginObjs) {
+            for (name in pluginObjs["MACROPLUGINS"]) {
+                delete pluginObjs["MACROPLUGINS"][name];
             }
         }
 
@@ -2062,8 +2411,10 @@ function Palette(palettes, name) {
         this._hideMenuItems();
     };
 
-    this.promptMacrosDelete = function () {
-        var msg = _('Do you want to remove all the stacks from your "%s" palette?').replace('%s', _('myblocks'));
+    this.promptMacrosDelete = function() {
+        var msg = _(
+            'Do you want to remove all the stacks from your "%s" palette?'
+        ).replace("%s", _("myblocks"));
         if (!confirm(msg)) {
             return;
         }
@@ -2075,7 +2426,7 @@ function Palette(palettes, name) {
             this.protoList.splice(i, 1);
         }
 
-        this.palettes.updatePalettes('myblocks');
+        this.palettes.updatePalettes("myblocks");
         storage.macros = prepareMacroExports(null, null, {});
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -2083,171 +2434,245 @@ function Palette(palettes, name) {
         }
     };
 
-    this.makeBlockFromSearch = function (protoblk, blkname, callback) {
+    this.makeBlockFromSearch = function(protoblk, blkname, callback) {
         this._makeBlockFromPalette(protoblk, blkname, callback);
     };
 
-    this._makeBlockFromPalette = function (protoblk, blkname, callback) {
+    this._makeBlockFromPalette = function(protoblk, blkname, callback) {
         if (protoblk === null) {
-            console.debug('null protoblk?');
+            console.debug("null protoblk?");
             return;
         }
 
         switch (protoblk.name) {
-        case 'do':
-            blkname = 'do ' + protoblk.defaults[0];
-            var newBlk = protoblk.name;
-            var arg = protoblk.defaults[0];
-            break;
-        case 'storein':
-            // Use the name of the box in the label
-            blkname = 'store in ' + protoblk.defaults[0];
-            var newBlk = protoblk.name;
-            var arg = protoblk.defaults[0];
-            break;
-        case 'storein2':
-            // Use the name of the box in the label
-            console.debug('storein2' + ' ' + protoblk.defaults[0] + ' ' + protoblk.staticLabels[0]);
-            blkname = 'store in2 ' + protoblk.defaults[0];
-            var newBlk = protoblk.name;
-            var arg = protoblk.staticLabels[0];
-            break;
-        case 'box':
-            // Use the name of the box in the label
-            blkname = protoblk.defaults[0];
-            var newBlk = protoblk.name;
-            var arg = protoblk.defaults[0];
-            break;
-        case 'namedbox':
-            // Use the name of the box in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'namedbox';
-                var arg = _('box');
-            } else {
-                console.debug(protoblk.defaults[0]);
-                blkname = protoblk.defaults[0];
+            case "do":
+                blkname = "do " + protoblk.defaults[0];
+                var newBlk = protoblk.name;
                 var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        case 'namedarg':
-            // Use the name of the arg in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'namedarg';
-                var arg = '1';
-            } else {
-                blkname = protoblk.defaults[0];
+                break;
+            case "storein":
+                // Use the name of the box in the label
+                blkname = "store in " + protoblk.defaults[0];
+                var newBlk = protoblk.name;
                 var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        case 'nameddo':
-            // Use the name of the action in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'nameddo';
-                var arg = _('action');
-            } else {
+                break;
+            case "storein2":
+                // Use the name of the box in the label
+                console.debug(
+                    "storein2" +
+                        " " +
+                        protoblk.defaults[0] +
+                        " " +
+                        protoblk.staticLabels[0]
+                );
+                blkname = "store in2 " + protoblk.defaults[0];
+                var newBlk = protoblk.name;
+                var arg = protoblk.staticLabels[0];
+                break;
+            case "box":
+                // Use the name of the box in the label
                 blkname = protoblk.defaults[0];
+                var newBlk = protoblk.name;
                 var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        case 'nameddoArg':
-            // Use the name of the action in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'nameddoArg';
-                var arg = _('action');
-            } else {
-                blkname = protoblk.defaults[0];
-                var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        case 'namedcalc':
-            // Use the name of the action in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'namedcalc';
-                var arg = _('action');
-            } else {
-                blkname = protoblk.defaults[0];
-                var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        case 'namedcalcArg':
-            // Use the name of the action in the label
-            if (protoblk.defaults[0] === undefined) {
-                blkname = 'namedcalcArg';
-                var arg = _('action');
-            } else {
-                blkname = protoblk.defaults[0];
-                var arg = protoblk.defaults[0];
-            }
-            var newBlk = protoblk.name;
-            break;
-        default:
-            if (blkname === 'nameddo') {
-                var arg = _('action');
-            } else {
-                var arg = '__NOARG__';
-            }
+                break;
+            case "namedbox":
+                // Use the name of the box in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "namedbox";
+                    var arg = _("box");
+                } else {
+                    console.debug(protoblk.defaults[0]);
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "namedarg":
+                // Use the name of the arg in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "namedarg";
+                    var arg = "1";
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "nameddo":
+                // Use the name of the action in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "nameddo";
+                    var arg = _("action");
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "nameddoArg":
+                // Use the name of the action in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "nameddoArg";
+                    var arg = _("action");
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "namedcalc":
+                // Use the name of the action in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "namedcalc";
+                    var arg = _("action");
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "namedcalcArg":
+                // Use the name of the action in the label
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "namedcalcArg";
+                    var arg = _("action");
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            default:
+                if (blkname === "nameddo") {
+                    var arg = _("action");
+                } else {
+                    var arg = "__NOARG__";
+                }
 
-            var newBlk = blkname;
-            break;
+                var newBlk = blkname;
+                break;
         }
 
         var lastBlock = this.palettes.blocks.blockList.length;
 
-        if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blockIsMacro(blkname)) {
+        if (
+            [
+                "namedbox",
+                "nameddo",
+                "namedcalc",
+                "nameddoArg",
+                "namedcalcArg"
+            ].indexOf(protoblk.name) === -1 &&
+            blockIsMacro(blkname)
+        ) {
             var moved = true;
             var saveX = this.protoContainers[blkname].x;
             var saveY = this.protoContainers[blkname].y;
-            this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
+            this._makeBlockFromProtoblock(
+                protoblk,
+                moved,
+                blkname,
+                null,
+                saveX,
+                saveY
+            );
             callback(lastBlock);
-        } else if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1 && blkname in this.palettes.pluginMacros) {
+        } else if (
+            [
+                "namedbox",
+                "nameddo",
+                "namedcalc",
+                "nameddoArg",
+                "namedcalcArg"
+            ].indexOf(protoblk.name) === -1 &&
+            blkname in this.palettes.pluginMacros
+        ) {
             var moved = true;
             var saveX = this.protoContainers[blkname].x;
             var saveY = this.protoContainers[blkname].y;
-            this._makeBlockFromProtoblock(protoblk, moved, blkname, null, saveX, saveY);
+            this._makeBlockFromProtoblock(
+                protoblk,
+                moved,
+                blkname,
+                null,
+                saveX,
+                saveY
+            );
             callback(lastBlock);
-
         } else {
-            var newBlock = paletteBlockButtonPush(this.palettes.blocks, newBlk, arg);
+            var newBlock = paletteBlockButtonPush(
+                this.palettes.blocks,
+                newBlk,
+                arg
+            );
             callback(newBlock);
         }
     };
 
-    this.cleanup = function () {
+    this.cleanup = function() {
         this._resetLayout();
         this._updateBlockMasks();
         this.palettes.refreshCanvas();
     };
 
-    this._makeBlockFromProtoblock = function (protoblk, moved, blkname, event, saveX, saveY) {
+    this._makeBlockFromProtoblock = function(
+        protoblk,
+        moved,
+        blkname,
+        event,
+        saveX,
+        saveY
+    ) {
         var that = this;
 
-        function __myCallback (newBlock) {
+        function __myCallback(newBlock) {
             // Move the drag group under the cursor.
             that.palettes.blocks.findDragGroup(newBlock);
             for (var i in that.palettes.blocks.dragGroup) {
-                that.palettes.blocks.moveBlockRelative(that.palettes.blocks.dragGroup[i], Math.round(event.stageX / that.palettes.scale) - that.palettes.blocks.stage.x, Math.round(event.stageY / that.palettes.scale) - that.palettes.blocks.stage.y);
+                that.palettes.blocks.moveBlockRelative(
+                    that.palettes.blocks.dragGroup[i],
+                    Math.round(event.stageX / that.palettes.scale) -
+                        that.palettes.blocks.stage.x,
+                    Math.round(event.stageY / that.palettes.scale) -
+                        that.palettes.blocks.stage.y
+                );
             }
             // Dock with other blocks if needed
             that.palettes.blocks.blockMoved(newBlock);
             that.palettes.blocks.checkBounds();
-        };
+        }
 
         if (moved) {
             moved = false;
             this.draggingProtoBlock = false;
 
             var macroExpansion = null;
-            if (['namedbox', 'nameddo', 'namedcalc', 'nameddoArg', 'namedcalcArg'].indexOf(protoblk.name) === -1) {
-                var macroExpansion = getMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+            if (
+                [
+                    "namedbox",
+                    "nameddo",
+                    "namedcalc",
+                    "nameddoArg",
+                    "namedcalcArg"
+                ].indexOf(protoblk.name) === -1
+            ) {
+                var macroExpansion = getMacroExpansion(
+                    blkname,
+                    this.protoContainers[blkname].x -
+                        this.palettes.blocks.stage.x,
+                    this.protoContainers[blkname].y -
+                        this.palettes.blocks.stage.y
+                );
                 if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
-                        var macroExpansion = this.palettes.getPluginMacroExpansion(blkname, this.protoContainers[blkname].x - this.palettes.blocks.stage.x, this.protoContainers[blkname].y - this.palettes.blocks.stage.y);
+                        var macroExpansion = this.palettes.getPluginMacroExpansion(
+                            blkname,
+                            this.protoContainers[blkname].x -
+                                this.palettes.blocks.stage.x,
+                            this.protoContainers[blkname].y -
+                                this.palettes.blocks.stage.y
+                        );
                     }
                 }
             }
@@ -2256,59 +2681,83 @@ function Palette(palettes, name) {
                 this.palettes.blocks.loadNewBlocks(macroExpansion);
                 var thisBlock = this.palettes.blocks.blockList.length - 1;
                 var topBlk = this.palettes.blocks.findTopBlock(thisBlock);
-            } else if (this.name === 'myblocks') {
+            } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
-                var macroName = blkname.replace('macro_', '');
+                var macroName = blkname.replace("macro_", "");
 
                 // We need to copy the macro data so it is not overwritten.
                 var obj = [];
-                for (var b = 0; b < this.palettes.macroDict[macroName].length; b++) {
+                for (
+                    var b = 0;
+                    b < this.palettes.macroDict[macroName].length;
+                    b++
+                ) {
                     var valueEntry = this.palettes.macroDict[macroName][b][1];
                     var newValue = [];
-                    if (typeof(valueEntry) === 'string') {
+                    if (typeof valueEntry === "string") {
                         newValue = valueEntry;
-                    } else if (typeof(valueEntry[1]) === 'string') {
-                        if (valueEntry[0] === 'number') {
+                    } else if (typeof valueEntry[1] === "string") {
+                        if (valueEntry[0] === "number") {
                             newValue = [valueEntry[0], Number(valueEntry[1])];
                         } else {
                             newValue = [valueEntry[0], valueEntry[1]];
                         }
-                    } else if (typeof(valueEntry[1]) === 'number') {
-                        if (valueEntry[0] === 'number') {
+                    } else if (typeof valueEntry[1] === "number") {
+                        if (valueEntry[0] === "number") {
                             newValue = [valueEntry[0], valueEntry[1]];
                         } else {
-                            newValue = [valueEntry[0], valueEntry[1].toString()];
+                            newValue = [
+                                valueEntry[0],
+                                valueEntry[1].toString()
+                            ];
                         }
                     } else {
-                        if (valueEntry[0] === 'number') {
-                            newValue = [valueEntry[0], Number(valueEntry[1]['value'])];
+                        if (valueEntry[0] === "number") {
+                            newValue = [
+                                valueEntry[0],
+                                Number(valueEntry[1]["value"])
+                            ];
                         } else {
-                            newValue = [valueEntry[0], {'value': valueEntry[1]['value']}];
+                            newValue = [
+                                valueEntry[0],
+                                { value: valueEntry[1]["value"] }
+                            ];
                         }
                     }
 
-                    var newBlock = [this.palettes.macroDict[macroName][b][0],
-                                    newValue,
-                                    this.palettes.macroDict[macroName][b][2],
-                                    this.palettes.macroDict[macroName][b][3],
-                                    this.palettes.macroDict[macroName][b][4]];
+                    var newBlock = [
+                        this.palettes.macroDict[macroName][b][0],
+                        newValue,
+                        this.palettes.macroDict[macroName][b][2],
+                        this.palettes.macroDict[macroName][b][3],
+                        this.palettes.macroDict[macroName][b][4]
+                    ];
                     obj.push(newBlock);
                 }
 
                 // Set the position of the top block in the stack
                 // before loading.
-                obj[0][2] = this.protoContainers[blkname].x - this.palettes.blocks.stage.x;
-                obj[0][3] = this.protoContainers[blkname].y - this.palettes.blocks.stage.y;
+                obj[0][2] =
+                    this.protoContainers[blkname].x -
+                    this.palettes.blocks.stage.x;
+                obj[0][3] =
+                    this.protoContainers[blkname].y -
+                    this.palettes.blocks.stage.y;
                 this.palettes.blocks.loadNewBlocks(obj);
 
                 // Ensure collapse state of new stack is set properly.
                 var thisBlock = this.palettes.blocks.blockList.length - 1;
                 var topBlk = this.palettes.blocks.findTopBlock(thisBlock);
-                setTimeout(function () {
+                setTimeout(function() {
                     this.palettes.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
-                var newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback, newBlock);
+                var newBlock = this._makeBlockFromPalette(
+                    protoblk,
+                    blkname,
+                    __myCallback,
+                    newBlock
+                );
             }
 
             // Put the protoblock back on the palette...
@@ -2317,11 +2766,10 @@ function Palette(palettes, name) {
     };
 
     return this;
-};
+}
 
-
-async  function initPalettes (palettes) {
-// function initPalettes (palettes) {
+async function initPalettes(palettes) {
+    // function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
     for (var i = 0; i < BUILTINPALETTES.length; i++) {
@@ -2335,28 +2783,29 @@ async  function initPalettes (palettes) {
     // Give the palettes time to load.
     // We are in no hurry since we are waiting on the splash screen.
     await delayExecution(3000);
-    console.debug('Time to show the palettes.');
+    console.debug("Time to show the palettes.");
     palettes.show();
     palettes.bringToTop();
     palettes.showSelection(0);
 
-   // }, 3000);
-};
+    // }, 3000);
+}
 
 const MODEUNSURE = 0;
 const MODEDRAG = 1;
 const MODESCROLL = 2;
 const DECIDEDISTANCE = 20;
 
-
 function makePaletteBitmap(palette, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
     var img = new Image();
-    img.onload = function () {
+    img.onload = function() {
         var bitmap = new createjs.Bitmap(img);
         callback(palette, name, bitmap, extras);
     };
 
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
-};
+    img.src =
+        "data:image/svg+xml;base64," +
+        window.btoa(unescape(encodeURIComponent(data)));
+}
