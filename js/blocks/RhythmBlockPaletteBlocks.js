@@ -374,6 +374,7 @@ function setupRhythmBlockPaletteBlocks() {
         null,
         "tuplet4"
       ]);
+      this.extraWidth = 20;
       this.formBlock({
         name: _("tuplet"),
         args: 1,

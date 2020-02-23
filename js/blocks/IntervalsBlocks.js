@@ -128,6 +128,7 @@ function setupIntervalsBlocks() {
       super("intervalname");
       this.setPalette("intervals");
       this.setHelpString();
+      this.extraWidth = 50;
       this.formBlock({ outType: "numberout" });
     }
   }
