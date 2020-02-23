@@ -192,48 +192,30 @@ function ModeWidget() {
         var letterName = currentModeName[0];
         var modeName = currentModeName[1];
 
-                var startingposition; // relative to keyboard
-                switch(letterName) { // sharp|flats included
-                        case "C♭": startingposition = 11; break;
-                        case "C": startingposition = 0; break;
-                        case "C♯":
-                        case "D♭": startingposition = 1; break;
-                        case "D": startingposition = 2; break;
-                        case "D♯":
-                        case "E♭": startingposition = 3; break;
-                        case "E": startingposition = 4; break;
-                        case "E♯": startingposition = 5; break;
-                        case "F♭": startingposition = 4; break;
-                        case "F": startingposition = 5; break;
-                        case "F♯":
-                        case "G♭": startingposition = 6; break;
-                        case "G": startingposition = 7; break;
-                        case "G♯":
-                        case "A♭": startingposition = 8; break;
-                        case "A": startingposition = 9; break;
-                        case "A♯":
-                        case "A♭": startingposition = 10; break;
-                        case "B": startingposition = 11; break;
-                        case "B♯": startingposition = 0; break;
-                        default: startingposition = 0;
-                }
-                modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+        var startDict = {"C♭": 11, "C": 0, "C♯": 1, "D♭": 1, "D": 2, "D♯": 3, "E♭": 3, "E": 4, "E♯": 5, "F♭": 4, "F": 5, "F♯": 6, "G♭": 6, "G": 7, "G♯": 8, "A♭": 8, "A": 9, "A♯": 10, "A♭": 10, "B": 11, "B♯": 0};
+        if (letterName in startDict) {
+            var startingPosition = startDict[letterName];
+        } else {
+            var startingPosition = 0;
+        }
 
-                for(var i = 0; i < 12; ++i) {
-                        if(this._selectedNotes[i])
-                                document.getElementById('pkey_'+i).src = highlightImgs[(i+startingposition)%12];
-                }
+        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+
+        for (var i = 0; i < 12; ++i) {
+            if (this._selectedNotes[i])
+                document.getElementById('pkey_'+i).src = highlightImgs[(i+startingPosition)%12];
+        }
     };
 
     this._invert = function() {
