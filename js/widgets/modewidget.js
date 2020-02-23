@@ -192,48 +192,30 @@ function ModeWidget() {
         var letterName = currentModeName[0];
         var modeName = currentModeName[1];
 
-                var startingposition; // relative to keyboard
-                switch(letterName) { // sharp|flats included
-                        case "C♭": startingposition = 11; break;
-                        case "C": startingposition = 0; break;
-                        case "C♯":
-                        case "D♭": startingposition = 1; break;
-                        case "D": startingposition = 2; break;
-                        case "D♯":
-                        case "E♭": startingposition = 3; break;
-                        case "E": startingposition = 4; break;
-                        case "E♯": startingposition = 5; break;
-                        case "F♭": startingposition = 4; break;
-                        case "F": startingposition = 5; break;
-                        case "F♯":
-                        case "G♭": startingposition = 6; break;
-                        case "G": startingposition = 7; break;
-                        case "G♯":
-                        case "A♭": startingposition = 8; break;
-                        case "A": startingposition = 9; break;
-                        case "A♯":
-                        case "A♭": startingposition = 10; break;
-                        case "B": startingposition = 11; break;
-                        case "B♯": startingposition = 0; break;
-                        default: startingposition = 0;
-                }
-                modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
-                modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+        var startDict = {"C♭": 11, "C": 0, "C♯": 1, "D♭": 1, "D": 2, "D♯": 3, "E♭": 3, "E": 4, "E♯": 5, "F♭": 4, "F": 5, "F♯": 6, "G♭": 6, "G": 7, "G♯": 8, "A♭": 8, "A": 9, "A♯": 10, "A♭": 10, "B": 11, "B♯": 0};
+        if (letterName in startDict) {
+            var startingPosition = startDict[letterName];
+        } else {
+            var startingPosition = 0;
+        }
 
-                for(var i = 0; i < 12; ++i) {
-                        if(this._selectedNotes[i])
-                                document.getElementById('pkey_'+i).src = highlightImgs[(i+startingposition)%12];
-                }
+        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+        modePianoDiv.innerHTML += '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+
+        for (var i = 0; i < 12; ++i) {
+            if (this._selectedNotes[i])
+                document.getElementById('pkey_'+i).src = highlightImgs[(i+startingPosition)%12];
+        }
     };
 
     this._invert = function() {
@@ -417,7 +399,7 @@ function ModeWidget() {
                 this._notesToPlay.push(i);
             }
         }
-
+        console.debug(this._notesToPlay);
         this._lastNotePlayed = null;
         if (this._playing) {
             this.__playNextNote(0);
@@ -425,42 +407,106 @@ function ModeWidget() {
     };
 
     this.__playNextNote = function(i) {
+
+        var highlightImgs = ['images/highlights/sel_c.png', 'images/highlights/sel_c_sharp.png', 'images/highlights/sel_d.png', 'images/highlights/sel_d_sharp.png', 'images/highlights/sel_e.png', 'images/highlights/sel_f.png', 'images/highlights/sel_f_sharp.png', 'images/highlights/sel_g.png', 'images/highlights/sel_g_sharp.png', 'images/highlights/sel_a.png', 'images/highlights/sel_a_sharp.png', 'images/highlights/sel_b.png'];
+
+        var animationImgs = ['images/animations/sel_c1.png', 'images/animations/sel_c_sharp1.png', 'images/animations/sel_d1.png', 'images/animations/sel_d_sharp1.png', 'images/animations/sel_e1.png', 'images/animations/sel_f1.png', 'images/animations/sel_f_sharp1.png', 'images/animations/sel_g1.png', 'images/animations/sel_g_sharp1.png', 'images/animations/sel_a1.png', 'images/animations/sel_a_sharp1.png', 'images/animations/sel_b1.png'];
+
+        var startingposition = 0;
         time = this._noteValue + 0.125;
         var that = this;
+        
 
-        if (i > this._notesToPlay.length - 1) {
-            setTimeout(function() {
+        var currentKey = keySignatureToMode(this._logo.keySignature[0])[0];
+        if(currentKey === 'C'){
+            if (i > this._notesToPlay.length - 1) {
+                setTimeout(function() {
                 // Did we just play the last note?
-                that._playing = false;
+                    that._playing = false;
+                    var note_key = document.getElementById('pkey_'+0);
+                    if(note_key !==null) {
+                        note_key.src = highlightImgs[0];
+                    }
+                    that._playButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
+                    that._resetNotes();
+                    that._locked = false;
+                }, 1000 * time);
 
-                that._playButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-                that._resetNotes();
-                that._locked = false;
+                return;
+                
+            }
+
+            setTimeout(function() {
+                if (that._lastNotePlayed !== null) {
+                    that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
+                    var note_key = document.getElementById('pkey_'+that._lastNotePlayed % 12);
+                    if(note_key !==null){
+                        note_key.src = highlightImgs[(that._lastNotePlayed+startingposition)%12];; 
+                    }
+                }
+
+                note = that._notesToPlay[i];
+                that._playWheel.navItems[note % 12].navItem.show();
+            
+                if(note !==12) {
+                    var note_key = document.getElementById('pkey_'+note%12);
+                    if(note_key !==null){
+                        note_key.src = animationImgs[(note+startingposition)%12]; 
+                    }
+                }
+                
+                that._lastNotePlayed = note;
+                var ks = that._logo.keySignature[0];
+                var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
+                that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
+                
+                if (that._playing) {
+                    that.__playNextNote(i + 1);
+                } else {
+                    that._locked = false;
+                    setTimeout(that._resetNotes(), 500);
+                    return;
+                }
             }, 1000 * time);
-
-            return;
         }
 
-        setTimeout(function() {
-            if (that._lastNotePlayed !== null) {
-                that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
-            }
+        else {
+            if (i > this._notesToPlay.length - 1) {
+                setTimeout(function() {
+                    // Did we just play the last note?
+                    that._playing = false;
+                    that._playButton.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';   
+                    that._resetNotes();
+                    that._locked = false;
+                }, 1000 * time);
 
-            note = that._notesToPlay[i];
-            that._playWheel.navItems[note % 12].navItem.show();
-            that._lastNotePlayed = note;
-
-            var ks = that._logo.keySignature[0];
-            var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
-            that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
-            if (that._playing) {
-                that.__playNextNote(i + 1);
-            } else {
-                that._locked = false;
-                setTimeout(that._resetNotes(), 500);
                 return;
             }
-        }, 1000 * time);
+
+            setTimeout(function() {
+                if (that._lastNotePlayed !== null) {
+                    that._playWheel.navItems[that._lastNotePlayed % 12].navItem.hide();
+                        
+                }
+
+                note = that._notesToPlay[i];
+                that._playWheel.navItems[note % 12].navItem.show();
+                that._lastNotePlayed = note;
+
+                var ks = that._logo.keySignature[0];
+                var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
+                that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
+                if (that._playing) {
+                    that.__playNextNote(i + 1);
+                } else {
+                    that._locked = false;
+                    setTimeout(that._resetNotes(), 500);
+                    return;
+                }
+            }, 1000 * time);
+
+        }
+    
     };
 
     this._playNote = function(i) {
