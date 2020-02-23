@@ -5111,7 +5111,7 @@ function Blocks (activity) {
                     var thisBlock = args[0];
                     var value = args[1];
                     that.blockList[thisBlock].privateData = value;
-                    console.log(value);
+
                     if (value === 'box1') {
                         that.blockList[thisBlock].overrideName = _('box 1');
                     } else if (value === 'box2') {
@@ -5119,7 +5119,7 @@ function Blocks (activity) {
                     } else {
                         that.blockList[thisBlock].overrideName = value;
                     }
-                    console.log(that.blockList[thisBlock].overrideName);
+
                     that.blockList[thisBlock].value = null;
                     that.blockList[thisBlock].regenerateArtwork();
                 };
