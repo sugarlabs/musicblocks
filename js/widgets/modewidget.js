@@ -465,19 +465,19 @@ function ModeWidget() {
 
                 note = that._notesToPlay[i];
                 that._playWheel.navItems[note % 12].navItem.show();
-                
-                var flag = that._lastNotePlayed ===12 && note ===12;
-                if(!flag) {
+            
+                if(note !==12) {
                     var note_key = document.getElementById('pkey_'+note%12);
                     if(note_key !==null){
                         note_key.src = animationImgs[(note+startingposition)%12]; 
                     }
-                
-                    that._lastNotePlayed = note;
-                    var ks = that._logo.keySignature[0];
-                    var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
-                    that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
                 }
+                
+                that._lastNotePlayed = note;
+                var ks = that._logo.keySignature[0];
+                var noteToPlay = getNote(that._pitch, 4, note, ks, false, null, that._logo.errorMsg);
+                that._logo.synth.trigger(0, noteToPlay[0].replace(/♯/g, '#').replace(/♭/g, 'b') + noteToPlay[1], that._noteValue, DEFAULTVOICE, null, null);
+                
                 if (that._playing) {
                     that.__playNextNote(i + 1);
                 } else {
