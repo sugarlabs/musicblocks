@@ -1035,9 +1035,9 @@ function ModeWidget() {
       that._noteWheel.navItems[i].navItem.show();
       that._playNote(i);
       that._setModeName();
-      var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+      var currentModeName = keySignatureToMode(that._logo.keySignature[0]);
       if (currentModeName[0] === "C") {
-        this._showPiano();
+        that._showPiano();
       }
     };
 
@@ -1052,9 +1052,9 @@ function ModeWidget() {
       that._saveState();
       that._selectedNotes[i] = false;
       that._setModeName();
-      var currentModeName = keySignatureToMode(this._logo.keySignature[0]);
+      var currentModeName = keySignatureToMode(that._logo.keySignature[0]);
       if (currentModeName[0] === "C") {
-        this._showPiano();
+        that._showPiano();
       }
     };
 
