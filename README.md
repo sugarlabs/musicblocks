@@ -10,6 +10,8 @@ Music Blocks is a programming language and collection of manipulative
 tools for exploring musical and mathematical concepts in an
 integrative and fun way.
 
+**Refer the following sections below to get familiar with this awesome project:**
+
 * [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
 * [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
 * [Using Music Blocks](#USING_MUSIC_BLOCKS)
@@ -77,6 +79,9 @@ NOTE: Make sure you can run either <code>python</code> or
 
 (5) Open your favorite browser and run <code>localhost:3000</code> or
 <code>127.0.0.1:3000</code>.
+
+NOTE: Use **ctrl + c** to quit the **HTTPServer** to avoid
+**socket.error:[Errno 48]**.
 
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
