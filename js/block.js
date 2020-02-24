@@ -5735,11 +5735,16 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         this._exitWheel.navItems[1].navigateFunction = function () {
-            if(that.value == 1) {
-                errorMsg(_("Note value must be greater than 0"));
-                return false;
+            var cblk1 = that.connections[0];
+            var cblk2 = that.blocks.blockList[cblk1].connections[0];
+
+            // Check if the number block is connected to a note value and prevent the value to go below zero
+            if((that.blocks.blockList[cblk1].name === 'newnote' || that.blocks.blockList[cblk2].name == 'newnote') && that.value < 1) {
+                that.value = 0;
+            } else {
+                that.value -= 1;
             }
-            that.value -= 1;
+    
             that.text.text = that.value.toString();
 
             // Make sure text is on top.
