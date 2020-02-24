@@ -80,7 +80,8 @@ NOTE: Make sure you can run either <code>python</code> or
 (5) Open your favorite browser and run <code>localhost:3000</code> or
 <code>127.0.0.1:3000</code>.
 
-NOTE: Always use **ctrl + c** command to quit the **HTTPServer** to prevent **socket.error:[Errno 48]**.
+NOTE: Use **ctrl + c** to quit the **HTTPServer** to avoid
+**socket.error:[Errno 48]**.
 
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
