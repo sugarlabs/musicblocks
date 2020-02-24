@@ -340,7 +340,7 @@ function Activity() {
 
     // Checks which browser is MB running from
 
-    this.doBrowserCheck = function() {
+    _doBrowserCheck = function() {
         var matched, browser;
         jQuery.uaMatch = function( ua ) {
             ua = ua.toLowerCase();
@@ -462,8 +462,17 @@ function Activity() {
         pluginsImages = {};
     };
 
-    window.onblur = function() {
-        that.doHardStopButton(true);
+    /*
+     * run browser check before implementing onblur functionality
+     * (This is being done to stop MB to lose focus when increasing/decreasing volume on Firefox)
+     */
+
+    _doBrowserCheck();
+
+    if(!jQuery.browser.mozilla){
+        window.onblur = function() {
+            that.doHardStopButton(true);
+        }
     };
 
     /*
