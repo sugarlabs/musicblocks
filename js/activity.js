@@ -217,7 +217,7 @@ function Activity() {
             "widgets/timbre",
             "activity/lilypond",
             "activity/abc",
-
+            "activity/mxml",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",

@@ -2037,6 +2037,10 @@ function Logo() {
                         console.debug("saving abc output:");
                         save.afterSaveAbc();
                         that.runningAbc = false;
+                    } else if (that.runningMxml) {
+                        console.log('saving mxml output');
+                        save.afterSaveMxml();
+                        that.runningMxml = false;
                     } else if (that.suppressOutput[turtle]) {
                         console.debug("finishing compiling");
                         if (!that.recording) {
@@ -3112,7 +3116,7 @@ function Logo() {
                                 var d = that.tieCarryOver[turtle];
                             }
 
-                            if (that.runningLilypond) {
+                            if (that.runningLilypond || that.runningMxml) {
                                 that.updateNotation(
                                     chordNotes,
                                     d,
