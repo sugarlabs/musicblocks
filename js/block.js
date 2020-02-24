@@ -7305,12 +7305,6 @@ function Block(protoblock, blocks, overrideName) {
         var oldValue = this.value;
         var newValue = this.label.value;
 
-        if(newValue < 1)
-        {
-          errorMsg(_("Note value must be greater than 0"));
-          return false;
-        }
-
         if (this.labelattr != null) {
             var attrValue = this.labelattr.value;
             switch (attrValue) {
@@ -7398,9 +7392,15 @@ function Block(protoblock, blocks, overrideName) {
 
         // Update the block value and block text.
         if (this.name === "number") {
+            var cblk1 = this.connections[0];
+            var cblk2 = this.blocks.blockList[cblk1].connections[0];
             if (this.value === "-") {
                 this.value = -1;
-            } else {
+            } else if ((newValue < 0) && (this.blocks.blockList[cblk1].name === 'newnote' || this.blocks.blockList[cblk2].name == 'newnote')) {
+                this.label.value = 0;
+                this.value = 0;
+            }
+            else {
                 this.value = Number(newValue);
             }
 
