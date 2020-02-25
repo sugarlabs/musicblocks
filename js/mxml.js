@@ -296,6 +296,13 @@ saveMxmlOutput = function(logo) {
 
         indent--;
         if (openedMeasureTag) {
+            indent++;
+            add("<barline>");
+            indent++;
+            add("<bar-style>light-heavy</bar-style>");
+            indent--;
+            add("</barline>");
+            indent--;
             add("</measure>");
         }
         indent--;
