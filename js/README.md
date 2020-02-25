@@ -77,7 +77,7 @@ files define blocks in each of the palettes:
 
 Subdirectories with additional utilities
 * utils -- additional general-purpose utilities
-	* `detectIE.js` -- check if Music Blocks is being run in Internet Explorer
+	<!-- * `detectIE.js` -- check if Music Blocks is being run in Internet Explorer -->
 	* `munsell.js` -- Munsell color system used for mice and widgets
 	* `musicutils.js` -- related to musical notations
 	* `platformstyle.js` -- checking platform that Music Blocks is run in

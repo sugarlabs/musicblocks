@@ -425,10 +425,6 @@ function Activity() {
         pluginsImages = {};
     };
 
-    window.onblur = function() {
-        that.doHardStopButton(true);
-    };
-
     /*
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
@@ -4555,6 +4551,19 @@ function Activity() {
         }
 
         docById("loader").className = "loader";
+
+        /*
+         * run browser check before implementing onblur --> stop MB functionality
+         * (This is being done to stop MB to lose focus when increasing/decreasing volume on Firefox)
+         */
+
+        doBrowserCheck();
+        
+        if(!jQuery.browser.mozilla){
+            window.onblur = function() {
+                that.doHardStopButton(true);
+            }
+        };
 
         stage = new createjs.Stage(canvas);
         createjs.Touch.enable(stage);
