@@ -12,6 +12,7 @@ const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const replace = require('gulp-replace');
 const minifyCSS = require("gulp-minify-css");
+const cleanCSS = require('gulp-clean-css');
 const gulp = require('gulp'); 
 const prettier = require('gulp-prettier');
 
@@ -69,12 +70,20 @@ function cacheBustTask(){
 
 //This gulp task formats the js files
 
-gulp.task('prettiertask', () => {
+gulp.task('prettify', () => {
     return gulp.src(files.jsPath)
-      .pipe(prettier({ singleQuote: true }))
-      .pipe(gulp.dest('./dist'));
-  });
+      .pipe(prettier({ singleQuote: true,
+                       trailingComma: "all"
+    }))
+      .pipe(gulp.dest('./dist/js')); 
+ });
 
+//to check whether or not files adhere to Prettier's formatting
+
+gulp.task('validate', () => {
+    return gulp.src(files.jsPath)
+        .pipe(prettier.check({ singleQuote: true, trailingComma: "all"}));
+});
 
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
@@ -85,9 +94,9 @@ function watchTask(){
 
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
-// then runs cacheBust, then watch task
+// then runs prettify, cacheBust, watch task, then validate
 exports.default = series(
-    parallel( jsTask, cssTask , sassTask ), prettiertask,
+    parallel( jsTask, cssTask , sassTask ), prettify,
     cacheBustTask,
-    watchTask
+    watchTask, validate
 );
