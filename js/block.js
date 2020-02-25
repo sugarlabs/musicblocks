@@ -5734,8 +5734,17 @@ function Block(protoblock, blocks, overrideName) {
             __exitMenu();
         };
 
-        this._exitWheel.navItems[1].navigateFunction = function() {
-            that.value -= 1;
+        this._exitWheel.navItems[1].navigateFunction = function () {
+            var cblk1 = that.connections[0];
+            var cblk2 = that.blocks.blockList[cblk1].connections[0];
+
+            // Check if the number block is connected to a note value and prevent the value to go below zero
+            if((that.blocks.blockList[cblk1].name === 'newnote' || that.blocks.blockList[cblk2].name == 'newnote') && that.value < 1) {
+                that.value = 0;
+            } else {
+                that.value -= 1;
+            }
+    
             that.text.text = that.value.toString();
 
             // Make sure text is on top.
@@ -7383,9 +7392,15 @@ function Block(protoblock, blocks, overrideName) {
 
         // Update the block value and block text.
         if (this.name === "number") {
+            var cblk1 = this.connections[0];
+            var cblk2 = this.blocks.blockList[cblk1].connections[0];
             if (this.value === "-") {
                 this.value = -1;
-            } else {
+            } else if ((newValue < 0) && (this.blocks.blockList[cblk1].name === 'newnote' || this.blocks.blockList[cblk2].name == 'newnote')) {
+                this.label.value = 0;
+                this.value = 0;
+            }
+            else {
                 this.value = Number(newValue);
             }
 
