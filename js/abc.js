@@ -444,7 +444,6 @@ processAbcNotes = function(logo, turtle) {
 
 saveAbcOutput = function(logo) {
     var turtleCount = 0;
-    var clef = [];
 
     logo.notationOutput = getABCHeader();
 
