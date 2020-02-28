@@ -217,7 +217,7 @@ function Activity() {
             "widgets/timbre",
             "activity/lilypond",
             "activity/abc",
-
+            "activity/mxml",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
@@ -423,10 +423,6 @@ function Activity() {
         firstRun = true;
 
         pluginsImages = {};
-    };
-
-    window.onblur = function() {
-        that.doHardStopButton(true);
     };
 
     /*
@@ -4555,6 +4551,19 @@ function Activity() {
         }
 
         docById("loader").className = "loader";
+
+        /*
+         * run browser check before implementing onblur --> stop MB functionality
+         * (This is being done to stop MB to lose focus when increasing/decreasing volume on Firefox)
+         */
+
+        doBrowserCheck();
+        
+        if(!jQuery.browser.mozilla){
+            window.onblur = function() {
+                that.doHardStopButton(true);
+            }
+        };
 
         stage = new createjs.Stage(canvas);
         createjs.Touch.enable(stage);

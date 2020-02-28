@@ -236,7 +236,11 @@ function WidgetWindow(key, title) {
         let cRect = canvas.getBoundingClientRect();
 
         if (cRect.width === 0 || cRect.height === 0) {
-            // The canvas isn't shown so we don't know how large it really is
+            // The canvas isn't shown so we set some approximate numbers
+            this.setPosition(
+                200,
+                140
+            )
             return this;
         }
 
