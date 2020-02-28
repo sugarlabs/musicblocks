@@ -47,17 +47,8 @@ function HelpWidget() {
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
 
-<<<<<<< HEAD
         // Make help div appear in center of screen
         this.widgetWindow.sendToCenter();
-=======
-        // Make help div apeear in center of screen
-        // this.widgetWindow.sendToCenter();
-        this .widgetWindow.setPosition(
-            404,
-            449
-        )
->>>>>>> hardwired position parameters for help div
 
         if (blocks === null) {
             var that = this;
