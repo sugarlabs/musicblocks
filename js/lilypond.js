@@ -100,7 +100,7 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                 queueSlur = true;
                 break;
             case 'end slur':
-                logo.notationNotes[turtle] += ') ';
+                logo.notationNotes[turtle] += ')  ';
                 break;
             case 'begin harmonics':
                 logo.notationNotes[turtle] += '\\harmonicsOn ';
@@ -451,7 +451,6 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                         logo.notationNotes[turtle] += '->';
                     }
 
-                    logo.notationNotes[turtle] += ' ';
                 }
 
                 if (obj[NOTATIONSTACCATO]) {
@@ -462,11 +461,10 @@ processLilypondNotes = function (lilypond, logo, turtle) {
                 tupletDuration = 0;
             }
 
-            logo.notationNotes[turtle] += ' ';
 
             if (queueSlur) {
                 queueSlur = false;
-                logo.notationNotes[turtle] += '(';
+                logo.notationNotes[turtle] += '(  ';
             }
         }
     }
