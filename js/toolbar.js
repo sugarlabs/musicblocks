@@ -80,6 +80,7 @@ function Toolbar() {
         svg_onclick,
         png_onclick,
         wave_onclick,
+        webm_onclick,
         ly_onclick,
         abc_onclick,
         mxml_onclick,
@@ -141,6 +142,7 @@ function Toolbar() {
 
                 var saveSVG = docById("save-svg");
                 var savePNG = docById("save-png");
+                var saveWEBM = docById("save-webm");
                 console.debug(savePNG);
                 var svgData = doSVG_onclick(
                     canvas,
@@ -155,13 +157,17 @@ function Toolbar() {
                 if (svgData == "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
+                    saveWEBM.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
                     savePNG.className = "grey-text inactiveLink";
+                    saveWEBM.className = "grey-text inactiveLink";
                 } else {
                     saveSVG.disabled = false;
                     savePNG.disabled = false;
+                    saveWEBM.disabled = false;
                     saveSVG.className = "";
                     savePNG.className = "";
+                    saveWEBM.className = "";
 
                     saveSVG.onclick = function() {
                         svg_onclick();
@@ -169,6 +175,10 @@ function Toolbar() {
 
                     savePNG.onclick = function() {
                         png_onclick();
+                    };
+
+                    saveWEBM.onclick = function() {
+                        webm_onclick();
                     };
                 }
 
@@ -202,6 +212,10 @@ function Toolbar() {
                     saveMXML.onclick = function() {
                         mxml_onclick();
                     };
+
+
+
+
                 }
 
                 var saveArtworkSVG = docById("save-blockartwork-svg");
@@ -488,6 +502,7 @@ function Toolbar() {
             ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
             ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
             ["save-wav", _("Save music as WAV"), "innerHTML"],
+            ["save-webm", _("Save artwork animation as WEBM"), "innerHTML"],
             ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
             ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
             ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
