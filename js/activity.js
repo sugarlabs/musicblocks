@@ -218,6 +218,7 @@ function Activity() {
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
+            "activity/webm",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
