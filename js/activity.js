@@ -5027,6 +5027,7 @@ function Activity() {
             save.saveSVG.bind(save),
             save.savePNG.bind(save),
             save.saveWAV.bind(save),
+            save.saveWEBM.bind(save),
             save.saveLilypond.bind(save),
             save.saveAbc.bind(save),
             save.saveMxml.bind(save),
