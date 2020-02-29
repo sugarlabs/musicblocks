@@ -209,6 +209,7 @@ function SaveInterface(PlanetInterface) {
         var svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
         this.download("svg", svg, filename);
     };
+    
 
     this.saveWAV = function(filename) {
         document.body.style.cursor = "wait";
@@ -227,6 +228,12 @@ function SaveInterface(PlanetInterface) {
         this.download("wav", URL.createObjectURL(blob));
     };
 
+    this.saveWEBM = function(filename){
+        document.body.style.cursor = "wait";
+        this.filename = filename;
+        this.download("webm", URL.createObjectURL(saveVideo()));
+    };
+    
     this.saveAbc = function(filename) {
         document.body.style.cursor = "wait";
         this.filename = filename;
