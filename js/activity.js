@@ -1001,30 +1001,36 @@ function Activity() {
         blocks.activeBlock = null;
         var mode = localStorage.beginnerMode;
 
-        // const MSGPrefix = '<a href=\'#\' ' +
-        // 'onClick=\'window.location.reload()\'' +
-        // 'onMouseOver=\'this.style.opacity = 0.5\'' +
-        // 'onMouseOut=\'this.style.opacity = 1\'>';
-        // const MSGSuffix = '</a>';
+        const MSGPrefix = '<a href=\'#\' ' +
+        'onClick=\'window.location.reload()\'' +
+        'onMouseOver=\'this.style.opacity = 0.5\'' +
+        'onMouseOut=\'this.style.opacity = 1\'>';
+        const MSGSuffix = '</a>';
 
         if (mode === null || mode === undefined || mode === 'true') {
             // textMsg(_(MSGPrefix + _('Refresh your browser to change to advanced mode.') + MSGSuffix));
             localStorage.setItem('beginnerMode', false);
             beginnerMode = false;
+            
+            // Change toolbar as per beginner/Advanced Mode
+            toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveMxml.bind(save), save.saveBlockArtwork.bind(save));
+            toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller, that._setupBlocksContainerEvents, beginnerMode);
+            toolbar.renderModeSelectIcon(doSwitchMode, beginnerMode);
+
+            //Change palettes and blocks as per beginner/Advanced mode
+            initBasicProtoBlocks(palettes, blocks, beginnerMode);
+            palettes.updatePalettes();
+
         } else {
-            // textMsg(_(MSGPrefix + _('Refresh your browser to change to beginner mode.') + MSGSuffix));
+
+            textMsg(_(MSGPrefix + 
+                _('Refresh your browser to change to beginner mode.') + 
+                MSGSuffix));
+
             localStorage.setItem('beginnerMode', true);
             beginnerMode = true;
         }
-        console.log(beginnerMode);
-        // Change toolbar as per beginner/Advanced Mode
-        toolbar.renderSaveIcons(save.saveHTML.bind(save),  doSVG, save.saveSVG.bind(save), save.savePNG.bind(save), save.saveWAV.bind(save), save.saveLilypond.bind(save), save.saveAbc.bind(save), save.saveMxml.bind(save), save.saveBlockArtwork.bind(save));
-        toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller, that._setupBlocksContainerEvents, beginnerMode);
-        toolbar.renderModeSelectIcon(doSwitchMode, beginnerMode);
 
-        //Change palettes and blocks as per beginner/Advanced mode
-        initBasicProtoBlocks(palettes, blocks, beginnerMode);
-        palettes.updatePalettes();
         refreshCanvas();
     };
 
