@@ -9,7 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
 function MeterWidget() {
     // A pie menu is used to show the meter and strong beats
     const BUTTONDIVWIDTH = 535;
@@ -33,10 +32,10 @@ function MeterWidget() {
         widgetWindow.clear();
 
         this._logo.synth.setMasterVolume(PREVIEWVOLUME);
-        this._logo.synth.loadSynth(0, 'kick drum');
-        this._logo.setSynthVolume(0, 'kick drum', PREVIEWVOLUME);
-        this._logo.synth.loadSynth(0, 'snare drum');
-        this._logo.setSynthVolume(0, 'snare drum', PREVIEWVOLUME);
+        this._logo.synth.loadSynth(0, "kick drum");
+        this._logo.setSynthVolume(0, "kick drum", PREVIEWVOLUME);
+        this._logo.synth.loadSynth(0, "snare drum");
+        this._logo.setSynthVolume(0, "snare drum", PREVIEWVOLUME);
 
         // For the button callbacks
         var that = this;
@@ -44,49 +43,74 @@ function MeterWidget() {
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
-        widgetWindow.onclose=function() {
+        widgetWindow.onclose = function() {
             that._playing = false;
             that._logo.hideMsgs();
             this.destroy();
-        }
-
+        };
 
         this._click_lock = false;
-        widgetWindow.addButton('play-button.svg', ICONSIZE, _('Play')).onclick = function() {
-          if (that._get_click_lock()) {
-              console.debug('click lock');
-              return;
-          } else {
-              console.debug('CLICK PLAY/PAUSE');
-              that._click_lock = true;
-              if (that.__getPlayingStatus()) {
-                  console.debug('PAUSING');
-                  this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' + _('Play all') + '" alt="' + _('Play all') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-                  that._playing = false;
-              } else {
-                  console.debug('PLAYING');
-                  this.innerHTML = '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' + _('Stop') + '" alt="' + _('Stop') + '" height="' + ICONSIZE + '" width="' + ICONSIZE + '" vertical-align="middle">&nbsp;&nbsp;';
-                  that._playing = true;
-                  that._logo.setTurtleDelay(0);
-                  that._logo.resetSynth(0);
-                  that._playBeat();
-              }
-          }
+        widgetWindow.addButton(
+            "play-button.svg",
+            ICONSIZE,
+            _("Play")
+        ).onclick = function() {
+            if (that._get_click_lock()) {
+                console.debug("click lock");
+                return;
+            } else {
+                console.debug("CLICK PLAY/PAUSE");
+                that._click_lock = true;
+                if (that.__getPlayingStatus()) {
+                    console.debug("PAUSING");
+                    this.innerHTML =
+                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                        _("Play all") +
+                        '" alt="' +
+                        _("Play all") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">&nbsp;&nbsp;';
+                    that._playing = false;
+                } else {
+                    console.debug("PLAYING");
+                    this.innerHTML =
+                        '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
+                        _("Stop") +
+                        '" alt="' +
+                        _("Stop") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">&nbsp;&nbsp;';
+                    that._playing = true;
+                    that._logo.setTurtleDelay(0);
+                    that._logo.resetSynth(0);
+                    that._playBeat();
+                }
+            }
 
-          setTimeout(function () {
-              that._click_lock = false;
-          }, 1000);
-        }
+            setTimeout(function() {
+                that._click_lock = false;
+            }, 1000);
+        };
 
-        widgetWindow.addButton('export-chunk.svg', ICONSIZE, _('Save')).onclick = function() {
-          that._save();
-        }
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            ICONSIZE,
+            _("Save")
+        ).onclick = function() {
+            that._save();
+        };
 
         // The pie menu goes here.
         var meterTableDiv = this.meterDiv;
-        meterTableDiv.style.display = 'inline';
-        meterTableDiv.style.visibility = 'visible';
-        meterTableDiv.style.border = '0px';
+        meterTableDiv.style.display = "inline";
+        meterTableDiv.style.visibility = "visible";
+        meterTableDiv.style.border = "0px";
         meterTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
 
         // Grab the number of beats and beat value from the meter block.
@@ -108,7 +132,9 @@ function MeterWidget() {
             this._piemenuMeter(4, this._beatValue);
         }
 
-        this._logo.textMsg(_('Click in the circle to select strong beats for the meter.'));
+        this._logo.textMsg(
+            _("Click in the circle to select strong beats for the meter.")
+        );
         widgetWindow.sendToCenter();
     };
 
@@ -116,13 +142,20 @@ function MeterWidget() {
         return this._click_lock;
     };
 
-    this.__playDrum = function (drum) {
-        this._logo.synth.trigger(0, 'C4', this._logo.defaultBPMFactor * this._beatValue, drum, null, null);
+    this.__playDrum = function(drum) {
+        this._logo.synth.trigger(
+            0,
+            "C4",
+            this._logo.defaultBPMFactor * this._beatValue,
+            drum,
+            null,
+            null
+        );
     };
 
     this.__getPlayingStatus = function() {
         return this._playing;
-    }
+    };
 
     this.__getPauseStatus = function() {
         return !this._playing;
@@ -130,7 +163,7 @@ function MeterWidget() {
 
     this.__playOneBeat = function(i, ms) {
         if (this.__getPauseStatus()) {
-            console.debug('PAUSING');
+            console.debug("PAUSING");
             for (var i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
             }
@@ -146,13 +179,13 @@ function MeterWidget() {
         this._playWheel.navItems[j].navItem.hide();
 
         if (this._strongBeats[i]) {
-            this.__playDrum('snare drum');
+            this.__playDrum("snare drum");
         } else {
-            this.__playDrum('kick drum');
+            this.__playDrum("kick drum");
         }
 
         var that = this;
-        setTimeout(function () {
+        setTimeout(function() {
             that.__playOneBeat((i + 1) % that._strongBeats.length, ms);
         }, ms);
     };
@@ -168,14 +201,25 @@ function MeterWidget() {
             this._playWheel.navItems[i].navItem.hide();
         }
 
-        var noteBeatValue = (bpmFactor * 1000) * this._beatValue;
+        var noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);
     };
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
+        cell.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/' +
+            icon +
+            '" title="' +
+            label +
+            '" alt="' +
+            label +
+            '" height="' +
+            iconSize +
+            '" width="' +
+            iconSize +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -183,13 +227,13 @@ function MeterWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
+        };
 
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = platformColor.selectorBackground;
-        }
+        };
 
         return cell;
     };
@@ -212,22 +256,88 @@ function MeterWidget() {
         for (var i = 0; i < strongBeats.length; i++) {
             if (i === 0) {
                 if (strongBeats.length === 1) {
-                    newStack.push([0, 'onbeatdo', 100, 100, [null, 1, 2, null]]);
-                    newStack.push([1, ['number', {'value': strongBeats[i] + 1}], 0, 0, [0]]);
-                    newStack.push([2, ['text', {'value': 'action'}], 0, 0, [0]]);
+                    newStack.push([
+                        0,
+                        "onbeatdo",
+                        100,
+                        100,
+                        [null, 1, 2, null]
+                    ]);
+                    newStack.push([
+                        1,
+                        ["number", { value: strongBeats[i] + 1 }],
+                        0,
+                        0,
+                        [0]
+                    ]);
+                    newStack.push([
+                        2,
+                        ["text", { value: "action" }],
+                        0,
+                        0,
+                        [0]
+                    ]);
                 } else {
-                    newStack.push([0, 'onbeatdo', 100, 100, [null, 1, 2, 3]]);
-                    newStack.push([1, ['number', {'value': strongBeats[i] + 1}], 0, 0, [0]]);
-                    newStack.push([2, ['text', {'value': 'action'}], 0, 0, [0]]);
+                    newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, 3]]);
+                    newStack.push([
+                        1,
+                        ["number", { value: strongBeats[i] + 1 }],
+                        0,
+                        0,
+                        [0]
+                    ]);
+                    newStack.push([
+                        2,
+                        ["text", { value: "action" }],
+                        0,
+                        0,
+                        [0]
+                    ]);
                 }
-            } else if (i === strongBeats.length -1) {
-                newStack.push([n, 'onbeatdo', 0, 0, [n - 3, n + 1, n + 2, null]]);
-                newStack.push([n + 1, ['number', {'value': strongBeats[i] + 1}], 0, 0, [n]]);
-                newStack.push([n + 2, ['text', {'value': 'action'}], 0, 0, [n]]);
+            } else if (i === strongBeats.length - 1) {
+                newStack.push([
+                    n,
+                    "onbeatdo",
+                    0,
+                    0,
+                    [n - 3, n + 1, n + 2, null]
+                ]);
+                newStack.push([
+                    n + 1,
+                    ["number", { value: strongBeats[i] + 1 }],
+                    0,
+                    0,
+                    [n]
+                ]);
+                newStack.push([
+                    n + 2,
+                    ["text", { value: "action" }],
+                    0,
+                    0,
+                    [n]
+                ]);
             } else {
-                newStack.push([n, 'onbeatdo', 0, 0, [n - 3, n + 1, n + 2, n + 3]]);
-                newStack.push([n + 1, ['number', {'value': strongBeats[i] + 1}], 0, 0, [n]]);
-                newStack.push([n + 2, ['text', {'value': 'action'}], 0, 0, [n]]);
+                newStack.push([
+                    n,
+                    "onbeatdo",
+                    0,
+                    0,
+                    [n - 3, n + 1, n + 2, n + 3]
+                ]);
+                newStack.push([
+                    n + 1,
+                    ["number", { value: strongBeats[i] + 1 }],
+                    0,
+                    0,
+                    [n]
+                ]);
+                newStack.push([
+                    n + 2,
+                    ["text", { value: "action" }],
+                    0,
+                    0,
+                    [n]
+                ]);
             }
 
             n += 3;
@@ -237,18 +347,18 @@ function MeterWidget() {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
-   this._piemenuMeter = function (numberOfBeats, beatValue) {
+    this._piemenuMeter = function(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
-        docById('meterWheelDiv').style.display = '';
+        docById("meterWheelDiv").style.display = "";
 
         // Use advanced constructor for multiple wheelnavs in the same div.
         // The meterWheel is used to hold the strong beats.
-        this._meterWheel = new wheelnav('meterWheelDiv', null, 400, 400);
+        this._meterWheel = new wheelnav("meterWheelDiv", null, 400, 400);
         // Strong beat is shown on this wheel
-        this._beatWheel = new wheelnav('_beatWheel', this._meterWheel.raphael);
+        this._beatWheel = new wheelnav("_beatWheel", this._meterWheel.raphael);
         // Play wheel is to show which beat is playing at any one time.
-        this._playWheel = new wheelnav('_playWheel', this._meterWheel.raphael);
+        this._playWheel = new wheelnav("_playWheel", this._meterWheel.raphael);
 
         wheelnav.cssMeter = true;
 
@@ -272,7 +382,24 @@ function MeterWidget() {
             numberOfBeats = 16;
         }
 
-        var labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'];
+        var labels = [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16"
+        ];
         var beatList = [];
         this._strongBeats = [];
         for (var i = 0; i < numberOfBeats; i++) {
@@ -294,7 +421,7 @@ function MeterWidget() {
         this._beatWheel.slicePathFunction = slicePath().DonutSlice;
         this._beatWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._beatWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._beatWheel.slicePathCustom.maxRadiusPercent = 0.90;
+        this._beatWheel.slicePathCustom.maxRadiusPercent = 0.9;
         this._beatWheel.sliceSelectedPathCustom = this._beatWheel.slicePathCustom;
         this._beatWheel.sliceInitPathCustom = this._beatWheel.slicePathCustom;
         this._beatWheel.clickModeRotate = false;
@@ -303,7 +430,7 @@ function MeterWidget() {
 
         var beatList = [];
         for (var i = 0; i < numberOfBeats; i++) {
-            beatList.push('x');
+            beatList.push("x");
         }
 
         // Always make the meter a complete circle.
@@ -314,7 +441,7 @@ function MeterWidget() {
         }
         */
 
-        this._beatWheel.createWheel(beatList)
+        this._beatWheel.createWheel(beatList);
 
         this._playWheel.colors = [platformColor.orange];
         this._playWheel.slicePathFunction = slicePath().DonutSlice;
@@ -329,7 +456,7 @@ function MeterWidget() {
 
         var beatList = [];
         for (var i = 0; i < numberOfBeats; i++) {
-            beatList.push(' ');
+            beatList.push(" ");
         }
 
         // Always make the meter a complete circle.
@@ -340,7 +467,7 @@ function MeterWidget() {
         }
         */
 
-        this._playWheel.createWheel(beatList)
+        this._playWheel.createWheel(beatList);
 
         for (var i = 0; i < numberOfBeats; i++) {
             this._playWheel.navItems[i].navItem.hide();
@@ -350,14 +477,14 @@ function MeterWidget() {
 
         // If a meterWheel sector is selected, show the corresponding
         // beat wheel sector.
-        var __setBeat = function () {
+        var __setBeat = function() {
             var i = that._meterWheel.selectedNavItemIndex;
             that._strongBeats[i] = true;
             that._beatWheel.navItems[i].navItem.show();
         };
 
         // If a beatWheel sector is selected, hide it.
-        var __clearBeat = function () {
+        var __clearBeat = function() {
             var i = that._beatWheel.selectedNavItemIndex;
             that._beatWheel.navItems[i].navItem.hide();
             that._strongBeats[i] = false;
@@ -370,4 +497,4 @@ function MeterWidget() {
             that._beatWheel.navItems[i].navItem.hide();
         }
     };
-};
+}

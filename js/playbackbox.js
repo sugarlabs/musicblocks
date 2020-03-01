@@ -11,7 +11,7 @@
 //
 
 // A pop up for playback functions, e.g., compile, play, pause, etc.
-function PlaybackBox () {
+function PlaybackBox() {
     const BOXBUTTONOFFSET = 55;
     const BOXBUTTONSPACING = 65;
 
@@ -20,7 +20,18 @@ function PlaybackBox () {
     var boxwidth2 = boxwidth - 1.5;
     var boxclose = boxwidth - 55;
 
-    const PLAYBACKBOXSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="' + boxwidth + '" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="' + boxwidth + '" /> <g style="fill:#000000;display:block" transform="translate(' + boxclose + ',-1)"> <path style="fill:#000000;display:inline" d="m 27.5,5.0 c -12.43,0 -22.5,10.0 -22.5,22.5 0,12.5 10.0,22.5 22.5,22.5 12.5,0 22.5,-10.0 22.5,-22.5 0,-12.5 -10.0,-22.5 -22.5,-22.5 z m 10.0,28.0 c 1.25,1.25 1.25,3.25 0,4.5 -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 l -5.75,-5.75 -5.75,5.75 c -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 -1.25,-1.25 -1.25,-3.25 0.0,-4.5 l 5.75,-5.75 -5.75,-5.75 c -1.25,-1.25 -1.25,-3.25 -0.0,-4.5 1.25,-1.25 3.25,-1.25 4.5,0 l 5.75,5.75 5.75,-5.75 c 1.25,-1.25 3.25,-1.25 4.5,0 1.25,1.25 1.25,3.25 0,4.5 l -5.75,5.75 5.75,5.75 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="' + boxwidth + '" /> <rect y="0.75" x="0.75" height="131.5" width="' + boxwidth2 + '" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
+    const PLAYBACKBOXSVG =
+        '<svg xmlns="http://www.w3.org/2000/svg" height="133" width="' +
+        boxwidth +
+        '" version="1.1"> <rect style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" y="0" x="0" height="133" width="' +
+        boxwidth +
+        '" /> <g style="fill:#000000;display:block" transform="translate(' +
+        boxclose +
+        ',-1)"> <path style="fill:#000000;display:inline" d="m 27.5,5.0 c -12.43,0 -22.5,10.0 -22.5,22.5 0,12.5 10.0,22.5 22.5,22.5 12.5,0 22.5,-10.0 22.5,-22.5 0,-12.5 -10.0,-22.5 -22.5,-22.5 z m 10.0,28.0 c 1.25,1.25 1.25,3.25 0,4.5 -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 l -5.75,-5.75 -5.75,5.75 c -0.5,0.5 -1.5,1.0 -2.25,1.0 -1.0,0 -1.5,-0.25 -2.25,-1.0 -1.25,-1.25 -1.25,-3.25 0.0,-4.5 l 5.75,-5.75 -5.75,-5.75 c -1.25,-1.25 -1.25,-3.25 -0.0,-4.5 1.25,-1.25 3.25,-1.25 4.5,0 l 5.75,5.75 5.75,-5.75 c 1.25,-1.25 3.25,-1.25 4.5,0 1.25,1.25 1.25,3.25 0,4.5 l -5.75,5.75 5.75,5.75 z" /> </g> <rect style="fill:#92b5c8;fill-opacity:1;stroke:none" y="51" x="0" height="82" width="' +
+        boxwidth +
+        '" /> <rect y="0.75" x="0.75" height="131.5" width="' +
+        boxwidth2 +
+        '" style="display:inline;visibility:visible;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;" /></svg>';
 
     this._stage = null;
     this._refreshCanvas = null;
@@ -32,46 +43,46 @@ function PlaybackBox () {
     this._container = null;
     this._scale = 1;
 
-    this.setStage = function (stage) {
+    this.setStage = function(stage) {
         this._stage = stage;
         return this;
     };
 
-    this.setRefreshCanvas = function (refreshCanvas) {
+    this.setRefreshCanvas = function(refreshCanvas) {
         this._refreshCanvas = refreshCanvas;
         return this;
     };
 
-    this.setQueueStatus = function (getQueueStatus) {
+    this.setQueueStatus = function(getQueueStatus) {
         this._getQueueStatus = getQueueStatus;
         return this;
     };
 
-    this.setCompile = function (compile) {
+    this.setCompile = function(compile) {
         this._doCompile = compile;
         return this;
     };
 
-    this.setPlay = function (play) {
+    this.setPlay = function(play) {
         this._doPlay = play;
         return this;
     };
 
-    this.setPause = function (pause) {
+    this.setPause = function(pause) {
         this._doPause = pause;
         return this;
     };
 
-    this.setRewind = function (rewind) {
+    this.setRewind = function(rewind) {
         this._doRewind = rewind;
         return this;
     };
 
-    this.getPos = function () {
+    this.getPos = function() {
         return [this._container.x, this._container.y];
     };
 
-    this.init = function (scale, x, y, makeButton, logo) {
+    this.init = function(scale, x, y, makeButton, logo) {
         this._logo = logo;
 
         if (this._container === null) {
@@ -80,47 +91,95 @@ function PlaybackBox () {
             var dx = BOXBUTTONOFFSET;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.playButton = makeButton('media-playback-start', _('playback music') + ' [Alt-P]', this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.playButton = makeButton(
+                "media-playback-start",
+                _("playback music") + " [Alt-P]",
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
 
-            this.playButton.on('click', function (event) {
+            this.playButton.on("click", function(event) {
                 that._doPlay();
             });
 
-            this.noplayButton = makeButton('media-playback-start-insensitive', _('playback music'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.noplayButton = makeButton(
+                "media-playback-start-insensitive",
+                _("playback music"),
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this.noplayButton.visible = true;
             this._positionHoverText(this.playButton);
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.pauseButton = makeButton('media-playback-pause', _('pause playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.pauseButton = makeButton(
+                "media-playback-pause",
+                _("pause playback"),
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this.pauseButton.visible = false;
             this._positionHoverText(this.pauseButton);
 
-            this.pauseButton.on('click', function (event) {
+            this.pauseButton.on("click", function(event) {
                 that._doPause();
             });
 
             dx += BOXBUTTONSPACING;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.rewindButton = makeButton('media-playlist-repeat', _('restart playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.rewindButton = makeButton(
+                "media-playlist-repeat",
+                _("restart playback"),
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
 
-            this.rewindButton.on('click', function (event) {
+            this.rewindButton.on("click", function(event) {
                 that._doRewind();
             });
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this.norewindButton = makeButton('media-playlist-repeat-insensitive', _('restart playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this.norewindButton = makeButton(
+                "media-playlist-repeat-insensitive",
+                _("restart playback"),
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this.norewindButton.visible = true;
             this._positionHoverText(this.norewindButton);
 
             dx += BOXBUTTONSPACING;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
-            this._compileButton = makeButton('compile-button', _('prepare music for playback'), this._container.x + dx, this._container.y + 85, 55, 0, this._stage);
+            this._compileButton = makeButton(
+                "compile-button",
+                _("prepare music for playback"),
+                this._container.x + dx,
+                this._container.y + 85,
+                55,
+                0,
+                this._stage
+            );
             this._compileButton.visible = true;
             this._positionHoverText(this._compileButton);
             for (var c = 0; c < this._compileButton.children.length; c++) {
@@ -130,7 +189,7 @@ function PlaybackBox () {
                 }
             }
 
-            this._compileButton.on('click', function (event) {
+            this._compileButton.on("click", function(event) {
                 that._doCompile();
             });
         } else {
@@ -140,7 +199,7 @@ function PlaybackBox () {
         this.setPlaybackStatus();
     };
 
-    this.setPlaybackStatus = function () {
+    this.setPlaybackStatus = function() {
         if (this._container != null) {
             if (!this._container.visible) {
                 this.noplayButton.visible = false;
@@ -169,10 +228,10 @@ function PlaybackBox () {
         }
     };
 
-    this._positionHoverText = function (button) {
+    this._positionHoverText = function(button) {
         for (var c = 0; c < button.children.length; c++) {
             if (button.children[c].text != undefined) {
-                button.children[c].textAlign = 'left';
+                button.children[c].textAlign = "left";
                 button.children[c].x = -27;
                 button.children[c].y = 27;
                 break;
@@ -180,7 +239,7 @@ function PlaybackBox () {
         }
     };
 
-    this.hide = function () {
+    this.hide = function() {
         if (this._container !== null) {
             this.playButton.visible = false;
             this.noplayButton.visible = false;
@@ -189,13 +248,13 @@ function PlaybackBox () {
             this.norewindButton.visible = false;
             this._compileButton.visible = false;
             this._container.visible = false;
-            var progressBar = docById('myProgress');
-            progressBar.style.visibility = 'hidden';
+            var progressBar = docById("myProgress");
+            progressBar.style.visibility = "hidden";
             this._refreshCanvas();
         }
     };
 
-    this._show = function () {
+    this._show = function() {
         if (this._container !== null) {
             if (this._logo.playbackQueue === {}) {
                 this.playButton.visible = false;
@@ -217,7 +276,7 @@ function PlaybackBox () {
         }
     };
 
-    this._createBox = function (scale, x, y) {
+    this._createBox = function(scale, x, y) {
         this._scale = scale;
 
         function __processBackground(that, name, bitmap, extras) {
@@ -225,14 +284,26 @@ function PlaybackBox () {
             that._loadPlaybackContainerHandler();
 
             that.bounds = that._container.getBounds();
-            that._container.cache(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+            that._container.cache(
+                that.bounds.x,
+                that.bounds.y,
+                that.bounds.width,
+                that.bounds.height
+            );
 
             var hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill('#FFF').drawRect(that.bounds.x, that.bounds.y, that.bounds.width, that.bounds.height);
+            hitArea.graphics
+                .beginFill("#FFF")
+                .drawRect(
+                    that.bounds.x,
+                    that.bounds.y,
+                    that.bounds.width,
+                    that.bounds.height
+                );
             hitArea.x = 0;
             hitArea.y = 0;
             that._container.hitArea = hitArea;
-        };
+        }
 
         if (this._container == null) {
             this._container = new createjs.Container();
@@ -241,46 +312,48 @@ function PlaybackBox () {
             this._container.y = y - 55;
 
             var PLAYBACKBOX = PLAYBACKBOXSVG;
-            this._makeBoxBitmap(PLAYBACKBOX, 'pbox', __processBackground, null);
+            this._makeBoxBitmap(PLAYBACKBOX, "pbox", __processBackground, null);
         }
     };
 
-    this._makeBoxBitmap = function (data, name, callback, extras) {
+    this._makeBoxBitmap = function(data, name, callback, extras) {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
         var that = this;
 
-        img.onload = function () {
+        img.onload = function() {
             bitmap = new createjs.Bitmap(img);
             callback(that, name, bitmap, extras);
         };
 
-        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(data)));
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(data)));
     };
 
-    this._loadPlaybackContainerHandler = function () {
+    this._loadPlaybackContainerHandler = function() {
         var locked = false;
         var that = this;
 
-        that._container.on('click', function (event) {
+        that._container.on("click", function(event) {
             // We need a lock to "debouce" the click.
             if (locked) {
-                console.debug('debouncing click');
+                console.debug("debouncing click");
                 return;
             }
 
             locked = true;
-            setTimeout(function () {
+            setTimeout(function() {
                 locked = false;
             }, 500);
 
-            var x = (event.stageX / that._scale) - that._container.x;
-            var y = (event.stageY / that._scale) - that._container.y;
+            var x = event.stageX / that._scale - that._container.x;
+            var y = event.stageY / that._scale - that._container.y;
 
             if (y < 55) {
                 that.hide();
             }
         });
     };
-};
+}

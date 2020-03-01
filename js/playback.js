@@ -12,7 +12,6 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-
 function PlaybackWidget() {
     const BUTTONDIVWIDTH = 128;
     const BUTTONSIZE = 53;
@@ -20,7 +19,7 @@ function PlaybackWidget() {
     const OUTERWINDOWWIDTH = (BUTTONSIZE + 2) * 2;
     const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
 
-    docById('playbackDiv').style.visibility = 'hidden';
+    docById("playbackDiv").style.visibility = "hidden";
 
     /*
     this._playAll = function () {
@@ -34,61 +33,76 @@ function PlaybackWidget() {
     };
     */
 
-    this.init = function (logo) {
+    this.init = function(logo) {
         // Initializes the playback matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        console.debug('INITIALIZING PLAYBACK WIDGET');
+        console.debug("INITIALIZING PLAYBACK WIDGET");
         this._logo = logo;
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
         var iconSize = ICONSIZE * this._cellScale;
 
-        var canvas = docById('myCanvas');
+        var canvas = docById("myCanvas");
 
         // Position the widget and make it visible.
-        var playbackDiv = docById('playbackDiv');
-        playbackDiv.style.visibility = 'visible';
-        playbackDiv.setAttribute('draggable', 'true');
-        playbackDiv.style.left = '200px';
-        playbackDiv.style.top = '150px';
+        var playbackDiv = docById("playbackDiv");
+        playbackDiv.style.visibility = "visible";
+        playbackDiv.setAttribute("draggable", "true");
+        playbackDiv.style.left = "200px";
+        playbackDiv.style.top = "150px";
 
         // The playback buttons
-        var playbackButtonsDiv = docById('playbackButtonsDiv');
-        playbackButtonsDiv.style.display = 'inline';
-        playbackButtonsDiv.style.visibility = 'visible';
+        var playbackButtonsDiv = docById("playbackButtonsDiv");
+        playbackButtonsDiv.style.display = "inline";
+        playbackButtonsDiv.style.visibility = "visible";
         playbackButtonsDiv.style.width = BUTTONDIVWIDTH;
-        playbackButtonsDiv.innerHTML = '<table cellpadding="0px" id="playbackButtonTable"></table>';
+        playbackButtonsDiv.innerHTML =
+            '<table cellpadding="0px" id="playbackButtonTable"></table>';
 
-        var buttonTable = docById('playbackButtonTable');
+        var buttonTable = docById("playbackButtonTable");
         var header = buttonTable.createTHead();
         var row = header.insertRow(0);
 
         // For the button callbacks
         var that = this;
 
-        this._playcell = this._addButton(row, 'play-button.svg', ICONSIZE, _('Play all'));
+        this._playcell = this._addButton(
+            row,
+            "play-button.svg",
+            ICONSIZE,
+            _("Play all")
+        );
 
-        this._playcell.onclick = function () {
-            that._logo.playback(-1);  // that._playAll();
-        }
+        this._playcell.onclick = function() {
+            that._logo.playback(-1); // that._playAll();
+        };
 
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
+        var cell = this._addButton(
+            row,
+            "close-button.svg",
+            ICONSIZE,
+            _("Close")
+        );
 
-        cell.onclick = function () {
-            playbackTableDiv.style.visibility = 'hidden';
-            playbackButtonsDiv.style.visibility = 'hidden';
-            playbackDiv.style.visibility = 'hidden';
+        cell.onclick = function() {
+            playbackTableDiv.style.visibility = "hidden";
+            playbackButtonsDiv.style.visibility = "hidden";
+            playbackDiv.style.visibility = "hidden";
             that._logo.stopTurtle = true;
-        }
+        };
 
         // We use this cell as a handle for dragging.
-        var dragCell = this._addButton(row, 'grab.svg', ICONSIZE, _('Drag'));
-        dragCell.style.cursor = 'move';
+        var dragCell = this._addButton(row, "grab.svg", ICONSIZE, _("Drag"));
+        dragCell.style.cursor = "move";
 
-        this._dx = dragCell.getBoundingClientRect().left - playbackDiv.getBoundingClientRect().left;
-        this._dy = dragCell.getBoundingClientRect().top - playbackDiv.getBoundingClientRect().top;
+        this._dx =
+            dragCell.getBoundingClientRect().left -
+            playbackDiv.getBoundingClientRect().left;
+        this._dy =
+            dragCell.getBoundingClientRect().top -
+            playbackDiv.getBoundingClientRect().top;
         this._dragging = false;
         this._target = false;
         this._dragCellHTML = dragCell.innerHTML;
@@ -97,7 +111,7 @@ function PlaybackWidget() {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
-            dragCell.innerHTML = '';
+            dragCell.innerHTML = "";
         };
 
         dragCell.onmouseout = function(e) {
@@ -115,9 +129,9 @@ function PlaybackWidget() {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
-                playbackDiv.style.left = x + 'px';
+                playbackDiv.style.left = x + "px";
                 var y = e.clientY - that._dy;
-                playbackDiv.style.top = y + 'px';
+                playbackDiv.style.top = y + "px";
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -131,9 +145,9 @@ function PlaybackWidget() {
             if (that._dragging) {
                 that._dragging = false;
                 var x = e.clientX - that._dx;
-                playbackDiv.style.left = x + 'px';
+                playbackDiv.style.left = x + "px";
                 var y = e.clientY - that._dy;
-                playbackDiv.style.top = y + 'px';
+                playbackDiv.style.top = y + "px";
                 dragCell.innerHTML = that._dragCellHTML;
             }
         };
@@ -144,68 +158,93 @@ function PlaybackWidget() {
 
         playbackDiv.ondragstart = function(e) {
             if (dragCell.contains(that._target)) {
-                e.dataTransfer.setData('text/plain', '');
+                e.dataTransfer.setData("text/plain", "");
             } else {
                 e.preventDefault();
             }
         };
 
         // The playback table
-        var playbackTableDiv = docById('playbackTableDiv');
-        playbackTableDiv.style.display = 'inline';
-        playbackTableDiv.style.visibility = 'visible';
-        playbackTableDiv.style.border = '0px';
+        var playbackTableDiv = docById("playbackTableDiv");
+        playbackTableDiv.style.display = "inline";
+        playbackTableDiv.style.visibility = "visible";
+        playbackTableDiv.style.border = "0px";
 
         // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
-        playbackTableDiv.innerHTML = '<div id="playbackOuterDiv"><div id="playbackInnerDiv"><table cellpadding="0px" id="playbackTable"></table></div></div>';
+        playbackTableDiv.innerHTML =
+            '<div id="playbackOuterDiv"><div id="playbackInnerDiv"><table cellpadding="0px" id="playbackTable"></table></div></div>';
 
         var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-        var outerDiv = docById('playbackOuterDiv');
+        var outerDiv = docById("playbackOuterDiv");
         if (this._logo.turtles.turtleList.length > n) {
-            outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 2) + 'px';
+            outerDiv.style.height =
+                this._cellScale * MATRIXSOLFEHEIGHT * (n + 2) + "px";
             var w = this._cellScale * BUTTONSIZE * 2 + 20;
-            outerDiv.style.width = w + 'px';
+            outerDiv.style.width = w + "px";
         } else {
-            outerDiv.style.height = this._cellScale * (MATRIXBUTTONHEIGHT2 + (2 + MATRIXSOLFEHEIGHT) * this._logo.turtles.turtleList.length) + 'px';
+            outerDiv.style.height =
+                this._cellScale *
+                    (MATRIXBUTTONHEIGHT2 +
+                        (2 + MATRIXSOLFEHEIGHT) *
+                            this._logo.turtles.turtleList.length) +
+                "px";
             var w = this._cellScale * BUTTONSIZE * 2;
-            outerDiv.style.width = w + 'px';
+            outerDiv.style.width = w + "px";
         }
 
         var w = this._cellScale * BUTTONSIZE * 2;
-        var innerDiv = docById('playbackInnerDiv');
-        innerDiv.style.width = w + 'px';
+        var innerDiv = docById("playbackInnerDiv");
+        innerDiv.style.width = w + "px";
 
-        innerDiv.style.marginLeft = '0px';
+        innerDiv.style.marginLeft = "0px";
 
         // Each row in the playback table contains a play button
-        var playbackTable = docById('playbackTable');
+        var playbackTable = docById("playbackTable");
 
         // One row per voice (turtle)
         var activeTurtles = 0;
-        for (var turtle = 0; turtle < this._logo.turtles.turtleList.length; turtle++) {
+        for (
+            var turtle = 0;
+            turtle < this._logo.turtles.turtleList.length;
+            turtle++
+        ) {
             if (this._logo.turtles.turtleList[turtle].trash) {
                 continue;
             }
 
             var row = playbackTable.insertRow();
-            var label = _('mouse') + activeTurtles;
+            var label = _("mouse") + activeTurtles;
             var cell = row.insertCell(-1);
-            cell.innerHTML = '&nbsp;&nbsp;<img src="images/mouse.svg" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-            cell.style.width = BUTTONSIZE + 'px';
+            cell.innerHTML =
+                '&nbsp;&nbsp;<img src="images/mouse.svg" title="' +
+                label +
+                '" alt="' +
+                label +
+                '" height="' +
+                iconSize +
+                '" width="' +
+                iconSize +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.style.width = BUTTONSIZE + "px";
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.height = cell.style.width;
             cell.style.minHeight = cell.style.height;
             cell.style.maxHeight = cell.style.height;
             cell.style.backgroundColor = MATRIXLABELCOLOR;
-            cell.style.left = '1px';
+            cell.style.left = "1px";
 
-            var buttonCell = this._addButton(row, 'play-button.svg', iconSize, _('Play'));
-            buttonCell.setAttribute('id', activeTurtles);
+            var buttonCell = this._addButton(
+                row,
+                "play-button.svg",
+                iconSize,
+                _("Play")
+            );
+            buttonCell.setAttribute("id", activeTurtles);
 
-            buttonCell.onclick = function () {
-                var id = Number(this.getAttribute('id'));
+            buttonCell.onclick = function() {
+                var id = Number(this.getAttribute("id"));
                 that._logo.playback(id);
             };
 
@@ -215,8 +254,19 @@ function PlaybackWidget() {
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
+        cell.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/' +
+            icon +
+            '" title="' +
+            label +
+            '" alt="' +
+            label +
+            '" height="' +
+            iconSize +
+            '" width="' +
+            iconSize +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -224,14 +274,14 @@ function PlaybackWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
-        }
+        };
 
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
-        }
+        };
 
         return cell;
     };
-};
+}
