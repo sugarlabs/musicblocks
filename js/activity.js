@@ -5416,7 +5416,7 @@ function Activity() {
                 reader.onload = function(theFile) {
                     loading = true;
                     document.body.style.cursor = "wait";
-                    doLoadAnimation();
+                    //doLoadAnimation();
 
                     setTimeout(function() {
                         obj = processRawPluginData(
