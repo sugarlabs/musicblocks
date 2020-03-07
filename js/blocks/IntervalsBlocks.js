@@ -532,7 +532,6 @@ function setupIntervalsBlocks() {
     function makeIntervalMacroBlocks() {
         class ChordIntervalMacroBlock extends FlowBlock {
             constructor(name, display, value1, value2) {
-		console.log(_(display));
                 super(name, _(display));
                 this.setPalette("intervals");
                 this.beginnerBlock(true);
@@ -564,7 +563,6 @@ function setupIntervalsBlocks() {
         }
         class IntervalMacroBlock extends FlowBlock {
             constructor(name, value, down) {
-                console.log(_((down ? "down " : "") + name));
                 super(
                     (down ? "down" : "") + name + "interval",
                     _((down ? "down " : "") + name)
