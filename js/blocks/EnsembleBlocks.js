@@ -3,10 +3,6 @@ function _blockFindTurtle(logo, turtle, blk, receivedArg) {
     let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
     for (let thisTurtle in logo.turtles)
         if (targetTurtle === thisTurtle.name) return thisTurtle;
-
-    if (_THIS_IS_MUSIC_BLOCKS_)
-        logo.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
-    else logo.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
     return null;
 }
 
