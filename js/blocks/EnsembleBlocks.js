@@ -1,9 +1,47 @@
-function _blockFindTurtle(logo, turtle, blk, receivedArg) {
-    let cblk = logo.blocks.blockList[blk].connections[1];
-    let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-    for (let thisTurtle in logo.turtles)
-        if (targetTurtle === thisTurtle.name) return thisTurtle;
+/**
+ * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
+ * @param   turtles instance
+ * @param   {number|string} targetTurtle
+ * @returns {number|object}
+ */
+function _getTargetTurtle(turtles, targetTurtle) {
+    // We'll compare the names as strings.
+    if (typeof targetTurtle === "number") {
+        targetTurtle = targetTurtle.toString();
+    }
+
+    for (var i = 0; i < turtles.turtleList.length; i++) {
+        if (!turtles.turtleList[i].trash) {
+            var turtleName = turtles.turtleList[i].name;
+            if (typeof turtleName === "number") {
+                turtleName = turtleName.toString();
+            }
+
+            if (turtleName === targetTurtle) {
+                return i;
+            }
+        }
+    }
+
+    console.log(targetTurtle + " not found");
+    console.log(turtles.turtleList);
     return null;
+}
+
+function _blockFindTurtle(logo, turtle, blk, receivedArg) {
+    var cblk = logo.blocks.blockList[blk].connections[1];
+    if (cblk === null) {
+        console.log("Could not find connecting block");
+        return null;
+    }
+    var targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+    if (targetTurtle === null) {
+        console.log("Could not find target turtle name from arg");
+        return null;
+    }
+    return logo.turtles.turtleList[
+        _getTargetTurtle(logo.turtles, targetTurtle)
+    ];
 }
 
 function setupEnsembleBlocks() {
@@ -87,7 +125,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            var targetTurtle = logo._getTargetTurtle(args[0]);
+            var targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -128,7 +166,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            var targetTurtle = logo._getTargetTurtle(args[0]);
+            var targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -257,7 +295,7 @@ function setupEnsembleBlocks() {
 
         // deprecated
         flow(args, logo, turtle, blk) {
-            var targetTurtle = logo._getTargetTurtle(args[0]);
+            var targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -302,7 +340,7 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            targetTurtle = logo._getTargetTurtle(args[0]);
+            targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle !== null) {
                 logo._runFromBlock(
                     logo,
@@ -347,6 +385,7 @@ function setupEnsembleBlocks() {
             if (thisTurtle)
                 return logo.turtles.screenY2turtleY(thisTurtle.container.y);
             thisTurtle = logo.turtles.turtleList[turtle];
+            console.log("Mouse not found. Using current mouse value instead.");
             return logo.turtles.screenY2turtleY(thisTurtle.container.y);
         }
     }
@@ -372,11 +411,13 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
+            var thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
             if (thisTurtle)
-                return logo.turtles.screenX2turtleX(thisTurtle.container.X);
+                return logo.turtles.screenX2turtleX(thisTurtle.container.x);
+
             thisTurtle = logo.turtles.turtleList[turtle];
+            console.log("Mouse not found. Using current mouse value instead.");
             return logo.turtles.screenX2turtleX(thisTurtle.container.x);
         }
     }
@@ -634,7 +675,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            var targetTurtle = logo._getTargetTurtle(args[0]);
+            var targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle == null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -675,7 +716,7 @@ function setupEnsembleBlocks() {
                 blk,
                 receivedArg
             );
-            return logo._getTargetTurtle(targetTurtle) !== null;
+            return _getTargetTurtle(logo.turtles, targetTurtle) !== null;
         }
     }
 
@@ -705,7 +746,7 @@ function setupEnsembleBlocks() {
                 blk,
                 receivedArg
             );
-            if (logo._getTargetTurtle(turtleName) === null) {
+            if (_getTargetTurtle(logo.turtles, turtleName) === null) {
                 var blockNumber = logo.blocks.blockList.length;
 
                 var x = logo.turtles.turtleX2screenX(

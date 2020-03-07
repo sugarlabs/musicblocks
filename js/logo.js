@@ -5159,34 +5159,6 @@ function Logo() {
     };
 
     /**
-     * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
-     * @privileged
-     * @param   {number|string} targetTurtle
-     * @returns {number|object}
-     */
-    this._getTargetTurtle = function(targetTurtle) {
-        // We'll compare the names as strings.
-        if (typeof targetTurtle === "number") {
-            targetTurtle = targetTurtle.toString();
-        }
-
-        for (var i = 0; i < this.turtles.turtleList.length; i++) {
-            if (!this.turtles.turtleList[i].trash) {
-                var turtleName = this.turtles.turtleList[i].name;
-                if (typeof turtleName === "number") {
-                    turtleName = turtleName.toString();
-                }
-
-                if (turtleName === targetTurtle) {
-                    return i;
-                }
-            }
-        }
-
-        return null;
-    };
-
-    /**
      * If the input name is forever, repeat, while or until, returns true (false otherwise).
      * @privileged
      * @param   {string}    name
