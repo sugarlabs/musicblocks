@@ -805,6 +805,8 @@ function setupWidgetBlocks() {
             this.setHelpString();
             //.TRANS: widget for subdividing a measure into distinct rhythmic elements
             this.formBlock({ name: _("rhythm maker"), canCollapse: true });
+            this.beginnerBlock(true);
+
             this.makeMacro((x, y) => [
                 [0, "rhythmruler2", x, y, [null, 1, 9]],
                 [1, "setdrum", 0, 0, [0, 2, 3, 8]],
@@ -825,7 +827,6 @@ function setupWidgetBlocks() {
         constructor() {
             super("rhythmruler2");
             this.setPalette("widgets");
-            this.beginnerBlock(true);
 
             this.setHelpString([
                 _(
@@ -858,7 +859,7 @@ function setupWidgetBlocks() {
                 [16, "hidden", 0, 0, [9, null]],
                 [17, "hiddennoflow", 0, 0, [0, null]]
             ]);
-            if (beginnerMode) this.hidden = true;
+            this.hidden = beginnerMode;
         }
 
         flow(args, logo, turtle, blk) {
