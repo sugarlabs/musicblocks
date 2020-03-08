@@ -1863,7 +1863,7 @@ function Logo() {
             }
 
             // We need to keep track of the parent block to the child
-            // flow so we can unlightlight the parent block after the
+            // flow so we can unhighlight the parent block after the
             // child flow completes.
             if (that.parentFlowQueue[turtle] != undefined) {
                 that.parentFlowQueue[turtle].push(blk);
