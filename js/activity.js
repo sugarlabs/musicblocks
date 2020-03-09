@@ -3256,9 +3256,9 @@ function Activity() {
     };
 
     textMsg = function(msg) {
-        if (msgTimeoutID != null) {
-	    console.debug('clearing textMsg timeout');
+        if (msgTimeoutID !== null) {
             clearTimeout(msgTimeoutID);
+	    msgTimeoutID = null;
         }
 
         if (msgText == null) {
@@ -3269,15 +3269,14 @@ function Activity() {
         // Show and populate printText div
         var printText = document.getElementById("printText");
 
-	console.debug('showing textMsg');
         printText.classList.add("show");
 
         var printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
         msgTimeoutID = setTimeout(function() {
-	    console.debug('hiding textMsg');
-            printText.style.visibility = "hidden";
+            printText.classList.remove("show");
+	    msgTimeoutID = null;
         }, _MSGTIMEOUT_);
     };
 

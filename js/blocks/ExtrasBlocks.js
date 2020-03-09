@@ -852,7 +852,6 @@ function setupExtrasBlocks() {
                             } else if (args[0] === null) {
                                 logo.textMsg("null");
                             } else {
-				console.debug('textMsg: ' + args[0].toString());
                                 logo.textMsg(args[0].toString());
                             }
                         }
