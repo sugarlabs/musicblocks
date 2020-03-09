@@ -820,10 +820,10 @@ A typical problem is when the music is not played
 continuously. Imagine an interactive game where a hero is battling a
 monster. Our hero plays theme music whenever the monster is
 defeated. But that might occur at any time, hence it is not going to
-be in synch with the conductor. The offset could be tens of
+be in sync with the conductor. The offset could be tens of
 seconds. This would mean that all of the notes in the theme music
 might be consumed by trying to catch up with the conductor. The
-*No-clock* block essential says, do your own thing and don't worry
+*No-clock* block essentially says, do your own thing and don't worry
 about the conductor.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
