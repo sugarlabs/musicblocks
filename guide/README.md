@@ -798,6 +798,34 @@ graphics commands inside of *Note value* blocks
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/drift_block.svg "No-clock block")
+
+Music Blocks has an internal "conductor" maintaining the beat.  When
+the Run button is clicked, the program begins and an internal master
+(or "conductor") clock starts up. All of the music tries to stay
+synced to that clock.
+
+For example, if you have multiple voices (mice), they all share the
+same conductor in order to keep on the same beat. If a voice (mouse)
+is falling behind, Music Blocks tries to catch up on the next note by
+truncating it. If it is an 1/8 note behind and the next note is a 1/2
+note, then only an 3/8 note would be played, so as to catch up. That
+is a somewhat extreme example -- usually the timing errors are only
+very very small differences.
+
+But in some situations, the timing errors can be very large. This is
+when the *No-clock* block is used.
+
+A typical problem is when the music is not played
+continuously. Imagine an interactive game where a hero is battling a
+monster. Our hero plays theme music whenever the monster is
+defeated. But that might occur at any time, hence it is not going to
+be in synch with the conductor. The offset could be in tens of
+seconds. This would mean that all of the notes in the theme music
+might be consumed by trying to catch up with the conductor. The
+*No-clock* block essential says, do your own thing and don't worry
+about the conductor.
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/fibonacci3.svg "usage of No-clock block")
 
 In this example, because the computation and graphics are more
