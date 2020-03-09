@@ -810,7 +810,7 @@ same conductor in order to keep on the same beat. If a voice (mouse)
 is falling behind, Music Blocks tries to catch up on the next note by
 truncating it. If it is an 1/8 note behind and the next note is a 1/2
 note, then only an 3/8 note would be played, so as to catch up. That
-is a somewhat extreme example -- usually the timing errors are only
+is a somewhat extreme example—usually the timing errors are only
 very very small differences.
 
 But in some situations, the timing errors can be very large. This is
@@ -820,7 +820,7 @@ A typical problem is when the music is not played
 continuously. Imagine an interactive game where a hero is battling a
 monster. Our hero plays theme music whenever the monster is
 defeated. But that might occur at any time, hence it is not going to
-be in synch with the conductor. The offset could be in tens of
+be in synch with the conductor. The offset could be tens of
 seconds. This would mean that all of the notes in the theme music
 might be consumed by trying to catch up with the conductor. The
 *No-clock* block essential says, do your own thing and don't worry
