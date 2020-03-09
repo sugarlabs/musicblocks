@@ -3257,6 +3257,7 @@ function Activity() {
 
     textMsg = function(msg) {
         if (msgTimeoutID != null) {
+	    console.debug('clearing textMsg timeout');
             clearTimeout(msgTimeoutID);
         }
 
@@ -3267,12 +3268,15 @@ function Activity() {
 
         // Show and populate printText div
         var printText = document.getElementById("printText");
+
+	console.debug('showing textMsg');
         printText.classList.add("show");
 
         var printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
         msgTimeoutID = setTimeout(function() {
+	    console.debug('hiding textMsg');
             printText.style.visibility = "hidden";
         }, _MSGTIMEOUT_);
     };
