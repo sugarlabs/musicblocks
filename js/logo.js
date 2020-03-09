@@ -5251,7 +5251,7 @@ function Logo() {
             if (childFlow != null) {
                 var queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the
-                // child flow so we can unlightlight the parent block
+                // child flow so we can unhighlight the parent block
                 // after the child flow completes.
                 this.parentFlowQueue[turtle].push(loopBlkIdx);
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
@@ -6357,7 +6357,24 @@ function Logo() {
 
         this.pickupPoint[turtle] = null;
     };
+    
+    /**
+     * Adds a repeat notation.
+     * @privileged
+     * @param   turtle
+     * @param   repeatCount
+     * @param   repeatedNotes
+     * @returns {void}
+     */
+    var repeatCount=this._doBreak.queuelength;
+    var repeatedNotes=this.turtles.turtleList[turtle].queue.pop();
+    this.notationRepeat=function(turtle,repeatCount,repeatedNotes) {
+        if (this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].parentBlk
+            ].name === "repeat"){
+              this.notationStaging[turtle].push("repeat",repeatCount,repeatedNotes);
+        }
 
+    };
     /**
      * Adds swing.
      * @privileged
