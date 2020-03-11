@@ -91,7 +91,6 @@ processLilypondNotes = function(lilypond, logo, turtle) {
     var targetDuration = 0;
     var tupletDuration = 0;
     var multivoice = false;
-    var repeat = false;
     for (var i = 0; i < logo.notationStaging[turtle].length; i++) {
         var obj = logo.notationStaging[turtle][i];
         if (typeof obj === "string") {
@@ -322,11 +321,6 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                 case "one voice":
                     logo.notationNotes[turtle] += "}\n>> \\oneVoice\n";
                     multivoice = false;
-                    break;
-                case "repeat":
-                    repeat = true;
-                    logo.notationNotes[turtle] += "\n\\repeat  unfold  "
-                        +logo.notationStaging[turtle][i+1]+"  { ";
                     break;
                 default:
                     logo.notationNotes[turtle] += obj;
@@ -661,11 +655,6 @@ processLilypondNotes = function(lilypond, logo, turtle) {
             if (queueSlur) {
                 queueSlur = false;
                 logo.notationNotes[turtle] += "(";
-            }
-
-            if (repeat) {
-                repeat = false;
-                logo.notationNotes[turtle] += " }";
             }
         }
     }
