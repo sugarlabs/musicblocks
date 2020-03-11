@@ -5223,7 +5223,7 @@ function Logo() {
             if (childFlow != null) {
                 var queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the
-                // child flow so we can unlightlight the parent block
+                // child flow so we can unhighlight the parent block
                 // after the child flow completes.
                 this.parentFlowQueue[turtle].push(loopBlkIdx);
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
