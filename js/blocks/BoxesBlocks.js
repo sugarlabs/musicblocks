@@ -86,6 +86,34 @@ function setupBoxesBlocks() {
         }
     }
 
+    class DecrementOneBlock extends IncrementBlock {
+        constructor() {
+            super("decrementOne");
+            this.setPalette("boxes");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Subtract-1-from block subtracts one from the value stored in a box."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("subtract 1 from"),
+                args: 1,
+                argTypes: ["anyin"],
+                argLabels: [""]
+            });
+
+	    if (this.lang === "ja") this.hidden = true;
+        }
+
+        flow(args, logo, turtle, blk) {
+            args[1] = -1;
+            super.flow(args, logo, turtle, blk);
+        }
+    }
+
     class BoxBlock extends LeftBlock {
         constructor() {
             super("box");
@@ -359,6 +387,7 @@ function setupBoxesBlocks() {
         }
     }
 
+    new DecrementOneBlock().setup();
     new IncrementOneBlock().setup();
     new IncrementBlock().setup();
     new BoxBlock().setup();
