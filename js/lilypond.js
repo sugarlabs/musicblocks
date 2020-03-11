@@ -640,6 +640,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                     }
 
                 }
+                logo.notationNotes[turtle] += " ";
 
                 if (obj[NOTATIONSTACCATO]) {
                     logo.notationNotes[turtle] += "\\staccato";
