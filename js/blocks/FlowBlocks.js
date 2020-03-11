@@ -867,6 +867,8 @@ function setupFlowBlocks() {
             this.size = 0;
             this.hidden = true;
         }
+
+        flow() {}
     }
 
     class HiddenBlock extends FlowBlock {
@@ -877,6 +879,8 @@ function setupFlowBlocks() {
             this.size = 0;
             this.hidden = true;
         }
+
+        flow() {}
     }
 
     new BackwardBlock().setup();
