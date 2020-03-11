@@ -326,7 +326,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                 case "repeat":
                     repeat = true;
                     logo.notationNotes[turtle] += "\n  \\repeat  unfold  "
-                            ++logo.notationStaging[turtle][i+1]+"  { ";
+                            +logo.notationStaging[turtle][i+1]+"  { ";
                     break;
                 default:
                     logo.notationNotes[turtle] += obj;
