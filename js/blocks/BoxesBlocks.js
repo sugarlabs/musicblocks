@@ -104,6 +104,8 @@ function setupBoxesBlocks() {
                 argTypes: ["anyin"],
                 argLabels: [""]
             });
+
+	    if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -385,8 +387,8 @@ function setupBoxesBlocks() {
         }
     }
 
-    new IncrementOneBlock().setup();
     new DecrementOneBlock().setup();
+    new IncrementOneBlock().setup();
     new IncrementBlock().setup();
     new BoxBlock().setup();
     new NamedBoxBlock().setup();
