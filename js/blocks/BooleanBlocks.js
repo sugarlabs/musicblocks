@@ -1,252 +1,291 @@
 function setupBooleanBlocks() {
-
-class NotBlock extends BooleanBlock {
-    constructor() {
-        super('not');
-        this.setPalette('boolean');
-        this.setHelpString([_('The Not block is the logical not operator.'), 'documentation', '']);
-	this.parameter = true;
-        this.formBlock({
-            name: _('not'),
-            args: 1, argTypes: ['booleanin']
-        })
-    }
-
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
-    }
-
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk = logo.blocks.blockList[blk].connections[1];
-        if (cblk === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+    class NotBlock extends BooleanBlock {
+        constructor() {
+            super("not");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The Not block is the logical not operator."),
+                "documentation",
+                ""
+            ]);
+            this.parameter = true;
+            this.formBlock({
+                name: _("not"),
+                args: 1,
+                argTypes: ["booleanin"]
+            });
         }
-        var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-        try {
-            return !a;
-        } catch (e) {
-            console.debug(e);
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+            var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            try {
+                return !a;
+            } catch (e) {
+                console.debug(e);
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
         }
     }
-}
 
-class AndBlock extends BooleanBlock {
-    constructor() {
-        super('and');
-        this.setPalette('boolean');
-        this.setHelpString([_('The And block is the logical and operator.'), 'documentation', '']);
-	this.parameter = true;
-        this.formBlock({
-            name: _('and'),
-            args: 2, argTypes: ['booleanin', 'booleanin']
-        });
+    class AndBlock extends BooleanBlock {
+        constructor() {
+            super("and");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The And block is the logical and operator."),
+                "documentation",
+                ""
+            ]);
+            this.parameter = true;
+            this.formBlock({
+                name: _("and"),
+                args: 2,
+                argTypes: ["booleanin", "booleanin"]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                return a && b;
+            }
+        }
     }
 
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
+    class OrBlock extends BooleanBlock {
+        constructor() {
+            super("or");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The Or block is the logical or operator."),
+                "documentation",
+                ""
+            ]);
+            this.parameter = true;
+            this.formBlock({
+                name: _("or"),
+                args: 2,
+                argTypes: ["booleanin", "booleanin"]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                return a || b;
+            }
+        }
     }
 
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk1 = logo.blocks.blockList[blk].connections[1];
-        var cblk2 = logo.blocks.blockList[blk].connections[2];
-        if (cblk1 === null || cblk2 === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
-        } else {
+    class GreaterBlock extends BooleanBlock {
+        constructor() {
+            super("greater");
+            this.setPalette("boolean");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Greater-than block returns True if the top number is greater than the bottom number."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.fontsize = 14;
+            this.parameter = true;
+            this.formBlock({
+                name: ">",
+                args: 2,
+                argTypes: ["numberin", "numberin"]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+
             var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            return a && b;
+            try {
+                return Number(a) > Number(b);
+            } catch (e) {
+                console.debug(e);
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
         }
     }
-}
 
-class OrBlock extends BooleanBlock {
-    constructor() {
-        super('or');
-        this.setPalette('boolean');
-        this.setHelpString([_('The Or block is the logical or operator.'), 'documentation', '']);
-	this.parameter = true;
-        this.formBlock({
-            name: _('or'),
-            args: 2, argTypes: ['booleanin', 'booleanin']
-        });
-    }
+    class LessBlock extends BooleanBlock {
+        constructor() {
+            super("less");
+            this.setPalette("boolean");
+            this.beginnerBlock(true);
 
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
-    }
+            this.setHelpString([
+                _(
+                    "The Less-than block returns True if the top number is less than the bottom number."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.fontsize = 14;
+            this.parameter = true;
+            this.formBlock({
+                name: "<",
+                args: 2,
+                argTypes: ["numberin", "numberin"]
+            });
+        }
 
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk1 = logo.blocks.blockList[blk].connections[1];
-        var cblk2 = logo.blocks.blockList[blk].connections[2];
-        if (cblk1 === null || cblk2 === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
-        } else {
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
             var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            return a || b;
+            try {
+                return Number(a) < Number(b);
+            } catch (e) {
+                console.debug(e);
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
         }
     }
-}
 
-class GreaterBlock extends BooleanBlock {
-    constructor() {
-        super('greater');
-        this.setPalette('boolean');
-        this.beginnerBlock(true);
+    class EqualBlock extends BooleanBlock {
+        constructor() {
+            super("equal");
+            this.setPalette("boolean");
+            this.beginnerBlock(true);
 
-        this.setHelpString([_('The Greater-than block returns True if the top number is greater than the bottom number.'), 'documentation', '']);
-        this.fontsize = 14;
-	this.parameter = true;
-        this.formBlock({
-            name: '>',
-            args: 2, argTypes: ['numberin', 'numberin']
-        });
-    }
-
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
-    }
-
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk1 = logo.blocks.blockList[blk].connections[1];
-        var cblk2 = logo.blocks.blockList[blk].connections[2];
-        if (cblk1 === null || cblk2 === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+            this.setHelpString([
+                _("The Equal block returns True if the two numbers are equal."),
+                "documentation",
+                ""
+            ]);
+            this.fontsize = 14;
+            this.parameter = true;
+            this.formBlock({
+                name: "=",
+                args: 2,
+                argTypes: ["anyin", "anyin"]
+            });
         }
 
-        var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-        var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-        try {
-            return Number(a) > Number(b);
-        } catch (e) {
-            console.debug(e);
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            try {
+                return a === b;
+            } catch (e) {
+                console.debug(e);
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
         }
     }
-}
 
-class LessBlock extends BooleanBlock {
-    constructor() {
-        super('less');
-        this.setPalette('boolean');
-        this.beginnerBlock(true);
-
-        this.setHelpString([_('The Less-than block returns True if the top number is less than the bottom number.'), 'documentation', '']);
-        this.fontsize = 14;
-	this.parameter = true;
-        this.formBlock({
-            name: '<',
-            args: 2, argTypes: ['numberin', 'numberin']
-        });
-    }
-
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
-    }
-
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk1 = logo.blocks.blockList[blk].connections[1];
-        var cblk2 = logo.blocks.blockList[blk].connections[2];
-        if (cblk1 === null || cblk2 === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+    class StaticBooleanBlock extends BooleanBlock {
+        constructor() {
+            super("boolean");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The Boolean block is used to specify true or false."),
+                "documentation",
+                ""
+            ]);
         }
-        var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-        var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-        try {
-            return Number(a) < Number(b);
-        } catch (e) {
-            console.debug(e);
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+
+        arg(logo, turtle, blk) {
+            if (typeof logo.blocks.blockList[blk].value === "string") {
+                return (
+                    logo.blocks.blockList[blk].value === _("true") ||
+                    logo.blocks.blockList[blk].value === "true"
+                );
+            }
+            return logo.blocks.blockList[blk].value;
         }
     }
-}
-
-class EqualBlock extends BooleanBlock {
-    constructor() {
-        super('equal');
-        this.setPalette('boolean');
-        this.beginnerBlock(true);
-
-        this.setHelpString([_('The Equal block returns True if the two numbers are equal.'), 'documentation', '']);
-        this.fontsize = 14;
-	this.parameter = true;
-        this.formBlock({
-            name: '=',
-            args: 2, argTypes: ['anyin', 'anyin']
-        });
-    }
-
-    updateParameter(logo, turtle, blk) {
-	if (logo.blocks.blockList[blk].value) {
-	    return _('true')
-	} else {
-	    return _('false')
-	}
-    }
-
-    arg(logo, turtle, blk, receivedArg) {
-        var cblk1 = logo.blocks.blockList[blk].connections[1];
-        var cblk2 = logo.blocks.blockList[blk].connections[2];
-        if (cblk1 === null || cblk2 === null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
-        }
-        var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-        var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-        try {
-            return a === b;
-        } catch (e) {
-            console.debug(e);
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false
-        }
-    }
-}
-
-class StaticBooleanBlock extends BooleanBlock {
-    constructor() {
-        super('boolean');
-        this.setPalette('boolean');
-        this.setHelpString([_('The Boolean block is used to specify true or false.'), 'documentation', '']);
-    }
-
-    arg(logo, turtle, blk) {
-        if (typeof(logo.blocks.blockList[blk].value) === 'string') {
-            return logo.blocks.blockList[blk].value === _('true') || logo.blocks.blockList[blk].value === 'true';
-        }
-        return logo.blocks.blockList[blk].value;
-    }
-}
-
 
     new NotBlock().setup();
     new AndBlock().setup();

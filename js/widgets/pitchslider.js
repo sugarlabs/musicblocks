@@ -14,7 +14,7 @@
 // in continuous manner.
 
 function PitchSlider() {
-    const BUTTONDIVWIDTH = 118;  // 2 buttons (55 + 4) * 2
+    const BUTTONDIVWIDTH = 118; // 2 buttons (55 + 4) * 2
     const BUTTONSIZE = 51;
     const ICONSIZE = 32;
     const SEMITONE = Math.pow(2, 1 / 12);
@@ -27,8 +27,19 @@ function PitchSlider() {
 
     this._addButton = function(row, icon, iconSize, label) {
         var cell = row.insertCell(-1);
-        cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' + icon + '" title="' + label + '" alt="' + label + '" height="' + iconSize + '" width="' + iconSize + '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + 'px';
+        cell.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/' +
+            icon +
+            '" title="' +
+            label +
+            '" alt="' +
+            label +
+            '" height="' +
+            iconSize +
+            '" width="' +
+            iconSize +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -36,32 +47,35 @@ function PitchSlider() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover=function() {
+        cell.onmouseover = function() {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        }
+        };
 
-        cell.onmouseout=function() {
+        cell.onmouseout = function() {
             this.style.backgroundColor = platformColor.selectorBackground;
-        }
+        };
 
         return cell;
     };
 
-    this._play = function (cell) {
+    this._play = function(cell) {
         var cellIndex = cell.cellIndex;
-        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
+        var frequency =
+            this.Sliders[cellIndex][0] *
+            Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
         this._logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
         return;
     };
 
-    this._moveSlider = function (cell, upDown) {
+    this._moveSlider = function(cell, upDown) {
         var cellIndex = cell.cellIndex;
         var cellDiv = this._slider.cells[cellIndex].childNodes[0];
         var frequencyDiv = cellDiv.childNodes[0];
-        var moveValue = parseFloat(Math.floor(SLIDERWIDTH * this._cellScale)) / 3;
+        var moveValue =
+            parseFloat(Math.floor(SLIDERWIDTH * this._cellScale)) / 3;
         var nextOctave = 2 * this.Sliders[cellIndex][0];
 
-        var idx = this.Sliders[cellIndex][1] + (1 * upDown);
+        var idx = this.Sliders[cellIndex][1] + 1 * upDown;
         var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, idx);
 
         if (frequency > nextOctave) {
@@ -73,18 +87,20 @@ function PitchSlider() {
         this.Sliders[cellIndex][2] = 0;
         this.Sliders[cellIndex][1] = idx; // += 1 * upDown;
 
-        var top = Number(cellDiv.style.top.replace('px', ''));
-        cellDiv.style.top = (top - (upDown * SLIDERHEIGHT / 12)) + 'px';
+        var top = Number(cellDiv.style.top.replace("px", ""));
+        cellDiv.style.top = top - (upDown * SLIDERHEIGHT) / 12 + "px";
 
         frequencyDiv.innerHTML = frequency.toFixed(this.places);
         this._logo.synth.stop();
         this._play(sliderrow.cells[cellIndex]);
     };
 
-    this._save = function (cell) {
+    this._save = function(cell) {
         var that = this;
         var cellIndex = cell.cellIndex;
-        var frequency = this.Sliders[cellIndex][0] * Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
+        var frequency =
+            this.Sliders[cellIndex][0] *
+            Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
 
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -92,7 +108,16 @@ function PitchSlider() {
 
         this._logo.refreshCanvas();
 
-        var newStack = [[0, 'note', 100 + this._delta, 100 + this._delta, [null, 1, 2, null]], [1, ['number', {'value': 8}], 0, 0, [0]]];
+        var newStack = [
+            [
+                0,
+                "note",
+                100 + this._delta,
+                100 + this._delta,
+                [null, 1, 2, null]
+            ],
+            [1, ["number", { value: 8 }], 0, 0, [0]]
+        ];
         this._delta += 21;
 
         var endOfStackIdx = 0;
@@ -101,14 +126,26 @@ function PitchSlider() {
         var hertzIdx = newStack.length;
         var frequencyIdx = hertzIdx + 1;
         var hiddenIdx = hertzIdx + 2;
-        newStack.push([hertzIdx, 'hertz', 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-        newStack.push([frequencyIdx, ['number', {'value': frequency.toFixed(this.places)}], 0, 0, [hertzIdx]]);
-        newStack.push([hiddenIdx, 'hidden', 0, 0, [hertzIdx, null]]);
+        newStack.push([
+            hertzIdx,
+            "hertz",
+            0,
+            0,
+            [previousBlock, frequencyIdx, hiddenIdx]
+        ]);
+        newStack.push([
+            frequencyIdx,
+            ["number", { value: frequency.toFixed(this.places) }],
+            0,
+            0,
+            [hertzIdx]
+        ]);
+        newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
         that._logo.blocks.loadNewBlocks(newStack);
-    }
+    };
 
-    this._addKeyboardInput = function (cell) {
+    this._addKeyboardInput = function(cell) {
         const KEYCODE_LEFT = 37;
         const KEYCODE_RIGHT = 39;
         const KEYCODE_UP = 38;
@@ -118,16 +155,19 @@ function PitchSlider() {
         var that = this;
         cell.focus();
 
-        cell.addEventListener('keydown', function(event) {
+        cell.addEventListener("keydown", function(event) {
             that._isKeyPressed = 0;
-            if (event.keyCode >= KEYCODE_LEFT && event.keyCode <= KEYCODE_DOWN) {
+            if (
+                event.keyCode >= KEYCODE_LEFT &&
+                event.keyCode <= KEYCODE_DOWN
+            ) {
                 that._isKeyPressed = 1;
             } else if (event.keyCode === RETURN) {
                 that._isKeyPressed = 1;
             }
         });
 
-        cell.addEventListener('keyup', function(event) {
+        cell.addEventListener("keyup", function(event) {
             if (that._isKeyPressed === 1) {
                 that._isKeyPressed = 0;
 
@@ -152,9 +192,9 @@ function PitchSlider() {
                 }
             }
         });
-    }
+    };
 
-    this._focusCell = function (cell, RightOrLeft) {
+    this._focusCell = function(cell, RightOrLeft) {
         var that = this;
         var cellIndex = cell.cellIndex;
         var toBeFocused = cellIndex + RightOrLeft;
@@ -170,9 +210,9 @@ function PitchSlider() {
         cell.blur();
         var newCell = this._slider.cells[toBeFocused];
         this._addKeyboardInput(newCell);
-    }
+    };
 
-    this.init = function (logo) {
+    this.init = function(logo) {
         this._logo = logo;
 
         if (beginnerMode) {
@@ -185,7 +225,11 @@ function PitchSlider() {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider");
+        var widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "pitch slider",
+            "slider"
+        );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
@@ -204,24 +248,26 @@ function PitchSlider() {
         for (var i = 0; i < this.Sliders.length; i++) {
             var sliderCell = this._slider.insertCell();
 
-            sliderCell.style.width = SLIDERWIDTH * this._cellScale + 'px';
+            sliderCell.style.width = SLIDERWIDTH * this._cellScale + "px";
             sliderCell.style.minWidth = sliderCell.style.width;
             sliderCell.style.maxWidth = sliderCell.style.width;
-            sliderCell.style.height = (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + 'px';
+            sliderCell.style.height =
+                (BUTTONSIZE + SLIDERHEIGHT) * this._cellScale + "px";
             sliderCell.style.backgroundColor = platformColor.selectorBackground;
-            sliderCell.setAttribute('tabIndex', 1);
+            sliderCell.setAttribute("tabIndex", 1);
 
             // Add a div to hold the slider.
-            var cellDiv = document.createElement('div');
-            cellDiv.style.position = 'absolute';
-            cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + 'px';
-            cellDiv.style.width = Math.floor(SLIDERWIDTH * this._cellScale) + 'px';
-            cellDiv.style.top = SLIDERHEIGHT + 'px';
+            var cellDiv = document.createElement("div");
+            cellDiv.style.position = "absolute";
+            cellDiv.style.height = Math.floor(w / SLIDERHEIGHT) + "px";
+            cellDiv.style.width =
+                Math.floor(SLIDERWIDTH * this._cellScale) + "px";
+            cellDiv.style.top = SLIDERHEIGHT + "px";
             cellDiv.style.backgroundColor = platformColor.selectorBackground;
             sliderCell.appendChild(cellDiv);
 
             // Add a paragraph element for the slider value.
-            var slider = document.createElement('P');
+            var slider = document.createElement("P");
             slider.innerHTML = this.Sliders[i][0].toFixed(this.places);
             cellDiv.appendChild(slider);
 
@@ -246,16 +292,28 @@ function PitchSlider() {
 
                 var cellIndex = this.cellIndex;
                 var cellDiv = that._slider.cells[cellIndex].childNodes[0];
-                cellDiv.style.top = offset + 'px';
+                cellDiv.style.top = offset + "px";
 
                 var distanceFromBottom = Math.max(SLIDERHEIGHT - offset, 0);
-                var frequencyOffset = parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT * distanceFromBottom;
+                var frequencyOffset =
+                    (parseFloat(that.Sliders[cellIndex][0]) / SLIDERHEIGHT) *
+                    distanceFromBottom;
 
-                that.Sliders[cellIndex][1] = Math.log2(parseFloat(that.Sliders[cellIndex][0] + frequencyOffset) / that.Sliders[cellIndex][0]) * 12;
-                that.Sliders[cellIndex][2] = frequencyOffset - that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
+                that.Sliders[cellIndex][1] =
+                    Math.log2(
+                        parseFloat(
+                            that.Sliders[cellIndex][0] + frequencyOffset
+                        ) / that.Sliders[cellIndex][0]
+                    ) * 12;
+                that.Sliders[cellIndex][2] =
+                    frequencyOffset -
+                    that.Sliders[cellIndex][0] *
+                        Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
 
                 var frequencyDiv = cellDiv.childNodes[0];
-                var frequency = that.Sliders[cellIndex][0] * Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
+                var frequency =
+                    that.Sliders[cellIndex][0] *
+                    Math.pow(SEMITONE, that.Sliders[cellIndex][1]);
                 frequencyDiv.innerHTML = frequency.toFixed(that.places);
                 that._play(this);
             };
@@ -264,19 +322,29 @@ function PitchSlider() {
                 that._save(this);
             };
 
-            var upCell = this._addButton(upRow, 'up.svg', iconSize, _('Move up'));
+            var upCell = this._addButton(
+                upRow,
+                "up.svg",
+                iconSize,
+                _("Move up")
+            );
 
             upCell.onclick = function() {
                 that._moveSlider(this, 1);
             };
 
-            var downCell = this._addButton(downRow, 'down.svg', iconSize, _('Move down'));
+            var downCell = this._addButton(
+                downRow,
+                "down.svg",
+                iconSize,
+                _("Move down")
+            );
 
             downCell.onclick = function() {
                 that._moveSlider(this, -1);
             };
         }
 
-        this._logo.textMsg(_('Click on the slider to create a note block.'));
+        this._logo.textMsg(_("Click on the slider to create a note block."));
     };
-};
+}

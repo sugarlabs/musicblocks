@@ -10,24 +10,23 @@
 
 // This widget displays help about a block or a button.
 
-
-function HelpWidget () {
+function HelpWidget() {
     const ICONSIZE = 32;
 
-    this.init = function (blocks) {
+    this.init = function(blocks) {
         this.isOpen = true;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, 'help', 'help');
+        var widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
         widgetWindow.onClose = function() {
             that.isOpen = false;
             this.destroy();
-        }
+        };
 
         // Position the widget and make it visible.
-        this._helpDiv = document.createElement('div');
+        this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
         var that = this;
@@ -36,33 +35,36 @@ function HelpWidget () {
         }, 100);
     };
 
-    this._setup = function (blocks) {
+    this._setup = function(blocks) {
         var iconSize = ICONSIZE;
         // Which help page are we on?
         var page = 0;
 
-        this._helpDiv.style.width = iconSize * 2 + 425 + 'px';
-        this._helpDiv.style.backgroundColor = '#e8e8e8';
-        this._helpDiv.innerHTML = '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+        this._helpDiv.style.width = iconSize * 2 + 425 + "px";
+        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        this._helpDiv.innerHTML =
+            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.setPosition(100, 100);
+
+        // Make help div appear in center of screen
+        this.widgetWindow.sendToCenter();
 
         if (blocks === null) {
             var that = this;
 
-            this.widgetWindow.updateTitle(_('Take a tour'));
-            var rightArrow = document.getElementById('right-arrow');
-            rightArrow.style.display = 'block';
-            rightArrow.classList.add('hover');
+            this.widgetWindow.updateTitle(_("Take a tour"));
+            var rightArrow = document.getElementById("right-arrow");
+            rightArrow.style.display = "block";
+            rightArrow.classList.add("hover");
 
-            var leftArrow = document.getElementById('left-arrow');
-            leftArrow.style.display = 'block';
-            leftArrow.classList.add('hover');
+            var leftArrow = document.getElementById("left-arrow");
+            leftArrow.style.display = "block";
+            leftArrow.classList.add("hover");
 
-            var cell = docById('left-arrow');
+            var cell = docById("left-arrow");
 
-            cell.onclick=function() {
+            cell.onclick = function() {
                 page = page - 1;
                 if (page < 0) {
                     page = HELPCONTENT.length - 1;
@@ -71,7 +73,7 @@ function HelpWidget () {
                 that._showPage(page);
             };
 
-            var cell = docById('right-arrow');
+            var cell = docById("right-arrow");
 
             cell.onclick = function() {
                 page = page + 1;
@@ -81,26 +83,27 @@ function HelpWidget () {
 
                 that._showPage(page);
             };
-
         } else {
             if (blocks.activeBlock.name !== null) {
-                var label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
+                var label =
+                    blocks.blockList[blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 this.widgetWindow.updateTitle(_(label));
             }
 
-            var rightArrow = document.getElementById('right-arrow');
-            rightArrow.style.display = 'none';
-            rightArrow.classList.remove('hover');
+            var rightArrow = document.getElementById("right-arrow");
+            rightArrow.style.display = "none";
+            rightArrow.classList.remove("hover");
 
-            var leftArrow = document.getElementById('left-arrow');
-            leftArrow.style.display = 'none';
-            leftArrow.classList.remove('hover');
+            var leftArrow = document.getElementById("left-arrow");
+            leftArrow.style.display = "none";
+            leftArrow.classList.remove("hover");
         }
 
         if (blocks === null) {
             // display help menu
-            docById('helpBodyDiv').style.height = '325px';
-            docById('helpBodyDiv').style.width = '400px';
+            docById("helpBodyDiv").style.height = "325px";
+            docById("helpBodyDiv").style.width = "400px";
             this._showPage(0);
         } else {
             // display help for this block
@@ -110,14 +113,15 @@ function HelpWidget () {
                 // path of the help svg, an override name for the help
                 // svg file, and an optional macro name for generating
                 // the help output.
-                var message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+                var message =
+                    blocks.blockList[blocks.activeBlock].protoblock.helpString;
                 // console.log(message);
                 // console.log(BLOCKHELP[name]);
                 if (message) {
-                    var helpBody = docById('helpBodyDiv');
-                    helpBody.style.height = '';
+                    var helpBody = docById("helpBodyDiv");
+                    helpBody.style.height = "";
 
-                    var body = '';
+                    var body = "";
                     if (message.length > 1) {
                         var path = message[1];
                         // We need to add a case here whenever we add
@@ -128,62 +132,88 @@ function HelpWidget () {
                             language = navigator.language;
                         }
 
-                        switch(language) {
-                        case 'ja':
-                            if (localStorage.kanaPreference == 'kana') {
-                                path = path + '-kana';
-                            } else {
-                                path = path + '-ja';
-                            }
-                            break;
-                        case 'es':
-                            path = path + '-es';
-                            break;
-                        case 'pt':
-                            path = path + '-pt';
-                            break;
-                        default:
-                            break;
+                        switch (language) {
+                            case "ja":
+                                if (localStorage.kanaPreference == "kana") {
+                                    path = path + "-kana";
+                                } else {
+                                    path = path + "-ja";
+                                }
+                                break;
+                            case "es":
+                                path = path + "-es";
+                                break;
+                            case "pt":
+                                path = path + "-pt";
+                                break;
+                            default:
+                                break;
                         }
 
-                        body = body + '<p><img src="' + path + '/' + name + '_block.svg"></p>';
+                        body =
+                            body +
+                            '<p><img src="' +
+                            path +
+                            "/" +
+                            name +
+                            '_block.svg"></p>';
                     }
 
-                    body = body + '<p>' + message[0] + '</p>';
+                    body = body + "<p>" + message[0] + "</p>";
 
-                    body += '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' + _('Load blocks') + '/>';
+                    body +=
+                        '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' +
+                        _("Load blocks") +
+                        "/>";
 
                     helpBody.innerHTML = body;
 
-                    var loadButton = docById('loadButton');
+                    var loadButton = docById("loadButton");
                     if (loadButton !== null) {
                         loadButton.onclick = function() {
                             if (message.length < 4) {
                                 // If there is nothing specified, just
                                 // load the block.
-                                console.debug('CLICK: ' + name);
-                                var obj = blocks.palettes.getProtoNameAndPalette
-(name);
+                                console.debug("CLICK: " + name);
+                                var obj = blocks.palettes.getProtoNameAndPalette(
+                                    name
+                                );
                                 var protoblk = obj[0];
                                 var paletteName = obj[1];
                                 var protoName = obj[2];
 
-                                var protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                                var protoResult = blocks.protoBlockDict.hasOwnProperty(
+                                    protoName
+                                );
                                 if (protoResult) {
-                                    blocks.palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (newBlock) {
-                                        blocks.moveBlock(newBlock, 100, 100);
-                                    });
+                                    blocks.palettes.dict[
+                                        paletteName
+                                    ].makeBlockFromSearch(
+                                        protoblk,
+                                        protoName,
+                                        function(newBlock) {
+                                            blocks.moveBlock(
+                                                newBlock,
+                                                100,
+                                                100
+                                            );
+                                        }
+                                    );
                                 }
-                            } else if (typeof(message[3]) === 'string') {
+                            } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                var blocksToLoad = getMacroExpansion(message[3], 100, 100);
-                                console.debug('CLICK: ' + blocksToLoad);
+                                var blocksToLoad = getMacroExpansion(
+                                    message[3],
+                                    100,
+                                    100
+                                );
+                                console.debug("CLICK: " + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
                                 var blocksToLoad = message[3];
-                                console.debug('CLICK: ' + blocksToLoad);
+                                console.debug("CLICK: " + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
@@ -196,23 +226,42 @@ function HelpWidget () {
     };
 
     this._showPage = function(page) {
-        var helpBody = docById('helpBodyDiv');
-        var body = '';
-        if ([_('Welcome to Music Blocks'), _('Meet Mr. Mouse!'), _('Guide'), _('About'), _('Congratulations.')].indexOf(HELPCONTENT[page][0]) !== -1) {
-            body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
+        var helpBody = docById("helpBodyDiv");
+        var body = "";
+        if (
+            [
+                _("Welcome to Music Blocks"),
+                _("Meet Mr. Mouse!"),
+                _("Guide"),
+                _("About"),
+                _("Congratulations.")
+            ].indexOf(HELPCONTENT[page][0]) !== -1
+        ) {
+            body =
+                body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
         } else {
-            body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"width="64px" height="64px"></p>';
+            body =
+                body +
+                '<p>&nbsp;<img src="' +
+                HELPCONTENT[page][2] +
+                '"width="64px" height="64px"></p>';
         }
-        body = body + '<h1>' + HELPCONTENT[page][0] + '</h1>';
-        body = body + '<p>' + HELPCONTENT[page][1] + '</p>';
+        body = body + "<h1>" + HELPCONTENT[page][0] + "</h1>";
+        body = body + "<p>" + HELPCONTENT[page][1] + "</p>";
 
         if (HELPCONTENT[page].length > 3) {
             var link = HELPCONTENT[page][3];
-            console.debug(page + ' ' + link);
-            body = body + '<p><a href="' + link + '" target="_blank">' + HELPCONTENT[page][4] + '</a></p>';
+            console.debug(page + " " + link);
+            body =
+                body +
+                '<p><a href="' +
+                link +
+                '" target="_blank">' +
+                HELPCONTENT[page][4] +
+                "</a></p>";
         }
 
-        helpBody.style.color = '#505050';
+        helpBody.style.color = "#505050";
         helpBody.innerHTML = body;
 
         this.widgetWindow.takeFocus();
@@ -225,4 +274,4 @@ function HelpWidget () {
             }
         }
     };
-};
+}

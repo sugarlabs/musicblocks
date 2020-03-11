@@ -9,12 +9,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function format (str, data) {
-    str = str.replace(/{([a-zA-Z0-9.]*)}/g, function (match, name) {
+function format(str, data) {
+    str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
         x = data;
-        name.split('.').forEach(function (v) {
+        name.split(".").forEach(function(v) {
             if (x === undefined) {
-                console.debug('Undefined value in template string', str, name, x, v);
+                console.debug(
+                    "Undefined value in template string",
+                    str,
+                    name,
+                    x,
+                    v
+                );
             }
 
             x = x[v];
@@ -23,78 +29,74 @@ function format (str, data) {
         return x;
     });
 
-    return str.replace(/{_([a-zA-Z0-9]+)}/g, function (match, item) {
+    return str.replace(/{_([a-zA-Z0-9]+)}/g, function(match, item) {
         return _(item);
     });
-};
+}
 
-
-function canvasPixelRatio () {
+function canvasPixelRatio() {
     var devicePixelRatio = window.devicePixelRatio || 1;
-    var context = document.querySelector('#myCanvas').getContext('2d');
-    var backingStoreRatio = context.webkitBackingStorePixelRatio ||
-                            context.mozBackingStorePixelRatio ||
-                            context.msBackingStorePixelRatio ||
-                            context.oBackingStorePixelRatio ||
-                            context.backingStorePixelRatio || 1;
+    var context = document.querySelector("#myCanvas").getContext("2d");
+    var backingStoreRatio =
+        context.webkitBackingStorePixelRatio ||
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio ||
+        1;
     return devicePixelRatio / backingStoreRatio;
-};
+}
 
-
-function windowHeight () {
+function windowHeight() {
     var onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
     } else {
         return window.innerHeight;
     }
-};
+}
 
-
-function windowWidth () {
+function windowWidth() {
     var onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
     } else {
         return window.innerWidth;
     }
-};
+}
 
-
-function httpGet (projectName) {
+function httpGet(projectName) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
         xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
+        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     } else {
         xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
+        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     }
 
     xmlHttp.send();
     if (xmlHttp.status > 299) {
-        throw 'Error from server';
+        throw "Error from server";
     }
 
     return xmlHttp.responseText;
-};
+}
 
-
-function httpPost (projectName, data) {
+function httpPost(projectName, data) {
     var xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader('x-api-key', '3tgTzMXbbw6xEKX7');
+    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
-};
+}
 
-
-function HttpRequest (url, loadCallback, userCallback) {
+function HttpRequest(url, loadCallback, userCallback) {
     // userCallback is an optional callback-handler.
-    var req = this.request = new XMLHttpRequest();
+    var req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
@@ -102,178 +104,290 @@ function HttpRequest (url, loadCallback, userCallback) {
 
     var objref = this;
     try {
-        req.open('GET', url);
+        req.open("GET", url);
 
-        req.onreadystatechange = function () {
+        req.onreadystatechange = function() {
             objref.handler();
         };
 
-        req.send('');
-    } catch(e) {
+        req.send("");
+    } catch (e) {
         if (self.console) {
-            console.debug('Failed to load resource from ' + url + ': Network error.');
+            console.debug(
+                "Failed to load resource from " + url + ": Network error."
+            );
         }
 
-        if (typeof userCallback === 'function') {
-            userCallback(false, 'network error');
+        if (typeof userCallback === "function") {
+            userCallback(false, "network error");
         }
 
         this.request = this.handler = this.userCallback = null;
     }
+}
+
+function doBrowserCheck() {
+    var matched, browser;
+    jQuery.uaMatch = function( ua ) {
+        ua = ua.toLowerCase();
+
+        var match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
+            /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
+            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
+            /(msie) ([\w.]+)/.exec( ua ) ||
+            ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
+            [];
+
+        return {
+            browser: match[ 1 ] || "",
+            version: match[ 2 ] || "0"
+        };
+    };
+
+    matched = jQuery.uaMatch( navigator.userAgent );
+    browser = {};
+
+    if ( matched.browser ) {
+        browser[ matched.browser ] = true;
+        browser.version = matched.version;
+    }
+
+    if ( browser.chrome ) {
+        browser.webkit = true;
+    } else if ( browser.webkit ) {
+        browser.safari = true;
+    }
+
+    jQuery.browser = browser;
+}
+
+// Check for Internet Explorer
+
+window.onload = function() {
+    var userAgent = window.navigator.userAgent;
+    console.log("run detectIE")
+    // For IE 10 or older
+    var MSIE = userAgent.indexOf("MSIE ");
+    if (MSIE > 0) {
+        DetectVersionOfIE = parseInt(
+            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
+            10
+        );
+    }
+
+    // For IE 11
+    var IETrident = userAgent.indexOf("Trident/");
+    if (IETrident > 0) {
+        var IERv = userAgent.indexOf("rv:");
+        DetectVersionOfIE = parseInt(
+            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
+            10
+        );
+    }
+
+    // For IE 12
+    var IEEDGE = userAgent.indexOf("Edge/");
+    if (IEEDGE > 0) {
+        DetectVersionOfIE = parseInt(
+            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
+            10
+        );
+    }
+
+    if (typeof DetectVersionOfIE != "undefined") {
+        document.body.innerHTML = "<div style='margin: 200px;'>";
+        document.body.innerHTML +=
+            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>";
+        document.body.innerHTML +=
+            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>";
+        document.body.innerHTML +=
+            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>";
+        document.body.innerHTML +=
+            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>";
+        document.body.innerHTML +=
+            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>";
+        document.body.innerHTML +=
+            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>";
+        document.body.innerHTML += "</div></div>";
+    }
 };
 
-
-function docByClass (classname) {
+function docByClass(classname) {
     return document.getElementsByClassName(classname);
-};
+}
 
-
-function docByTagName (tag) {
+function docByTagName(tag) {
     document.getElementsByTagName(tag);
-};
+}
 
-
-function docById (id) {
+function docById(id) {
     return document.getElementById(id);
-};
-
+}
 
 function docByName(name) {
     return document.getElementsByName(name);
-};
+}
 
-
-function last (myList) {
+function last(myList) {
     var i = myList.length;
     if (i === 0) {
         return null;
     } else {
         return myList[i - 1];
     }
-};
-
+}
 
 function getTextWidth(text, font) {
     // re-use canvas object for better performance
-    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'));
-    var context = canvas.getContext('2d');
+    var canvas =
+        getTextWidth.canvas ||
+        (getTextWidth.canvas = document.createElement("canvas"));
+    var context = canvas.getContext("2d");
     context.font = font;
     var metrics = context.measureText(text);
     return metrics.width;
-};
+}
 
-
-function doSVG (canvas, logo, turtles, width, height, scale) {
+function doSVG(canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
-    var turtleSVG = '';
+    var turtleSVG = "";
     for (var turtle in turtles.turtleList) {
         turtles.turtleList[turtle].closeSVG();
         turtleSVG += turtles.turtleList[turtle].svgOutput;
     }
 
-    var svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">\n';
-    svg += '<g transform="scale(' + scale + ',' + scale + ')">\n';
+    var svg =
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' +
+        width +
+        '" height="' +
+        height +
+        '">\n';
+    svg += '<g transform="scale(' + scale + "," + scale + ')">\n';
     svg += logo.svgOutput;
 
-    if (turtleSVG === '') {
+    if (turtleSVG === "") {
         return "";
     } else {
         svg += turtleSVG;
     }
 
-    svg += '</g>';
-    svg += '</svg>';
+    svg += "</g>";
+    svg += "</svg>";
     return svg;
-};
+}
 
-
-function isSVGEmpty (turtles) {
+function isSVGEmpty(turtles) {
     for (var turtle in turtles.turtleList) {
         turtles.turtleList[turtle].closeSVG();
-        if (turtles.turtleList[turtle].svgOutput !== '') {
+        if (turtles.turtleList[turtle].svgOutput !== "") {
             return false;
         }
     }
     return true;
-};
+}
 
-
-function fileExt (file) {
+function fileExt(file) {
     if (file === null) {
-        return '';
+        return "";
     }
 
-    var parts = file.split('.');
-    if (parts.length === 1 || (parts[0] === '' && parts.length === 2)) {
-        return '';
+    var parts = file.split(".");
+    if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
+        return "";
     }
 
     return parts.pop();
-};
+}
 
-
-function fileBasename (file) {
-    var parts = file.split('.');
+function fileBasename(file) {
+    var parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
-    } else if (parts[0] === '' && parts.length === 2) {
+    } else if (parts[0] === "" && parts.length === 2) {
         return file;
     } else {
         parts.pop(); // throw away suffix
-        return parts.join('.');
+        return parts.join(".");
     }
-};
+}
 
-
-function _ (text) {
+function _(text) {
     if (text === null) {
-	console.debug('null string passed to _');
-	return '';
+        console.debug("null string passed to _");
+        return "";
     }
 
     var replaced = text;
-    var replace = [',', '(', ')', '?', '¿', '<', '>', '.', '\n', '"', ':', '%s', '%d', '/', "'", ';', '×', '!', '¡'];
+    var replace = [
+        ",",
+        "(",
+        ")",
+        "?",
+        "¿",
+        "<",
+        ">",
+        ".",
+        "\n",
+        '"',
+        ":",
+        "%s",
+        "%d",
+        "/",
+        "'",
+        ";",
+        "×",
+        "!",
+        "¡"
+    ];
     for (var p = 0; p < replace.length; p++) {
-        replaced = replaced.replace(replace[p], '');
+        replaced = replaced.replace(replace[p], "");
     }
 
-    replaced = replaced.replace(/ /g, '-');
+    replaced = replaced.replace(/ /g, "-");
 
-    if (localStorage.kanaPreference === 'kana') {
+    if (localStorage.kanaPreference === "kana") {
         var lang = document.webL10n.getLanguage();
-        if (lang === 'ja') {
-            replaced = 'kana-' + replaced;
+        if (lang === "ja") {
+            replaced = "kana-" + replaced;
         }
     }
 
     try {
         var translation = document.webL10n.get(replaced);
-        if (translation === '') {
+        if (translation === "") {
             translation = text;
-        };
+        }
         return translation;
     } catch (e) {
-        console.debug('i18n error: ' + text);
+        console.debug("i18n error: " + text);
         return text;
     }
-};
+}
 
-
-function toTitleCase (str) {
-    if (typeof str !== 'string')
-        return;
-    var tempStr = '';
-    if (str.length > 1)
-        tempStr = str.substring(1);
+function toTitleCase(str) {
+    if (typeof str !== "string") return;
+    var tempStr = "";
+    if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-};
+}
 
-
-function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
+function processRawPluginData(
+    rawData,
+    palettes,
+    blocks,
+    errorMsg,
+    evalFlowDict,
+    evalArgDict,
+    evalParameterDict,
+    evalSetterDict,
+    evalOnStartList,
+    evalOnStopList,
+    evalMacroDict
+) {
     // console.debug(rawData);
-    var lineData = rawData.split('\n');
-    var cleanData = '';
+    var lineData = rawData.split("\n");
+    var cleanData = "";
 
     // We need to remove blank lines and comments and then
     // join the data back together for processing as JSON.
@@ -282,7 +396,7 @@ function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict
             continue;
         }
 
-        if (lineData[i][0] === '/') {
+        if (lineData[i][0] === "/") {
             continue;
         }
 
@@ -292,72 +406,99 @@ function processRawPluginData (rawData, palettes, blocks, errorMsg, evalFlowDict
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
     try {
-        var obj = processPluginData(cleanData.replace(/\n/g,''), palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict);
+        var obj = processPluginData(
+            cleanData.replace(/\n/g, ""),
+            palettes,
+            blocks,
+            evalFlowDict,
+            evalArgDict,
+            evalParameterDict,
+            evalSetterDict,
+            evalOnStartList,
+            evalOnStopList,
+            evalMacroDict
+        );
     } catch (e) {
         var obj = null;
-        errorMsg('Error loading plugin: ' + e);
+        errorMsg("Error loading plugin: " + e);
     }
 
     return obj;
-};
+}
 
-
-function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgDict, evalParameterDict, evalSetterDict, evalOnStartList, evalOnStopList, evalMacroDict) {
+function processPluginData(
+    pluginData,
+    palettes,
+    blocks,
+    evalFlowDict,
+    evalArgDict,
+    evalParameterDict,
+    evalSetterDict,
+    evalOnStartList,
+    evalOnStopList,
+    evalMacroDict
+) {
     // Plugins are JSON-encoded dictionaries.
     // console.debug(pluginData);
     var obj = JSON.parse(pluginData);
 
     // Create a palette entry.
     var newPalette = false;
-    if ('PALETTEPLUGINS' in obj) {
-        for (var name in obj['PALETTEPLUGINS']) {
-            PALETTEICONS[name] = obj['PALETTEPLUGINS'][name];
-            var fillColor = '#ff0066';
-            if ('PALETTEFILLCOLORS' in obj) {
-                if (name in obj['PALETTEFILLCOLORS']) {
-                    var fillColor = obj['PALETTEFILLCOLORS'][name];
+    if ("PALETTEPLUGINS" in obj) {
+        for (var name in obj["PALETTEPLUGINS"]) {
+            PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
+            var fillColor = "#ff0066";
+            if ("PALETTEFILLCOLORS" in obj) {
+                if (name in obj["PALETTEFILLCOLORS"]) {
+                    var fillColor = obj["PALETTEFILLCOLORS"][name];
                     // console.debug(fillColor);
                 }
             }
 
             PALETTEFILLCOLORS[name] = fillColor;
 
-            var strokeColor = '#ef003e';
-            if ('PALETTESTROKECOLORS' in obj) {
-                if (name in obj['PALETTESTROKECOLORS']) {
-                    var strokeColor = obj['PALETTESTROKECOLORS'][name];
+            var strokeColor = "#ef003e";
+            if ("PALETTESTROKECOLORS" in obj) {
+                if (name in obj["PALETTESTROKECOLORS"]) {
+                    var strokeColor = obj["PALETTESTROKECOLORS"][name];
                     // console.debug(strokeColor);
                 }
             }
 
             PALETTESTROKECOLORS[name] = strokeColor;
 
-            var highlightColor = '#ffb1b3';
-            if ('PALETTEHIGHLIGHTCOLORS' in obj) {
-                if (name in obj['PALETTEHIGHLIGHTCOLORS']) {
-                    var highlightColor = obj['PALETTEHIGHLIGHTCOLORS'][name];
+            var highlightColor = "#ffb1b3";
+            if ("PALETTEHIGHLIGHTCOLORS" in obj) {
+                if (name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                    var highlightColor = obj["PALETTEHIGHLIGHTCOLORS"][name];
                     // console.debug(highlightColor);
                 }
             }
 
             PALETTEHIGHLIGHTCOLORS[name] = highlightColor;
 
-            var strokeHighlightColor = '#404040';
-            if ('HIGHLIGHTSTROKECOLORS' in obj) {
-                if (name in obj['HIGHLIGHTSTROKECOLORS']) {
-                    var strokeHighlightColor = obj['HIGHLIGHTSTROKECOLORS'][name];
+            var strokeHighlightColor = "#404040";
+            if ("HIGHLIGHTSTROKECOLORS" in obj) {
+                if (name in obj["HIGHLIGHTSTROKECOLORS"]) {
+                    var strokeHighlightColor =
+                        obj["HIGHLIGHTSTROKECOLORS"][name];
                     // console.debug(highlightColor);
                 }
             }
 
             HIGHLIGHTSTROKECOLORS[name] = strokeHighlightColor;
 
-            platformColor.paletteColors[name] = [fillColor, strokeColor, highlightColor, strokeHighlightColor];
+            platformColor.paletteColors[name] = [
+                fillColor,
+                strokeColor,
+                highlightColor,
+                strokeHighlightColor
+            ];
 
             if (name in palettes.buttons) {
-                console.debug('palette ' + name + ' already exists');
+                console.debug("palette " + name + " already exists");
             } else {
-                console.debug('adding palette ' + name);
+                console.debug("adding palette " + name);
                 palettes.add(name);
                 newPalette = true;
             }
@@ -366,54 +507,54 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
 
     if (newPalette) {
         try {
-            console.debug('CALLING makePalettes');
+            console.debug("CALLING makePalettes");
             palettes.makePalettes();
         } catch (e) {
-            console.debug('makePalettes: ' + e);
+            console.debug("makePalettes: " + e);
         }
     }
 
     // Define the image blocks
-    if ('IMAGES' in obj)  {
-        for (var blkName in obj['IMAGES'])  {
-            pluginsImages[blkName] = obj['IMAGES'][blkName];
+    if ("IMAGES" in obj) {
+        for (var blkName in obj["IMAGES"]) {
+            pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
 
     // Populate the flow-block dictionary, i.e., the code that is
     // eval'd by this block.
-    if ('FLOWPLUGINS' in obj) {
-        for (var flow in obj['FLOWPLUGINS']) {
-            evalFlowDict[flow] = obj['FLOWPLUGINS'][flow];
+    if ("FLOWPLUGINS" in obj) {
+        for (var flow in obj["FLOWPLUGINS"]) {
+            evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
         }
     }
 
     // Populate the arg-block dictionary, i.e., the code that is
     // eval'd by this block.
-    if ('ARGPLUGINS' in obj) {
-        for (var arg in obj['ARGPLUGINS']) {
-            evalArgDict[arg] = obj['ARGPLUGINS'][arg];
+    if ("ARGPLUGINS" in obj) {
+        for (var arg in obj["ARGPLUGINS"]) {
+            evalArgDict[arg] = obj["ARGPLUGINS"][arg];
         }
     }
 
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
-    if ('MACROPLUGINS' in obj) {
-        for (var macro in obj['MACROPLUGINS']) {
+    if ("MACROPLUGINS" in obj) {
+        for (var macro in obj["MACROPLUGINS"]) {
             try {
-                evalMacroDict[macro] = JSON.parse(obj['MACROPLUGINS'][macro]);
+                evalMacroDict[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
-                console.debug('could not parse macro ' + macro);
-                console.debug(obj['MACROPLUGINS'][macro]);
+                console.debug("could not parse macro " + macro);
+                console.debug(obj["MACROPLUGINS"][macro]);
             }
         }
     }
 
     // Populate the setter dictionary, i.e., the code that is
     // used to set a value block.
-    if ('SETTERPLUGINS' in obj) {
-        for (var setter in obj['SETTERPLUGINS']) {
-            evalSetterDict[setter] = obj['SETTERPLUGINS'][setter];
+    if ("SETTERPLUGINS" in obj) {
+        for (var setter in obj["SETTERPLUGINS"]) {
+            evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
         }
     }
 
@@ -423,212 +564,224 @@ function processPluginData (pluginData, palettes, blocks, evalFlowDict, evalArgD
     // Maybe:
     // var g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
-    if ('BLOCKPLUGINS' in obj) {
-        for (var block in obj['BLOCKPLUGINS']) {
-            console.debug('adding plugin block ' + block);
+    if ("BLOCKPLUGINS" in obj) {
+        for (var block in obj["BLOCKPLUGINS"]) {
+            console.debug("adding plugin block " + block);
             try {
-                eval(obj['BLOCKPLUGINS'][block]);
+                eval(obj["BLOCKPLUGINS"][block]);
             } catch (e) {
-                console.debug('Failed to load plugin for ' + block + ': ' + e);
+                console.debug("Failed to load plugin for " + block + ": " + e);
             }
         }
     }
 
     // Create the globals.
-    if ('GLOBALS' in obj) {
-        eval(obj['GLOBALS']);
+    if ("GLOBALS" in obj) {
+        eval(obj["GLOBALS"]);
     }
 
-    if ('PARAMETERPLUGINS' in obj) {
-        for (var parameter in obj['PARAMETERPLUGINS']) {
-            evalParameterDict[parameter] = obj['PARAMETERPLUGINS'][parameter];
+    if ("PARAMETERPLUGINS" in obj) {
+        for (var parameter in obj["PARAMETERPLUGINS"]) {
+            evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
         }
     }
 
     // Code to execute when plugin is loaded
-    if ('ONLOAD' in obj) {
-        for (var arg in obj['ONLOAD']) {
-            eval(obj['ONLOAD'][arg]);
+    if ("ONLOAD" in obj) {
+        for (var arg in obj["ONLOAD"]) {
+            eval(obj["ONLOAD"][arg]);
         }
     }
 
     // Code to execute when turtle code is started
-    if ('ONSTART' in obj) {
-        for (var arg in obj['ONSTART']) {
-            evalOnStartList[arg] = obj['ONSTART'][arg];
+    if ("ONSTART" in obj) {
+        for (var arg in obj["ONSTART"]) {
+            evalOnStartList[arg] = obj["ONSTART"][arg];
         }
     }
 
     // Code to execute when turtle code is stopped
-    if ('ONSTOP' in obj) {
-        for (var arg in obj['ONSTOP']) {
-            evalOnStopList[arg] = obj['ONSTOP'][arg];
+    if ("ONSTOP" in obj) {
+        for (var arg in obj["ONSTOP"]) {
+            evalOnStopList[arg] = obj["ONSTOP"][arg];
         }
     }
 
     for (var protoblock in blocks.protoBlockDict) {
         try {
-        // Push the protoblocks onto their palettes.
+            // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
-                console.debug('Cannot find palette for protoblock ' + protoblock);
+                console.debug(
+                    "Cannot find palette for protoblock " + protoblock
+                );
             } else if (blocks.protoBlockDict[protoblock].palette === null) {
-                console.debug('Cannot find palette for protoblock ' + protoblock);
+                console.debug(
+                    "Cannot find palette for protoblock " + protoblock
+                );
             } else {
-                blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+                blocks.protoBlockDict[protoblock].palette.add(
+                    blocks.protoBlockDict[protoblock]
+                );
             }
         } catch (e) {
             console.debug(e);
         }
     }
 
-    console.debug('updating palette ' + name);
+    console.debug("updating palette " + name);
     palettes.updatePalettes(name);
 
-    setTimeout(function () {
+    setTimeout(function() {
         palettes.show();
         palettes.bringToTop();
     }, 2000);
 
     // Return the object in case we need to save it to local storage.
     return obj;
-};
+}
 
-
-function updatePluginObj (obj) {
-    for (var name in obj['PALETTEPLUGINS']) {
-        pluginObjs['PALETTEPLUGINS'][name] = obj['PALETTEPLUGINS'][name];
+function updatePluginObj(obj) {
+    for (var name in obj["PALETTEPLUGINS"]) {
+        pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    for (var name in obj['PALETTEFILLCOLORS']) {
-        pluginObjs['PALETTEFILLCOLORS'][name] = obj['PALETTEFILLCOLORS'][name];
+    for (var name in obj["PALETTEFILLCOLORS"]) {
+        pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
-    for (var name in obj['PALETTESTROKECOLORS']) {
-        pluginObjs['PALETTESTROKECOLORS'][name] = obj['PALETTESTROKECOLORS'][name];
+    for (var name in obj["PALETTESTROKECOLORS"]) {
+        pluginObjs["PALETTESTROKECOLORS"][name] =
+            obj["PALETTESTROKECOLORS"][name];
     }
 
-    for (var name in obj['PALETTEHIGHLIGHTCOLORS']) {
-        pluginObjs['PALETTEHIGHLIGHTCOLORS'][name] = obj['PALETTEHIGHLIGHTCOLORS'][name];
+    for (var name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+        pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
+            obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
-    for (var flow in obj['FLOWPLUGINS']) {
-        pluginObjs['FLOWPLUGINS'][flow] = obj['FLOWPLUGINS'][flow];
+    for (var flow in obj["FLOWPLUGINS"]) {
+        pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
-    for (var arg in obj['ARGPLUGINS']) {
-        pluginObjs['ARGPLUGINS'][arg] = obj['ARGPLUGINS'][arg];
+    for (var arg in obj["ARGPLUGINS"]) {
+        pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
-    for (var block in obj['BLOCKPLUGINS']) {
-        pluginObjs['BLOCKPLUGINS'][block] = obj['BLOCKPLUGINS'][block];
+    for (var block in obj["BLOCKPLUGINS"]) {
+        pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
-    if ('MACROPLUGINS' in obj) {
-        for (var macro in obj['MACROPLUGINS']) {
-            pluginObjs['MACROPLUGINS'][macro] = obj['MACROPLUGINS'][macro];
+    if ("MACROPLUGINS" in obj) {
+        for (var macro in obj["MACROPLUGINS"]) {
+            pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
 
-    if ('GLOBALS' in obj) {
-        if (!('GLOBALS' in pluginObjs)) {
-            pluginObjs['GLOBALS'] = '';
+    if ("GLOBALS" in obj) {
+        if (!("GLOBALS" in pluginObjs)) {
+            pluginObjs["GLOBALS"] = "";
         }
-        pluginObjs['GLOBALS'] += obj['GLOBALS'];
+        pluginObjs["GLOBALS"] += obj["GLOBALS"];
     }
 
-    if ('IMAGES' in obj) {
-        pluginObjs['IMAGES'] = obj['IMAGES'];
+    if ("IMAGES" in obj) {
+        pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (var name in obj['ONLOAD']) {
-        pluginObjs['ONLOAD'][name] = obj['ONLOAD'][name];
+    for (var name in obj["ONLOAD"]) {
+        pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
-    for (var name in obj['ONSTART']) {
-        pluginObjs['ONSTART'][name] = obj['ONSTART'][name];
+    for (var name in obj["ONSTART"]) {
+        pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
-    for (var name in obj['ONSTOP']) {
-        pluginObjs['ONSTOP'][name] = obj['ONSTOP'][name];
+    for (var name in obj["ONSTOP"]) {
+        pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
-};
+}
 
-
-function preparePluginExports (obj) {
+function preparePluginExports(obj) {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(obj);
 
     return JSON.stringify(pluginObjs);
-};
+}
 
-
-function processMacroData (macroData, palettes, blocks, macroDict) {
+function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
-    if (macroData !== '{}') {
+    if (macroData !== "{}") {
         var obj = JSON.parse(macroData);
-        palettes.add('myblocks', 'black', '#a0a0a0');
+        palettes.add("myblocks", "black", "#a0a0a0");
 
         for (var name in obj) {
-            console.debug('adding ' + name + ' to macroDict');
+            console.debug("adding " + name + " to macroDict");
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
         }
 
         palettes.makePalettes();
     }
-};
+}
 
-
-function prepareMacroExports (name, stack, macroDict) {
+function prepareMacroExports(name, stack, macroDict) {
     if (name !== null) {
         macroDict[name] = stack;
     }
 
     return JSON.stringify(macroDict);
-};
+}
 
 // Some block-specific code
 
 // Publish to FB
-function doPublish (desc) {
+function doPublish(desc) {
     var url = doSave();
-    console.debug('push ' + url + ' to FB');
+    console.debug("push " + url + " to FB");
     var descElem = docById("description");
-    var msg = desc + ' ' + descElem.value + ' ' + url;
-    console.debug('comment: ' + msg);
+    var msg = desc + " " + descElem.value + " " + url;
+    console.debug("comment: " + msg);
     var post_cb = function() {
-        FB.api('/me/feed', 'post', {
+        FB.api("/me/feed", "post", {
             message: msg
         });
     };
 
     FB.login(post_cb, {
-        scope: 'publish_actions'
+        scope: "publish_actions"
     });
-};
-
+}
 
 // TODO: Move to camera plugin
 var hasSetupCamera = false;
-function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
+function doUseCamera(
+    args,
+    turtles,
+    turtle,
+    isVideo,
+    cameraID,
+    setCameraID,
+    errorMsg
+) {
     var w = 320;
     var h = 240;
 
     var streaming = false;
-    var video = document.querySelector('#camVideo');
-    var canvas = document.querySelector('#camCanvas');
-    navigator.getMedia = (navigator.getUserMedia ||
-                          navigator.mozGetUserMedia ||
-                          navigator.webkitGetUserMedia ||
-                          navigator.msGetUserMedia);
+    var video = document.querySelector("#camVideo");
+    var canvas = document.querySelector("#camCanvas");
+    navigator.getMedia =
+        navigator.getUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.msGetUserMedia;
     if (navigator.getMedia === undefined) {
-        errorMsg('Your browser does not support the webcam');
+        errorMsg("Your browser does not support the webcam");
     }
 
     if (!hasSetupCamera) {
         navigator.getMedia(
-            {video: true, audio: false},
-            function (stream) {
+            { video: true, audio: false },
+            function(stream) {
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
@@ -638,10 +791,12 @@ function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, err
 
                 video.play();
                 hasSetupCamera = true;
-            }, function (error) {
-                errorMsg('Could not connect to camera');
-                console.debug('Could not connect to camera', error);
-        });
+            },
+            function(error) {
+                errorMsg("Could not connect to camera");
+                console.debug("Could not connect to camera", error);
+            }
+        );
     } else {
         streaming = true;
         video.play();
@@ -653,63 +808,64 @@ function doUseCamera (args, turtles, turtle, isVideo, cameraID, setCameraID, err
         }
     }
 
-    video.addEventListener('canplay', function (event) {
-        console.debug('canplay', streaming, hasSetupCamera);
-        if (!streaming) {
-            video.setAttribute('width', w);
-            video.setAttribute('height', h);
-            canvas.setAttribute('width', w);
-            canvas.setAttribute('height', h);
-            streaming = true;
+    video.addEventListener(
+        "canplay",
+        function(event) {
+            console.debug("canplay", streaming, hasSetupCamera);
+            if (!streaming) {
+                video.setAttribute("width", w);
+                video.setAttribute("height", h);
+                canvas.setAttribute("width", w);
+                canvas.setAttribute("height", h);
+                streaming = true;
 
-            if (isVideo) {
-                cameraID = window.setInterval(draw, 100);
-                setCameraID(cameraID);
-            } else {
-                draw();
+                if (isVideo) {
+                    cameraID = window.setInterval(draw, 100);
+                    setCameraID(cameraID);
+                } else {
+                    draw();
+                }
             }
-        }
-    }, false);
+        },
+        false
+    );
 
-    function draw () {
+    function draw() {
         canvas.width = w;
         canvas.height = h;
-        canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-        var data = canvas.toDataURL('image/png');
+        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+        var data = canvas.toDataURL("image/png");
         turtles.turtleList[turtle].doShowImage(args[0], data);
-    };
-};
+    }
+}
 
-
-function doStopVideoCam (cameraID, setCameraID) {
+function doStopVideoCam(cameraID, setCameraID) {
     if (cameraID !== null) {
         window.clearInterval(cameraID);
     }
 
     setCameraID(null);
-    document.querySelector('#camVideo').pause();
-};
+    document.querySelector("#camVideo").pause();
+}
 
-
-function hideDOMLabel () {
-    var textLabel = docById('textLabel');
+function hideDOMLabel() {
+    var textLabel = docById("textLabel");
     if (textLabel !== null) {
-        textLabel.style.display = 'none';
+        textLabel.style.display = "none";
     }
 
-    var numberLabel = docById('numberLabel');
+    var numberLabel = docById("numberLabel");
     if (numberLabel !== null) {
-        numberLabel.style.display = 'none';
+        numberLabel.style.display = "none";
     }
 
-    var piemenu = docById('wheelDiv');
+    var piemenu = docById("wheelDiv");
     if (piemenu !== null) {
-        piemenu.style.display = 'none';
+        piemenu.style.display = "none";
     }
-};
+}
 
-
-function displayMsg (blocks, text) {
+function displayMsg(blocks, text) {
     /*
     var msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
@@ -718,24 +874,22 @@ function displayMsg (blocks, text) {
     blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
     */
     return;
-};
+}
 
-
-function safeSVG (label) {
-    if (typeof(label) === 'string') {
+function safeSVG(label) {
+    if (typeof label === "string") {
         return label
-            .replace(/&/, '&amp;')
-            .replace(/</, '&lt;')
-            .replace(/>/, '&gt;');
+            .replace(/&/, "&amp;")
+            .replace(/</, "&lt;")
+            .replace(/>/, "&gt;");
     } else {
         return label;
     }
-};
+}
 
-
-function toFixed2 (d) {
+function toFixed2(d) {
     // Return number as fixed 2 precision
-    if (typeof(d) === 'number') {
+    if (typeof d === "number") {
         var floor = Math.floor(d);
         if (d !== floor) {
             return d.toFixed(2).toString();
@@ -745,19 +899,17 @@ function toFixed2 (d) {
     } else {
         return d;
     }
-};
+}
 
-
-function mixedNumber (d) {
+function mixedNumber(d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
-    if (typeof(d) === 'number') {
+    if (typeof d === "number") {
         var floor = Math.floor(d);
         if (d > floor) {
             var obj = rationalToFraction(d - floor);
             if (floor === 0) {
-                return obj[0] + '/' + obj[1];
-
+                return obj[0] + "/" + obj[1];
             } else {
                 if (obj[0] === 1 && obj[1] === 1) {
                     return floor + 1;
@@ -765,7 +917,7 @@ function mixedNumber (d) {
                     if (obj[1] > 99) {
                         return d.toFixed(2);
                     } else {
-                        return floor + ' ' + obj[0] + '/' + obj[1];
+                        return floor + " " + obj[0] + "/" + obj[1];
                     }
                 }
             }
@@ -773,36 +925,30 @@ function mixedNumber (d) {
             return d.toString();
         }
     } else {
-
         return d;
-
-
     }
-};
+}
 
-
-function LCD (a, b) {
+function LCD(a, b) {
     return Math.abs((a * b) / GCD(a, b));
-};
+}
 
-
-function GCD (a, b) {
+function GCD(a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
 
-    while(b) {
+    while (b) {
         var n = b;
         b = a % b;
         a = n;
     }
 
     return a;
-};
+}
 
-
-function rationalSum (a, b) {
+function rationalSum(a, b) {
     if (a === 0 || b === 0) {
-        console.debug('divide by zero?');
+        console.debug("divide by zero?");
         return [0, 1];
     }
 
@@ -838,12 +984,11 @@ function rationalSum (a, b) {
 
     // Find the least common denomenator
     var lcd = LCD(a[1], b[1]);
-    var c0 = a[0] * lcd / a[1] + b[0] * lcd / b[1];
-    return [a[0] * lcd / a[1] + b[0] * lcd / b[1], lcd];
-};
+    var c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
+    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+}
 
-
-function rationalToFraction (d) {
+function rationalToFraction(d) {
     /*
     Convert float to its approximate fractional representation. '''
 
@@ -891,10 +1036,9 @@ readable-fractions/681534#681534
     } else {
         return [top, bot];
     }
-};
+}
 
-
-function nearestBeat (d, b) {
+function nearestBeat(d, b) {
     // Find the closest beat for a given fraction.
 
     var sum = 1 / (2 * b);
@@ -906,10 +1050,9 @@ function nearestBeat (d, b) {
     }
 
     return [count, b];
-};
+}
 
-
-function oneHundredToFraction (d) {
+function oneHundredToFraction(d) {
     // Generate some simple fractions based on a scale of 1-100
 
     if (d < 1) {
@@ -918,195 +1061,194 @@ function oneHundredToFraction (d) {
         return [1, 1];
     }
 
-    switch(Math.floor(d)) {
-    case 1:
-        return [1, 64];
-        break;
-    case 2:
-        return [1, 48];
-        break;
-    case 3:
-    case 4:
-    case 5:
-        return [1, 32];
-        break;
-    case 6:
-    case 7:
-    case 8:
-        return [1, 16];
-        break;
-    case 9:
-    case 10:
-    case 11:
-        return [1, 12];
-        break;
-    case 12:
-    case 13:
-    case 14:
-        return [1, 8];
-        break;
-    case 15:
-    case 16:
-    case 17:
-        return [1, 6];
-        break;
-    case 18:
-    case 19:
-        return [3, 16];
-        break;
-    case 20:
-    case 21:
-    case 22:
-        return [1, 5];
-        break;
-    case 23:
-    case 24:
-    case 25:
-    case 26:
-    case 27:
-    case 28:
-    case 29:
-        return [1, 4];
-        break;
-    case 30:
-    case 31:
-        return [5, 16];
-        break;
-    case 32:
-    case 33:
-    case 34:
-    case 35:
-        return [1, 3];
-        break;
-    case 36:
-    case 37:
-    case 38:
-    case 39:
-        return [3, 8];
-        break;
-    case 40:
-    case 41:
-        return [2, 5];
-        break;
-    case 42:
-    case 43:
-    case 44:
-        return [7, 16];
-        break;
-    case 45:
-    case 46:
-    case 47:
-        return [15, 32];
-        break;
-    case 48:
-    case 49:
-    case 50:
-    case 51:
-    case 52:
-        return [1, 2];
-        break;
-    case 53:
-    case 54:
-        return [17, 32];
-        break;
-    case 56:
-    case 57:
-    case 58:
-        return [9, 16];
-        break;
-    case 59:
-    case 60:
-    case 61:
-        return [3, 5];
-        break;
-    case 62:
-    case 63:
-    case 64:
-    case 65:
-        return [5, 8];
-        break;
-    case 66:
-    case 67:
-        return [2, 3];
-        break;
-    case 68:
-    case 69:
-    case 70:
-        return [11, 16];
-        break;
-    case 71:
-    case 72:
-    case 73:
-    case 74:
-        return [23, 32];
-        break;
-    case 75:
-    case 76:
-    case 77:
-    case 78:
-    case 79:
-    case 80:
-        return [3, 4];
-        break;
-    case 81:
-    case 82:
-        return [13, 16];
-        break;
-    case 83:
-    case 84:
-    case 85:
-    case 86:
-        return [5, 6];
-        break;
-    case 87:
-    case 88:
-    case 89:
-    case 90:
-        return [7, 8];
-        break;
-    case 91:
-    case 92:
-        return [11, 12];
-        break;
-    case 93:
-    case 94:
-    case 95:
-        return [15, 16];
-        break;
-    case 96:
-    case 98:
-        return [31, 32];
-        break;
-    case 98:
-        return [63, 64];
-        break;
-    default:
-        return [d, 100];
+    switch (Math.floor(d)) {
+        case 1:
+            return [1, 64];
+            break;
+        case 2:
+            return [1, 48];
+            break;
+        case 3:
+        case 4:
+        case 5:
+            return [1, 32];
+            break;
+        case 6:
+        case 7:
+        case 8:
+            return [1, 16];
+            break;
+        case 9:
+        case 10:
+        case 11:
+            return [1, 12];
+            break;
+        case 12:
+        case 13:
+        case 14:
+            return [1, 8];
+            break;
+        case 15:
+        case 16:
+        case 17:
+            return [1, 6];
+            break;
+        case 18:
+        case 19:
+            return [3, 16];
+            break;
+        case 20:
+        case 21:
+        case 22:
+            return [1, 5];
+            break;
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+            return [1, 4];
+            break;
+        case 30:
+        case 31:
+            return [5, 16];
+            break;
+        case 32:
+        case 33:
+        case 34:
+        case 35:
+            return [1, 3];
+            break;
+        case 36:
+        case 37:
+        case 38:
+        case 39:
+            return [3, 8];
+            break;
+        case 40:
+        case 41:
+            return [2, 5];
+            break;
+        case 42:
+        case 43:
+        case 44:
+            return [7, 16];
+            break;
+        case 45:
+        case 46:
+        case 47:
+            return [15, 32];
+            break;
+        case 48:
+        case 49:
+        case 50:
+        case 51:
+        case 52:
+            return [1, 2];
+            break;
+        case 53:
+        case 54:
+            return [17, 32];
+            break;
+        case 56:
+        case 57:
+        case 58:
+            return [9, 16];
+            break;
+        case 59:
+        case 60:
+        case 61:
+            return [3, 5];
+            break;
+        case 62:
+        case 63:
+        case 64:
+        case 65:
+            return [5, 8];
+            break;
+        case 66:
+        case 67:
+            return [2, 3];
+            break;
+        case 68:
+        case 69:
+        case 70:
+            return [11, 16];
+            break;
+        case 71:
+        case 72:
+        case 73:
+        case 74:
+            return [23, 32];
+            break;
+        case 75:
+        case 76:
+        case 77:
+        case 78:
+        case 79:
+        case 80:
+            return [3, 4];
+            break;
+        case 81:
+        case 82:
+            return [13, 16];
+            break;
+        case 83:
+        case 84:
+        case 85:
+        case 86:
+            return [5, 6];
+            break;
+        case 87:
+        case 88:
+        case 89:
+        case 90:
+            return [7, 8];
+            break;
+        case 91:
+        case 92:
+            return [11, 12];
+            break;
+        case 93:
+        case 94:
+        case 95:
+            return [15, 16];
+            break;
+        case 96:
+        case 98:
+            return [31, 32];
+            break;
+        case 98:
+            return [63, 64];
+            break;
+        default:
+            return [d, 100];
 
-        break;
-
+            break;
     }
-};
-
+}
 
 function rgbToHex(r, g, b) {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-};
-
+}
 
 function hexToRGB(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-};
+    return result
+        ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
+        : null;
+}
 
 function delayExecution(duration) {
-    return new Promise(function(resolve,reject) {
-        setTimeout(function(){
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
             resolve(true);
         }, duration);
-    })
+    });
 }

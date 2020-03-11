@@ -3,9 +3,14 @@ MUSIC BLOCKS
 
 “All musicians are subconsciously mathematicians” – Monk
 
+“Music is a hidden arithmetic exercise of the soul, which does not
+know that it is counting.” ~ Leibniz
+
 Music Blocks is a programming language and collection of manipulative
 tools for exploring musical and mathematical concepts in an
 integrative and fun way.
+
+**Refer the following sections below to get familiar with this awesome project:**
 
 * [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
 * [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
@@ -75,6 +80,9 @@ NOTE: Make sure you can run either <code>python</code> or
 (5) Open your favorite browser and run <code>localhost:3000</code> or
 <code>127.0.0.1:3000</code>.
 
+NOTE: Use **ctrl + c** to quit the **HTTPServer** to avoid
+**socket.error:[Errno 48]**.
+
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use it.
@@ -128,15 +136,14 @@ Temperament Widget. Ritwik Abhishek added a keyboard widget and a
 pitch-tracking widget.
 
 Many students contributed to the project as part of Google Code-in
-(2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018). Sam Parkinson
-built the Planet during GCI 2016&ndash;17. Emily Ong designed our
-mouse icon and Euan Ong redesigned the Planet code as a series of GCI
-tasks in 2017&ndash;18; Austin George refactored the toolbars as a
-series of GCI tasks in 2018. In GCI 2019, Bottersnike redesigned the
-widgets and the Block API, AndreaGon made the widgets responsive,
-Pidddgy refactored the update code, resulting in an order-of-magnitude
-improvement in CPU usage, and Nepaltechguy2 updated the local storage
-mechanism to use localforage.
+(2015&ndash;2020). Sam Parkinson built the Planet during GCI. Emily
+Ong designed our mouse icon and Euan Ong redesigned the Planet code as
+a series of GCI tasks.  Austin George refactored the toolbars as a
+series of GCI tasks. Bottersnike redesigned the widgets and the Block
+API, AndreaGon made the widgets responsive, Pidddgy refactored the
+update code, resulting in an order-of-magnitude improvement in CPU
+usage, and Nepaltechguy2 updated the local storage mechanism to use
+localforage.
 
 A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
@@ -160,6 +167,14 @@ music, your lesson plans, your artwork, and your code.
 
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
+
+Please note there is no need to ask permission to work on an
+issue. You should check for pull requests linked to an issue you are
+addressing; if there are none, then assume nobody has done
+anything. Begin to fix the problem, test, make your commits, push your
+commits, then make a pull request. Mention an issue number in the pull
+request, but not the commit message. These practices allow the
+competition of ideas (Sugar Labs is a meritocracy).
 
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
