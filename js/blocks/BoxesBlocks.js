@@ -107,7 +107,7 @@ function setupBoxesBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            args[1] = 1;
+            args[1] = -1;
             super.flow(args, logo, turtle, blk);
         }
     }
