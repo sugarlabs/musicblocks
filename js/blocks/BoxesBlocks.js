@@ -93,13 +93,13 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Sub-1-from block subtracts one from the value stored in a box."),
+                _("The Subtract-1-from block subtracts one from the value stored in a box."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("sub 1 from"),
+                name: _("subtract 1 from"),
                 args: 1,
                 argTypes: ["anyin"],
                 argLabels: [""]
