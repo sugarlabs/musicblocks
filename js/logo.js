@@ -1875,7 +1875,6 @@ function Logo() {
 
         var nextBlock = null;
         var parentBlk = null;
-        var flag = 0;
         // Run the last flow in the queue.
         if (that.turtles.turtleList[turtle].queue.length > queueStart) {
             nextBlock = last(that.turtles.turtleList[turtle].queue).blk;
@@ -1886,12 +1885,6 @@ function Logo() {
                 // Finished child so pop it off the queue.
                 that.turtles.turtleList[turtle].queue.pop();
             } else {
-                if (flag !== 1) {
-                    var repeatCount = last(that.turtles.turtleList[
-                                           turtle].queue).count;
-                    var repeatedNotes = that.turtles.turtleList[turtle].queue;
-                    flag = 1;
-                }
                 // Decrement the counter for repeating that flow.
                 last(that.turtles.turtleList[turtle].queue).count -= 1;
             }
@@ -6285,15 +6278,16 @@ function Logo() {
      * @returns {void}
      */
     this.notationRepeat = function(turtle, repeatCount, repeatedNotes) {
-        //If repeatCount is -1 , then the parentBlock is forever ,
-        //otherwise it is repeat.
-        if (repeatCount !== -1) {
-          
-            this.notationStaging[turtle].push("repeat",repeatCount,repeatedNotes);
-        }
+        
+            this.notationStaging[turtle].push("repeatNotes",repeatCount,repeatedNotes);
     }
 
-    /**
+    this.repeatAction = function(turtle, repeatCount, repeatedNotes) {
+        
+            this.notationStaging[turtle].push("repeatAction",repeatCount,repeatedNotes);
+    }
+
+     /**
      * Sets the notation markup.
      * @privileged
      * @param   turtle

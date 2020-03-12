@@ -817,7 +817,7 @@ function setupFlowBlocks() {
             });
         }
 
-        flow(args, logo) {
+        flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
 
             let arg;
@@ -831,6 +831,24 @@ function setupFlowBlocks() {
             } else {
                 arg = args[0];
             }
+           
+            var repeatCount = Math.floor(arg);
+            
+            var parentBlk = logo.blocks.blockList[blk].connections[0];
+            var nextBlk = logo.blocks.blockList[blk].connections[2];
+            var queueBlock = new Queue(blk, 1, parentBlk);
+            logo.parentFlowQueue[turtle].push(parentBlk);
+            logo.turtles.turtleList[turtle].queue.push(queueBlock);
+
+            var repeatedNotes = logo.turtles.turtleList[turtle].queue;
+            
+            if (nextBlk.name === "action") {
+                logo.repeatAction(turtle, repeatCount, repeatedNotes);
+            }
+            else {
+                logo.notationRepeat(turtle, repeatCount, repeatedNotes);
+            }
+            
 
             return [args[1], Math.floor(arg)];
         }
