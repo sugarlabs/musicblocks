@@ -329,6 +329,7 @@ function setupBooleanBlocks() {
     new NotBlock().setup();
     new AndBlock().setup();
     new OrBlock().setup();
+    new XorBlock().setup();
     new GreaterBlock().setup();
     new LessBlock().setup();
     new EqualBlock().setup();
