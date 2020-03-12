@@ -119,6 +119,45 @@ function setupBooleanBlocks() {
         }
     }
 
+    class XorBlock extends BooleanBlock {
+        constructor() {
+            super("xor");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The xor block is the logical xor operator,which retruns FALSE if both the arguments are same,otherwise returns TRUE."),
+                "documentation",
+                ""
+            ]);
+            this.parameter = true;
+            this.formBlock({
+                name: _("xor"),
+                args: 2,
+                argTypes: ["booleanin", "booleanin"]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
+                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                return ((a && !b)||(!a && b));
+            }
+        }
+    }
+
     class GreaterBlock extends BooleanBlock {
         constructor() {
             super("greater");
