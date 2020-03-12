@@ -85,7 +85,8 @@ processLilypondNotes = function(lilypond, logo, turtle) {
             .toLowerCase();
     }
 
-    var repeat = false;
+    var repeatAction = false;
+    var repeatNotes = false;
     var noteCounter = 0;
     var queueSlur = false;
     var articulation = false;
@@ -323,11 +324,14 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                     logo.notationNotes[turtle] += "}\n>> \\oneVoice\n";
                     multivoice = false;
                     break;
-                case "repeat":
-                    repeat = true;
+                case "repeatNotes":
+                    repeatNotes = true;
                     logo.notationNotes[turtle] += "\n  \\repeat  unfold  "
                             +logo.notationStaging[turtle][i+1]+"  { ";
                     break;
+                case "repeatAction":
+                    repeatAction = true;
+                    logo.notationNotes[turtle] += "\n  \\repeat  \bar  \".|:\" ";
                 default:
                     logo.notationNotes[turtle] += obj;
                     break;
@@ -656,9 +660,14 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                 tupletDuration = 0;
             }
 
-            if (repeat) {
-                repeat = false;
+            if (repeatNotes) {
+                repeatNotes= false;
                 logo.notationNotes[turtle] += " } ";
+            }
+
+            if (repeatAction) {
+                repeatAction= false;
+                logo.notationNotes[turtle] += "\\bar \":|.\"";
             }
 
 
