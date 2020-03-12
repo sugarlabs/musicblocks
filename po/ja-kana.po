@@ -3795,7 +3795,7 @@ msgstr "ヘルツスライダー"
 
 #: js/basicblocks.js:1330
 msgid "chromatic keyboard"
-msgstr ""
+msgstr "クロマティック キーボード"
 
 #: js/basicblocks.js:1343
 #: js/basicblocks.js:1355
@@ -3825,7 +3825,7 @@ msgstr "フレーズメーカー"
 #: js/basicblocks.js:1467
 #.TRANS: musical meter, e.g., 4:4
 msgid "current meter"
-msgstr ""
+msgstr "げんだいの びょうし"
 
 #: js/basicblocks.js:1478
 #.TRANS: number of beats per minute
@@ -4454,7 +4454,7 @@ msgstr "スネアドラム"
 #: js/basicblocks.js:3053
 #.TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
-msgstr ""
+msgstr "ドラムを おんぷに かえる"
 
 #: js/basicblocks.js:3066
 #.TRANS: set the current drum sound for playback

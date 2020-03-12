@@ -3704,7 +3704,7 @@ msgstr "ヘルツスライダー"
 
 #: js/basicblocks.js:1330
 msgid "chromatic keyboard"
-msgstr ""
+msgstr "クロマティック・キーボード"
 
 #: js/basicblocks.js:1343
 #: js/basicblocks.js:1355
@@ -3734,7 +3734,7 @@ msgstr "フレーズメーカー"
 #: js/basicblocks.js:1467
 #.TRANS: musical meter, e.g., 4:4
 msgid "current meter"
-msgstr ""
+msgstr "現代の拍子"
 
 #: js/basicblocks.js:1478
 #.TRANS: number of beats per minute
@@ -4152,12 +4152,12 @@ msgstr "音階の音数"
 #: js/basicblocks.js:2704
 #.TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
-msgstr ""
+msgstr "現代の音階"
 
 #: js/basicblocks.js:2715
 #.TRANS: the key is a group of pitches with which a music composition is created
 msgid "current key"
-msgstr ""
+msgstr "現代の調"
 
 #: js/basicblocks.js:2726
 #: js/basicblocks.js:2738
@@ -4363,7 +4363,7 @@ msgstr "スネアドラム"
 #: js/basicblocks.js:3053
 #.TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
-msgstr ""
+msgstr "音符をドラムに変える"
 
 #: js/basicblocks.js:3066
 #.TRANS: set the current drum sound for playback
