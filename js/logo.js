@@ -2460,7 +2460,7 @@ function Logo() {
             );
             this.timbre.notesToPlay.push([
                 noteObj[0] + noteObj[1],
-                1 / noteBeatVvalue
+                1 / noteBeatValue
             ]);
             this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
             this.lastNotePlayed[turtle] = [
