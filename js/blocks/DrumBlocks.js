@@ -123,7 +123,13 @@ function setupDrumBlocks() {
     function _createPlayDrumMacros() {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
-                super(name, _(name || displayName));
+		if (displayName === undefined) {
+		    console.log(_(name));
+                    super(name, _(name));
+		} else {
+		    console.log(_(displayName));
+                    super(name, _(displayName));
+		}
                 this.setPalette("drum");
                 this.formBlock({ args: 1 });
                 this.makeMacro((x, y) => [
