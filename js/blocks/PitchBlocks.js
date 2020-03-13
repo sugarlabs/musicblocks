@@ -1409,6 +1409,7 @@ function setupPitchBlocks() {
                 ""
             ]);
             this.formBlock({ outType: "textout" });
+            this.extraWidth = 50;
         }
     }
 
