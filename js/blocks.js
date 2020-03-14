@@ -6980,6 +6980,7 @@ function Blocks(activity) {
             that.palettes.removeActionPrototype(actionName);
         }
     };
+
     /*
      * Send a stack of blocks to the trash.
      * @param - myBlock
@@ -7092,4 +7093,4 @@ function Blocks(activity) {
     };
 
     return this;
-}
+};

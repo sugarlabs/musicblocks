@@ -2809,6 +2809,9 @@ function Activity() {
         }, 100 * actionBlockCounter); // 1000
 
         update = true;
+
+	// Close any open widgets.
+	closeWidgets();
     };
 
     // function _changePaletteVisibility() {
