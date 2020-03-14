@@ -124,10 +124,8 @@ function setupDrumBlocks() {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
 		if (displayName === undefined) {
-		    console.log(_(name));
                     super(name, _(name));
 		} else {
-		    console.log(_(displayName));
                     super(name, _(displayName));
 		}
                 this.setPalette("drum");
