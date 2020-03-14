@@ -237,7 +237,7 @@ function StatusMatrix() {
                     case "heading":
                         var value = this._logo.blocks.blockList[
                             this._logo.statusFields[i][0]
-                        ].value.toFixed(2);
+                        ].value.toFixed(0);
                         break;
                     case "mynotevalue":
                         var value = mixedNumber(
