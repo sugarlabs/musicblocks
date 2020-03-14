@@ -163,7 +163,7 @@ function StatusMatrix() {
                     break;
             }
 
-            cell.innerHTML = "<b>" + label + "</b>";
+            cell.innerHTML = "&nbsp;<b>" + label + "</b>";
             cell.style.height =
                 Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
@@ -185,7 +185,7 @@ function StatusMatrix() {
             var cell = row.insertCell();
             cell.style.fontSize =
                 Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
-            cell.innerHTML = "<b>" + _("note") + "</b>";
+            cell.innerHTML = "&nbsp;<b>" + _("note") + "</b>";
             cell.style.height =
                 Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
