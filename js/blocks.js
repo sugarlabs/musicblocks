@@ -6991,6 +6991,7 @@ function Blocks(activity) {
         // First, hide the palettes as they will need updating.
         for (var name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
+            closeWidgets();
         }
 
         this.refreshCanvas();
