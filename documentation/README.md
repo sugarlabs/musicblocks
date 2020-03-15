@@ -32,8 +32,6 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 5`. The first note is a `1/2` note; the second and third notes are
 `1/4` notes; the fourth note is a `1/1` note.
 
-https://github.com/sugarlabs/
-
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You
@@ -340,7 +338,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/widget.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
