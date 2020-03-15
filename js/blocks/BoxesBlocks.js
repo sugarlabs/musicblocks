@@ -104,8 +104,6 @@ function setupBoxesBlocks() {
                 argTypes: ["anyin"],
                 argLabels: [""]
             });
-
-	    if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
