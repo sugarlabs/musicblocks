@@ -69,7 +69,7 @@ written to the browser console.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status1.svg "given Music block")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status2.svg "status in tabular form")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/status_example_debug_guide.png "status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
