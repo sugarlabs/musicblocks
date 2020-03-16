@@ -66,8 +66,15 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
-            if (!thisTurtle) return -1;
+            var cblk1 = logo.blocks.blockList[blk].connections[1];
+            if (cblk1 == null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+		return -1;
+	    }
+
+	    var targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+	    var i = _getTargetTurtle(logo.turtles, targetTurtle);
+	    if (i < 0) return -1;
 
             var cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk2 == null) {
@@ -93,7 +100,6 @@ function setupEnsembleBlocks() {
                     while (logo.turtleHeaps[i].length < a) {
                         logo.turtleHeaps[i].push(0);
                     }
-
                     return logo.turtleHeaps[i][a - 1];
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
@@ -692,6 +698,7 @@ function setupEnsembleBlocks() {
         constructor() {
             super("foundturtle", _("found mouse"));
             this.setPalette("ensemble");
+	    this.extraWidth = 20;
             this.setHelpString([
                 _(
                     "The Found mouse block will return true if the specified mouse can be found."
