@@ -566,8 +566,8 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: "–",
                 args: 1,
-                argTypes: "anyin",
-                outType: "anyout"
+                argTypes: ["anyin"],
+                outType: "numberout"
             });
         }
 
