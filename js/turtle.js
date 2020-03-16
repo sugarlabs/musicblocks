@@ -801,28 +801,43 @@ function Turtle(name, turtles, drum) {
 
         if (resetSkin) {
             if (this.drum) {
-                if (this.name !== _('start drum')) {
-                    this.rename(_('start drum'));
+                if (this.name !== _("start drum")) {
+                    this.rename(_("start drum"));
                 }
             } else {
-                if (this.name !== _('start')) {
-                    this.rename(_('start'));
+                if (this.name !== _("start")) {
+                    this.rename(_("start"));
                 }
             }
 
             if (this.skinChanged) {
                 var artwork = TURTLESVG;
                 if (sugarizerCompatibility.isInsideSugarizer()) {
-                    artwork = artwork.replace(/fill_color/g, sugarizerCompatibility.xoColor.fill).replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
+                    artwork = artwork
+                        .replace(
+                            /fill_color/g,
+                            sugarizerCompatibility.xoColor.fill
+                        )
+                        .replace(
+                            /stroke_color/g,
+                            sugarizerCompatibility.xoColor.stroke
+                        );
                 } else {
-                    artwork = artwork.replace(/fill_color/g, FILLCOLORS[i]).replace(/stroke_color/g, STROKECOLORS[i]);
+                    artwork = artwork
+                        .replace(/fill_color/g, FILLCOLORS[i])
+                        .replace(/stroke_color/g, STROKECOLORS[i]);
                 }
 
-                this.doTurtleShell(55, 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(artwork))));
+                this.doTurtleShell(
+                    55,
+                    "data:image/svg+xml;base64," +
+                    window.btoa(unescape(encodeURIComponent(artwork)))
+                );
                 this.skinChanged = false;
             }
         }
 
+        this.container.rotation = this.orientation;
         this.bitmap.rotation = this.orientation;
         this.updateCache();
 
@@ -842,11 +857,11 @@ function Turtle(name, turtles, drum) {
         this.hollowState = false;
 
         this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this.canvasColor[0] === '#') {
-            this.canvasColor = hex2rgb(this.canvasColor.split('#')[1]);
+        if (this.canvasColor[0] === "#") {
+            this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
-        this.svgOutput = '';
+        this.svgOutput = "";
         this.svgPath = false;
         this.penstrokes.image = null;
         ctx.beginPath();
@@ -856,6 +871,31 @@ function Turtle(name, turtles, drum) {
             this.turtles.c1ctx.clearRect(0, 0, 3 * canvas.width, 3 * canvas.height);
         }
         this.penstrokes.image = canvas;
+        this.turtles.refreshCanvas();
+    };
+
+    /**
+     * Removes penstrokes and clears canvas
+     */
+    this.clearPenStrokes = function () {
+        this.penState = true;
+        this.fillState = false;
+        this.hollowState = false;
+
+        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        if (this.canvasColor[0] === "#") {
+            this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
+        }
+
+        ctx.beginPath();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.processColor();
+        ctx.lineWidth = this.stroke;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        this.penstrokes.image = canvas;
+        this.svgOutput = "";
+        this.svgPath = false;
         this.turtles.refreshCanvas();
     };
 
