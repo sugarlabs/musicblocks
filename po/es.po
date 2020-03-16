@@ -9,6 +9,9 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "subtract 1 from"
+msgstr "restar 1 de"
+
 msgid "search for blocks"
 msgstr "buscar bloques"
 
