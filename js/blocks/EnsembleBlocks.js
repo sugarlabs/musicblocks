@@ -823,6 +823,75 @@ function setupEnsembleBlocks() {
         }
     }
 
+    class NumberOfTurtlesBlock extends ValueBlock {
+        constructor() {
+            super("turtlecount", _("mouse count"));
+            this.setPalette("ensemble");
+            this.hidden = (this.lang === "ja");
+
+            this.setHelpString([
+                _("The Mouse-count block returns the number of mice."),
+                "documentation",
+                null,
+                "clickhelp"
+            ]);
+
+            this.formBlock({
+                outType: "textout"
+            });
+        }
+
+        arg(logo, turtle) {
+            return logo.turtles.turtleList.length;
+        }
+    }
+
+    class NthTurtleNameBlock extends LeftBlock {
+        constructor() {
+            super("nthturtle", _("nth mouse name"));
+            this.setPalette("ensemble");
+            this.hidden = (this.lang === "ja");
+
+            this.setHelpString([
+                _("The Nth-Mouse name block returns the name of the nth mice."),
+                "documentation",
+                null,
+                "clickhelp"
+            ]);
+
+            this.formBlock({
+                outType: "textout",
+                args: 1,
+                defaults: [1]
+            });
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            var cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+            var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            if (typeof a === "number") {
+                a -= 1;  // Internally, we count from 0
+                if (a >= 0 && a < logo.turtles.turtleList.length) {
+                    return logo.turtles.turtleList[a].name;
+                } else {
+                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                        logo.errorMsg(_("Cannot find mouse"));
+                    } else {
+                        logo.errorMsg(_("Cannot find turtle"));
+                    }
+                    return "";
+                }
+            } else {
+                logo.errorMsg(_("Index must be > 0."));
+                return "";
+            }
+        }
+    }
+
     class SetTurtleNameBlock extends FlowBlock {
         constructor() {
             super("setturtlename", _("set name"));
@@ -918,6 +987,8 @@ function setupEnsembleBlocks() {
     new TurtleNoteBlock().setup();
     new TurtleNote2Block().setup();
     new TurtleSyncBlock().setup();
+    new NthTurtleNameBlock().setup();
+    new NumberOfTurtlesBlock().setup();
     new FoundTurtleBlock().setup();
     new NewTurtleBlock().setup();
     new TurtleNameBlock().setup();
