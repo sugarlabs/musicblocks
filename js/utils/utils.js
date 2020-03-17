@@ -1274,4 +1274,14 @@ function closeWidgets() {
             break;
         }
     }
+}
+
+function closeBlkWidgets (name) {
+    var widgetTitle = document.getElementsByClassName("wftTitle");
+    for (var i = 0; i < widgetTitle.length; i++) {
+        if(widgetTitle[i].innerHTML === name) {
+           window.widgetWindows.hideWindows(widgetTitle[i].innerHTML);
+           break;
+         }
+      }
 };

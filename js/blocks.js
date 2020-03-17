@@ -6991,7 +6991,6 @@ function Blocks(activity) {
         // First, hide the palettes as they will need updating.
         for (var name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
-            closeWidgets();
         }
 
         this.refreshCanvas();
@@ -7051,6 +7050,9 @@ function Blocks(activity) {
             // console.debug('putting ' + this.blockList[blk].name + ' in the trash');
             this.blockList[blk].trash = true;
             this.blockList[blk].hide();
+            var title = this.blockList[blk].protoblock
+            .staticLabels[0];
+            closeBlkWidgets(_(title));
             this.refreshCanvas();
         }
 
