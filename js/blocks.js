@@ -7090,6 +7090,31 @@ function Blocks(activity) {
             this._cleanupStacks();
             this.refreshCanvas();
         }
+
+        console.debug(myBlock);
+        console.debug(thisBlock);
+        console.debug(myBlock.name);
+        console.debug(window.widgetWindows);
+        console.debug(window.WidgetWindow);
+
+        switch (myBlock.name) {
+            case "tempo":
+            case "rhythmruler2":
+            case "pitchslider":
+            case "pitchstaircase":
+            case "status":
+            case "matrix":
+            case "custom mode":
+            case "musickeyboard":
+            case "pitchdrummatrix":
+            case "meter":
+            case "temperament":
+            case "mode":
+            case "timbre":
+                //window.widgetWindows.hideWindows(myBlock.name);
+                window.widgetWindows.exitWindow(myBlock.name);
+            break;
+        }
     };
 
     return this;

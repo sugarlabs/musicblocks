@@ -215,7 +215,7 @@ function WidgetWindow(key, title) {
 
     this.destroy = function() {
         this._frame.remove();
-
+        console.debug(this._key);
         window.widgetWindows.openWindows[this._key] = undefined;
     };
 
@@ -343,8 +343,34 @@ window.widgetWindows.hideWindows = function(name) {
     });
 };
 
+window.widgetWindows.exitWindow = function(name) {
+    console.debug(name);
+    if(name == 'rhythmruler2') 
+        name = 'rhythm maker';
+    else if(name == 'pitchslider')
+        name = 'pitchslider';
+    else if(name == 'pitchstaircase')
+        name = 'pitch staircase';
+    else if(name == 'pitchdrummatrix')
+        name = 'pitch drum';
+    else if(name == 'matrix') 
+        name = 'phrase maker';
+    else if(name == 'musickeyboard')
+        name = 'music keyboard';
+
+    var win = window.widgetWindows.openWindows[name];
+        console.debug(win);
+        if(win !== undefined) {
+            win._frame.style.display = "none";
+            console.debug(win._key);
+            
+        }
+
+};
+
 window.widgetWindows.showWindows = function(name) {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });
+
 };
