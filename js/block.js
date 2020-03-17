@@ -7393,10 +7393,15 @@ function Block(protoblock, blocks, overrideName) {
         // Update the block value and block text.
         if (this.name === "number") {
             var cblk1 = this.connections[0];
-            var cblk2 = this.blocks.blockList[cblk1].connections[0];
+            if (cblk1 !== null) {
+                var cblk2 = this.blocks.blockList[cblk1].connections[0];
+            } else {
+                var cblk2 = null;
+            }
+
             if (this.value === "-") {
                 this.value = -1;
-            } else if ((newValue < 0) && (this.blocks.blockList[cblk1].name === 'newnote' || this.blocks.blockList[cblk2].name == 'newnote')) {
+            } else if ((cblk2 !== null) && (newValue < 0) && (this.blocks.blockList[cblk1].name === 'newnote' || this.blocks.blockList[cblk2].name == 'newnote')) {
                 this.label.value = 0;
                 this.value = 0;
             }
