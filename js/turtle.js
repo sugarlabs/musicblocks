@@ -92,7 +92,6 @@ function Turtle(name, turtles, drum) {
         var imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
 
         if (this.turtles.canvas1 == null) {
-
             this.turtles.gx = ctx.canvas.width;
             this.turtles.gy = ctx.canvas.height;
 
@@ -103,7 +102,6 @@ function Turtle(name, turtles, drum) {
             this.turtles.c1ctx.rect(0, 0, 3 * ctx.canvas.width, 3 * ctx.canvas.height);
             this.turtles.c1ctx.fillStyle = "#F9F9F9";
             this.turtles.c1ctx.fill();
-
         }
 
         this.turtles.c1ctx.putImageData(imgData, this.turtles.gx, this.turtles.gy);
