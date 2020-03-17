@@ -922,16 +922,22 @@ function Logo() {
         this.Rhythm_Rulers = rulers;
         this.Rhythm_Drums = drums;
         console.debug(this.inRhythmRuler);
-    }
+    };
 
     this.initialiseRhythmRuler = function() {
         if(this.loadRhythmData) {
-            this.rhythmRuler.Rulers = this.Rhythm_Rulers;
-            this.rhythmRuler.Drums = this.Rhythm_Drums;
-            this.inRhythmRuler = true;
-            this.loadRhythmData = false;
+            if(this.Rhythm_Rulers != undefined && this.Rhythm_Drums != undefined) {
+                this.rhythmRuler.Rulers = this.Rhythm_Rulers;
+                this.rhythmRuler.Drums = this.Rhythm_Drums;
+            }
+            else {
+                this.rhythmRuler.Rulers = [];
+                this.rhythmRuler.Drums = [];
+            }
         }
-    }
+        this.inRhythmRuler = true;
+        this.loadRhythmData = false;
+    };
 
     /**
      * Initialises the microphone.
