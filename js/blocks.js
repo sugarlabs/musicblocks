@@ -3137,7 +3137,7 @@ function Blocks(activity) {
      * @return {void}
      */
     this.makeBlock = function(name, arg) {
-        // console.debug('makeBlock ' + name + ' ' + arg);
+         //console.debug('makeBlock ' + name + ' ' + arg);
 
         var postProcess = function(args) {
             var thisBlock = args[0];
@@ -5816,7 +5816,7 @@ function Blocks(activity) {
                             blkInfo
                         );
                     };
-
+                    
                     this._makeNewBlockWithConnections(
                         name,
                         blockOffset,
@@ -5851,6 +5851,23 @@ function Blocks(activity) {
                         // Load the synth for this drum
                         this.logo.synth.loadSynth(0, DEFAULTDRUM);
                     }
+                    break;
+                case "rhythmruler2":
+                    var postProcess = function(args) {
+                        var thisBlock = args[0];
+                        var blkInfo = args[1];
+                    };
+                    console.debug(thisBlock);
+                    console.debug(blkInfo[1]["rulers"]);
+
+                    this.logo.passRhythmData(blkInfo[1]["rulers"],blkInfo[1]["drums"]);
+                    this._makeNewBlockWithConnections(
+                        name,
+                        blockOffset,
+                        blkData[4],
+                        postProcess,
+                        [thisBlock, blkInfo[1]]
+                        );
                     break;
                 case "action":
                 case "hat":
@@ -6980,7 +6997,6 @@ function Blocks(activity) {
             that.palettes.removeActionPrototype(actionName);
         }
     };
-
     /*
      * Send a stack of blocks to the trash.
      * @param - myBlock
@@ -7093,4 +7109,4 @@ function Blocks(activity) {
     };
 
     return this;
-};
+}

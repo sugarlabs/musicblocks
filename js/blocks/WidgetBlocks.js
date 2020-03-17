@@ -867,9 +867,7 @@ function setupWidgetBlocks() {
                 logo.rhythmRuler = new RhythmRuler();
             }
 
-            logo.rhythmRuler.Rulers = [];
-            logo.rhythmRuler.Drums = [];
-            logo.inRhythmRuler = true;
+            logo.initialiseRhythmRuler();
 
             var listenerName = "_rhythmruler_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);

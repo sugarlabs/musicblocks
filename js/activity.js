@@ -2809,9 +2809,6 @@ function Activity() {
         }, 100 * actionBlockCounter); // 1000
 
         update = true;
-
-	// Close any open widgets.
-	closeWidgets();
     };
 
     // function _changePaletteVisibility() {
@@ -3259,9 +3256,8 @@ function Activity() {
     };
 
     textMsg = function(msg) {
-        if (msgTimeoutID !== null) {
+        if (msgTimeoutID != null) {
             clearTimeout(msgTimeoutID);
-	    msgTimeoutID = null;
         }
 
         if (msgText == null) {
@@ -3271,15 +3267,13 @@ function Activity() {
 
         // Show and populate printText div
         var printText = document.getElementById("printText");
-
         printText.classList.add("show");
 
         var printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
         msgTimeoutID = setTimeout(function() {
-            printText.classList.remove("show");
-	    msgTimeoutID = null;
+            printText.style.visibility = "hidden";
         }, _MSGTIMEOUT_);
     };
 
@@ -3490,6 +3484,7 @@ function Activity() {
      * Next, save the playback queue, but don't save the
      * playback queue if we are saving to Lilypond.
      */
+
     function prepareExport() {
         var blockMap = [];
         var hasMatrixDataBlock = false;
@@ -3572,12 +3567,28 @@ function Activity() {
                             };
                         }
                         break;
+                    case "rhythmruler2":
+                        var ruler = logo.rhythmRuler;
+                        if(ruler  == null) {
+                            args = {
+                                collapsed: myBlock.collapsed,
+                                rulers: [],
+                                drums: []
+                            };
+                        }
+                        else {
+                            args = {
+                                collapsed: myBlock.collapsed,
+                                rulers: ruler.Rulers,
+                                drums: ruler.Drums
+                            };
+                        }
+                        break;
                     case "interval":
                     case "newnote":
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -5178,6 +5189,8 @@ function Activity() {
             );
             updatePluginObj(obj);
         }
+
+     
 
         // Load custom mode saved in local storage.
         var custommodeData = storage.custommode;

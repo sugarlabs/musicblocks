@@ -163,6 +163,11 @@ function Logo() {
     this.insideTemperament = false;
     this.inSetTimbre = {};
 
+    //rhythm ruler data 
+    this.Rhythm_Rulers = [];
+    this.Rhythm_Drums = [];
+    this.loadRhythmData = true;
+
     // pitch-rhythm matrix
     this.inMatrix = false;
     this.keySignature = {};
@@ -911,6 +916,23 @@ function Logo() {
         }
     };
 
+    this.passRhythmData = function(rulers, drums) {
+        console.debug(rulers);
+        console.debug(drums);
+        this.Rhythm_Rulers = rulers;
+        this.Rhythm_Drums = drums;
+        console.debug(this.inRhythmRuler);
+    }
+
+    this.initialiseRhythmRuler = function() {
+        if(this.loadRhythmData) {
+            this.rhythmRuler.Rulers = this.Rhythm_Rulers;
+            this.rhythmRuler.Drums = this.Rhythm_Drums;
+            this.inRhythmRuler = true;
+            this.loadRhythmData = false;
+        }
+    }
+
     /**
      * Initialises the microphone.
      * @privileged
@@ -946,6 +968,7 @@ function Logo() {
         }
     };
 
+    
     /**
      * Initialises a turtle.
      * @privileged
@@ -1863,7 +1886,7 @@ function Logo() {
             }
 
             // We need to keep track of the parent block to the child
-            // flow so we can unhighlight the parent block after the
+            // flow so we can unlightlight the parent block after the
             // child flow completes.
             if (that.parentFlowQueue[turtle] != undefined) {
                 that.parentFlowQueue[turtle].push(blk);
@@ -2460,7 +2483,7 @@ function Logo() {
             );
             this.timbre.notesToPlay.push([
                 noteObj[0] + noteObj[1],
-                1 / noteBeatValue
+                1 / noteBeatVvalue
             ]);
             this.previousNotePlayed[turtle] = this.lastNotePlayed[turtle];
             this.lastNotePlayed[turtle] = [
@@ -5156,6 +5179,34 @@ function Logo() {
         } else {
             this.turtles.turtleList[turtle].doShowText(arg0, arg1);
         }
+    };
+
+    /**
+     * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
+     * @privileged
+     * @param   {number|string} targetTurtle
+     * @returns {number|object}
+     */
+    this._getTargetTurtle = function(targetTurtle) {
+        // We'll compare the names as strings.
+        if (typeof targetTurtle === "number") {
+            targetTurtle = targetTurtle.toString();
+        }
+
+        for (var i = 0; i < this.turtles.turtleList.length; i++) {
+            if (!this.turtles.turtleList[i].trash) {
+                var turtleName = this.turtles.turtleList[i].name;
+                if (typeof turtleName === "number") {
+                    turtleName = turtleName.toString();
+                }
+
+                if (turtleName === targetTurtle) {
+                    return i;
+                }
+            }
+        }
+
+        return null;
     };
 
     /**

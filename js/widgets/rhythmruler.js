@@ -2314,6 +2314,7 @@ function RhythmRuler() {
 
     this.init = function(logo) {
         console.debug("init RhythmRuler");
+
         this._logo = logo;
 
         this._bpmFactor = (1000 * TONEBPM) / this._logo._masterBPM;
@@ -2661,6 +2662,7 @@ function RhythmRuler() {
         }
 
         // Restore dissect history.
+        
         for (var drum = 0; drum < this.Drums.length; drum++) {
             if (this.Drums[i] === null) {
                 continue;
@@ -2738,6 +2740,8 @@ function RhythmRuler() {
                 }
             }
         }
+     
+
 
         this._logo.textMsg(_("Click on the ruler to divide it."));
         // this._piemenuRuler(this._rulerSelected);
@@ -2773,8 +2777,9 @@ function RhythmRuler() {
                 dissectHistory.push([history, drum]);
             }
         }
-
+        
         that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+
     };
 
     this._piemenuRuler = function(selectedRuler) {
