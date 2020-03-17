@@ -86,15 +86,37 @@ function Turtle(name, turtles, drum) {
      * @param  dx - change in x coordinate
      * @param  dy - change in y coordinate
      */
-    this.doScrollXY = function(dx, dy) {
+    this.doScrollXY = function (dx, dy) {
         // FIXME: how big?
-        var imgData = ctx.getImageData(
-            0,
-            0,
-            ctx.canvas.width + dx,
-            ctx.canvas.height + dx
-        );
-        ctx.putImageData(imgData, dx, dy);
+
+        var imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        if (this.turtles.canvas1 == null) {
+            this.turtles.gx = ctx.canvas.width;
+            this.turtles.gy = ctx.canvas.height;
+
+            this.turtles.canvas1 = document.createElement("canvas");
+            this.turtles.canvas1.width = 3 * ctx.canvas.width;
+            this.turtles.canvas1.height = 3 * ctx.canvas.height;
+            this.turtles.c1ctx = this.turtles.canvas1.getContext("2d");
+            this.turtles.c1ctx.rect(0, 0, 3 * ctx.canvas.width, 3 * ctx.canvas.height);
+            this.turtles.c1ctx.fillStyle = "#F9F9F9";
+            this.turtles.c1ctx.fill();
+        }
+
+        this.turtles.c1ctx.putImageData(imgData, this.turtles.gx, this.turtles.gy);
+
+
+        this.turtles.gy -= dy;
+        this.turtles.gx -= dx;
+        this.turtles.gx = 2 * ctx.canvas.width > this.turtles.gx ? this.turtles.gx : 2 * ctx.canvas.width;
+        this.turtles.gx = 0 > this.turtles.gx ? 0 : this.turtles.gx;
+        this.turtles.gy = 2 * ctx.canvas.height > this.turtles.gy ? this.turtles.gy : 2 * ctx.canvas.height;
+        this.turtles.gy = 0 > this.turtles.gy ? 0 : this.turtles.gy;
+
+        var newImgData = this.turtles.c1ctx.getImageData(this.turtles.gx, this.turtles.gy, ctx.canvas.width, ctx.canvas.height)
+
+        ctx.putImageData(newImgData, 0, 0);
 
         // Draw under the turtle as the canvas moves.
         for (var t = 0; t < this.turtles.turtleList.length; t++) {
@@ -105,16 +127,10 @@ function Turtle(name, turtles, drum) {
             if (this.turtles.turtleList[t].penState) {
                 this.turtles.turtleList[t].processColor();
                 ctx.lineWidth = this.turtles.turtleList[t].stroke;
-                ctx.lineCap = "round";
+                ctx.lineCap = 'round';
                 ctx.beginPath();
-                ctx.moveTo(
-                    this.turtles.turtleList[t].container.x + dx,
-                    this.turtles.turtleList[t].container.y + dy
-                );
-                ctx.lineTo(
-                    this.turtles.turtleList[t].container.x,
-                    this.turtles.turtleList[t].container.y
-                );
+                ctx.moveTo(this.turtles.turtleList[t].container.x + dx, this.turtles.turtleList[t].container.y + dy);
+                ctx.lineTo(this.turtles.turtleList[t].container.x, this.turtles.turtleList[t].container.y);
                 ctx.stroke();
                 ctx.closePath();
             }
@@ -759,12 +775,14 @@ function Turtle(name, turtles, drum) {
      * @param  resetPosition - boolean value regarding whether the turtle's position (orientation, x, y etc) should be reset
      *
      */
-    this.doClear = function(resetPen, resetSkin, resetPosition) {
+    this.doClear = function (resetPen, resetSkin, resetPosition) {
         // Reset turtle.
         if (resetPosition) {
             this.x = 0;
             this.y = 0;
             this.orientation = 0.0;
+            this.turtles.gx = ctx.canvas.width;
+            this.turtles.gy = ctx.canvas.height;
         }
 
         if (resetPen) {
@@ -811,7 +829,7 @@ function Turtle(name, turtles, drum) {
                 this.doTurtleShell(
                     55,
                     "data:image/svg+xml;base64," +
-                        window.btoa(unescape(encodeURIComponent(artwork)))
+                    window.btoa(unescape(encodeURIComponent(artwork)))
                 );
                 this.skinChanged = false;
             }
@@ -846,6 +864,10 @@ function Turtle(name, turtles, drum) {
         this.penstrokes.image = null;
         ctx.beginPath();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (this.turtles.c1ctx != null) {
+            this.turtles.c1ctx.beginPath();
+            this.turtles.c1ctx.clearRect(0, 0, 3 * canvas.width, 3 * canvas.height);
+        }
         this.penstrokes.image = canvas;
         this.turtles.refreshCanvas();
     };
@@ -853,7 +875,7 @@ function Turtle(name, turtles, drum) {
     /**
      * Removes penstrokes and clears canvas
      */
-    this.clearPenStrokes = function() {
+    this.clearPenStrokes = function () {
         this.penState = true;
         this.fillState = false;
         this.hollowState = false;
@@ -1624,6 +1646,11 @@ function Turtles() {
     this._canvas = null;
     this._rotating = false;
     this._drum = false;
+
+    this.gx = null;
+    this.gy = null;
+    this.canvas1 = null;
+
 
     console.debug("Creating border container");
     this._borderContainer = new createjs.Container();
