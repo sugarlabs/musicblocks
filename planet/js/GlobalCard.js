@@ -28,9 +28,13 @@ function GlobalCard(Planet) {
         <div class="card-action"> \
             <div class="flexcontainer"> \
                 <a class="project-icon" id="global-project-more-details-{ID}">'+_('More Details')+'</a> \
-                <a class="project-icon"></a> \
-                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> \
-                    <div id="global-share-{ID}"> \
+                <a class="project-icon"></a>';
+                if(Planet.ProjectStorage.isLiked(this.id)) {
+                    this.renderData += '<a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Unlike project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>/';
+                } else {
+                    this.renderData += '<a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>/';
+                }                    
+                    this.renderData += '<div id="global-share-{ID}"> \
                                         <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Share project')+'" id="global-project-share-{ID}"><i class="material-icons">share</i></a> \
                                         <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> \
                                                 <div class="card-content shareurltext"> \
