@@ -110,8 +110,6 @@ function PitchDrumMatrix() {
         var that = this;
 
         widgetWindow.onclose = function() {
-            pdmDiv.style.visibility = "hidden";
-            pdmButtonsDiv.style.visibility = "hidden";
             pdmTableDiv.style.visibility = "hidden";
             that._logo.hideMsgs();
             this.destroy();
