@@ -12,6 +12,8 @@
 
 function HelpWidget() {
     const ICONSIZE = 32;
+    var beginnerBlocks = [];
+    var index = 1;
 
     this.init = function(blocks) {
         this.isOpen = true;
@@ -259,6 +261,18 @@ function HelpWidget() {
                 '" target="_blank">' +
                 HELPCONTENT[page][4] +
                 "</a></p>";
+        }
+
+        if (
+            [
+                _("Congratulations.")
+            ].indexOf(HELPCONTENT[page][0]) !== -1
+        ) {
+            var cell = docById("right-arrow");
+            var that = this;
+            cell.onclick = function() {
+                alert("clicked")
+            }
         }
 
         helpBody.style.color = "#505050";
