@@ -14,8 +14,8 @@ Chrome        | Supported
 Safari        | Supported
 Firefox       | Supported
 Opera         | Supported
-IE            | Not Supported
-Edge	      | Coming soon
+IE            | Not supported
+Edge	      | Recent versions supported
 
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -331,6 +331,29 @@ The *Print* block, found on the *Extras* palette, is used to print
 messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
 karaoke.
+
+Flow Palette
+------------
+
+The Flow palette is described in more detail in the Turtle Blocks
+documentation. Here we review a few ways to approach different actions
+on different beats.
+
+The *Switch* block will take the action defined in the *Case* that
+matches the argument passed to the *Switch* block. In the figure
+below, it will take a different action based on the beat value: 1, 2,
+3, 4.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-on-beat.png "Switch on Beat")
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-actions.png "Switch actions")
+
+Another way to do the same thing is with the *Do* block found on the
+Action palette. In the figure below, we add the beat count to "action"
+to create a series of strings: "action1", "action2", ...,
+"action4". We then "do" that action.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/do-actions.png "Do actions")
 
 Widget Palette
 --------------
