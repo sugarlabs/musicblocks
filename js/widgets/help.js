@@ -13,6 +13,7 @@
 function HelpWidget() {
     const ICONSIZE = 32;
     var beginnerBlocks = [];
+    var advancedBlocks = [];
     var index = 1;
 
     this.init = function(blocks) {
@@ -271,7 +272,7 @@ function HelpWidget() {
             var cell = docById("right-arrow");
             var that = this;
             cell.onclick = function() {
-                alert("clicked")
+                this._prepareBlockList(blocks);
             }
         }
 
@@ -280,6 +281,22 @@ function HelpWidget() {
 
         this.widgetWindow.takeFocus();
     };
+
+    this._prepareBlockList = function(blocks) {
+        for (var key in blocks.protoBlockDict){
+            if(blocks.protoBlockDict[key].beginnerModeBlock === true && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
+                beginnerBlocks.push(key);
+            }
+        }
+
+        for(var key in blocks.protoBlockDict) {
+            if(blocks.protoBlockDict[key].beginnerModeBlock === false && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
+                advancedBlocks.push(key);
+        }
+    }
+        console.log(beginnerBlocks);
+        console.log(advancedBlocks);
+    }
 
     this.showPageByName = function(pageName) {
         for (var i = 0; i < HELPCONTENT.length; i++) {
