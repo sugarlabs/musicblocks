@@ -14,7 +14,7 @@ function HelpWidget() {
     const ICONSIZE = 32;
     var beginnerBlocks = [];
     var advancedBlocks = [];
-    var index = 1;
+    var index = 0;
 
     this.init = function(blocks) {
         this.isOpen = true;
@@ -118,8 +118,7 @@ function HelpWidget() {
                 // the help output.
                 var message =
                     blocks.blockList[blocks.activeBlock].protoblock.helpString;
-                // console.log(message);
-                // console.log(BLOCKHELP[name]);
+                
                 if (message) {
                     var helpBody = docById("helpBodyDiv");
                     helpBody.style.height = "";
@@ -282,6 +281,8 @@ function HelpWidget() {
         this.widgetWindow.takeFocus();
     };
 
+    // Prepare a list of beginner and advanced blocks and cycle through their help
+
     this._prepareBlockList = function(blocks) {
         for (var key in blocks.protoBlockDict){
             if(blocks.protoBlockDict[key].beginnerModeBlock === true && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
@@ -306,15 +307,13 @@ function HelpWidget() {
     this._blockHelp = function(block, blocks) {
         var iconSize = ICONSIZE;
     
-        console.log("called")
-        // this.widgetWindow.onClose();
         var widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         this._helpDiv = document.createElement("div");
     
-        this._helpDiv.style.width = iconSize * 2 + 495 + "px";
-        this._helpDiv.style.height = iconSize * 2 + 495 + "px";
+        this._helpDiv.style.width = "500px";
+        this._helpDiv.style.height = "500px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         this._helpDiv.innerHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
@@ -323,8 +322,18 @@ function HelpWidget() {
         var cell = docById("right-arrow");
         var that = this;
         cell.onclick = function() {
-            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks)
             index += 1;
+            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks)
+        }
+
+        var cell = docById("left-arrow");
+        
+        cell.onclick = function() {
+            if(index !== 0){
+                index -= 1;
+            }
+            
+            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks);
         }
         if (block.name !== null) {
                 var label =
@@ -340,10 +349,10 @@ function HelpWidget() {
     
         if (block.name !== null) {
             var name = block.name;
-            console.log("called 2");
+
             var message =
                 block.helpString;
-            console.log(message);
+
             var helpBody = docById("helpBodyDiv");
                 helpBody.style.height = "";
             if (message) {
@@ -394,7 +403,7 @@ function HelpWidget() {
                     "/>";
     
                 helpBody.innerHTML = body;
-                console.log(body);
+
                 var loadButton = docById("loadButton");
                 if (loadButton !== null) {
                     loadButton.onclick = function() {
