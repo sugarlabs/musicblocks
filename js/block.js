@@ -7606,6 +7606,10 @@ function Block(protoblock, blocks, overrideName) {
      * Sets up context menu for each block
      */
     this.piemenuBlockContext = function() {
+        if (this.blocks.activeBlock === null) {
+            return;
+        }
+
         var pasteDx = 0;
         var pasteDy = 0;
 
@@ -7652,7 +7656,7 @@ function Block(protoblock, blocks, overrideName) {
         //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
         // }
         var message =
-            blocks.blockList[blocks.activeBlock].protoblock.helpString;
+            this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
         if (message) {
             labels.push("imgsrc:header-icons/help-button.svg");
             var helpButton = labels.length - 1;
