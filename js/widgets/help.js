@@ -14,6 +14,7 @@ function HelpWidget() {
     const ICONSIZE = 32;
     var beginnerBlocks = [];
     var advancedBlocks = [];
+    var appendedBlockList = [];
     var index = 0;
 
     this.init = function(blocks) {
@@ -295,9 +296,13 @@ function HelpWidget() {
                 advancedBlocks.push(key);
         }
     }
-        console.log(beginnerBlocks);
-        console.log(advancedBlocks);
-        this._blockHelp(blocks.protoBlockDict[beginnerBlocks[0]], blocks)
+
+        // Array containing list of all blocks (Beginner blocks first)
+        
+        appendedBlockList.push(...beginnerBlocks);
+        appendedBlockList.push(...advancedBlocks);
+
+        this._blockHelp(blocks.protoBlockDict[appendedBlockList[0]], blocks)
 
     }
 
@@ -319,11 +324,14 @@ function HelpWidget() {
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
     
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        this.widgetWindow.sendToCenter();
         var cell = docById("right-arrow");
         var that = this;
         cell.onclick = function() {
-            index += 1;
-            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks)
+            if(index !== appendedBlockList.length - 1) {
+                index += 1;
+        }
+            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks)
         }
 
         var cell = docById("left-arrow");
@@ -333,7 +341,7 @@ function HelpWidget() {
                 index -= 1;
             }
             
-            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks);
+            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
         }
         if (block.name !== null) {
                 var label =
