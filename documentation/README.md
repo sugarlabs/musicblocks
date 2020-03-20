@@ -336,24 +336,25 @@ Flow Palette
 ------------
 
 The Flow palette is described in more detail in the Turtle Blocks
-documentation. Here we review a few ways to approach different actions
-on different beats.
+documentation. Here we review a few ways to approach taking different
+actions on different beats.
 
 The *Switch* block will take the action defined in the *Case* that
 matches the argument passed to the *Switch* block. In the figure
-below, it will take a different action based on the beat value: 1, 2,
-3, 4.
+below, it will take a different action based on the beat value: "on
+case 1 run action1", "on case 2, run action2", ..., "on case 4 run
+action4". You can also define a default action.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-on-beat.png "Switch on Beat")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-on-beat.svg "Switch on Beat")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-actions.png "Switch actions")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-actions.svg "Switch actions")
 
 Another way to do the same thing is with the *Do* block found on the
 Action palette. In the figure below, we add the beat count to "action"
 to create a series of strings: "action1", "action2", ...,
 "action4". We then "do" that action.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/do-actions.png "Do actions")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/do-actions.svg "Do actions")
 
 Widget Palette
 --------------
