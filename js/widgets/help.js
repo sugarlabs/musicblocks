@@ -272,7 +272,7 @@ function HelpWidget() {
             var cell = docById("right-arrow");
             var that = this;
             cell.onclick = function() {
-                this._prepareBlockList(blocks);
+                that._prepareBlockList(blocks);
             }
         }
 
@@ -296,7 +296,161 @@ function HelpWidget() {
     }
         console.log(beginnerBlocks);
         console.log(advancedBlocks);
+        this._blockHelp(blocks.protoBlockDict[beginnerBlocks[0]], blocks)
+
     }
+
+    // Function to display help related to a single block
+    // called recursively to cycle through help string of all blocks (Beginner Blocks First)
+
+    this._blockHelp = function(block, blocks) {
+        var iconSize = ICONSIZE;
+    
+        console.log("called")
+        // this.widgetWindow.onClose();
+        var widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        this._helpDiv = document.createElement("div");
+    
+        this._helpDiv.style.width = iconSize * 2 + 495 + "px";
+        this._helpDiv.style.height = iconSize * 2 + 495 + "px";
+        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        this._helpDiv.innerHTML =
+            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+    
+        this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        var cell = docById("right-arrow");
+        var that = this;
+        cell.onclick = function() {
+            that._blockHelp(blocks.protoBlockDict[beginnerBlocks[index]], blocks)
+            index += 1;
+        }
+        if (block.name !== null) {
+                var label =
+                    block
+                        .staticLabels[0];
+                this.widgetWindow.updateTitle(_(label));
+            }
+    
+        // display help menu
+        // docById("helpBodyDiv").style.height = "325px";
+        // docById("helpBodyDiv").style.width = "400px";
+        // this._showPage(0);
+    
+        if (block.name !== null) {
+            var name = block.name;
+            console.log("called 2");
+            var message =
+                block.helpString;
+            console.log(message);
+            var helpBody = docById("helpBodyDiv");
+                helpBody.style.height = "";
+            if (message) {
+    
+                var body = "";
+                if (message.length > 1) {
+                    var path = message[1];
+                    // We need to add a case here whenever we add
+                    // help artwort support for a new language.
+                    // e.g., documentation-es
+                    var language = localStorage.languagePreference;
+                    if (language === undefined) {
+                        language = navigator.language;
+                    }
+    
+                    switch (language) {
+                        case "ja":
+                            if (localStorage.kanaPreference == "kana") {
+                                path = path + "-kana";
+                            } else {
+                                path = path + "-ja";
+                            }
+                            break;
+                        case "es":
+                            path = path + "-es";
+                            break;
+                        case "pt":
+                            path = path + "-pt";
+                            break;
+                        default:
+                            break;
+                    }
+    
+                    body =
+                        body +
+                        '<p><img src="' +
+                        path +
+                        "/" +
+                        name +
+                        '_block.svg"></p>';
+                }
+    
+                body = body + "<p>" + message[0] + "</p>";
+    
+                body +=
+                    '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' +
+                    _("Load blocks") +
+                    "/>";
+    
+                helpBody.innerHTML = body;
+                console.log(body);
+                var loadButton = docById("loadButton");
+                if (loadButton !== null) {
+                    loadButton.onclick = function() {
+                        if (message.length < 4) {
+                            // If there is nothing specified, just
+                            // load the block.
+                            console.debug("CLICK: " + name);
+                            var obj = blocks.palettes.getProtoNameAndPalette(
+                                name
+                            );
+                            var protoblk = obj[0];
+                            var paletteName = obj[1];
+                            var protoName = obj[2];
+    
+                            var protoResult = blocks.protoBlockDict.hasOwnProperty(
+                                protoName
+                            );
+                            if (protoResult) {
+                                blocks.palettes.dict[
+                                    paletteName
+                                ].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    function(newBlock) {
+                                        blocks.moveBlock(
+                                            newBlock,
+                                            100,
+                                            100
+                                        );
+                                    }
+                                );
+                            }
+                        } else if (typeof message[3] === "string") {
+                            // If it is a string, load the macro
+                            // assocuated with this block
+                            var blocksToLoad = getMacroExpansion(
+                                message[3],
+                                100,
+                                100
+                            );
+                            console.debug("CLICK: " + blocksToLoad);
+                            blocks.loadNewBlocks(blocksToLoad);
+                        } else {
+                            // Load the blocks.
+                            var blocksToLoad = message[3];
+                            console.debug("CLICK: " + blocksToLoad);
+                            blocks.loadNewBlocks(blocksToLoad);
+                        }
+                    };
+                }
+            }
+        }
+    
+    this.widgetWindow.takeFocus();
+    }
+    
 
     this.showPageByName = function(pageName) {
         for (var i = 0; i < HELPCONTENT.length; i++) {
