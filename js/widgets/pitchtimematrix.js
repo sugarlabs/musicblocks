@@ -2013,9 +2013,13 @@ function PitchTimeMatrix() {
                     that._noteStored[index]
                 );
                 cell = that._rows[index][i];
-                if (cell.style.backgroundColor === "black") {
-                    that._notesToPlay[i][0][noteIndex] = noteStored;
-                }
+		if (cell === undefined) {
+		    // console.log('cell undefined: ' + index + ' ' + i);
+		} else {
+                    if (cell.style.backgroundColor === "black") {
+			that._notesToPlay[i][0][noteIndex] = noteStored;
+                    }
+		}
             }
             that._noteStored[index] = noteStored;
         };
@@ -2048,6 +2052,7 @@ function PitchTimeMatrix() {
                     that._logo.errorMsg,
                     that._logo.synth.inTemperament
                 );
+		obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(
