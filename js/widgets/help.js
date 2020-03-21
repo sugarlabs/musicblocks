@@ -358,6 +358,17 @@ function HelpWidget() {
     
         if (block.name !== null) {
             var name = block.name;
+            var advIcon = '<br><br><a\
+            class="tooltipped"\
+            data-toggle="tooltip"\
+            title="This block is only available in advance mode"\
+            data-position="bottom"\
+            ><i\
+                id="advIconText"\
+                class="material-icons md-48"\
+                >star</i\
+            ></a\
+        >';
 
             var message =
                 block.helpString;
@@ -413,6 +424,9 @@ function HelpWidget() {
                     "/>";
     
                 helpBody.innerHTML = body;
+                if (!block.beginnerModeBlock) {
+                    helpBody.innerHTML += advIcon;
+                }
 
                 var loadButton = docById("loadButton");
                 if (loadButton !== null) {
