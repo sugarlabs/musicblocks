@@ -1010,6 +1010,7 @@ The Found mouse block will return true if the specified mouse can be found.
 The Set mouse block sends a stack of blocks to be run by the specified mouse.
 
 ![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/setturtle_block.svg "set mouse")
+
 ## <a name="WIDGETS"></a>Widgets
 
 [Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
