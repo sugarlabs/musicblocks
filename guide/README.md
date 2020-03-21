@@ -31,7 +31,7 @@ also available.
       5. [Dotted Notes](#DOTTED)
       6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       7. [Repeating Notes](#REPETITION)
-      8. [Swinging Notes and Tied Notes](#SWINGING)
+      8. [Swinging Notes, Tied Notes & Duplicate Notes](#SWINGING)
       9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
       10. [Intervals](#INTERVALS)
       11. [Inversion](#INVERSION)
@@ -42,6 +42,7 @@ also available.
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
+   7. [Ensemble](#ENSEMBLE)
 4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
@@ -528,6 +529,11 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
+The Duplicate block will run each block multiple times.Here in the example,the notes will be duplicated 2 times.
+The output of the example is: sol, sol, mi, mi.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/duplicatenotes_block.svg "duplicate notes")
+
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.9 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
@@ -610,6 +616,10 @@ double diminishment.
 
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
+
+The Set key block is used to set the key and mode, eg C Major.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/setkey2_block.svg "set key")
 
 #### <a name= "INVERSION"></a>3.2.11 Inversion
 
@@ -854,6 +864,15 @@ before the beat.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/beat1.svg "meter and pickup")
 
+The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
+In the figure, it is used to take an action on the first beat of each measure.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/beatvalue_block.svg "beat count")
+
+The Measure count block returns the current measure.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/measurevalue_block.svg "measure count")
+
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
 notes on Beat `1` and Beat `3` are increased, while the volume of off
@@ -948,6 +967,49 @@ the link below, takes musical paint in a novel direction.
 
 [RUN LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
+## <a name="ENSEMBLE"></a>3.7 Ensemble
+
+This secction will guide about different Mouse blocks, which returns the data like notes played, current pen color, pitch number etc.
+
+The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheap_block.svg "mouse heap index")
+
+The Mouse sync block aligns the beat count between mice.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlesync_block.svg "mouse sync")
+
+The Mouse elapse notes block returns the number of notes played by the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
+
+The Mouse pitch block returns the current pitch number being played by the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlepitch_block.svg "mouse pitch number")
+
+The X mouse block returns the X position of the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/xturtle_block.svg "mouse x")
+
+The Y mouse block returns the Y position of the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/yturtle_block.svg 'mouse y")
+
+The Mouse heading block returns the heading of the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheading_block.svg "mouse heading")
+
+The Mouse color block returns the pen color of the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlecolor_block.svg "mouse color")
+
+The Found mouse block will return true if the specified mouse can be found.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/foundturtle_block.svg "found mouse")
+
+The Set mouse block sends a stack of blocks to be run by the specified mouse.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/setturtle_block.svg "set mouse")
 ## <a name="WIDGETS"></a>Widgets
 
 [Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
@@ -1330,6 +1392,10 @@ The *Play* button will play the beat, using a snare drum for strong beats and a 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/meter3.svg "on strong beat do blocks")
 
 The *Save* button will export *On strong beat do* blocks for each strong beat.
+
+The No clock block decouples the notes from the master clock.
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
