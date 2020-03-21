@@ -73,7 +73,7 @@ $ npm run winserve
 NOTE: Make sure you can run either <code>python</code> or
 <code>py</code> from your terminal.
 
-(4) You should see a message: <code>Serving HTTP on 0.0.0.0 port 3000
+(4) You should see a message: <code>Serving HTTP on 127.0.0.1 port 3000
 ...</code> since the HTTPServer is set to start listening on Port
 3000.
 
