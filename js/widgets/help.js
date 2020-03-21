@@ -370,6 +370,18 @@ function HelpWidget() {
             ></a\
         >';
 
+            var findIcon = '<br><br><a\
+            class="tooltipped"\
+            data-toggle="tooltip"\
+            title="Show Palette containing the block"\
+            data-position="bottom"\
+            ><i\
+                id="findIcon"\
+                class="material-icons md-48"\
+                >search</i\
+            ></a\
+        >';
+
             var message =
                 block.helpString;
 
@@ -424,8 +436,16 @@ function HelpWidget() {
                     "/>";
     
                 helpBody.innerHTML = body;
+                helpBody.innerHTML += findIcon;
+
                 if (!block.beginnerModeBlock) {
                     helpBody.innerHTML += advIcon;
+                }
+
+                var findIconMethod = docById("findIcon");
+
+                findIconMethod.onclick = function() {
+                    block.palette.palettes.showPalette(block.palette.name);
                 }
 
                 var loadButton = docById("loadButton");
