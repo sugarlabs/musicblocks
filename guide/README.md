@@ -31,7 +31,7 @@ also available.
       5. [Dotted Notes](#DOTTED)
       6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       7. [Repeating Notes](#REPETITION)
-      8. [Swinging Notes, Tied Notes and Duplicate Notes](#SWINGING)
+      8. [Swinging Notes and Tied Notes](#SWINGING)
       9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
       10. [Intervals](#INTERVALS)
       11. [Inversion](#INVERSION)
@@ -964,15 +964,15 @@ This secction will guide about different Mouse blocks, which returns the data li
 
 The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheap_block.svg "mouse heap index")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/blob/master/documentation/turtleheap_block.svg "mouse heap index")
 
 The Mouse sync block aligns the beat count between mice.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlesync_block.svg "mouse sync")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/blob/master/documentation/turtlesync_block.svg "mouse sync")
 
 The Mouse elapse notes block returns the number of notes played by the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/blob/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
 
 The Mouse pitch block returns the current pitch number being played by the specified mouse.
 
