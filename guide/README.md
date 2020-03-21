@@ -529,11 +529,6 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
-The Duplicate block will run each block multiple times. Here in the example, the notes will be duplicated 2 times. 
-The output of the example is: sol, sol, mi, mi.
-
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/duplicatenotes_block.svg "duplicate notes")
-
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.9 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
@@ -616,10 +611,6 @@ double diminishment.
 
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
-
-The Set key block is used to set the key and mode, eg C Major.
-
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/setkey2_block.svg "set key")
 
 #### <a name= "INVERSION"></a>3.2.11 Inversion
 
@@ -1394,7 +1385,11 @@ The *Play* button will play the beat, using a snare drum for strong beats and a 
 
 The *Save* button will export *On strong beat do* blocks for each strong beat.
 
-The No clock block decouples the notes from the master clock.
+Music Blocks has an internal "conductor" maintaining the beat. When the Run button is clicked, the program begins and an internal master (or "conductor") clock starts up. All of the music tries to stay synced to that clock. 
+
+For example, if you have multiple voices (mice), they all share the same conductor in order to keep on the same beat. If a voice (mouse) is falling behind, Music Blocks tries to catch up on the next note by truncating it. If it is an 1/8 note behind and the next note is a 1/2 note, then only an 3/8 note would be played, so as to catch up. That is a somewhat extreme example—usually the timing errors are only very very small differences. But in some situations, the timing errors can be very large. This is when the No-clock block is used. A typical problem is when the music is not played continuously. 
+
+Imagine an interactive game where a hero is battling a monster. Our hero plays theme music whenever the monster is defeated. But that might occur at any time, hence it is not going to be in sync with the conductor. The offset could be tens of seconds. This would mean that all of the notes in the theme music might be consumed by trying to catch up with the conductor. The No-clock block essentially says, do your own thing and don't worry about the conductor.
 
 ![alt tag](https://github.com/sugarlabs/musicblocks/blob/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg "no clock")
 
