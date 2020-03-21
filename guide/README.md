@@ -31,7 +31,7 @@ also available.
       5. [Dotted Notes](#DOTTED)
       6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       7. [Repeating Notes](#REPETITION)
-      8. [Swinging Notes, Tied Notes & Duplicate Notes](#SWINGING)
+      8. [Swinging Notes, Tied Notes and Duplicate Notes](#SWINGING)
       9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
       10. [Intervals](#INTERVALS)
       11. [Inversion](#INVERSION)
@@ -529,7 +529,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "using notes with ties")
 
-The Duplicate block will run each block multiple times.Here in the example,the notes will be duplicated 2 times.
+The Duplicate block will run each block multiple times. Here in the example, the notes will be duplicated 2 times. 
 The output of the example is: sol, sol, mi, mi.
 
 ![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/duplicatenotes_block.svg "duplicate notes")
