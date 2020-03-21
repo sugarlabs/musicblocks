@@ -993,7 +993,7 @@ The X mouse block returns the X position of the specified mouse.
 
 The Y mouse block returns the Y position of the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/yturtle_block.svg 'mouse y")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/yturtle_block.svg  "mouse y")
 
 The Mouse heading block returns the heading of the specified mouse.
 
