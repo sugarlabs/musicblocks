@@ -33,6 +33,7 @@ function ModeWidget() {
         var widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         // For the button callbacks
         var that = this;

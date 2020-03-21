@@ -2345,6 +2345,7 @@ function RhythmRuler() {
         var widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         // For the button callbacks
         var that = this;

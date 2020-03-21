@@ -761,6 +761,7 @@ function TimbreWidget() {
         var widgetWindow = window.widgetWindows.windowFor(this, "timbre");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;

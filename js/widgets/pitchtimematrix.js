@@ -208,6 +208,7 @@ function PitchTimeMatrix() {
         var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 

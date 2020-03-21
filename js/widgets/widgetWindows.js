@@ -223,6 +223,10 @@ function WidgetWindow(key, title) {
         return this;
     };
 
+    this.show = function() {
+        this._frame.style.display = "block";
+    };
+
     this.setPosition = function(x, y) {
         this._frame.style.left = x + "px";
         this._frame.style.top = Math.max(y, 64) + "px";
@@ -337,13 +341,19 @@ window.widgetWindows.isOpen = function(name) {
     return window.widgetWindows.openWindows[name] ? true : "";
 };
 
-window.widgetWindows.hideWindows = function(name) {
+window.widgetWindows.hideAllWindows = function() {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "none";
     });
 };
 
-window.widgetWindows.showWindows = function(name) {
+window.widgetWindows.hideWindow = function(name) {
+    let win = window.widgetWindows.openWindows[name];
+    if (!win) return;
+    win._frame.style.display = "none";
+};
+
+window.widgetWindows.showWindows = function() {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });

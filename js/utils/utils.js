@@ -1254,34 +1254,15 @@ function delayExecution(duration) {
 }
 
 function closeWidgets() {
-    var widgetTitle = document.getElementsByClassName("wftTitle");
-    for (var i = 0; i < widgetTitle.length; i++) {
-        switch (widgetTitle[i].innerHTML) {
-        case "tempo":
-        case "rhythm maker":
-        case "pitch slider":
-        case "pitch staircase":
-        case "status":
-        case "phrase maker":
-        case "custom mode":
-        case "music keyboard":
-        case "pitch drum":
-        case "meter":
-        case "temperament":
-        case "mode":
-        case "timbre":
-	    window.widgetWindows.hideWindows(widgetTitle[i].innerHTML);
-            break;
-        }
-    }
-}
+    window.widgetWindows.hideAllWindows();
+};
 
 function closeBlkWidgets (name) {
     var widgetTitle = document.getElementsByClassName("wftTitle");
     for (var i = 0; i < widgetTitle.length; i++) {
-        if(widgetTitle[i].innerHTML === name) {
-           window.widgetWindows.hideWindows(widgetTitle[i].innerHTML);
+        if (widgetTitle[i].innerHTML === name) {
+           window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
            break;
-         }
-      }
+        }
+    }
 };

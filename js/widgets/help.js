@@ -23,6 +23,7 @@ function HelpWidget() {
         var widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         widgetWindow.onClose = function() {
             that.isOpen = false;

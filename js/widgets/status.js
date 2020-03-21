@@ -39,6 +39,7 @@ function StatusMatrix() {
         );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         // For the button callbacks
         var that = this;

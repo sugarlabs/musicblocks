@@ -382,6 +382,7 @@ function MusicKeyboard() {
         );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         this._keysLayout();
 

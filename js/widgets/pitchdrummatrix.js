@@ -105,6 +105,7 @@ function PitchDrumMatrix() {
         var widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         // For the button callbacks
         var that = this;

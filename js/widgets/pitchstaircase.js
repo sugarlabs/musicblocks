@@ -544,41 +544,9 @@ function PitchStaircase() {
         );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-
-        /*
-        // Position the widget and make it visible.
-        var pscDiv = docById('pscDiv');
-        pscDiv.style.visibility = 'visible';
-        pscDiv.setAttribute('draggable', 'true');
-        pscDiv.style.left = '200px';
-        pscDiv.style.top = '150px';
-
-        // The widget buttons
-        var widgetButtonsDiv = docById('pscButtonsDiv');
-        widgetButtonsDiv.style.display = 'inline';
-        widgetButtonsDiv.style.visibility = 'visible';
-        widgetButtonsDiv.style.width = BUTTONDIVWIDTH;
-        widgetButtonsDiv.innerHTML = '<table cellpadding="0px" id="pscButtonTable"></table>';
-
-        var canvas = docById('myCanvas');
-
-        var buttonTable = docById('pscButtonTable');
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
-        */
+	widgetWindow.show();
 
         var that = this;
-
-        /*
-        var cell = this._addButton(row, 'close-button.svg', ICONSIZE, _('Close'));
-        cell.onclick=function() {
-            docById('pscDiv').style.visibility = 'hidden';
-            docById('pscButtonsDiv').style.visibility = 'hidden';
-            docById('pscTableDiv').style.visibility = 'hidden';
-            docById('musicratio1').classList.remove('hasKeyboard');
-            docById('musicratio2').classList.remove('hasKeyboard');
-            that._logo.hideMsgs();
-        };*/
 
         widgetWindow.addButton(
             "play-chord.svg",
