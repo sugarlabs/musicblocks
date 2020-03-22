@@ -858,11 +858,11 @@ before the beat.
 The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
 In the figure, it is used to take an action on the first beat of each measure.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/beatvalue_block.svg "beat count")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/beatvalue_block.svg "beat count")
 
 The Measure count block returns the current measure.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/measurevalue_block.svg "measure count")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/measurevalue_block.svg "measure count")
 
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
@@ -964,43 +964,43 @@ This secction will guide about different Mouse blocks, which returns the data li
 
 The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheap_block.svg "mouse heap index")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg "mouse heap index")
 
 The Mouse sync block aligns the beat count between mice.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlesync_block.svg "mouse sync")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlesync_block.svg "mouse sync")
 
 The Mouse elapse notes block returns the number of notes played by the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
 
 The Mouse pitch block returns the current pitch number being played by the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlepitch_block.svg "mouse pitch number")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlepitch_block.svg "mouse pitch number")
 
 The X mouse block returns the X position of the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/xturtle_block.svg "mouse x")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/xturtle_block.svg "mouse x")
 
 The Y mouse block returns the Y position of the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/yturtle_block.svg  "mouse y")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/yturtle_block.svg  "mouse y")
 
 The Mouse heading block returns the heading of the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheading_block.svg "mouse heading")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheading_block.svg "mouse heading")
 
 The Mouse color block returns the pen color of the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtlecolor_block.svg "mouse color")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlecolor_block.svg "mouse color")
 
 The Found mouse block will return true if the specified mouse can be found.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/foundturtle_block.svg "found mouse")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/foundturtle_block.svg "found mouse")
 
 The Set mouse block sends a stack of blocks to be run by the specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/setturtle_block.svg "set mouse")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg "set mouse")
 
 ## <a name="WIDGETS"></a>Widgets
 
@@ -1391,7 +1391,7 @@ For example, if you have multiple voices (mice), they all share the same conduct
 
 Imagine an interactive game where a hero is battling a monster. Our hero plays theme music whenever the monster is defeated. But that might occur at any time, hence it is not going to be in sync with the conductor. The offset could be tens of seconds. This would mean that all of the notes in the theme music might be consumed by trying to catch up with the conductor. The No-clock block essentially says, do your own thing and don't worry about the conductor.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg "no clock")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
