@@ -358,7 +358,7 @@ function HelpWidget() {
     
         if (block.name !== null) {
             var name = block.name;
-            var advIcon = '<br><br><a\
+            var advIcon = '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
             title="This block is only available in advance mode"\
@@ -370,12 +370,13 @@ function HelpWidget() {
             ></a\
         >';
 
-            var findIcon = '<br><br><a\
+            var findIcon = '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
             title="Show Palette containing the block"\
             data-position="bottom"\
             ><i\
+            style="margin-right: 10px"\
                 id="findIcon"\
                 class="material-icons md-48"\
                 >search</i\
@@ -431,9 +432,7 @@ function HelpWidget() {
                 body = body + "<p>" + message[0] + "</p>";
     
                 body +=
-                    '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' +
-                    _("Load blocks") +
-                    "/>";
+                    '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
     
                 helpBody.innerHTML = body;
                 helpBody.innerHTML += findIcon;
