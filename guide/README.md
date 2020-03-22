@@ -42,6 +42,7 @@ also available.
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
+   7. [Ensemble](#ENSEMBLE)
 4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
@@ -854,6 +855,15 @@ before the beat.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/beat1.svg "meter and pickup")
 
+The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
+In the figure, it is used to take an action on the first beat of each measure.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/beatvalue_block.svg "beat count")
+
+The Measure count block returns the current measure.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/measurevalue_block.svg "measure count")
+
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
 notes on Beat `1` and Beat `3` are increased, while the volume of off
@@ -947,6 +957,50 @@ While a bit fanciful, this example, which can be run by clicking on
 the link below, takes musical paint in a novel direction.
 
 [RUN LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+
+## <a name="ENSEMBLE"></a>3.7 Ensemble
+
+This secction will guide about different Mouse blocks, which returns the data like notes played, current pen color, pitch number etc.
+
+The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg "mouse heap index")
+
+The Mouse sync block aligns the beat count between mice.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlesync_block.svg "mouse sync")
+
+The Mouse elapse notes block returns the number of notes played by the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleelapsednotes_block.svg "mouse notes played")
+
+The Mouse pitch block returns the current pitch number being played by the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlepitch_block.svg "mouse pitch number")
+
+The X mouse block returns the X position of the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/xturtle_block.svg "mouse x")
+
+The Y mouse block returns the Y position of the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/yturtle_block.svg  "mouse y")
+
+The Mouse heading block returns the heading of the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheading_block.svg "mouse heading")
+
+The Mouse color block returns the pen color of the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlecolor_block.svg "mouse color")
+
+The Found mouse block will return true if the specified mouse can be found.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/foundturtle_block.svg "found mouse")
+
+The Set mouse block sends a stack of blocks to be run by the specified mouse.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg "set mouse")
 
 ## <a name="WIDGETS"></a>Widgets
 
@@ -1331,6 +1385,14 @@ The *Play* button will play the beat, using a snare drum for strong beats and a 
 
 The *Save* button will export *On strong beat do* blocks for each strong beat.
 
+Music Blocks has an internal "conductor" maintaining the beat. When the Run button is clicked, the program begins and an internal master (or "conductor") clock starts up. All of the music tries to stay synced to that clock. 
+
+For example, if you have multiple voices (mice), they all share the same conductor in order to keep on the same beat. If a voice (mouse) is falling behind, Music Blocks tries to catch up on the next note by truncating it. If it is an 1/8 note behind and the next note is a 1/2 note, then only an 3/8 note would be played, so as to catch up. That is a somewhat extreme example—usually the timing errors are only very very small differences. But in some situations, the timing errors can be very large. This is when the No-clock block is used. A typical problem is when the music is not played continuously. 
+
+Imagine an interactive game where a hero is battling a monster. Our hero plays theme music whenever the monster is defeated. But that might occur at any time, hence it is not going to be in sync with the conductor. The offset could be tens of seconds. This would mean that all of the notes in the theme music might be consumed by trying to catch up with the conductor. The No-clock block essentially says, do your own thing and don't worry about the conductor.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg "no clock")
+
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum2.svg "Pitch-drum matrix")
@@ -1550,16 +1612,16 @@ keyboard.
 When there are no *Pitch* blocks inside the widget clamp, a keyboard with
 all keys between C4 and G5 is created.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard1.svg "keyboard block without clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard1.svg "keyboard block without clamp")
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard2.svg "keyboard widget without clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard2.svg "keyboard widget without clamp")
 
 When there are *Pitch* blocks inside the widget clamp, a keyboard with
 only those pitches is created.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard3.svg "keyboard block with pitch block in clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard3.svg "keyboard block with pitch block in clamp")
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard4.svg "keyboard widget with pitch block in clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard4.svg "keyboard widget with pitch block in clamp")
 
 Click on the keys to hear sounds. Click on the Play button to playback
 all of the notes played. Click on the Save button to output code (a
