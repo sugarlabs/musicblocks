@@ -964,7 +964,7 @@ This secction will guide about different Mouse blocks, which returns the data li
 
 The Mouse index heap block returns a value in the heap at a specified location for a specified mouse.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/documentation/guide/turtleheap_block.svg "mouse heap index")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/documentation/turtleheap_block.svg "mouse heap index")
 
 The Mouse sync block aligns the beat count between mice.
 
