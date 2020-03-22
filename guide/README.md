@@ -1612,16 +1612,16 @@ keyboard.
 When there are no *Pitch* blocks inside the widget clamp, a keyboard with
 all keys between C4 and G5 is created.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard1.svg "keyboard block without clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard1.svg "keyboard block without clamp")
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard2.svg "keyboard widget without clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard2.svg "keyboard widget without clamp")
 
 When there are *Pitch* blocks inside the widget clamp, a keyboard with
 only those pitches is created.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard3.svg "keyboard block with pitch block in clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard3.svg "keyboard block with pitch block in clamp")
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/guide/keyboard4.svg "keyboard widget with pitch block in clamp")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard4.svg "keyboard widget with pitch block in clamp")
 
 Click on the keys to hear sounds. Click on the Play button to playback
 all of the notes played. Click on the Save button to output code (a
