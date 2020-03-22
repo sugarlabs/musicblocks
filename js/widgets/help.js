@@ -114,6 +114,33 @@ function HelpWidget() {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
                 var name = blocks.blockList[blocks.activeBlock].name;
+
+                var advIcon = '<a\
+                class="tooltipped"\
+                data-toggle="tooltip"\
+                title="This block is only available in advance mode"\
+                data-position="bottom"\
+                ><i\
+                    id="advIconText"\
+                    class="material-icons md-48"\
+                    >star</i\
+                ></a\
+                >';
+
+            var findIcon = '<a\
+            class="tooltipped"\
+            data-toggle="tooltip"\
+            title="Show Palette containing the block"\
+            data-position="bottom"\
+            ><i\
+            style="margin-right: 10px"\
+                id="findIcon"\
+                class="material-icons md-48"\
+                >search</i\
+            ></a\
+            >';
+
+            var showPaletteParamater = blocks.blockList[blocks.activeBlock].protoblock.palette.name;
                 // Each block's help entry contains a help string, the
                 // path of the help svg, an override name for the help
                 // svg file, and an optional macro name for generating
@@ -165,12 +192,18 @@ function HelpWidget() {
 
                     body = body + "<p>" + message[0] + "</p>";
 
-                    body +=
-                        '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' +
-                        _("Load blocks") +
-                        "/>";
+                    body += '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
 
                     helpBody.innerHTML = body;
+                    helpBody.innerHTML += findIcon;
+
+                    if (!blocks.blockList[blocks.activeBlock].protoblock.beginnerModeBlock) {
+                        helpBody.innerHTML += advIcon;
+                    }
+
+                    var object = blocks.palettes.getProtoNameAndPalette(
+                        name
+                    );
 
                     var loadButton = docById("loadButton");
                     if (loadButton !== null) {
@@ -179,12 +212,10 @@ function HelpWidget() {
                                 // If there is nothing specified, just
                                 // load the block.
                                 console.debug("CLICK: " + name);
-                                var obj = blocks.palettes.getProtoNameAndPalette(
-                                    name
-                                );
-                                var protoblk = obj[0];
-                                var paletteName = obj[1];
-                                var protoName = obj[2];
+
+                                var protoblk = object[0];
+                                var paletteName = object[1];
+                                var protoName = object[2];
 
                                 var protoResult = blocks.protoBlockDict.hasOwnProperty(
                                     protoName
@@ -221,6 +252,12 @@ function HelpWidget() {
                                 blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
+                    }
+                    var findIconMethod = docById("findIcon");
+
+                    findIconMethod.onclick = function() {
+                        blocks.palettes.showPalette(object[1]);
+                       
                     }
                 }
             }
