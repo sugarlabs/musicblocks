@@ -363,7 +363,8 @@ function HelpWidget() {
                 block.helpString;
 
             var helpBody = docById("helpBodyDiv");
-                helpBody.style.height = "";
+                helpBody.style.height = "500px";
+                helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
     
                 var body = "";
