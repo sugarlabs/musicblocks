@@ -358,6 +358,30 @@ function HelpWidget() {
     
         if (block.name !== null) {
             var name = block.name;
+            var advIcon = '<a\
+            class="tooltipped"\
+            data-toggle="tooltip"\
+            title="This block is only available in advance mode"\
+            data-position="bottom"\
+            ><i\
+                id="advIconText"\
+                class="material-icons md-48"\
+                >star</i\
+            ></a\
+        >';
+
+            var findIcon = '<a\
+            class="tooltipped"\
+            data-toggle="tooltip"\
+            title="Show Palette containing the block"\
+            data-position="bottom"\
+            ><i\
+            style="margin-right: 10px"\
+                id="findIcon"\
+                class="material-icons md-48"\
+                >search</i\
+            ></a\
+        >';
 
             var message =
                 block.helpString;
@@ -408,11 +432,20 @@ function HelpWidget() {
                 body = body + "<p>" + message[0] + "</p>";
     
                 body +=
-                    '<img src="header-icons/export-chunk.svg" id="loadButton" width="32" height="32" alt=' +
-                    _("Load blocks") +
-                    "/>";
+                    '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
     
                 helpBody.innerHTML = body;
+                helpBody.innerHTML += findIcon;
+
+                if (!block.beginnerModeBlock) {
+                    helpBody.innerHTML += advIcon;
+                }
+
+                var findIconMethod = docById("findIcon");
+
+                findIconMethod.onclick = function() {
+                    block.palette.palettes.showPalette(block.palette.name);
+                }
 
                 var loadButton = docById("loadButton");
                 if (loadButton !== null) {
