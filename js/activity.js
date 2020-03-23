@@ -4748,7 +4748,7 @@ function Activity() {
 
             this.hideMusicBlocks = function() {
                 hideSearchWidget();
-                widgetWindows.hideWindows();
+                widgetWindows.hideAllWindows();
 
                 logo.doStopTurtle();
                 docById("helpElem").style.visibility = "hidden";
