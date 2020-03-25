@@ -23,8 +23,6 @@
 </metadata>
 <defs
    id="defs1874" />
-
-
      style=&quot;fill:#c0c0c0;fill-opacity:1;stroke:none&quot;
      transform=&quot;matrix(1.2296745,0,0,1.2293956,-15.512203,-15.505513)&quot;
      id=&quot;layer1&quot;&gt;
@@ -39,5 +37,5 @@
    height="45"
    width="45"
    id="rect816"
-   style="fill:#c0c0c0;fill-opacity:0.1;stroke:none;stroke-width:23.84326935;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+   style="fill:#c0c0c0;fill-opacity:0.0;stroke:none;stroke-width:23.84326935;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
 </svg>
