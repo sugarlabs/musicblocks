@@ -4525,7 +4525,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         if (!custom) {
             this._accidentalsWheel.colors =
