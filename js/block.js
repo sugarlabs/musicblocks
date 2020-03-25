@@ -4525,7 +4525,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         if (!custom) {
             this._accidentalsWheel.colors =
@@ -4924,7 +4924,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         this._octavesWheel.colors = platformColor.octavesWheelcolors;
         this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -5197,7 +5197,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var that = this;
 
@@ -5366,7 +5366,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var tabsLabels = [];
         for (var i = 0; i < WHEELVALUES.length; i++) {
@@ -5620,7 +5620,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", "-", "+"]);
+        this._exitWheel.createWheel(["×", "-", "+"]);
 
         var that = this;
 
@@ -5965,7 +5965,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var that = this;
 
@@ -6377,7 +6377,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var that = this;
 
@@ -6601,7 +6601,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var that = this;
 
@@ -6874,7 +6874,7 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", "▶"]); // imgsrc:header-icons/play-button.svg']);
+        this._exitWheel.createWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
 
         var that = this;
 
