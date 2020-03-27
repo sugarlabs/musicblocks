@@ -56,7 +56,7 @@ function PitchTimeMatrix() {
         chorusDepth: 0
     };
 
-    // rowLabels can contain either a pitch, a drum, or a grphics command
+    // rowLabels can contain either a pitch, a drum, or a graphics commands
     this.rowLabels = [];
     // rowArgs can contain an octave or the arg(s) to a graphics command
     this.rowArgs = [];
@@ -606,7 +606,6 @@ function PitchTimeMatrix() {
 
             var ptmCell = ptmTableRow.insertCell();
             // Create tables to store individual notes.
-
             var ptmCellTable = document.createElement("table");
             ptmCellTable.setAttribute("cellpadding", "0px");
             ptmCell.append(ptmCellTable);
@@ -2217,12 +2216,10 @@ function PitchTimeMatrix() {
                     thisRow.push(i);
                 }
             }
-
             this._markedColsInRow.push(thisRow);
         }
 
         var sortableList = [];
-
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
         for (var i = 0; i < this.rowLabels.length; i++) {
@@ -2337,20 +2334,22 @@ function PitchTimeMatrix() {
                     "skipping " + obj[1] + " " + last(this.rowLabels)
                 );
                 this._sortedRowMap.push(last(this._sortedRowMap));
-                setTimeout(
-                    this._removePitchBlock(
-                        oldColumnBlockMap[sortedList[lastObj][3]][0]
-                    ),
-                    500
-                );
-                this.columnBlocksMap = this.columnBlocksMap.filter(function(
-                    ele
-                ) {
-                    return (
-                        ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0]
+                if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
+                    setTimeout(
+                        this._removePitchBlock(
+                            oldColumnBlockMap[sortedList[lastObj][3]][0]
+                        ),
+                        500
                     );
-                });
-                lastObj = i;
+                    this.columnBlocksMap = this.columnBlocksMap.filter(function(
+                        ele
+                    ) {
+                        return (
+                            ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0]
+                        );
+                    });
+                    lastObj = i;
+                }
                 // skip duplicates
                 for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
