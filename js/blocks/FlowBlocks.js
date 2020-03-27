@@ -272,7 +272,7 @@ function setupFlowBlocks() {
                 ),
                 "documentation",
                 null,
-                ""
+                "switchhelp"
                 ]);
 
             this.formBlock({
