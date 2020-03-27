@@ -208,7 +208,7 @@ function PitchTimeMatrix() {
         var widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
@@ -734,7 +734,7 @@ function PitchTimeMatrix() {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         var x = docById("addnotes").getBoundingClientRect().x;
         var y = docById("addnotes").getBoundingClientRect().y;
@@ -1073,7 +1073,7 @@ function PitchTimeMatrix() {
 
         this.xblockValue = [xblockLabelValue.toString(), "x"];
         this.yblockValue = [yblockLabelValue.toString(), "y"];
-        this._exitWheel.createWheel(["x", ""]);
+        this._exitWheel.createWheel(["×", ""]);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
@@ -1229,16 +1229,6 @@ function PitchTimeMatrix() {
                 that.rowArgs[blockIndex][0] +
                 ": " +
                 that.rowArgs[blockIndex][1];
-            for (var i = 0; i < that._notesToPlay.length; i++) {
-                var noteIndex = that._notesToPlay[i][0].indexOf(
-                    that._noteStored[blockIndex]
-                );
-                var cell = that._rows[blockIndex][i];
-
-                if (cell.style.backgroundColor === "black") {
-                    that._notesToPlay[i][0][noteIndex] = noteStored;
-                }
-            }
 
             that._noteStored[blockIndex] = noteStored;
         };
@@ -1424,7 +1414,7 @@ function PitchTimeMatrix() {
         }
 
         this.blockValue = blockLabelValue.toString();
-        this._exitWheel.createWheel(["x", ""]);
+        this._exitWheel.createWheel(["×", ""]);
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
@@ -1599,16 +1589,6 @@ function PitchTimeMatrix() {
                 noteStored = that.rowArgs[blockIndex];
             }
 
-            for (var i = 0; i < that._notesToPlay.length; i++) {
-                var noteIndex = that._notesToPlay[i][0].indexOf(
-                    that._noteStored[blockIndex]
-                );
-                cell = that._rows[blockIndex][i];
-                if (cell.style.backgroundColor === "black") {
-                    that._notesToPlay[i][0][noteIndex] = noteStored;
-                }
-            }
-
             that._noteStored[blockIndex] =
                 that.rowLabels[blockIndex] + ": " + that.rowArgs[blockIndex];
         };
@@ -1739,7 +1719,7 @@ function PitchTimeMatrix() {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         if (condition === "pitchblocks") {
             this._accidentalsWheel.colors =
@@ -2009,19 +1989,6 @@ function PitchTimeMatrix() {
                 noteStored = drumName;
             }
 
-            for (var i = 0; i < that._notesToPlay.length; i++) {
-                var noteIndex = that._notesToPlay[i][0].indexOf(
-                    that._noteStored[index]
-                );
-                cell = that._rows[index][i];
-		if (cell === undefined) {
-		    // console.log('cell undefined: ' + index + ' ' + i);
-		} else {
-                    if (cell.style.backgroundColor === "black") {
-			that._notesToPlay[i][0][noteIndex] = noteStored;
-                    }
-		}
-            }
             that._noteStored[index] = noteStored;
         };
 
@@ -4062,10 +4029,6 @@ function PitchTimeMatrix() {
                     var c = this._markedColsInRow[ii][j];
                     var cell = row.cells[c];
                     cell.style.backgroundColor = "black";
-                    if (this._notesToPlay[c][0][0] === "R") {
-                        this._notesToPlay[c][0] = [];
-                    }
-
                     this._setNoteCell(r, c, cell, false, null);
                 }
             }
@@ -4133,10 +4096,6 @@ function PitchTimeMatrix() {
                         var cell = row.cells[c];
                         if (cell != undefined) {
                             cell.style.backgroundColor = "black";
-                            if (this._notesToPlay[c][0][0] === "R") {
-                                this._notesToPlay[c][0] = [];
-                            }
-
                             this._setNoteCell(r, c, cell, false, null);
                         }
                     }
@@ -4159,13 +4118,8 @@ function PitchTimeMatrix() {
 
             this._logo.synth.stop();
 
-            var notes = [];
-
-            for (var i in this._notesToPlay) {
-                notes.push(this._notesToPlay[i]);
-            }
-
-            this._notesToPlay = notes;
+            // Retrieve list of note to play, from matrix state
+            this.collectNotesToPlay();
 
             this._notesCounter = 0;
 
@@ -4275,6 +4229,65 @@ function PitchTimeMatrix() {
             );
         }
     };
+
+    this.collectNotesToPlay = function() {
+        // Generate the list of notes to play, on the fly from
+        // row labels and note value (from "alt" attribute of
+        // corresponding cells in the row)
+        var notes = [];
+        for (var i = 0; i < this._colBlocks.length; i++) {
+            var note = [];
+            for (var j = 0; j < this.rowLabels.length; j++) {
+                var row = this._rows[j];
+                var cell = row.cells[i];
+                if (cell.style.backgroundColor == "black") {
+                    if (this.rowLabels[j] === "hertz") {
+                        // if pitch specified in hertz
+                        note.push(this.rowArgs[j]);
+                    } else {
+                        // list of half-tones with solfeges
+                        MATRIXHALFTONES = [
+                            "do", "C", "C♯", "D♭", "re", "D", "D♯", "E♭",
+                            "mi", "E", "fa", "F", "F♯", "G♭", "sol", "G",
+                            "G♯", "A♭", "la", "A", "A♯", "B♭", "ti", "B"
+                        ];
+                        // list of half-tones in letter representations
+                        MATRIXHALFTONES2 = [
+                            "C", "C", "C♯", "D♭", "D", "D", "D♯", "E♭",
+                            "E", "E", "F", "F", "F♯", "G♭", "G", "G",
+                            "G♯", "A♭", "A", "A", "A♯", "B♭", "B", "B"
+                        ];
+
+                        if (
+                            // if graphic block
+                            MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1 ||
+                            MATRIXGRAPHICS2.indexOf(this.rowLabels[j]) != -1
+                        ) {
+                            // push "action: value"
+                            note.push(this.rowLabels[j] + ": " + this.rowArgs[j]);
+                        } else if (
+                            // if pitch represented by halftone
+                            MATRIXHALFTONES.indexOf(this.rowLabels[j]) != -1
+                        ) {
+                            // push "halftone" + "notevalue"
+                            note.push(
+                                MATRIXHALFTONES2[
+                                    MATRIXHALFTONES.indexOf(this.rowLabels[j])
+                                ] + this.rowArgs[j]
+                            );
+                        } else {
+                            // if drum push drum name
+                            note.push(this.rowLabels[j]);
+                        }
+                    }
+                }
+            }
+            // push [note/chord, relative-duration-inverse (e.g. 8 for 1/8)]
+            notes.push([note, 1 / cell.getAttribute("alt")]);
+        }
+
+        this._notesToPlay = notes;
+    }
 
     this._resetMatrix = function() {
         var row = this._noteValueRow;
@@ -4555,7 +4568,6 @@ function PitchTimeMatrix() {
             this.removeNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
 
-        this._notesToPlay[colIndex][0] = [];
         for (var j = 0; j < this.rowLabels.length; j++) {
             var row = this._rows[j];
             var cell = row.cells[colIndex];
@@ -4590,8 +4602,6 @@ function PitchTimeMatrix() {
 
         // Using the alt attribute to store the note value
         var noteValue = cell.getAttribute("alt") * this._logo.defaultBPMFactor;
-
-        this._notesToPlay[parseInt(colIndex)][0].push(note);
 
         if (obj.length === 1) {
             if (playNote) {
@@ -4685,6 +4695,9 @@ function PitchTimeMatrix() {
             [1, ["text", { value: _("action") }], 0, 0, [0]]
         ];
         var endOfStackIdx = 0;
+
+        // Retrieve the list of notes to play, that'll be saved
+        this.collectNotesToPlay();
 
         for (var i = 0; i < this._notesToPlay.length; i++) {
             // We want all of the notes in a column.
