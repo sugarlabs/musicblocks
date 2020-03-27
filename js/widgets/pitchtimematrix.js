@@ -653,7 +653,16 @@ function PitchTimeMatrix() {
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
 
+        // ***************
+        /* If there are note blocks we may sort them to remove
+           duplicates, but by using note blocks (we could also
+           be using them inside activities) we might rather be
+           interested in seeing corresponding note on the matrix
+           (and possibly change it too: this feature hasn't
+           been added yet). */
+
         // Sort them if there are note blocks.
+        /*
         this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function() {
@@ -663,6 +672,9 @@ function PitchTimeMatrix() {
         } else {
             this.sorted = false;
         }
+        */
+
+        // ***************
 
         this._logo.textMsg(_("Click on the table to add notes."));
 
@@ -4041,13 +4053,21 @@ function PitchTimeMatrix() {
                     var rIdx = null;
                     // Look in the rowBlocks for the nth match
                     for (var j = 0; j < this._rowBlocks.length; j++) {
-                        if (this._rowBlocks[j] === obj[0]) {
-                            if (c === n) {
-                                var rIdx = j;
+                        /* for note blocks within repeat block
+                           their ids are added with a larger number
+                           e.g. 11 becomes 1000011 or 2000011 */
+
+                        // Slice length of comparing id from end
+                        // of augmented id and compare
+                        var idsliced =
+                            this._rowBlocks[j]
+                            .toString()
+                            .slice(-obj[0].toString().length);
+                        if (idsliced === obj[0].toString()) {
+                            if ((c++) === n) {
+                                rIdx = j;
                                 break;
                             }
-
-                            c += 1;
                         }
                     }
 
@@ -4239,7 +4259,7 @@ function PitchTimeMatrix() {
             for (var j = 0; j < this.rowLabels.length; j++) {
                 var row = this._rows[j];
                 var cell = row.cells[i];
-                if (cell.style.backgroundColor == "black") {
+                if (cell.style.backgroundColor === "black") {
                     if (this.rowLabels[j] === "hertz") {
                         // if pitch specified in hertz
                         note.push(this.rowArgs[j]);
