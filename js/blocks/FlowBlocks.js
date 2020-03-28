@@ -266,7 +266,14 @@ function setupFlowBlocks() {
         constructor() {
             super("defaultcase");
             this.setPalette("flow");
-            this.setHelpString();
+            this.setHelpString([
+                _(
+                    "The Default block is used inside of a Switch to define the default action."
+                ),
+                "documentation",
+                null,
+                "switchhelp"
+            ]);
 
             this.formBlock({
                 name: _("default")
