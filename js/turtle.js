@@ -948,10 +948,8 @@ function Turtle(name, turtles, drum) {
             ox = this.turtles.screenX2turtleX(this.container.x);
 
             // new turtle point increment;
-
             nx = ox + xIncrease;
             ny = oy + yIncrease;
-            console.log(ox, oy, nx, ny);
 
             this.move(ox, oy, nx, ny, true)
             this.container.x = this.turtles.turtleX2screenX(nx);
@@ -961,10 +959,6 @@ function Turtle(name, turtles, drum) {
             steps -= stepUnit;
         }
         this.turtles.refreshCanvas();
-
-
-
-
     };
 
     /**
