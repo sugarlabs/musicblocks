@@ -1847,6 +1847,7 @@ function PitchTimeMatrix() {
                 that._octavesWheel.removeWheel();
             }
 
+            that.sorted = false;
             if (sortedClose === true) {
                 that._sort();
             }
@@ -1867,6 +1868,8 @@ function PitchTimeMatrix() {
                     label += attr;
                     flag = true;
                 }
+                // Allow sorting since sorted order might be lost
+                this.sorted = false;
             }
 
             var noteLabelBlock =
@@ -2031,7 +2034,7 @@ function PitchTimeMatrix() {
                     that._logo.errorMsg,
                     that._logo.synth.inTemperament
                 );
-		obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
+                obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(
@@ -2086,15 +2089,13 @@ function PitchTimeMatrix() {
         }
         if (condition === "pitchblocks") {
             for (var i = 0; i < accidentals.length; i++) {
-                this._accidentalsWheel.navItems[
-                    i
-                ].navigateFunction = __pitchPreview;
+                this._accidentalsWheel.navItems[i]
+                    .navigateFunction = __pitchPreview;
             }
 
             for (var i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[
-                    i
-                ].navigateFunction = __pitchPreview;
+                this._octavesWheel.navItems[i]
+                    .navigateFunction = __pitchPreview;
             }
         }
     };
