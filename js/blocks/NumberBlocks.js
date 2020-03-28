@@ -866,7 +866,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("one of"),
                 args: 2,
-                argLabels: [_("this"), _("logo")],
+                argLabels: [_("this"), _("that")],
                 outType: "anyout",
                 argTypes: ["anyin", "anyin"],
                 defaults: [-90, 90]
