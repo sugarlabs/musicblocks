@@ -1,4 +1,99 @@
 function setupSensorsBlocks() {
+    class InputBlock extends FlowBlock {
+        constructor() {
+            super("input");
+            this.setPalette("sensors");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Input block prompts for keyboard input."
+                ),
+                "documentation",
+                ""
+            ]);
+
+	    this.formBlock({
+		name: _("input"),
+		args: 1,
+		argTypes: ["anyin"],
+		defaults: [_("Input a value")],
+	    });
+        }
+
+        flow(args, logo, turtle, blk) {
+            var cblk = logo.blocks.blockList[blk].connections[1];
+	    if (cblk !== null) {
+		logo.textMsg(logo.blocks.blockList[cblk].value);
+	    }
+
+	    // Pause the flow while we wait for input.
+            logo._doWait(turtle, 120);
+
+	    // Display the input form.
+            var inputElem = docById("labelDiv");
+            inputElem.innerHTML =
+                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="" />';
+            // inputElem.style.display = "";
+            var inputElem = docById("textLabel");
+	    var leftpos = Math.floor(canvas.width / 2) - 50;
+	    inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
+	    inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
+	    // Why doesn't this override work?
+	    inputElem.style.backgroundColor = "#FFFFFF";
+	    inputElem.style.fontSize = "24px";
+            inputElem.focus();
+
+            var inputElem = docById("labelDiv");
+            inputElem.classList.add("hasKeyboard");
+
+	    // Add a handler to continue flow after the input.
+	    function __keyPressed(event) {
+		if (event.keyCode === 13) { // RETURN
+		    var inputElem = docById("textLabel");
+		    console.log(inputElem.value);
+		    try {
+			logo.inputValues[turtle] = Number(inputElem.value);
+		    } catch (e) {
+			logo.inputValues[turtle] = inputElem.value;
+		    }
+
+		    logo.clearRunBlock(turtle);
+		    logo.hideMsgs();
+		    inputElem.classList.remove("hasKeyboard");
+		    inputElem.style.display = "none";
+		}
+	    };
+
+            var inputElem = docById("textLabel");
+            inputElem.addEventListener("keypress", __keyPressed);
+        };
+    }
+
+    class InputValueBlock extends ValueBlock {
+        constructor() {
+            super("inputvalue", _("input value"));
+            this.setPalette("sensors");
+            this.parameter = true;
+        }
+
+        updateParameter(logo, turtle, blk) {
+	    if (turtle in logo.inputValues) {
+		return logo.inputValues[turtle];
+	    } else {
+		return 0;
+	    }
+        }
+
+        arg(logo, turtle, blk) {
+	    if (turtle in logo.inputValues) {
+		return logo.inputValues[turtle];
+	    } else {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+		return 0;
+	    }
+        }
+    }
+
     class PitchnessBlock extends ValueBlock {
         constructor() {
             super("pitchness", _("pitch"));
@@ -407,6 +502,8 @@ function setupSensorsBlocks() {
         }
     }
 
+    new InputValueBlock().setup();
+    new InputBlock().setup();
     new PitchnessBlock().setup();
     new LoudnessBlock().setup();
     new MyClickBlock().setup();
