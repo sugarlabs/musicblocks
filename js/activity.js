@@ -3249,9 +3249,11 @@ function Activity() {
      */
     hideMsgs = function() {
         errorMsgText.parent.visible = false;
+        errorText.classList.remove("show");
         hideArrows();
 
         msgText.parent.visible = false;
+        printText.classList.remove("show");
         for (var i in errorArtwork) {
             errorArtwork[i].visible = false;
         }

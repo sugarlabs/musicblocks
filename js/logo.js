@@ -92,6 +92,7 @@ function Logo() {
     this.unhighlightQueue = {};
     this.parameterQueue = {};
 
+    this.inputValues = {};
     this.boxes = {};
     this.actions = {};
     this.returns = {};
@@ -115,6 +116,10 @@ function Logo() {
     this.prematureRestart = false;
     this.runningBlock = null;
     this.ignoringBlock = null;
+
+    // These are used to halt runtime during input.
+    this.delayTimeout = {};
+    this.delayParameters = {};
 
     this.time = 0;
     this.firstNoteTime = null;
@@ -1473,7 +1478,8 @@ function Logo() {
                 }
                 that.stepQueue[turtle].push(blk);
             } else {
-                setTimeout(function() {
+		that.delayParameters[turtle] = {'blk': blk, 'flow': isflow, 'arg': receivedArg};
+                that.delayTimeout[turtle] = setTimeout(function() {
                     that._runFromBlockNow(
                         that,
                         turtle,
@@ -1484,6 +1490,22 @@ function Logo() {
                 }, delay);
             }
         }
+    };
+
+    // We may need to clear the timeout, e.g., after a successful input.
+    this.clearRunBlock = function(turtle) {
+	if (this.delayTimeout[turtle] !== null) {
+	    clearTimeout(this.delayTimeout[turtle]);
+	    this.delayTimeout[turtle] = null;
+	    this.hideMsgs();
+	    this.requeueRunBlock(turtle);
+	}
+    };
+
+    // If we clear the delay timeout, we need to requeue the runBlock.
+    this.requeueRunBlock = function(turtle) {
+	console.log(turtle + " " + this.delayParameters[turtle]['blk'] + " " + this.delayParameters[turtle]['flow'] + " " + this.delayParameters[turtle]['arg']);
+	this._runFromBlockNow(this, turtle, this.delayParameters[turtle]['blk'], this.delayParameters[turtle]['flow'], this.delayParameters[turtle]['arg']);
     };
 
     /**
