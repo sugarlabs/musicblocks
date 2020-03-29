@@ -74,6 +74,16 @@ function setupSensorsBlocks() {
             super("inputvalue", _("input value"));
             this.setPalette("sensors");
             this.parameter = true;
+
+            this.setHelpString([
+                _(
+                    "The Input-value block stores the input."
+                ),
+                "documentation",
+		null,
+                "input"
+            ]);
+
         }
 
         updateParameter(logo, turtle, blk) {
