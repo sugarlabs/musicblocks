@@ -1461,6 +1461,7 @@ function Activity() {
 		
 		var closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!=null) docById("wheelDiv").style.display = "none";
+            if (docById("contextWheelDiv")!=null) docById("contextWheelDiv").style.display = "none";
             if (docById("textLabel") != null) docById("textLabel").style.display = "none";
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         }
