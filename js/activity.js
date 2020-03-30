@@ -1458,9 +1458,17 @@ function Activity() {
         }
 
         __heightBasedScroll();
+		
+		var closeAnyOpenMenusAndLabels = function () {
+            if (docById("wheelDiv")!=null) docById("wheelDiv").style.display = "none";
+            if (docById("contextWheelDiv")!=null) docById("contextWheelDiv").style.display = "none";
+            if (docById("textLabel") != null) docById("textLabel").style.display = "none";
+            if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
+        }
 
         var __wheelHandler = function(event) {
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+				closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
                         blocksContainer.y -= event.deltaY;
@@ -1475,6 +1483,7 @@ function Activity() {
             // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+					closeAnyOpenMenusAndLabels();
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             blocksContainer.x -= event.deltaX;
@@ -3241,9 +3250,11 @@ function Activity() {
      */
     hideMsgs = function() {
         errorMsgText.parent.visible = false;
+        errorText.classList.remove("show");
         hideArrows();
 
         msgText.parent.visible = false;
+        printText.classList.remove("show");
         for (var i in errorArtwork) {
             errorArtwork[i].visible = false;
         }

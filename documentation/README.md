@@ -84,7 +84,8 @@ etc. and also the button for selecting language.
 (3) The *Palette* toolbar is on the left side of the screen. New
 blocks are dragged from the palette.
 
-(4) On the upper right of the canvas is a small toolbar for showing grids, clearing the screen, and toggling the display size.
+(4) On the upper right of the canvas is a small toolbar for showing
+grids, clearing the screen, and toggling the display size.
 
 (5) On the lower right of the canvas is a small toolbar where you will
 find the *Home* button, buttons for show/hide blocks, expand/collapse
@@ -264,7 +265,10 @@ Blocks.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/forward_block.svg "forward")
 
-The *Forward* block, found on the *Mouse* palette, is used to draw straight lines. (Note that if this block is used inside of a *Note value* block&mdash;the line will be drawn as the note plays; otherwise the line is drawn "instantly".)
+The *Forward* block, found on the *Mouse* palette, is used to draw
+straight lines. (Note that if this block is used inside of a *Note
+value* block&mdash;the line will be drawn as the note plays; otherwise
+the line is drawn "instantly".)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/left_block.svg "right")
 
@@ -316,6 +320,14 @@ create some interactivity in your program.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/x_block.svg "cursorx-cursory")
 
 The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/input_block.svg "input")
+
+Prompting the user for input is done with the *Input* block. This
+block will display a messgae with a prompt and open an input form at
+the current position of the mouse. Program execution is paused until
+the user types into the form and types RETURN (or Enter). The contents
+of the input form are then transferred to *Input-value* block.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/push_block.svg "push")
 

@@ -921,11 +921,16 @@ function Turtle(name, turtles, drum) {
 
         var stepUnit = 10;
 
-        var xIncrease = stepUnit * Math.sin(angleRadians);
-        var yIncrease = stepUnit * Math.cos(angleRadians);
+	if (steps > 0) {
+            var xIncrease = stepUnit * Math.sin(angleRadians);
+            var yIncrease = stepUnit * Math.cos(angleRadians);
+	} else {
+            var xIncrease = -stepUnit * Math.sin(angleRadians);
+            var yIncrease = -stepUnit * Math.cos(angleRadians);
+	    steps = -steps;
+	}
 
         while (steps >= 0) {
-
             if (this.container.x > w) {
                 this.container.x = 0;
                 ctx.moveTo(this.container.x, this.container.y);

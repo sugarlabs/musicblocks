@@ -1100,9 +1100,13 @@ function MusicKeyboard() {
                     );
                     cell.setAttribute("alt", selectedNotes[j].duration[ind]);
                     cell.style.backgroundColor = "black";
+                    cell.style.border = "2px solid white";
+                    cell.style.borderRadius = "10px";
                 } else {
                     cell.setAttribute("alt", maxWidth);
                     cell.style.backgroundColor = cellColor;
+                    cell.style.border = "2px solid white";
+                    cell.style.borderRadius = "10px";
                 }
 
                 cell.setAttribute("cellColor", cellColor);
