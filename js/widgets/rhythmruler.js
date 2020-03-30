@@ -17,9 +17,6 @@
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
 function RhythmRuler() {
-    const BUTTONDIVWIDTH = 535; // 9 buttons 535 = (55 + 4) * 9
-    const OUTERWINDOWWIDTH = 675;
-    const INNERWINDOWWIDTH = 600;
     const ROWHEIGHT = 130;
     const RULERHEIGHT = 70;
     const BUTTONSIZE = 51;
@@ -67,7 +64,7 @@ function RhythmRuler() {
     this._rulers = [];
 
     this._noteWidth = function(noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 4);
     };
 
     this._calculateZebraStripes = function(rulerno) {
