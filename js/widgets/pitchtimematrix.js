@@ -179,7 +179,7 @@ function PitchTimeMatrix() {
                 obj[1][0] === rhythmBlock &&
                 obj[1][1] === n
             ) {
-                this._blockMap[i] = [-1, [-1, 1, 0]]; // Mark as removed
+                this._blockMap.splice(i, 1);
             }
         }
     };
@@ -191,7 +191,7 @@ function PitchTimeMatrix() {
 
     this.init = function(logo) {
         // Initializes the matrix. First removes the previous matrix
-        // and them make another one in DOM (document object model)
+        // and then make another one in DOM (document object model)
         let tempTable;
 
         this._noteStored = [];
@@ -653,6 +653,7 @@ function PitchTimeMatrix() {
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
 
+        this._lookForNoteBlocksOrRepeat();
         // ***************
         /* If there are note blocks we may sort them to remove
            duplicates, but by using note blocks (we could also
@@ -663,7 +664,6 @@ function PitchTimeMatrix() {
 
         // Sort them if there are note blocks.
         /*
-        this._lookForNoteBlocks();
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function() {
                 console.debug("sorting");
@@ -2938,7 +2938,7 @@ function PitchTimeMatrix() {
         }
     };
 
-    this._lookForNoteBlocks = function() {
+    this._lookForNoteBlocksOrRepeat = function() {
         this._noteBlocks = false;
         for (var i = 0; i < this._blockMap.length; i++) {
             var blk = this._blockMap[i][1][0];
@@ -2955,8 +2955,11 @@ function PitchTimeMatrix() {
                 continue;
             }
 
-            if (this._logo.blocks.blockList[blk].name === "newnote") {
-                console.debug("FOUND A NOTE BLOCK.");
+            if (
+                this._logo.blocks.blockList[blk].name === "newnote" ||
+                this._logo.blocks.blockList[blk].name === "repeat"
+            ) {
+                console.debug("FOUND A NOTE OR REPEAT BLOCK.");
                 this._noteBlocks = true;
                 break;
             }
@@ -3995,10 +3998,10 @@ function PitchTimeMatrix() {
                             "cellColor"
                         );
                         that._notesToPlay[j][0] = ["R"];
-                        that._setNotes(j, i, false);
+                        if (!that._noteBlocks)   that._setNotes(j, i, false);
                     } else {
                         this.style.backgroundColor = "black";
-                        that._setNotes(j, i, true);
+                        if (!that._noteBlocks)   that._setNotes(j, i, true);
                     }
                 };
 
@@ -4011,10 +4014,10 @@ function PitchTimeMatrix() {
                                 "cellColor"
                             );
                             that._notesToPlay[j][0] = ["R"];
-                            that._setNotes(j, i, false);
+                            if (!that._noteBlocks)   that._setNotes(j, i, false);
                         } else {
                             this.style.backgroundColor = "black";
-                            that._setNotes(j, i, true);
+                            if (!that._noteBlocks)   that._setNotes(j, i, true);
                         }
                     }
                 };
@@ -4024,8 +4027,6 @@ function PitchTimeMatrix() {
                 };
             }
         }
-
-        this._lookForNoteBlocks();
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
@@ -4062,8 +4063,8 @@ function PitchTimeMatrix() {
                         // of augmented id and compare
                         var idsliced =
                             this._rowBlocks[j]
-                            .toString()
-                            .slice(-obj[0].toString().length);
+                                .toString()
+                                .slice(-obj[0].toString().length);
                         if (idsliced === obj[0].toString()) {
                             if ((c++) === n) {
                                 rIdx = j;
@@ -4107,8 +4108,7 @@ function PitchTimeMatrix() {
                         continue;
                     }
 
-                    // If we found a match, mark this cell and add this
-                    // note to the play list.
+                    // If we found a match, mark this cell
                     var row = this._rows[r];
                     if (row === null || typeof row === "undefined") {
                         console.debug("COULD NOT FIND ROW " + r);
