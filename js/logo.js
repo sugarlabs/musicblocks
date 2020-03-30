@@ -1497,7 +1497,6 @@ function Logo() {
 	if (this.delayTimeout[turtle] !== null) {
 	    clearTimeout(this.delayTimeout[turtle]);
 	    this.delayTimeout[turtle] = null;
-	    this.hideMsgs();
 	    this.requeueRunBlock(turtle);
 	}
     };

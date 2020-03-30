@@ -410,6 +410,17 @@ select {
     width: 20px;
 }
 
+input.input {
+    background-color: #FFF !important;
+    text-align: center;
+    font-weight: bold !important;
+    font-size: 24px !important;
+    resize: none !important;
+    padding: 0px !important;
+    border: 1px !important;
+    width: 200px;
+}
+
 input.text {
     background-color: #FF5942 !important;
     text-align: center;

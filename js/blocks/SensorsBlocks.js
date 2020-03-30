@@ -21,10 +21,6 @@ function setupSensorsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
-	    if (cblk !== null) {
-		logo.textMsg(logo.blocks.blockList[cblk].value);
-	    }
 
 	    // Pause the flow while we wait for input.
             logo._doWait(turtle, 120);
@@ -32,15 +28,15 @@ function setupSensorsBlocks() {
 	    // Display the input form.
             var inputElem = docById("labelDiv");
             inputElem.innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="" />';
+                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
             // inputElem.style.display = "";
             var inputElem = docById("textLabel");
-	    var leftpos = Math.floor(canvas.width / 2) - 50;
+            var cblk = logo.blocks.blockList[blk].connections[1];
+	    if (cblk !== null) {
+		inputElem.placeholder = logo.blocks.blockList[cblk].value;
+	    }
 	    inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
 	    inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
-	    // Why doesn't this override work?
-	    inputElem.style.backgroundColor = "#FFFFFF";
-	    inputElem.style.fontSize = "24px";
             inputElem.focus();
 
             var inputElem = docById("labelDiv");
@@ -58,7 +54,6 @@ function setupSensorsBlocks() {
 		    }
 
 		    logo.clearRunBlock(turtle);
-		    logo.hideMsgs();
 		    inputElem.classList.remove("hasKeyboard");
 		    inputElem.style.display = "none";
 		}
