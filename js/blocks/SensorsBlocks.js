@@ -31,7 +31,6 @@ function setupSensorsBlocks() {
             var inputElem = docById("labelDiv");
             inputElem.innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            // inputElem.style.display = "";
             var inputElem = docById("textLabel");
             var cblk = logo.blocks.blockList[blk].connections[1];
 	    if (cblk !== null) {
@@ -49,10 +48,12 @@ function setupSensorsBlocks() {
 		if (event.keyCode === 13) { // RETURN
 		    var inputElem = docById("textLabel");
 		    console.log(inputElem.value);
-		    try {
-			logo.inputValues[turtle] = Number(inputElem.value);
-		    } catch (e) {
-			logo.inputValues[turtle] = inputElem.value;
+		    console.log('trying a number');
+		    var value = inputElem.value;
+		    if (isNaN(value)) {
+			logo.inputValues[turtle] = value;
+		    } else {
+			logo.inputValues[turtle] = Number(value);
 		    }
 
 		    logo.clearRunBlock(turtle);

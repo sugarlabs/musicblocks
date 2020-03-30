@@ -1503,7 +1503,6 @@ function Logo() {
 
     // If we clear the delay timeout, we need to requeue the runBlock.
     this.requeueRunBlock = function(turtle) {
-	console.log(turtle + " " + this.delayParameters[turtle]['blk'] + " " + this.delayParameters[turtle]['flow'] + " " + this.delayParameters[turtle]['arg']);
 	this._runFromBlockNow(this, turtle, this.delayParameters[turtle]['blk'], this.delayParameters[turtle]['flow'], this.delayParameters[turtle]['arg']);
     };
 
