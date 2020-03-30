@@ -80,6 +80,8 @@ function RhythmRuler() {
 
         for (var i = 0; i < ruler.cells.length; i++) {
             var newCell = ruler.cells[i];
+            newCell.style.border = "2px solid lightgrey";
+            newCell.style.borderRadius = "10px";
             if (evenColor === platformColor.selectorBackground) {
                 if (i % 2 === 0) {
                     newCell.style.backgroundColor =
