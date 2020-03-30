@@ -18,6 +18,8 @@ function setupSensorsBlocks() {
 		argTypes: ["anyin"],
 		defaults: [_("Input a value")],
 	    });
+
+            if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -79,6 +81,7 @@ function setupSensorsBlocks() {
                 "input"
             ]);
 
+            if (this.lang === "ja") this.hidden = true;
         }
 
         updateParameter(logo, turtle, blk) {
