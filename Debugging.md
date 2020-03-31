@@ -15,7 +15,7 @@ testing, revising, etc.*&mdash;Cynthia Solomon
 *Sometimes bugs are serendipitously adopted as features worth
 perpetuating, sometimes procedures must be constructed to deal with
 the phenomena caused by their appearance, and sometimes the bugs and
-their side effect need to be removed. But in this pursuit, children
+their side effects need to be removed. But in this pursuit, children
 become creative researchers studying behavior, making up theories,
 trying out ideas, etc.*&mdash;Cynthia Solomon
 
@@ -32,7 +32,7 @@ trying out ideas, etc.*&mdash;Cynthia Solomon
 Programming is hard. Composing music is also hard. Both programming
 and composing involve some trial and error and serendipity. Inevitably
 you will make mistakes along the way. Music Blocks provides a number
-of mechanism, reviewed below, to help you explore ideas and find
+of mechanisms, reviewed below, to help you explore ideas and find
 mistakes.
 
 ## 1. Clicking on an individual stack of blocks
