@@ -654,16 +654,8 @@ function PitchTimeMatrix() {
         ptmTableRow.insertCell().append(tempTable);
 
         this._lookForNoteBlocksOrRepeat();
-        // ***************
-        /* If there are note blocks we may sort them to remove
-           duplicates, but by using note blocks (we could also
-           be using them inside activities) we might rather be
-           interested in seeing corresponding note on the matrix
-           (and possibly change it too: this feature hasn't
-           been added yet). */
 
         // Sort them if there are note blocks.
-        /*
         if (!this.sorted && this._noteBlocks) {
             setTimeout(function() {
                 console.debug("sorting");
@@ -672,9 +664,6 @@ function PitchTimeMatrix() {
         } else {
             this.sorted = false;
         }
-        */
-
-        // ***************
 
         this._logo.textMsg(_("Click on the table to add notes."));
 
