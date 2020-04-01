@@ -38,7 +38,7 @@ mistakes.
 ## 1. Clicking on an individual stack of blocks
 
 The *Play* button (in top left corner) will run all of the *Start*
-blocks simultenously. (Every Music Blocks project has at least one
+blocks simultaneously. (Every Music Blocks project has at least one
 *Start* block). But you can also run an individual stack of code by
 clicking on a stack. This lets you test and debug small sections of
 code, or, as in the example below, you can play a single voice by
