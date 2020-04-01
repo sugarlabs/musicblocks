@@ -90,25 +90,20 @@ before being displayed.
 
 ## 4. Playback modes
 
-Clicking on the *Play* button will play your program at full
-speed. (It will also hide the blocks while the program runs, which
-improves performance.) But there are four other playback modes.
+Clicking on the Play button will play your program at full speed.
+(It will also hide the blocks while the program runs, which improves
+performance.) But there are two other playback modes.
 
-A "long press" on the *Play* button will invoke *Playback Slow*
-mode. The program will pause between the execution of each block and
-the block being executed will be highlighted. This is useful for
-following program flow, ensuring that the sequence of blocks being
-executed is what you expect. In addition, the value stored in any box
-or parameter is displayed on the block as the program runs, so you can
-"inspect" program elements as the program runs.
+On the Secondary Menu, there are two other Play buttons.
 
-An "extra long press" on the *Play* button will invoke *Playback Music
-Slow* mode. This mode is similar to *Playback Slow* mode, only the
-pause is only inserted between *Note Value* blocks. All other blocks
-are run at full speed.
+During Playback Slow mode the program will pause between the execution
+of each block and the block being executed will be highlighted. This is
+useful for following program flow, ensuring that the sequence of blocks
+being executed is what you expect. In addition, the value stored in any
+box or parameter is displayed on the block as the program runs, so you
+can "inspect" program elements as the program runs.
 
-Two other modes, *Run Step by Step* and *Run Note by Note* advance one
-block or one note per button press.
+Run Step by Step advances one block per button press.
 
 ## 5. Show and Hide blocks
 
