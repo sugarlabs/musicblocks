@@ -113,7 +113,7 @@ useful for setting
 program to debug a specific section of code. By putting a *Show* block
 at the start of a problematic section of code and a *Hide* block at
 the end of the section, your program can be run full speed until it
-gets to the *Show* block. Then the blocks are blocks are displayed and
+gets to the *Show* block. Then the blocks are displayed and
 run in *Playback Slow* mode. When the *Hide* block is encountered, the
 blocks are hidden and the program resumes running at full speed.
 
