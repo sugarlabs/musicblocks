@@ -82,7 +82,7 @@
         <!-- <script src="lib/movieclip-0.7.1.min.js"></script> -->
 
         <script>
-            var canvas, stage;
+            let canvas, stage, lang;
             function init() {
                 canvas = document.getElementById("canvas");
                 stage = new createjs.Stage(canvas);
@@ -131,7 +131,7 @@
             style="position: absolute; width: 100%; height: 100%;cursor: wait;"
         >
             <script>
-                var loadL10nSplashScreen = function() {
+                let loadL10nSplashScreen = function() {
                     console.debug(
                         "The browser is set to " + navigator.language
                     );
@@ -140,9 +140,9 @@
                             "Music Blocks is set to " +
                                 localStorage.languagePreference
                         );
-                        var lang = localStorage.languagePreference;
+                        let lang = localStorage.languagePreference;
                     } else {
-                        var lang = navigator.language;
+                        let lang = navigator.language;
                     }
 
                     console.debug("Using " + lang);
@@ -168,7 +168,7 @@
             (function($) {
                 $.fn.fixMe = function() {
                     return this.each(function() {
-                        var $this = $(this),
+                        let $this = $(this),
                             $t_fixed;
 
                         function init() {
@@ -198,7 +198,7 @@
                         }
 
                         function scrollFixed() {
-                            var offset = $(this).scrollTop(),
+                            let offset = $(this).scrollTop(),
                                 tableOffsetTop = $this.offset().top,
                                 tableOffsetBottom =
                                     tableOffsetTop +
@@ -239,7 +239,7 @@
                 });
             });
 
-            var isDragging = false;
+            let isDragging = false;
         </script>
 
         <!-- #92B5C8  width = 3790 height = 1743-->
@@ -284,12 +284,12 @@
 
                 <script>
                     function hidePrintText() {
-                        var printText = document.getElementById("printText");
+                        let printText = document.getElementById("printText");
                         printText.classList.remove("show");
                     }
 
                     function hideErrorText() {
-                        var errorText = document.getElementById("errorText");
+                        let errorText = document.getElementById("errorText");
                         errorText.classList.remove("show");
                         hideArrows(); // This function is declared in js/activity.js
                     }
