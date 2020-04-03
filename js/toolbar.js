@@ -78,11 +78,29 @@ function Toolbar() {
     // let wrapTurtleTooltipData = "Wrap Turtle Off";
     
     this.renderWrapIcon = function() {
-        var wrapIcon = docById("wrapTurtle");
+        let wrapIcon = docById("wrapTurtle");
+        let wrapButtonTooltipData = "Turtle Wrap Off";
+
+        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        $j(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
 
         wrapIcon.onclick = () => {
             WRAP = !WRAP;
             console.log(WRAP);
+            if (WRAP) {
+                wrapButtonTooltipData = "Turtle Wrap Off";
+            } else {
+                wrapButtonTooltipData = "Turle Wrap On";
+            }
+
+            wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
         }
     }
 
