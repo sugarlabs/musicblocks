@@ -18,12 +18,12 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return "0";
             } else {
-                var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof a === "number") {
                     if (a < 0) {
                         a = a * -1;
@@ -61,7 +61,7 @@ function setupExtrasBlocks() {
                 return;
             }
 
-            for (var p in logo.blocks.palettes.dict) {
+            for (let p in logo.blocks.palettes.dict) {
                 if (
                     _(logo.blocks.palettes.dict[p].name) ===
                     args[0].toLowerCase()
@@ -111,11 +111,11 @@ function setupExtrasBlocks() {
             }
 
             // Disconnect the block.
-            var c = logo.blocks.blockList[args[0]].connections[0];
+            let c = logo.blocks.blockList[args[0]].connections[0];
             logo.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[c].connections.length;
                     i++
                 ) {
@@ -162,8 +162,8 @@ function setupExtrasBlocks() {
                 return;
             }
 
-            var x = logo.turtles.turtleX2screenX(args[1]);
-            var y = logo.turtles.turtleY2screenY(args[2]);
+            let x = logo.turtles.turtleX2screenX(args[1]);
+            let y = logo.turtles.turtleY2screenY(args[2]);
             logo.blocks.moveBlock(args[0], x, y);
         }
     }
@@ -197,7 +197,7 @@ function setupExtrasBlocks() {
 
             if (typeof args[0] == "string") {
                 // Look for a block with logo name
-                for (var i = 0; i < logo.blocks.blockList.length; i++) {
+                for (let i = 0; i < logo.blocks.blockList.length; i++) {
                     if (
                         logo.blocks.blockList[i].protoblock.staticLabels
                             .length > 0 &&
@@ -220,7 +220,7 @@ function setupExtrasBlocks() {
             }
 
             if (logo.blocks.blockList[args[0]].name === "start") {
-                var thisTurtle = logo.blocks.blockList[args[0]].value;
+                let thisTurtle = logo.blocks.blockList[args[0]].value;
                 console.debug("run start " + thisTurtle);
                 logo.initTurtle(thisTurtle);
                 logo.turtles.turtleList[thisTurtle].queue = [];
@@ -299,7 +299,7 @@ function setupExtrasBlocks() {
             }
 
             // Make sure there is not another block already connected.
-            var c = logo.blocks.blockList[args[0]].connections[args[1]];
+            let c = logo.blocks.blockList[args[0]].connections[args[1]];
             if (c !== null) {
                 if (logo.blocks.blockList[c].name === "hidden") {
                     // Dock to the hidden block.
@@ -308,7 +308,7 @@ function setupExtrasBlocks() {
                 } else {
                     // Or disconnection the old connection.
                     for (
-                        var i = 0;
+                        let i = 0;
                         i < logo.blocks.blockList[c].connections.length;
                         i++
                     ) {
@@ -359,14 +359,14 @@ function setupExtrasBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             logo.showBlocks(); // Force blocks to be visible.
-            var blockArgs = [null];
+            let blockArgs = [null];
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    var t = logo.parseArg(
+                    let t = logo.parseArg(
                         logo,
                         turtle,
                         logo.blocks.blockList[blk].connections[i + 2],
@@ -376,14 +376,14 @@ function setupExtrasBlocks() {
                     blockArgs.push(t);
                 }
             }
-            var cblk = logo.blocks.blockList[blk].connections[1];
-            var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            var blockNumber = logo.blocks.blockList.length;
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            let blockNumber = logo.blocks.blockList.length;
 
-            var x = logo.turtles.turtleX2screenX(
+            let x = logo.turtles.turtleX2screenX(
                 logo.turtles.turtleList[turtle].x
             );
-            var y = logo.turtles.turtleY2screenY(
+            let y = logo.turtles.turtleY2screenY(
                 logo.turtles.turtleList[turtle].y
             );
 
@@ -395,28 +395,28 @@ function setupExtrasBlocks() {
             if (name === _("note")) {
                 switch (blockArgs.length) {
                     case 1:
-                        var p = "sol";
-                        var o = 4;
-                        var v = 4;
+                        let p = "sol";
+                        let o = 4;
+                        let v = 4;
                         break;
                     case 2:
-                        var p = blockArgs[1];
-                        var o = 4;
-                        var v = 4;
+                        p = blockArgs[1];
+                        o = 4;
+                        v = 4;
                         break;
                     case 3:
-                        var p = blockArgs[1];
-                        var o = blockArgs[2];
-                        var v = 4;
+                        p = blockArgs[1];
+                        o = blockArgs[2];
+                        v = 4;
                         break;
                     default:
-                        var p = blockArgs[1];
-                        var o = blockArgs[2];
-                        var v = blockArgs[3];
+                        p = blockArgs[1];
+                        o = blockArgs[2];
+                        v = blockArgs[3];
                         break;
                 }
 
-                var newNote = [
+                let newNote = [
                     [0, "newnote", x, y, [null, 1, 4, 8]],
                     [1, "divide", 0, 0, [0, 2, 3]],
                     [2, ["number", { value: 1 }], 0, 0, [1]],
@@ -431,28 +431,28 @@ function setupExtrasBlocks() {
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("start")) {
-                var newBlock = [[0, "start", x, y, [null, null, null]]];
+                let newBlock = [[0, "start", x, y, [null, null, null]]];
                 logo.blocks.loadNewBlocks(newBlock);
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("silence")) {
                 // FIXME: others too
-                var newBlock = [[0, "rest2", x, y, [null, null]]];
+                let newBlock = [[0, "rest2", x, y, [null, null]]];
                 logo.blocks.loadNewBlocks(newBlock);
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else {
-                var obj = logo.blocks.palettes.getProtoNameAndPalette(name);
-                var protoblk = obj[0];
-                var protoName = obj[2];
+                let obj = logo.blocks.palettes.getProtoNameAndPalette(name);
+                let protoblk = obj[0];
+                let protoName = obj[2];
                 if (protoblk === null) {
                     logo.errorMsg(_("Cannot find block") + " " + name);
                     console.debug("Cannot find block " + name);
                     return 0;
                 } else {
-                    var newBlock = [[0, protoName, x, y, [null]]];
+                    let newBlock = [[0, protoName, x, y, [null]]];
                     for (
-                        var i = 1;
+                        let i = 1;
                         i <
                         logo.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
@@ -685,7 +685,7 @@ function setupExtrasBlocks() {
             url = args[0];
 
             function ValidURL(str) {
-                var pattern = new RegExp(
+                let pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
                     "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
                     "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
@@ -703,7 +703,7 @@ function setupExtrasBlocks() {
             }
 
             if (ValidURL(url)) {
-                var win = window.open(url, "_blank");
+                let win = window.open(url, "_blank");
                 if (win) {
                     // Browser has allowed it to be opened.
                     win.focus();
@@ -752,7 +752,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         }
     }
@@ -783,7 +783,7 @@ function setupExtrasBlocks() {
                     var bpmFactor = TONEBPM / logo._masterBPM;
                 }
 
-                var noteBeatValue = bpmFactor / (1 / args[0]);
+                let noteBeatValue = bpmFactor / (1 / args[0]);
                 logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
                 logo.turtleTime[turtle] += noteBeatValue;
                 logo._doWait(turtle, args[0]);

@@ -209,8 +209,8 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
+            let drumname = DEFAULTDRUM;
+            for (let drum in DRUMNAMES) {
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
                 } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -220,10 +220,10 @@ function setupDrumBlocks() {
 
             logo.drumStyle[turtle].push(drumname);
 
-            var listenerName = "_mapdrum_" + turtle;
+            let listenerName = "_mapdrum_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.drumStyle[turtle].pop();
             };
 
@@ -287,8 +287,8 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
+            let drumname = DEFAULTDRUM;
+            for (let drum in DRUMNAMES) {
                 if (DRUMNAMES[drum][0] === args[0]) {
                     drumname = DRUMNAMES[drum][1];
                 } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -298,11 +298,11 @@ function setupDrumBlocks() {
 
             logo.drumStyle[turtle].push(drumname);
 
-            var listenerName = "_setdrum_" + turtle;
+            let listenerName = "_setdrum_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
-                var drumname = logo.drumStyle[turtle].pop();
+            let __listener = function(event) {
+                let drumname = logo.drumStyle[turtle].pop();
                 logo.pitchDrumTable[turtle] = {};
             };
 
@@ -361,11 +361,11 @@ function setupDrumBlocks() {
                 var arg = args[0];
             }
 
-            var drumname = DEFAULTDRUM;
+            let drumname = DEFAULTDRUM;
             if (arg.slice(0, 4) === "http") {
                 drumname = arg;
             } else {
-                for (var drum in DRUMNAMES) {
+                for (let drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === arg) {
                         drumname = DRUMNAMES[drum][1];
                         break;
@@ -422,11 +422,11 @@ function setupDrumBlocks() {
                     var bpmFactor = TONEBPM / logo._masterBPM;
                 }
 
-                var noteBeatValue = 4;
+                let noteBeatValue = 4;
                 var beatValue = bpmFactor / noteBeatValue;
 
                 __callback = function() {
-                    var j = logo.inNoteBlock[turtle].indexOf(blk);
+                    let j = logo.inNoteBlock[turtle].indexOf(blk);
                     logo.inNoteBlock[turtle].splice(j, 1);
                 };
 
