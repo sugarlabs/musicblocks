@@ -8,6 +8,7 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+let WRAP = true;
 
 function Toolbar() {
     var $j = jQuery.noConflict();
@@ -73,6 +74,34 @@ function Toolbar() {
             onclick();
         };
     };
+
+    // let wrapTurtleTooltipData = "Wrap Turtle Off";
+    
+    this.renderWrapIcon = function() {
+        let wrapIcon = docById("wrapTurtle");
+        let wrapButtonTooltipData = "Turtle Wrap Off";
+
+        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        $j(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
+
+        wrapIcon.onclick = () => {
+            WRAP = !WRAP;
+            if (WRAP) {
+                wrapButtonTooltipData = "Turtle Wrap Off";
+            } else {
+                wrapButtonTooltipData = "Turle Wrap On";
+            }
+
+            wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
+    }
 
     this.renderSaveIcons = function(
         html_onclick,
