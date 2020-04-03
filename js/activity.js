@@ -20,23 +20,23 @@ function Activity() {
     LEADING = 0;
     _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
-    var _ERRORMSGTIMEOUT_ = 15000;
-    var _MSGTIMEOUT_ = 60000;
-    var cellSize = 55;
-    var searchSuggestions = [];
-    var homeButtonContainers = [];
+    let _ERRORMSGTIMEOUT_ = 15000;
+    let _MSGTIMEOUT_ = 60000;
+    let cellSize = 55;
+    let searchSuggestions = [];
+    let homeButtonContainers = [];
 
-    var msgTimeoutID = null;
-    var msgText = null;
-    var errorMsgTimeoutID = null;
-    var errorMsgText = null;
-    var errorMsgArrow = null;
-    var errorArtwork = {};
+    let msgTimeoutID = null;
+    let msgText = null;
+    let errorMsgTimeoutID = null;
+    let errorMsgText = null;
+    let errorMsgArrow = null;
+    let errorArtwork = {};
 
-    var cartesianBitmap = null;
-    var polarBitmap = null;
+    let cartesianBitmap = null;
+    let polarBitmap = null;
 
-    var ERRORARTWORK = [
+    let ERRORARTWORK = [
         "emptybox",
         "emptyheap",
         "negroot",
@@ -48,7 +48,7 @@ function Activity() {
         "nomicrophone"
     ];
 
-    var that = this;
+    const that = this;
 
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
@@ -98,7 +98,7 @@ function Activity() {
         } catch (e) {}
     }
 
-    var firstTimeUser = false;
+    let firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
         beginnerMode = true;
         try {
@@ -201,7 +201,7 @@ function Activity() {
     ];
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        MUSICBLOCKS_EXTRAS = [
+        let MUSICBLOCKS_EXTRAS = [
             "Tone",
             "widgets/widgetWindows",
             "widgets/modewidget",
@@ -434,8 +434,8 @@ function Activity() {
         if (!blocks.visible) {
             _changeBlockVisibility();
         }
-        var leftpos = Math.floor(canvas.width / 4);
-        var toppos;
+        let leftpos = Math.floor(canvas.width / 4);
+        let toppos;
         blocks.activeBlock = null;
         hideDOMLabel();
         logo.showBlocks();
@@ -449,26 +449,26 @@ function Activity() {
         }
 
         palettes.updatePalettes();
-        var x = Math.floor(leftpos * turtleBlocksScale);
-        var y = Math.floor(toppos * turtleBlocksScale);
-        var even = true;
+        let x = Math.floor(leftpos * turtleBlocksScale);
+        let y = Math.floor(toppos * turtleBlocksScale);
+        let even = true;
 
         // First start blocks
-        for (var blk in blocks.blockList) {
+        for (let blk in blocks.blockList) {
             if (!blocks.blockList[blk].trash) {
-                var myBlock = blocks.blockList[blk];
+                let myBlock = blocks.blockList[blk];
                 if (myBlock.name !== "start") {
                     continue;
                 }
 
                 if (myBlock.connections[0] == null) {
-                    var dx = x - myBlock.container.x;
-                    var dy = y - myBlock.container.y;
+                    let dx = x - myBlock.container.x;
+                    let dy = y - myBlock.container.y;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.findDragGroup(blk);
                     if (blocks.dragGroup.length > 0) {
-                        for (var b = 0; b < blocks.dragGroup.length; b++) {
-                            var bblk = blocks.dragGroup[b];
+                        for (let b = 0; b < blocks.dragGroup.length; b++) {
+                            let bblk = blocks.dragGroup[b];
                             if (b !== 0) {
                                 blocks.moveBlockRelative(bblk, dx, dy);
                             }
@@ -491,21 +491,21 @@ function Activity() {
         }
 
         // The everything else
-        for (var blk in blocks.blockList) {
+        for (let blk in blocks.blockList) {
             if (!blocks.blockList[blk].trash) {
-                var myBlock = blocks.blockList[blk];
+                let myBlock = blocks.blockList[blk];
                 if (myBlock.name === "start") {
                     continue;
                 }
 
                 if (myBlock.connections[0] == null) {
-                    var dx = x - myBlock.container.x;
-                    var dy = y - myBlock.container.y;
+                    let dx = x - myBlock.container.x;
+                    let dy = y - myBlock.container.y;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.findDragGroup(blk);
                     if (blocks.dragGroup.length > 0) {
-                        for (var b = 0; b < blocks.dragGroup.length; b++) {
-                            var bblk = blocks.dragGroup[b];
+                        for (let b = 0; b < blocks.dragGroup.length; b++) {
+                            let bblk = blocks.dragGroup[b];
                             if (b !== 0) {
                                 blocks.moveBlockRelative(bblk, dx, dy);
                             }
@@ -531,9 +531,9 @@ function Activity() {
         boundary.hide();
 
         // Return mice to the center of the screen.
-        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             console.debug("bringing turtle " + turtle + "home");
-            var savedPenState = turtles.turtleList[turtle].penState;
+            let savedPenState = turtles.turtleList[turtle].penState;
             turtles.turtleList[turtle].penState = false;
             turtles.turtleList[turtle].doSetXY(0, 0);
             turtles.turtleList[turtle].doSetHeading(0);
@@ -562,18 +562,18 @@ function Activity() {
         setTimeout(function() {
             sendAllToTrash(false, true);
             setTimeout(function() {
-                var message =
+                let message =
                     blocks.blockList[blocks.activeBlock].protoblock.helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just
                     // load the block.
                     console.debug("CLICK: " + name);
-                    var obj = blocks.palettes.getProtoNameAndPalette(name);
-                    var protoblk = obj[0];
-                    var paletteName = obj[1];
-                    var protoName = obj[2];
+                    let obj = blocks.palettes.getProtoNameAndPalette(name);
+                    let protoblk = obj[0];
+                    let paletteName = obj[1];
+                    let protoName = obj[2];
 
-                    var protoResult = blocks.protoBlockDict.hasOwnProperty(
+                    let protoResult = blocks.protoBlockDict.hasOwnProperty(
                         protoName
                     );
                     if (protoResult) {
@@ -588,12 +588,12 @@ function Activity() {
                 } else if (typeof message[3] === "string") {
                     // If it is a string, load the macro
                     // assocuated with this block
-                    var blocksToLoad = getMacroExpansion(message[3], 0, 0);
+                    let blocksToLoad = getMacroExpansion(message[3], 0, 0);
                     console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 } else {
                     // Load the blocks.
-                    var blocksToLoad = message[3];
+                    let blocksToLoad = message[3];
                     console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 }
@@ -608,8 +608,8 @@ function Activity() {
 
     _saveHelpBlocks = function() {
         // Save the artwork for every help block.
-        var i = 0;
-        for (var name in BLOCKHELP) {
+        let i = 0;
+        for (let name in BLOCKHELP) {
             console.debug(name);
             __saveHelpBlock(name, i * 2000);
             i += 1;
@@ -623,11 +623,12 @@ function Activity() {
      */
     _printBlockSVG = function() {
         blocks.activeBlock = null;
-        var startCounter = 0;
-        var svg = "";
-        var xMax = 0;
-        var yMax = 0;
-        for (var i = 0; i < blocks.blockList.length; i++) {
+        let startCounter = 0;
+        let svg = "";
+        let xMax = 0;
+        let yMax = 0;
+        let parts;
+        for (let i = 0; i < blocks.blockList.length; i++) {
             if (blocks.blockList[i].ignore()) {
                 continue;
             }
@@ -650,9 +651,9 @@ function Activity() {
             }
 
             if (blocks.blockList[i].collapsed) {
-                var parts = blocks.blockCollapseArt[i].split("><");
+                parts = blocks.blockCollapseArt[i].split("><");
             } else {
-                var parts = blocks.blockArt[i].split("><");
+                parts = blocks.blockArt[i].split("><");
             }
 
             if (blocks.blockList[i].isCollapsible()) {
@@ -666,7 +667,7 @@ function Activity() {
                 blocks.blockList[i].container.y +
                 ')">';
             if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) {
-                for (var p = 1; p < parts.length; p++) {
+                for (let p = 1; p < parts.length; p++) {
                     // FIXME: This is fragile.
                     if (p === 1) {
                         svg += "<" + parts[p] + "><";
@@ -701,7 +702,7 @@ function Activity() {
                     }
                 }
             } else {
-                for (var p = 1; p < parts.length; p++) {
+                for (let p = 1; p < parts.length; p++) {
                     // FIXME: This is fragile.
                     if (p === 1) {
                         svg += "<" + parts[p] + "><";
@@ -727,9 +728,9 @@ function Activity() {
                 if (
                     INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1
                 ) {
-                    var y = blocks.blockList[i].container.y + 4;
+                    let y = blocks.blockList[i].container.y + 4;
                 } else {
-                    var y = blocks.blockList[i].container.y + 12;
+                    let y = blocks.blockList[i].container.y + 12;
                 }
 
                 svg +=
@@ -739,12 +740,12 @@ function Activity() {
                     y +
                     ') scale(0.5 0.5)">';
                 if (blocks.blockList[i].collapsed) {
-                    var parts = EXPANDBUTTON.split("><");
+                    parts = EXPANDBUTTON.split("><");
                 } else {
-                    var parts = COLLAPSEBUTTON.split("><");
+                    parts = COLLAPSEBUTTON.split("><");
                 }
 
-                for (var p = 2; p < parts.length - 1; p++) {
+                for (let p = 2; p < parts.length - 1; p++) {
                     svg += "<" + parts[p] + ">";
                 }
 
@@ -752,7 +753,7 @@ function Activity() {
             }
 
             if (blocks.blockList[i].name === "start") {
-                var x = blocks.blockList[i].container.x + 110;
+                let x = blocks.blockList[i].container.x + 110;
                 var y = blocks.blockList[i].container.y + 12;
                 svg +=
                     '<g transform="translate(' +
@@ -761,7 +762,7 @@ function Activity() {
                     y +
                     ') scale(0.4 0.4)">';
 
-                var parts = TURTLESVG.replace(
+                parts = TURTLESVG.replace(
                     /fill_color/g,
                     FILLCOLORS[startCounter]
                 )
@@ -773,7 +774,7 @@ function Activity() {
                     startCounter = 0;
                 }
 
-                for (var p = 2; p < parts.length - 1; p++) {
+                for (let p = 2; p < parts.length - 1; p++) {
                     svg += "<" + parts[p] + ">";
                 }
 
@@ -814,7 +815,7 @@ function Activity() {
         hideMsgs();
         logo.setBackgroundColor(-1);
         logo.notationOutput = "";
-        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             logo.turtleHeaps[turtle] = [];
             logo.notationStaging[turtle] = [];
             logo.notationDrumStaging[turtle] = [];
@@ -832,14 +833,14 @@ function Activity() {
         };
 
         NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (var i = 0, len = this.length; i < len; i++) {
+            for (let i = 0, len = this.length; i < len; i++) {
                 if (this[i] && this[i].parentElement) {
                     this[i].parentElement.removeChild(this[i]);
                 }
             }
         };
 
-        var table = docById("myTable");
+        let table = docById("myTable");
         if (table != null) {
             table.remove();
         }
@@ -854,8 +855,8 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        var currentDelay = logo.turtleDelay;
-        var playingWidget = false;
+        let currentDelay = logo.turtleDelay;
+        let playingWidget = false;
         logo.setTurtleDelay(0);
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
@@ -868,8 +869,8 @@ function Activity() {
             }
             */
 
-            var widgetTitle = document.getElementsByClassName("wftTitle");
-            for (var i = 0; i < widgetTitle.length; i++) {
+            let widgetTitle = document.getElementsByClassName("wftTitle");
+            for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
                     if (logo.tempo.isMoving) {
                         logo.tempo.pause();
@@ -938,7 +939,7 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        var turtleCount = Object.keys(logo.stepQueue).length;
+        let turtleCount = Object.keys(logo.stepQueue).length;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
         }
@@ -982,8 +983,8 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo._setMasterVolume(0);
 
-            var widgetTitle = document.getElementsByClassName("wftTitle");
-            for (var i = 0; i < widgetTitle.length; i++) {
+            let widgetTitle = document.getElementsByClassName("wftTitle");
+            for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
                     if (logo.tempo.isMoving) {
                         logo.tempo.pause();
@@ -999,7 +1000,7 @@ function Activity() {
      */
     doSwitchMode = function() {
         blocks.activeBlock = null;
-        var mode = localStorage.beginnerMode;
+        let mode = localStorage.beginnerMode;
 
         const MSGPrefix =
             "<a href='#' " +
@@ -1055,8 +1056,8 @@ function Activity() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         scrollPaletteContainer = !scrollPaletteContainer;
-        var enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        var disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        let enableHorizScrollIcon = docById("enableHorizScrollIcon");
+        let disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
             enableHorizScrollIcon.style.display = "none";
             disableHorizScrollIcon.style.display = "block";
@@ -1068,7 +1069,7 @@ function Activity() {
 
     //Load Animation handler
     doLoadAnimation = function() {
-        var messages = {
+        let messages = {
             load_messages: [
                 _("Catching mice"),
                 _("Cleaning the instruments"),
@@ -1083,11 +1084,11 @@ function Activity() {
         };
 
         document.getElementById("load-container").style.display = "block";
-        var counter = 0;
+        let counter = 0;
         setInterval(changeText, 2000);
 
         function changeText() {
-            var randomLoadMessage =
+            let randomLoadMessage =
                 messages.load_messages[
                     Math.floor(Math.random() * messages.load_messages.length)
                 ];
@@ -1108,7 +1109,7 @@ function Activity() {
      */
     this.closeAnalytics = function(chartBitmap, ctx) {
         blocks.activeBlock = null;
-        var button = this;
+        let button = this;
         button.x = canvas.width / (2 * turtleBlocksScale) + 300 / Math.sqrt(2);
         button.y = 200.0;
         this.closeButton = _makeButton(
@@ -1134,7 +1135,7 @@ function Activity() {
      * Checks if the canvas is blank
      */
     function _isCanvasBlank(canvas) {
-        var blank = document.createElement("canvas");
+        let blank = document.createElement("canvas");
         blank.width = canvas.width;
         blank.height = canvas.height;
         return canvas.toDataURL() == blank.toDataURL();
@@ -1145,7 +1146,7 @@ function Activity() {
      * of the MB project
      */
     closeAnalytics = this.closeAnalytics;
-    var th = this;
+    let th = this;
     doAnalytics = function() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
@@ -1155,14 +1156,14 @@ function Activity() {
             return;
         }
 
-        var ctx = myChart.getContext("2d");
+        let ctx = myChart.getContext("2d");
         loading = true;
         document.body.style.cursor = "wait";
 
-        var myRadarChart = null;
-        var scores = analyzeProject(blocks);
-        var data = scoreToChartData(scores);
-        var Analytics = this;
+        let myRadarChart = null;
+        let scores = analyzeProject(blocks);
+        let data = scoreToChartData(scores);
+        let Analytics = this;
         Analytics.close = th.closeAnalytics;
 
         __callback = function() {
@@ -1204,7 +1205,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale < BLOCKSCALES.length - 1) {
-                var resizeDebounce = true;
+                let resizeDebounce = true;
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
                 setTimeout(function() {
@@ -1378,14 +1379,14 @@ function Activity() {
      * Sets up block actions with regards to different mouse events
      */
     this._setupBlocksContainerEvents = function() {
-        var moving = false;
-        var lastCoords = {
+        let moving = false;
+        let lastCoords = {
             x: 0,
             y: 0,
             delta: 0
         };
 
-        var __paletteWheelHandler = function(event) {
+        let __paletteWheelHandler = function(event) {
             // vertical scroll
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
@@ -1419,12 +1420,12 @@ function Activity() {
             refreshCanvas();
         };
 
-        var myCanvas = docById("myCanvas");
+        let myCanvas = docById("myCanvas");
 
-        var __heightBasedScroll = function(event) {
+        let __heightBasedScroll = function(event) {
             actualReszieHandler(); // check size during init
             window.addEventListener("resize", resizeThrottler, false);
-            var resizeTimeout;
+            let resizeTimeout;
 
             function resizeThrottler() {
                 // Ignore resize events as long as an actualResizeHandler
@@ -1442,7 +1443,7 @@ function Activity() {
 
         function actualReszieHandler() {
             // Handle the resize event
-            var h = window.innerHeight;
+            let h = window.innerHeight;
 
             if (h < 500) {
                 //activate on mobile
@@ -1459,14 +1460,14 @@ function Activity() {
 
         __heightBasedScroll();
 		
-		var closeAnyOpenMenusAndLabels = function () {
-            if (docById("wheelDiv")!=null) docById("wheelDiv").style.display = "none";
-            if (docById("contextWheelDiv")!=null) docById("contextWheelDiv").style.display = "none";
+		let closeAnyOpenMenusAndLabels = function () {
+            if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
+            if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
             if (docById("textLabel") != null) docById("textLabel").style.display = "none";
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         }
 
-        var __wheelHandler = function(event) {
+        let __wheelHandler = function(event) {
             if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
 				closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
                 if (palettes.paletteVisible) {
@@ -1503,7 +1504,7 @@ function Activity() {
 
         docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
-        var __stageMouseUpHandler = function(event) {
+        let __stageMouseUpHandler = function(event) {
             stageMouseDown = false;
             moving = false;
 
@@ -1547,7 +1548,7 @@ function Activity() {
                 // if we are moving the block container, deselect the active block.
                 blocks.activeBlock = null;
 
-                var delta =
+                let delta =
                     Math.abs(event.stageX - lastCoords.x) +
                     Math.abs(event.stageY - lastCoords.y);
 
@@ -1574,15 +1575,15 @@ function Activity() {
      * Sets up scrolling functionality in palette and across canvas
      */
     function scrollEvent(event) {
-        var data = event.wheelDelta || -event.detail;
-        var delta = Math.max(-1, Math.min(1, data));
-        var scrollSpeed = 30;
+        let data = event.wheelDelta || -event.detail;
+        let delta = Math.max(-1, Math.min(1, data));
+        let scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
             palettes.menuScrollEvent(delta, scrollSpeed);
             palettes.hidePaletteIconCircles();
         } else {
-            var palette = palettes.findPalette(
+            let palette = palettes.findPalette(
                 event.clientX / turtleBlocksScale,
                 event.clientY / turtleBlocksScale
             );
@@ -1622,12 +1623,12 @@ function Activity() {
      * Renders grid
      */
     _createGrid = function(imagePath) {
-        var img = new Image();
+        let img = new Image();
         img.src = imagePath;
-        var container = new createjs.Container();
+        let container = new createjs.Container();
         stage.addChild(container);
 
-        var bitmap = new createjs.Bitmap(img);
+        let bitmap = new createjs.Bitmap(img);
         container.addChild(bitmap);
         bitmap.cache(0, 0, 1200, 900);
 
@@ -1648,22 +1649,22 @@ function Activity() {
      * @return {description}
      */
     _createMsgContainer = function(fillColor, strokeColor, callback, y) {
-        var container = new createjs.Container();
+        let container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
         container.y = y;
         container.visible = false;
 
-        var img = new Image();
-        var svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
+        let img = new Image();
+        let svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
             "stroke_color",
             strokeColor
         );
 
         img.onload = function() {
-            var msgBlock = new createjs.Bitmap(img);
+            let msgBlock = new createjs.Bitmap(img);
             container.addChild(msgBlock);
-            var text = new createjs.Text(
+            let text = new createjs.Text(
                 "your message here",
                 "20px Arial",
                 "#000000"
@@ -1674,10 +1675,10 @@ function Activity() {
             text.x = 500;
             text.y = 30;
 
-            var bounds = container.getBounds();
+            let bounds = container.getBounds();
             container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
-            var hitArea = new createjs.Shape();
+            let hitArea = new createjs.Shape();
             hitArea.graphics.beginFill("#FFF").drawRect(0, 0, 1000, 42);
             hitArea.x = 0;
             hitArea.y = 0;
@@ -1707,8 +1708,8 @@ function Activity() {
      * Some error messages have special artwork.
      */
     _createErrorContainers = function() {
-        for (var i = 0; i < ERRORARTWORK.length; i++) {
-            var name = ERRORARTWORK[i];
+        for (let i = 0; i < ERRORARTWORK.length; i++) {
+            let name = ERRORARTWORK[i];
             _makeErrorArtwork(name);
         }
     };
@@ -1718,7 +1719,7 @@ function Activity() {
      * renders error message with appropriate artwork
      */
     _makeErrorArtwork = function(name) {
-        var container = new createjs.Container();
+        let container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
         container.y = 80;
@@ -1726,19 +1727,19 @@ function Activity() {
         errorArtwork[name].name = name;
         errorArtwork[name].visible = false;
 
-        var img = new Image();
+        let img = new Image();
         img.onload = function() {
-            var artwork = new createjs.Bitmap(img);
+            let artwork = new createjs.Bitmap(img);
             container.addChild(artwork);
-            var text = new createjs.Text("", "20px Sans", "#000000");
+            let text = new createjs.Text("", "20px Sans", "#000000");
             container.addChild(text);
             text.x = 70;
             text.y = 10;
 
-            var bounds = container.getBounds();
+            let bounds = container.getBounds();
             container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
-            var hitArea = new createjs.Shape();
+            let hitArea = new createjs.Shape();
             hitArea.graphics
                 .beginFill("#FFF")
                 .drawRect(0, 0, bounds.width, bounds.height);
@@ -1789,7 +1790,7 @@ function Activity() {
      */
     hideSearchWidget = function() {
         // Hide the jQuery search results widget
-        var obj = docByClass("ui-menu");
+        let obj = docByClass("ui-menu");
         if (obj.length > 0) {
             obj[0].style.visibility = "hidden";
         }
@@ -1804,7 +1805,7 @@ function Activity() {
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
-            var obj = docByClass("ui-menu");
+            let obj = docByClass("ui-menu");
             if (obj.length > 0) {
                 obj[0].style.visibility = "visible";
             }
@@ -1832,7 +1833,7 @@ function Activity() {
      * Uses JQuery to add autocompleted search suggestions
      */
     doSearch = function() {
-        var $j = jQuery.noConflict();
+        let $j = jQuery.noConflict();
 
         $j("#search").autocomplete({
             source: searchSuggestions,
@@ -1846,13 +1847,13 @@ function Activity() {
             .autocomplete("widget")
             .addClass("scrollSearch");
 
-        var searchInput = searchWidget.value;
-        var obj = palettes.getProtoNameAndPalette(searchInput);
-        var protoblk = obj[0];
-        var paletteName = obj[1];
-        var protoName = obj[2];
+        let searchInput = searchWidget.value;
+        let obj = palettes.getProtoNameAndPalette(searchInput);
+        let protoblk = obj[0];
+        let paletteName = obj[1];
+        let protoName = obj[2];
 
-        var searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+        let searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
         if (searchInput.length > 0) {
             if (searchResult) {
@@ -1886,7 +1887,7 @@ function Activity() {
      * Makes initial "start up" note for a brand new MB project
      */
     __makeNewNote = function(octave, solf) {
-        var newNote = [
+        let newNote = [
             [
                 0,
                 "newnote",
@@ -1953,7 +1954,7 @@ function Activity() {
             // Connect the newly created block to the active block
             // (if it is a hidden block at the end of a new note
             // block).
-            var bottom = blocks.findBottomBlock(blocks.activeBlock);
+            let bottom = blocks.findBottomBlock(blocks.activeBlock);
             console.debug(blocks.activeBlock + " " + bottom);
             if (
                 blocks.blockList[bottom].name === "hidden" &&
@@ -1961,11 +1962,11 @@ function Activity() {
                     .name === "newnote"
             ) {
                 // The note block macro creates nine blocks.
-                var newlyCreatedBlock = blocks.blockList.length - 9;
+                let newlyCreatedBlock = blocks.blockList.length - 9;
 
                 // Set last connection of active block to the
                 // newly created block.
-                var lastConnection =
+                let lastConnection =
                     blocks.blockList[bottom].connections.length - 1;
                 blocks.blockList[bottom].connections[
                     lastConnection
@@ -1988,10 +1989,11 @@ function Activity() {
      * Handles keyboard shortcuts in MB
      */
     // Flag to disable keyboard during loading of MB
-    var keyboardEnableFlag;
+    let keyboardEnableFlag;
 
     function __keyPressed(event) {
-        var that = this;
+        let that = this;
+        let disableKeys;
 
         if (!keyboardEnableFlag) {
             return;
@@ -2078,7 +2080,7 @@ function Activity() {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            var disableKeys =
+            disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 searchWidget.style.visibility === "visible" ||
                 docById("planet-iframe").style.display === "" ||
@@ -2086,17 +2088,17 @@ function Activity() {
                 docById("wheelDiv").style.display === "" ||
                 logo.turtles.running();
         } else {
-            var disableKeys =
+            disableKeys =
                 searchWidget.style.visibility === "visible" ||
                 docById("paste").style.visibility === "visible" ||
                 logo.turtles.running();
         }
 
-        var widgetTitle = document.getElementsByClassName("wftTitle");
-        var inTempoWidget = false;
-        for (var i = 0; i < widgetTitle.length; i++) {
+        let widgetTitle = document.getElementsByClassName("wftTitle");
+        let inTempoWidget = false;
+        for (let i = 0; i < widgetTitle.length; i++) {
             if (widgetTitle[i].innerHTML === "tempo") {
-                var inTempoWidget = true;
+                inTempoWidget = true;
                 break;
             }
         }
@@ -2154,7 +2156,7 @@ function Activity() {
                     break;
             }
         } else if (event.shiftKey && !disableKeys) {
-            var solfnotes_ = _("ti la sol fa mi re do").split(" ");
+            let solfnotes_ = _("ti la sol fa mi re do").split(" ");
             switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2208,7 +2210,7 @@ function Activity() {
                     pasted();
                 }
             } else if (!disableKeys) {
-                var solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                let solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
                     case END:
                         textMsg(
@@ -2323,7 +2325,7 @@ function Activity() {
                     case HOME:
                         textMsg("HOME " + _("Jump to home position."));
                         if (palettes.mouseOver) {
-                            var dy = Math.max(
+                            let dy = Math.max(
                                 55 - palettes.buttons["rhythm"].y,
                                 0
                             );
@@ -2455,7 +2457,7 @@ function Activity() {
      * Repositions containers/palette/home buttons
      */
     function _onResize(force) {
-        var $j = jQuery.noConflict();
+        let $j = jQuery.noConflict();
         console.debug(
             "document.body.clientWidth and clientHeight: " +
                 document.body.clientWidth +
@@ -2476,13 +2478,13 @@ function Activity() {
                 ", " +
                 window.outerHeight
         );
-
+        let w = 0, h = 0;
         if (!platform.androidWebkit) {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
+            w = window.innerWidth;
+            h = window.innerHeight;
         } else {
-            var w = window.outerWidth;
-            var h = window.outerHeight;
+            w = window.outerWidth;
+            h = window.outerHeight;
         }
 
         // If the clientWidth hasn't changed, don't resize (except
@@ -2519,19 +2521,19 @@ function Activity() {
             return;
         }
 
-        var smallSide = Math.min(w, h);
-
+        let smallSide = Math.min(w, h);
+        let mobileSize;
         if (smallSide < cellSize * 9) {
             // var mobileSize = true;
             // FIXME
-            var mobileSize = false;
+            mobileSize = false;
             if (w < cellSize * 10) {
                 turtleBlocksScale = smallSide / (cellSize * 11);
             } else {
                 turtleBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
             }
         } else {
-            var mobileSize = false;
+            mobileSize = false;
             if (w / 1200 > h / 900) {
                 turtleBlocksScale = w / 1200;
             } else {
@@ -2576,11 +2578,11 @@ function Activity() {
             palettes.bringToTop();
         }
 
-        for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             turtles.turtleList[turtle].doClear(false, false, true);
         }
 
-        var artcanvas = docById("overlayCanvas");
+        let artcanvas = docById("overlayCanvas");
         // Workaround for #795.5
         if (mobileSize) {
             artcanvas.width = w * 2;
@@ -2603,27 +2605,27 @@ function Activity() {
      * Repositions blocks about trash area
      */
     _restoreTrash = function() {
-        for (var name in blocks.palettes.dict) {
+        for (let name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
         blocks.activeBlock = null;
         refreshCanvas();
 
-        var dx = 0;
-        var dy = -cellSize * 3; // Reposition
+        let dx = 0;
+        let dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
             console.debug("Trash is empty--nothing to do");
             return;
         }
 
-        var thisBlock = blocks.trashStacks.pop();
+        let thisBlock = blocks.trashStacks.pop();
 
         // Restore drag group in trash
         blocks.findDragGroup(thisBlock);
-        for (var b = 0; b < blocks.dragGroup.length; b++) {
-            var blk = blocks.dragGroup[b];
+        for (let b = 0; b < blocks.dragGroup.length; b++) {
+            let blk = blocks.dragGroup[b];
             // console.debug('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
             blocks.blockList[blk].trash = false;
             blocks.moveBlockRelative(blk, dx, dy);
@@ -2636,22 +2638,22 @@ function Activity() {
             blocks.blockList[thisBlock].name === "start" ||
             blocks.blockList[thisBlock].name === "drum"
         ) {
-            var turtle = blocks.blockList[thisBlock].value;
+            let turtle = blocks.blockList[thisBlock].value;
             turtles.turtleList[turtle].trash = false;
             turtles.turtleList[turtle].container.visible = true;
         } else if (blocks.blockList[thisBlock].name === "action") {
             // We need to add a palette entry for this action.
             // But first we need to ensure we have a unqiue name,
             // as the name could have been taken in the interim.
-            var actionArg =
+            let actionArg =
                 blocks.blockList[blocks.blockList[thisBlock].connections[1]];
             if (actionArg != null) {
-                var oldName = actionArg.value;
+                let oldName = actionArg.value;
                 // Mark the action block as still being in the
                 // trash so that its name won't be considered when
                 // looking for a unique name.
                 blocks.blockList[thisBlock].trash = true;
-                var uniqueName = blocks.findUniqueActionName(oldName);
+                let uniqueName = blocks.findUniqueActionName(oldName);
                 blocks.blockList[thisBlock].trash = false;
 
                 if (uniqueName !== actionArg) {
@@ -2664,7 +2666,7 @@ function Activity() {
 
                     actionArg.value = uniqueName;
 
-                    var label = actionArg.value.toString();
+                    let label = actionArg.value.toString();
                     if (label.length > 8) {
                         label = label.substr(0, 7) + "...";
                     }
@@ -2678,8 +2680,8 @@ function Activity() {
 
                     // Check the drag group to ensure any do
                     // blocks are updated (in case of recursion).
-                    for (var b = 0; b < blocks.dragGroup.length; b++) {
-                        var me = blocks.blockList[blocks.dragGroup[b]];
+                    for (let b = 0; b < blocks.dragGroup.length; b++) {
+                        let me = blocks.blockList[blocks.dragGroup[b]];
                         if (
                             [
                                 "nameddo",
@@ -2695,7 +2697,7 @@ function Activity() {
                             me.privateData = uniqueName;
                             me.value = uniqueName;
 
-                            var label = me.value.toString();
+                            label = me.value.toString();
                             if (label.length > 8) {
                                 label = label.substr(0, 7) + "...";
                             }
@@ -2707,7 +2709,7 @@ function Activity() {
                     }
                 }
 
-                var actionName = actionArg.value;
+                let actionName = actionArg.value;
                 if (actionName !== _("action")) {
                     // blocks.checkPaletteEntries('action');
                     console.debug("FIXME: Check for unique action name here");
@@ -2755,17 +2757,17 @@ function Activity() {
         // Return to home position after loading new blocks.
         blocksContainer.x = 0;
         blocksContainer.y = 0;
-        for (var name in blocks.palettes.dict) {
+        for (let name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
         hideDOMLabel();
         refreshCanvas();
 
-        var actionBlockCounter = 0;
-        var dx = 0;
-        var dy = cellSize * 3;
-        for (var blk in blocks.blockList) {
+        let actionBlockCounter = 0;
+        let dx = 0;
+        const dy = cellSize * 3;
+        for (let blk in blocks.blockList) {
             // If this block is at the top of a stack, push it
             // onto the trashStacks list.
             if (blocks.blockList[blk].connections[0] == null) {
@@ -2782,7 +2784,7 @@ function Activity() {
                         " value is " +
                         blocks.blockList[blk].value
                 );
-                var turtle = blocks.blockList[blk].value;
+                let turtle = blocks.blockList[blk].value;
                 if (!blocks.blockList[blk].trash && turtle != null) {
                     console.debug("sending turtle " + turtle + " to trash");
                     turtles.turtleList[turtle].trash = true;
@@ -2907,7 +2909,7 @@ function Activity() {
     /*
      * Updates all canvas elements
      */
-    var blockRefreshCanvas = false;
+    let blockRefreshCanvas = false;
     function refreshCanvas() {
         if (blockRefreshCanvas) {
             return;
@@ -3057,11 +3059,11 @@ function Activity() {
             update = true;
         }, 2500);
 
-        var run = flags.run;
-        var show = flags.show;
-        var collapse = flags.collapse;
+        let run = flags.run;
+        let show = flags.show;
+        let collapse = flags.collapse;
 
-        var __functionload = function() {
+        let __functionload = function() {
             setTimeout(function() {
                 if (!collapse && firstRun) {
                     _toggleCollapsibleStacks();
@@ -3069,7 +3071,7 @@ function Activity() {
 
                 if (run && firstRun) {
                     for (
-                        var turtle = 0;
+                        let turtle = 0;
                         turtle < turtles.turtleList.length;
                         turtle++
                     ) {
@@ -3110,12 +3112,12 @@ function Activity() {
      * @param loadProject all params are from load project function
      */
     this.loadStartWrapper = async function(func, arg1, arg2, arg3) {
-        var time1 = new Date();
+        let time1 = new Date();
         await func(arg1, arg2, arg3);
 
-        var time2 = new Date();
-        var elapsedTime = time2.getTime() - time1.getTime();
-        var timeLeft = Math.max(6000 - elapsedTime);
+        let time2 = new Date();
+        let elapsedTime = time2.getTime() - time1.getTime();
+        let timeLeft = Math.max(6000 - elapsedTime);
         setTimeout(that.showContents, timeLeft);
     };
 
@@ -3159,11 +3161,11 @@ function Activity() {
         if (planet) {
             sessionData = await planet.openCurrentProject();
         } else {
-            var currentProject = storage.currentProject;
+            let currentProject = storage.currentProject;
             sessionData = storage["SESSION" + currentProject];
         }
 
-        var __afterLoad = function() {
+        let __afterLoad = function() {
             if (!turtles.running()) {
                 setTimeout(function() {
                     stage.update(event);
@@ -3172,7 +3174,7 @@ function Activity() {
                     );
 
                     for (
-                        var turtle = 0;
+                        let turtle = 0;
                         turtle < turtles.turtleList.length;
                         turtle++
                     ) {
@@ -3227,7 +3229,7 @@ function Activity() {
                         )}...`
                     );
                     // First, hide the palettes as they will need updating.
-                    for (var name in blocks.palettes.dict) {
+                    for (let name in blocks.palettes.dict) {
                         blocks.palettes.dict[name].hideMenu(true);
                     }
 
@@ -3281,11 +3283,11 @@ function Activity() {
         }
 
         // Show and populate printText div
-        var printText = document.getElementById("printText");
+        let printText = document.getElementById("printText");
 
         printText.classList.add("show");
 
-        var printTextContent = document.getElementById("printTextContent");
+        let printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
         msgTimeoutID = setTimeout(function() {
@@ -3318,17 +3320,17 @@ function Activity() {
             blk != null &&
             !blocks.blockList[blk].collapsed
         ) {
-            var fromX = (canvas.width - 1000) / 2;
-            var fromY = 128;
-            var toX = blocks.blockList[blk].container.x + blocksContainer.x;
-            var toY = blocks.blockList[blk].container.y + blocksContainer.y;
+            let fromX = (canvas.width - 1000) / 2;
+            let fromY = 128;
+            let toX = blocks.blockList[blk].container.x + blocksContainer.x;
+            let toY = blocks.blockList[blk].container.y + blocksContainer.y;
 
             if (errorMsgArrow == null) {
                 errorMsgArrow = new createjs.Container();
                 stage.addChild(errorMsgArrow);
             }
 
-            var line = new createjs.Shape();
+            let line = new createjs.Shape();
             errorMsgArrow.addChild(line);
             line.graphics
                 .setStrokeStyle(4)
@@ -3337,8 +3339,8 @@ function Activity() {
                 .lineTo(toX, toY);
             stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
 
-            var angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
-            var head = new createjs.Shape();
+            let angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
+            let head = new createjs.Shape();
             errorMsgArrow.addChild(head);
             head.graphics
                 .setStrokeStyle(4)
@@ -3429,19 +3431,18 @@ function Activity() {
                 break;
             default:
                 // Show and populate errorText div
-                var errorText = document.getElementById("errorText");
+                let errorText = document.getElementById("errorText");
                 errorText.classList.add("show");
-                var errorTextContent = document.getElementById(
+                let errorTextContent = document.getElementById(
                     "errorTextContent"
                 );
                 errorTextContent.innerHTML = msg;
                 break;
         }
 
-        if (timeout != undefined) {
-            var myTimeout = timeout;
-        } else {
-            var myTimeout = _ERRORMSGTIMEOUT_;
+        let myTimeout = _ERRORMSGTIMEOUT_;
+        if (timeout !== undefined) {
+            myTimeout = timeout;
         }
 
         if (myTimeout > 0) {
@@ -3502,10 +3503,10 @@ function Activity() {
      * playback queue if we are saving to Lilypond.
      */
     function prepareExport() {
-        var blockMap = [];
-        var hasMatrixDataBlock = false;
-        for (var blk = 0; blk < blocks.blockList.length; blk++) {
-            var myBlock = blocks.blockList[blk];
+        let blockMap = [];
+        let hasMatrixDataBlock = false;
+        for (let blk = 0; blk < blocks.blockList.length; blk++) {
+            let myBlock = blocks.blockList[blk];
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
                 continue;
@@ -3514,10 +3515,10 @@ function Activity() {
             blockMap.push(blk);
         }
 
-        var data = [];
-        for (var blk = 0; blk < blocks.blockList.length; blk++) {
-            var myBlock = blocks.blockList[blk];
-            var args = null;
+        let data = [];
+        for (let blk = 0; blk < blocks.blockList.length; blk++) {
+            let myBlock = blocks.blockList[blk];
+            let args = null;
 
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
@@ -3547,7 +3548,7 @@ function Activity() {
                     case "start":
                     case "drum":
                         // Find the turtle associated with this block.
-                        var turtle = turtles.turtleList[myBlock.value];
+                        let turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
                             args = {
                                 collapsed: false,
@@ -3632,8 +3633,8 @@ function Activity() {
             }
 
             connections = [];
-            for (var c = 0; c < myBlock.connections.length; c++) {
-                var mapConnection = blockMap.indexOf(myBlock.connections[c]);
+            for (let c = 0; c < myBlock.connections.length; c++) {
+                let mapConnection = blockMap.indexOf(myBlock.connections[c]);
                 if (myBlock.connections[c] == null || mapConnection === -1) {
                     connections.push(null);
                 } else {
@@ -3666,12 +3667,12 @@ function Activity() {
             logo.playbackQueue = {};
         }
 
-        var i = data.length;
+        let i = data.length;
         if (i > 0) {
-            for (var turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+            for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                 if (turtle in logo.playbackQueue) {
                     for (
-                        var j = 0;
+                        let j = 0;
                         j < logo.playbackQueue[turtle].length;
                         j++
                     ) {
@@ -3758,14 +3759,14 @@ function Activity() {
             stage.removeChild(largerOffContainer);
         }
 
-        var btnSize = cellSize;
+        let btnSize = cellSize;
         // Upper left
         // var x = 27.5 + 6;
         // var y = toolbarHeight + 95.5 + 6;
         // Lower right
-        var x = this._innerWidth - 4 * btnSize - 27.5;
-        var y = this._innerHeight - 27.5;
-        var dx = btnSize;
+        let x = this._innerWidth - 4 * btnSize - 27.5;
+        let y = this._innerHeight - 27.5;
+        let dx = btnSize;
 
         homeButtonContainers = [];
         homeButtonContainers.push(
@@ -3957,7 +3958,7 @@ function Activity() {
      * Shows help page
      */
     _showHelp = function() {
-        var helpWidget = new HelpWidget();
+        let helpWidget = new HelpWidget();
         helpWidget.init(null);
     };
 
@@ -3965,7 +3966,7 @@ function Activity() {
      * Shows about page
      */
     _showAboutPage = function() {
-        var helpWidget = new HelpWidget();
+        let helpWidget = new HelpWidget();
         helpWidget.init(null);
         helpWidget.showPageByName(_("About"));
     };
@@ -3981,22 +3982,20 @@ function Activity() {
      * REDUNDANT
      */
     _doMenuAnimation = function(arg) {
+        let animate = arg;
         if (arg === undefined) {
-            var animate = true;
-        } else {
-            var animate = arg;
+            animate = true;
         }
 
+        let timeout = 50;
         if (animate) {
-            var timeout = 500;
-        } else {
-            var timeout = 50;
+            timeout = 500;
         }
 
-        var bitmap = last(menuContainer.children);
+        let bitmap = last(menuContainer.children);
         if (bitmap != null) {
             if (animate) {
-                var r = bitmap.rotation;
+                let r = bitmap.rotation;
                 if (r % 95.5 !== 0) {
                     return;
                 }
@@ -4046,11 +4045,11 @@ function Activity() {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
         headerContainer.visible = buttonsVisible;
-        for (var button in onscreenButtons) {
+        for (let button in onscreenButtons) {
             onscreenButtons[button].visible = buttonsVisible;
         }
 
-        for (var button in onscreenMenu) {
+        for (let button in onscreenMenu) {
             onscreenMenu[button].visible = buttonsVisible;
         }
 
@@ -4074,7 +4073,7 @@ function Activity() {
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
     _makeButton = function(name, label, x, y, size, rotation, parent) {
-        var container = new createjs.Container();
+        let container = new createjs.Container();
 
         if (parent == undefined) {
             stage.addChild(container);
@@ -4085,7 +4084,7 @@ function Activity() {
         container.x = x;
         container.y = y;
 
-        var text = new createjs.Text(label, "14px Sans", "#282828");
+        let text = new createjs.Text(label, "14px Sans", "#282828");
         if (container.x < 55) {
             text.textAlign = "left";
             text.x = -14;
@@ -4105,16 +4104,16 @@ function Activity() {
 
         text.visible = false;
 
-        var circles;
+        let circles;
         container.on("mouseover", function(event) {
-            for (var c = 0; c < container.children.length; c++) {
+            for (let c = 0; c < container.children.length; c++) {
                 if (container.children[c].text != undefined) {
                     container.children[c].visible = true;
                     // Do we need to add a background?
                     // Should be image and text, hence === 2
                     if ([2, 5, 8].indexOf(container.children.length) !== -1) {
-                        var b = container.children[c].getBounds();
-                        var bg = new createjs.Shape();
+                        let b = container.children[c].getBounds();
+                        let bg = new createjs.Shape();
                         if (container.children[c].textAlign === "center") {
                             bg.graphics
                                 .beginFill("#FFF")
@@ -4164,7 +4163,7 @@ function Activity() {
                 }
             }
 
-            var r = size / 2;
+            let r = size / 2;
             circles = showButtonHighlight(
                 container.x,
                 container.y,
@@ -4177,7 +4176,7 @@ function Activity() {
 
         container.on("mouseout", function(event) {
             hideButtonHighlight(circles, stage);
-            for (var c = 0; c < container.children.length; c++) {
+            for (let c = 0; c < container.children.length; c++) {
                 if (container.children[c].text != undefined) {
                     container.children[c].visible = false;
                     container.children[0].visible = false;
@@ -4187,13 +4186,13 @@ function Activity() {
             }
         });
 
-        var img = new Image();
+        let img = new Image();
 
         img.onload = function() {
-            var originalSize = 55; // this is the original svg size
-            var halfSize = Math.floor(size / 2);
+            let originalSize = 55; // this is the original svg size
+            let halfSize = Math.floor(size / 2);
 
-            var bitmap = new createjs.Bitmap(img);
+            let bitmap = new createjs.Bitmap(img);
             if (size !== originalSize) {
                 bitmap.scaleX = size / originalSize;
                 bitmap.scaleY = size / originalSize;
@@ -4206,7 +4205,7 @@ function Activity() {
             }
 
             container.addChild(bitmap);
-            var hitArea = new createjs.Shape();
+            let hitArea = new createjs.Shape();
             hitArea.graphics
                 .beginFill("#FFF")
                 .drawEllipse(-halfSize, -halfSize, size, size);
@@ -4241,8 +4240,8 @@ function Activity() {
         hoverAction
     ) {
         // Prevent multiple button presses (i.e., debounce).
-        var lockTimer = null;
-        var locked = false;
+        let lockTimer = null;
+        let locked = false;
 
         /*
         if (longAction === null) {
@@ -4263,8 +4262,8 @@ function Activity() {
         */
 
         // Long hover variables
-        var hoverTimer = null;
-        var isLongHover = false;
+        let hoverTimer = null;
+        let isLongHover = false;
 
         container.on("mouseover", function(event) {
             if (!loading) {
@@ -4342,7 +4341,7 @@ function Activity() {
                 }
             }, 1000);
             */
-            var circles = showButtonHighlight(
+            let circles = showButtonHighlight(
                 ox,
                 oy,
                 cellSize / 2,
@@ -4384,7 +4383,7 @@ function Activity() {
             }
 
             container.removeAllEventListeners("pressup");
-            var closure = container.on("pressup", __pressupFunction);
+            let closure = container.on("pressup", __pressupFunction);
 
             isLongHover = false;
             // isLong = false;
@@ -4396,21 +4395,22 @@ function Activity() {
      * Handles pasted strings into input fields
      */
     pasted = function() {
-        var pasteinput = docById("paste").value;
-        var rawData = pasteinput;
+        let pasteinput = docById("paste").value;
+        let rawData = pasteinput;
+        let obj = "";
         if (rawData == null || rawData == "") {
             return;
         }
 
-        var cleanData = rawData.replace("\n", " ");
+        let cleanData = rawData.replace("\n", " ");
         try {
-            var obj = JSON.parse(cleanData);
+            obj = JSON.parse(cleanData);
         } catch (e) {
             errorMsg(_("Could not parse JSON input."));
             return;
         }
 
-        for (var name in blocks.palettes.dict) {
+        for (let name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
@@ -4430,7 +4430,7 @@ function Activity() {
      */
     deltaY = function(dy) {
         toolbarHeight += dy;
-        for (var i = 0; i < onscreenButtons.length; i++) {
+        for (let i = 0; i < onscreenButtons.length; i++) {
             onscreenButtons[i].y += dy;
         }
 
@@ -4442,7 +4442,7 @@ function Activity() {
         smallerContainer.y = homeButtonContainers[0].y;
         largerContainer.y = homeButtonContainers[0].y;
 
-        for (var i = 0; i < onscreenMenu.length; i++) {
+        for (let i = 0; i < onscreenMenu.length; i++) {
             onscreenMenu[i].y += dy;
         }
 
@@ -4474,7 +4474,7 @@ function Activity() {
      * Toggles Aux menu visibility and positioning
      */
     _showHideAuxMenu = function(resize) {
-        var cellsize = 55;
+        let cellsize = 55, dy;
         if (!resize && toolbarHeight === 0) {
             dy = cellsize + LEADING + 5;
             toolbarHeight = dy;
@@ -4493,7 +4493,7 @@ function Activity() {
             blocksContainer.y += dy;
             blocks.checkBounds();
         } else {
-            var dy = toolbarHeight;
+            dy = toolbarHeight;
             toolbarHeight = 0;
 
             homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
@@ -4590,10 +4590,10 @@ function Activity() {
         // createjs.Ticker.addEventListener('tick', stage);
         // createjs.Ticker.addEventListener('tick', that.__tick);
 
-        var mouseEvents = 0;
+        let mouseEvents = 0;
         document.addEventListener("mousemove", function() {
             mouseEvents++;
-            if (mouseEvents % 4 == 0) {
+            if (mouseEvents % 4 === 0) {
                 that.__tick();
             }
         });
@@ -4843,11 +4843,11 @@ function Activity() {
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
-                for (var name in blocks.palettes.dict) {
+                for (let name in blocks.palettes.dict) {
                     blocks.palettes.dict[name].hideMenu(true);
                 }
 
-                var __afterLoad = function() {
+                let __afterLoad = function() {
                     // playbackOnLoad();
                     document.removeEventListener(
                         "finishedLoading",
@@ -4862,7 +4862,7 @@ function Activity() {
                 }
 
                 try {
-                    var obj = JSON.parse(data);
+                    let obj = JSON.parse(data);
                     logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
                     setPlaybackStatus();
@@ -4901,8 +4901,8 @@ function Activity() {
             this.saveLocally = function() {
                 stage.update(event);
                 console.debug("overwriting session data");
-                var data = prepareExport();
-                var svgData = doSVG(
+                let data = prepareExport();
+                let svgData = doSVG(
                     canvas,
                     logo,
                     turtles,
@@ -4914,11 +4914,11 @@ function Activity() {
                     if (svgData === null || svgData === "") {
                         this.planet.ProjectStorage.saveLocally(data, null);
                     } else {
-                        var img = new Image();
-                        var t = this;
+                        let img = new Image();
+                        let t = this;
                         img.onload = function() {
-                            var bitmap = new createjs.Bitmap(img);
-                            var bounds = bitmap.getBounds();
+                            let bitmap = new createjs.Bitmap(img);
+                            let bounds = bitmap.getBounds();
                             bitmap.cache(
                                 bounds.x,
                                 bounds.y,
@@ -5065,12 +5065,12 @@ function Activity() {
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
 
-        if (planet != undefined) {
+        if (planet !== undefined) {
             saveLocally = planet.saveLocally.bind(planet);
         } else {
             __saveLocally = function() {
                 console.debug("overwriting session data (local)");
-                var data = prepareExport();
+                let data = prepareExport();
                 var svgData = doSVG(
                     canvas,
                     logo,
@@ -5098,14 +5098,14 @@ function Activity() {
                 }
 
                 try {
-                    var p = storage.currentProject;
+                    let p = storage.currentProject;
                     storage["SESSION" + p] = prepareExport();
                 } catch (e) {
                     console.debug(e);
                 }
 
-                var img = new Image();
-                var svgData = doSVG(
+                let img = new Image();
+                svgData = doSVG(
                     canvas,
                     logo,
                     turtles,
@@ -5115,8 +5115,8 @@ function Activity() {
                 );
 
                 img.onload = function() {
-                    var bitmap = new createjs.Bitmap(img);
-                    var bounds = bitmap.getBounds();
+                    let bitmap = new createjs.Bitmap(img);
+                    let bounds = bitmap.getBounds();
                     bitmap.cache(
                         bounds.x,
                         bounds.y,
@@ -5148,7 +5148,7 @@ function Activity() {
 
         initPalettes(palettes);
 
-        var __clearFunction = function() {
+        let __clearFunction = function() {
             sendAllToTrash(true, false);
             if (planet !== undefined) {
                 planet.initialiseNewProject.bind(planet);
@@ -5191,8 +5191,8 @@ function Activity() {
         }
 
         // Load custom mode saved in local storage.
-        var custommodeData = storage.custommode;
-        if (custommodeData != undefined) {
+        let custommodeData = storage.custommode;
+        if (custommodeData !== undefined) {
             customMode = JSON.parse(custommodeData);
             console.debug("restoring custom mode: " + customMode);
         }
@@ -5205,7 +5205,7 @@ function Activity() {
             "change",
             function(event) {
                 // Read file here.
-                var reader = new FileReader();
+                let reader = new FileReader();
 
                 reader.onload = function(theFile) {
                     loading = true;
@@ -5213,7 +5213,7 @@ function Activity() {
                     doLoadAnimation();
 
                     setTimeout(function() {
-                        var rawData = reader.result;
+                        let rawData = reader.result;
                         if (rawData == null || rawData === "") {
                             console.debug("rawData is " + rawData);
                             errorMsg(
@@ -5222,20 +5222,20 @@ function Activity() {
                                 )
                             );
                         } else {
-                            var cleanData = rawData.replace("\n", " ");
-
+                            let cleanData = rawData.replace("\n", " ");
+                            let obj;
                             try {
                                 if (cleanData.includes("html")) {
-                                    var obj = JSON.parse(
+                                    obj = JSON.parse(
                                         cleanData.match(
                                             '<div class="code">(.+?)</div>'
                                         )[1]
                                     );
                                 } else {
-                                    var obj = JSON.parse(cleanData);
+                                    obj = JSON.parse(cleanData);
                                 }
                                 // First, hide the palettes as they will need updating.
-                                for (var name in blocks.palettes.dict) {
+                                for (let name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
@@ -5243,7 +5243,7 @@ function Activity() {
 
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
-                                    var __listener = function(event) {
+                                    let __listener = function(event) {
                                         logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
                                         setPlaybackStatus();
@@ -5298,12 +5298,12 @@ function Activity() {
             false
         );
 
-        var __handleFileSelect = function(event) {
+        let __handleFileSelect = function(event) {
             event.stopPropagation();
             event.preventDefault();
 
-            var files = event.dataTransfer.files;
-            var reader = new FileReader();
+            let files = event.dataTransfer.files;
+            let reader = new FileReader();
 
             reader.onload = function(theFile) {
                 loading = true;
@@ -5311,7 +5311,7 @@ function Activity() {
                 // doLoadAnimation();
 
                 setTimeout(function() {
-                    var rawData = reader.result;
+                    let rawData = reader.result;
                     if (rawData == null || rawData === "") {
                         errorMsg(
                             _(
@@ -5319,24 +5319,24 @@ function Activity() {
                             )
                         );
                     } else {
-                        var cleanData = rawData.replace("\n", " ");
-
+                        let cleanData = rawData.replace("\n", " ");
+                        let obj;
                         try {
                             if (cleanData.includes("html")) {
                                 dat = cleanData.match(
                                     '<div class="code">(.+?)</div>'
                                 );
-                                var obj = JSON.parse(dat[1]);
+                                obj = JSON.parse(dat[1]);
                             } else {
-                                var obj = JSON.parse(cleanData);
+                                obj = JSON.parse(cleanData);
                             }
-                            for (var name in blocks.palettes.dict) {
+                            for (let name in blocks.palettes.dict) {
                                 blocks.palettes.dict[name].hideMenu(true);
                             }
 
                             stage.removeAllEventListeners("trashsignal");
 
-                            var __afterLoad = function() {
+                            let __afterLoad = function() {
                                 // playbackOnLoad();
                                 document.removeEventListener(
                                     "finishedLoading",
@@ -5345,7 +5345,7 @@ function Activity() {
                             };
 
                             // Wait for the old blocks to be removed.
-                            var __listener = function(event) {
+                            let __listener = function(event) {
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                                 setPlaybackStatus();
@@ -5403,13 +5403,13 @@ function Activity() {
             }
         };
 
-        var __handleDragOver = function(event) {
+        let __handleDragOver = function(event) {
             event.stopPropagation();
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy";
         };
 
-        var dropZone = docById("canvasHolder");
+        let dropZone = docById("canvasHolder");
         dropZone.addEventListener("dragover", __handleDragOver, false);
         dropZone.addEventListener("drop", __handleFileSelect, false);
 
@@ -5428,7 +5428,7 @@ function Activity() {
                 window.scroll(0, 0);
 
                 // Read file here.
-                var reader = new FileReader();
+                let reader = new FileReader();
 
                 reader.onload = function(theFile) {
                     loading = true;
@@ -5451,7 +5451,7 @@ function Activity() {
                         );
                         // Save plugins to local storage.
                         if (obj != null) {
-                            var pluginObj = preparePluginExports(obj);
+                            let pluginObj = preparePluginExports(obj);
                             // console.debug(pluginObj);
                             storage.plugins = pluginObj; // preparePluginExports(obj));
                         }
@@ -5496,9 +5496,9 @@ function Activity() {
                 window.btoa(unescape(encodeURIComponent(POLAR)))
         );
 
-        var URL = window.location.href;
-        var projectID = null;
-        var flags = {
+        let URL = window.location.href;
+        let projectID = null;
+        let flags = {
             run: false,
             show: false,
             collapse: false
@@ -5507,19 +5507,20 @@ function Activity() {
         // Scale the canvas relative to the screen size.
         _onResize(true);
 
-        var urlParts;
-        var env = [];
+        let urlParts;
+        let env = [];
 
         if (
             !sugarizerCompatibility.isInsideSugarizer() &&
             URL.indexOf("?") > 0
         ) {
-            var urlParts = URL.split("?");
+            let args, url;
+            urlParts = URL.split("?");
             if (urlParts[1].indexOf("&") > 0) {
-                var newUrlParts = urlParts[1].split("&");
-                for (var i = 0; i < newUrlParts.length; i++) {
+                let newUrlParts = urlParts[1].split("&");
+                for (let i = 0; i < newUrlParts.length; i++) {
                     if (newUrlParts[i].indexOf("=") > 0) {
-                        var args = newUrlParts[i].split("=");
+                        args = newUrlParts[i].split("=");
                         switch (args[0].toLowerCase()) {
                             case "file":
                                 console.debug(
@@ -5542,17 +5543,17 @@ function Activity() {
                                     flags.collapse = true;
                                 break;
                             case "inurl":
-                                var url = args[1];
-                                var getJSON = function(url) {
+                                url = args[1];
+                                let getJSON = function(url) {
                                     return new Promise(function(
                                         resolve,
                                         reject
                                     ) {
-                                        var xhr = new XMLHttpRequest();
+                                        let xhr = new XMLHttpRequest();
                                         xhr.open("get", url, true);
                                         xhr.responseType = "json";
                                         xhr.onload = function() {
-                                            var status = xhr.status;
+                                            let status = xhr.status;
                                             if (status === 200) {
                                                 resolve(xhr.response);
                                             } else {
@@ -5566,7 +5567,7 @@ function Activity() {
                                 getJSON(url).then(
                                     function(data) {
                                         // console.debug('Your JSON result is:  ' + data.arg);
-                                        n = data.arg;
+                                        let n = data.arg;
                                         env.push(parseInt(n));
                                     },
                                     function(status) {
@@ -5577,7 +5578,7 @@ function Activity() {
                                 );
                                 break;
                             case "outurl":
-                                var url = args[1];
+                                url = args[1];
                                 break;
                             default:
                                 errorMsg(_("Invalid parameters"));
@@ -5587,7 +5588,7 @@ function Activity() {
                 }
             } else {
                 if (urlParts[1].indexOf("=") > 0) {
-                    var args = urlParts[1].split("=");
+                    args = urlParts[1].split("=");
                 }
 
                 //ID is the only arg that can stand alone
