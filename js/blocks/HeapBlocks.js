@@ -26,16 +26,17 @@ function setupHeapBlocks() {
                 return;
             }
 
-            var data = [];
-            var url = args[1];
-            var name = args[0];
-            var xmlHttp = new XMLHttpRequest();
+            let data = [];
+            let url = args[1];
+            let name = args[0];
+            let oldHeap;
+            let xmlHttp = new XMLHttpRequest();
             xmlHttp.open("GET", url, false);
             xmlHttp.send();
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 console.debug(xmlHttp.responseText);
                 try {
-                    var data = JSON.parse(xmlHttp.responseText);
+                       data = JSON.parse(xmlHttp.responseText);
                 } catch (e) {
                     console.debug(e);
                     logo.errorMsg(_("Error parsing JSON data:") + e);
@@ -49,9 +50,9 @@ function setupHeapBlocks() {
                 return;
             }
             if (name in logo.turtleHeaps) {
-                var oldHeap = turtleHeaps[turtle];
+                oldHeap = turtleHeaps[turtle];
             } else {
-                var oldHeap = [];
+                oldHeap = [];
             }
             logo.turtleHeaps[name] = data;
         }
@@ -82,11 +83,11 @@ function setupHeapBlocks() {
                 return;
             }
 
-            var name = args[0];
-            var url = args[1];
+            let name = args[0];
+            let url = args[1];
             if (name in logo.turtleHeaps) {
-                var data = JSON.stringify(logo.turtleHeaps[name]);
-                var xmlHttp = new XMLHttpRequest();
+                let data = JSON.stringify(logo.turtleHeaps[name]);
+                let xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
                 xmlHttp.setRequestHeader(
                     "Content-Type",
@@ -254,14 +255,15 @@ function setupHeapBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var block = logo.blocks.blockList[blk];
+            let block = logo.blocks.blockList[blk];
+            let oldHeap;
             if (turtle in logo.turtleHeaps) {
-                var oldHeap = logo.turtleHeaps[turtle];
+                oldHeap = logo.turtleHeaps[turtle];
             } else {
-                var oldHeap = [];
+                oldHeap = [];
             }
 
-            var c = block.connections[1];
+            let c = block.connections[1];
             if (c != null && logo.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 1) {
                     logo.errorMsg(_("You must select a file."));
@@ -334,12 +336,12 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (typeof a === "number") {
                 if (!(turtle in logo.turtleHeaps)) {
                     logo.turtleHeaps[turtle] = [];
@@ -412,7 +414,7 @@ function setupHeapBlocks() {
                 logo.turtleHeaps[turtle] = [];
             }
 
-            var idx = Math.floor(args[0]);
+            let idx = Math.floor(args[0]);
             if (idx < 1) {
                 logo.errorMsg(_("Index must be > 0."));
                 idx = 1;

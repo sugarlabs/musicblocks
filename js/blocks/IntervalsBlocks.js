@@ -30,7 +30,7 @@ function setupIntervalsBlocks() {
             logo.synth.startingPitch = args[1] + "" + args[2];
 
             logo.temperamentSelected.push(args[0]);
-            var len = logo.temperamentSelected.length;
+            let len = logo.temperamentSelected.length;
 
             if (
                 logo.temperamentSelected[len - 1] !==
@@ -88,15 +88,15 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             //find block at end of chain
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var currentblock = cblk;
+                let currentblock = cblk;
                 while (true) {
-                    var blockToCheck = logo.blocks.blockList[currentblock];
+                    let blockToCheck = logo.blocks.blockList[currentblock];
                     if (blockToCheck.name === "intervalname") {
                         // Augmented or diminished only
                         if (blockToCheck.value[0] === "a") {
@@ -129,7 +129,7 @@ function setupIntervalsBlocks() {
                             );
                         }
                     } else if (blockToCheck.name !== "doubly") {
-                        var value = logo.parseArg(
+                        let value = logo.parseArg(
                             logo,
                             turtle,
                             cblk,
@@ -184,40 +184,40 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk == null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
                 // collision with other turtles.
-                var saveBoxes = JSON.stringify(logo.boxes);
-                var saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+                let saveBoxes = JSON.stringify(logo.boxes);
+                let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                var saveX = logo.turtles.turtleList[turtle].x;
-                var saveY = logo.turtles.turtleList[turtle].y;
-                var saveColor = logo.turtles.turtleList[turtle].color;
-                var saveValue = logo.turtles.turtleList[turtle].value;
-                var saveChroma = logo.turtles.turtleList[turtle].chroma;
-                var saveStroke = logo.turtles.turtleList[turtle].stroke;
-                var saveCanvasAlpha =
+                let saveX = logo.turtles.turtleList[turtle].x;
+                let saveY = logo.turtles.turtleList[turtle].y;
+                let saveColor = logo.turtles.turtleList[turtle].color;
+                let saveValue = logo.turtles.turtleList[turtle].value;
+                let saveChroma = logo.turtles.turtleList[turtle].chroma;
+                let saveStroke = logo.turtles.turtleList[turtle].stroke;
+                let saveCanvasAlpha =
                     logo.turtles.turtleList[turtle].canvasAlpha;
-                var saveOrientation =
+                let saveOrientation =
                     logo.turtles.turtleList[turtle].orientation;
-                var savePenState = logo.turtles.turtleList[turtle].penState;
+                let savePenState = logo.turtles.turtleList[turtle].penState;
 
                 logo.suppressOutput[turtle] = true;
 
                 logo.justCounting[turtle].push(true);
                 logo.justMeasuring[turtle].push(true);
 
-                for (var b in logo.endOfClampSignals[turtle]) {
+                for (let b in logo.endOfClampSignals[turtle]) {
                     logo.butNotThese[turtle][b] = [];
                     for (
-                        var i = 0;
+                        let i = 0;
                         i < logo.endOfClampSignals[turtle][b].length;
                         i++
                     ) {
@@ -225,8 +225,8 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                var actionArgs = [];
-                var saveNoteCount = logo.notesPlayed[turtle];
+                let actionArgs = [];
+                let saveNoteCount = logo.notesPlayed[turtle];
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(
                     logo,
@@ -300,40 +300,40 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk == null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
                 // collision with other turtles.
-                var saveBoxes = JSON.stringify(logo.boxes);
-                var saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+                let saveBoxes = JSON.stringify(logo.boxes);
+                let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                var saveX = logo.turtles.turtleList[turtle].x;
-                var saveY = logo.turtles.turtleList[turtle].y;
-                var saveColor = logo.turtles.turtleList[turtle].color;
-                var saveValue = logo.turtles.turtleList[turtle].value;
-                var saveChroma = logo.turtles.turtleList[turtle].chroma;
-                var saveStroke = logo.turtles.turtleList[turtle].stroke;
-                var saveCanvasAlpha =
+                let saveX = logo.turtles.turtleList[turtle].x;
+                let saveY = logo.turtles.turtleList[turtle].y;
+                let saveColor = logo.turtles.turtleList[turtle].color;
+                let saveValue = logo.turtles.turtleList[turtle].value;
+                let saveChroma = logo.turtles.turtleList[turtle].chroma;
+                let saveStroke = logo.turtles.turtleList[turtle].stroke;
+                let saveCanvasAlpha =
                     logo.turtles.turtleList[turtle].canvasAlpha;
-                var saveOrientation =
+                let saveOrientation =
                     logo.turtles.turtleList[turtle].orientation;
-                var savePenState = logo.turtles.turtleList[turtle].penState;
+                let savePenState = logo.turtles.turtleList[turtle].penState;
 
                 logo.suppressOutput[turtle] = true;
 
                 logo.justCounting[turtle].push(true);
                 logo.justMeasuring[turtle].push(true);
 
-                for (var b in logo.endOfClampSignals[turtle]) {
+                for (let b in logo.endOfClampSignals[turtle]) {
                     logo.butNotThese[turtle][b] = [];
                     for (
-                        var i = 0;
+                        let i = 0;
                         i < logo.endOfClampSignals[turtle][b].length;
                         i++
                     ) {
@@ -341,8 +341,8 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                var actionArgs = [];
-                var saveNoteCount = logo.notesPlayed[turtle];
+                let actionArgs = [];
+                let saveNoteCount = logo.notesPlayed[turtle];
                 logo.turtles.turtleList[turtle].running = true;
                 logo._runFromBlockNow(
                     logo,
@@ -515,10 +515,10 @@ function setupIntervalsBlocks() {
                 ]);
                 logo.noteDirection[turtle] = 0;
 
-                var listenerName = "_semitone_interval_" + turtle;
+                let listenerName = "_semitone_interval_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function() {
+                let __listener = function() {
                     logo.semitoneIntervals[turtle].pop();
                 };
 
@@ -661,10 +661,10 @@ function setupIntervalsBlocks() {
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             logo.intervals[turtle].push(i);
 
-            var listenerName = "_interval_" + turtle;
+            let listenerName = "_interval_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.intervals[turtle].pop();
             };
 
@@ -722,29 +722,29 @@ function setupIntervalsBlocks() {
 
             logo.inDefineMode[turtle] = true;
             logo.defineMode[turtle] = [];
-
+            let modeName;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var modeName = "custom";
+                modeName = "custom";
             } else {
-                var modeName = args[0].toLowerCase();
+                modeName = args[0].toLowerCase();
             }
 
-            var listenerName = "_definemode_" + turtle;
+            let listenerName = "_definemode_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 MUSICALMODES[modeName] = [];
                 if (logo.defineMode[turtle].indexOf(0) === -1) {
                     logo.defineMode[turtle].push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                var pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
+                let pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
                     return a[0] - b[0];
                 });
 
-                for (var i = 0; i < pitchNumbers.length; i++) {
+                for (let i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
                         logo.errorMsg(
                             _(
@@ -768,7 +768,7 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
                 if (logo.blocks.blockList[cblk].name === "modename") {
                     logo.blocks.updateBlockText(cblk);
                 }
@@ -873,7 +873,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
-                var obj = logo.keySignature[turtle].split(" ");
+                let obj = logo.keySignature[turtle].split(" ");
                 return obj[1];
             }
         }
@@ -973,8 +973,8 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
-                var modename = "major";
-                for (var mode in MUSICALMODES) {
+                let modename = "major";
+                for (let mode in MUSICALMODES) {
                     if (mode === args[1] || _(mode) === args[1]) {
                         modename = mode;
                         logo._modeBlock =
@@ -985,7 +985,7 @@ function setupIntervalsBlocks() {
 
                 // Check to see if there are any transpositions on the key.
                 if (turtle in logo.transposition) {
-                    var noteObj = getNote(
+                    let noteObj = getNote(
                         args[0],
                         4,
                         logo.transposition[turtle],
