@@ -1031,16 +1031,6 @@ function Activity() {
         refreshCanvas();
     };
 
-    //  = function() {
-    //     WRAP = !WRAP;
-    //     let data = "";
-    //     if(WRAP) {
-    //         data = "off"
-    //     } else {
-    //         data = "on";
-    //     }
-    // }
-
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;

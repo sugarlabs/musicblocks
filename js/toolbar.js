@@ -89,7 +89,6 @@ function Toolbar() {
 
         wrapIcon.onclick = () => {
             WRAP = !WRAP;
-            console.log(WRAP);
             if (WRAP) {
                 wrapButtonTooltipData = "Turtle Wrap Off";
             } else {
