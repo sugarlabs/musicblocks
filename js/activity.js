@@ -819,7 +819,7 @@ function Activity() {
             logo.turtleHeaps[turtle] = [];
             logo.notationStaging[turtle] = [];
             logo.notationDrumStaging[turtle] = [];
-            if (noErase == undefined || !noErase) {
+            if (noErase === undefined || !noErase) {
                 turtles.turtleList[turtle].doClear(true, true, true);
             }
         }
@@ -969,7 +969,7 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        if (onblur == undefined) {
+        if (onblur === undefined) {
             onblur = false;
         }
 
@@ -1138,7 +1138,7 @@ function Activity() {
         let blank = document.createElement("canvas");
         blank.width = canvas.width;
         blank.height = canvas.height;
-        return canvas.toDataURL() == blank.toDataURL();
+        return canvas.toDataURL() === blank.toDataURL();
     }
 
     /*
@@ -1152,7 +1152,7 @@ function Activity() {
         blocks.activeBlock = null;
         myChart = docById("myChart");
 
-        if (_isCanvasBlank(myChart) == false) {
+        if (_isCanvasBlank(myChart) === false) {
             return;
         }
 
@@ -1252,7 +1252,7 @@ function Activity() {
             smallerContainer.visible = false;
         }
 
-        if (BLOCKSCALES[blockscale] == 4) {
+        if (BLOCKSCALES[blockscale] === 4) {
             largerOffContainer.visible = true;
             largerContainer.visible = false;
         } else {
@@ -1388,7 +1388,7 @@ function Activity() {
 
         let __paletteWheelHandler = function(event) {
             // vertical scroll
-            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
                         palettesContainer.y -= event.deltaY;
@@ -1402,7 +1402,7 @@ function Activity() {
 
             // horizontal scroll
             if (scrollPaletteContainer) {
-                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             palettesContainer.x -= event.deltaX;
@@ -1468,7 +1468,7 @@ function Activity() {
         }
 
         let __wheelHandler = function(event) {
-            if (event.deltaY != 0 && event.axis === event.VERTICAL_AXIS) {
+            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
 				closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
@@ -1483,7 +1483,7 @@ function Activity() {
 
             // horizontal scroll
             if (scrollBlockContainer) {
-                if (event.deltaX != 0 && event.axis === event.HORIZONTAL_AXIS) {
+                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
 					closeAnyOpenMenusAndLabels();
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
@@ -4075,7 +4075,7 @@ function Activity() {
     _makeButton = function(name, label, x, y, size, rotation, parent) {
         let container = new createjs.Container();
 
-        if (parent == undefined) {
+        if (parent === undefined) {
             stage.addChild(container);
         } else {
             parent.addChild(container);
@@ -4107,7 +4107,7 @@ function Activity() {
         let circles;
         container.on("mouseover", function(event) {
             for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text != undefined) {
+                if (container.children[c].text !== undefined) {
                     container.children[c].visible = true;
                     // Do we need to add a background?
                     // Should be image and text, hence === 2
@@ -4177,7 +4177,7 @@ function Activity() {
         container.on("mouseout", function(event) {
             hideButtonHighlight(circles, stage);
             for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text != undefined) {
+                if (container.children[c].text !== undefined) {
                     container.children[c].visible = false;
                     container.children[0].visible = false;
                     stage.update();
@@ -4395,10 +4395,9 @@ function Activity() {
      * Handles pasted strings into input fields
      */
     pasted = function() {
-        let pasteinput = docById("paste").value;
-        let rawData = pasteinput;
+        let rawData = docById("paste").value;
         let obj = "";
-        if (rawData == null || rawData == "") {
+        if (rawData == null || rawData === "") {
             return;
         }
 
@@ -4580,7 +4579,7 @@ function Activity() {
             window.onblur = function() {
                 that.doHardStopButton(true);
             }
-        };
+        }
 
         stage = new createjs.Stage(canvas);
         createjs.Touch.enable(stage);
@@ -4827,7 +4826,7 @@ function Activity() {
                     sendAllToTrash(false, true);
                 }
 
-                if (data == undefined) {
+                if (data === undefined) {
                     console.debug(
                         "loadRawProject: data is undefined... punting"
                     );
@@ -4911,7 +4910,7 @@ function Activity() {
                     320 / canvas.width
                 );
                 try {
-                    if (svgData === null || svgData === "") {
+                    if (svgData == null || svgData === "") {
                         this.planet.ProjectStorage.saveLocally(data, null);
                     } else {
                         let img = new Image();
@@ -5397,7 +5396,7 @@ function Activity() {
 
             // Work-around in case the handler is called by the
             // widget drag & drop code.
-            if (files[0] != undefined) {
+            if (files[0] !== undefined) {
                 reader.readAsText(files[0]);
                 window.scroll(0, 0);
             }
@@ -5451,9 +5450,8 @@ function Activity() {
                         );
                         // Save plugins to local storage.
                         if (obj != null) {
-                            let pluginObj = preparePluginExports(obj);
                             // console.debug(pluginObj);
-                            storage.plugins = pluginObj; // preparePluginExports(obj));
+                            storage.plugins = preparePluginExports(obj); // preparePluginExports(obj));
                         }
 
                         // Refresh the palettes.
