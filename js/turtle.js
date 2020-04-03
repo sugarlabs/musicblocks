@@ -912,58 +912,75 @@ function Turtle(name, turtles, drum) {
             ctx.moveTo(this.container.x, this.container.y);
         }
 
-        var angleRadians = (this.orientation * Math.PI) / 180.0;
-
-        var w = ctx.canvas.width;
-        var h = ctx.canvas.height;
-
-        var ox, oy, nx, ny;
-
-        var stepUnit = 10;
-
-	if (steps > 0) {
-            var xIncrease = stepUnit * Math.sin(angleRadians);
-            var yIncrease = stepUnit * Math.cos(angleRadians);
-	} else {
-            var xIncrease = -stepUnit * Math.sin(angleRadians);
-            var yIncrease = -stepUnit * Math.cos(angleRadians);
-	    steps = -steps;
-	}
-
-        while (steps >= 0) {
-            if (this.container.x > w) {
-                this.container.x = 0;
-                ctx.moveTo(this.container.x, this.container.y);
-            }
-            if (this.container.x < 0) {
-                this.container.x = w;
-                ctx.moveTo(this.container.x, this.container.y);
-            }
-            if (this.container.y > h) {
-                this.container.y = 0;
-                ctx.moveTo(this.container.x, this.container.y);
-            }
-            if (this.container.y < 0) {
-                this.container.y = h;
-                ctx.moveTo(this.container.x, this.container.y);
-            }
-
+        if (!WRAP) {
+            
             // old turtle point
-            oy = this.turtles.screenY2turtleY(this.container.y);
-            ox = this.turtles.screenX2turtleX(this.container.x);
+            var ox = this.turtles.screenX2turtleX(this.container.x);
+            var oy = this.turtles.screenY2turtleY(this.container.y);
 
-            // new turtle point increment;
-            nx = ox + xIncrease;
-            ny = oy + yIncrease;
+            var angleRadians = (this.orientation * Math.PI) / 180.0;
 
-            this.move(ox, oy, nx, ny, true)
-            this.container.x = this.turtles.turtleX2screenX(nx);
-            this.container.y = this.turtles.turtleY2screenY(ny);
-            ctx.moveTo(this.container.x, this.container.y);
+            // new turtle point
+            var nx = ox + Number(steps) * Math.sin(angleRadians);
+            var ny = oy + Number(steps) * Math.cos(angleRadians);
+            this.move(ox, oy, nx, ny, true);
+            this.turtles.refreshCanvas();   
+        
+        } else {
+            var angleRadians = (this.orientation * Math.PI) / 180.0
+            var w = ctx.canvas.width;
+            var h = ctx.canvas.height;
 
-            steps -= stepUnit;
+            var ox, oy, nx, ny;
+
+            var stepUnit = 10;
+
+            if (steps > 0) {
+                var xIncrease = stepUnit * Math.sin(angleRadians);
+                var yIncrease = stepUnit * Math.cos(angleRadians);
+            } else {
+                var xIncrease = -stepUnit * Math.sin(angleRadians);
+                var yIncrease = -stepUnit * Math.cos(angleRadians);
+            steps = -steps;
+
+             }
+
+            while (steps >= 0) {
+                if (this.container.x > w) {
+                    this.container.x = 0;
+                    ctx.moveTo(this.container.x, this.container.y);
+                }
+                if (this.container.x < 0) {
+                    this.container.x = w;
+                    ctx.moveTo(this.container.x, this.container.y);
+                }
+                if (this.container.y > h) {
+                    this.container.y = 0;
+                    ctx.moveTo(this.container.x, this.container.y);
+                }
+                if (this.container.y < 0) {
+                    this.container.y = h;
+                    ctx.moveTo(this.container.x, this.container.y);
+                }
+
+                // old turtle point
+                oy = this.turtles.screenY2turtleY(this.container.y);
+                ox = this.turtles.screenX2turtleX(this.container.x);
+
+                // new turtle point increment;
+                nx = ox + xIncrease;
+                ny = oy + yIncrease;
+
+                this.move(ox, oy, nx, ny, true)
+                this.container.x = this.turtles.turtleX2screenX(nx);
+                this.container.y = this.turtles.turtleY2screenY(ny);
+                ctx.moveTo(this.container.x, this.container.y);
+
+                steps -= stepUnit;
+            }
+            this.turtles.refreshCanvas();
+
         }
-        this.turtles.refreshCanvas();
     };
 
     /**

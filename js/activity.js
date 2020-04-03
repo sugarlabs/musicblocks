@@ -5064,6 +5064,7 @@ function Activity() {
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
+        toolbar.renderWrapIcon();
 
         if (planet != undefined) {
             saveLocally = planet.saveLocally.bind(planet);
