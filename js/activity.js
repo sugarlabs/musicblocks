@@ -1031,6 +1031,16 @@ function Activity() {
         refreshCanvas();
     };
 
+    //  = function() {
+    //     WRAP = !WRAP;
+    //     let data = "";
+    //     if(WRAP) {
+    //         data = "off"
+    //     } else {
+    //         data = "on";
+    //     }
+    // }
+
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
@@ -5064,6 +5074,7 @@ function Activity() {
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderLanguageSelectIcon(languageBox);
+        toolbar.renderWrapIcon();
 
         if (planet != undefined) {
             saveLocally = planet.saveLocally.bind(planet);
