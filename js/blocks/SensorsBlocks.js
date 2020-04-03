@@ -18,13 +18,11 @@ function setupSensorsBlocks() {
 		argTypes: ["anyin"],
 		defaults: [_("Input a value")],
 	    });
+
+            if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
-	    if (cblk !== null) {
-		logo.textMsg(logo.blocks.blockList[cblk].value);
-	    }
 
 	    // Pause the flow while we wait for input.
             logo._doWait(turtle, 120);
@@ -32,15 +30,14 @@ function setupSensorsBlocks() {
 	    // Display the input form.
             var inputElem = docById("labelDiv");
             inputElem.innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="" />';
-            // inputElem.style.display = "";
+                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
             var inputElem = docById("textLabel");
-	    var leftpos = Math.floor(canvas.width / 2) - 50;
+            var cblk = logo.blocks.blockList[blk].connections[1];
+	    if (cblk !== null) {
+		inputElem.placeholder = logo.blocks.blockList[cblk].value;
+	    }
 	    inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
 	    inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
-	    // Why doesn't this override work?
-	    inputElem.style.backgroundColor = "#FFFFFF";
-	    inputElem.style.fontSize = "24px";
             inputElem.focus();
 
             var inputElem = docById("labelDiv");
@@ -51,14 +48,15 @@ function setupSensorsBlocks() {
 		if (event.keyCode === 13) { // RETURN
 		    var inputElem = docById("textLabel");
 		    console.log(inputElem.value);
-		    try {
-			logo.inputValues[turtle] = Number(inputElem.value);
-		    } catch (e) {
-			logo.inputValues[turtle] = inputElem.value;
+		    console.log('trying a number');
+		    var value = inputElem.value;
+		    if (isNaN(value)) {
+			logo.inputValues[turtle] = value;
+		    } else {
+			logo.inputValues[turtle] = Number(value);
 		    }
 
 		    logo.clearRunBlock(turtle);
-		    logo.hideMsgs();
 		    inputElem.classList.remove("hasKeyboard");
 		    inputElem.style.display = "none";
 		}
@@ -84,6 +82,7 @@ function setupSensorsBlocks() {
                 "input"
             ]);
 
+            if (this.lang === "ja") this.hidden = true;
         }
 
         updateParameter(logo, turtle, blk) {

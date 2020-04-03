@@ -362,6 +362,8 @@ function PitchDrumMatrix() {
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.border = "2px solid white";
+            cell.style.borderRadius = "10px";
 
             cell.onmouseover = function() {
                 if (this.style.backgroundColor !== "black") {
