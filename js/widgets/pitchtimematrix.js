@@ -654,7 +654,6 @@ function PitchTimeMatrix() {
         ptmTableRow.insertCell().append(tempTable);
 
         this._lookForNoteBlocksOrRepeat();
-        console.log(this._noteBlocks);
 
         // Sort them if there are note blocks.
         if (!this.sorted && this._noteBlocks) {
