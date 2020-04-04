@@ -1797,34 +1797,36 @@ function PitchTimeMatrix() {
                 Math.max(0, y * this._logo.blocks.getStageScale())
             ) + "px";
 
-        var block = this.columnBlocksMap[index][0];
-        var noteValue = this._logo.blocks.blockList[
-            this._logo.blocks.blockList[block].connections[1]
-        ].value;
-
-        if (condition === "pitchblocks") {
-            var octaveValue = this._logo.blocks.blockList[
-                this._logo.blocks.blockList[block].connections[2]
+        if (!this._noteBlocks) {
+            var block = this.columnBlocksMap[index][0];
+            var noteValue = this._logo.blocks.blockList[
+                this._logo.blocks.blockList[block].connections[1]
             ].value;
-            var accidentalsValue = 2;
 
-            for (var i = 0; i < accidentals.length; i++) {
-                if (noteValue.indexOf(accidentals[i]) !== -1) {
-                    accidentalsValue = i;
-                    noteValue = noteValue.substr(
-                        0,
-                        noteValue.indexOf(accidentals[i])
-                    );
-                    break;
+            if (condition === "pitchblocks") {
+                var octaveValue = this._logo.blocks.blockList[
+                    this._logo.blocks.blockList[block].connections[2]
+                ].value;
+                var accidentalsValue = 2;
+
+                for (var i = 0; i < accidentals.length; i++) {
+                    if (noteValue.indexOf(accidentals[i]) !== -1) {
+                        accidentalsValue = i;
+                        noteValue = noteValue.substr(
+                            0,
+                            noteValue.indexOf(accidentals[i])
+                        );
+                        break;
+                    }
                 }
-            }
 
-            this._accidentalsWheel.navigateWheel(accidentalsValue);
-            this._octavesWheel.navigateWheel(
-                octaveLabels.indexOf(octaveValue.toString())
-            );
+                this._accidentalsWheel.navigateWheel(accidentalsValue);
+                this._octavesWheel.navigateWheel(
+                    octaveLabels.indexOf(octaveValue.toString())
+                );
+            }
+            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
         }
-        this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
 
         var that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
@@ -1861,31 +1863,38 @@ function PitchTimeMatrix() {
                 this.sorted = false;
             }
 
-            var noteLabelBlock =
-                that._logo.blocks.blockList[block].connections[1];
-            that._logo.blocks.blockList[noteLabelBlock].text.text = label;
-            that._logo.blocks.blockList[noteLabelBlock].value = label;
+            if (!that._noteBlocks) {
+                var noteLabelBlock =
+                    that._logo.blocks.blockList[block].connections[1];
+                that._logo.blocks.blockList[noteLabelBlock].text.text = label;
+                that._logo.blocks.blockList[noteLabelBlock].value = label;
 
-            var z =
-                that._logo.blocks.blockList[noteLabelBlock].container.children
-                    .length - 1;
-            that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(
-                that._logo.blocks.blockList[noteLabelBlock].text,
-                z
-            );
-            that._logo.blocks.blockList[noteLabelBlock].updateCache();
+                var z =
+                    that._logo.blocks.blockList[noteLabelBlock].container.children
+                        .length - 1;
+                that._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(
+                    that._logo.blocks.blockList[noteLabelBlock].text,
+                    z
+                );
+                that._logo.blocks.blockList[noteLabelBlock].updateCache();
+            }
+
             if (condition === "pitchblocks") {
                 var octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
                     ].title
                 );
-                that._logo.blocks.blockList[
-                    noteLabelBlock
-                ].blocks.setPitchOctave(
-                    that._logo.blocks.blockList[noteLabelBlock].connections[0],
-                    octave
-                );
+
+                if (!that._noteBlocks) {
+                    that._logo.blocks.blockList[
+                        noteLabelBlock
+                    ].blocks.setPitchOctave(
+                        that._logo.blocks.blockList[noteLabelBlock].connections[0],
+                        octave
+                    );
+                }
+
                 var noteObj = [label, octave];
                 if (flag) {
                     noteObj = getNote(
@@ -2433,7 +2442,7 @@ function PitchTimeMatrix() {
 
         var header = exportTable.createTHead();
 
-        for (var i = 0, row; (row = this._rows[i]); i++) {
+        for (var i = 0; i < this.rowLabels.length; i++) {
             var exportRow = header.insertRow();
             // Add the row label...
             var exportLabel = exportRow.insertCell();
@@ -2482,7 +2491,7 @@ function PitchTimeMatrix() {
             }
 
             // Add then the note cells.
-            for (var j = 0, col; (col = row.cells[j]); j++) {
+            for (var j = 0, col; (col = this._rows[i].cells[j]); j++) {
                 var exportCell = exportRow.insertCell();
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
