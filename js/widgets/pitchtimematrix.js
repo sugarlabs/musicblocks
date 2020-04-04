@@ -654,6 +654,7 @@ function PitchTimeMatrix() {
         ptmTableRow.insertCell().append(tempTable);
 
         this._lookForNoteBlocksOrRepeat();
+        console.log(this._noteBlocks);
 
         // Sort them if there are note blocks.
         if (!this.sorted && this._noteBlocks) {
@@ -2938,28 +2939,26 @@ function PitchTimeMatrix() {
 
     this._lookForNoteBlocksOrRepeat = function() {
         this._noteBlocks = false;
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var blk = this._blockMap[i][1][0];
-            if (blk === -1) {
-                continue;
-            }
+        var blk = this._logo.blocks.blockList[this.blockNo];
 
-            if (this._logo.blocks.blockList[blk] === null) {
-                continue;
-            }
-
-            if (this._logo.blocks.blockList[blk] === undefined) {
-                console.debug("block " + blk + " is undefined");
-                continue;
-            }
-
-            if (
-                this._logo.blocks.blockList[blk].name === "newnote" ||
-                this._logo.blocks.blockList[blk].name === "repeat"
-            ) {
+        // Implement Breadth First Search from corresponding
+        // matrix (phrase maker) block, by looking into their
+        // child connections.
+        var queue = [ blk ];
+        while (queue.length != 0) {
+            var pop = queue.shift();
+            if (pop.name === "newnote" || pop.name === "repeat") {
                 console.debug("FOUND A NOTE OR REPEAT BLOCK.");
                 this._noteBlocks = true;
                 break;
+            }
+
+            var conn = pop.connections.slice(1);
+            for (var i = 0; i < conn.length; i++) {
+                if (conn[i] != null) {
+                    var curr = this._logo.blocks.blockList[conn[i]];
+                    queue.push(curr);
+                }
             }
         }
     };
