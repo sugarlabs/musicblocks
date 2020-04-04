@@ -25,7 +25,7 @@ const files = {
 
 }
 
-function sassTask(){    
+const sassTask = () => {    
     return src(files.sassPath)
         .pipe(sourcemaps.init()) // initialize sourcemaps first
         .pipe(sass()) // compile SASS to CSS
@@ -35,7 +35,7 @@ function sassTask(){
     ); // put final CSS in dist folder
 }
 
-function cssTask () { 
+const cssTask = () => { 
     return src(files.cssPath)
                .pipe(minifyCSS({compatibility: 'ie8'}))
                .pipe(gulp.dest('dist/css'));
@@ -45,7 +45,7 @@ function cssTask () {
 
 
 // JS task: concatenates and uglifies JS files to app.min.js
-function jsTask(){
+const jsTask = () => {
     return src([
         files.jsPath
         ])
@@ -61,7 +61,7 @@ function jsTask(){
 
 // Cachebust
 const cbString = new Date().getTime();
-function cacheBustTask(){
+const cacheBustTask = () => {
     return src(['index.html'])
         .pipe(replace(/cb=\d+/g, 'cb=' + cbString))
         .pipe(dest('.'));
@@ -69,24 +69,24 @@ function cacheBustTask(){
 
 //This gulp task formats the js files
 
-gulp.task('prettify', () => {
+const prettify = () => {
     return gulp.src(files.jsPath)
       .pipe(prettier({ singleQuote: true,
                        trailingComma: "all"
     }))
       .pipe(gulp.dest('./dist/js')); 
- });
+ };
 
 //to check whether or not files adhere to Prettier's formatting
 
-gulp.task('validate', () => {
+const validate = () => {
     return gulp.src(files.jsPath)
         .pipe(prettier.check({ singleQuote: true, trailingComma: "all"}));
-});
+};
 
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
-function watchTask(){
+const watchTask = () => {
     watch([ files.jsPath, files.cssPath, files.sassPath ], 
         parallel( jsTask, cssTask, sassTask));    
 }

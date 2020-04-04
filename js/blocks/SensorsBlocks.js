@@ -467,7 +467,7 @@ function setupSensorsBlocks() {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
                 var cblk1 = logo.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
+                if (cblk1 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return "A";
                 }
