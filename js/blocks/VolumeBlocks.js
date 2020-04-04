@@ -37,16 +37,16 @@ function setupVolumeBlocks() {
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
                 if (cblk !== null) {
-                    var targetSynth = logo.parseArg(
+                    let targetSynth = logo.parseArg(
                         logo,
                         turtle,
                         cblk,
                         blk,
                         receivedArg
                     );
-                    for (var synth in logo.synthVolume[turtle]) {
+                    for (let synth in logo.synthVolume[turtle]) {
                         if (synth === targetSynth) {
                             return last(logo.synthVolume[turtle][synth]);
                         }
@@ -71,7 +71,7 @@ function setupVolumeBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var len = logo.masterVolume.length;
+            let len = logo.masterVolume.length;
             logo.masterVolume[len - 1] = value;
             if (!logo.suppressOutput[turtle]) {
                 logo._setMasterVolume(value);
@@ -237,23 +237,24 @@ function setupVolumeBlocks() {
                 return;
             }
 
+            let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = "electronic synth";
+                arg0 = "electronic synth";
             } else {
-                var arg0 = args[0];
+                arg0 = args[0];
             }
 
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 50;
+                arg1 = 50;
             } else {
                 if (args[1] < 0) {
-                    var arg1 = 0;
+                    arg1 = 0;
                 } else if (args[1] > 100) {
-                    var arg1 = 100;
+                    arg1 = 100;
                 } else {
-                    var arg1 = args[1];
+                    arg1 = args[1];
                 }
 
                 if (arg1 === 0) {
@@ -261,7 +262,7 @@ function setupVolumeBlocks() {
                 }
             }
 
-            var synth = null;
+            let synth = null;
 
             if (arg0 === "electronic synth" || arg0 === _("electronic synth")) {
                 synth = "electronic synth";
@@ -270,7 +271,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (var voice in VOICENAMES) {
+                for (let voice in VOICENAMES) {
                     if (VOICENAMES[voice][0] === arg0) {
                         synth = VOICENAMES[voice][1];
                         break;
@@ -282,7 +283,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (var drum in DRUMNAMES) {
+                for (let drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
                         synth = DRUMNAMES[drum][1];
                         break;
@@ -324,10 +325,10 @@ function setupVolumeBlocks() {
                 ]);
             }
 
-            var listenerName = "_synthvolume_" + turtle;
+            let listenerName = "_synthvolume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.synthVolume[turtle][synth].pop();
                 // Restore previous volume.
                 if (
@@ -410,23 +411,24 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = "electronic synth";
+                arg0 = "electronic synth";
             } else {
-                var arg0 = args[0];
+                arg0 = args[0];
             }
 
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 50;
+                arg1 = 50;
             } else {
                 if (args[1] < 0) {
-                    var arg1 = 0;
+                    arg1 = 0;
                 } else if (args[1] > 100) {
-                    var arg1 = 100;
+                    arg1 = 100;
                 } else {
-                    var arg1 = args[1];
+                    arg1 = args[1];
                 }
 
                 if (arg1 === 0) {
@@ -434,7 +436,7 @@ function setupVolumeBlocks() {
                 }
             }
 
-            var synth = null;
+            let synth = null;
 
             if (arg0 === "electronic synth" || arg0 === _("electronic synth")) {
                 synth = "electronic synth";
@@ -443,7 +445,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (var voice in VOICENAMES) {
+                for (let voice in VOICENAMES) {
                     if (VOICENAMES[voice][0] === arg0) {
                         synth = VOICENAMES[voice][1];
                         break;
@@ -455,7 +457,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (var drum in DRUMNAMES) {
+                for (let drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
                         synth = DRUMNAMES[drum][1];
                         break;
@@ -519,15 +521,16 @@ function setupVolumeBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
+                let arg;
                 if (typeof args[0] !== "number") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
                     if (args[0] < 0) {
-                        var arg = 0;
+                        arg = 0;
                     } else if (args[0] > 100) {
-                        var arg = 100;
+                        arg = 100;
                     } else {
-                        var arg = args[0];
+                        arg = args[0];
                     }
 
                     if (arg === 0) {
@@ -580,16 +583,17 @@ function setupVolumeBlocks() {
                 return;
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 50;
+                arg = 50;
             } else {
                 if (args[0] < 0) {
-                    var arg = 0;
+                    arg = 0;
                 } else if (args[0] > 100) {
-                    var arg = 100;
+                    arg = 100;
                 } else {
-                    var arg = args[0];
+                    arg = args[0];
                 }
 
                 if (arg === 0) {
@@ -610,10 +614,10 @@ function setupVolumeBlocks() {
                 ]);
             }
 
-            var listenerName = "_volume_" + turtle;
+            let listenerName = "_volume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.masterVolume.pop();
                 // Restore previous volume.
                 if (
@@ -661,15 +665,16 @@ function setupVolumeBlocks() {
                 return;
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 0;
+                arg = 0;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
-            for (var synth in logo.synthVolume[turtle]) {
-                var newVolume =
+            for (let synth in logo.synthVolume[turtle]) {
+                let newVolume =
                     (last(logo.synthVolume[turtle][synth]) * (100 + arg)) / 100;
                 if (newVolume > 100) {
                     console.debug("articulated volume exceeds 100%. clipping");
@@ -703,11 +708,11 @@ function setupVolumeBlocks() {
                 logo.notationBeginArticulation(turtle);
             }
 
-            var listenerName = "_articulation_" + turtle;
+            let listenerName = "_articulation_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
-                for (var synth in logo.synthVolume[turtle]) {
+            let __listener = function(event) {
+                for (let synth in logo.synthVolume[turtle]) {
                     logo.synthVolume[turtle][synth].pop();
                     logo.setSynthVolume(
                         turtle,
@@ -773,8 +778,8 @@ function setupVolumeBlocks() {
                     logo.crescendoDelta[turtle].push(-args[0]);
                 }
 
-                for (var synth in logo.synthVolume[turtle]) {
-                    var vol = last(logo.synthVolume[turtle][synth]);
+                for (let synth in logo.synthVolume[turtle]) {
+                    let vol = last(logo.synthVolume[turtle][synth]);
                     logo.synthVolume[turtle][synth].push(vol);
                     if (
                         logo.crescendoInitialVolume[turtle][synth] == undefined
@@ -787,10 +792,10 @@ function setupVolumeBlocks() {
 
                 logo.inCrescendo[turtle].push(true);
 
-                var listenerName = "_crescendo_" + turtle;
+                let listenerName = "_crescendo_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
+                let __listener = function(event) {
                     if (logo.justCounting[turtle].length === 0) {
                         logo.notationEndCrescendo(
                             turtle,
@@ -799,8 +804,8 @@ function setupVolumeBlocks() {
                     }
 
                     logo.crescendoDelta[turtle].pop();
-                    for (var synth in logo.synthVolume[turtle]) {
-                        var len = logo.synthVolume[turtle][synth].length;
+                    for (let synth in logo.synthVolume[turtle]) {
+                        let len = logo.synthVolume[turtle][synth].length;
                         logo.synthVolume[turtle][synth][len - 1] = last(
                             logo.crescendoInitialVolume[turtle][synth]
                         );
