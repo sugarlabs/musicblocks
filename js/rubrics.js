@@ -500,7 +500,7 @@ const PALLABELS = [
     _("mice")
 ];
 
-function analyzeProject(blocks) {
+const analyzeProject = (blocks) => {
     // Parse block data and generate score based on rubric
 
     var blockList = [];
@@ -607,7 +607,7 @@ function analyzeProject(blocks) {
     return scores;
 }
 
-function scoreToChartData(scores) {
+const scoreToChartData = (scores) => {
     var normalizedScores = [];
     var maxScore = 0;
     for (var i = 0; i < scores.length; i++) {
@@ -649,7 +649,7 @@ function scoreToChartData(scores) {
     return data;
 }
 
-function getChartOptions(callback) {
+const getChartOptions = (callback) => {
     return {
         // Callback for rendering chart into a bitmap
         onAnimationComplete: callback,

@@ -43,46 +43,46 @@ function PlaybackBox() {
     this._container = null;
     this._scale = 1;
 
-    this.setStage = function(stage) {
+    this.setStage = (stage) => {
         this._stage = stage;
         return this;
     };
 
-    this.setRefreshCanvas = function(refreshCanvas) {
+    this.setRefreshCanvas = (refreshCanvas) => {
         this._refreshCanvas = refreshCanvas;
         return this;
     };
 
-    this.setQueueStatus = function(getQueueStatus) {
+    this.setQueueStatus = (getQueueStatus) => {
         this._getQueueStatus = getQueueStatus;
         return this;
     };
 
-    this.setCompile = function(compile) {
+    this.setCompile = (compile) => {
         this._doCompile = compile;
         return this;
     };
 
-    this.setPlay = function(play) {
+    this.setPlay = (play) => {
         this._doPlay = play;
         return this;
     };
 
-    this.setPause = function(pause) {
+    this.setPause = (pause) => {
         this._doPause = pause;
         return this;
     };
 
-    this.setRewind = function(rewind) {
+    this.setRewind = (rewind) => {
         this._doRewind = rewind;
         return this;
     };
 
-    this.getPos = function() {
+    this.getPos = () => {
         return [this._container.x, this._container.y];
     };
 
-    this.init = function(scale, x, y, makeButton, logo) {
+    this.init = (scale, x, y, makeButton, logo) => {
         this._logo = logo;
 
         if (this._container === null) {
@@ -103,7 +103,7 @@ function PlaybackBox() {
             this.playButton.visible = true;
             this._positionHoverText(this.playButton);
 
-            this.playButton.on("click", function(event) {
+            this.playButton.on("click", (event) => {
                 that._doPlay();
             });
 
@@ -132,7 +132,7 @@ function PlaybackBox() {
             this.pauseButton.visible = false;
             this._positionHoverText(this.pauseButton);
 
-            this.pauseButton.on("click", function(event) {
+            this.pauseButton.on("click", (event) => {
                 that._doPause();
             });
 
@@ -151,7 +151,7 @@ function PlaybackBox() {
             this.rewindButton.visible = false;
             this._positionHoverText(this.rewindButton);
 
-            this.rewindButton.on("click", function(event) {
+            this.rewindButton.on("click", (event) => {
                 that._doRewind();
             });
 
@@ -189,7 +189,7 @@ function PlaybackBox() {
                 }
             }
 
-            this._compileButton.on("click", function(event) {
+            this._compileButton.on("click", (event) => {
                 that._doCompile();
             });
         } else {
@@ -199,7 +199,7 @@ function PlaybackBox() {
         this.setPlaybackStatus();
     };
 
-    this.setPlaybackStatus = function() {
+    this.setPlaybackStatus = () => {
         if (this._container != null) {
             if (!this._container.visible) {
                 this.noplayButton.visible = false;
@@ -228,7 +228,7 @@ function PlaybackBox() {
         }
     };
 
-    this._positionHoverText = function(button) {
+    this._positionHoverText = (button) => {
         for (var c = 0; c < button.children.length; c++) {
             if (button.children[c].text != undefined) {
                 button.children[c].textAlign = "left";
@@ -239,7 +239,7 @@ function PlaybackBox() {
         }
     };
 
-    this.hide = function() {
+    this.hide = () => {
         if (this._container !== null) {
             this.playButton.visible = false;
             this.noplayButton.visible = false;
@@ -254,7 +254,7 @@ function PlaybackBox() {
         }
     };
 
-    this._show = function() {
+    this._show = () => {
         if (this._container !== null) {
             if (this._logo.playbackQueue === {}) {
                 this.playButton.visible = false;
@@ -276,10 +276,10 @@ function PlaybackBox() {
         }
     };
 
-    this._createBox = function(scale, x, y) {
+    this._createBox = (scale, x, y) => {
         this._scale = scale;
 
-        function __processBackground(that, name, bitmap, extras) {
+        const __processBackground = (that, name, bitmap, extras) => {
             that._container.addChild(bitmap);
             that._loadPlaybackContainerHandler();
 
@@ -316,13 +316,13 @@ function PlaybackBox() {
         }
     };
 
-    this._makeBoxBitmap = function(data, name, callback, extras) {
+    this._makeBoxBitmap = (data, name, callback, extras) => {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
         var that = this;
 
-        img.onload = function() {
+        img.onload = () => {
             bitmap = new createjs.Bitmap(img);
             callback(that, name, bitmap, extras);
         };
@@ -332,11 +332,11 @@ function PlaybackBox() {
             window.btoa(unescape(encodeURIComponent(data)));
     };
 
-    this._loadPlaybackContainerHandler = function() {
+    this._loadPlaybackContainerHandler = () => {
         var locked = false;
         var that = this;
 
-        that._container.on("click", function(event) {
+        that._container.on ("click", (event) => {
             // We need a lock to "debouce" the click.
             if (locked) {
                 console.debug("debouncing click");
@@ -344,7 +344,7 @@ function PlaybackBox() {
             }
 
             locked = true;
-            setTimeout(function() {
+            setTimeout(() => {
                 locked = false;
             }, 500);
 

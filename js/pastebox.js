@@ -23,27 +23,27 @@ function PasteBox() {
     this.close = null;
     this._scale = 1;
 
-    this.setCanvas = function(canvas) {
+    this.setCanvas = (canvas) => {
         this._canvas = canvas;
         return this;
     };
 
-    this.setStage = function(stage) {
+    this.setStage = (stage) => {
         this._stage = stage;
         return this;
     };
 
-    this.setPaste = function(paste) {
+    this.setPaste = (paste) => {
         this._paste = paste;
         return this;
     };
 
-    this.setRefreshCanvas = function(refreshCanvas) {
+    this.setRefreshCanvas = (refreshCanvas) => {
         this._refreshCanvas = refreshCanvas;
         return this;
     };
 
-    this.hide = function() {
+    this.hide = () => {
         if (this._container != null) {
             this._container.visible = false;
             this._refreshCanvas();
@@ -52,7 +52,7 @@ function PasteBox() {
         }
     };
 
-    this.createBox = function(scale, x, y) {
+    this.createBox = (scale, x, y) => {
         if (this._container == null) {
             this._scale = scale;
 
@@ -61,7 +61,7 @@ function PasteBox() {
             this._container.x = x;
             this._container.y = y;
 
-            function __processBackground(that, name, bitmap, extras) {
+            const __processBackground = (that, name, bitmap, extras) => {
                 that._container.addChild(bitmap);
                 that._loadClearContainerHandler();
                 that._container.visible = true;
@@ -72,18 +72,18 @@ function PasteBox() {
         }
     };
 
-    this.show = function() {
+    this.show = () => {
         this._container.visible = true;
         this._refreshCanvas();
         // this._paste.visibile = true;
         docById("paste").style.visibility = "visible";
     };
 
-    this.getPos = function() {
+    this.getPos = () => {
         return [this._container.x, this._container.y];
     };
 
-    this._loadClearContainerHandler = function() {
+    this._loadClearContainerHandler = () => {
         var hitArea = new createjs.Shape();
         this.bounds = this._container.getBounds();
         hitArea.graphics
@@ -99,9 +99,9 @@ function PasteBox() {
         this._container.hitArea = hitArea;
 
         var locked = false;
-        var that = this;
+        // var that = this;
 
-        this._container.on("click", function(event) {
+        this._container.on("click", (event) => {
             // We need a lock to "debouce" the click.
             if (locked) {
                 console.debug("debouncing click");
@@ -110,27 +110,27 @@ function PasteBox() {
 
             locked = true;
 
-            setTimeout(function() {
+            setTimeout(() => {
                 locked = false;
             }, 500);
 
-            var x = event.stageX / that._scale - that._container.x;
-            var y = event.stageY / that._scale - that._container.y;
+            var x = event.stageX / this._scale - this._container.x;
+            var y = event.stageY / this._scale - this._container.y;
             if (x > 125 && y < 55) {
-                that.hide();
+                this.hide();
             }
         });
     };
 
-    this._makeBoxBitmap = function(data, name, callback, extras) {
+    this._makeBoxBitmap = (data, name, callback, extras) => {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
-        var that = this;
+        // var that = this;
 
-        img.onload = function() {
+        img.onload = () => {
             var bitmap = new createjs.Bitmap(img);
-            callback(that, name, bitmap, extras);
+            callback(this, name, bitmap, extras);
         };
 
         img.src =

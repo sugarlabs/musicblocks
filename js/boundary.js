@@ -18,31 +18,31 @@ function Boundary() {
     this._stage = null;
     this._container = null;
 
-    this.setStage = function(stage) {
+    this.setStage = (stage) => {
         this._stage = stage;
         return this;
     };
 
-    this.resizeEvent = function(scale) {};
+    this.resizeEvent = (scale) => {};
 
-    this.init = function() {
+    this.init = () => {
         this._container = new createjs.Container();
         this._stage.addChild(this._container);
         this._stage.setChildIndex(this._container, 0);
     };
 
-    this.setScale = function(w, h, scale) {
+    this.setScale = (w, h, scale) => {
         this.destroy();
         this.create(w, h, scale);
     };
 
-    this.destroy = function() {
+    this.destroy = () => {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
     };
 
-    this.offScreen = function(x, y) {
+    this.offScreen = (x, y) => {
         return (
             x < this.x ||
             x > this.x + this.dx ||
@@ -51,7 +51,7 @@ function Boundary() {
         );
     };
 
-    this.create = function(w, h, scale) {
+    this.create = (w, h, scale) => {
         this.w = w / scale;
         this.x = 55 + 13;
         this.dx = this.w - (110 + 26);
@@ -62,9 +62,9 @@ function Boundary() {
 
         that = this;
 
-        function __makeBoundary() {
+        const __makeBoundary = () => {
             var img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 bitmap = new createjs.Bitmap(img);
                 that._container.addChild(bitmap);
             };
@@ -89,11 +89,11 @@ function Boundary() {
         __makeBoundary();
     };
 
-    this.hide = function() {
+    this.hide = () => {
         this._container.visible = false;
     };
 
-    this.show = function() {
+    this.show = () => {
         this._container.visible = true;
     };
 }

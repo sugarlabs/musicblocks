@@ -66,7 +66,7 @@ function SaveInterface(PlanetInterface) {
         "'" +
         ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
 
-    this.download = function(extension, dataurl, defaultfilename) {
+    this.download = (extension, dataurl, defaultfilename) => {
         var filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.PlanetInterface === undefined) {
@@ -106,7 +106,7 @@ function SaveInterface(PlanetInterface) {
         this.downloadURL(filename, dataurl);
     };
 
-    this.downloadURL = function(filename, dataurl) {
+    this.downloadURL = (filename, dataurl) => {
         var a = document.createElement("a");
         a.setAttribute("href", dataurl);
         a.setAttribute("download", filename);
@@ -115,14 +115,14 @@ function SaveInterface(PlanetInterface) {
         document.body.removeChild(a);
     };
 
-    this.setVariables = function(vars) {
+    this.setVariables = (vars) => {
         for (var i = 0; i < vars.length; i++) {
             this[vars[i][0]] = vars[i][1];
         }
     };
 
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
-    this.prepareHTML = function() {
+    this.prepareHTML = () => {
         var file = this.htmlSaveTemplate;
         if (this.PlanetInterface !== undefined) {
             var description = this.PlanetInterface.getCurrentProjectDescription();
@@ -156,7 +156,7 @@ function SaveInterface(PlanetInterface) {
         return file;
     };
 
-    this.saveHTML = function(filename) {
+    this.saveHTML = (filename) => {
         var html =
             "data:text/plain;charset=utf-8," +
             encodeURIComponent(this.prepareHTML());
@@ -164,9 +164,9 @@ function SaveInterface(PlanetInterface) {
         this.download("html", html, filename);
     };
 
-    this.saveHTMLNoPrompt = function() {
+    this.saveHTMLNoPrompt = () => {
         setTimeout(
-            function() {
+            () => {
                 var html =
                     "data:text/plain;charset=utf-8," +
                     encodeURIComponent(this.prepareHTML());
@@ -181,12 +181,12 @@ function SaveInterface(PlanetInterface) {
                         html
                     );
                 }
-            }.bind(this),
+            },
             500
         );
     };
 
-    this.saveSVG = function(filename) {
+    this.saveSVG = (filename) => {
         var svg =
             "data:image/svg+xml;utf8," +
             doSVG(
@@ -200,17 +200,17 @@ function SaveInterface(PlanetInterface) {
         this.download("svg", svg, filename);
     };
 
-    this.savePNG = function(filename) {
+    this.savePNG = (filename) => {
         var png = docById("overlayCanvas").toDataURL("image/png");
         this.download("png", png, filename);
     };
 
-    this.saveBlockArtwork = function(filename) {
+    this.saveBlockArtwork = (filename) => {
         var svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
         this.download("svg", svg, filename);
     };
 
-    this.saveWAV = function(filename) {
+    this.saveWAV = (filename) => {
         document.body.style.cursor = "wait";
         this.filename = filename;
         this.logo.playbackQueue = {};
@@ -221,13 +221,13 @@ function SaveInterface(PlanetInterface) {
         this.logo.runLogoCommands();
     };
 
-    this.afterSaveWAV = function(blob) {
+    this.afterSaveWAV = (blob) => {
         console.debug("AFTER SAVE WAV");
         //don't reset cursor
         this.download("wav", URL.createObjectURL(blob));
     };
 
-    this.saveAbc = function(filename) {
+    this.saveAbc = (filename) => {
         document.body.style.cursor = "wait";
         this.filename = filename;
         console.debug("Saving .abc file");
@@ -248,12 +248,12 @@ function SaveInterface(PlanetInterface) {
         this.logo.runLogoCommands();
     };
 
-    this.afterSaveAbc = function(filename) {
+    this.afterSaveAbc = (filename) => {
         var abc = encodeURIComponent(saveAbcOutput(this.logo));
         this.download("abc", "data:text;utf8," + abc, filename);
     };
 
-    this.saveLilypond = function(filename) {
+    this.saveLilypond = (filename) => {
         var lyext = "ly";
         if (filename === undefined) {
             if (this.PlanetInterface !== undefined) {
@@ -308,23 +308,23 @@ function SaveInterface(PlanetInterface) {
             docById("author").value = _("Mr. Mouse");
         }
 
-        docById("submitLilypond").onclick = function() {
+        docById("submitLilypond").onclick = () => {
             this.saveLYFile(false);
-        }.bind(this);
+        }
         // if (this.planet){
-        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
+        //     docById('submitPDF').onclick = (){this.saveLYFile(true);}.bind(this);
         //     docById('submitPDF').disabled = false;
         // } else {
         //     docById('submitPDF').disabled = true;
         // }
-        var t = this;
-        docByClass("close")[0].onclick = function() {
-            t.logo.runningLilypond = false;
+        // var t = this;
+        docByClass("close")[0].onclick = () => {
+            this.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
         };
     };
 
-    this.saveLYFile = function(isPDF) {
+    this.saveLYFile = (isPDF) => {
         if (isPDF === undefined) {
             isPDF = false;
         }
@@ -351,7 +351,7 @@ function SaveInterface(PlanetInterface) {
 
         var lyheader = LILYPONDHEADER.replace(
             /My Music Blocks Creation|Mr. Mouse/gi,
-            function(matched) {
+            (matched) => {
                 return mapLilypondObj[matched];
             }
         );
@@ -400,7 +400,7 @@ function SaveInterface(PlanetInterface) {
         docById("lilypondModal").style.display = "none";
     };
 
-    this.afterSaveLilypond = function(filename) {
+    this.afterSaveLilypond = (filename) => {
         var ly = saveLilypondOutput(this.logo);
         switch (this.notationConvert) {
             case "pdf":
@@ -413,7 +413,7 @@ function SaveInterface(PlanetInterface) {
         this.notationConvert = "";
     };
 
-    this.afterSaveLilypondLY = function(lydata, filename) {
+    this.afterSaveLilypondLY = (lydata, filename) => {
         if (platform.FF) {
             console.debug('execCommand("copy") does not work on FireFox');
         } else {
@@ -442,9 +442,9 @@ function SaveInterface(PlanetInterface) {
         );
     };
 
-    this.afterSaveLilypondPDF = function(lydata, filename) {
+    this.afterSaveLilypondPDF = (lydata, filename) => {
         document.body.style.cursor = "wait";
-        window.Converter.ly2pdf(lydata, function(success, dataurl) {
+        window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
                 console.debug("Error: " + dataurl);
@@ -455,7 +455,7 @@ function SaveInterface(PlanetInterface) {
         });
     };
 
-    this.saveMxml = function(filename) {
+    this.saveMxml = (filename) => {
         this.logo.runningMxml = true;
         for (
             var turtle = 0;
@@ -471,7 +471,7 @@ function SaveInterface(PlanetInterface) {
         // this.download('musicxml', 'data:text;utf8,'+data);
     };
 
-    this.afterSaveMxml = function(filename) {
+    this.afterSaveMxml = (filename) => {
         var data = saveMxmlOutput(this.logo);
         data = saveMxmlOutput(this.logo);
 
@@ -485,9 +485,9 @@ function SaveInterface(PlanetInterface) {
         this.logo.runningMxml = false;
     };
 
-    this.init = function() {
+    this.init = () => {
         this.timeLastSaved = -100;
-        window.onbeforeunload = function(e) {
+        window.onbeforeunload = (e) => {
             if (
                 this.PlanetInterface !== undefined &&
                 this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
@@ -496,7 +496,7 @@ function SaveInterface(PlanetInterface) {
                 // "Cancel", we attempt to perform an action that would otherwise be blocked. That is, if the
                 // user does not cancel the navigation, the HTTP request will fail, and the prompt never shown.
                 setTimeout(
-                    function() {
+                    () => {
                         var xhr = new XMLHttpRequest();
                         xhr.open("GET", document.location.href, true);
                         xhr.onreadystatechange = function() {
@@ -510,14 +510,14 @@ function SaveInterface(PlanetInterface) {
                                     this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
                                 }
                             }
-                        }.bind(this);
+                        };
                         xhr.send();
-                    }.bind(this)
-                );
+                    }
+                )
 
                 e.preventDefault();
                 e.returnValue = "";
             }
-        }.bind(this);
-    };
+        }
+    }
 }

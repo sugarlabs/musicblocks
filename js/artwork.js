@@ -79,8 +79,13 @@ const MEDIASAFEAREA = [40, 4, 108, 80];
 const HIGHLIGHTCOLOR = "#FFFFFF";
 const ACTIVECOLOR = "#212121";
 
+<<<<<<< HEAD
 function showMaterialHighlight(x, y, r, event, scale, stage) {
     let circles = {
+=======
+const showMaterialHighlight = (x, y, r, event, scale, stage) => {
+    var circles = {
+>>>>>>> small size files done
         highlight: new createjs.Shape(),
         active: new createjs.Shape()
     };
@@ -110,7 +115,7 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
     return circles;
 }
 
-function hideButtonHighlight(circles, stage) {
+const hideButtonHighlight = (circles, stage) => {
     // Un-real circles!
     if (circles.active === undefined) {
         return;
@@ -118,13 +123,13 @@ function hideButtonHighlight(circles, stage) {
 
     createjs.Tween.get(circles.active).to({ alpha: 0 }, 200);
     createjs.Tween.get(circles.highlight).to({ alpha: 0 }, 400);
-    setTimeout(function() {
+    setTimeout(() => {
         stage.removeChild(circles.active, circles.highlight);
     }, 410);
 }
 
-function hidePaletteNameDisplay(palette_text, stage) {
-    setTimeout(function() {
+const hidePaletteNameDisplay = (palette_text, stage) => {
+    setTimeout(() => {
         stage.removeChild(palette_text);
     }, 150);
 }

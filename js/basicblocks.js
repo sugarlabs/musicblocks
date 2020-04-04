@@ -52,7 +52,7 @@ var NAMEDICT = {
 // from bottom to top, i.e., the block at the top of a palette will be
 // the last block added to a palette.
 
-function initBasicProtoBlocks(palettes, blocks) {
+const initBasicProtoBlocks = (palettes, blocks) => {
     blocks.palettes = palettes;
 
     setupRhythmBlockPaletteBlocks();

@@ -33,7 +33,7 @@ function PlaybackWidget() {
     };
     */
 
-    this.init = function(logo) {
+    this.init = (logo) => {
         // Initializes the playback matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
@@ -66,7 +66,7 @@ function PlaybackWidget() {
         var row = header.insertRow(0);
 
         // For the button callbacks
-        var that = this;
+        // var that = this;
 
         this._playcell = this._addButton(
             row,
@@ -75,8 +75,8 @@ function PlaybackWidget() {
             _("Play all")
         );
 
-        this._playcell.onclick = function() {
-            that._logo.playback(-1); // that._playAll();
+        this._playcell.onclick = () => {
+            this._logo.playback(-1); // that._playAll();
         };
 
         var cell = this._addButton(
@@ -86,11 +86,11 @@ function PlaybackWidget() {
             _("Close")
         );
 
-        cell.onclick = function() {
+        cell.onclick = () => {
             playbackTableDiv.style.visibility = "hidden";
             playbackButtonsDiv.style.visibility = "hidden";
             playbackDiv.style.visibility = "hidden";
-            that._logo.stopTurtle = true;
+            this._logo.stopTurtle = true;
         };
 
         // We use this cell as a handle for dragging.
@@ -107,57 +107,57 @@ function PlaybackWidget() {
         this._target = false;
         this._dragCellHTML = dragCell.innerHTML;
 
-        dragCell.onmouseover = function(e) {
+        dragCell.onmouseover = (e) => {
             // In order to prevent the dragged item from triggering a
             // browser reload in Firefox, we empty the cell contents
             // before dragging.
             dragCell.innerHTML = "";
         };
 
-        dragCell.onmouseout = function(e) {
-            if (!that._dragging) {
-                dragCell.innerHTML = that._dragCellHTML;
+        dragCell.onmouseout = (e) => {
+            if (!this._dragging) {
+                dragCell.innerHTML = this._dragCellHTML;
             }
         };
 
-        canvas.ondragover = function(e) {
-            that._dragging = true;
+        canvas.ondragover = (e) => {
+            this._dragging = true;
             e.preventDefault();
         };
 
-        canvas.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
+        canvas.ondrop = (e) => {
+            if (this._dragging) {
+                this._dragging = false;
+                var x = e.clientX - this._dx;
                 playbackDiv.style.left = x + "px";
-                var y = e.clientY - that._dy;
+                var y = e.clientY - this._dy;
                 playbackDiv.style.top = y + "px";
-                dragCell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = this._dragCellHTML;
             }
         };
 
-        playbackDiv.ondragover = function(e) {
-            that._dragging = true;
+        playbackDiv.ondragover = (e) => {
+            this._dragging = true;
             e.preventDefault();
         };
 
-        playbackDiv.ondrop = function(e) {
-            if (that._dragging) {
-                that._dragging = false;
-                var x = e.clientX - that._dx;
+        playbackDiv.ondrop = (e) => {
+            if (this._dragging) {
+                this._dragging = false;
+                var x = e.clientX - this._dx;
                 playbackDiv.style.left = x + "px";
-                var y = e.clientY - that._dy;
+                var y = e.clientY - this._dy;
                 playbackDiv.style.top = y + "px";
-                dragCell.innerHTML = that._dragCellHTML;
+                dragCell.innerHTML = this._dragCellHTML;
             }
         };
 
-        playbackDiv.onmousedown = function(e) {
-            that._target = e.target;
+        playbackDiv.onmousedown = (e) => {
+            this._target = e.target;
         };
 
-        playbackDiv.ondragstart = function(e) {
-            if (dragCell.contains(that._target)) {
+        playbackDiv.ondragstart = (e) => {
+            if (dragCell.contains(this._target)) {
                 e.dataTransfer.setData("text/plain", "");
             } else {
                 e.preventDefault();
@@ -243,16 +243,16 @@ function PlaybackWidget() {
             );
             buttonCell.setAttribute("id", activeTurtles);
 
-            buttonCell.onclick = function() {
+            buttonCell.onclick = () => {
                 var id = Number(this.getAttribute("id"));
-                that._logo.playback(id);
+                this._logo.playback(id);
             };
 
             activeTurtles += 1;
         }
     };
 
-    this._addButton = function(row, icon, iconSize, label) {
+    this._addButton = (row, icon, iconSize, label) => {
         var cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -274,11 +274,11 @@ function PlaybackWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = MATRIXBUTTONCOLOR;
 
-        cell.onmouseover = function() {
+        cell.onmouseover = () => {
             this.style.backgroundColor = MATRIXBUTTONCOLORHOVER;
         };
 
-        cell.onmouseout = function() {
+        cell.onmouseout = () => {
             this.style.backgroundColor = MATRIXBUTTONCOLOR;
         };
 

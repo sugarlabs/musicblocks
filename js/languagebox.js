@@ -14,84 +14,84 @@ function LanguageBox() {
     var language = localStorage.languagePreference;
     this._message = null;
 
-    this.setMessage = function(message) {
+    this.setMessage = (message) => {
         this._message = message;
         return this;
     };
 
-    this.enUS_onclick = function() {
+    this.enUS_onclick = () => {
         language = "enUS";
         this.hide();
     };
 
-    this.enUK_onclick = function() {
+    this.enUK_onclick = () => {
         language = "enUK";
         this.hide();
     };
 
-    this.ja_onclick = function() {
+    this.ja_onclick = () => {
         language = "ja";
         localStorage.kanaPreference = "kanji";
         this.hide();
     };
 
-    this.kana_onclick = function() {
+    this.kana_onclick = () => {
         language = "ja";
         localStorage.kanaPreference = "kana";
         this.hide();
     };
 
-    this.es_onclick = function() {
+    this.es_onclick = () => {
         language = "es";
         this.hide();
     };
 
-    this.pt_onclick = function() {
+    this.pt_onclick = () => {
         language = "pt";
         this.hide();
     };
 
-    this.zhCN_onclick = function() {
+    this.zhCN_onclick = () => {
         language = "zhCN";
         this.hide();
     };
 
-    this.th_onclick = function() {
+    this.th_onclick = () => {
         language = "th";
         this.hide();
     };
 
-    this.hi_onclick = function() {
+    this.hi_onclick = () => {
         language = "hi";
         this.hide();
     };
 
-    this.ibo_onclick = function() {
+    this.ibo_onclick = () => {
         language = "ibo";
         this.hide();
     };
 
-    this.ar_onclick = function() {
+    this.ar_onclick = () => {
         language = "ar";
         this.hide();
     };
 
-    this.he_onclick = function() {
+    this.he_onclick = () => {
         language = "he";
         this.hide();
     };
 
-    this.ayc_onclick = function() {
+    this.ayc_onclick = () => {
         language = "ayc";
         this.hide();
     };
 
-    this.gug_onclick = function() {
+    this.gug_onclick = () => {
         language = "gug";
         this.hide();
     };
 
-    this.hide = function() {
+    this.hide = () => {
         const MSGPrefix =
             "<a href='#' " +
             "onClick='window.location.reload()'" +
