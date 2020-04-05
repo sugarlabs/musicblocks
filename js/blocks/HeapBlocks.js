@@ -36,7 +36,7 @@ function setupHeapBlocks() {
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 console.debug(xmlHttp.responseText);
                 try {
-                       data = JSON.parse(xmlHttp.responseText);
+                    data = JSON.parse(xmlHttp.responseText);
                 } catch (e) {
                     console.debug(e);
                     logo.errorMsg(_("Error parsing JSON data:") + e);
