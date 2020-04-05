@@ -3152,7 +3152,7 @@ function Logo() {
                                 var d = that.tieCarryOver[turtle];
                             }
 
-                            if (that.runningLilypond || that.runningMxml) {
+                            if (that.runningLilypond || that.runningMxml || that.runningAbc) {
                                 that.updateNotation(
                                     chordNotes,
                                     d,
