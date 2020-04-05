@@ -144,9 +144,9 @@ function setupPenBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 3) {
-                var hue = logo.turtles.turtleList[turtle].color;
-                var value = logo.turtles.turtleList[turtle].value;
-                var chroma = logo.turtles.turtleList[turtle].chroma;
+                let hue = logo.turtles.turtleList[turtle].color;
+                let value = logo.turtles.turtleList[turtle].value;
+                let chroma = logo.turtles.turtleList[turtle].chroma;
                 logo.turtles.turtleList[turtle].doSetHue(args[0]);
                 logo.turtles.turtleList[turtle].doSetValue(args[1]);
                 logo.turtles.turtleList[turtle].doSetChroma(args[2]);
@@ -175,7 +175,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetChroma(value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -216,7 +216,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetValue(value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -258,7 +258,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetColor(value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -299,7 +299,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetPensize(value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -411,10 +411,10 @@ function setupPenBlocks() {
                 }
             }
 
-            var listenerName = "_hollowline_" + turtle;
+            let listenerName = "_hollowline_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function() {
+            let __listener = function() {
                 if (logo.inNoteBlock[turtle].length > 0) {
                     logo.embeddedGraphics[turtle][
                         last(logo.inNoteBlock[turtle])
@@ -472,7 +472,7 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 if (logo.suppressOutput[turtle]) {
-                    var savedPenState =
+                    let savedPenState =
                         logo.turtles.turtleList[turtle].penState;
                     logo.turtles.turtleList[turtle].penState = false;
                     logo.turtles.turtleList[turtle].doStartFill();
@@ -489,17 +489,17 @@ function setupPenBlocks() {
                 }
             }
 
-            var listenerName = "_fill_" + turtle;
+            let listenerName = "_fill_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function() {
+            let __listener = function() {
                 if (logo.inNoteBlock[turtle].length > 0) {
                     logo.embeddedGraphics[turtle][
                         last(logo.inNoteBlock[turtle])
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doEndFill();
@@ -681,8 +681,8 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                var arg = args[0] % 101;
-                var alpha = 1.0 - arg / 100;
+                let arg = args[0] % 101;
+                let alpha = 1.0 - arg / 100;
                 logo.turtles.turtleList[turtle].doSetPenAlpha(alpha);
                 if (logo.justCounting[turtle].length === 0) {
                     logo._playbackPush(turtle, [

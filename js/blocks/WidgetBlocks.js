@@ -110,12 +110,12 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var filtertype = DEFAULTFILTERTYPE;
-            var freq;
-            var rollOff;
+            let filtertype = DEFAULTFILTERTYPE;
+            let freq;
+            let rollOff;
 
             if (args.length === 3 && typeof args[1] === "number") {
-                for (var ftype in FILTERTYPES) {
+                for (let ftype in FILTERTYPES) {
                     if (FILTERTYPES[ftype][0] === args[0]) {
                         filtertype = FILTERTYPES[ftype][1];
                     } else if (FILTERTYPES[ftype][1] === args[0]) {
@@ -193,37 +193,37 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.temperament == null) {
+            if (logo.temperament === null) {
                 logo.temperament = new TemperamentWidget();
             }
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
-            var scale = [];
+            let scale = [];
 
             if (
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[2]]
                     .name === "pitch"
             ) {
-                var pitchBlock =
+                let pitchBlock =
                     logo.blocks.blockList[
                         logo.blocks.blockList[blk].connections[2]
                     ];
-                var note =
+                let note =
                     logo.blocks.blockList[pitchBlock.connections[1]].value;
-                var octave =
+                let octave =
                     logo.blocks.blockList[pitchBlock.connections[2]].value;
-                var setKey = logo.blocks.blockList[pitchBlock.connections[3]];
+                let setKey = logo.blocks.blockList[pitchBlock.connections[3]];
                 scale[0] = logo.blocks.blockList[setKey.connections[1]].value;
                 scale[1] = logo.blocks.blockList[setKey.connections[2]].value;
                 logo.synth.startingPitch = note + octave;
                 logo.temperament.scale = scale;
             }
 
-            var listenerName = "_temperament_" + turtle;
+            let listenerName = "_temperament_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.temperament.init(logo);
             };
 
@@ -279,7 +279,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.timbre == null) {
+            if (logo.timbre === null) {
                 logo.timbre = new TimbreWidget();
             }
 
@@ -336,10 +336,10 @@ function setupWidgetBlocks() {
             logo.timbre.duoSynthParams = [];
             logo.timbre.notesToPlay = [];
 
-            var listenerName = "_timbre_" + turtle;
+            let listenerName = "_timbre_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.timbre.init(logo);
             };
 
@@ -376,16 +376,16 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.meterWidget == null) {
+            if (logo.meterWidget === null) {
                 logo.meterWidget = new MeterWidget();
             }
 
             logo.insideMeterWidget = true;
 
-            var listenerName = "_meterwidget_" + turtle;
+            let listenerName = "_meterwidget_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.meterWidget.init(logo, logo._meterBlock);
                 logo.insideMeterWidget = false;
             };
@@ -422,16 +422,16 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.modeWidget == null) {
+            if (logo.modeWidget === null) {
                 logo.modeWidget = new ModeWidget();
             }
 
             logo.insideModeWidget = true;
 
-            var listenerName = "_modewidget_" + turtle;
+            let listenerName = "_modewidget_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.modeWidget.init(logo, logo._modeBlock);
                 logo.insideModeWidget = false;
             };
@@ -470,7 +470,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (logo.tempo == null) {
+            if (logo.tempo === null) {
                 logo.tempo = new Tempo();
             }
 
@@ -478,10 +478,10 @@ function setupWidgetBlocks() {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
 
-            var listenerName = "_tempo_" + turtle;
+            let listenerName = "_tempo_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.tempo.init(logo);
             };
 
@@ -526,7 +526,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchDrumMatrix == null) {
+            if (logo.pitchDrumMatrix === null) {
                 logo.pitchDrumMatrix = new PitchDrumMatrix();
             }
 
@@ -536,10 +536,10 @@ function setupWidgetBlocks() {
             logo.pitchDrumMatrix.drums = [];
             logo.pitchDrumMatrix.clearBlocks();
 
-            var listenerName = "_pitchdrummatrix_" + turtle;
+            let listenerName = "_pitchdrummatrix_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -586,7 +586,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchSlider == null) {
+            if (logo.pitchSlider === null) {
                 logo.pitchSlider = new PitchSlider();
             }
 
@@ -594,10 +594,10 @@ function setupWidgetBlocks() {
 
             logo.inPitchSlider = true;
 
-            var listenerName = "_pitchslider_" + turtle;
+            let listenerName = "_pitchslider_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
@@ -735,10 +735,10 @@ function setupWidgetBlocks() {
             logo.musicKeyboard.octaves = [];
             logo.musicKeyboard._rowBlocks = [];
 
-            var listenerName = "_musickeyboard_" + turtle;
+            let listenerName = "_musickeyboard_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.musicKeyboard.init(logo);
             };
 
@@ -775,7 +775,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchStaircase == null) {
+            if (logo.pitchStaircase === null) {
                 logo.pitchStaircase = new PitchStaircase();
             }
 
@@ -784,10 +784,10 @@ function setupWidgetBlocks() {
 
             logo.inPitchStaircase = true;
 
-            var listenerName = "_pitchstaircase_" + turtle;
+            let listenerName = "_pitchstaircase_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
@@ -871,10 +871,10 @@ function setupWidgetBlocks() {
             logo.rhythmRuler.Drums = [];
             logo.inRhythmRuler = true;
 
-            var listenerName = "_rhythmruler_" + turtle;
+            let listenerName = "_rhythmruler_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.rhythmRuler.init(logo);
             };
 
@@ -998,7 +998,7 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
-            if (logo.pitchTimeMatrix == null) {
+            if (logo.pitchTimeMatrix === null) {
                 logo.pitchTimeMatrix = new PitchTimeMatrix();
             }
 
@@ -1013,10 +1013,10 @@ function setupWidgetBlocks() {
             logo.tupletParams = [];
             logo.addingNotesToTuplet = false;
 
-            var listenerName = "_matrix_" + turtle;
+            let listenerName = "_matrix_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 if (
                     logo.tupletRhythms.length === 0 ||
                     logo.pitchTimeMatrix.rowLabels.length === 0
@@ -1033,7 +1033,7 @@ function setupWidgetBlocks() {
                     logo.pitchTimeMatrix.sorted = false;
                     logo.pitchTimeMatrix.init(logo);
 
-                    for (var i = 0; i < logo.tupletRhythms.length; i++) {
+                    for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
                         // and (2) rhythm block outside of a
                         // tuplet. Rhythm blocks in a tuplet are
@@ -1041,10 +1041,10 @@ function setupWidgetBlocks() {
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
                             case "simple":
-                                var tupletParam = [logo.tupletParams[i]];
+                                let tupletParam = [logo.tupletParams[i]];
                                 tupletParam.push([]);
                                 for (
-                                    var j = 2;
+                                    let j = 2;
                                     j < logo.tupletRhythms[i].length;
                                     j++
                                 ) {
@@ -1108,7 +1108,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.statusMatrix == null) {
+            if (logo.statusMatrix === null) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
@@ -1117,10 +1117,10 @@ function setupWidgetBlocks() {
 
             logo.inStatusMatrix = true;
 
-            var listenerName = "_status_" + turtle;
+            let listenerName = "_status_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };

@@ -184,7 +184,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo) {
-            for (var sound in logo.sounds) {
+            for (let sound in logo.sounds) {
                 logo.sounds[sound].stop();
             }
             logo.sounds = [];
@@ -212,7 +212,7 @@ function setupMediaBlocks() {
                 return;
             }
 
-            var sound = new Howl({
+            let sound = new Howl({
                 urls: [args[0]]
             });
             logo.sounds.push(sound);
@@ -395,15 +395,15 @@ function setupMediaBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                var block = logo.blocks.blockList[blk];
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
+                let block = logo.blocks.blockList[blk];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 392;
                 }
-                var note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var octave = Math.floor(
+                let note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let octave = Math.floor(
                     calcOctave(
                         logo.currentOctave[turtle],
                         logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
@@ -436,13 +436,14 @@ function setupMediaBlocks() {
                     "F♯": "G♭",
                     "G♯": "A♭"
                 };
-                var block = logo.blocks.blockList[blk];
-                var cblk = block.connections[1];
+                let block = logo.blocks.blockList[blk];
+                let cblk = block.connections[1];
+                let noteName;
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
-                    var noteName = "G";
+                    noteName = "G";
                 } else {
-                    var noteName = logo.parseArg(
+                    noteName = logo.parseArg(
                         logo,
                         turtle,
                         cblk,
@@ -460,7 +461,7 @@ function setupMediaBlocks() {
                     noteName = NOTECONVERSION[noteName];
                 }
 
-                var idx = NOTENAMES.indexOf(noteName);
+                let idx = NOTENAMES.indexOf(noteName);
                 if (idx === -1) {
                     this.errorMsg(
                         _(
@@ -469,12 +470,13 @@ function setupMediaBlocks() {
                     );
                     return 440;
                 }
-                var cblk = block.connections[2];
+                cblk = block.connections[2];
+                let octave;
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
-                    var octave = 4;
+                    octave = 4;
                 } else {
-                    var octave = Math.floor(
+                    octave = Math.floor(
                         logo.parseArg(logo, turtle, cblk, blk, receivedArg)
                     );
                 }
@@ -487,7 +489,7 @@ function setupMediaBlocks() {
                     octave -= 1; // New octave starts on C
                 }
 
-                var i = octave * 12 + idx;
+                let i = octave * 12 + idx;
                 return 27.5 * Math.pow(1.05946309435929, i);
             }
         }

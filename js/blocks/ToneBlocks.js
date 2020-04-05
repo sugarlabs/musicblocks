@@ -19,11 +19,11 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var oscillatorType = DEFAULTOSCILLATORTYPE;
-            var partials = 0;
+            let oscillatorType = DEFAULTOSCILLATORTYPE;
+            let partials = 0;
 
             if (args.length === 2 && typeof args[1] === "number") {
-                for (var otype in OSCTYPES) {
+                for (let otype in OSCTYPES) {
                     if (OSCTYPES[otype][0] === args[0]) {
                         oscillatorType = OSCTYPES[otype][1];
                     } else if (OSCTYPES[otype][1] === args[0]) {
@@ -97,8 +97,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var synthVibratoRate;
-            var synthVibratoAmount;
+            let synthVibratoRate;
+            let synthVibratoAmount;
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
                     logo.errorMsg(
@@ -109,18 +109,19 @@ function setupToneBlocks() {
                 logo.timbre.duoSynthParams = [];
             }
 
+            let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 10;
+                arg0 = 10;
             } else {
-                var arg0 = args[0];
+                arg0 = args[0];
             }
 
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg1 = 50;
+                arg1 = 50;
             } else {
-                var arg1 = args[1];
+                arg1 = args[1];
             }
 
             synthVibratoRate = Math.abs(arg0);
@@ -165,7 +166,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var harmonicity;
+            let harmonicity;
             if (logo.inTimbre) {
                 logo.timbre.AMSynthParams = [];
                 if (logo.timbre.osc.length != 0) {
@@ -175,11 +176,12 @@ function setupToneBlocks() {
                 }
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1;
+                arg = 1;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             if (arg < 0) {
@@ -224,7 +226,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var modulationIndex;
+            let modulationIndex;
             if (logo.inTimbre) {
                 logo.timbre.FMSynthParams = [];
                 if (logo.timbre.osc.length != 0) {
@@ -234,11 +236,12 @@ function setupToneBlocks() {
                 }
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 10;
+                arg = 10;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             if (arg < 0) {
@@ -292,7 +295,7 @@ function setupToneBlocks() {
             }
 
             if (logo.inHarmonic[turtle].length > 0) {
-                var n = logo.inHarmonic[turtle].length - 1;
+                let n = logo.inHarmonic[turtle].length - 1;
                 logo.partials[turtle][n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
@@ -336,10 +339,10 @@ function setupToneBlocks() {
             logo.inHarmonic[turtle].push(blk);
             logo.partials[turtle].push([]);
 
-            var listenerName = "_harmonic_" + turtle + "_" + blk;
+            let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.inHarmonic[turtle].pop();
                 logo.partials[turtle].pop();
             };
@@ -385,19 +388,19 @@ function setupToneBlocks() {
 
             logo.inHarmonic[turtle].push(blk);
             logo.partials[turtle].push([]);
-            var n = logo.partials[turtle].length - 1;
+            let n = logo.partials[turtle].length - 1;
 
-            for (var i = 0; i < args[0]; i++) {
+            for (let i = 0; i < args[0]; i++) {
                 logo.partials[turtle][n].push(0);
             }
 
             logo.partials[turtle][n].push(1);
             logo.notationBeginHarmonics(turtle);
 
-            var listenerName = "_harmonic_" + turtle + "_" + blk;
+            let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.inHarmonic[turtle].pop();
                 logo.partials[turtle].pop();
                 logo.notationEndHarmonics(turtle);
@@ -428,7 +431,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var distortion = args[0] / 100;
+            let distortion = args[0] / 100;
             if (distortion < 0 || distortion > 1) {
                 logo.errorMsg(_("Distortion must be from 0 to 100."), blk);
                 logo.stopTurtle = true;
@@ -436,10 +439,10 @@ function setupToneBlocks() {
 
             logo.distortionAmount[turtle].push(distortion);
 
-            var listenerName = "_distortion_" + turtle;
+            let listenerName = "_distortion_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.distortionAmount[turtle].pop();
             };
 
@@ -496,8 +499,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var frequency = args[0];
-            var depth = args[1] / 100;
+            let frequency = args[0];
+            let depth = args[1] / 100;
 
             if (depth < 0 || depth > 1) {
                 //.TRANS: Depth is the intesity of the tremolo effect.
@@ -508,10 +511,10 @@ function setupToneBlocks() {
             logo.tremoloFrequency[turtle].push(frequency);
             logo.tremoloDepth[turtle].push(depth);
 
-            var listenerName = "_tremolo_" + turtle;
+            let listenerName = "_tremolo_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.tremoloFrequency[turtle].pop();
                 logo.tremoloDepth[turtle].pop();
             };
@@ -560,18 +563,18 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var rate = args[0];
-            var octaves = args[1];
-            var baseFrequency = args[2];
+            let rate = args[0];
+            let octaves = args[1];
+            let baseFrequency = args[2];
 
             logo.rate[turtle].push(rate);
             logo.octaves[turtle].push(octaves);
             logo.baseFrequency[turtle].push(baseFrequency);
 
-            var listenerName = "_phaser_" + turtle;
+            let listenerName = "_phaser_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.rate[turtle].pop();
                 logo.octaves[turtle].pop();
                 logo.baseFrequency[turtle].pop();
@@ -624,9 +627,9 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var chorusRate = args[0];
-            var delayTime = args[1];
-            var chorusDepth = args[2] / 100;
+            let chorusRate = args[0];
+            let delayTime = args[1];
+            let chorusDepth = args[2] / 100;
 
             if (chorusDepth < 0 || chorusDepth > 1) {
                 //.TRANS: Depth is the intesity of the chorus effect.
@@ -638,10 +641,10 @@ function setupToneBlocks() {
             logo.delayTime[turtle].push(delayTime);
             logo.chorusDepth[turtle].push(chorusDepth);
 
-            var listenerName = "_chorus_" + turtle;
+            let listenerName = "_chorus_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.chorusRate[turtle].pop();
                 logo.delayTime[turtle].pop();
                 logo.chorusDepth[turtle].pop();
@@ -706,8 +709,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            var intensity = args[0];
-            var rate = args[1];
+            let intensity = args[0];
+            let rate = args[1];
 
             if (intensity < 1 || intensity > 100) {
                 logo.errorMsg(
@@ -725,10 +728,10 @@ function setupToneBlocks() {
             logo.vibratoIntensity[turtle].push(intensity / 100);
             logo.vibratoRate[turtle].push(1 / rate);
 
-            var listenerName = "_vibrato_" + turtle;
+            let listenerName = "_vibrato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.vibratoIntensity[turtle].pop();
                 logo.vibratoRate[turtle].pop();
             };
@@ -777,8 +780,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var voicename = null;
-            for (var voice in VOICENAMES) {
+            let voicename = null;
+            for (let voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === args[0]) {
                     voicename = VOICENAMES[voice][1];
                 } else if (VOICENAMES[voice][1] === args[0]) {
@@ -787,8 +790,8 @@ function setupToneBlocks() {
             }
 
             // Maybe it is a drum?
-            if (voicename == null) {
-                for (var drum in DRUMNAMES) {
+            if (voicename === null) {
+                for (let drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === args[0]) {
                         voicename = DRUMNAMES[drum][1];
                     } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -797,14 +800,14 @@ function setupToneBlocks() {
                 }
             }
 
-            if (voicename == null) {
+            if (voicename === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
                 logo.voices[turtle].push(voicename);
-                var listenerName = "_setvoice_" + turtle;
+                let listenerName = "_setvoice_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
+                let __listener = function(event) {
                     logo.voices[turtle].pop();
                 };
 
@@ -902,8 +905,8 @@ function setupToneBlocks() {
             } else {
                 logo.inSetTimbre[turtle] = true;
 
-                var synth = args[0];
-                for (var voice in VOICENAMES) {
+                let synth = args[0];
+                for (let voice in VOICENAMES) {
                     if (VOICENAMES[voice][0] === args[0]) {
                         synth = VOICENAMES[voice][1];
                         break;
@@ -922,7 +925,7 @@ function setupToneBlocks() {
                     logo.instrumentNames[turtle].push(synth);
                     logo.synth.loadSynth(turtle, synth);
 
-                    if (logo.synthVolume[turtle][synth] == undefined) {
+                    if (logo.synthVolume[turtle][synth] === undefined) {
                         logo.synthVolume[turtle][synth] = [DEFAULTVOLUME];
                         logo.crescendoInitialVolume[turtle][synth] = [
                             DEFAULTVOLUME
@@ -930,10 +933,10 @@ function setupToneBlocks() {
                     }
                 }
 
-                var listenerName = "_settimbre_" + turtle;
+                let listenerName = "_settimbre_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
+                let __listener = function(event) {
                     logo.inSetTimbre[turtle] = false;
                     // console.debug('popping ' + logo.instrumentNames[turtle].pop() + ' from instrumentNames');
                     logo.instrumentNames[turtle].pop();
