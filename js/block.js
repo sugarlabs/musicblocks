@@ -164,9 +164,9 @@ function Block(protoblock, blocks, overrideName) {
     // Internal function for creating cache.
     // Includes workaround for a race condition.
     this._createCache = function(callback, args) {
-        var that = this;
+        let that = this;
         return new Promise(function(resolve, reject) {
-            var loopCount = 0;
+            let loopCount = 0;
 
             async function checkBounds(counter) {
                 try {
@@ -204,9 +204,9 @@ function Block(protoblock, blocks, overrideName) {
     // Internal function for updating the cache.
     // Includes workaround for a race condition.
     this.updateCache = function(counter) {
-        var that = this;
+        let that = this;
         return new Promise(function(resolve, reject) {
-            var loopCount = 0;
+            let loopCount = 0;
 
             async function updateBounds(counter) {
                 try {
@@ -523,7 +523,7 @@ function Block(protoblock, blocks, overrideName) {
      * @public
      */
     this.resize = function(scale) {
-        var that = this;
+        let that = this;
 
         /*
          * After the new artwork is created, this function is used to add
@@ -547,7 +547,7 @@ function Block(protoblock, blocks, overrideName) {
             if (that.name === "start" || that.name === "drum") {
                 // Rescale the decoration on the start blocks.
                 for (
-                    var turtle = 0;
+                    let turtle = 0;
                     turtle < that.blocks.turtles.turtleList.length;
                     turtle++
                 ) {
@@ -587,7 +587,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.container !== null) {
-            var that = this;
+            that = this;
 
             /*
              * After new buttons are creates, they are cached and a
@@ -596,7 +596,7 @@ function Block(protoblock, blocks, overrideName) {
              * @return{void}
              * @private
              */
-            var _postProcess = function(that) {
+            let _postProcess = function(that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
                     scale / 3;
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
@@ -608,7 +608,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (this.isCollapsible()) {
                 this._generateCollapseArtwork(_postProcess);
-                var fontSize = 10 * scale;
+                let fontSize = 10 * scale;
                 this.collapseText.font = fontSize + "px Sans";
                 this._positionCollapseLabel(scale);
             }
@@ -622,8 +622,9 @@ function Block(protoblock, blocks, overrideName) {
      * @private
      */
     this._newArtwork = function(plusMinus) {
+        let proto, obj;
         if (this.isInlineCollapsible()) {
-            var proto = new ProtoBlock("collapse-note");
+            proto = new ProtoBlock("collapse-note");
             proto.scale = this.protoblock.scale;
             if (this.name === "interval") {
                 proto.extraWidth = 80;
@@ -631,41 +632,41 @@ function Block(protoblock, blocks, overrideName) {
                 proto.extraWidth = 40;
             }
             proto.zeroArgBlock();
-            var obj = proto.generator();
+            obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var obj = this.protoblock.generator(this.clampCount[0]);
+            obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.isCollapsible()) {
-            var proto = new ProtoBlock("collapse");
+            proto = new ProtoBlock("collapse");
             proto.scale = this.protoblock.scale;
             proto.extraWidth = 40;
             proto.basicBlockCollapsed();
-            var obj = proto.generator();
+            obj = proto.generator();
             this.collapseArtwork = obj[0];
-            var obj = this.protoblock.generator(this.clampCount[0]);
+            obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.name === "ifthenelse") {
-            var obj = this.protoblock.generator(
+            obj = this.protoblock.generator(
                 this.clampCount[0],
                 this.clampCount[1]
             );
         } else if (this.protoblock.style === "clamp") {
-            var obj = this.protoblock.generator(this.clampCount[0]);
+            obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.protoblock.style === "argflowclamp") {
-            var obj = this.protoblock.generator(this.clampCount[0]);
+            obj = this.protoblock.generator(this.clampCount[0]);
         } else {
             switch (this.name) {
                 case "equal":
                 case "greater":
                 case "less":
-                    var obj = this.protoblock.generator(this.clampCount[0]);
+                    obj = this.protoblock.generator(this.clampCount[0]);
                     break;
                 case "makeblock":
                 case "calcArg":
                 case "doArg":
                 case "namedcalcArg":
                 case "nameddoArg":
-                    var obj = this.protoblock.generator(this.argClampSlots);
+                    obj = this.protoblock.generator(this.argClampSlots);
                     this.size = 2;
-                    for (var i = 0; i < this.argClampSlots.length; i++) {
+                    for (let i = 0; i < this.argClampSlots.length; i++) {
                         this.size += this.argClampSlots[i];
                     }
                     this.docks = [];
@@ -677,11 +678,11 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 default:
                     if (this.isArgBlock()) {
-                        var obj = this.protoblock.generator(this.clampCount[0]);
+                        obj = this.protoblock.generator(this.clampCount[0]);
                     } else if (this.isTwoArgBlock()) {
-                        var obj = this.protoblock.generator(this.clampCount[0]);
+                        obj = this.protoblock.generator(this.clampCount[0]);
                     } else {
-                        var obj = this.protoblock.generator();
+                        obj = this.protoblock.generator();
                     }
                     this.size += plusMinus;
                     break;
@@ -690,14 +691,14 @@ function Block(protoblock, blocks, overrideName) {
 
         switch (this.name) {
             case "nameddoArg":
-                for (var i = 1; i < obj[1].length - 1; i++) {
+                for (let i = 1; i < obj[1].length - 1; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
 
                 this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
                 break;
             case "namedcalcArg":
-                for (var i = 1; i < obj[1].length; i++) {
+                for (let i = 1; i < obj[1].length; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
                 break;
@@ -707,7 +708,7 @@ function Block(protoblock, blocks, overrideName) {
                     obj[1][1][1],
                     this.protoblock.dockTypes[1]
                 ]);
-                for (var i = 2; i < obj[1].length - 1; i++) {
+                for (let i = 2; i < obj[1].length - 1; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
 
@@ -720,7 +721,7 @@ function Block(protoblock, blocks, overrideName) {
                     obj[1][1][1],
                     this.protoblock.dockTypes[1]
                 ]);
-                for (var i = 2; i < obj[1].length; i++) {
+                for (let i = 2; i < obj[1].length; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
                 break;
@@ -730,7 +731,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Save new artwork and dock positions.
         this.artwork = obj[0];
-        for (var i = 0; i < this.docks.length; i++) {
+        for (let i = 0; i < this.docks.length; i++) {
             this.docks[i][0] = obj[1][i][0];
             this.docks[i][1] = obj[1][i][1];
         }
@@ -752,7 +753,7 @@ function Block(protoblock, blocks, overrideName) {
      * @public
      */
     this.imageLoad = function() {
-        var fontSize = 10 * this.protoblock.scale;
+        let fontSize = 10 * this.protoblock.scale;
         this.text = new createjs.Text(
             "",
             fontSize + "px Sans",
@@ -768,8 +769,8 @@ function Block(protoblock, blocks, overrideName) {
      * @private
      */
     this._addImage = function() {
-        var image = new Image();
-        var that = this;
+        let image = new Image();
+        let that = this;
 
         /*
          * The loader
@@ -777,7 +778,7 @@ function Block(protoblock, blocks, overrideName) {
          * @private
          */
         image.onload = function() {
-            var bitmap = new createjs.Bitmap(image);
+            let bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
             that.container.addChild(bitmap);
             that._positionMedia(
@@ -837,12 +838,12 @@ function Block(protoblock, blocks, overrideName) {
      */
     this.generateArtwork = function(firstTime) {
         // Get the block labels from the protoblock.
-        var that = this;
-        var thisBlock = this.blocks.blockList.indexOf(this);
-        var block_label = "";
+        let that = this;
+        let thisBlock = this.blocks.blockList.indexOf(this);
+        let block_label = "";
 
         // Create the highlight bitmap for the block.
-        var __processHighlightBitmap = function(bitmap, that) {
+        let __processHighlightBitmap = function(bitmap, that) {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -866,7 +867,7 @@ function Block(protoblock, blocks, overrideName) {
 
             __callback = function(that, firstTime) {
                 that.blocks.refreshCanvas();
-                var thisBlock = that.blocks.blockList.indexOf(that);
+                let thisBlock = that.blocks.blockList.indexOf(that);
 
                 if (firstTime) {
                     that._loadEventHandlers();
@@ -903,7 +904,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Create the disconnect highlight bitmap for the block.
-        var __processDisconnectedHighlightBitmap = function(bitmap, that) {
+        let __processDisconnectedHighlightBitmap = function(bitmap, that) {
             if (that.disconnectedHighlightBitmap != null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
@@ -919,14 +920,14 @@ function Block(protoblock, blocks, overrideName) {
             }
             // Hide disconnected bitmap to start.
             that.disconnectedHighlightBitmap.visible = false;
-
+            let artwork;
             if (that.protoblock.disabled) {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
                     .replace("block_label", safeSVG(block_label));
             } else {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(
                         /fill_color/g,
                         PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]
@@ -938,7 +939,7 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             }
 
-            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace(
                     "arg_label_" + i,
                     that.protoblock.staticLabels[i]
@@ -949,7 +950,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Create the disconnect bitmap for the block.
-        var __processDisconnectedBitmap = function(bitmap, that) {
+        let __processDisconnectedBitmap = function(bitmap, that) {
             if (that.disconnectedBitmap != null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
@@ -964,19 +965,19 @@ function Block(protoblock, blocks, overrideName) {
             }
             // Hide disconnected bitmap to start.
             that.disconnectedBitmap.visible = false;
-
+            let artwork;
             if (that.protoblock.disabled) {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
                     .replace("block_label", safeSVG(block_label));
             } else {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(
                         /fill_color/g,
                         platformColor.paletteColors[
                             that.protoblock.palette.name
-                        ][3]
+                            ][3]
                     )
                     .replace(
                         /stroke_color/g,
@@ -985,7 +986,7 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             }
 
-            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace(
                     "arg_label_" + i,
                     that.protoblock.staticLabels[i]
@@ -1000,7 +1001,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Create the bitmap for the block.
-        var __processBitmap = function(bitmap, that) {
+        let __processBitmap = function(bitmap, that) {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -1012,14 +1013,14 @@ function Block(protoblock, blocks, overrideName) {
             that.bitmap.name = "bmp_" + thisBlock;
             that.bitmap.cursor = "pointer";
             that.blocks.refreshCanvas();
-
+            let artwork;
             if (that.protoblock.disabled) {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
                     .replace("block_label", safeSVG(block_label));
             } else {
-                var artwork = that.artwork
+                artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
                     .replace(
                         /stroke_color/g,
@@ -1028,7 +1029,7 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             }
 
-            for (var i = 1; i < that.protoblock.staticLabels.length; i++) {
+            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
                 artwork = artwork.replace(
                     "arg_label_" + i,
                     that.protoblock.staticLabels[i]
@@ -1073,9 +1074,9 @@ function Block(protoblock, blocks, overrideName) {
             // Create artwork and dock.
             this.protoblock.scale = this.blocks.blockScale;
 
-            var obj = this.protoblock.generator();
+            let obj = this.protoblock.generator();
             this.artwork = obj[0];
-            for (var i = 0; i < obj[1].length; i++) {
+            for (let i = 0; i < obj[1].length; i++) {
                 this.docks.push([
                     obj[1][i][0],
                     obj[1][i][1],
@@ -1087,14 +1088,14 @@ function Block(protoblock, blocks, overrideName) {
             this.height = obj[3];
             this.hitHeight = obj[4];
         }
-
+        let artwork;
         if (this.protoblock.disabled) {
-            var artwork = this.artwork
+            artwork = this.artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
                 .replace("block_label", safeSVG(block_label));
         } else {
-            var artwork = this.artwork
+            artwork = this.artwork
                 .replace(
                     /fill_color/g,
                     PALETTEFILLCOLORS[this.protoblock.palette.name]
@@ -1106,7 +1107,7 @@ function Block(protoblock, blocks, overrideName) {
                 .replace("block_label", safeSVG(block_label));
         }
 
-        for (var i = 1; i < this.protoblock.staticLabels.length; i++) {
+        for (let i = 1; i < this.protoblock.staticLabels.length; i++) {
             artwork = artwork.replace(
                 "arg_label_" + i,
                 this.protoblock.staticLabels[i]
@@ -1124,8 +1125,8 @@ function Block(protoblock, blocks, overrideName) {
      * @private
      */
     this._finishImageLoad = function() {
-        var thisBlock = this.blocks.blockList.indexOf(this);
-
+        let thisBlock = this.blocks.blockList.indexOf(this);
+        let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
@@ -1138,7 +1139,7 @@ function Block(protoblock, blocks, overrideName) {
                         this.value = "sol";
                         break;
                     case "customNote":
-                        var len = this.blocks.logo.synth.startingPitch.length;
+                        let len = this.blocks.logo.synth.startingPitch.length;
                         this.value =
                             this.blocks.logo.synth.startingPitch.substring(
                                 0,
@@ -1194,30 +1195,30 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.name === "solfege") {
-                var obj = splitSolfege(this.value);
-                var label = i18nSolfege(obj[0]);
-                var attr = obj[1];
+                obj = splitSolfege(this.value);
+                label = i18nSolfege(obj[0]);
+                attr = obj[1];
 
                 if (attr !== "♮") {
                     label += attr;
                 }
             } else if (this.name === "eastindiansolfege") {
-                var obj = splitSolfege(this.value);
-                var label = WESTERN2EISOLFEGENAMES[obj[0]];
-                var attr = obj[1];
+                obj = splitSolfege(this.value);
+                label = WESTERN2EISOLFEGENAMES[obj[0]];
+                attr = obj[1];
 
                 if (attr !== "♮") {
                     label += attr;
                 }
             } else if (this.name === "drumname") {
-                var label = getDrumName(this.value);
+                label = getDrumName(this.value);
             } else if (this.name === "noisename") {
-                var label = getNoiseName(this.value);
+                label = getNoiseName(this.value);
             } else {
                 if (this.value !== null) {
-                    var label = this.value.toString();
+                    label = this.value.toString();
                 } else {
-                    var label = "???";
+                    label = "???";
                 }
             }
 
@@ -1257,7 +1258,7 @@ function Block(protoblock, blocks, overrideName) {
             // Some blocks, e.g., Start blocks and Action blocks can
             // collapse, so add an event handler.
             if (this.isInlineCollapsible()) {
-                var proto = new ProtoBlock("collapse-note");
+                proto = new ProtoBlock("collapse-note");
                 proto.scale = this.protoblock.scale;
                 if (this.name === "interval") {
                     proto.extraWidth = 80;
@@ -1266,16 +1267,16 @@ function Block(protoblock, blocks, overrideName) {
                 }
                 proto.zeroArgBlock();
             } else {
-                var proto = new ProtoBlock("collapse");
+                proto = new ProtoBlock("collapse");
                 proto.scale = this.protoblock.scale;
                 proto.extraWidth = 40;
                 proto.basicBlockCollapsed();
             }
 
-            var obj = proto.generator();
+            obj = proto.generator();
             this.collapseArtwork = obj[0];
 
-            var postProcess = function(that) {
+            let postProcess = function(that) {
                 // that._loadCollapsibleEventHandlers();
                 that.loadComplete = true;
 
@@ -1305,15 +1306,15 @@ function Block(protoblock, blocks, overrideName) {
      * @private
      */
     this._generateCollapseArtwork = function(postProcess) {
-        var that = this;
-        var thisBlock = this.blocks.blockList.indexOf(this);
+        let that = this;
+        let thisBlock = this.blocks.blockList.indexOf(this);
 
         /*
          * Run the postprocess function after the artwork is loaded
          * @return{void}
          * @private
          */
-        var __finishCollapse = function(that) {
+        let __finishCollapse = function(that) {
             if (postProcess !== null) {
                 postProcess(that);
             }
@@ -1333,8 +1334,8 @@ function Block(protoblock, blocks, overrideName) {
          * @return{void}
          * @private
          */
-        var __processCollapseButton = function(that) {
-            var image = new Image();
+        let __processCollapseButton = function(that) {
+            let image = new Image();
             image.onload = function() {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
@@ -1364,8 +1365,8 @@ function Block(protoblock, blocks, overrideName) {
          * @return{void}
          * @private
          */
-        var __processExpandButton = function(that) {
-            var image = new Image();
+        let __processExpandButton = function(that) {
+            let image = new Image();
             image.onload = function() {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
                 that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
@@ -1396,7 +1397,7 @@ function Block(protoblock, blocks, overrideName) {
          * @return{void}
          * @private
          */
-        var __processHighlightCollapseBitmap = function(bitmap, that) {
+        let __processHighlightCollapseBitmap = function(bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name =
                 "highlight_collapse_" + thisBlock;
@@ -1404,7 +1405,7 @@ function Block(protoblock, blocks, overrideName) {
             that.highlightCollapseBlockBitmap.visible = false;
 
             if (that.collapseText === null) {
-                var fontSize = 10 * that.protoblock.scale;
+                let fontSize = 10 * that.protoblock.scale;
                 switch (that.name) {
                     case "action":
                         that.collapseText = new createjs.Text(
@@ -1550,7 +1551,9 @@ function Block(protoblock, blocks, overrideName) {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            var artwork = that.collapseArtwork
+            that.blocks.blockCollapseArt[
+                that.blocks.blockList.indexOf(that)
+                ] = that.collapseArtwork
                 .replace(
                     /fill_color/g,
                     PALETTEFILLCOLORS[that.protoblock.palette.name]
@@ -1560,9 +1563,6 @@ function Block(protoblock, blocks, overrideName) {
                     PALETTESTROKECOLORS[that.protoblock.palette.name]
                 )
                 .replace("block_label", safeSVG(that.collapseText.text));
-            that.blocks.blockCollapseArt[
-                that.blocks.blockList.indexOf(that)
-            ] = artwork;
 
             __processExpandButton(that);
         };
@@ -1574,14 +1574,14 @@ function Block(protoblock, blocks, overrideName) {
          * @return{void}
          * @private
          */
-        var __processCollapseBitmap = function(bitmap, that) {
+        let __processCollapseBitmap = function(bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
             that.collapseBlockBitmap.visible = that.collapsed;
             that.blocks.refreshCanvas();
 
-            var artwork = that.collapseArtwork;
+            let artwork = that.collapseArtwork;
             _blockMakeBitmap(
                 artwork
                     .replace(
@@ -1598,7 +1598,7 @@ function Block(protoblock, blocks, overrideName) {
             );
         };
 
-        var artwork = this.collapseArtwork
+        let artwork = this.collapseArtwork
             .replace(
                 /fill_color/g,
                 PALETTEFILLCOLORS[this.protoblock.palette.name]
@@ -1798,12 +1798,12 @@ function Block(protoblock, blocks, overrideName) {
 
     this.getBlockId = function() {
         // Generate a UID based on the block index into the blockList.
-        var number = blockBlocks.blockList.indexOf(this);
+        let number = blockBlocks.blockList.indexOf(this);
         return "_" + number.toString();
     };
 
     this.removeChildBitmap = function(name) {
-        for (var child = 0; child < this.container.children.length; child++) {
+        for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
@@ -1813,29 +1813,29 @@ function Block(protoblock, blocks, overrideName) {
 
     this.loadThumbnail = function(imagePath) {
         // Load an image thumbnail onto block.
-        var thisBlock = this.blocks.blockList.indexOf(this);
-        var that = this;
+        let thisBlock = this.blocks.blockList.indexOf(this);
+        let that = this;
         if (
             this.blocks.blockList[thisBlock].value === null &&
             imagePath === null
         ) {
             return;
         }
-        var image = new Image();
+        let image = new Image();
 
         image.onload = function() {
             // Before adding new artwork, remove any old artwork.
             that.removeChildBitmap("media");
 
-            var bitmap = new createjs.Bitmap(image);
+            let bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
 
-            var myContainer = new createjs.Container();
+            let myContainer = new createjs.Container();
             myContainer.addChild(bitmap);
 
             // Resize the image to a reasonable maximum.
-            var MAXWIDTH = 600;
-            var MAXHEIGHT = 450;
+            let MAXWIDTH = 600;
+            let MAXHEIGHT = 450;
             if (image.width > image.height) {
                 if (image.width > MAXWIDTH) {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale =
@@ -1848,7 +1848,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            var bounds = myContainer.getBounds();
+            let bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             that.value = myContainer.bitmapCache.getCacheDataURL();
             that.imageBitmap = bitmap;
@@ -1966,8 +1966,8 @@ function Block(protoblock, blocks, overrideName) {
                 default:
                     console.debug(
                         "What do we do with a collapsed " +
-                            this.name +
-                            " block?"
+                        this.name +
+                        " block?"
                     );
                     break;
             }
@@ -2697,7 +2697,7 @@ function Block(protoblock, blocks, overrideName) {
                         var topBlock = that.blocks.findTopBlock(thisBlock);
                         console.debug(
                             "running from " +
-                                that.blocks.blockList[topBlock].name
+                            that.blocks.blockList[topBlock].name
                         );
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
@@ -2796,13 +2796,13 @@ function Block(protoblock, blocks, overrideName) {
                     moved =
                         Math.abs(
                             event.stageX / that.blocks.getStageScale() -
-                                that.original.x
+                            that.original.x
                         ) +
-                            Math.abs(
-                                event.stageY / that.blocks.getStageScale() -
-                                    that.original.y
-                            ) >
-                            20 && !window.hasMouse;
+                        Math.abs(
+                            event.stageY / that.blocks.getStageScale() -
+                            that.original.y
+                        ) >
+                        20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
@@ -2812,13 +2812,13 @@ function Block(protoblock, blocks, overrideName) {
 
             var dx = Math.round(
                 event.stageX / that.blocks.getStageScale() +
-                    that.offset.x -
-                    oldX
+                that.offset.x -
+                oldX
             );
             var dy = Math.round(
                 event.stageY / that.blocks.getStageScale() +
-                    that.offset.y -
-                    oldY
+                that.offset.y -
+                oldY
             );
 
             var finalPos = oldY + dy;
@@ -2979,7 +2979,7 @@ function Block(protoblock, blocks, overrideName) {
             if (
                 event.stageX / this.blocks.getStageScale() < this.container.x ||
                 event.stageX / this.blocks.getStageScale() >
-                    this.container.x + this.width ||
+                this.container.x + this.width ||
                 event.stageY < this.container.y ||
                 event.stageY > this.container.y + this.hitHeight
             ) {
@@ -3189,7 +3189,7 @@ function Block(protoblock, blocks, overrideName) {
                     ) {
                         this.blocks.turtles.turtleList[
                             turtle
-                        ].decorationBitmap.x =
+                            ].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }
@@ -3685,7 +3685,7 @@ function Block(protoblock, blocks, overrideName) {
             } else if (this.blocks.intervalModifierNumber(blk)) {
                 var name = this.blocks.blockList[
                     this.blocks.blockList[this.connections[0]].connections[0]
-                ].name;
+                    ].name;
                 switch (name) {
                     case "interval":
                     case "setscalartransposition":
@@ -3967,7 +3967,7 @@ function Block(protoblock, blocks, overrideName) {
                         for (var i = 0; i < this.blocks.blockList.length; i++) {
                             if (
                                 this.blocks.blockList[i].name ==
-                                    "settemperament" &&
+                                "settemperament" &&
                                 this.blocks.blockList[i].connections[0] !== null
                             ) {
                                 var index = this.blocks.blockList[i]
@@ -4234,17 +4234,17 @@ function Block(protoblock, blocks, overrideName) {
             this.label.style.left =
                 Math.round(
                     (x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
                     (y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) + "px";
             this.label.style.width =
                 (Math.round(selectorWidth * this.blocks.blockScale) *
                     this.protoblock.scale) /
-                    2 +
+                2 +
                 "px";
 
             this.label.style.fontSize =
@@ -4431,7 +4431,7 @@ function Block(protoblock, blocks, overrideName) {
                 "scaledegree"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
             this.blocks.blockList[this.connections[0]].connections[2] ===
-                this.blocks.blockList.indexOf(this)
+            this.blocks.blockList.indexOf(this)
         );
     };
 
@@ -4606,8 +4606,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -4618,8 +4618,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -4683,7 +4683,7 @@ function Block(protoblock, blocks, overrideName) {
                 var attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
-                    ].title;
+                        ].title;
                 if (attr !== "♮") {
                     label += attr;
                     that.value += attr;
@@ -4702,7 +4702,7 @@ function Block(protoblock, blocks, overrideName) {
                 var octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                    ].title
+                        ].title
                 );
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
@@ -4759,7 +4759,7 @@ function Block(protoblock, blocks, overrideName) {
                 var attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
-                    ].title;
+                        ].title;
 
                 if (label === " ") {
                     return;
@@ -4772,7 +4772,7 @@ function Block(protoblock, blocks, overrideName) {
                 var octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                    ].title
+                        ].title
                 );
             } else {
                 octave = 4;
@@ -4850,7 +4850,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[
                     i
-                ].navigateFunction = __pitchPreview;
+                    ].navigateFunction = __pitchPreview;
             }
         }
 
@@ -4858,7 +4858,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[
                     i
-                ].navigateFunction = __pitchPreview;
+                    ].navigateFunction = __pitchPreview;
             }
         }
 
@@ -4971,8 +4971,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -4983,8 +4983,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -5030,7 +5030,7 @@ function Block(protoblock, blocks, overrideName) {
             var octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                ].title
+                    ].title
             );
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
@@ -5074,7 +5074,7 @@ function Block(protoblock, blocks, overrideName) {
             var octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                ].title
+                    ].title
             );
             octave += deltaOctave;
             if (octave < 1) {
@@ -5205,7 +5205,7 @@ function Block(protoblock, blocks, overrideName) {
             var label =
                 that._accidentalWheel.navItems[
                     that._accidentalWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             var i = labels.indexOf(label);
             that.value = accidentalValues[i];
             that.text.text = accidentalLabels[i];
@@ -5248,8 +5248,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -5260,8 +5260,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -5399,7 +5399,7 @@ function Block(protoblock, blocks, overrideName) {
             that.text.text =
                 that._tabsWheel.navItems[
                     that._tabsWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             that.value = Number(that.text.text);
 
             // Make sure text is on top.
@@ -5479,7 +5479,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.width =
             (Math.round(selectorWidth * this.blocks.blockScale) *
                 this.protoblock.scale) /
-                2 +
+            2 +
             "px";
 
         var __showHide = function() {
@@ -5702,7 +5702,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.width =
             (Math.round(selectorWidth * this.blocks.blockScale) *
                 this.protoblock.scale) /
-                2 +
+            2 +
             "px";
 
         // Navigate to a the current number value.
@@ -5744,7 +5744,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 that.value -= 1;
             }
-    
+
             that.text.text = that.value.toString();
 
             // Make sure text is on top.
@@ -5771,7 +5771,7 @@ function Block(protoblock, blocks, overrideName) {
             var label =
                 that._numberWheel.navItems[
                     that._numberWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             var i = wheelLabels.indexOf(label);
             var actualPitch = numberToPitch(wheelValues[i] + 3);
 
@@ -5817,7 +5817,7 @@ function Block(protoblock, blocks, overrideName) {
             var label =
                 that._numberWheel.navItems[
                     that._numberWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             var i = wheelLabels.indexOf(label);
             var actualPitch = frequencyToPitch(wheelValues[i]);
 
@@ -5868,7 +5868,7 @@ function Block(protoblock, blocks, overrideName) {
             for (var i = 0; i < wheelValues.length; i++) {
                 this._numberWheel.navItems[
                     i
-                ].navigateFunction = __pitchPreviewForNum;
+                    ].navigateFunction = __pitchPreviewForNum;
             }
         }
 
@@ -6043,7 +6043,7 @@ function Block(protoblock, blocks, overrideName) {
         this.label.style.width =
             (Math.round(selectorWidth * this.blocks.blockScale) *
                 this.protoblock.scale) /
-                2 +
+            2 +
             "px";
 
         // Navigate to a the current number value.
@@ -6159,8 +6159,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -6171,8 +6171,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -6232,7 +6232,7 @@ function Block(protoblock, blocks, overrideName) {
             var label =
                 that._booleanWheel.navItems[
                     that._booleanWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             var i = labels.indexOf(label);
             that.value = booleanValues[i];
             that.text.text = booleanLabels[i];
@@ -6269,8 +6269,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -6281,8 +6281,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -6475,8 +6475,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -6487,8 +6487,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -6624,8 +6624,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -6636,8 +6636,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -6650,16 +6650,16 @@ function Block(protoblock, blocks, overrideName) {
                     for (var j = 0; j < 8; j++) {
                         if (l !== i) {
                             that._intervalWheel.navItems[
-                                l * 8 + j
-                            ].navItem.hide();
+                            l * 8 + j
+                                ].navItem.hide();
                         } else if (activeTabs.indexOf(j + 1) === -1) {
                             that._intervalWheel.navItems[
-                                l * 8 + j
-                            ].navItem.hide();
+                            l * 8 + j
+                                ].navItem.hide();
                         } else {
                             that._intervalWheel.navItems[
-                                l * 8 + j
-                            ].navItem.show();
+                            l * 8 + j
+                                ].navItem.show();
                         }
                     }
                 }
@@ -6703,11 +6703,11 @@ function Block(protoblock, blocks, overrideName) {
             var label =
                 that._intervalNameWheel.navItems[
                     that._intervalNameWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             var number =
                 that._intervalWheel.navItems[
                     that._intervalWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
 
             that.value =
                 INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] +
@@ -6773,7 +6773,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < 8 * labels.length; i++) {
             this._intervalWheel.navItems[
                 i
-            ].navigateFunction = __selectionChanged;
+                ].navigateFunction = __selectionChanged;
         }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
@@ -6882,17 +6882,17 @@ function Block(protoblock, blocks, overrideName) {
             var title =
                 that._modeNameWheel.navItems[
                     that._modeNameWheel.selectedNavItemIndex
-                ].title;
+                    ].title;
             if (title === " ") {
                 that._modeNameWheel.navigateWheel(
                     (that._modeNameWheel.selectedNavItemIndex + 1) %
-                        that._modeNameWheel.navItems.length
+                    that._modeNameWheel.navItems.length
                 );
             } else {
                 that.text.text =
                     that._modeNameWheel.navItems[
                         that._modeNameWheel.selectedNavItemIndex
-                    ].title;
+                        ].title;
 
                 if (that.text.text === _("major") + " / " + _("ionian")) {
                     that.value = "major";
@@ -7180,8 +7180,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (x + this.blocks.stage.x) *
-                            this.blocks.getStageScale() +
-                            canvasLeft
+                        this.blocks.getStageScale() +
+                        canvasLeft
                     ) - 200
                 )
             ) + "px";
@@ -7192,8 +7192,8 @@ function Block(protoblock, blocks, overrideName) {
                     0,
                     Math.round(
                         (y + this.blocks.stage.y) *
-                            this.blocks.getStageScale() +
-                            canvasTop
+                        this.blocks.getStageScale() +
+                        canvasTop
                     ) - 200
                 )
             ) + "px";
@@ -7229,7 +7229,7 @@ function Block(protoblock, blocks, overrideName) {
         for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
             this._modeGroupWheel.navItems[
                 i
-            ].navigateFunction = __buildModeWheel;
+                ].navigateFunction = __buildModeWheel;
         }
 
         for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
@@ -7372,7 +7372,7 @@ function Block(protoblock, blocks, overrideName) {
                             ) {
                                 TEMPERAMENT["custom"][
                                     pitchNumber
-                                ][1] = newValue;
+                                    ][1] = newValue;
                             }
                         }
                     }
@@ -7630,14 +7630,14 @@ function Block(protoblock, blocks, overrideName) {
         docById("contextWheelDiv").style.left =
             Math.round(
                 (x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                    canvasLeft
+                canvasLeft
             ) -
             150 +
             "px";
         docById("contextWheelDiv").style.top =
             Math.round(
                 (y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                    canvasTop
+                canvasTop
             ) -
             150 +
             "px";
