@@ -91,10 +91,10 @@ function setupOrnamentBlocks() {
             logo.neighborStepPitch[turtle].push(args[0]);
             logo.neighborNoteValue[turtle].push(args[1]);
 
-            var listenerName = "_neighbor_" + turtle + "_" + blk;
+            let listenerName = "_neighbor_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.inNeighbor[turtle].pop();
                 logo.neighborStepPitch[turtle].pop();
                 logo.neighborNoteValue[turtle].pop();
@@ -171,11 +171,12 @@ function setupOrnamentBlocks() {
                 return;
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
+                arg = 1 / 16;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             logo.glide[turtle].push(arg);
@@ -187,10 +188,10 @@ function setupOrnamentBlocks() {
             logo.glideOverride[turtle] = logo._noteCounter(turtle, args[1]);
             console.debug("length of glide " + logo.glideOverride[turtle]);
 
-            var listenerName = "_glide_" + turtle;
+            let listenerName = "_glide_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 if (logo.justCounting[turtle].length === 0) {
                     logo.notationEndSlur(turtle);
                 }
@@ -229,11 +230,12 @@ function setupOrnamentBlocks() {
                 return;
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
+                arg = 1 / 16;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             if (logo.blocks.blockList[blk].name === "slur") {
@@ -246,10 +248,10 @@ function setupOrnamentBlocks() {
                 logo.notationBeginSlur(turtle);
             }
 
-            var listenerName = "_staccato_" + turtle;
+            let listenerName = "_staccato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.staccato[turtle].pop();
                 if (logo.justCounting[turtle].length === 0) {
                     logo.notationEndSlur(turtle);
@@ -286,12 +288,13 @@ function setupOrnamentBlocks() {
                 // Nothing to do.
                 return;
             }
-
+          
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 32;
+                arg = 1 / 32;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             if (logo.blocks.blockList[blk].name === "newstaccato") {
@@ -300,10 +303,10 @@ function setupOrnamentBlocks() {
                 logo.staccato[turtle].push(arg);
             }
 
-            var listenerName = "_staccato_" + turtle;
+            let listenerName = "_staccato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.staccato[turtle].pop();
             };
 

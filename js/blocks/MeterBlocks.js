@@ -86,7 +86,7 @@ function setupMeterBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var len = logo.bpm[turtle].length;
+            let len = logo.bpm[turtle].length;
             if (len > 0) {
                 logo.bpm[turtle][len - 1] = value;
             } else {
@@ -250,7 +250,7 @@ function setupMeterBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -337,15 +337,15 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "elapsednotes2"]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
-                var notevalue = logo.parseArg(
+                let cblk = logo.blocks.blockList[blk].connections[1];
+                let notevalue = logo.parseArg(
                     logo,
                     turtle,
                     cblk,
                     blk,
                     receivedArg
                 );
-                if (notevalue == null || notevalue === 0) {
+                if (notevalue === null || notevalue === 0) {
                     return 0;
                 } else {
                     return (
@@ -386,10 +386,10 @@ function setupMeterBlocks() {
 
             logo.drift[turtle] += 1;
 
-            var listenerName = "_drift_" + turtle;
+            let listenerName = "_drift_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.drift[turtle] -= 1;
             };
 
@@ -424,9 +424,9 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                var __listener = function(event) {
+                let __listener = function(event) {
                     if (logo.turtles.turtleList[turtle].running) {
-                        var queueBlock = new Queue(
+                        let queueBlock = new Queue(
                             logo.actions[args[0]],
                             1,
                             blk
@@ -457,7 +457,7 @@ function setupMeterBlocks() {
                     }
                 };
 
-                var eventName = "__offbeat_" + turtle + "__";
+                let eventName = "__offbeat_" + turtle + "__";
                 logo._setListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("offbeat");
@@ -493,9 +493,9 @@ function setupMeterBlocks() {
                 if (!(args[1] in logo.actions)) {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
-                    var __listener = function(event) {
+                    let __listener = function(event) {
                         if (logo.turtles.turtleList[turtle].running) {
-                            var queueBlock = new Queue(
+                            let queueBlock = new Queue(
                                 logo.actions[args[1]],
                                 1,
                                 blk
@@ -528,7 +528,7 @@ function setupMeterBlocks() {
                         }
                     };
 
-                    var eventName = "__beat_" + args[0] + "_" + turtle + "__";
+                    let eventName = "__beat_" + args[0] + "_" + turtle + "__";
                     logo._setListener(turtle, eventName, __listener);
 
                     if (args[0] > logo.beatsPerMeasure[turtle]) {
@@ -569,9 +569,9 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                var __listener = function(event) {
+                let __listener = function(event) {
                     if (logo.turtles.turtleList[turtle].running) {
-                        var queueBlock = new Queue(
+                        let queueBlock = new Queue(
                             logo.actions[args[0]],
                             1,
                             blk
@@ -602,7 +602,7 @@ function setupMeterBlocks() {
                     }
                 };
 
-                var eventName = "__everybeat_" + turtle + "__";
+                let eventName = "__everybeat_" + turtle + "__";
                 logo._setListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("everybeat");
@@ -647,10 +647,11 @@ function setupMeterBlocks() {
                 typeof args[0] === "number" &&
                 typeof args[1] === "number"
             ) {
-                var bpm = (args[0] * args[1]) / 0.25;
+                let bpm = (args[0] * args[1]) / 0.25;
+                let obj, target;
                 if (bpm < 30) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = (30 * 0.25) / args[1];
+                    obj = rationalToFraction(args[1]);
+                    target = (30 * 0.25) / args[1];
                     logo.errorMsg(
                         obj[0] +
                             "/" +
@@ -663,8 +664,8 @@ function setupMeterBlocks() {
                     );
                     logo._masterBPM = 30;
                 } else if (bpm > 1000) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = (1000 * 0.25) / args[1];
+                    obj = rationalToFraction(args[1]);
+                    target = (1000 * 0.25) / args[1];
                     logo.errorMsg(
                         _("maximum") +
                             " " +
@@ -688,7 +689,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(
                     logo.blocks.blockList[bpmnumberblock].text.text
                 );
@@ -726,7 +727,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(
                     logo.blocks.blockList[bpmnumberblock].text.text
                 );
@@ -771,10 +772,11 @@ function setupMeterBlocks() {
                 typeof args[0] === "number" &&
                 typeof args[1] === "number"
             ) {
-                var bpm = (args[0] * args[1]) / 0.25;
+                let bpm = (args[0] * args[1]) / 0.25;
+                let obj, target;
                 if (bpm < 30) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = (30 * 0.25) / args[1];
+                    obj = rationalToFraction(args[1]);
+                    target = (30 * 0.25) / args[1];
                     logo.errorMsg(
                         obj[0] +
                             "/" +
@@ -787,8 +789,8 @@ function setupMeterBlocks() {
                     );
                     bpm = 30;
                 } else if (bpm > 1000) {
-                    var obj = rationalToFraction(args[1]);
-                    var target = (1000 * 0.25) / args[1];
+                    obj = rationalToFraction(args[1]);
+                    target = (1000 * 0.25) / args[1];
                     logo.errorMsg(
                         _("maximum") +
                             " " +
@@ -812,7 +814,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                var bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(
                     logo.blocks.blockList[bpmnumberblock].text.text
                 );
@@ -851,10 +853,10 @@ function setupMeterBlocks() {
                 typeof args[0] === "number" &&
                 typeof args[1] == "number"
             ) {
-                var bpm = (args[0] * args[1]) / 0.25;
+                let bpm = (args[0] * args[1]) / 0.25;
                 if (args[0] < 30) {
                     logo.errorMsg(_("Beats per minute must be > 30."));
-                    var bpm = 30;
+                    bpm = 30;
                 } else if (args[0] > 1000) {
                     logo.errorMsg(_("Maximum beats per minute is 1000."));
                     bpm = 1000;
@@ -863,10 +865,10 @@ function setupMeterBlocks() {
                 logo.notationTempo(turtle, args[0], args[1]);
                 logo.bpm[turtle].push(bpm);
 
-                var listenerName = "_bpm_" + turtle;
+                let listenerName = "_bpm_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
+                let __listener = function(event) {
                     logo.bpm[turtle].pop();
                 };
 
@@ -899,22 +901,23 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 2 && typeof args[0] === "number") {
+                let bpm;
                 if (args[0] < 30) {
                     logo.errorMsg(_("Beats per minute must be > 30."), blk);
-                    var bpm = 30;
+                    bpm = 30;
                 } else if (args[0] > 1000) {
                     logo.errorMsg(_("Maximum beats per minute is 1000."), blk);
-                    var bpm = 1000;
+                    bpm = 1000;
                 } else {
-                    var bpm = args[0];
+                    bpm = args[0];
                 }
 
                 logo.bpm[turtle].push(bpm);
 
-                var listenerName = "_bpm_" + turtle;
+                let listenerName = "_bpm_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
+                let __listener = function(event) {
                     logo.bpm[turtle].pop();
                 };
 

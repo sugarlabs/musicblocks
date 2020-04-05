@@ -14,7 +14,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetHeading(value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -62,7 +62,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetXY(turtleObj.x, value);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -113,7 +113,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetXY(value, turtleObj.y);
             if (logo.justCounting[turtle].length === 0) {
                 logo._playbackPush(turtle, [
@@ -188,7 +188,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doScrollXY(
@@ -235,7 +235,7 @@ function setupGraphicsBlocks() {
                 ].push(blk);
             } else {
                 if (logo.suppressOutput[turtle]) {
-                    var savedPenState =
+                    let savedPenState =
                         logo.turtles.turtleList[turtle].penState;
                     logo.turtles.turtleList[turtle].penState = false;
                     logo.turtles.turtleList[turtle].doSetXY(0, 0);
@@ -387,7 +387,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doBezier(
@@ -469,7 +469,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
@@ -587,7 +587,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doSetXY(
@@ -657,7 +657,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doRight(args[0]);
@@ -720,7 +720,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doRight(-args[0]);
@@ -782,7 +782,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doForward(-args[0]);
@@ -844,7 +844,7 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     if (logo.suppressOutput[turtle]) {
-                        var savedPenState =
+                        let savedPenState =
                             logo.turtles.turtleList[turtle].penState;
                         logo.turtles.turtleList[turtle].penState = false;
                         logo.turtles.turtleList[turtle].doForward(args[0]);

@@ -118,7 +118,7 @@ function setupSensorsBlocks() {
             if (logo.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
                 return 440;
             }
-            if (logo.pitchAnalyser == null) {
+            if (logo.pitchAnalyser === null) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
                     size: this.limit
@@ -127,11 +127,11 @@ function setupSensorsBlocks() {
                 this.mic.connect(this.pitchAnalyser);
             }
 
-            var values = logo.pitchAnalyser.getValue();
-            var max = 0;
-            var idx = 0;
-            for (var i = 0; i < this.limit; i++) {
-                var v2 = values[i] * values[i];
+            let values = logo.pitchAnalyser.getValue();
+            let max = 0;
+            let idx = 0;
+            for (let i = 0; i < this.limit; i++) {
+                let v2 = values[i] * values[i];
                 if (v2 > max) {
                     max = v2;
                     idx = i;
@@ -167,7 +167,7 @@ function setupSensorsBlocks() {
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 return Math.round(logo.mic.getLevel() * 1000);
             }
-            if (logo.volumeAnalyser == null) {
+            if (logo.volumeAnalyser === null) {
                 logo.volumeAnalyser = new Tone.Analyser({
                     type: "waveform",
                     size: logo.limit
@@ -176,13 +176,13 @@ function setupSensorsBlocks() {
                 logo.mic.connect(logo.volumeAnalyser);
             }
 
-            var values = logo.volumeAnalyser.getValue();
-            var sum = 0;
-            for (var k = 0; k < logo.limit; k++) {
+            let values = logo.volumeAnalyser.getValue();
+            let sum = 0;
+            for (let k = 0; k < logo.limit; k++) {
                 sum += values[k] * values[k];
             }
 
-            var rms = Math.sqrt(sum / logo.limit);
+            let rms = Math.sqrt(sum / logo.limit);
             return Math.round(rms * 100);
         }
     }
@@ -225,10 +225,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].canvasColor;
             if (colorString[2] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -252,10 +252,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].canvasColor;
             if (colorString[1] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -279,10 +279,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].canvasColor;
             if (colorString[0] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -306,17 +306,17 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var wasVisible = logo.turtles.turtleList[turtle].container.visible;
+            let wasVisible = logo.turtles.turtleList[turtle].container.visible;
             logo.turtles.turtleList[turtle].container.visible = false;
-            var x = logo.turtles.turtleList[turtle].container.x;
-            var y = logo.turtles.turtleList[turtle].container.y;
+            let x = logo.turtles.turtleList[turtle].container.x;
+            let y = logo.turtles.turtleList[turtle].container.y;
             logo.refreshCanvas();
 
-            var canvas = docById("overlayCanvas");
-            var ctx = canvas.getContext("2d");
-            var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
+            let canvas = docById("overlayCanvas");
+            let ctx = canvas.getContext("2d");
+            let imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
                 .data;
-            var color = searchColors(imgData[0], imgData[1], imgData[2]);
+            let color = searchColors(imgData[0], imgData[1], imgData[2]);
             if (imgData[3] === 0) {
                 (color = body.style.background
                     .substring(
@@ -353,7 +353,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo) {
-            var d = new Date();
+            let d = new Date();
             return (d.getTime() - logo.time) / 1000;
         }
     }
@@ -466,12 +466,12 @@ function setupSensorsBlocks() {
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return "A";
                 }
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 if (typeof a === "number") {
                     if (a < 1) return 0;
                     else return String.fromCharCode(a);
