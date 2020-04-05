@@ -61,7 +61,7 @@ function PasteBox() {
             this._container.x = x;
             this._container.y = y;
 
-            const __processBackground = (that, name, bitmap, extras) => {
+            __processBackground = (that, name, bitmap, extras) => {
                 that._container.addChild(bitmap);
                 that._loadClearContainerHandler();
                 that._container.visible = true;

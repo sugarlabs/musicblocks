@@ -60,13 +60,13 @@ function Boundary() {
         this.y = 55 + 13;
         this.dy = this.h - (55 + 26);
 
-        that = this;
+        // that = this;
 
-        const __makeBoundary = () => {
+        __makeBoundary = () => {
             var img = new Image();
             img.onload = () => {
                 bitmap = new createjs.Bitmap(img);
-                that._container.addChild(bitmap);
+                this._container.addChild(bitmap);
             };
 
             img.src =
@@ -74,12 +74,12 @@ function Boundary() {
                 window.btoa(
                     unescape(
                         encodeURIComponent(
-                            BOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", that.y)
-                                .replace("X", that.x)
-                                .replace("DY", that.dy)
-                                .replace("DX", that.dx)
+                            BOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", this.y)
+                                .replace("X", this.x)
+                                .replace("DY", this.dy)
+                                .replace("DX", this.dx)
                                 .replace("stroke_color", "#e08080")
                         )
                     )

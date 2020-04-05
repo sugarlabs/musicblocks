@@ -87,7 +87,7 @@ function PlaybackBox() {
 
         if (this._container === null) {
             this._createBox(scale, x, y);
-            var that = this;
+            // var that = this;
             var dx = BOXBUTTONOFFSET;
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
@@ -104,7 +104,7 @@ function PlaybackBox() {
             this._positionHoverText(this.playButton);
 
             this.playButton.on("click", (event) => {
-                that._doPlay();
+                this._doPlay();
             });
 
             this.noplayButton = makeButton(
@@ -133,7 +133,7 @@ function PlaybackBox() {
             this._positionHoverText(this.pauseButton);
 
             this.pauseButton.on("click", (event) => {
-                that._doPause();
+                this._doPause();
             });
 
             dx += BOXBUTTONSPACING;
@@ -152,7 +152,7 @@ function PlaybackBox() {
             this._positionHoverText(this.rewindButton);
 
             this.rewindButton.on("click", (event) => {
-                that._doRewind();
+                this._doRewind();
             });
 
             //.TRANS: playback in the case refers to playing back music that has been preprocessed.
@@ -190,7 +190,7 @@ function PlaybackBox() {
             }
 
             this._compileButton.on("click", (event) => {
-                that._doCompile();
+                this._doCompile();
             });
         } else {
             this._show();
@@ -320,11 +320,11 @@ function PlaybackBox() {
         // Async creation of bitmap from SVG data
         // Works with Chrome, Safari, Firefox (untested on IE)
         var img = new Image();
-        var that = this;
+        // var that = this;
 
         img.onload = () => {
             bitmap = new createjs.Bitmap(img);
-            callback(that, name, bitmap, extras);
+            callback(this, name, bitmap, extras);
         };
 
         img.src =
@@ -334,9 +334,9 @@ function PlaybackBox() {
 
     this._loadPlaybackContainerHandler = () => {
         var locked = false;
-        var that = this;
+        // var that = this;
 
-        that._container.on ("click", (event) => {
+        this._container.on ("click", (event) => {
             // We need a lock to "debouce" the click.
             if (locked) {
                 console.debug("debouncing click");
@@ -348,11 +348,11 @@ function PlaybackBox() {
                 locked = false;
             }, 500);
 
-            var x = event.stageX / that._scale - that._container.x;
-            var y = event.stageY / that._scale - that._container.y;
+            var x = event.stageX / this._scale - this._container.x;
+            var y = event.stageY / this._scale - this._container.y;
 
             if (y < 55) {
-                that.hide();
+                this.hide();
             }
         });
     };

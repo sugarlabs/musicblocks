@@ -48,7 +48,7 @@ function Activity() {
         "nomicrophone"
     ];
 
-    const that = this;
+    // const that = this;
 
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
@@ -1991,7 +1991,7 @@ function Activity() {
     let keyboardEnableFlag;
 
     __keyPressed = (event) => {
-        let that = this;
+        // let that = this;
         let disableKeys;
 
         if (!keyboardEnableFlag) {
@@ -2124,7 +2124,7 @@ function Activity() {
                     break;
                 case 82: // 'R'
                     textMsg("Alt-R " + _("Play"));
-                    that._doFastButton();
+                    this._doFastButton();
                     break;
                 case 83: // 'S'
                     textMsg("Alt-S " + _("Stop"));
@@ -2988,7 +2988,7 @@ function Activity() {
         document.querySelector("#myOpenFile").focus();
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
-        that.doHardStopButton();
+        this.doHardStopButton();
         console.debug("Calling all clear from doLoad");
         _allClear(true);
     };
@@ -3005,7 +3005,7 @@ function Activity() {
         setTimeout(() => {
             console.debug("Run");
             _changeBlockVisibility();
-            that._doFastButton(env);
+            this._doFastButton(env);
         }, 5000);
     };
 
@@ -3042,12 +3042,12 @@ function Activity() {
         setTimeout(() => {
             try {
                 planet.openProjectFromPlanet(projectID, () => {
-                    that.loadStartWrapper(that._loadStart);
+                    this.loadStartWrapper(this._loadStart);
                 });
             } catch (e) {
                 console.debug(e);
-                console.debug("that._loadStart on error");
-                that.loadStartWrapper(that._loadStart);
+                console.debug("this._loadStart on error");
+                this.loadStartWrapper(this._loadStart);
             }
 
             planet.initialiseNewProject();
@@ -3117,7 +3117,7 @@ function Activity() {
         let time2 = new Date();
         let elapsedTime = time2.getTime() - time1.getTime();
         let timeLeft = Math.max(6000 - elapsedTime);
-        setTimeout(that.showContents, timeLeft);
+        setTimeout(this.showContents, timeLeft);
     };
 
     /*
@@ -3778,7 +3778,7 @@ function Activity() {
                 0
             )
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             homeButtonContainers[0],
             x,
             y,
@@ -3799,7 +3799,7 @@ function Activity() {
                 0
             )
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             homeButtonContainers[1],
             x,
             y,
@@ -3828,7 +3828,7 @@ function Activity() {
                 0
             )
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             hideBlocksContainer[0],
             x,
             y,
@@ -3849,7 +3849,7 @@ function Activity() {
                 0
             )
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             hideBlocksContainer[1],
             x,
             y,
@@ -3874,7 +3874,7 @@ function Activity() {
             btnSize,
             0
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             collapseBlocksContainer,
             x,
             y,
@@ -3895,7 +3895,7 @@ function Activity() {
             btnSize,
             0
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             smallerContainer,
             x,
             y,
@@ -3926,7 +3926,7 @@ function Activity() {
             btnSize,
             0
         );
-        that._loadButtonDragHandler(
+        this._loadButtonDragHandler(
             largerContainer,
             x,
             y,
@@ -4027,10 +4027,10 @@ function Activity() {
                         advancedModeContainer.visible = false;
                     } else {
                         beginnerModeContainer.visible = true;
-                        that.setScrollerButton();
+                        this.setScrollerButton();
                     }
                 } else {
-                    that.setScrollerButton();
+                    this.setScrollerButton();
                 }
             }
             update = true;
@@ -4058,10 +4058,10 @@ function Activity() {
                     advancedModeContainer.visible = false;
                 } else {
                     beginnerModeContainer.visible = true;
-                    that.setScrollerButton();
+                    this.setScrollerButton();
                 }
             } else {
-                that.setScrollerButton();
+                this.setScrollerButton();
             }
         }
 
@@ -4576,7 +4576,7 @@ function Activity() {
         
         if(!jQuery.browser.mozilla){
             window.onblur = () => {
-                that.doHardStopButton(true);
+                this.doHardStopButton(true);
             }
         }
 
@@ -4592,12 +4592,12 @@ function Activity() {
         document.addEventListener("mousemove", () => {
             mouseEvents++;
             if (mouseEvents % 4 === 0) {
-                that.__tick();
+                this.__tick();
             }
         });
 
         document.addEventListener("click", () => {
-            that.__tick();
+            this.__tick();
         });
 
         _createMsgContainer(
@@ -4641,7 +4641,7 @@ function Activity() {
         */
         stage.addChild(turtleContainer);
         stage.addChild(trashContainer, blocksContainer, palettesContainer);
-        that._setupBlocksContainerEvents();
+        this._setupBlocksContainerEvents();
 
         trashcan = new Trashcan();
         trashcan
@@ -4707,13 +4707,13 @@ function Activity() {
             .setTextMsg(textMsg)
             .setErrorMsg(errorMsg)
             .setHideMsgs(hideMsgs)
-            .setOnStopTurtle(that.onStopTurtle)
-            .setOnRunTurtle(that.onRunTurtle)
+            .setOnStopTurtle(this.onStopTurtle)
+            .setOnRunTurtle(this.onRunTurtle)
             .setGetStageX(getStageX)
             .setGetStageY(getStageY)
             .setGetStageMouseDown(getStageMouseDown)
-            .setGetCurrentKeyCode(that.getCurrentKeyCode)
-            .setClearCurrentKeyCode(that.clearCurrentKeyCode)
+            .setGetCurrentKeyCode(this.getCurrentKeyCode)
+            .setClearCurrentKeyCode(this.clearCurrentKeyCode)
             // .setMeSpeak(meSpeak)
             .setSetPlaybackStatus(setPlaybackStatus);
 
@@ -4885,7 +4885,7 @@ function Activity() {
                 console.debug("NEW");
                 this.closePlanet();
                 this.initialiseNewProject();
-                that._loadStart();
+                this._loadStart();
                 this.saveLocally();
             };
 
@@ -5031,8 +5031,8 @@ function Activity() {
         toolbar.init(beginnerMode);
 
         toolbar.renderLogoIcon(_showAboutPage);
-        toolbar.renderPlayIcon(that._doFastButton);
-        toolbar.renderStopIcon(that.doHardStopButton);
+        toolbar.renderPlayIcon(this._doFastButton);
+        toolbar.renderStopIcon(this.doHardStopButton);
         toolbar.renderNewProjectIcon(_afterDelete);
         toolbar.renderLoadIcon(doLoad);
         toolbar.renderSaveIcons(
@@ -5050,14 +5050,14 @@ function Activity() {
         toolbar.renderMenuIcon(_showHideAuxMenu);
         toolbar.renderHelpIcon(_showHelp);
         toolbar.renderModeSelectIcon(doSwitchMode);
-        toolbar.renderRunSlowlyIcon(that._doSlowButton);
+        toolbar.renderRunSlowlyIcon(this._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             doAnalytics,
             doOpenPlugin,
             deletePlugin,
             setScroller,
-            that._setupBlocksContainerEvents
+            this._setupBlocksContainerEvents
         );
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
@@ -5599,12 +5599,12 @@ function Activity() {
         if (projectID != null) {
             setTimeout(() => {
                 console.debug("loading " + projectID);
-                that.loadStartWrapper(that.loadProject, projectID, flags, env);
+                this.loadStartWrapper(this.loadProject, projectID, flags, env);
             }, 200); // 2000
         } else {
             setTimeout(() => {
                 console.debug("load new Start block");
-                that.loadStartWrapper(that._loadStart);
+                this.loadStartWrapper(this._loadStart);
             }, 200); // 2000
         }
 
