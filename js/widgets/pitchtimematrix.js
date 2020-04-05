@@ -103,7 +103,7 @@ function PitchTimeMatrix() {
     // This array is preserved between sessions.
     // We populate the blockMap whenever a note is selected and
     // restore any notes that might be present.
-    this._blockMap = [];
+    this._blockMap = {};
 
     this.blockNo = null;
     this.notesBlockMap = [];
@@ -151,12 +151,16 @@ function PitchTimeMatrix() {
         }
     };
 
-    this.addNode = function(rowBlock, rhythmBlock, n) {
+    this.addNode = function(rowBlock, rhythmBlock, n, blk) {
         // A node exists for each cell in the matrix. It is used to
         // preserve and restore the state of the cell.
+        if (this._blockMap[blk] === undefined) {
+            this._blockMap[blk] = [];
+        }
+
         var j = 0;
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
+        for (var i = 0; i < this._blockMap[blk].length; i++) {
+            var obj = this._blockMap[blk][i];
             if (
                 obj[0] === rowBlock &&
                 obj[1][0] === rhythmBlock &&
@@ -167,19 +171,20 @@ function PitchTimeMatrix() {
             }
         }
 
-        this._blockMap.push([rowBlock, [rhythmBlock, n], j]);
+        this._blockMap[blk].push([rowBlock, [rhythmBlock, n], j]);
     };
 
     this.removeNode = function(rowBlock, rhythmBlock, n) {
         // When the matrix is changed, we may need to remove nodes.
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
+        var blk = this.blockNo;
+        for (var i = 0; i < this._blockMap[blk].length; i++) {
+            var obj = this._blockMap[blk][i];
             if (
                 obj[0] === rowBlock &&
                 obj[1][0] === rhythmBlock &&
                 obj[1][1] === n
             ) {
-                this._blockMap.splice(i, 1);
+                this._blockMap[blk].splice(i, 1);
             }
         }
     };
@@ -653,6 +658,9 @@ function PitchTimeMatrix() {
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
 
+        if (this._blockMap[this.blockNo] === undefined) {
+            this._blockMap[this.blockNo] = [];
+        }
         this._lookForNoteBlocksOrRepeat();
 
         // Sort them if there are note blocks.
@@ -2938,8 +2946,9 @@ function PitchTimeMatrix() {
 
     this._lookForNoteBlocksOrRepeat = function() {
         this._noteBlocks = false;
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var blk = this._blockMap[i][1][0];
+        var bno = this.blockNo;
+        for (var i = 0; i < this._blockMap[bno].length; i++) {
+            var blk = this._blockMap[bno][i][1][0];
             if (blk === -1) {
                 continue;
             }
@@ -2966,14 +2975,15 @@ function PitchTimeMatrix() {
 
     this._syncMarkedBlocks = function() {
         var newBlockMap = [];
-        for (var i = 0; i < this._blockMap.length; i++) {
-            if (this._blockMap[i][0] === -1) {
+        var blk = this.blockNo;
+        for (var i = 0; i < this._blockMap[blk].length; i++) {
+            if (this._blockMap[blk][i][0] === -1) {
                 continue;
             }
 
             for (var j = 0; j < this._blockMapHelper.length; j++) {
                 if (
-                    JSON.stringify(this._blockMap[i][1]) ===
+                    JSON.stringify(this._blockMap[blk][i][1]) ===
                     JSON.stringify(this._blockMapHelper[j][0])
                 ) {
                     for (
@@ -2982,16 +2992,16 @@ function PitchTimeMatrix() {
                         k++
                     ) {
                         newBlockMap.push([
-                            this._blockMap[i][0],
+                            this._blockMap[blk][i][0],
                             this._colBlocks[this._blockMapHelper[j][1][k]],
-                            this._blockMap[i][2]
+                            this._blockMap[blk][i][2]
                         ]);
                     }
                 }
             }
         }
 
-        this._blockMap = newBlockMap.filter((el, i) => {
+        this._blockMap[blk] = newBlockMap.filter((el, i) => {
             return (
                 i ===
                 newBlockMap.findIndex(ele => {
@@ -4045,8 +4055,9 @@ function PitchTimeMatrix() {
             }
         } else {
             // Otherwise, we need to look at the blockMap.
-            for (var i = 0; i < this._blockMap.length; i++) {
-                var obj = this._blockMap[i];
+            var blk = this.blockNo;
+            for (var i = 0; i < this._blockMap[blk].length; i++) {
+                var obj = this._blockMap[blk][i];
                 if (obj[0] !== -1) {
                     var n = obj[2];
                     var c = 0;
@@ -4581,7 +4592,9 @@ function PitchTimeMatrix() {
         var rhythmBlockObj = this._colBlocks[colIndex];
 
         if (playNote) {
-            this.addNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
+            this.addNode(
+                rowBlock, rhythmBlockObj[0], rhythmBlockObj[1], this.blockNo
+            );
         } else {
             this.removeNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
