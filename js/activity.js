@@ -71,8 +71,8 @@ function Activity() {
     scrollPaletteContainer = false;
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
-        function facebookInit() {
-            window.fbAsyncInit = function() {
+        const facebookInit = () => {
+            window.fbAsyncInit = () => {
                 FB.init({
                     appId: "1496189893985945",
                     xfbml: true,
@@ -84,7 +84,7 @@ function Activity() {
         }
 
         try {
-            (function(d, s, id) {
+            ((d, s, id) => {
                 js, (fjs = d.getElementsByTagName(s)[0]);
                 if (d.getElementById(id)) {
                     return;
@@ -248,7 +248,7 @@ function Activity() {
      * Initialises major variables and renders default stack
      *
      */
-    this.setupDependencies = function() {
+    this.setupDependencies = () => {
         // blocks = new Blocks(this);
         createDefaultStack();
         createHelpContent();
@@ -331,7 +331,7 @@ function Activity() {
         paste = docById("paste");
         paste.style.visibility = "hidden";
 
-        closeContextWheel = function() {
+        const closeContextWheel = () => {
             // docById('contextWheelDiv').style.display = 'none';
         };
 
@@ -342,10 +342,10 @@ function Activity() {
      * Sets up right click functionality opening the context menus
      * (if block is right clicked)
      */
-    this.doContextMenus = function() {
+    this.doContextMenus = () => {
         document.addEventListener(
             "contextmenu",
-            function(event) {
+            (event) => {
                 event.preventDefault();
                 event.stopPropagation();
             },
@@ -356,7 +356,7 @@ function Activity() {
     /*
      * Sets up plugin and palette boiler plate
      */
-    this.doPluginsAndPaletteCols = function() {
+    this.doPluginsAndPaletteCols = () => {
         // Calculate the palette colors.
         /*
         for ( p in PALETTECOLORS) {
@@ -429,7 +429,7 @@ function Activity() {
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
      */
-    _findBlocks = function() {
+    const _findBlocks = () => {
         // _showHideAuxMenu(false);
         if (!blocks.visible) {
             _changeBlockVisibility();
@@ -545,7 +545,7 @@ function Activity() {
      * @param zero {hides container}
      * @param one {shows container}
      */
-    setHomeContainers = function(zero, one) {
+    setHomeContainers = (zero, one) => {
         if (homeButtonContainers[0] === null) {
             return;
         }
@@ -554,15 +554,15 @@ function Activity() {
         homeButtonContainers[1].visible = one;
     };
 
-    __saveHelpBlock = function(name, delay) {
+    __saveHelpBlock = (name, delay) => {
         // Save the artwork for an individual help block.
         // (1) clear the block list
         // (2) generate the help blocks
         // (3) save the blocks as svg
-        setTimeout(function() {
+        setTimeout(() => {
             sendAllToTrash(false, true);
-            setTimeout(function() {
-                let message =
+            setTimeout(() => {
+                var message =
                     blocks.blockList[blocks.activeBlock].protoblock.helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just
@@ -580,7 +580,7 @@ function Activity() {
                         blocks.palettes.dict[paletteName].makeBlockFromSearch(
                             protoblk,
                             protoName,
-                            function(newBlock) {
+                            (newBlock) => {
                                 blocks.moveBlock(newBlock, 0, 0);
                             }
                         );
@@ -598,7 +598,7 @@ function Activity() {
                     blocks.loadNewBlocks(blocksToLoad);
                 }
 
-                setTimeout(function() {
+                setTimeout(() => {
                     // save.saveBlockArtwork(message[3]);
                     save.saveBlockArtwork(name + "_block.svg");
                 }, 500);
@@ -606,7 +606,7 @@ function Activity() {
         }, delay + 1000);
     };
 
-    _saveHelpBlocks = function() {
+    _saveHelpBlocks = () => {
         // Save the artwork for every help block.
         let i = 0;
         for (let name in BLOCKHELP) {
@@ -621,7 +621,7 @@ function Activity() {
     /*
      * @return {SVG} returns SVG of blocks
      */
-    _printBlockSVG = function() {
+    _printBlockSVG = () => {
         blocks.activeBlock = null;
         let startCounter = 0;
         let svg = "";
@@ -801,7 +801,7 @@ function Activity() {
     /*
      * Clears "canvas"
      */
-    _allClear = function(noErase) {
+    _allClear = (noErase) => {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -828,12 +828,12 @@ function Activity() {
         blocksContainer.y = 0;
 
         // Code specific to cleaning up music blocks
-        Element.prototype.remove = function() {
+        Element.prototype.remove = () => {
             this.parentElement.removeChild(this);
         };
 
-        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-            for (let i = 0, len = this.length; i < len; i++) {
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
+            for (var i = 0, len = this.length; i < len; i++) {
                 if (this[i] && this[i].parentElement) {
                     this[i].parentElement.removeChild(this[i]);
                 }
@@ -851,7 +851,7 @@ function Activity() {
      * Sets up play button functionality
      * Runs music blocks
      */
-    this._doFastButton = function(env) {
+    this._doFastButton = (env) => {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -900,7 +900,7 @@ function Activity() {
                 document.getElementById("stop").style.color = "white";
                 logo.doStopTurtle();
 
-                setTimeout(function() {
+                setTimeout(() => {
                     console.debug("AND RUNNING");
                     document.getElementById("stop").style.color = "#ea174c";
 
@@ -913,7 +913,7 @@ function Activity() {
     /*
      * Runs music blocks at a slower rate
      */
-    this._doSlowButton = function() {
+    this._doSlowButton = () => {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -935,7 +935,7 @@ function Activity() {
     /*
      * Runs music blocks step by step
      */
-    _doStepButton = function() {
+    _doStepButton = () => {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -965,7 +965,7 @@ function Activity() {
      * Stops running of music blocks.
      * Stops all mid-way synths
      */
-    this.doHardStopButton = function(onblur) {
+    this.doHardStopButton = (onblur) => {
         blocks.activeBlock = null;
         hideDOMLabel();
 
@@ -998,7 +998,7 @@ function Activity() {
     /*
      * Switches between beginner/advanced mode
      */
-    doSwitchMode = function() {
+    doSwitchMode = () => {
         blocks.activeBlock = null;
         let mode = localStorage.beginnerMode;
 
@@ -1033,7 +1033,7 @@ function Activity() {
     };
 
     // DEPRECATED
-    doStopButton = function() {
+    doStopButton = () => {
         blocks.activeBlock = null;
         logo.doStopTurtle();
     };
@@ -1052,7 +1052,7 @@ function Activity() {
     /*
      * Initialises the functionality of the horizScrollIcon
      */
-    function setScroller() {
+    setScroller = () => {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
         scrollPaletteContainer = !scrollPaletteContainer;
@@ -1068,8 +1068,8 @@ function Activity() {
     }
 
     //Load Animation handler
-    doLoadAnimation = function() {
-        let messages = {
+    doLoadAnimation = () => {
+        var messages = {
             load_messages: [
                 _("Catching mice"),
                 _("Cleaning the instruments"),
@@ -1085,9 +1085,7 @@ function Activity() {
 
         document.getElementById("load-container").style.display = "block";
         let counter = 0;
-        setInterval(changeText, 2000);
-
-        function changeText() {
+        changeText = () => {
             let randomLoadMessage =
                 messages.load_messages[
                     Math.floor(Math.random() * messages.load_messages.length)
@@ -1099,6 +1097,7 @@ function Activity() {
                 counter = 0;
             }
         }
+        setInterval(changeText, 2000);
     };
 
     /*
@@ -1107,7 +1106,7 @@ function Activity() {
      * Renders close icon and functionality to
      * stop analytics of the MB project
      */
-    this.closeAnalytics = function(chartBitmap, ctx) {
+    this.closeAnalytics = (chartBitmap, ctx) => {
         blocks.activeBlock = null;
         let button = this;
         button.x = canvas.width / (2 * turtleBlocksScale) + 300 / Math.sqrt(2);
@@ -1120,7 +1119,7 @@ function Activity() {
             55,
             0
         );
-        this.closeButton.on("click", function(event) {
+        this.closeButton.on("click", (event) => {
             button.closeButton.visible = false;
             stage.removeChild(chartBitmap);
             logo.showBlocks();
@@ -1134,7 +1133,8 @@ function Activity() {
      * @return {boolean} {if canvas is blank }
      * Checks if the canvas is blank
      */
-    function _isCanvasBlank(canvas) {
+
+     _isCanvasBlank = (canvas) => {
         let blank = document.createElement("canvas");
         blank.width = canvas.width;
         blank.height = canvas.height;
@@ -1147,7 +1147,7 @@ function Activity() {
      */
     closeAnalytics = this.closeAnalytics;
     let th = this;
-    doAnalytics = function() {
+    doAnalytics = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
         myChart = docById("myChart");
@@ -1166,10 +1166,10 @@ function Activity() {
         let Analytics = this;
         Analytics.close = th.closeAnalytics;
 
-        __callback = function() {
+        __callback = () => {
             imageData = myRadarChart.toBase64Image();
             img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 chartBitmap = new createjs.Bitmap(img);
                 stage.addChild(chartBitmap);
                 chartBitmap.x = canvas.width / (2 * turtleBlocksScale) - 300;
@@ -1190,7 +1190,7 @@ function Activity() {
     };
 
     // DEPRECATED
-    function doOptimize(state) {
+     doOptimize = (state) => {
         blocks.activeBlock = null;
         console.debug("Setting optimize to " + state);
         logo.setOptimize(state);
@@ -1198,7 +1198,7 @@ function Activity() {
     /*
      * Increases block size
      */
-    doLargerBlocks = function() {
+    doLargerBlocks = () => {
         blocks.activeBlock = null;
 
         // hideDOMLabel();
@@ -1208,7 +1208,7 @@ function Activity() {
                 let resizeDebounce = true;
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
-                setTimeout(function() {
+                setTimeout(() => {
                     resizeDebounce = false;
                 }, 3000);
             }
@@ -1220,7 +1220,7 @@ function Activity() {
     /*
      * Decreases block size
      */
-    doSmallerBlocks = function() {
+    doSmallerBlocks = () => {
         blocks.activeBlock = null;
 
         // hideDOMLabel();
@@ -1231,7 +1231,7 @@ function Activity() {
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
-            setTimeout(function() {
+            setTimeout(() => {
                 resizeDebounce = false;
             }, 3000);
         }
@@ -1243,7 +1243,7 @@ function Activity() {
      * If either the block size has reached its minimum or maximum
      * then the icons to make them smaller/bigger will be hidden
      */
-    setSmallerLargerStatus = function() {
+    setSmallerLargerStatus = () => {
         if (BLOCKSCALES[blockscale] > 1) {
             smallerContainer.visible = true;
             smallerOffContainer.visible = false;
@@ -1264,7 +1264,7 @@ function Activity() {
     /*
      * Removes loaded plugin
      */
-    deletePlugin = function() {
+    deletePlugin = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
         if (palettes.paletteObject !== null) {
@@ -1284,7 +1284,7 @@ function Activity() {
     //     return Object.keys(logo.playbackQueue).length > 0;
     // };
 
-    function setPlaybackStatus() {
+    setPlaybackStatus = () => {
         // if (playbackBox != null) {
         //     playbackBox.setPlaybackStatus();
         // }
@@ -1345,7 +1345,7 @@ function Activity() {
     /*
      * Hides all grids (Cartesian/polar)
      */
-    hideGrids = function() {
+    hideGrids = () => {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
@@ -1354,7 +1354,7 @@ function Activity() {
     /*
      * Renders Cartesian/Polar grids and changes button labels accordingly
      */
-    _doCartesianPolar = function() {
+    _doCartesianPolar = () => {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
             //.TRANS: hide Polar coordinate overlay grid
@@ -1378,7 +1378,7 @@ function Activity() {
     /*
      * Sets up block actions with regards to different mouse events
      */
-    this._setupBlocksContainerEvents = function() {
+    this._setupBlocksContainerEvents = () => {
         let moving = false;
         let lastCoords = {
             x: 0,
@@ -1386,7 +1386,7 @@ function Activity() {
             delta: 0
         };
 
-        let __paletteWheelHandler = function(event) {
+        let __paletteWheelHandler = (event) => {
             // vertical scroll
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 if (palettes.paletteVisible) {
@@ -1422,16 +1422,14 @@ function Activity() {
 
         let myCanvas = docById("myCanvas");
 
-        let __heightBasedScroll = function(event) {
+        __heightBasedScroll = (event) => {
             actualReszieHandler(); // check size during init
-            window.addEventListener("resize", resizeThrottler, false);
-            let resizeTimeout;
-
-            function resizeThrottler() {
+            resizeThrottler = () => {
+                let resizeTimeout;
                 // Ignore resize events as long as an actualResizeHandler
                 // execution is in queue.
                 if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
+                    resizeTimeout = setTimeout(() => {
                         resizeTimeout = null;
                         actualReszieHandler();
                         // The actualResizeHandler will execute at the
@@ -1439,9 +1437,10 @@ function Activity() {
                     }, 66);
                 }
             }
+            window.addEventListener("resize", resizeThrottler, false);
         };
 
-        function actualReszieHandler() {
+         actualReszieHandler = () => {
             // Handle the resize event
             let h = window.innerHeight;
 
@@ -1460,14 +1459,14 @@ function Activity() {
 
         __heightBasedScroll();
 		
-		let closeAnyOpenMenusAndLabels = function () {
+		closeAnyOpenMenusAndLabels = () => {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
             if (docById("textLabel") != null) docById("textLabel").style.display = "none";
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         }
 
-        let __wheelHandler = function(event) {
+        __wheelHandler = (event) => {
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
 				closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
                 if (palettes.paletteVisible) {
@@ -1504,7 +1503,7 @@ function Activity() {
 
         docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
-        let __stageMouseUpHandler = function(event) {
+        __stageMouseUpHandler = (event) => {
             stageMouseDown = false;
             moving = false;
 
@@ -1514,12 +1513,12 @@ function Activity() {
             }
         };
 
-        stage.on("stagemousemove", function(event) {
+        stage.on("stagemousemove", (event) => {
             stageX = event.stageX;
             stageY = event.stageY;
         });
 
-        stage.on("stagemousedown", function(event) {
+        stage.on("stagemousedown", (event) => {
             stageMouseDown = true;
             if ((stage.getObjectUnderPoint() !== null) | turtles.running()) {
                 stage.removeAllEventListeners("stagemouseup");
@@ -1537,7 +1536,7 @@ function Activity() {
             hideDOMLabel();
 
             stage.removeAllEventListeners("stagemousemove");
-            stage.on("stagemousemove", function(event) {
+            stage.on("stagemousemove", (event) => {
                 stageX = event.stageX;
                 stageY = event.stageY;
 
@@ -1574,7 +1573,7 @@ function Activity() {
     /*
      * Sets up scrolling functionality in palette and across canvas
      */
-    function scrollEvent(event) {
+     scrollEvent = (event) => {
         let data = event.wheelDelta || -event.detail;
         let delta = Math.max(-1, Math.min(1, data));
         let scrollSpeed = 30;
@@ -1596,21 +1595,21 @@ function Activity() {
         }
     }
 
-    function getStageScale() {
+     getStageScale = () => {
         return turtleBlocksScale;
     }
 
-    function getStageX() {
+     getStageX = () => {
         return turtles.screenX2turtleX(stageX / turtleBlocksScale);
     }
 
-    function getStageY() {
+     getStageY = () => {
         return turtles.screenY2turtleY(
             (stageY - toolbarHeight) / turtleBlocksScale
         );
     }
 
-    function getStageMouseDown() {
+     getStageMouseDown = () => {
         return stageMouseDown;
     }
 
@@ -1622,7 +1621,7 @@ function Activity() {
      * @param imagePath {path of grid to be rendered}
      * Renders grid
      */
-    _createGrid = function(imagePath) {
+    _createGrid = (imagePath) => {
         let img = new Image();
         img.src = imagePath;
         let container = new createjs.Container();
@@ -1648,7 +1647,7 @@ function Activity() {
      * @param  y           {position on canvas}
      * @return {description}
      */
-    _createMsgContainer = function(fillColor, strokeColor, callback, y) {
+    _createMsgContainer = (fillColor, strokeColor, callback, y) => {
         let container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
@@ -1661,7 +1660,7 @@ function Activity() {
             strokeColor
         );
 
-        img.onload = function() {
+        img.onload = () => {
             let msgBlock = new createjs.Bitmap(img);
             container.addChild(msgBlock);
             let text = new createjs.Text(
@@ -1684,7 +1683,7 @@ function Activity() {
             hitArea.y = 0;
             container.hitArea = hitArea;
 
-            container.on("click", function(event) {
+            container.on("click", (event) => {
                 container.visible = false;
                 // On the possibility that there was an error
                 // arrow associated with this container
@@ -1707,7 +1706,7 @@ function Activity() {
     /*
      * Some error messages have special artwork.
      */
-    _createErrorContainers = function() {
+    _createErrorContainers = () => {
         for (let i = 0; i < ERRORARTWORK.length; i++) {
             let name = ERRORARTWORK[i];
             _makeErrorArtwork(name);
@@ -1718,7 +1717,7 @@ function Activity() {
      * @param  name {specifies svg to be rendered}
      * renders error message with appropriate artwork
      */
-    _makeErrorArtwork = function(name) {
+    _makeErrorArtwork = (name) => {
         let container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
@@ -1728,7 +1727,7 @@ function Activity() {
         errorArtwork[name].visible = false;
 
         let img = new Image();
-        img.onload = function() {
+        img.onload = () => {
             let artwork = new createjs.Bitmap(img);
             container.addChild(artwork);
             let text = new createjs.Text("", "20px Sans", "#000000");
@@ -1747,7 +1746,7 @@ function Activity() {
             hitArea.y = 0;
             container.hitArea = hitArea;
 
-            container.on("click", function(event) {
+            container.on("click", (event) => {
                 container.visible = false;
                 // On the possibility that there was an error
                 // arrow associated with this container
@@ -1764,7 +1763,7 @@ function Activity() {
     /*
       Prepare a list of blocks for the search bar autocompletion.
      */
-    prepSearchWidget = function() {
+    prepSearchWidget = () => {
         searchWidget.style.visibility = "hidden";
         searchBlockPosition = [100, 100];
 
@@ -1788,7 +1787,7 @@ function Activity() {
     /*
      * Hides search widget
      */
-    hideSearchWidget = function() {
+    hideSearchWidget = () => {
         // Hide the jQuery search results widget
         let obj = docByClass("ui-menu");
         if (obj.length > 0) {
@@ -1801,7 +1800,7 @@ function Activity() {
     /*
      * Shows search widget
      */
-    showSearchWidget = function() {
+    showSearchWidget = () => {
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
@@ -1822,7 +1821,7 @@ function Activity() {
 
             // Give the browser time to update before selecting
             // focus.
-            setTimeout(function() {
+            setTimeout(() => {
                 searchWidget.focus();
                 doSearch();
             }, 500);
@@ -1832,12 +1831,12 @@ function Activity() {
     /*
      * Uses JQuery to add autocompleted search suggestions
      */
-    doSearch = function() {
+    doSearch = () => {
         let $j = jQuery.noConflict();
 
         $j("#search").autocomplete({
             source: searchSuggestions,
-            select: function(event, ui) {
+            select: (event, ui) => {
                 searchWidget.value = ui.item.label;
                 doSearch();
             }
@@ -1860,7 +1859,7 @@ function Activity() {
                 palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
-                    function(newBlock) {
+                    (newBlock) => {
                         blocks.moveBlock(
                             newBlock,
                             100 + searchBlockPosition[0] - blocksContainer.x,
@@ -1886,7 +1885,7 @@ function Activity() {
     /*
      * Makes initial "start up" note for a brand new MB project
      */
-    __makeNewNote = function(octave, solf) {
+    __makeNewNote = (octave, solf) => {
         let newNote = [
             [
                 0,
@@ -1991,7 +1990,7 @@ function Activity() {
     // Flag to disable keyboard during loading of MB
     let keyboardEnableFlag;
 
-    function __keyPressed(event) {
+    __keyPressed = (event) => {
         let that = this;
         let disableKeys;
 
@@ -2439,14 +2438,14 @@ function Activity() {
     /*
      * @return currentKeyCode
      */
-    this.getCurrentKeyCode = function() {
+    this.getCurrentKeyCode = () => {
         return currentKeyCode;
     };
 
     /*
      * Sets current key code to 0
      */
-    this.clearCurrentKeyCode = function() {
+    this.clearCurrentKeyCode = () => {
         currentKey = "";
         currentKeyCode = 0;
     };
@@ -2456,7 +2455,7 @@ function Activity() {
      * Detects width/height changes and closes any menus before actual resize.
      * Repositions containers/palette/home buttons
      */
-    function _onResize(force) {
+     _onResize = (force) => {
         let $j = jQuery.noConflict();
         console.debug(
             "document.body.clientWidth and clientHeight: " +
@@ -2595,7 +2594,7 @@ function Activity() {
         blocks.checkBounds();
     }
 
-    window.onresize = function() {
+    window.onresize = () => {
         _onResize(false);
     };
 
@@ -2604,7 +2603,7 @@ function Activity() {
      * Hides palettes before update
      * Repositions blocks about trash area
      */
-    _restoreTrash = function() {
+    _restoreTrash = () => {
         for (let name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2723,7 +2722,7 @@ function Activity() {
     /*
      * Hides aux menu
      */
-    hideAuxMenu = function() {
+    hideAuxMenu = () => {
         if (toolbarHeight > 0) {
             _showHideAuxMenu(false);
             menuButtonsVisible = false;
@@ -2733,7 +2732,7 @@ function Activity() {
     /*
      * Sets up a new "clean" MB i.e. new project instance
      */
-    _afterDelete = function() {
+    _afterDelete = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         sendAllToTrash(true, false);
         if (planet !== undefined) {
@@ -2753,7 +2752,7 @@ function Activity() {
      * Hide the palettes before update.
      * Then deletes everything/sends all to trash
      */
-    sendAllToTrash = function(addStartBlock, doNotSave) {
+    sendAllToTrash = (addStartBlock, doNotSave) => {
         // Return to home position after loading new blocks.
         blocksContainer.x = 0;
         blocksContainer.y = 0;
@@ -2815,7 +2814,7 @@ function Activity() {
 
         // Wait for palette to clear (#891)
         // We really need to signal when each palette item is deleted
-        setTimeout(function() {
+        setTimeout(() => {
             stage.dispatchEvent("trashsignal");
         }, 100 * actionBlockCounter); // 1000
 
@@ -2837,7 +2836,7 @@ function Activity() {
     /*
      * Toggles block/palette visibility
      */
-    _changeBlockVisibility = function() {
+    _changeBlockVisibility = () => {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2864,7 +2863,7 @@ function Activity() {
     /*
      * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
      */
-    _toggleCollapsibleStacks = function() {
+    _toggleCollapsibleStacks = () => {
         hideDOMLabel();
 
         if (blocks.visible) {
@@ -2875,7 +2874,7 @@ function Activity() {
     /*
      * When turtle stops running restore stop button to normal state
      */
-    this.onStopTurtle = function() {
+    this.onStopTurtle = () => {
         // TODO: plugin support
         /*
         if (stopTurtleContainer === null) {
@@ -2892,7 +2891,7 @@ function Activity() {
     /*
      * When turtle starts running change stop button to running state
      */
-    this.onRunTurtle = function() {
+    this.onRunTurtle = () => {
         // TODO: plugin support
         // If the stop button is hidden, show it.
         /*
@@ -2910,13 +2909,13 @@ function Activity() {
      * Updates all canvas elements
      */
     let blockRefreshCanvas = false;
-    function refreshCanvas() {
+     refreshCanvas = () => {
         if (blockRefreshCanvas) {
             return;
         }
 
         blockRefreshCanvas = true;
-        setTimeout(function() {
+        setTimeout(() => {
             blockRefreshCanvas = false;
         }, 5);
 
@@ -2928,7 +2927,7 @@ function Activity() {
      * This set makes it so the stage only re-renders when an
      * event handler indicates a change has happened.
      */
-    this.__tick = function(event) {
+    this.__tick = (event) => {
         if (update || createjs.Tween.hasActiveTweens()) {
             update = false; // Only update once
             stage.update(event);
@@ -2938,7 +2937,7 @@ function Activity() {
     /*
      * Opens samples on planet after closing all sub menus
      */
-    _doOpenSamples = function() {
+    _doOpenSamples = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
     };
@@ -2948,7 +2947,7 @@ function Activity() {
      * If beginner, assigns default "My Project" title to html file
      * If advanced, assigns custom title to html file
      */
-    this.doSave = function() {
+    this.doSave = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (beginnerMode) {
             save.saveHTML(_("My Project"));
@@ -2958,7 +2957,7 @@ function Activity() {
     /*
      * Uploads MB file to Planet
      */
-    doUploadToPlanet = function() {
+    doUploadToPlanet = () => {
         planet.openPlanet();
     };
 
@@ -2971,7 +2970,7 @@ function Activity() {
      * @param merge {if specified the selected file's blocks merge into current project}
      *  Loads/merges existing MB file
      */
-    doLoad = function(merge) {
+    doLoad = (merge) => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
@@ -3000,10 +2999,10 @@ function Activity() {
      * @param env {specifies environment}
      * Runs music blocks project
      */
-    this.runProject = function(env) {
+    this.runProject = (env) => {
         console.debug("Running Project from Event");
         document.removeEventListener("finishedLoading", this.runProject);
-        setTimeout(function() {
+        setTimeout(() => {
             console.debug("Run");
             _changeBlockVisibility();
             that._doFastButton(env);
@@ -3017,7 +3016,7 @@ function Activity() {
      *
      * Loads MB project from Planet
      */
-    this.loadProject = function(projectID, flags, env) {
+    this.loadProject = (projectID, flags, env) => {
         console.debug("LOAD PROJECT");
         if (planet === undefined) {
             console.debug("CANNOT ACCESS PLANET");
@@ -3040,9 +3039,9 @@ function Activity() {
         // palettes.updatePalettes();
         console.debug("LOADING" + planet.getCurrentProjectName());
         textMsg(planet.getCurrentProjectName());
-        setTimeout(function() {
+        setTimeout(() => {
             try {
-                planet.openProjectFromPlanet(projectID, function() {
+                planet.openProjectFromPlanet(projectID, () => {
                     that.loadStartWrapper(that._loadStart);
                 });
             } catch (e) {
@@ -3063,8 +3062,8 @@ function Activity() {
         let show = flags.show;
         let collapse = flags.collapse;
 
-        let __functionload = function() {
-            setTimeout(function() {
+        __functionload = () => {
+            setTimeout(() => {
                 if (!collapse && firstRun) {
                     _toggleCollapsibleStacks();
                 }
@@ -3111,7 +3110,7 @@ function Activity() {
      *
      * @param loadProject all params are from load project function
      */
-    this.loadStartWrapper = async function(func, arg1, arg2, arg3) {
+    this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
         let time1 = new Date();
         await func(arg1, arg2, arg3);
 
@@ -3125,7 +3124,7 @@ function Activity() {
      * Hides the loading animation and unhides the background.
      * Shows contents of MB after loading screen.
      */
-    this.showContents = function() {
+    this.showContents = () => {
         docById("loading-image-container").style.display = "none";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
@@ -3140,7 +3139,7 @@ function Activity() {
         */
     };
 
-    this._loadStart = async function() {
+    this._loadStart = async () => {
         console.debug("LOAD START");
 
         // Set the flag to zero to disable keyboard
@@ -3148,7 +3147,7 @@ function Activity() {
 
         // where to put this?
         // palettes.updatePalettes();
-        justLoadStart = function() {
+        justLoadStart = () => {
             console.debug("Loading start");
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
@@ -3165,9 +3164,9 @@ function Activity() {
             sessionData = storage["SESSION" + currentProject];
         }
 
-        let __afterLoad = function() {
+        __afterLoad = () => {
             if (!turtles.running()) {
-                setTimeout(function() {
+                setTimeout(() => {
                     stage.update(event);
                     console.debug(
                         "reset turtles after load: " + turtles.turtleList.length
@@ -3250,7 +3249,7 @@ function Activity() {
     /*
      * Hides all message containers
      */
-    hideMsgs = function() {
+    hideMsgs = () => {
         errorMsgText.parent.visible = false;
         errorText.classList.remove("show");
         hideArrows();
@@ -3264,14 +3263,14 @@ function Activity() {
         refreshCanvas();
     };
 
-    hideArrows = function() {
+    hideArrows = () => {
         if (errorMsgArrow != null) {
             errorMsgArrow.removeAllChildren();
             refreshCanvas();
         }
     };
 
-    textMsg = function(msg) {
+    textMsg = (msg) => {
         if (msgTimeoutID !== null) {
             clearTimeout(msgTimeoutID);
 	    msgTimeoutID = null;
@@ -3290,13 +3289,13 @@ function Activity() {
         let printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
-        msgTimeoutID = setTimeout(function() {
+        msgTimeoutID = setTimeout(() => {
             printText.classList.remove("show");
 	    msgTimeoutID = null;
         }, _MSGTIMEOUT_);
     };
 
-    errorMsg = function(msg, blk, text, timeout) {
+    errorMsg = (msg, blk, text, timeout) => {
         /*
         if (logo.optimize) {
             return;
@@ -3446,7 +3445,7 @@ function Activity() {
         }
 
         if (myTimeout > 0) {
-            errorMsgTimeoutID = setTimeout(function() {
+            errorMsgTimeoutID = setTimeout(() => {
                 hideMsgs();
             }, myTimeout);
         }
@@ -3457,7 +3456,7 @@ function Activity() {
     /*
      * Hides cartesian grid
      */
-    _hideCartesian = function() {
+    _hideCartesian = () => {
         cartesianBitmap.visible = false;
         cartesianBitmap.updateCache();
         update = true;
@@ -3466,7 +3465,7 @@ function Activity() {
     /*
      * Shows cartesian grid
      */
-    _showCartesian = function() {
+    _showCartesian = () => {
         cartesianBitmap.visible = true;
         cartesianBitmap.updateCache();
         update = true;
@@ -3475,7 +3474,7 @@ function Activity() {
     /*
      * Hides polar grid
      */
-    _hidePolar = function() {
+    _hidePolar = () => {
         polarBitmap.visible = false;
         polarBitmap.updateCache();
         update = true;
@@ -3484,7 +3483,7 @@ function Activity() {
     /*
      * Shows polar grid
      */
-    _showPolar = function() {
+    _showPolar = () => {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
@@ -3689,13 +3688,13 @@ function Activity() {
     /*
      * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
      */
-    doOpenPlugin = function() {
+    doOpenPlugin = () => {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         pluginChooser.focus();
         pluginChooser.click();
     };
 
-    _hideStopButton = function() {
+    _hideStopButton = () => {
         /*
         if (stopTurtleContainer === null) {
             return;
@@ -3706,7 +3705,7 @@ function Activity() {
         */
     };
 
-    _showStopButton = function() {
+    _showStopButton = () => {
         /*
         if (stopTurtleContainer === null) {
             return;
@@ -3736,7 +3735,7 @@ function Activity() {
      * Specifies that loading an MB project should merge it
      * within the existing project
      */
-    _doMergeLoad = function() {
+    _doMergeLoad = () => {
         doLoad(true);
     };
 
@@ -3745,7 +3744,7 @@ function Activity() {
      * e.g. Home, Collapse, Expand
      * These menu items are on the canvas, not the toolbar.
      */
-    _setupPaletteMenu = function(turtleBlocksScale) {
+    _setupPaletteMenu = (turtleBlocksScale) => {
         // Clean up if we've been here before.
         if (homeButtonContainers.length !== 0) {
             stage.removeChild(homeButtonContainers[0]);
@@ -3957,7 +3956,7 @@ function Activity() {
     /*
      * Shows help page
      */
-    _showHelp = function() {
+    _showHelp = () => {
         let helpWidget = new HelpWidget();
         helpWidget.init(null);
     };
@@ -3965,7 +3964,7 @@ function Activity() {
     /*
      * Shows about page
      */
-    _showAboutPage = function() {
+    _showAboutPage = () => {
         let helpWidget = new HelpWidget();
         helpWidget.init(null);
         helpWidget.showPageByName(_("About"));
@@ -3974,14 +3973,14 @@ function Activity() {
     /*
      * REDUNDANT
      */
-    _doMenuButton = function() {
+    _doMenuButton = () => {
         _doMenuAnimation(true);
     };
 
     /*
      * REDUNDANT
      */
-    _doMenuAnimation = function(arg) {
+    _doMenuAnimation = (arg) => {
         let animate = arg;
         if (arg === undefined) {
             animate = true;
@@ -4018,7 +4017,7 @@ function Activity() {
             setTimeout(_doMenuAnimation, 50);
         }
 
-        setTimeout(function() {
+        setTimeout(() => {
             if (menuButtonsVisible) {
                 menuButtonsVisible = false;
             } else {
@@ -4041,7 +4040,7 @@ function Activity() {
     /*
      * REDUNDANT
      */
-    _toggleToolbar = function() {
+    _toggleToolbar = () => {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
         headerContainer.visible = buttonsVisible;
@@ -4072,7 +4071,7 @@ function Activity() {
     /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
-    _makeButton = function(name, label, x, y, size, rotation, parent) {
+    _makeButton = (name, label, x, y, size, rotation, parent) => {
         let container = new createjs.Container();
 
         if (parent === undefined) {
@@ -4105,7 +4104,7 @@ function Activity() {
         text.visible = false;
 
         let circles;
-        container.on("mouseover", function(event) {
+        container.on("mouseover", (event) => {
             for (let c = 0; c < container.children.length; c++) {
                 if (container.children[c].text !== undefined) {
                     container.children[c].visible = true;
@@ -4174,7 +4173,7 @@ function Activity() {
             );
         });
 
-        container.on("mouseout", function(event) {
+        container.on("mouseout", (event) => {
             hideButtonHighlight(circles, stage);
             for (let c = 0; c < container.children.length; c++) {
                 if (container.children[c].text !== undefined) {
@@ -4188,7 +4187,7 @@ function Activity() {
 
         let img = new Image();
 
-        img.onload = function() {
+        img.onload = () => {
             let originalSize = 55; // this is the original svg size
             let halfSize = Math.floor(size / 2);
 
@@ -4232,13 +4231,13 @@ function Activity() {
      *
      * Handles button dragging, long hovering and prevents multiple button presses
      */
-    this._loadButtonDragHandler = function(
+    this._loadButtonDragHandler = (
         container,
         ox,
         oy,
         action,
         hoverAction
-    ) {
+    ) => {
         // Prevent multiple button presses (i.e., debounce).
         let lockTimer = null;
         let locked = false;
@@ -4265,7 +4264,7 @@ function Activity() {
         let hoverTimer = null;
         let isLongHover = false;
 
-        container.on("mouseover", function(event) {
+        container.on("mouseover", (event) => {
             if (!loading) {
                 document.body.style.cursor = "pointer";
             }
@@ -4278,21 +4277,21 @@ function Activity() {
                 return;
             } else {
                 locked = true;
-                lockTimer = setTimeout(function() {
+                lockTimer = setTimeout(() => {
                     locked = false;
 
                     clearTimeout(hoverTimer);
                 }, 2000);
             }
 
-            hoverTimer = setTimeout(function() {
+            hoverTimer = setTimeout(() => {
                 isLongHover = true;
                 console.debug("HOVER ACTION");
                 hoverAction(false);
             }, 1500);
         });
 
-        container.on("mouseout", function(event) {
+        container.on("mouseout", (event) => {
             if (!loading) {
                 document.body.style.cursor = "default";
             }
@@ -4303,7 +4302,7 @@ function Activity() {
         });
 
         container.removeAllEventListeners("mousedown");
-        container.on("mousedown", function(event) {
+        container.on("mousedown", (event) => {
             /*
             if (locked) {
                 return;
@@ -4350,7 +4349,7 @@ function Activity() {
                 stage
             );
 
-            function __pressupFunction(event) {
+            __pressupFunction = (event) => {
                 hideButtonHighlight(circles, stage);
 
                 /*
@@ -4394,9 +4393,9 @@ function Activity() {
     /*
      * Handles pasted strings into input fields
      */
-    pasted = function() {
-        let rawData = docById("paste").value;
-        let obj = "";
+    pasted = () => {
+        let pasteinput = docById("paste").value;
+        let rawData = pasteinput;
         if (rawData == null || rawData === "") {
             return;
         }
@@ -4427,7 +4426,7 @@ function Activity() {
      * aux toolbar is opened.
      * Repositions elements on screen by a certain amount (dy)
      */
-    deltaY = function(dy) {
+    deltaY = (dy) => {
         toolbarHeight += dy;
         for (let i = 0; i < onscreenButtons.length; i++) {
             onscreenButtons[i].y += dy;
@@ -4463,7 +4462,7 @@ function Activity() {
     /*
      * Open aux menu
      */
-    _openAuxMenu = function() {
+    _openAuxMenu = () => {
         if (!turtles.running() && toolbarHeight === 0) {
             _showHideAuxMenu(false);
         }
@@ -4472,8 +4471,8 @@ function Activity() {
     /*
      * Toggles Aux menu visibility and positioning
      */
-    _showHideAuxMenu = function(resize) {
-        let cellsize = 55, dy;
+    _showHideAuxMenu = (resize) => {
+        let cellsize = 55;
         if (!resize && toolbarHeight === 0) {
             dy = cellsize + LEADING + 5;
             toolbarHeight = dy;
@@ -4515,7 +4514,7 @@ function Activity() {
      * Ran once dom is ready and editable
      * Sets up dependencies and vars
      */
-    this.domReady = async function(doc) {
+    this.domReady = async (doc) => {
         // _onResize = _onResize;
         // var that = this;
         // window.onblur = functionf () {
@@ -4533,7 +4532,7 @@ function Activity() {
     /*
      * Inits everything. The main function.
      */
-    this.init = async function() {
+    this.init = async () => {
         console.debug(
             "document.body.clientWidth and clientHeight: " +
                 document.body.clientWidth +
@@ -4576,7 +4575,7 @@ function Activity() {
         doBrowserCheck();
         
         if(!jQuery.browser.mozilla){
-            window.onblur = function() {
+            window.onblur = () => {
                 that.doHardStopButton(true);
             }
         }
@@ -4590,21 +4589,21 @@ function Activity() {
         // createjs.Ticker.addEventListener('tick', that.__tick);
 
         let mouseEvents = 0;
-        document.addEventListener("mousemove", function() {
+        document.addEventListener("mousemove", () => {
             mouseEvents++;
             if (mouseEvents % 4 === 0) {
                 that.__tick();
             }
         });
 
-        document.addEventListener("click", function() {
+        document.addEventListener("click", () => {
             that.__tick();
         });
 
         _createMsgContainer(
             "#ffffff",
             "#7a7a7a",
-            function(text) {
+            (text) => {
                 msgText = text;
             },
             130
@@ -4613,7 +4612,7 @@ function Activity() {
         _createMsgContainer(
             "#ffcbc4",
             "#ff0031",
-            function(text) {
+            (text) => {
                 errorMsgText = text;
             },
             130
@@ -4735,7 +4734,7 @@ function Activity() {
             _showHelp();
         }
 
-        playbackOnLoad = function() {
+        playbackOnLoad = () => {
             /*
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 // Play playback queue if there is one.
@@ -4756,7 +4755,7 @@ function Activity() {
             this.iframe = null;
             this.mainCanvas = null;
 
-            this.hideMusicBlocks = function() {
+            this.hideMusicBlocks = () => {
                 hideSearchWidget();
                 widgetWindows.hideAllWindows();
 
@@ -4765,14 +4764,14 @@ function Activity() {
                 document.querySelector(".canvasHolder").classList.add("hide");
                 document.querySelector("#canvas").style.display = "none";
                 document.querySelector("#theme-color").content = "#8bc34a";
-                setTimeout(function() {
+                setTimeout(() => {
                     // Time to release the mouse
                     stage.enableDOMEvents(false);
                 }, 250);
                 window.scroll(0, 0);
             };
 
-            this.showMusicBlocks = function() {
+            this.showMusicBlocks = () => {
                 document.getElementById("toolbars").style.display = "block";
 
                 widgetWindows.showWindows();
@@ -4787,7 +4786,7 @@ function Activity() {
                 window.scroll(0, 0);
             };
 
-            this.showPlanet = function() {
+            this.showPlanet = () => {
                 this.planet.open(this.mainCanvas.toDataURL("image/png"));
                 this.iframe.style.display = "block";
                 try {
@@ -4799,23 +4798,23 @@ function Activity() {
                 }
             };
 
-            this.hidePlanet = function() {
+            this.hidePlanet = () => {
                 this.iframe.style.display = "none";
             };
 
-            this.openPlanet = function() {
+            this.openPlanet = () => {
                 console.debug("SAVE LOCALLY");
                 this.saveLocally();
                 this.hideMusicBlocks();
                 this.showPlanet();
             };
 
-            this.closePlanet = function() {
+            this.closePlanet = () => {
                 this.hidePlanet();
                 this.showMusicBlocks();
             };
 
-            this.loadProjectFromData = function(data, merge) {
+            this.loadProjectFromData = (data, merge) => {
                 console.debug("LOAD PROJECT FROM DATA");
                 if (merge === undefined) {
                     merge = false;
@@ -4846,7 +4845,7 @@ function Activity() {
                     blocks.palettes.dict[name].hideMenu(true);
                 }
 
-                let __afterLoad = function() {
+                __afterLoad = () => {
                     // playbackOnLoad();
                     document.removeEventListener(
                         "finishedLoading",
@@ -4876,13 +4875,13 @@ function Activity() {
                 document.body.style.cursor = "default";
             };
 
-            this.loadProjectFromFile = function() {
+            this.loadProjectFromFile = () => {
                 document.querySelector("#myOpenFile").focus();
                 document.querySelector("#myOpenFile").click();
                 window.scroll(0, 0);
             };
 
-            this.newProject = function() {
+            this.newProject = () => {
                 console.debug("NEW");
                 this.closePlanet();
                 this.initialiseNewProject();
@@ -4890,14 +4889,14 @@ function Activity() {
                 this.saveLocally();
             };
 
-            this.initialiseNewProject = function(name) {
+            this.initialiseNewProject = (name) => {
                 this.planet.ProjectStorage.initialiseNewProject(name);
                 sendAllToTrash();
                 refreshCanvas();
                 blocks.trashStacks = [];
             };
 
-            this.saveLocally = function() {
+            this.saveLocally = () => {
                 stage.update(event);
                 console.debug("overwriting session data");
                 let data = prepareExport();
@@ -4915,7 +4914,7 @@ function Activity() {
                     } else {
                         let img = new Image();
                         let t = this;
-                        img.onload = function() {
+                        img.onload = () => {
                             let bitmap = new createjs.Bitmap(img);
                             let bounds = bitmap.getBounds();
                             bitmap.cache(
@@ -4951,35 +4950,35 @@ function Activity() {
                 //}
             };
 
-            this.openCurrentProject = async function() {
+            this.openCurrentProject = async () => {
                 return await this.planet.ProjectStorage.getCurrentProjectData();
             };
 
-            this.openProjectFromPlanet = function(id, error) {
+            this.openProjectFromPlanet = (id, error) => {
                 this.planet.openProjectFromPlanet(id, error);
             };
 
-            this.onConverterLoad = function() {
+            this.onConverterLoad = () => {
                 window.Converter = this.planet.Converter;
             };
 
-            this.getCurrentProjectName = function() {
+            this.getCurrentProjectName = () => {
                 return this.planet.ProjectStorage.getCurrentProjectName();
             };
 
-            this.getCurrentProjectDescription = function() {
+            this.getCurrentProjectDescription = () => {
                 return this.planet.ProjectStorage.getCurrentProjectDescription();
             };
 
-            this.getCurrentProjectImage = function() {
+            this.getCurrentProjectImage = () => {
                 return this.planet.ProjectStorage.getCurrentProjectImage();
             };
 
-            this.getTimeLastSaved = function() {
+            this.getTimeLastSaved = () => {
                 return this.planet.ProjectStorage.TimeLastSaved;
             };
 
-            this.init = async function() {
+            this.init = async () => {
                 this.iframe = document.getElementById("planet-iframe");
                 try {
                     await this.iframe.contentWindow.makePlanet(
@@ -5068,7 +5067,7 @@ function Activity() {
         if (planet !== undefined) {
             saveLocally = planet.saveLocally.bind(planet);
         } else {
-            __saveLocally = function() {
+            __saveLocally = () => {
                 console.debug("overwriting session data (local)");
                 let data = prepareExport();
                 var svgData = doSVG(
@@ -5114,7 +5113,7 @@ function Activity() {
                     320 / canvas.width
                 );
 
-                img.onload = function() {
+                img.onload = () => {
                     let bitmap = new createjs.Bitmap(img);
                     let bounds = bitmap.getBounds();
                     bitmap.cache(
@@ -5148,7 +5147,7 @@ function Activity() {
 
         initPalettes(palettes);
 
-        let __clearFunction = function() {
+        __clearFunction = () => {
             sendAllToTrash(true, false);
             if (planet !== undefined) {
                 planet.initialiseNewProject.bind(planet);
@@ -5197,22 +5196,22 @@ function Activity() {
             console.debug("restoring custom mode: " + customMode);
         }
 
-        fileChooser.addEventListener("click", function(event) {
+        fileChooser.addEventListener("click", (event) => {
             this.value = null;
         });
 
         fileChooser.addEventListener(
             "change",
-            function(event) {
+            (event) => {
                 // Read file here.
                 let reader = new FileReader();
 
-                reader.onload = function(theFile) {
+                reader.onload = (theFile) => {
                     loading = true;
                     document.body.style.cursor = "wait";
                     doLoadAnimation();
 
-                    setTimeout(function() {
+                    setTimeout(() => {
                         let rawData = reader.result;
                         if (rawData == null || rawData === "") {
                             console.debug("rawData is " + rawData);
@@ -5243,7 +5242,7 @@ function Activity() {
 
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
-                                    let __listener = function(event) {
+                                    __listener = (event) => {
                                         logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
                                         setPlaybackStatus();
@@ -5298,19 +5297,19 @@ function Activity() {
             false
         );
 
-        let __handleFileSelect = function(event) {
+        __handleFileSelect = (event) => {
             event.stopPropagation();
             event.preventDefault();
 
             let files = event.dataTransfer.files;
             let reader = new FileReader();
 
-            reader.onload = function(theFile) {
+            reader.onload = (theFile) => {
                 loading = true;
                 document.body.style.cursor = "wait";
                 // doLoadAnimation();
 
-                setTimeout(function() {
+                setTimeout(() => {
                     let rawData = reader.result;
                     if (rawData == null || rawData === "") {
                         errorMsg(
@@ -5336,7 +5335,7 @@ function Activity() {
 
                             stage.removeAllEventListeners("trashsignal");
 
-                            let __afterLoad = function() {
+                            __afterLoad = () => {
                                 // playbackOnLoad();
                                 document.removeEventListener(
                                     "finishedLoading",
@@ -5345,7 +5344,7 @@ function Activity() {
                             };
 
                             // Wait for the old blocks to be removed.
-                            let __listener = function(event) {
+                            __listener = (event) => {
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                                 setPlaybackStatus();
@@ -5403,7 +5402,7 @@ function Activity() {
             }
         };
 
-        let __handleDragOver = function(event) {
+        __handleDragOver = (event) => {
             event.stopPropagation();
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy";
@@ -5413,29 +5412,29 @@ function Activity() {
         dropZone.addEventListener("dragover", __handleDragOver, false);
         dropZone.addEventListener("drop", __handleFileSelect, false);
 
-        allFilesChooser.addEventListener("click", function(event) {
+        allFilesChooser.addEventListener("click", (event) => {
             this.value = null;
         });
 
-        pluginChooser.addEventListener("click", function(event) {
+        pluginChooser.addEventListener("click", (event) => {
             window.scroll(0, 0);
             this.value = null;
         });
 
         pluginChooser.addEventListener(
             "change",
-            function(event) {
+            (event) => {
                 window.scroll(0, 0);
 
                 // Read file here.
                 let reader = new FileReader();
 
-                reader.onload = function(theFile) {
+                reader.onload = (theFile) => {
                     loading = true;
                     document.body.style.cursor = "wait";
                     //doLoadAnimation();
 
-                    setTimeout(function() {
+                    setTimeout(() => {
                         obj = processRawPluginData(
                             reader.result,
                             palettes,
@@ -5456,7 +5455,7 @@ function Activity() {
                         }
 
                         // Refresh the palettes.
-                        setTimeout(function() {
+                        setTimeout(() => {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
@@ -5543,7 +5542,7 @@ function Activity() {
                                 break;
                             case "inurl":
                                 url = args[1];
-                                let getJSON = function(url) {
+                                let getJSON = (url) => {
                                     return new Promise(function(
                                         resolve,
                                         reject
@@ -5564,12 +5563,12 @@ function Activity() {
                                 };
 
                                 getJSON(url).then(
-                                    function(data) {
+                                    (data) => {
                                         // console.debug('Your JSON result is:  ' + data.arg);
                                         let n = data.arg;
                                         env.push(parseInt(n));
                                     },
-                                    function(status) {
+                                    (status) => {
                                         alert(
                                             "Something went wrong reading JSON-encoded project data."
                                         );
@@ -5598,12 +5597,12 @@ function Activity() {
         }
 
         if (projectID != null) {
-            setTimeout(function() {
+            setTimeout(() => {
                 console.debug("loading " + projectID);
                 that.loadStartWrapper(that.loadProject, projectID, flags, env);
             }, 200); // 2000
         } else {
-            setTimeout(function() {
+            setTimeout(() => {
                 console.debug("load new Start block");
                 that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
@@ -5621,12 +5620,12 @@ function Activity() {
 
 activity = new Activity();
 
-require(["domReady!", "activity/sugarizer-compatibility"], function(doc) {
+require(["domReady!", "activity/sugarizer-compatibility"], (doc) => {
     if (sugarizerCompatibility.isInsideSugarizer()) {
-        window.addEventListener("localized", function() {
-            sugarizerCompatibility.loadData(function() {
+        window.addEventListener("localized", () => {
+            sugarizerCompatibility.loadData(() => {
                 planet = document.getElementById("planet-iframe");
-                planet.onload = function() {
+                planet.onload = () => {
                     activity.domReady(doc);
                 };
             });
@@ -5639,7 +5638,7 @@ require(["domReady!", "activity/sugarizer-compatibility"], function(doc) {
     }
 });
 
-define(MYDEFINES, function(compatibility) {
+define(MYDEFINES, (compatibility) => {
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();
