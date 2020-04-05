@@ -496,6 +496,9 @@ const UTILITYBUTTONSPANNER =
 
 const UTILITYBUTTON = UTILITYBUTTONGEAR;
 
+const WRAPTURTLEBUTTON = 
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" width="18px" height="18px"><path d="M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3 3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
+    
 const RESTORETRASHBUTTON =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg6" version="1.1" viewBox="0 0 24 24" height="24" width="24"> <metadata id="metadata12"> <rdf:RDF> <cc:Work rdf:about=""> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /> <dc:title></dc:title> </cc:Work> </rdf:RDF> </metadata> <defs id="defs10" /> <path style="fill:#ffffff" id="path2" d="m 19,4 h -3.5 l -1,-1 h -5 l -1,1 H 5 V 6 H 19 Z M 6,7 v 12 c 0,1.1 0.9,2 2,2 h 8 c 1.1,0 2,-0.9 2,-2 V 7 Z m 8,7 v 4 H 10 V 14 H 8 l 4,-4 4,4 z" /> <path id="path4" d="M0 0h24v24H0z" fill="none" /></svg>';
 

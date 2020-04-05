@@ -695,6 +695,14 @@ function createHelpContent() {
                     window.btoa(unescape(encodeURIComponent(LANGUAGEBUTTON)))
             ],
             [
+                _("Wrap Turtle"),
+                _("Turn Turtle wrapping On or Off."),
+                "data:image/svg+xml;base64," +
+                    window.btoa(
+                        unescape(encodeURIComponent(WRAPTURTLEBUTTON))
+                    )
+            ],
+            [
                 _("Restore"),
                 _("Restore blocks from the trash."),
                 "data:image/svg+xml;base64," +
