@@ -238,7 +238,7 @@ function setupActionBlocks() {
 
                     let nextBlock =
                         logo.blocks.blockList[actionBlk].connections[2];
-                    if (nextBlock == null) {
+                    if (nextBlock === null) {
                         logo.backward[turtle].pop();
                     } else {
                         if (nextBlock in logo.endOfClampSignals[turtle]) {
@@ -529,7 +529,7 @@ function setupActionBlocks() {
 
             // If an action block with an arg is clicked,
             // the arg will have no value.
-            if (actionArgs == null) {
+            if (actionArgs === null) {
                 logo.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
@@ -824,7 +824,7 @@ function setupActionBlocks() {
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
                 let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
-                if (nextBlock == null) {
+                if (nextBlock === null) {
                     logo.backward[turtle].pop();
                 } else {
                     if (nextBlock in logo.endOfClampSignals[turtle]) {

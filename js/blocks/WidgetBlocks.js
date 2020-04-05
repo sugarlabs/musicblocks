@@ -193,7 +193,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.temperament == null) {
+            if (logo.temperament === null) {
                 logo.temperament = new TemperamentWidget();
             }
 
@@ -279,7 +279,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.timbre == null) {
+            if (logo.timbre === null) {
                 logo.timbre = new TimbreWidget();
             }
 
@@ -376,7 +376,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.meterWidget == null) {
+            if (logo.meterWidget === null) {
                 logo.meterWidget = new MeterWidget();
             }
 
@@ -422,7 +422,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.modeWidget == null) {
+            if (logo.modeWidget === null) {
                 logo.modeWidget = new ModeWidget();
             }
 
@@ -470,7 +470,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (logo.tempo == null) {
+            if (logo.tempo === null) {
                 logo.tempo = new Tempo();
             }
 
@@ -526,7 +526,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchDrumMatrix == null) {
+            if (logo.pitchDrumMatrix === null) {
                 logo.pitchDrumMatrix = new PitchDrumMatrix();
             }
 
@@ -586,7 +586,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchSlider == null) {
+            if (logo.pitchSlider === null) {
                 logo.pitchSlider = new PitchSlider();
             }
 
@@ -775,7 +775,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchStaircase == null) {
+            if (logo.pitchStaircase === null) {
                 logo.pitchStaircase = new PitchStaircase();
             }
 
@@ -998,7 +998,7 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
-            if (logo.pitchTimeMatrix == null) {
+            if (logo.pitchTimeMatrix === null) {
                 logo.pitchTimeMatrix = new PitchTimeMatrix();
             }
 
@@ -1108,7 +1108,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.statusMatrix == null) {
+            if (logo.statusMatrix === null) {
                 logo.statusMatrix = new StatusMatrix();
             }
 

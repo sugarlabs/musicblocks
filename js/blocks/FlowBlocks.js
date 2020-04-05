@@ -32,7 +32,7 @@ function setupFlowBlocks() {
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             let nextBlock = logo.blocks.blockList[blk].connections[2];
-            if (nextBlock == null) {
+            if (nextBlock === null) {
                 logo.backward[turtle].pop();
             } else {
                 if (nextBlock in logo.endOfClampSignals[turtle]) {
@@ -134,7 +134,7 @@ function setupFlowBlocks() {
                     logo.connectionStoreLock = true;
 
                     // The last turtle should restore the broken connections.
-                    if (__lookForOtherTurtles(blk, turtle) == null) {
+                    if (__lookForOtherTurtles(blk, turtle) === null) {
                         let n = logo.connectionStore[turtle][blk].length;
                         for (let i = 0; i < n; i++) {
                             let obj = logo.connectionStore[turtle][blk].pop();
@@ -528,7 +528,7 @@ function setupFlowBlocks() {
                 }
 
                 // We need to reset the turtle time.
-                if (logo.firstNoteTime == null) {
+                if (logo.firstNoteTime === null) {
                     let d = new Date();
                     logo.firstNoteTime = d.getTime();
                 }

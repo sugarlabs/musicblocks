@@ -67,7 +67,7 @@ function setupEnsembleBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             let cblk1 = logo.blocks.blockList[blk].connections[1];
-            if (cblk1 == null) {
+            if (cblk1 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
 		return -1;
 	    }
@@ -77,7 +77,7 @@ function setupEnsembleBlocks() {
 	    if (i < 0) return -1;
 
             let cblk2 = logo.blocks.blockList[blk].connections[2];
-            if (cblk2 == null) {
+            if (cblk2 === null) {
                 logo.errorMsg(NANERRORMSG, blk);
             } else {
                 let a = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -132,7 +132,7 @@ function setupEnsembleBlocks() {
             }
 
             let targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
-            if (targetTurtle == null) {
+            if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
@@ -173,7 +173,7 @@ function setupEnsembleBlocks() {
             }
 
             let targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
-            if (targetTurtle == null) {
+            if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
@@ -524,7 +524,7 @@ function setupEnsembleBlocks() {
                 }
             }
 
-            if (value == null) {
+            if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(
                         _("Cannot find mouse") + " " + targetTurtle,
@@ -628,7 +628,7 @@ function setupEnsembleBlocks() {
                 }
             }
 
-            if (value == null) {
+            if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(
                         _("Cannot find mouse") + " " + targetTurtle,
@@ -682,7 +682,7 @@ function setupEnsembleBlocks() {
             }
 
             let targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
-            if (targetTurtle == null) {
+            if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {

@@ -345,7 +345,7 @@ function setupMeterBlocks() {
                     blk,
                     receivedArg
                 );
-                if (notevalue == null || notevalue === 0) {
+                if (notevalue === null || notevalue === 0) {
                     return 0;
                 } else {
                     return (

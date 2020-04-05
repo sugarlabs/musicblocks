@@ -195,13 +195,13 @@ function setupExtrasBlocks() {
                 return;
             }
 
-            if (typeof args[0] == "string") {
+            if (typeof args[0] === "string") {
                 // Look for a block with logo name
                 for (let i = 0; i < logo.blocks.blockList.length; i++) {
                     if (
                         logo.blocks.blockList[i].protoblock.staticLabels
                             .length > 0 &&
-                        logo.blocks.blockList[i].protoblock.staticLabels[0] ==
+                        logo.blocks.blockList[i].protoblock.staticLabels[0] ===
                             args[0]
                     ) {
                         args[0] = i;
@@ -210,7 +210,7 @@ function setupExtrasBlocks() {
                 }
             }
 
-            if (typeof args[0] == "string") {
+            if (typeof args[0] === "string") {
                 args[0] = -1;
             }
 

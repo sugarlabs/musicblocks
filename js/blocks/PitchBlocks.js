@@ -53,7 +53,7 @@ function _playPitch(args, logo, turtle, blk) {
     let note, octave, cents;
     if (logo.blocks.blockList[blk].name === "pitchnumber") {
         let arg0;
-        if (args.length !== 1 || args[0] == null) {
+        if (args.length !== 1 || args[0] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             arg0 = 7;
         } else {
@@ -79,7 +79,7 @@ function _playPitch(args, logo, turtle, blk) {
             );
 
             if (
-                logo.synth.inTemperament == "custom" &&
+                logo.synth.inTemperament === "custom" &&
                 logo.scalarTransposition[turtle] +
                     logo.transposition[turtle] !==
                     0
@@ -97,7 +97,7 @@ function _playPitch(args, logo, turtle, blk) {
             logo.currentNote = note;
         }
     } else if (logo.blocks.blockList[blk].name === "customNote") {
-        if (args[0] == null || args[1] == null) {
+        if (args[0] === null || args[1] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             logo.stopTurtle = true;
             return;
@@ -168,7 +168,7 @@ function _playPitch(args, logo, turtle, blk) {
             }
         } else if (
             typeof arg0 === "number" &&
-            logo.blocks.blockList[blk].name == "scaledegree"
+            logo.blocks.blockList[blk].name === "scaledegree"
         ) {
             //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
             //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
@@ -717,12 +717,12 @@ function _playPitch(args, logo, turtle, blk) {
             // logo.blocks.blockList[blk].connections[0] == null && last(logo.blocks.blockList[blk].connections) == null) {
             // Play a stand-alone pitch block as a quarter note.
             logo.clearNoteParams(turtle, blk, []);
-            if (logo.currentCalculatedOctave[turtle] == undefined) {
+            if (logo.currentCalculatedOctave[turtle] === undefined) {
                 logo.currentCalculatedOctave[turtle] = 4;
             }
 
             let noteObj;
-            if (logo.blocks.blockList[blk].name == "scaledegree") {
+            if (logo.blocks.blockList[blk].name === "scaledegree") {
                 noteObj = getNote(
                     logo.currentNote,
                     calcOctave(
@@ -737,7 +737,7 @@ function _playPitch(args, logo, turtle, blk) {
                     null,
                     logo.errorMsg
                 );
-            } else if (logo.blocks.blockList[blk].name == "pitchnumber") {
+            } else if (logo.blocks.blockList[blk].name === "pitchnumber") {
                 //For pitch number, need to translate number value to pitch
                 let getNumberToPitch = numberToPitch(
                     Math.floor(arg0 + logo.pitchNumberOffset[turtle]),
@@ -1753,7 +1753,7 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] == null || args[1] == null) {
+            if (args[0] === null || args[1] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
@@ -2525,14 +2525,14 @@ function setupPitchBlocks() {
             // If we are just counting notes we don't care about the pitch.
             if (
                 logo.justCounting[turtle].length > 0 &&
-                logo.lastNotePlayed[turtle] == null
+                logo.lastNotePlayed[turtle] === null
             ) {
                 console.debug("Just counting, so spoofing last note played.");
                 logo.previousNotePlayed[turtle] = ["G4", 4];
                 logo.lastNotePlayed[turtle] = ["G4", 4];
             }
 
-            if (logo.lastNotePlayed[turtle] == null) {
+            if (logo.lastNotePlayed[turtle] === null) {
                 logo.errorMsg(
                     _(
                         "The Scalar Step Block must be preceded by a Pitch Block."

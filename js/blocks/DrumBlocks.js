@@ -96,7 +96,7 @@ function setupDrumBlocks() {
                 logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
                     noisename
                 );
-                if (logo.synthVolume[turtle][noisename] == undefined) {
+                if (logo.synthVolume[turtle][noisename] === undefined) {
                     logo.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
                     logo.crescendoInitialVolume[turtle][noisename] = [
                         DEFAULTVOLUME
@@ -399,7 +399,7 @@ function setupDrumBlocks() {
                 logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
                     drumname
                 );
-                if (logo.synthVolume[turtle][drumname] == undefined) {
+                if (logo.synthVolume[turtle][drumname] === undefined) {
                     logo.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
                     logo.crescendoInitialVolume[turtle][drumname] = [
                         DEFAULTVOLUME

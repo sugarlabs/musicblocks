@@ -290,7 +290,7 @@ function _playDotted(args, logo, turtle, blk) {
     if (logo.blocks.blockList[blk].name === "rhythmicdot") {
         arg = 1;
     } else {
-        if (args[0] == null) {
+        if (args[0] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             arg = 0;
         } else {

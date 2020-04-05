@@ -790,7 +790,7 @@ function setupToneBlocks() {
             }
 
             // Maybe it is a drum?
-            if (voicename == null) {
+            if (voicename === null) {
                 for (let drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === args[0]) {
                         voicename = DRUMNAMES[drum][1];
@@ -800,7 +800,7 @@ function setupToneBlocks() {
                 }
             }
 
-            if (voicename == null) {
+            if (voicename === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
                 logo.voices[turtle].push(voicename);
@@ -925,7 +925,7 @@ function setupToneBlocks() {
                     logo.instrumentNames[turtle].push(synth);
                     logo.synth.loadSynth(turtle, synth);
 
-                    if (logo.synthVolume[turtle][synth] == undefined) {
+                    if (logo.synthVolume[turtle][synth] === undefined) {
                         logo.synthVolume[turtle][synth] = [DEFAULTVOLUME];
                         logo.crescendoInitialVolume[turtle][synth] = [
                             DEFAULTVOLUME

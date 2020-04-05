@@ -303,7 +303,7 @@ function setupVolumeBlocks() {
                 logo.instrumentNames[turtle].push(synth);
                 logo.synth.loadSynth(turtle, synth);
 
-                if (logo.synthVolume[turtle][synth] == undefined) {
+                if (logo.synthVolume[turtle][synth] === undefined) {
                     logo.synthVolume[turtle][synth] = [DEFAULTVOLUME];
                     logo.crescendoInitialVolume[turtle][synth] = [
                         DEFAULTVOLUME
@@ -684,7 +684,7 @@ function setupVolumeBlocks() {
                     newVolume = -100;
                 }
 
-                if (logo.synthVolume[turtle][synth] == undefined) {
+                if (logo.synthVolume[turtle][synth] === undefined) {
                     logo.synthVolume[turtle][synth] = [newVolume];
                 } else {
                     logo.synthVolume[turtle][synth].push(newVolume);
@@ -782,7 +782,7 @@ function setupVolumeBlocks() {
                     let vol = last(logo.synthVolume[turtle][synth]);
                     logo.synthVolume[turtle][synth].push(vol);
                     if (
-                        logo.crescendoInitialVolume[turtle][synth] == undefined
+                        logo.crescendoInitialVolume[turtle][synth] === undefined
                     ) {
                         logo.crescendoInitialVolume[turtle][synth] = [vol];
                     } else {

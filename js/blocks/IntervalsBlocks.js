@@ -147,7 +147,7 @@ function setupIntervalsBlocks() {
 
                     currentblock =
                         logo.blocks.blockList[currentblock].connections[1];
-                    if (currentblock == null) {
+                    if (currentblock === null) {
                         return 0;
                     }
                 }
@@ -185,7 +185,7 @@ function setupIntervalsBlocks() {
 
         arg(logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            if (cblk == null) {
+            if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
@@ -301,7 +301,7 @@ function setupIntervalsBlocks() {
 
         arg(logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            if (cblk == null) {
+            if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
@@ -568,7 +568,7 @@ function setupIntervalsBlocks() {
                     _((down ? "down " : "") + name)
                 );
                 this.setPalette("intervals");
-                this.beginnerBlock(value == 2 || value == 5);
+                this.beginnerBlock(value === 2 || value === 5);
                 this.setHelpString();
                 this.makeMacro((x, y) => [
                     [0, "interval", x, y, [null, 1, 6, 8]],

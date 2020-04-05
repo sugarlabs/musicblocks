@@ -14,7 +14,7 @@ function setupSensorsBlocks() {
             if (logo.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
                 return 440;
             }
-            if (logo.pitchAnalyser == null) {
+            if (logo.pitchAnalyser === null) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
                     size: this.limit
@@ -63,7 +63,7 @@ function setupSensorsBlocks() {
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 return Math.round(logo.mic.getLevel() * 1000);
             }
-            if (logo.volumeAnalyser == null) {
+            if (logo.volumeAnalyser === null) {
                 logo.volumeAnalyser = new Tone.Analyser({
                     type: "waveform",
                     size: logo.limit
