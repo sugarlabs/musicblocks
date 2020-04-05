@@ -483,8 +483,6 @@ function setupNumberBlocks() {
             } else {
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
                 let cblk2 = logo.blocks.blockList[blk].connections[2];
-                let cblk0 = logo.blocks.blockList[blk].connections[0];
-                let noteBlock = logo.blocks.blockList[cblk0].connections[1];
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
@@ -512,16 +510,54 @@ function setupNumberBlocks() {
                     // We have a special case for certain keywords
                     // associated with octaves: current, next, and
                     // previous.
+
+                    let cblk0 = logo.blocks.blockList[blk].connections[0];
                     let a,b;
                     if (
-                        typeof logo.blocks.blockList[cblk1].value === "string"
+                        cblk0 !== null &&
+                        logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        a = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk1].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
+                        let noteBlock =
+                            logo.blocks.blockList[cblk0].connections[1];
+                        if (
+                            typeof logo.blocks.blockList[cblk1].value ===
+                            "string"
+                        ) {
+                            a = calcOctave(
+                                logo.currentOctave[turtle],
+                                logo.blocks.blockList[cblk1].value,
+                                logo.lastNotePlayed[turtle],
+                                logo.blocks.blockList[noteBlock].value
+                            );
+                        } else {
+                            a = logo.parseArg(
+                                logo,
+                                turtle,
+                                cblk1,
+                                blk,
+                                receivedArg
+                            );
+                        }
+
+                        if (
+                            typeof logo.blocks.blockList[cblk2].value ===
+                            "string"
+                        ) {
+                            b = calcOctave(
+                                logo.currentOctave[turtle],
+                                logo.blocks.blockList[cblk2].value,
+                                logo.lastNotePlayed[turtle],
+                                logo.blocks.blockList[noteBlock].value
+                            );
+                        } else {
+                            b = logo.parseArg(
+                                logo,
+                                turtle,
+                                cblk2,
+                                blk,
+                                receivedArg
+                            );
+                        }
                     } else {
                         a = logo.parseArg(
                             logo,
@@ -530,18 +566,6 @@ function setupNumberBlocks() {
                             blk,
                             receivedArg
                         );
-                    }
-
-                    if (
-                        typeof logo.blocks.blockList[cblk2].value === "string"
-                    ) {
-                        b = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk2].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
-                    } else {
                         b = logo.parseArg(
                             logo,
                             turtle,
@@ -550,6 +574,7 @@ function setupNumberBlocks() {
                             receivedArg
                         );
                     }
+
                     return logo._doMultiply(a, b);
                 }
             }
@@ -637,8 +662,6 @@ function setupNumberBlocks() {
             } else {
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
                 let cblk2 = logo.blocks.blockList[blk].connections[2];
-                let cblk0 = logo.blocks.blockList[blk].connections[0];
-                let noteBlock = logo.blocks.blockList[cblk0].connections[1];
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
@@ -666,16 +689,53 @@ function setupNumberBlocks() {
                     // We have a special case for certain keywords
                     // associated with octaves: current, next, and
                     // previous.
+
+                    let cblk0 = logo.blocks.blockList[blk].connections[0];
                     let a,b;
                     if (
-                        typeof logo.blocks.blockList[cblk1].value === "string"
+                        cblk0 !== null &&
+                        logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        a = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk1].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
+                        let noteBlock =
+                            logo.blocks.blockList[cblk0].connections[1];
+                        if (
+                            typeof logo.blocks.blockList[cblk1].value === "string"
+                        ) {
+                            a = calcOctave(
+                                logo.currentOctave[turtle],
+                                logo.blocks.blockList[cblk1].value,
+                                logo.lastNotePlayed[turtle],
+                                logo.blocks.blockList[noteBlock].value
+                            );
+                        } else {
+                            a = logo.parseArg(
+                                logo,
+                                turtle,
+                                cblk1,
+                                blk,
+                                receivedArg
+                            );
+                        }
+
+                        if (
+                            typeof logo.blocks.blockList[cblk2].value ===
+                            "string"
+                        ) {
+                            b = calcOctave(
+                                logo.currentOctave[turtle],
+                                logo.blocks.blockList[cblk2].value,
+                                logo.lastNotePlayed[turtle],
+                                logo.blocks.blockList[noteBlock].value
+                            );
+                        } else {
+                            b = logo.parseArg(
+                                logo,
+                                turtle,
+                                cblk2,
+                                blk,
+                                receivedArg
+                            );
+                        }
                     } else {
                         a = logo.parseArg(
                             logo,
@@ -684,18 +744,6 @@ function setupNumberBlocks() {
                             blk,
                             receivedArg
                         );
-                    }
-
-                    if (
-                        typeof logo.blocks.blockList[cblk2].value === "string"
-                    ) {
-                        b = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk2].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
-                    } else {
                         b = logo.parseArg(
                             logo,
                             turtle,
@@ -704,6 +752,7 @@ function setupNumberBlocks() {
                             receivedArg
                         );
                     }
+
                     return logo._doMinus(a, b);
                 }
             }
