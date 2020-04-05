@@ -2490,12 +2490,28 @@ function Logo() {
         } else if (this.inMatrix || this.tuplet) {
             if (this.inNoteBlock[turtle].length > 0) {
                 this.pitchTimeMatrix.addColBlock(blk, 1);
+
+                // Find the block ID of parent "matrix" block
+                var mat_block = -1;
+                var par = this.blocks.blockList[blk].connections[0];
+                while (par != null) {
+                    if (this.blocks.blockList[par].name === "matrix") {
+                        mat_block = par;
+                        break;
+                    } else {
+                        par = this.blocks.blockList[par].connections[0];
+                    }
+                }
                 for (var i = 0; i < this.pitchBlocks.length; i++) {
-                    this.pitchTimeMatrix.addNode(this.pitchBlocks[i], blk, 0);
+                    this.pitchTimeMatrix.addNode(
+                        this.pitchBlocks[i], blk, 0, mat_block
+                    );
                 }
 
                 for (var i = 0; i < this.drumBlocks.length; i++) {
-                    this.pitchTimeMatrix.addNode(this.drumBlocks[i], blk, 0);
+                    this.pitchTimeMatrix.addNode(
+                        this.drumBlocks[i], blk, 0, mat_block
+                    );
                 }
             }
 
