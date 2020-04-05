@@ -393,11 +393,12 @@ function setupExtrasBlocks() {
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
             if (name === _("note")) {
+                let p, o, v;
                 switch (blockArgs.length) {
                     case 1:
-                        let p = "sol";
-                        let o = 4;
-                        let v = 4;
+                        p = "sol";
+                        o = 4;
+                        v = 4;
                         break;
                     case 2:
                         p = blockArgs[1];
