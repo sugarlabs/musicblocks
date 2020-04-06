@@ -1,4 +1,4 @@
-function setupDrumBlocks() {
+setupDrumBlocks = () => {
     class NoiseNameBlock extends ValueBlock {
         constructor() {
             super("noisename");
@@ -120,7 +120,7 @@ function setupDrumBlocks() {
         }
     }
 
-    function _createPlayDrumMacros() {
+    _createPlayDrumMacros = () => {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
                 if (displayName === undefined) {
@@ -223,7 +223,7 @@ function setupDrumBlocks() {
             let listenerName = "_mapdrum_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.drumStyle[turtle].pop();
             };
 
@@ -301,7 +301,7 @@ function setupDrumBlocks() {
             let listenerName = "_setdrum_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 let drumname = logo.drumStyle[turtle].pop();
                 logo.pitchDrumTable[turtle] = {};
             };
@@ -427,7 +427,7 @@ function setupDrumBlocks() {
 
                 let noteBeatValue = 4;
 
-                __callback = function() {
+                __callback = () => {
                     let j = logo.inNoteBlock[turtle].indexOf(blk);
                     logo.inNoteBlock[turtle].splice(j, 1);
                 };

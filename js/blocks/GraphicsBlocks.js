@@ -1,4 +1,4 @@
-function setupGraphicsBlocks() {
+setupGraphicsBlocks = () => {
     class HeadingBlock extends ValueBlock {
         constructor() {
             //.TRANS: orientation or compass direction

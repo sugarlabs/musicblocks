@@ -1,4 +1,4 @@
-function setupFlowBlocks() {
+ setupFlowBlocks = () => {
     class BackwardBlock extends FlowClampBlock {
         constructor() {
             super("backward");
@@ -44,7 +44,7 @@ function setupFlowBlocks() {
                 }
             }
 
-            let __listener = function() {
+            let __listener = () => {
                 logo.backward[turtle].pop();
             };
 
@@ -106,7 +106,7 @@ function setupFlowBlocks() {
                 let listenerName = "_duplicate_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __lookForOtherTurtles = function(blk, turtle) {
+                let __lookForOtherTurtles = (blk, turtle) => {
                     for (let t in logo.connectionStore) {
                         if (t !== turtle.toString()) {
                             for (let b in logo.connectionStore[t]) {
@@ -122,7 +122,7 @@ function setupFlowBlocks() {
 
                 logo.inDuplicate[turtle] = true;
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.inDuplicate[turtle] = false;
                     logo.duplicateFactor[turtle] /= factor;
 
@@ -365,7 +365,7 @@ function setupFlowBlocks() {
             let listenerName = "_switch_" + blk + "_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function() {
+            let __listener = () => {
                 let switchBlk = last(logo.switchBlocks[turtle]);
                 // Run the cases here.
                 let switchCase;

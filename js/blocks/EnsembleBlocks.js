@@ -4,7 +4,7 @@
  * @param   {number|string} targetTurtle
  * @returns {number|object}
  */
-function _getTargetTurtle(turtles, targetTurtle) {
+_getTargetTurtle = (turtles, targetTurtle) => {
     // We'll compare the names as strings.
     if (typeof targetTurtle === "number") {
         targetTurtle = targetTurtle.toString();
@@ -28,7 +28,7 @@ function _getTargetTurtle(turtles, targetTurtle) {
     return null;
 }
 
-function _blockFindTurtle(logo, turtle, blk, receivedArg) {
+_blockFindTurtle = (logo, turtle, blk, receivedArg) => {
     let cblk = logo.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         console.log("Could not find connecting block");
@@ -44,7 +44,7 @@ function _blockFindTurtle(logo, turtle, blk, receivedArg) {
     ];
 }
 
-function setupEnsembleBlocks() {
+setupEnsembleBlocks = () => {
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
             super("turtleheap", _("mouse index heap"));
@@ -779,7 +779,7 @@ function setupEnsembleBlocks() {
                     [1, "setturtlename2", 0, 0, [0, 2, null]],
                     [2, ["text", { value: turtleName }], 0, 0, [1]]
                 ];
-                let __afterLoad = function() {
+                let __afterLoad = () => {
                     console.debug("AFTERLOAD");
                     let thisTurtle = logo.blocks.blockList[blockNumber].value;
                     logo.initTurtle(thisTurtle);

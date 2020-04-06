@@ -1,4 +1,4 @@
-function setupExtrasBlocks() {
+setupExtrasBlocks = () => {
     class FloatToStringBlock extends LeftBlock {
         constructor() {
             super("float2string", _("fraction"));
@@ -685,7 +685,7 @@ function setupExtrasBlocks() {
 
             url = args[0];
 
-            function ValidURL(str) {
+            ValidURL = (str) => {
                 let pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
                     "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name

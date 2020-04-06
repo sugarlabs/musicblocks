@@ -1,4 +1,4 @@
-function setupIntervalsBlocks() {
+setupIntervalsBlocks = () => {
     class SetTemperamentBlock extends FlowBlock {
         constructor() {
             super("settemperament", _("set temperament"));
@@ -400,7 +400,7 @@ function setupIntervalsBlocks() {
         }
     }
 
-    function makeSemitoneIntervalMacroBlocks() {
+     makeSemitoneIntervalMacroBlocks = () => {
         class SemitoneIntervalMacroBlock extends FlowBlock {
             constructor(type, value, isDown) {
                 super(
@@ -518,7 +518,7 @@ function setupIntervalsBlocks() {
                 let listenerName = "_semitone_interval_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function() {
+                let __listener = () => {
                     logo.semitoneIntervals[turtle].pop();
                 };
 
@@ -529,7 +529,7 @@ function setupIntervalsBlocks() {
         }
     }
 
-    function makeIntervalMacroBlocks() {
+     makeIntervalMacroBlocks = () => {
         class ChordIntervalMacroBlock extends FlowBlock {
             constructor(name, display, value1, value2) {
                 super(name, _(display));
@@ -664,7 +664,7 @@ function setupIntervalsBlocks() {
             let listenerName = "_interval_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.intervals[turtle].pop();
             };
 
@@ -733,14 +733,14 @@ function setupIntervalsBlocks() {
             let listenerName = "_definemode_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 MUSICALMODES[modeName] = [];
                 if (logo.defineMode[turtle].indexOf(0) === -1) {
                     logo.defineMode[turtle].push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                let pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
+                let pitchNumbers = logo.defineMode[turtle].sort((a, b) => {
                     return a[0] - b[0];
                 });
 

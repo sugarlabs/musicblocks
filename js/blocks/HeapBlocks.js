@@ -1,4 +1,4 @@
-function setupHeapBlocks() {
+setupHeapBlocks = () => {
     class LoadHeapFromAppBlock extends FlowBlock {
         constructor() {
             super("loadHeapFromApp");

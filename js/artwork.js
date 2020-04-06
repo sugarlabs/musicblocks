@@ -79,13 +79,8 @@ const MEDIASAFEAREA = [40, 4, 108, 80];
 const HIGHLIGHTCOLOR = "#FFFFFF";
 const ACTIVECOLOR = "#212121";
 
-<<<<<<< HEAD
-function showMaterialHighlight(x, y, r, event, scale, stage) {
-    let circles = {
-=======
 const showMaterialHighlight = (x, y, r, event, scale, stage) => {
-    var circles = {
->>>>>>> small size files done
+    let circles = {
         highlight: new createjs.Shape(),
         active: new createjs.Shape()
     };

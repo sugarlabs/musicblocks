@@ -1,4 +1,4 @@
-function setupBooleanBlocks() {
+setupBooleanBlocks = () => {
     class NotBlock extends BooleanBlock {
         constructor() {
             super("not");

@@ -1,4 +1,4 @@
-function setupBoxesBlocks() {
+setupBoxesBlocks = () => {
     class IncrementBlock extends FlowBlock {
         constructor(name) {
             super(name || "increment");

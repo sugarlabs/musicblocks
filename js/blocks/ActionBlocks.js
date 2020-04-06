@@ -1,4 +1,4 @@
-function setupActionBlocks() {
+setupActionBlocks = () => {
     class ReturnBlock extends FlowBlock {
         constructor() {
             super("return");
@@ -69,7 +69,7 @@ function setupActionBlocks() {
                 let xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", outurl, true);
                 // Call a function when the state changes.
-                xmlHttp.onreadystatechange = function() {
+                xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         alert(xmlHttp.responseText);
                     }
@@ -252,7 +252,7 @@ function setupActionBlocks() {
                         }
                     }
 
-                    let __listener = function(event) {
+                    let __listener = (event) => {
                         logo.backward[turtle].pop();
                     };
 
@@ -636,7 +636,7 @@ function setupActionBlocks() {
             if (!(args[1] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
+                let __listener = (event) => {
                     if (logo.turtles.turtleList[turtle].running) {
                         let queueBlock = new Queue(
                             logo.actions[args[1]],
@@ -838,7 +838,7 @@ function setupActionBlocks() {
                     }
                 }
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.backward[turtle].pop();
                 };
 
