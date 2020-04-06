@@ -1,4 +1,4 @@
-function setupWidgetBlocks() {
+setupWidgetBlocks = () => {
     class EnvelopeBlock extends FlowBlock {
         constructor() {
             //.TRANS: sound envelope (ADSR)
@@ -223,7 +223,7 @@ function setupWidgetBlocks() {
             let listenerName = "_temperament_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.temperament.init(logo);
             };
 
@@ -339,7 +339,7 @@ function setupWidgetBlocks() {
             let listenerName = "_timbre_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.timbre.init(logo);
             };
 
@@ -385,7 +385,7 @@ function setupWidgetBlocks() {
             let listenerName = "_meterwidget_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.meterWidget.init(logo, logo._meterBlock);
                 logo.insideMeterWidget = false;
             };
@@ -431,7 +431,7 @@ function setupWidgetBlocks() {
             let listenerName = "_modewidget_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.modeWidget.init(logo, logo._modeBlock);
                 logo.insideModeWidget = false;
             };
@@ -481,7 +481,7 @@ function setupWidgetBlocks() {
             let listenerName = "_tempo_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.tempo.init(logo);
             };
 
@@ -539,7 +539,7 @@ function setupWidgetBlocks() {
             let listenerName = "_pitchdrummatrix_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -597,7 +597,7 @@ function setupWidgetBlocks() {
             let listenerName = "_pitchslider_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
@@ -738,7 +738,7 @@ function setupWidgetBlocks() {
             let listenerName = "_musickeyboard_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.musicKeyboard.init(logo);
             };
 
@@ -787,7 +787,7 @@ function setupWidgetBlocks() {
             let listenerName = "_pitchstaircase_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
@@ -874,7 +874,7 @@ function setupWidgetBlocks() {
             let listenerName = "_rhythmruler_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.rhythmRuler.init(logo);
             };
 
@@ -1016,7 +1016,7 @@ function setupWidgetBlocks() {
             let listenerName = "_matrix_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (
                     logo.tupletRhythms.length === 0 ||
                     logo.pitchTimeMatrix.rowLabels.length === 0
@@ -1120,7 +1120,7 @@ function setupWidgetBlocks() {
             let listenerName = "_status_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };

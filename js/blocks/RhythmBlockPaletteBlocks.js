@@ -1,7 +1,7 @@
 let language = localStorage.languagePreference || navigator.language;
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 
-function setupRhythmBlockPaletteBlocks() {
+setupRhythmBlockPaletteBlocks = () => {
     class RhythmBlock extends FlowBlock {
         constructor(name) {
             super(name || "rhythm");
@@ -120,14 +120,14 @@ function setupRhythmBlockPaletteBlocks() {
 
                 let beatValue = bpmFactor / noteBeatValue;
 
-                let __rhythmPlayNote = function(
+                let __rhythmPlayNote = (
                     thisBeat,
                     blk,
                     turtle,
                     callback,
                     timeout
-                ) {
-                    setTimeout(function() {
+                ) => {
+                    setTimeout(() => {
                         logo._processNote(thisBeat, blk, turtle, callback);
                     }, timeout);
                 };
@@ -135,7 +135,7 @@ function setupRhythmBlockPaletteBlocks() {
 
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function() {
+                        __callback = () => {
                             delete logo.noteDrums[turtle][blk];
                             let j = logo.inNoteBlock[turtle].indexOf(blk);
                             logo.inNoteBlock[turtle].splice(j, 1);
@@ -341,7 +341,7 @@ function setupRhythmBlockPaletteBlocks() {
             let listenerName = "_tuplet_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -456,7 +456,7 @@ function setupRhythmBlockPaletteBlocks() {
             let listenerName = "_tuplet_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.tuplet = false;
                 logo.addingNotesToTuplet = false;
                 if (!logo.inMatrix) {
@@ -503,14 +503,14 @@ function setupRhythmBlockPaletteBlocks() {
 
                     let totalBeats = 0;
 
-                    __tupletPlayNote = function(
+                    __tupletPlayNote = (
                         thisBeat,
                         blk,
                         turtle,
                         callback,
                         timeout
-                    ) {
-                        setTimeout(function() {
+                    ) => {
+                        setTimeout(() => {
                             logo._processNote(thisBeat, blk, turtle, callback);
                         }, timeout);
                     };
@@ -521,7 +521,7 @@ function setupRhythmBlockPaletteBlocks() {
                         let beatValue = bpmFactor / thisBeat;
 
                         if (i === beatValues.length - 1) {
-                            __callback = function() {
+                            __callback = () => {
                                 delete logo.noteDrums[turtle][blk];
                                 let j = logo.inNoteBlock[turtle].indexOf(blk);
                                 logo.inNoteBlock[turtle].splice(j, 1);
@@ -701,21 +701,21 @@ function setupRhythmBlockPaletteBlocks() {
 
                 let beatValue = bpmFactor / noteBeatValue / arg0;
 
-                __rhythmPlayNote = function(
+                __rhythmPlayNote = (
                     thisBeat,
                     blk,
                     turtle,
                     callback,
                     timeout
-                ) {
-                    setTimeout(function() {
+                ) => {
+                    setTimeout(() => {
                         logo._processNote(thisBeat, blk, turtle, callback);
                     }, timeout);
                 };
 
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function() {
+                        __callback = () => {
                             delete logo.noteDrums[turtle][blk];
                             let j = logo.inNoteBlock[turtle].indexOf(blk);
                             logo.inNoteBlock[turtle].splice(j, 1);

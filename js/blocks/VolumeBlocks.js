@@ -1,4 +1,4 @@
-function setupVolumeBlocks() {
+setupVolumeBlocks = () => {
     class SynthVolumeBlock extends LeftBlock {
         constructor() {
             //.TRANS: the volume for this synth
@@ -328,7 +328,7 @@ function setupVolumeBlocks() {
             let listenerName = "_synthvolume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.synthVolume[turtle][synth].pop();
                 // Restore previous volume.
                 if (
@@ -617,7 +617,7 @@ function setupVolumeBlocks() {
             let listenerName = "_volume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.masterVolume.pop();
                 // Restore previous volume.
                 if (
@@ -711,7 +711,7 @@ function setupVolumeBlocks() {
             let listenerName = "_articulation_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 for (let synth in logo.synthVolume[turtle]) {
                     logo.synthVolume[turtle][synth].pop();
                     logo.setSynthVolume(
@@ -795,7 +795,7 @@ function setupVolumeBlocks() {
                 let listenerName = "_crescendo_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     if (logo.justCounting[turtle].length === 0) {
                         logo.notationEndCrescendo(
                             turtle,

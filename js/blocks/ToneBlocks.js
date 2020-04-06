@@ -1,4 +1,4 @@
-function setupToneBlocks() {
+setupToneBlocks = () => {
     class OscillatorBlock extends FlowBlock {
         constructor() {
             super("oscillator", _("oscillator"));
@@ -342,7 +342,7 @@ function setupToneBlocks() {
             let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.inHarmonic[turtle].pop();
                 logo.partials[turtle].pop();
             };
@@ -400,7 +400,7 @@ function setupToneBlocks() {
             let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.inHarmonic[turtle].pop();
                 logo.partials[turtle].pop();
                 logo.notationEndHarmonics(turtle);
@@ -442,7 +442,7 @@ function setupToneBlocks() {
             let listenerName = "_distortion_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.distortionAmount[turtle].pop();
             };
 
@@ -514,7 +514,7 @@ function setupToneBlocks() {
             let listenerName = "_tremolo_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.tremoloFrequency[turtle].pop();
                 logo.tremoloDepth[turtle].pop();
             };
@@ -574,7 +574,7 @@ function setupToneBlocks() {
             let listenerName = "_phaser_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.rate[turtle].pop();
                 logo.octaves[turtle].pop();
                 logo.baseFrequency[turtle].pop();
@@ -644,7 +644,7 @@ function setupToneBlocks() {
             let listenerName = "_chorus_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.chorusRate[turtle].pop();
                 logo.delayTime[turtle].pop();
                 logo.chorusDepth[turtle].pop();
@@ -731,7 +731,7 @@ function setupToneBlocks() {
             let listenerName = "_vibrato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.vibratoIntensity[turtle].pop();
                 logo.vibratoRate[turtle].pop();
             };
@@ -807,7 +807,7 @@ function setupToneBlocks() {
                 let listenerName = "_setvoice_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.voices[turtle].pop();
                 };
 
@@ -936,7 +936,7 @@ function setupToneBlocks() {
                 let listenerName = "_settimbre_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.inSetTimbre[turtle] = false;
                     // console.debug('popping ' + logo.instrumentNames[turtle].pop() + ' from instrumentNames');
                     logo.instrumentNames[turtle].pop();

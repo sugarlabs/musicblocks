@@ -1,4 +1,4 @@
-function _playSynthBlock(args, logo, turtle, blk) {
+_playSynthBlock = (args, logo, turtle, blk) => {
     if (args.length === 1) {
         let obj = frequencyToPitch(args[0]);
         // obj[2] is cents
@@ -48,7 +48,7 @@ function _playSynthBlock(args, logo, turtle, blk) {
     }
 }
 
-function _playPitch(args, logo, turtle, blk) {
+_playPitch = (args, logo, turtle, blk) => {
     let useSolfegeName = false;
     let note, octave, cents;
     let arg0, arg1;
@@ -547,7 +547,7 @@ function _playPitch(args, logo, turtle, blk) {
             }
         }
     } else if (logo.inNoteBlock[turtle].length > 0) {
-        function addPitch(note, octave, cents, direction) {
+        addPitch = (note, octave, cents, direction) => {
             let t = transposition + logo.register[turtle] * 12;
             let noteObj = getNote(
                 note,
@@ -873,7 +873,7 @@ function _playPitch(args, logo, turtle, blk) {
             let noteBeatValue = 4;
             let beatValue = bpmFactor / noteBeatValue;
 
-            __callback = function() {
+            __callback = () => {
                 let j = logo.inNoteBlock[turtle].indexOf(blk);
                 logo.inNoteBlock[turtle].splice(j, 1);
             };
@@ -888,7 +888,7 @@ function _playPitch(args, logo, turtle, blk) {
     }
 }
 
-function setupPitchBlocks() {
+setupPitchBlocks = () => {
     class RestBlock extends ValueBlock {
         constructor() {
             super("rest");
@@ -1634,7 +1634,7 @@ function setupPitchBlocks() {
             let listenerName = "_invert_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.invertList[turtle].pop();
             };
 
@@ -1667,7 +1667,7 @@ function setupPitchBlocks() {
             let listenerName = "_invert_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.invertList[turtle].pop();
             };
 
@@ -1774,7 +1774,7 @@ function setupPitchBlocks() {
                 let listenerName = "_transposition_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     transValue = logo.transpositionValues[turtle].pop();
                     if (!(logo.invertList[turtle].length === 0)) {
                         logo.transposition[turtle] += transValue;
@@ -2057,7 +2057,7 @@ function setupPitchBlocks() {
             let listenerName = "_scalar_transposition_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 transValue = logo.scalarTranspositionValues[turtle].pop();
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.scalarTransposition[turtle] += transValue;
@@ -2143,7 +2143,7 @@ function setupPitchBlocks() {
             let listenerName = "_accidental_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] += value;
                 } else {
@@ -2194,7 +2194,7 @@ function setupPitchBlocks() {
             let listenerName = "_flat_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] -= 1;
                 } else {
@@ -2245,7 +2245,7 @@ function setupPitchBlocks() {
             let listenerName = "_sharp_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (!(logo.invertList[turtle].length === 0)) {
                     logo.transposition[turtle] += 1;
                 } else {
@@ -2298,7 +2298,7 @@ function setupPitchBlocks() {
             let cents = obj[2];
             let delta = 0;
 
-            function addPitch(note, octave, cents, frequency, direction) {
+            addPitch = (note, octave, cents, frequency, direction) => {
                 let t = transposition + logo.register[turtle] * 12;
                 let noteObj = getNote(
                     note,
@@ -2615,7 +2615,7 @@ function setupPitchBlocks() {
                 // return;
             }
 
-            function addPitch(note, octave, cents, direction) {
+            addPitch = (note, octave, cents, direction) => {
                 let t = transposition + logo.register[turtle] * 12;
                 let noteObj = getNote(
                     note,

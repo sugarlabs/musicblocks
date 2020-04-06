@@ -1,4 +1,4 @@
-function setupSensorsBlocks() {
+setupSensorsBlocks = () => {
     class InputBlock extends FlowBlock {
         constructor() {
             super("input");
@@ -42,7 +42,7 @@ function setupSensorsBlocks() {
             docById("labelDiv").classList.add("hasKeyboard");
 
             // Add a handler to continue flow after the input.
-            function __keyPressed(event) {
+            __keyPressed = (event) => {
                 if (event.keyCode === 13) { // RETURN
                     let inputElem = docById("textLabel");
                     console.debug(inputElem.value);

@@ -1,4 +1,4 @@
-function setupMeterBlocks() {
+setupMeterBlocks = () => {
     class CurrentMeterBlock extends ValueBlock {
         constructor() {
             //.TRANS: musical meter, e.g., 4:4
@@ -389,7 +389,7 @@ function setupMeterBlocks() {
             let listenerName = "_drift_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.drift[turtle] -= 1;
             };
 
@@ -424,7 +424,7 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
+                let __listener = (event) => {
                     if (logo.turtles.turtleList[turtle].running) {
                         let queueBlock = new Queue(
                             logo.actions[args[0]],
@@ -493,7 +493,7 @@ function setupMeterBlocks() {
                 if (!(args[1] in logo.actions)) {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
-                    let __listener = function(event) {
+                    let __listener = (event) => {
                         if (logo.turtles.turtleList[turtle].running) {
                             let queueBlock = new Queue(
                                 logo.actions[args[1]],
@@ -580,7 +580,7 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
+                let __listener = (event) => {
                     if (logo.turtles.turtleList[turtle].running) {
                         let queueBlock = new Queue(
                             logo.actions[args[0]],
@@ -879,7 +879,7 @@ function setupMeterBlocks() {
                 let listenerName = "_bpm_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.bpm[turtle].pop();
                 };
 
@@ -928,7 +928,7 @@ function setupMeterBlocks() {
                 let listenerName = "_bpm_" + turtle;
                 logo._setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = (event) => {
                     logo.bpm[turtle].pop();
                 };
 

@@ -1,4 +1,4 @@
-function setupMediaBlocks() {
+setupMediaBlocks = () => {
     class RightPosBlock extends ValueBlock {
         constructor() {
             //.TRANS: right side of the screen

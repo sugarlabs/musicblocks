@@ -1,4 +1,4 @@
-function setupPenBlocks() {
+setupPenBlocks = () => {
     class PurpleBlock extends FlowBlock {
         constructor() {
             super("purple", _("purple"));
@@ -414,7 +414,7 @@ function setupPenBlocks() {
             let listenerName = "_hollowline_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function() {
+            let __listener = () => {
                 if (logo.inNoteBlock[turtle].length > 0) {
                     logo.embeddedGraphics[turtle][
                         last(logo.inNoteBlock[turtle])
@@ -492,7 +492,7 @@ function setupPenBlocks() {
             let listenerName = "_fill_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function() {
+            let __listener = () => {
                 if (logo.inNoteBlock[turtle].length > 0) {
                     logo.embeddedGraphics[turtle][
                         last(logo.inNoteBlock[turtle])

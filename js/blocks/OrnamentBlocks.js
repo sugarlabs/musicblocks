@@ -1,4 +1,4 @@
-function setupOrnamentBlocks() {
+setupOrnamentBlocks = () => {
     class StaccatoFactorBlock extends ValueBlock {
         constructor() {
             //.TRANS: the duration of a note played as staccato
@@ -94,7 +94,7 @@ function setupOrnamentBlocks() {
             let listenerName = "_neighbor_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.inNeighbor[turtle].pop();
                 logo.neighborStepPitch[turtle].pop();
                 logo.neighborNoteValue[turtle].pop();
@@ -191,7 +191,7 @@ function setupOrnamentBlocks() {
             let listenerName = "_glide_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 if (logo.justCounting[turtle].length === 0) {
                     logo.notationEndSlur(turtle);
                 }
@@ -251,7 +251,7 @@ function setupOrnamentBlocks() {
             let listenerName = "_staccato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.staccato[turtle].pop();
                 if (logo.justCounting[turtle].length === 0) {
                     logo.notationEndSlur(turtle);
@@ -306,7 +306,7 @@ function setupOrnamentBlocks() {
             let listenerName = "_staccato_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.staccato[turtle].pop();
             };
 

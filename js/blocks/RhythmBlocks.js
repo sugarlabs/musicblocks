@@ -1,4 +1,4 @@
-function _playNote(args, logo, turtle, blk, receivedArg) {
+_playNote = (args, logo, turtle, blk, receivedArg) => {
     // We queue up the child flow of the note clamp and
     // once all of the children are run, we trigger a
     // _playnote_ event, then wait for the note to play.
@@ -165,7 +165,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
     let listenerName = "_playnote_" + turtle;
     logo._setDispatchBlock(blk, turtle, listenerName);
 
-    let __listener = function(event) {
+    let __listener = (event) => {
         if (logo.multipleVoices[turtle]) {
             logo.notationVoices(turtle, logo.inNoteBlock[turtle].length);
         }
@@ -221,7 +221,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
     return [childFlow, childFlowCount];
 }
 
-function _playSwing(args, logo, turtle, blk) {
+_playSwing = (args, logo, turtle, blk) => {
     let childFlow;
 
     // Grab a bit from the next note to give to the current note.
@@ -269,7 +269,7 @@ function _playSwing(args, logo, turtle, blk) {
     let listenerName = "_swing_" + turtle;
     logo._setDispatchBlock(blk, turtle, listenerName);
 
-    let __listener = function(event) {
+    let __listener = (event) => {
         if (!logo.suppressOutput[turtle]) {
             logo.swingTarget[turtle].pop();
             logo.swing[turtle].pop();
@@ -283,7 +283,7 @@ function _playSwing(args, logo, turtle, blk) {
     return [childFlow, 1];
 }
 
-function _playDotted(args, logo, turtle, blk) {
+_playDotted = (args, logo, turtle, blk) => {
     // Dotting a note will increase its play time by
     // a(2 - 1/2^n)
     let arg;
@@ -319,7 +319,7 @@ function _playDotted(args, logo, turtle, blk) {
     let listenerName = "_dot_" + turtle;
     logo._setDispatchBlock(blk, turtle, listenerName);
 
-    let __listener = function(event) {
+    let __listener = (event) => {
         let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
         logo.beatFactor[turtle] *= currentDotFactor;
         if (arg >= 0) {
@@ -341,7 +341,7 @@ function _playDotted(args, logo, turtle, blk) {
     }
 }
 
-function setupRhythmBlocks() {
+setupRhythmBlocks = () => {
     class MyNoteValueBlock extends ValueBlock {
         constructor() {
             //.TRANS: the value (e.g., 1/4 note) of the note being played.
@@ -653,7 +653,7 @@ function setupRhythmBlocks() {
             let listenerName = "_multiplybeat_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.beatFactor[turtle] *= factor;
             };
 
@@ -705,7 +705,7 @@ function setupRhythmBlocks() {
             let listenerName = "_tie_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = (event) => {
                 logo.tie[turtle] = false;
 
                 // If tieCarryOver > 0, we have one more note to

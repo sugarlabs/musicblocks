@@ -1,4 +1,4 @@
-function setupNumberBlocks() {
+setupNumberBlocks = () => {
     class IntBlock extends LeftBlock {
         constructor() {
             super("int");
