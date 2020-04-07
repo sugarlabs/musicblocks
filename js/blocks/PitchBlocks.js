@@ -2233,6 +2233,7 @@ function setupPitchBlocks() {
             let delta = 0;
 
             function addPitch(note, octave, cents, frequency, direction) {
+                let transposition;
                 let t = transposition + logo.register[turtle] * 12;
                 let noteObj = getNote(
                     note,

@@ -685,7 +685,7 @@ const ACCIDENTALNAMES = [
     "flat" + " " + FLAT,
     "double flat" + " " + DOUBLEFLAT
 ];
-const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
+let ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
 const INVERTMODES = [
     [_("even"), "even"],
