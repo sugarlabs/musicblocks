@@ -1687,6 +1687,13 @@ class BaseBlock extends ProtoBlock {
                     ][1];
             else clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
+
+            // Special case for one argument boolean output blocks e.g found mouse
+            
+            if(this._style.flows.left === "bool") {
+                artwork = svg.booleanNot(true); // OneArg
+            }
+
             return [
                 artwork,
                 svg.docks,
