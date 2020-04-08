@@ -2266,6 +2266,11 @@ function setupPitchBlocks() {
                 return noteObj;
             }
 
+            let transposition = 2 * delta;
+            if (turtle in logo.transposition) {
+                transposition += logo.transposition[turtle];
+            }
+
             if (note === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
