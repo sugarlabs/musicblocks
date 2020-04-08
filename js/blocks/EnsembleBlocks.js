@@ -696,9 +696,9 @@ function setupEnsembleBlocks() {
 
     class FoundTurtleBlock extends BooleanBlock {
         constructor() {
-            super("foundturtle", _("found mouse"));
+            super("foundturtle");
             this.setPalette("ensemble");
-	    this.extraWidth = 20;
+	        // this.extraWidth = 20;
             this.setHelpString([
                 _(
                     "The Found mouse block will return true if the specified mouse can be found."
@@ -708,6 +708,10 @@ function setupEnsembleBlocks() {
             ]);
 
             this.formBlock({
+                name: _("found mouse"),
+                flows: {
+                    left: "bool"
+                },
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [_("Mr. Mouse")]
