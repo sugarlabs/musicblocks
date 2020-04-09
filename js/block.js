@@ -7174,19 +7174,19 @@ function Block(protoblock, blocks, overrideName) {
             modeGroup = "7";
         }
 
-        var __buildModeWheel = function() {
-            var i = that._modeGroupWheel.selectedNavItemIndex;
+        let __buildModeWheel = function() {
+            let i = that._modeGroupWheel.selectedNavItemIndex;
             modeGroup = that._modeGroupWheel.navItems[i].title;
             __buildModeNameWheel(modeGroup);
         };
 
-        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+        for (let i = 0; i < this._modeGroupWheel.navItems.length; i++) {
             this._modeGroupWheel.navItems[
                 i
                 ].navigateFunction = __buildModeWheel;
         }
 
-        for (var i = 0; i < this._modeGroupWheel.navItems.length; i++) {
+        for (let i = 0; i < this._modeGroupWheel.navItems.length; i++) {
             if (this._modeGroupWheel.navItems[i].title === modeGroup) {
                 this._modeGroupWheel.navigateWheel(i);
                 break;
@@ -7200,12 +7200,12 @@ function Block(protoblock, blocks, overrideName) {
     this._checkWidgets = function(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
-        var thisBlock = this.blocks.blockList.indexOf(this);
-        var topBlock = this.blocks.findTopBlock(thisBlock);
-        var widgetTitle = document.getElementsByClassName("wftTitle");
-        var lockInit = false;
+        let thisBlock = this.blocks.blockList.indexOf(this);
+        let topBlock = this.blocks.findTopBlock(thisBlock);
+        let widgetTitle = document.getElementsByClassName("wftTitle");
+        let lockInit = false;
         if (closeInput === false) {
-            for (var i = 0; i < widgetTitle.length; i++) {
+            for (let i = 0; i < widgetTitle.length; i++) {
                 if (lockInit === false) {
                     switch (widgetTitle[i].innerHTML) {
                         case "tempo":
@@ -7256,11 +7256,11 @@ function Block(protoblock, blocks, overrideName) {
             docById("wheelDiv").style.display = "none";
         }
 
-        var oldValue = this.value;
-        var newValue = this.label.value;
+        let oldValue = this.value;
+        let newValue = this.label.value;
 
         if (this.labelattr != null) {
-            var attrValue = this.labelattr.value;
+            let attrValue = this.labelattr.value;
             switch (attrValue) {
                 case "𝄪":
                 case "♯":
@@ -7273,7 +7273,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        var c = this.connections[0];
+        let c = this.connections[0];
 
         if (oldValue === newValue) {
             // Nothing to do in this case.
@@ -7287,23 +7287,24 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        var c = this.connections[0];
+        c = this.connections[0];
         if (this.name === "text" && c != null) {
-            var cblock = this.blocks.blockList[c];
+            let cblock = this.blocks.blockList[c];
+            let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    var that = this;
+                    let that = this;
 
                     that.blocks.palettes.removeActionPrototype(oldValue);
 
                     // Ensure new name is unique.
-                    var uniqueValue = this.blocks.findUniqueActionName(
+                    uniqueValue = this.blocks.findUniqueActionName(
                         newValue
                     );
                     if (uniqueValue !== newValue) {
                         newValue = uniqueValue;
                         this.value = newValue;
-                        var label = this.value.toString();
+                        let label = this.value.toString();
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                             label = label.substr(0, STRINGLEN) + "...";
                         }
@@ -7314,11 +7315,11 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case "pitch":
                     // In case of custom temperament
-                    var uniqueValue = this.blocks.findUniqueCustomName(
+                    uniqueValue = this.blocks.findUniqueCustomName(
                         newValue
                     );
                     newValue = uniqueValue;
-                    for (var pitchNumber in TEMPERAMENT["custom"]) {
+                    for (let pitchNumber in TEMPERAMENT["custom"]) {
                         if (pitchNumber !== "pitchNumber") {
                             if (
                                 oldValue ==
@@ -7346,11 +7347,13 @@ function Block(protoblock, blocks, overrideName) {
 
         // Update the block value and block text.
         if (this.name === "number") {
-            var cblk1 = this.connections[0];
+            let cblk1 = this.connections[0];
+            let cblk2;
+
             if (cblk1 !== null) {
-                var cblk2 = this.blocks.blockList[cblk1].connections[0];
+                cblk2 = this.blocks.blockList[cblk1].connections[0];
             } else {
-                var cblk2 = null;
+                cblk2 = null;
             }
 
             if (this.value === "-") {
@@ -7364,7 +7367,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (isNaN(this.value)) {
-                var thisBlock = this.blocks.blockList.indexOf(this);
+                let thisBlock = this.blocks.blockList.indexOf(this);
                 this.blocks.errorMsg(
                     newValue + ": " + _("Not a number"),
                     thisBlock
@@ -7377,17 +7380,17 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.name === "solfege") {
-            var obj = splitSolfege(this.value);
+            let obj = splitSolfege(this.value);
             var label = i18nSolfege(obj[0]);
-            var attr = obj[1];
+            let attr = obj[1];
 
             if (attr !== "♮") {
                 label += attr;
             }
         } else if (this.name === "eastindiansolfege") {
-            var obj = splitSolfege(this.value);
+            let obj = splitSolfege(this.value);
             var label = WESTERN2EISOLFEGENAMES[obj[0]];
-            var attr = obj[1];
+            let attr = obj[1];
 
             if (attr !== "♮") {
                 label += attr;
@@ -7402,12 +7405,12 @@ function Block(protoblock, blocks, overrideName) {
             WIDENAMES.indexOf(this.name) === -1 &&
             getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
         ) {
-            var slen = label.length - 5;
-            var nlabel = "" + label.substr(0, slen) + "...";
+            let slen = label.length - 5;
+            let nlabel = "" + label.substr(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
                 slen -= 1;
                 nlabel = "" + label.substr(0, slen) + "...";
-                var foo = getTextWidth(nlabel, "bold 20pt Sans");
+                let foo = getTextWidth(nlabel, "bold 20pt Sans");
                 if (slen <= STRINGLEN) {
                     break;
                 }
@@ -7425,12 +7428,11 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Make sure text is on top.
-        var z = this.container.children.length - 1;
-        this.container.setChildIndex(this.text, z);
+        this.container.setChildIndex(this.text, this.container.children.length - 1);
         this.updateCache();
 
         if (this.name === "text" && c != null) {
-            var cblock = this.blocks.blockList[c];
+            let cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
                     // If the label was the name of an action, update the
@@ -7452,13 +7454,13 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.actionHasReturn(c),
                         this.blocks.actionHasArgs(c)
                     );
-                    var blockPalette = this.blocks.palettes.dict["action"];
+                    let blockPalette = this.blocks.palettes.dict["action"];
                     for (
                         var blk = 0;
                         blk < blockPalette.protoList.length;
                         blk++
                     ) {
-                        var block = blockPalette.protoList[blk];
+                        let block = blockPalette.protoList[blk];
                         if (oldValue === _("action")) {
                             if (
                                 block.name === "nameddo" &&
@@ -7564,21 +7566,21 @@ function Block(protoblock, blocks, overrideName) {
             return;
         }
 
-        var pasteDx = 0;
-        var pasteDy = 0;
+        let pasteDx = 0;
+        let pasteDy = 0;
 
-        var that = this;
-        var thisBlock = this.blocks.blockList.indexOf(this);
+        let that = this;
+        let thisBlock = this.blocks.blockList.indexOf(this);
 
         // Position the widget centered over the active block.
         docById("contextWheelDiv").style.position = "absolute";
 
-        var x = this.blocks.blockList[thisBlock].container.x;
-        var y = this.blocks.blockList[thisBlock].container.y;
+        let x = this.blocks.blockList[thisBlock].container.x;
+        let y = this.blocks.blockList[thisBlock].container.y;
 
-        var canvasLeft =
+        let canvasLeft =
             this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
-        var canvasTop =
+        let canvasTop =
             this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
 
         docById("contextWheelDiv").style.left =
@@ -7605,20 +7607,21 @@ function Block(protoblock, blocks, overrideName) {
             "imgsrc:header-icons/cancel-button.svg"
         ];
 
-        var topBlock = this.blocks.findTopBlock(thisBlock);
+        let topBlock = this.blocks.findTopBlock(thisBlock);
         // if (this.name === 'action') {
         //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
         // }
-        var message =
+        let message =
             this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
+        let helpButton;
         if (message) {
             labels.push("imgsrc:header-icons/help-button.svg");
-            var helpButton = labels.length - 1;
+            helpButton = labels.length - 1;
         } else {
-            var helpButton = null;
+            helpButton = null;
         }
 
-        var wheel = new wheelnav("contextWheelDiv", null, 250, 250);
+        let wheel = new wheelnav("contextWheelDiv", null, 250, 250);
         wheel.colors = platformColor.wheelcolors;
         wheel.slicePathFunction = slicePath().DonutSlice;
         wheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -7683,7 +7686,7 @@ function Block(protoblock, blocks, overrideName) {
         if (helpButton !== null) {
             wheel.navItems[helpButton].navigateFunction = function() {
                 that.blocks.activeBlock = thisBlock;
-                var helpWidget = new HelpWidget();
+                let helpWidget = new HelpWidget();
                 helpWidget.init(blocks);
                 docById("contextWheelDiv").style.display = "none";
             };
@@ -7702,10 +7705,10 @@ function Block(protoblock, blocks, overrideName) {
  * @return{void}
  */
 function $() {
-    var elements = new Array();
+    let elements = new Array();
 
-    for (var i = 0; i < arguments.length; i++) {
-        var element = arguments[i];
+    for (let i = 0; i < arguments.length; i++) {
+        let element = arguments[i];
         if (typeof element === "string") {
             element = docById(element);
         }
@@ -7729,10 +7732,10 @@ document.addEventListener("mousemove", function(e) {
 function _blockMakeBitmap(data, callback, args) {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
-    var img = new Image();
+    let img = new Image();
 
     img.onload = function() {
-        var bitmap = new createjs.Bitmap(img);
+        let bitmap = new createjs.Bitmap(img);
         callback(bitmap, args);
     };
 
