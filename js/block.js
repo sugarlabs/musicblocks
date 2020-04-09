@@ -3211,8 +3211,8 @@ function Block(protoblock, blocks, overrideName) {
         let fromY, labelValue, obj, selectednote,
             selectedattr, selectedaccidental, selectedmode,
             selectedinvert, selectedinterval, selecteddrum,
-            slectedtype, selectedeffect, selectedvoice, selectednoise,
-            selectedTemperament, selectedvalue;
+            selectedeffect, selectedvoice, selectednoise,
+            selectedTemperament, selectedvalue, selectedtype, selectedNote;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
             fromY = this.blocks.stage.y;
@@ -3949,7 +3949,7 @@ function Block(protoblock, blocks, overrideName) {
                         let temperament;
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
-                                this.blocks.blockList[i].name ==
+                                this.blocks.blockList[i].name ===
                                 "settemperament" &&
                                 this.blocks.blockList[i].connections[0] !== null
                             ) {
@@ -4301,14 +4301,7 @@ function Block(protoblock, blocks, overrideName) {
                         case "newstaccato":
                         case "newslur":
                         case "elapsednotes2":
-                            if (
-                                this.blocks.blockList[cblk].connections[1] ===
-                                dblk
-                            ) {
-                                return true;
-                            } else {
-                                return false;
-                            }
+                            return this.blocks.blockList[cblk].connections[1] === dblk;
                             break;
                         case "meter":
                             this._check_meter_block = cblk;
@@ -4320,14 +4313,7 @@ function Block(protoblock, blocks, overrideName) {
                         case "vibrato":
                         case "neighbor":
                         case "neighbor2":
-                            if (
-                                this.blocks.blockList[cblk].connections[2] ===
-                                dblk
-                            ) {
-                                return true;
-                            } else {
-                                return false;
-                            }
+                            return this.blocks.blockList[cblk].connections[2] === dblk;
                             break;
                         default:
                             return false;
