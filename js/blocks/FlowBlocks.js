@@ -83,15 +83,16 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk, receivedArg) {
             if (args[1] === undefined) return;
 
+            let arg0;
             if (
                 args[0] === null ||
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                let arg0 = 2;
+                arg0 = 2;
             } else {
-                let arg0 = args[0];
+                arg0 = args[0];
             }
 
             let factor = Math.floor(arg0);
