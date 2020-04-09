@@ -71,7 +71,6 @@ function WidgetWindow(key, title) {
         let data = evt.wheelDelta || -evt.detail;
         let x = docByClass("wfbWidget")[0];
         let l = x.getElementsByTagName("tr").length;
-        console.log(l, that.top, evt);
         if (data < 0) {
             if (x.getElementsByTagName("tr")[that.top] != null) {
                 x.getElementsByTagName("tr")[that.top].style.display = "none";
