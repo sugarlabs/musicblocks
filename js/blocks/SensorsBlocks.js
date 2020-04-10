@@ -56,6 +56,7 @@ function setupSensorsBlocks() {
                         logo.inputValues[turtle] = Number(value);
                     }
 
+                    inputElem.blur();
                     inputElem.style.display = "none";
                     logo.clearRunBlock(turtle);
                     docById("labelDiv").classList.remove("hasKeyboard");
