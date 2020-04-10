@@ -64,6 +64,29 @@ function WidgetWindow(key, title) {
     // Needed to keep things canvas-relative
     let canvas = docById("myCanvas");
 
+    // Scrolling in window body .
+    this.top = 0;
+    scrollEvent = function (evt) {
+
+        let data = evt.wheelDelta || -evt.detail;
+        let x = docByClass("wfbWidget")[0];
+        let l = x.getElementsByTagName("tr").length;
+        if (data < 0) {
+            if (x.getElementsByTagName("tr")[that.top] != null) {
+                x.getElementsByTagName("tr")[that.top].style.display = "none";
+                that.top = that.top == l ? l : that.top + 1;
+            }
+        }
+        else if (data > 0) {
+
+            x.getElementsByTagName("tr")[that.top--].style.display = "";
+            that.top = that.top < 0 ? 0 : that.top;
+        }
+    };
+
+    this._widget.addEventListener("mousewheel", scrollEvent, false);
+    this._widget.addEventListener("DOMMouseScroll", scrollEvent, false);
+
     // Global watcher to track the mouse
     document.addEventListener("mousemove", function(e) {
         if (!that._dragging) return;
