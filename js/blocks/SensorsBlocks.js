@@ -12,55 +12,56 @@ function setupSensorsBlocks() {
                 ""
             ]);
 
-	    this.formBlock({
-		name: _("input"),
-		args: 1,
-		argTypes: ["anyin"],
-		defaults: [_("Input a value")],
-	    });
+            this.formBlock({
+                name: _("input"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [_("Input a value")],
+            });
 
             if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
 
-	    // Pause the flow while we wait for input.
+            // Pause the flow while we wait for input.
             logo._doWait(turtle, 120);
 
-	    // Display the input form.
+            // Display the input form.
             var inputElem = docById("labelDiv");
             inputElem.innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
             var inputElem = docById("textLabel");
             var cblk = logo.blocks.blockList[blk].connections[1];
-	    if (cblk !== null) {
-		inputElem.placeholder = logo.blocks.blockList[cblk].value;
-	    }
-	    inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
-	    inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
+            if (cblk !== null) {
+                inputElem.placeholder = logo.blocks.blockList[cblk].value;
+            }
+            inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
+            inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
             inputElem.focus();
 
             var inputElem = docById("labelDiv");
             inputElem.classList.add("hasKeyboard");
 
-	    // Add a handler to continue flow after the input.
-	    function __keyPressed(event) {
-		if (event.keyCode === 13) { // RETURN
-		    var inputElem = docById("textLabel");
-		    console.log(inputElem.value);
-		    console.log('trying a number');
-		    var value = inputElem.value;
-		    if (isNaN(value)) {
-			logo.inputValues[turtle] = value;
-		    } else {
-			logo.inputValues[turtle] = Number(value);
-		    }
+            // Add a handler to continue flow after the input.
+            function __keyPressed(event) {
+                if (event.keyCode === 13) { // RETURN
+                    var inputElem = docById("textLabel");
+                    console.debug(inputElem.value);
+                    console.debug('trying a number');
+                    var value = inputElem.value;
+                    if (isNaN(value)) {
+                        logo.inputValues[turtle] = value;
+                    } else {
+                        logo.inputValues[turtle] = Number(value);
+                    }
 
-		    logo.clearRunBlock(turtle);
-		    inputElem.classList.remove("hasKeyboard");
-		    inputElem.style.display = "none";
-		}
-	    };
+                    inputElem.blur();
+                    inputElem.style.display = "none";
+                    logo.clearRunBlock(turtle);
+                    docById("labelDiv").classList.remove("hasKeyboard");
+                }
+            };
 
             var inputElem = docById("textLabel");
             inputElem.addEventListener("keypress", __keyPressed);
@@ -78,7 +79,7 @@ function setupSensorsBlocks() {
                     "The Input-value block stores the input."
                 ),
                 "documentation",
-		null,
+                null,
                 "input"
             ]);
 
@@ -86,20 +87,20 @@ function setupSensorsBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-	    if (turtle in logo.inputValues) {
-		return logo.inputValues[turtle];
-	    } else {
-		return 0;
-	    }
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
+                return 0;
+            }
         }
 
         arg(logo, turtle, blk) {
-	    if (turtle in logo.inputValues) {
-		return logo.inputValues[turtle];
-	    } else {
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-		return 0;
-	    }
+                return 0;
+            }
         }
     }
 
