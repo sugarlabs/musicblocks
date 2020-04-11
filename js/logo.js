@@ -3336,6 +3336,33 @@ function Logo() {
                                     neighborArgCurrentBeat: neighborArgCurrentBeat
                                 };
 
+                                // For case when note block is inside a
+                                // settimbre block, which in turn is inside a
+                                // setdrum block
+                                let hasSetTimbreInSetDrum = false;
+                                // This case is only applicable if the note
+                                // block is at all inside a setdrum block
+                                if (that.drumStyle[turtle].length > 0) {
+                                    // Start from the note block's parent
+                                    let par =
+                                        that.blocks.blockList[blk]
+                                        .connections[0];
+                                    par = that.blocks.blockList[par];
+                                    // Keep looking for all parents up in order
+                                    while (par.name != "setdrum") {
+                                        // If settimbre encountered before
+                                        // setdrum, the said case is true
+                                        if (par.name === "settimbre") {
+                                            hasSetTimbreInSetDrum = true;
+                                            break;
+                                        }
+                                        par = par.connections[0];
+                                        if (par === null)
+                                            break;
+                                        par = that.blocks.blockList[par];
+                                    }
+                                }
+
                                 if (that.oscList[turtle][thisBlk].length > 0) {
                                     if (notes.length > 1) {
                                         that.errorMsg(
@@ -3373,7 +3400,11 @@ function Logo() {
                                             null
                                         ]);
                                     }
-                                } else if (that.drumStyle[turtle].length > 0) {
+                                } else if (
+                                    that.drumStyle[turtle].length > 0 &&
+                                    // Don't play drum if settimbre encountered
+                                    !hasSetTimbreInSetDrum
+                                ) {
                                     if (!that.suppressOutput[turtle]) {
                                         that.synth.trigger(
                                             turtle,
