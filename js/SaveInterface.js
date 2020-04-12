@@ -427,7 +427,11 @@ function SaveInterface(PlanetInterface) {
                 _(
                     "The Lilypond code is copied to clipboard. You can paste it here: "
                 ) +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a>."
+                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                  +
+                  "or "
+                  +
+                  "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>."
             );
         }
 
