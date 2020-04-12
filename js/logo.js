@@ -3462,7 +3462,9 @@ function Logo() {
                                     for (var d = 0; d < notes.length; d++) {
                                         if (
                                             notes[d] in
-                                            that.pitchDrumTable[turtle]
+                                            that.pitchDrumTable[turtle] &&
+                                            // Don't play drum if settimbre encountered
+                                            !hasSetTimbreInSetDrum
                                         ) {
                                             if (!that.suppressOutput[turtle]) {
                                                 console.debug(
