@@ -603,7 +603,7 @@ function _playPitch(args, logo, turtle, blk) {
         logo.pushedNote[turtle] = true;
     } else if (logo.drumStyle[turtle].length > 0) {
         let drumname = last(logo.drumStyle[turtle]);
-        let transposition = 2 * delta;
+        let transposition = 0;
         if (turtle in logo.transposition) {
             transposition += logo.transposition[turtle];
         }
