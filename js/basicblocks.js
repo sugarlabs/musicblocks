@@ -13,7 +13,7 @@
 
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
-var NAMEDICT = {
+let NAMEDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
     sandwichclampcollapsed: "clamp",

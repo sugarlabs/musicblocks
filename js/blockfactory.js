@@ -111,9 +111,9 @@ function SVG() {
 
     this.setClampCount = function(number) {
         this._clampCount = number;
-        var n = this._clampSlots.length;
+        let n = this._clampSlots.length;
         if (n < number) {
-            for (var i = 0; i < number - n; i++) {
+            for (let i = 0; i < number - n; i++) {
                 this._clampSlots.push(1);
             }
         }
@@ -153,7 +153,7 @@ function SVG() {
     };
 
     this.setInnies = function(inniesArray) {
-        for (var i = 0; i < inniesArray.length; i++) {
+        for (let i = 0; i < inniesArray.length; i++) {
             this._innies.push(inniesArray[i]);
         }
     };
@@ -232,8 +232,8 @@ function SVG() {
     };
 
     this._calculateXY = function() {
-        var x = this._strokeWidth / 2.0;
-        var y = this._strokeWidth / 2.0 + this._radius;
+        let x = this._strokeWidth / 2.0;
+        let y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = x + this._strokeWidth + 0.5;
         this.margins[1] = this._strokeWidth + 0.5;
 
@@ -313,24 +313,25 @@ function SVG() {
         this._checkMinMax();
 
         // writing-mode:lr';
+        let align;
         switch (alignment) {
             case "left":
             case "start":
-                var align = "start";
+                align = "start";
                 break;
             case "middle":
             case "center":
-                var align = "middle";
+                align = "middle";
                 break;
             case "right":
             case "end":
-                var align = "end";
+                align = "end";
                 break;
         }
 
-        var yy = y;
-        var tspans = string.split("\n");
-        var text =
+        let yy = y;
+        let tspans = string.split("\n");
+        let text =
             '<text style="font-size:' +
             fontSize +
             "px;fill:" +
@@ -338,7 +339,7 @@ function SVG() {
             ";font-family:sans-serif;text-anchor:" +
             align +
             '">';
-        for (var i = 0; i < tspans.length; i++) {
+        for (let i = 0; i < tspans.length; i++) {
             text +=
                 '<tspan x="' +
                 Math.floor(x + 0.5) +
@@ -405,16 +406,17 @@ function SVG() {
         if (this._radius === 0) {
             return "";
         } else {
-            var x = this._x + signX * this._radius;
-            var y = this._y + signY * this._radius;
-            return this._arcTo(x, y, this._radius, a, l, s);
+            return this._arcTo(
+                (this._x + signX * this._radius),
+                (this._y + signY * this._radius),
+                this._radius, a, l, s);
         }
     };
 
     this._corner = function(signX, signY, a, l, s, start, end, skip) {
-        var svg_str = "";
+        let svg_str = "";
         if (this._radius > 0) {
-            var r2 = this._radius / 2.0;
+            let r2 = this._radius / 2.0;
             if (start) {
                 if (signX * signY === 1) {
                     svg_str += this._rLineTo(signX * r2, 0);
@@ -422,8 +424,8 @@ function SVG() {
                     svg_str += this._rLineTo(0, signY * r2);
                 }
             }
-            var x = this._x + signX * r2;
-            var y = this._y + signY * r2;
+            let x = this._x + signX * r2;
+            let y = this._y + signY * r2;
             svg_str += this._arcTo(x, y, r2, a, l, s);
             if (end) {
                 if (signX * signY === 1) {
@@ -437,24 +439,25 @@ function SVG() {
     };
 
     this._iCorner = function(signX, signY, a, l, s, start, end) {
-        var r2 = this._strokeWidth + this._radius / 2.0;
+        let r2 = this._strokeWidth + this._radius / 2.0;
+        let svg_str;
         if (start) {
             if (signX * signY === -1) {
-                var svg_str = this._rLineTo(
+                svg_str = this._rLineTo(
                     signX * (r2 - this._strokeWidth),
                     0
                 );
             } else {
-                var svg_str = this._rLineTo(
+                svg_str = this._rLineTo(
                     0,
                     signY * (r2 - this._strokeWidth)
                 );
             }
         } else {
-            var svg_str = "";
+            svg_str = "";
         }
-        var x = this._x + signX * r2;
-        var y = this._y + signY * r2;
+        let x = this._x + signX * r2;
+        let y = this._y + signY * r2;
         svg_str += this._arcTo(x, y, r2, a, l, s);
         if (end) {
             if (signX * signY === -1) {
@@ -517,7 +520,7 @@ function SVG() {
 
     this._doSlot = function() {
         if (this._slot) {
-            var x = this._x + this._slotX / 2.0;
+            let x = this._x + this._slotX / 2.0;
             this.docks.push([x * this._scale, this._y * this._scale]);
             return (
                 this._rLineTo(0, this._slotY) +
@@ -525,7 +528,7 @@ function SVG() {
                 this._rLineTo(0, -this._slotY)
             );
         } else if (this._cap) {
-            var x = this._x + this._slotX / 2.0;
+            let x = this._x + this._slotX / 2.0;
             this.docks.push([x * this._scale, this._y * this._scale]);
             return (
                 this._rLineTo(this._slotX / 2.0, -this._slotY * 3.0) +
@@ -540,7 +543,7 @@ function SVG() {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
         } else if (this._tail) {
-            var x = this._x + this._slotX / 2.0;
+            let x = this._x + this._slotX / 2.0;
             this.docks.push([x * this._scale, this._y * this._scale]);
             return (
                 this._rLineTo(-this._slotX / 2.0, this._slotY * 3.0) +
@@ -555,7 +558,7 @@ function SVG() {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
         }
-        var x = this._x - this._slotX / 2.0;
+        let x = this._x - this._slotX / 2.0;
         this.docks.push([
             x * this._scale,
             (this._y + this._strokeWidth) * this._scale
@@ -586,7 +589,7 @@ function SVG() {
     };
 
     this._startBoolean = function(xoffset, yoffset) {
-        var svg = this._newPath(xoffset, yoffset); // - this._radius);
+        let svg = this._newPath(xoffset, yoffset); // - this._radius);
         this._radius -= this._strokeWidth;
         this.docks.push([this._x * this._scale, this._y * this._scale]);
         svg += this._rarcTo(1, -1, 90, 0, 1);
@@ -603,15 +606,15 @@ function SVG() {
         ]);
         this.margins[2] =
             (this._x - this._radius - this._strokeWidth) * this._scale;
-        var svg = this._rarcTo(-1, 1, 90, 0, 0) + this._rarcTo(1, 1, 90, 0, 0);
-        return svg;
+        return this._rarcTo(-1, 1, 90, 0, 0) + this._rarcTo(1, 1, 90, 0, 0);
     };
 
     this._endBoolean = function(notnot) {
+        let svg;
         if (!notnot) {
-            var svg = this._rLineTo(-this._radius * 1.5, 0);
+            svg = this._rLineTo(-this._radius * 1.5, 0);
         } else {
-            var svg = "";
+            svg = "";
         }
         svg += this._rLineTo(0, -this._strokeWidth);
         svg += this._rLineTo(-this._strokeWidth, 0);
@@ -626,7 +629,7 @@ function SVG() {
 
     this._header = function(center) {
         // FIXME: Why are our calculations off by 2 x strokeWidth?
-        var width = this._width + 2 * this._strokeWidth;
+        let width = this._width + 2 * this._strokeWidth;
         return (
             '<svg xmlns="http://www.w3.org/2000/svg" width="' +
             Math.floor(width + 0.5) +
@@ -649,10 +652,11 @@ function SVG() {
     };
 
     this._transform = function(center) {
+        let orientation;
         if (this._orientation !== 0) {
-            var w = this._width / 2.0;
-            var h = this._height / 2.0;
-            var orientation =
+            let w = this._width / 2.0;
+            let h = this._height / 2.0;
+            orientation =
                 '<g transform = "rotate(' +
                 this._orientation +
                 " " +
@@ -661,11 +665,11 @@ function SVG() {
                 h +
                 ')">';
         } else {
-            var orientation = "";
+            orientation = "";
         }
         if (center) {
-            var x = -this._minX;
-            var y = -this._minY;
+            let x = -this._minX;
+            let y = -this._minY;
             return '<g transform="translate(' + x + ", " + y + ')">';
         } else {
             return (
@@ -716,14 +720,14 @@ function SVG() {
         // argument commands (forward, setxy, plus, sqrt, etc.)
         this._resetMinMax();
 
-        var obj = this._calculateXY();
-        var x = obj[0];
-        var y = obj[1];
+        let obj = this._calculateXY();
+        let x = obj[0];
+        let y = obj[1];
 
         this.margins[2] = 0;
         this.margins[3] = 0;
 
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
         svg += this._rLineTo(this._expandX, 0);
@@ -741,7 +745,7 @@ function SVG() {
             // To maintain standard block height
             svg += this._rLineTo(0, this._padding);
         } else {
-            for (var i = 0; i < this._innies.length; i++) {
+            for (let i = 0; i < this._innies.length; i++) {
                 if (this._innies[i]) {
                     svg += this._doInnie();
                 }
@@ -790,16 +794,16 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
-        var tx =
+        let tx =
             this._width -
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        var ty = this._height / 2 + this._fontSize / (5 / this._scale);
+        let ty = this._height / 2 + this._fontSize / (5 / this._scale);
 
         // If we have an odd number of innie slots, we need to avoid a
         // collision between the block label and the slot label.
-        var nInnies = this._innies.length;
+        let nInnies = this._innies.length;
         if (nInnies > 2 && Math.round(nInnies / 2) * 2 !== nInnies) {
             ty -= 2 * this._fontSize;
         }
@@ -813,15 +817,16 @@ function SVG() {
             "block_label"
         );
 
+        let di;
         // Add a label for each innies
         if (this._slot || this._outie) {
-            var di = 1; // Skip the first dock since it is a slot.
+            di = 1; // Skip the first dock since it is a slot.
         } else {
-            var di = 0;
+            di = 0;
         }
 
-        var count = 1;
-        for (var i = 0; i < this._innies.length; i++) {
+        let count = 1;
+        for (let i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
                 ty =
                     this.docks[di][1] -
@@ -849,12 +854,12 @@ function SVG() {
         this._resetMinMax();
         this.setOutie(true);
 
-        var x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
+        let x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
-        var svg = this._newPath(x, this._strokeWidth / 2.0);
+        let svg = this._newPath(x, this._strokeWidth / 2.0);
         svg += this._rLineTo(this._expandX, 0);
         svg += this._rLineTo(
             0,
@@ -871,11 +876,11 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
-        var tx =
+        let tx =
             2 * (this._innieX1 + this._innieX2) +
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        var ty = this._height / 2 + this._fontSize / 2;
+        let ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -892,7 +897,7 @@ function SVG() {
     this.booleanAndOr = function() {
         // Booleans are in a class of their own
         this._resetMinMax();
-        var svg = this._startBoolean(
+        let svg = this._startBoolean(
             this._strokeWidth / 2.0,
             this._radius * 5.5 +
                 this._strokeWidth / 2.0 +
@@ -910,7 +915,7 @@ function SVG() {
 
         svg += this._rarcTo(1, -1, 90, 0, 1);
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._rLineTo(0, this._radius / 2.0);
         svg += this._doBoolean();
         svg += this._rLineTo(
@@ -933,12 +938,12 @@ function SVG() {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx =
+        let tx =
             this._width -
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        var ty = this._height / 2 + this._fontSize / 2;
+        let ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -953,20 +958,21 @@ function SVG() {
     };
 
     this.booleanNot = function(notnot) {
+        let svg;
         // Booleans are in a class of their own: not and not not
         this._resetMinMax();
         if (this._innies[0]) {
-            var svg = this._startBoolean(
+            svg = this._startBoolean(
                 this._strokeWidth / 2.0,
                 this._radius * 1.25 + this._strokeWidth / 2.0
             );
         } else if (!notnot) {
-            var svg = this._startBoolean(
+            svg = this._startBoolean(
                 this._strokeWidth / 2.0,
                 this._radius * 2.0 + this._strokeWidth / 2.0
             );
         } else {
-            var svg = this._startBoolean(
+            svg = this._startBoolean(
                 this._strokeWidth / 2.0,
                 this._radius * 1.25 + this._strokeWidth / 2.0
             );
@@ -983,7 +989,7 @@ function SVG() {
         }
 
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
-        var xx = this._x;
+        let xx = this._x;
 
         if (this._innies[0]) {
             svg += this._rLineTo(0, this._radius);
@@ -1033,12 +1039,12 @@ function SVG() {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx =
+        let tx =
             this._width -
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        var ty = this._height / 2 + this._fontSize / 2;
+        let ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -1055,16 +1061,16 @@ function SVG() {
     this.booleanCompare = function() {
         // Booleans are in a class of their own (greater than, less than, etc)
         this._resetMinMax();
-        var yoffset =
+        let yoffset =
             this._radius * 2 +
             2 * this._innieY2 +
             this._inniesSpacer +
             this._strokeWidth / 2.0 +
             this._expandY;
-        var xoffset = this._strokeWidth / 2.0;
+        let xoffset = this._strokeWidth / 2.0;
 
-        var yoff = this._radius * 2;
-        var svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
+        let yoff = this._radius * 2;
+        let svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
 
         svg += this._newPath(xoffset, yoffset + this._radius);
         this.docks.push([
@@ -1083,7 +1089,7 @@ function SVG() {
         svg += this._rarcTo(1, -1, 90, 0, 1);
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
         svg += this._rLineTo(0, this._radius);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._doInnie();
         this.docks[1][1] -= this._radius * 2 * this._scale;
         svg += this._rLineTo(0, this._expandY);
@@ -1117,12 +1123,12 @@ function SVG() {
         this.margins[2] = this._strokeWidth * this._scale;
 
         // Add a block label
-        var tx =
+        let tx =
             this._width -
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        var ty = this._height / 2 + this._fontSize / 2; // + this._radius * this._scale;
+        let ty = this._height / 2 + this._fontSize / 2; // + this._radius * this._scale;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -1140,18 +1146,19 @@ function SVG() {
         // Special block for clamps around stacks; includes an 'arm'
         // that extends down the left side of a stack and a bottom jaw
         // to clamp the blocks. (Used for start, action, repeat, etc.)
-        var save_cap = this._cap;
-        var save_slot = this._slot;
+        let save_cap = this._cap;
+        let save_slot = this._slot;
+        let x, y;
         this._resetMinMax();
         if (this._outie) {
-            var x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
+            x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
         } else {
-            var x = this._strokeWidth / 2.0;
+            x = this._strokeWidth / 2.0;
         }
         if (this._cap) {
-            var y = this._strokeWidth / 2.0 + this._radius + this._slotY * 3.0;
+            y = this._strokeWidth / 2.0 + this._radius + this._slotY * 3.0;
         } else {
-            var y = this._strokeWidth / 2.0 + this._radius;
+            y = this._strokeWidth / 2.0 + this._radius;
         }
 
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
@@ -1159,7 +1166,7 @@ function SVG() {
         this.margins[2] = 0;
         this.margins[3] = 0;
 
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
         if (this._cap) {
@@ -1168,12 +1175,12 @@ function SVG() {
         }
 
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._rLineTo(this._expandX, 0);
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         if (this._innies[0]) {
             // svg += this._doInnie();
-            for (var i = 0; i < this._innies.length; i++) {
+            for (let i = 0; i < this._innies.length; i++) {
                 if (this._innies[i]) {
                     svg += this._doInnie();
                 }
@@ -1200,26 +1207,25 @@ function SVG() {
             this.margins[2] = (this._x - this._strokeWidth + 0.5) * this._scale;
         }
 
-        for (var clamp = 0; clamp < this._clampCount; clamp++) {
+        for (let clamp = 0; clamp < this._clampCount; clamp++) {
             if (clamp > 0) {
                 svg += this._rLineTo(this._expandX, 0);
                 svg += this._rLineTo(0, 3 * this._padding);
             }
             svg += this._corner(-1, 1, 90, 0, 1, true, true, false);
             svg += this._lineTo(xx, this._y);
-            var saveOutie = this._outie;
+            let saveOutie = this._outie;
             this._outie = false;
             svg += this._doTab();
             this._outie = saveOutie;
             svg += this._iCorner(-1, 1, 90, 0, 0, true, true);
             svg += this._rLineTo(0, this._padding);
             if (this._clampSlots[clamp] > 1) {
-                var dy = this._slotSize * (this._clampSlots[clamp] - 1);
-                svg += this._rLineTo(0, dy);
+                svg += this._rLineTo(0, (this._slotSize * (this._clampSlots[clamp] - 1)));
             }
             svg += this._rLineTo(0, this._expandY2);
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
-            var saveSlot = this._slot;
+            let saveSlot = this._slot;
             this._slot = true;
             svg += this._doSlot();
             this._slot = saveSlot;
@@ -1263,26 +1269,27 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
+        let tx, ty;
         if (this._outie) {
-            var tx =
+            tx =
                 10 * this._strokeWidth +
                 this._innieX1 +
                 this._innieX2 +
                 this._labelOffset * this._scale;
         } else {
-            var tx = 8 * this._strokeWidth + this._labelOffset * this._scale;
+            tx = 8 * this._strokeWidth + this._labelOffset * this._scale;
         }
 
         if (this._cap) {
-            var ty =
+            ty =
                 (this._strokeWidth / 2.0 + this._radius + this._slotY) *
                 this._scale;
         } else if (this._innies.length > 1) {
-            var ty =
+            ty =
                 ((this._strokeWidth / 2.0 + this._radius) * this._scale) / 2;
             ty += this._fontSize;
         } else {
-            var ty =
+            ty =
                 ((this._strokeWidth / 2.0 + this._radius) * this._scale) / 2;
         }
 
@@ -1302,9 +1309,9 @@ function SVG() {
 
         // Booleans get an extra label.
         if (this._bool) {
-            var count = 1;
-            var tx = this._width - this._radius;
-            for (var clamp = 0; clamp < this._clampCount; clamp++) {
+            let count = 1;
+            tx = this._width - this._radius;
+            for (let clamp = 0; clamp < this._clampCount; clamp++) {
                 ty =
                     this.docks[clamp + 2][1] -
                     this._fontSize +
@@ -1321,18 +1328,19 @@ function SVG() {
             }
         }
 
+        let di;
         // Add a label for each innies
         if (this._slot || this._outie) {
-            var di = 1; // Skip the first dock since it is a slot.
+            di = 1; // Skip the first dock since it is a slot.
         } else {
-            var di = 0;
+            di = 0;
         }
-        var count = 1;
-        var tx =
+        let count = 1;
+        tx =
             this._width -
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth;
-        for (var i = 0; i < this._innies.length; i++) {
+        for (let i = 0; i < this._innies.length; i++) {
             if (this._innies[i]) {
                 ty =
                     this.docks[di][1] -
@@ -1357,23 +1365,24 @@ function SVG() {
 
     this.argClamp = function() {
         // A clamp that contains innies rather than flow blocks
+        let x;
         this._resetMinMax();
         if (this._outie) {
-            var x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
+            x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
         } else {
-            var x = this._strokeWidth / 2.0;
+            x = this._strokeWidth / 2.0;
         }
-        var y = this._strokeWidth / 2.0 + this._radius;
+        let y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
 
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._rLineTo(this._expandX, 0);
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         if (this._innies[0]) {
@@ -1387,19 +1396,19 @@ function SVG() {
         svg += this._lineTo(xx, this._y);
         svg += this._iCorner(-1, 1, 90, 0, 0, true, true);
 
-        var j = 0;
+        let j = 0;
         svg += this._doInnie();
-        var dy = this._slotSize * (this._clampSlots[0][j] - 1);
+        let dy = this._slotSize * (this._clampSlots[0][j] - 1);
         if (dy > 0) {
             svg += this._rLineTo(0, dy);
         }
         j += 1;
 
-        var ddy = this._slotSize - this._innieY2;
-        for (var i = 1; i < this._clampSlots[0].length; i++) {
+        let ddy = this._slotSize - this._innieY2;
+        for (let i = 1; i < this._clampSlots[0].length; i++) {
             svg += this._rLineTo(0, ddy);
             svg += this._doInnie();
-            var dy = this._slotSize * (this._clampSlots[0][j] - 1);
+            let dy = this._slotSize * (this._clampSlots[0][j] - 1);
             if (dy > 0) {
                 svg += this._rLineTo(0, dy);
             }
@@ -1438,17 +1447,18 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
+        let tx, ty;
         if (this._outie) {
-            var tx = 10 * this._strokeWidth + this._innieX1 + this._innieX2;
+            tx = 10 * this._strokeWidth + this._innieX1 + this._innieX2;
         } else {
-            var tx = 8 * this._strokeWidth;
+            tx = 8 * this._strokeWidth;
         }
         if (this._cap) {
-            var ty =
+            ty =
                 (this._strokeWidth / 2.0 + this._radius + this._slotY) *
                 this._scale;
         } else {
-            var ty =
+            ty =
                 ((this._strokeWidth / 2.0 + this._radius) * this._scale) / 2;
         }
         ty += (this._fontSize + 1) * this._scale;
@@ -1472,18 +1482,18 @@ function SVG() {
     this.untilClamp = function() {
         // Until block is like clamp but docks are flipped
         this._resetMinMax();
-        var x = this._strokeWidth / 2.0;
-        var y = this._strokeWidth / 2.0 + this._radius;
+        let x = this._strokeWidth / 2.0;
+        let y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
         svg += this._rLineTo(this._expandX, 0);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._corner(1, 1, 90, 0, 1, true, true, true);
         svg += this._rLineTo(0, 2 * this._innieY1);
         svg += this._corner(-1, 1, 90, 0, 1, true, true, true);
@@ -1514,8 +1524,8 @@ function SVG() {
         svg += this._style();
 
         // Add a block label
-        var tx = 4 * this._strokeWidth;
-        var ty = this.docks[2][1];
+        let tx = 4 * this._strokeWidth;
+        let ty = this.docks[2][1];
 
         svg += this.text(
             tx / this._scale,
@@ -1528,7 +1538,7 @@ function SVG() {
 
         if (this._bool) {
             // Booleans get an extra label.
-            var tx = this._width - this._radius;
+            tx = this._width - this._radius;
             ty = this.docks[1][1] - this._fontSize;
             svg += this.text(
                 tx / this._scale,
@@ -1543,8 +1553,8 @@ function SVG() {
         if (this._bool) {
             // Swap bool and tab args so that the docking behaves like the
             // while block.
-            var tx = this.docks[1][0];
-            var ty = this.docks[1][1];
+            tx = this.docks[1][0];
+            ty = this.docks[1][1];
             this.docks[1][0] = this.docks[2][0];
             this.docks[1][1] = this.docks[2][1];
             this.docks[2][0] = tx;
@@ -1558,15 +1568,15 @@ function SVG() {
     this.statusBlock = function(graphic) {
         // Generate a status block
         this._resetMinMax();
-        var obj = this._calculateXY();
-        var x = obj[0];
-        var y = obj[1];
+        let obj = this._calculateXY();
+        let x = obj[0];
+        let y = obj[1];
         this.margins[2] = 0;
         this.margins[3] = 0;
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._rLineTo(this._expandX, 0);
-        var xx = this._x;
+        let xx = this._x;
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         svg += this._rLineTo(0, this._expandY);
         svg += this._corner(-1, 1, 90, 0, 1, true, true, false);
