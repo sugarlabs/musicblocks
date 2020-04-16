@@ -11,7 +11,7 @@
 
 const POLYCOUNT = 3;
 
-var NOISENAMES = [
+let NOISENAMES = [
     //.TRANS: white noise synthesizer
     [_("white noise"), "noise1", "images/synth.svg", "electronic"],
     //.TRANS: brown noise synthesizer
@@ -20,7 +20,7 @@ var NOISENAMES = [
     [_("pink noise"), "noise3", "images/synth.svg", "electronic"]
 ];
 
-var VOICENAMES = [
+let VOICENAMES = [
     //.TRANS: musical instrument
     [_("piano"), "piano", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -96,7 +96,7 @@ var VOICENAMES = [
 
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
-var DRUMNAMES = [
+let DRUMNAMES = [
     //.TRANS: musical instrument
     [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
@@ -166,7 +166,7 @@ var DRUMNAMES = [
 ];
 
 // Some "drums" are sound effects.
-var EFFECTSNAMES = [
+let EFFECTSNAMES = [
     "duck",
     "dog",
     "cricket",
@@ -176,7 +176,7 @@ var EFFECTSNAMES = [
     "bottle"
 ];
 
-var SOUNDSAMPLESDEFINES = [
+let SOUNDSAMPLESDEFINES = [
     "samples/violin",
     "samples/cello",
     "samples/flute",
@@ -295,7 +295,7 @@ function validateAndSetParams(defaultParams, params) {
         params &&
         params !== undefined
     ) {
-        for (var key in defaultParams) {
+        for (let key in defaultParams) {
             if (key in params && params[key] !== undefined)
                 defaultParams[key] = params[key];
         }
@@ -309,21 +309,21 @@ function validateAndSetParams(defaultParams, params) {
 // the user sets in the "Timbre" clamp and uses in the "Set Timbre"
 // clamp; There is one instrument dictionary per turtle.
 
-var instruments = { 0: {} };
+let instruments = { 0: {} };
 
 // This object contains mapping between instrument name and its source
 // - (0->default, 1->drum, 2->voice, 3->builtin)
 // e.g. instrumentsSource['kick drum'] = [1, 'kick drum']
 
-var instrumentsSource = {};
+let instrumentsSource = {};
 
 // Effects associated with instruments in the timbre widget
 
-var instrumentsEffects = { 0: {} };
+let instrumentsEffects = { 0: {} };
 
 // Filters associated with instruments in the timbre widget
 
-var instrumentsFilters = { 0: {} };
+let instrumentsFilters = { 0: {} };
 
 function Synth() {
     console.debug("SYNTH");
@@ -373,10 +373,10 @@ function Synth() {
     };
 
     this.temperamentChanged = function(temperament, startingPitch) {
-        var startPitch = startingPitch;
-        var t = TEMPERAMENT[temperament];
-        var len = startPitch.length;
-        var number = pitchToNumber(
+        let startPitch = startingPitch;
+        let t = TEMPERAMENT[temperament];
+        let len = startPitch.length;
+        let number = pitchToNumber(
             startPitch.substring(0, len - 1),
             startPitch.slice(-1),
             "C major"
@@ -396,7 +396,7 @@ function Synth() {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
-        var frequency = Tone.Frequency(startPitch).toFrequency();
+        let frequency = Tone.Frequency(startPitch).toFrequency();
 
         this.noteFrequencies = {
             // note: [octave, Frequency]
@@ -490,19 +490,20 @@ function Synth() {
             ]
         };
 
-        for (var key in this.noteFrequencies) {
+        for (let key in this.noteFrequencies) {
+            let note;
             if (
                 key.substring(1, key.length) === FLAT ||
                 key.substring(1, key.length) === "b"
             ) {
-                var note = key.substring(0, 1) + "" + "b";
+                note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
                 key.substring(1, key.length) === "#"
             ) {
-                var note = key.substring(0, 1) + "" + "#";
+                note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
                 delete this.noteFrequencies[key];
             }
@@ -526,20 +527,21 @@ function Synth() {
         }
 
         if (this.inTemperament === "equal") {
+            let len, note, octave;
             if (typeof notes === "string") {
-                var len = notes.length;
-                var note = notes.substring(0, len - 1);
-                var octave = Number(notes.slice(-1));
+                len = notes.length;
+                note = notes.substring(0, len - 1);
+                octave = Number(notes.slice(-1));
                 return pitchToFrequency(note, octave, 0, "c major");
             } else if (typeof notes === "number") {
                 return notes;
             } else {
-                var results = [];
+                let results = [];
                 for (i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
-                        var len = notes[i].length;
-                        var note = notes[i].substring(0, len - 1);
-                        var octave = Number(notes[i].slice(-1));
+                        len = notes[i].length;
+                        note = notes[i].substring(0, len - 1);
+                        octave = Number(notes[i].slice(-1));
                         results.push(
                             pitchToFrequency(note, octave, 0, "c major")
                         );
@@ -551,12 +553,12 @@ function Synth() {
             }
         }
 
-        var that = this;
+        let that = this;
 
-        var __getFrequency = function(oneNote) {
-            var len = oneNote.length;
+        let __getFrequency = function(oneNote) {
+            let len = oneNote.length;
 
-            for (var note in that.noteFrequencies) {
+            for (let note in that.noteFrequencies) {
                 if (note === oneNote.substring(0, len - 1)) {
                     if (
                         that.noteFrequencies[note][0] ===
@@ -566,7 +568,7 @@ function Synth() {
                         return that.noteFrequencies[note][1];
                     } else {
                         //Note to be played is not in the same octave.
-                        var power =
+                        let power =
                             Number(oneNote.slice(-1)) -
                             that.noteFrequencies[note][0];
                         return (
@@ -580,8 +582,8 @@ function Synth() {
         if (typeof notes === "string") {
             return __getFrequency(notes);
         } else if (typeof notes === "object") {
-            var results = [];
-            for (var i = 0; i < notes.length; i++) {
+            let results = [];
+            for (let i = 0; i < notes.length; i++) {
                 if (typeof notes[i] === "string") {
                     results.push(__getFrequency(notes[i]));
                 } else {
@@ -598,11 +600,11 @@ function Synth() {
     };
 
     this.getCustomFrequency = function(notes) {
-        var __getCustomFrequency = function(oneNote) {
-            var octave = oneNote.slice(-1);
+        let __getCustomFrequency = function(oneNote) {
+            let octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
-            var pitch = that.startingPitch;
-            var startPitchFrequency = pitchToFrequency(
+            let pitch = that.startingPitch;
+            let startPitchFrequency = pitchToFrequency(
                 pitch.substring(0, pitch.length - 1),
                 pitch.slice(-1),
                 0,
@@ -611,10 +613,10 @@ function Synth() {
             if (typeof oneNote === "number") {
                 oneNote = oneNote;
             } else {
-                for (var pitchNumber in TEMPERAMENT["custom"]) {
+                for (let pitchNumber in TEMPERAMENT["custom"]) {
                     if (pitchNumber !== "pitchNumber") {
                         if (oneNote == TEMPERAMENT["custom"][pitchNumber][1]) {
-                            var octaveDiff =
+                            let octaveDiff =
                                 octave - TEMPERAMENT["custom"][pitchNumber][2];
                             return Number(
                                 TEMPERAMENT["custom"][pitchNumber][0] *
@@ -630,8 +632,8 @@ function Synth() {
         if (typeof notes === "string") {
             return __getCustomFrequency(notes);
         } else if (typeof notes === "object") {
-            var results = [];
-            for (var i = 0; i < notes.length; i++) {
+            let results = [];
+            for (let i = 0; i < notes.length; i++) {
                 if (typeof notes[i] === "string") {
                     results.push(__getCustomFrequency(notes[i]));
                 } else {
@@ -715,7 +717,7 @@ function Synth() {
 
         if (this.samples === null) {
             this.samples = {};
-            for (var type in this.samplesManifest) {
+            for (let type in this.samplesManifest) {
                 if (this.samplesManifest.hasOwnProperty(type)) {
                     this.samples[type] = {};
                 }
@@ -724,11 +726,11 @@ function Synth() {
     };
 
     this._loadSample = function(sampleName) {
-        for (var type in this.samplesManifest) {
+        for (let type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
-                for (var sample in this.samplesManifest[type]) {
+                for (let sample in this.samplesManifest[type]) {
                     if (this.samplesManifest[type].hasOwnProperty(sample)) {
-                        var name = this.samplesManifest[type][sample].name;
+                        let name = this.samplesManifest[type][sample].name;
                         if (sampleName === name) {
                             // Load data returned from samples function.
                             this.samples[type][name] = this.samplesManifest[
@@ -743,11 +745,11 @@ function Synth() {
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
 
-    var that = this;
+    let that = this;
     require(SOUNDSAMPLESDEFINES, function() {
         that.loadSamples();
 
-        for (var i = 0; i < that.samplesQueue.length; i++) {
+        for (let i = 0; i < that.samplesQueue.length; i++) {
             that.__createSynth(
                 0,
                 that.samplesQueue[i][0],
@@ -766,14 +768,15 @@ function Synth() {
     // Function that provides default parameters for various synths
     this.getDefaultParamValues = function(sourceName) {
         // sourceName may need to be 'untranslated'
-        var sourceNameLC = sourceName.toLowerCase();
+        let sourceNameLC = sourceName.toLowerCase();
         if (getOscillatorTypes(sourceNameLC) !== null) {
             sourceNameLC = getOscillatorTypes(sourceNameLC);
         }
 
+        let synthOptions;
         switch (sourceNameLC) {
             case "amsynth":
-                var synthOptions = {
+                synthOptions = {
                     harmonicity: 1,
                     detune: 0,
                     envelope: {
@@ -794,7 +797,7 @@ function Synth() {
                 };
                 break;
             case "fmsynth":
-                var synthOptions = {
+                synthOptions = {
                     harmonicity: 1,
                     modulationIndex: 10,
                     detune: 0,
@@ -816,7 +819,7 @@ function Synth() {
                 };
                 break;
             case "noise1":
-                var synthOptions = {
+                synthOptions = {
                     noise: {
                         type: "white"
                     },
@@ -828,7 +831,7 @@ function Synth() {
                 };
                 break;
             case "noise2":
-                var synthOptions = {
+                synthOptions = {
                     noise: {
                         type: "brown"
                     },
@@ -840,7 +843,7 @@ function Synth() {
                 };
                 break;
             case "noise3":
-                var synthOptions = {
+                synthOptions = {
                     noise: {
                         type: "pink"
                     },
@@ -855,7 +858,7 @@ function Synth() {
             case "simple 2":
             case "simple 3":
             case "simple 4":
-                var synthOptions = {
+                synthOptions = {
                     oscillator: {
                         type: "sine"
                     },
@@ -868,7 +871,7 @@ function Synth() {
                 };
                 break;
             case "duosynth":
-                var synthOptions = {
+                synthOptions = {
                     vibratoAmount: 0.5,
                     vibratoRate: 5,
                     harmonicity: 1.5,
@@ -916,7 +919,7 @@ function Synth() {
             case "triangle":
             case "square":
             case "sawtooth":
-                var synthOptions = {
+                synthOptions = {
                     oscillator: {
                         type: sourceNameLC
                     },
@@ -929,19 +932,19 @@ function Synth() {
                 };
                 break;
             case "pluck":
-                var synthOptions = {
+                synthOptions = {
                     attackNoise: 1,
                     dampening: 4000,
                     resonance: 0.9
                 };
                 break;
             case "poly":
-                var synthOptions = {
+                synthOptions = {
                     polyphony: POLYCOUNT
                 };
                 break;
             default:
-                var synthOptions = {};
+                synthOptions = {};
                 break;
         }
 
@@ -953,7 +956,7 @@ function Synth() {
         console.debug(
             "create default poly/default/custom synth for turtle " + turtle
         );
-        var default_synth = new Tone.PolySynth(
+        let default_synth = new Tone.PolySynth(
             POLYCOUNT,
             Tone.AMSynth
         ).toMaster();
@@ -971,23 +974,24 @@ function Synth() {
         sourceName,
         params
     ) {
+        let tempSynth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             console.debug(sourceName + " " + SAMPLECENTERNO[sourceName][0]);
-            var noteDict = {};
+            let noteDict = {};
             noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[
                 sourceName
             ];
-            var tempSynth = new Tone.Sampler(noteDict);
+            tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.debug(sourceName);
-            var tempSynth = new Tone.Player(this.samples.drum[sourceName]);
+            tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, "drum"];
             console.debug(DEFAULTDRUM);
-            var tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
+            tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
         return tempSynth;
@@ -1000,8 +1004,9 @@ function Synth() {
         sourceName,
         params
     ) {
+        let synthOptions, builtin_synth;
         if (sourceName in BUILTIN_SYNTHS) {
-            var synthOptions = this.getDefaultParamValues(sourceName);
+            synthOptions = this.getDefaultParamValues(sourceName);
             synthOptions = validateAndSetParams(synthOptions, params);
         }
 
@@ -1012,7 +1017,7 @@ function Synth() {
             case "simple 4":
                 instrumentsSource[instrumentName] = [3, sourceName];
                 console.debug(sourceName);
-                var builtin_synth = new Tone.Synth(synthOptions);
+                builtin_synth = new Tone.Synth(synthOptions);
                 break;
             case "sine":
             case "triangle":
@@ -1020,17 +1025,17 @@ function Synth() {
             case "sawtooth":
                 instrumentsSource[instrumentName] = [3, sourceName];
                 console.debug(sourceName);
-                var builtin_synth = new Tone.Synth(synthOptions);
+                builtin_synth = new Tone.Synth(synthOptions);
                 break;
             case "pluck":
                 instrumentsSource[instrumentName] = [3, sourceName];
                 console.debug(sourceName);
-                var builtin_synth = new Tone.PluckSynth(synthOptions);
+                builtin_synth = new Tone.PluckSynth(synthOptions);
                 break;
             case "poly":
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly");
-                var builtin_synth = new Tone.PolySynth(
+                builtin_synth = new Tone.PolySynth(
                     synthOptions.polyphony,
                     Tone.AMSynth
                 );
@@ -1040,12 +1045,12 @@ function Synth() {
             case "noise3":
                 instrumentsSource[instrumentName] = [4, sourceName];
                 console.debug(sourceName);
-                var builtin_synth = new Tone.NoiseSynth(synthOptions);
+                builtin_synth = new Tone.NoiseSynth(synthOptions);
                 break;
             default:
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly (default)");
-                var builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+                builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
                 break;
         }
 
@@ -1056,17 +1061,18 @@ function Synth() {
     // Tonejs methods like AMSynth, FMSynth, etc.
     this._createCustomSynth = function(sourceName, params) {
         // Getting parameters for custom synth
-        var synthOptions = this.getDefaultParamValues(sourceName);
+        let synthOptions = this.getDefaultParamValues(sourceName);
         synthOptions = validateAndSetParams(synthOptions, params);
 
+        let tempSynth;
         if (sourceName.toLowerCase() === "amsynth") {
-            var tempSynth = new Tone.AMSynth(synthOptions);
+            tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === "fmsynth") {
-            var tempSynth = new Tone.FMSynth(synthOptions);
+            tempSynth = new Tone.FMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === "duosynth") {
-            var tempSynth = new Tone.DuoSynth(synthOptions);
+            tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
-            var tempSynth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+            tempSynth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
         }
 
         return tempSynth;
@@ -1128,7 +1134,7 @@ function Synth() {
         if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
 
-            var that = this;
+            let that = this;
             require(SOUNDSAMPLESDEFINES, function() {
                 that.loadSamples();
             });
@@ -1165,7 +1171,7 @@ function Synth() {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
-                var notes1 = notes;
+                let notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
                     if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
@@ -1190,7 +1196,7 @@ function Synth() {
         }
 
         if (this.inTemperament == "custom") {
-            var notes1 = notes;
+            let notes1 = notes;
             notes = this.getCustomFrequency(notes);
             if (notes === undefined) {
                 notes = notes1;
@@ -1202,13 +1208,13 @@ function Synth() {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
-                var numFilters = paramsFilters.length; // no. of filters
-                var k = 0;
-                var temp_filters = [];
+                let numFilters = paramsFilters.length; // no. of filters
+                let k = 0;
+                let temp_filters = [];
 
                 for (k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
-                    var filterVal = new Tone.Filter(
+                    let filterVal = new Tone.Filter(
                         paramsFilters[k].filterFrequency,
                         paramsFilters[k].filterType,
                         paramsFilters[k].filterRolloff
@@ -1220,7 +1226,7 @@ function Synth() {
 
             if (paramsEffects !== null && paramsEffects !== undefined) {
                 if (paramsEffects.doVibrato) {
-                    var vibrato = new Tone.Vibrato(
+                    let vibrato = new Tone.Vibrato(
                         1 / paramsEffects.vibratoFrequency,
                         paramsEffects.vibratoIntensity
                     );
@@ -1228,14 +1234,14 @@ function Synth() {
                 }
 
                 if (paramsEffects.doDistortion) {
-                    var distort = new Tone.Distortion(
+                    let distort = new Tone.Distortion(
                         paramsEffects.distortionAmount
                     ).toMaster();
                     synth.connect(distort, Tone.Master);
                 }
 
                 if (paramsEffects.doTremolo) {
-                    var tremolo = new Tone.Tremolo({
+                    let tremolo = new Tone.Tremolo({
                         frequency: paramsEffects.tremoloFrequency,
                         depth: paramsEffects.tremoloDepth
                     })
@@ -1245,7 +1251,7 @@ function Synth() {
                 }
 
                 if (paramsEffects.doPhaser) {
-                    var phaser = new Tone.Phaser({
+                    let phaser = new Tone.Phaser({
                         frequency: paramsEffects.rate,
                         octaves: paramsEffects.octaves,
                         baseFrequency: paramsEffects.baseFrequency
@@ -1254,7 +1260,7 @@ function Synth() {
                 }
 
                 if (paramsEffects.doChorus) {
-                    var chorusEffect = new Tone.Chorus({
+                    let chorusEffect = new Tone.Chorus({
                         frequency: paramsEffects.chorusRate,
                         delayTime: paramsEffects.delayTime,
                         depth: paramsEffects.chorusDepth
@@ -1289,21 +1295,21 @@ function Synth() {
                 }
 
                 if (paramsEffects.doNeighbor) {
-                    var firstTwoBeats = paramsEffects["neighborArgBeat"];
-                    var finalBeat = paramsEffects["neighborArgCurrentBeat"];
+                    let firstTwoBeats = paramsEffects["neighborArgBeat"];
+                    let finalBeat = paramsEffects["neighborArgCurrentBeat"];
 
                     // Create an array of start times and durations
                     // for each note.
-                    var obj = [];
+                    let obj = [];
                     for (
-                        var i = 0;
+                        let i = 0;
                         i < paramsEffects["neighborArgNote1"].length;
                         i++
                     ) {
-                        var note1 = paramsEffects["neighborArgNote1"][i]
+                        let note1 = paramsEffects["neighborArgNote1"][i]
                             .replace("♯", "#")
                             .replace("♭", "b");
-                        var note2 = paramsEffects["neighborArgNote2"][i]
+                        let note2 = paramsEffects["neighborArgNote2"][i]
                             .replace("♯", "#")
                             .replace("♭", "b");
                         obj.push(
@@ -1321,7 +1327,7 @@ function Synth() {
                         );
                     }
 
-                    var neighborEffect = new Tone.Part(function(time, value) {
+                    let neighborEffect = new Tone.Part(function(time, value) {
                         synth.triggerAttackRelease(
                             value.note,
                             value.duration,
@@ -1447,14 +1453,14 @@ function Synth() {
             }
         }
 
-        var tempNotes = notes;
-        var tempSynth = instruments[turtle]["electronic synth"];
-        var flag = 0;
+        let tempNotes = notes;
+        let tempSynth = instruments[turtle]["electronic synth"];
+        let flag = 0;
         if (instrumentName in instruments[turtle]) {
             tempSynth = instruments[turtle][instrumentName];
             flag = instrumentsSource[instrumentName][0];
             if (flag === 1 || flag === 2) {
-                var sampleName = instrumentsSource[instrumentName][1];
+                let sampleName = instrumentsSource[instrumentName][1];
             }
         }
 
@@ -1511,7 +1517,7 @@ function Synth() {
     };
 
     this.stopSound = function(turtle, instrumentName, note) {
-        var flag = instrumentsSource[instrumentName][0];
+        let flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
                 instruments[turtle][instrumentName].stop();
@@ -1537,20 +1543,21 @@ function Synth() {
     this.setVolume = function(turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
+        let nv;
         if (instrumentName in DEFAULTSYNTHVOLUME) {
-            var sv = DEFAULTSYNTHVOLUME[instrumentName];
+            let sv = DEFAULTSYNTHVOLUME[instrumentName];
             if (volume > 50) {
-                var d = 100 - sv;
-                var nv = ((volume - 50) / 50) * d + sv;
+                let d = 100 - sv;
+                nv = ((volume - 50) / 50) * d + sv;
             } else {
-                var nv = (volume / 50) * sv;
+                nv = (volume / 50) * sv;
             }
         } else {
-            var nv = volume;
+            nv = volume;
         }
 
         // Convert volume to decibals
-        var db = Tone.gainToDb(nv / 100);
+        let db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
             instruments[turtle][instrumentName].volume.value = db;
         }
@@ -1567,7 +1574,7 @@ function Synth() {
     };
 
     this.setMasterVolume = function(volume) {
-        var db = Tone.gainToDb(volume / 100);
+        let db = Tone.gainToDb(volume / 100);
         Tone.Master.volume.rampTo(db, 0.01);
     };
 
