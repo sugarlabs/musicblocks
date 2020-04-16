@@ -642,38 +642,38 @@ function processPluginData(
 }
 
 function updatePluginObj(obj) {
-    for (var name in obj["PALETTEPLUGINS"]) {
+    for (let name in obj["PALETTEPLUGINS"]) {
         pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    for (var name in obj["PALETTEFILLCOLORS"]) {
+    for (let name in obj["PALETTEFILLCOLORS"]) {
         pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
-    for (var name in obj["PALETTESTROKECOLORS"]) {
+    for (let name in obj["PALETTESTROKECOLORS"]) {
         pluginObjs["PALETTESTROKECOLORS"][name] =
             obj["PALETTESTROKECOLORS"][name];
     }
 
-    for (var name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+    for (let name in obj["PALETTEHIGHLIGHTCOLORS"]) {
         pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
             obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
-    for (var flow in obj["FLOWPLUGINS"]) {
+    for (let flow in obj["FLOWPLUGINS"]) {
         pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
-    for (var arg in obj["ARGPLUGINS"]) {
+    for (let arg in obj["ARGPLUGINS"]) {
         pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
-    for (var block in obj["BLOCKPLUGINS"]) {
+    for (let block in obj["BLOCKPLUGINS"]) {
         pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (var macro in obj["MACROPLUGINS"]) {
+        for (let macro in obj["MACROPLUGINS"]) {
             pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -689,15 +689,15 @@ function updatePluginObj(obj) {
         pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (var name in obj["ONLOAD"]) {
+    for (let name in obj["ONLOAD"]) {
         pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
-    for (var name in obj["ONSTART"]) {
+    for (let name in obj["ONSTART"]) {
         pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
-    for (var name in obj["ONSTOP"]) {
+    for (let name in obj["ONSTOP"]) {
         pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 }
@@ -712,10 +712,10 @@ function preparePluginExports(obj) {
 function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== "{}") {
-        var obj = JSON.parse(macroData);
+        let obj = JSON.parse(macroData);
         palettes.add("myblocks", "black", "#a0a0a0");
 
-        for (var name in obj) {
+        for (let name in obj) {
             console.debug("adding " + name + " to macroDict");
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
@@ -737,12 +737,12 @@ function prepareMacroExports(name, stack, macroDict) {
 
 // Publish to FB
 function doPublish(desc) {
-    var url = doSave();
+    let url = doSave();
     console.debug("push " + url + " to FB");
-    var descElem = docById("description");
-    var msg = desc + " " + descElem.value + " " + url;
+    let descElem = docById("description");
+    let msg = desc + " " + descElem.value + " " + url;
     console.debug("comment: " + msg);
-    var post_cb = function() {
+    let post_cb = function() {
         FB.api("/me/feed", "post", {
             message: msg
         });
@@ -754,7 +754,7 @@ function doPublish(desc) {
 }
 
 // TODO: Move to camera plugin
-var hasSetupCamera = false;
+let hasSetupCamera = false;
 function doUseCamera(
     args,
     turtles,
@@ -764,12 +764,12 @@ function doUseCamera(
     setCameraID,
     errorMsg
 ) {
-    var w = 320;
-    var h = 240;
+    let w = 320;
+    let h = 240;
 
-    var streaming = false;
-    var video = document.querySelector("#camVideo");
-    var canvas = document.querySelector("#camCanvas");
+    let streaming = false;
+    let video = document.querySelector("#camVideo");
+    let canvas = document.querySelector("#camCanvas");
     navigator.getMedia =
         navigator.getUserMedia ||
         navigator.mozGetUserMedia ||
@@ -786,7 +786,7 @@ function doUseCamera(
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
-                    var vendorURL = window.URL || window.webkitURL;
+                    let vendorURL = window.URL || window.webkitURL;
                     video.src = vendorURL.createObjectURL(stream);
                 }
 
@@ -835,7 +835,7 @@ function doUseCamera(
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-        var data = canvas.toDataURL("image/png");
+        let data = canvas.toDataURL("image/png");
         turtles.turtleList[turtle].doShowImage(args[0], data);
     }
 }
@@ -850,17 +850,17 @@ function doStopVideoCam(cameraID, setCameraID) {
 }
 
 function hideDOMLabel() {
-    var textLabel = docById("textLabel");
+    let textLabel = docById("textLabel");
     if (textLabel !== null) {
         textLabel.style.display = "none";
     }
 
-    var numberLabel = docById("numberLabel");
+    let numberLabel = docById("numberLabel");
     if (numberLabel !== null) {
         numberLabel.style.display = "none";
     }
 
-    var piemenu = docById("wheelDiv");
+    let piemenu = docById("wheelDiv");
     if (piemenu !== null) {
         piemenu.style.display = "none";
     }
@@ -868,7 +868,7 @@ function hideDOMLabel() {
 
 function displayMsg(blocks, text) {
     /*
-    var msgContainer = blocks.msgText.parent;
+    let msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
     blocks.msgText.text = text;
     msgContainer.updateCache();
@@ -891,7 +891,7 @@ function safeSVG(label) {
 function toFixed2(d) {
     // Return number as fixed 2 precision
     if (typeof d === "number") {
-        var floor = Math.floor(d);
+        let floor = Math.floor(d);
         if (d !== floor) {
             return d.toFixed(2).toString();
         } else {
@@ -906,9 +906,9 @@ function mixedNumber(d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
-        var floor = Math.floor(d);
+        let floor = Math.floor(d);
         if (d > floor) {
-            var obj = rationalToFraction(d - floor);
+            let obj = rationalToFraction(d - floor);
             if (floor === 0) {
                 return obj[0] + "/" + obj[1];
             } else {
@@ -939,7 +939,7 @@ function GCD(a, b) {
     b = Math.abs(b);
 
     while (b) {
-        var n = b;
+        let n = b;
         b = a % b;
         a = n;
     }
@@ -954,28 +954,29 @@ function rationalSum(a, b) {
     }
 
     // Make sure a and b components are integers.
+    let obja0, objb0, obja1, objb1;
     if (Math.floor(a[0]) !== a[0]) {
-        var obja0 = rationalToFraction(a[0]);
+        obja0 = rationalToFraction(a[0]);
     } else {
-        var obja0 = [a[0], 1];
+        obja0 = [a[0], 1];
     }
 
     if (Math.floor(b[0]) !== b[0]) {
-        var objb0 = rationalToFraction(b[0]);
+        objb0 = rationalToFraction(b[0]);
     } else {
-        var objb0 = [b[0], 1];
+        objb0 = [b[0], 1];
     }
 
     if (Math.floor(a[1]) !== a[1]) {
-        var obja1 = rationalToFraction(a[1]);
+        obja1 = rationalToFraction(a[1]);
     } else {
-        var obja1 = [a[1], 1];
+        obja1 = [a[1], 1];
     }
 
     if (Math.floor(b[1]) !== b[1]) {
-        var objb1 = rationalToFraction(b[1]);
+        objb1 = rationalToFraction(b[1]);
     } else {
-        var objb1 = [b[1], 1];
+        objb1 = [b[1], 1];
     }
 
     a[0] = obja0[0] * obja1[1];
@@ -984,8 +985,8 @@ function rationalSum(a, b) {
     b[1] = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    var lcd = LCD(a[1], b[1]);
-    var c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
+    let lcd = LCD(a[1], b[1]);
+    let c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 }
 
@@ -1006,16 +1007,17 @@ readable-fractions/681534#681534
 
     */
 
+    let invert;
     if (d > 1) {
-        var invert = true;
+        invert = true;
         d = 1 / d;
     } else {
-        var invert = false;
+        invert = false;
     }
 
-    var df = 1.0;
-    var top = 1;
-    var bot = 1;
+    let df = 1.0;
+    let top = 1;
+    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001) {
         if (df < d) {
@@ -1042,9 +1044,9 @@ readable-fractions/681534#681534
 function nearestBeat(d, b) {
     // Find the closest beat for a given fraction.
 
-    var sum = 1 / (2 * b);
-    var count = 0;
-    var dd = d / 100;
+    let sum = 1 / (2 * b);
+    let count = 0;
+    let dd = d / 100;
     while (dd > sum) {
         sum += 1 / b;
         count += 1;
@@ -1236,7 +1238,7 @@ function rgbToHex(r, g, b) {
 }
 
 function hexToRGB(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
               r: parseInt(result[1], 16),
@@ -1259,8 +1261,8 @@ function closeWidgets() {
 };
 
 function closeBlkWidgets (name) {
-    var widgetTitle = document.getElementsByClassName("wftTitle");
-    for (var i = 0; i < widgetTitle.length; i++) {
+    let widgetTitle = document.getElementsByClassName("wftTitle");
+    for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
            break;
