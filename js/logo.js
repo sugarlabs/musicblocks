@@ -2218,6 +2218,15 @@ function Logo() {
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setMasterVolume(volume);
+            for (
+                let turtle = 0;
+                turtle < this.turtles.turtleList.length;
+                turtle++
+            ) {
+                for (let synth in this.synthVolume[turtle]) {
+                    this.synthVolume[turtle][synth].push(volume);
+                }
+            }
         }
     };
 
