@@ -100,6 +100,7 @@ const TACAT = {
 
     // rhythm palette
     mynotevalue: "rhythmfactor",
+    silenceinput: 'note',
     duplicatefactor: "rhythmfactor",
     skipfactor: "rhythmfactor",
     osctime: "rhythm",

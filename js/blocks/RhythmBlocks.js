@@ -412,6 +412,28 @@ function setupRhythmBlocks() {
         }
     }
 
+    class SilenceInputBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the value (e.g., 1/4 note) of the note being played.
+            super("silenceinput", _("Silence Value"));
+            this.setPalette("rhythm");
+            this.parameter = true;
+            this.beginnerBlock(true);
+            this.setHelpString([
+                _(
+                    "The Note value block is the value of the duration of the note currently being played."
+                ),
+                "documentation",
+                null,
+                "everybeathelp"
+            ]);
+        }
+
+        arg(logo, turtle, blk) {
+            return 'R';
+        }
+    }
+
     class SkipFactorBlock extends ValueBlock {
         constructor() {
             super("skipfactor", "skip factor");
@@ -1173,6 +1195,7 @@ function setupRhythmBlocks() {
     }
 
     new MyNoteValueBlock().setup();
+    new SilenceInputBlock().setup();
     new SkipFactorBlock().setup();
     new MillisecondsBlock().setup();
     new SwingBlock().setup();
