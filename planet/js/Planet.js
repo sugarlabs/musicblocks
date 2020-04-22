@@ -29,7 +29,7 @@ function Planet(isMusicBlocks, storage) {
     this.loadProjectFromFile = null;
 
     this.prepareUserID = function() {
-        var id = getCookie(this.UserIDCookie);
+        let id = getCookie(this.UserIDCookie);
         if (id === ''){
             id = this.ProjectStorage.generateID();
             setCookie(this.UserIDCookie, id, 3650);
@@ -80,7 +80,7 @@ function Planet(isMusicBlocks, storage) {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        var that = this;
+        let that = this;
 
         document.getElementById('close-planet').addEventListener('click', function (evt) {
             that.closeButton();
@@ -99,7 +99,7 @@ function Planet(isMusicBlocks, storage) {
 
     this.closeButton = function() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            var d = this.ProjectStorage.getCurrentProjectData();
+            let d = this.ProjectStorage.getCurrentProjectData();
             if (d === null){
             this.loadNewProject();
             } else {
