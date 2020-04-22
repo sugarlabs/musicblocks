@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function GlobalTag(Planet) {
-    var tagNames = [
+    let tagNames = [
 	//.TRANS: On the Planet, we use labels to tag projects.
 	_('All Projects'),
 	//.TRANS: On the Planet, we use labels to tag projects.
@@ -48,7 +48,7 @@ function GlobalTag(Planet) {
     this.selectedClass = null;
 
     this.render = function() {
-        var tag = document.createElement('div');
+        let tag = document.createElement('div');
         tag.classList.add('chipselect');
         tag.classList.add('cursor');
         if (this.selected){
@@ -57,13 +57,13 @@ function GlobalTag(Planet) {
 
         tag.textContent = _(this.name);
 
-        var that = this;
+        let that = this;
 
         tag.addEventListener('click', function (evt) {
             that.onTagClick();
         });
 
-        var el = document.getElementById('morechips');
+        let el = document.getElementById('morechips');
         if (this.IsDisplayTag){
             el = document.getElementById('primarychips');
         }
