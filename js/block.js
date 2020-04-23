@@ -5693,7 +5693,7 @@ function Block(protoblock, blocks, overrideName) {
             let cblk2 = that.blocks.blockList[cblk1].connections[0];
 
             // Check if the number block is connected to a note value and prevent the value to go below zero
-            if((that.blocks.blockList[cblk1].name === 'newnote' || that.blocks.blockList[cblk2].name == 'newnote') && that.value < 1) {
+            if ((that.value < 1) && (that.blocks.blockList[cblk1].name === 'newnote' || (cblk2 && that.blocks.blockList[cblk2].name == 'newnote'))) {
                 that.value = 0;
             } else {
                 that.value -= 1;
