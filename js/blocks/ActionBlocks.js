@@ -684,7 +684,7 @@ function setupActionBlocks() {
                 name: _("broadcast"),
                 args: 1,
                 defaults: [_("event")],
-                argTypes: ["textin"]
+                argTypes: ["anyin"]
             });
         }
 
