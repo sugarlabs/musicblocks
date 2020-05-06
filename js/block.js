@@ -4178,7 +4178,7 @@ function Block(protoblock, blocks, overrideName) {
                     return;
                 }
 
-                that._labelChanged(false, true);
+                that._labelChanged(true, true);
 
                 event.preventDefault();
 
