@@ -2254,10 +2254,11 @@ function Block(protoblock, blocks, overrideName) {
             return "";
         }
 
+        let c1, c2;
         switch (this.blocks.blockList[c].name) {
             case "pitch":
-                let c1 = this.blocks.blockList[c].connections[1];
-                let c2 = this.blocks.blockList[c].connections[2];
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "solfege") {
                         let solfnotes_ = _("ti la sol fa mi re do").split(" ");
