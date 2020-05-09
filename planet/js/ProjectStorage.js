@@ -25,10 +25,10 @@ function ProjectStorage(Planet) {
         console.debug("DATA LOADED");
     });
     this.generateID = function() {
-        var n = Date.now();
-        var prefix = n.toString();
-        var suffix = ''
-        for (var i = 0; i < 3; i++) {
+        let n = Date.now();
+        let prefix = n.toString();
+        let suffix = ''
+        for (let i = 0; i < 3; i++) {
             suffix += Math.floor(Math.random() * 10).toString();
         }
         return prefix+suffix;
@@ -39,7 +39,7 @@ function ProjectStorage(Planet) {
             this.initialiseNewProject();
         }
 
-        var c = this.data.CurrentProject;
+        let c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             this.data.Projects[c] = {};
             this.data.Projects[c].ProjectName = this.defaultProjectName;
@@ -57,7 +57,7 @@ function ProjectStorage(Planet) {
 
     this.getCurrentProjectData = async function() {
         await this.dataLoaded;
-        var c = this.data.CurrentProject;
+        let c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             return null;
         } else {
@@ -66,7 +66,7 @@ function ProjectStorage(Planet) {
     };
 
     this.getCurrentProjectName = function() {
-        var c = this.data.CurrentProject;
+        let c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             return this.defaultProjectName;
         } else {
@@ -75,7 +75,7 @@ function ProjectStorage(Planet) {
     };
 
     this.getCurrentProjectDescription = function() {
-        var c = this.data.CurrentProject;
+        let c = this.data.CurrentProject;
         if (this.data.Projects[c]!=undefined) {
             if (this.data.Projects[c].PublishedData !== null) {
                 return this.data.Projects[c].PublishedData.ProjectDescription;
@@ -86,7 +86,7 @@ function ProjectStorage(Planet) {
     };
 
     this.getCurrentProjectImage = function() {
-        var c = this.data.CurrentProject;
+        let c = this.data.CurrentProject;
         if (this.data.Projects[c] !== undefined) {
             if (this.data.Projects[c].ProjectImage !== null) {
                 return this.data.Projects[c].ProjectImage;
@@ -109,7 +109,7 @@ function ProjectStorage(Planet) {
             image = null;
         }
 
-        var c = this.generateID();
+        let c = this.generateID();
         this.data.CurrentProject = c;
         this.data.Projects[c] = {};
         this.data.Projects[c].ProjectName = name;
@@ -181,7 +181,7 @@ function ProjectStorage(Planet) {
     // Ancillary Functions
 
     this.set = async function(key, obj) {
-        var jsonobj = JSON.stringify(obj);
+        let jsonobj = JSON.stringify(obj);
         await this.LocalStorage.setItem(key, jsonobj);
         let savedjsonobj = await this.LocalStorage.getItem(key);
         if(savedjsonobj !== jsonobj){

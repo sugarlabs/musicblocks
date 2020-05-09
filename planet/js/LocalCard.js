@@ -57,12 +57,12 @@ function LocalCard(Planet){
 </div>';
 
     this.download = function() {
-        var image = Planet.ProjectStorage.ImageDataURL;
+        let image = Planet.ProjectStorage.ImageDataURL;
         if (this.ProjectData.ProjectImage !== null){
             image = this.ProjectData.ProjectImage;
         }
 
-        var description = null;
+        let description = null;
         if (this.ProjectData.PublishedData !== null){
             description = this.ProjectData.PublishedData.ProjectDescription;
         }
@@ -77,8 +77,8 @@ function LocalCard(Planet){
 
     this.render = function() {
         // TODO: Have a TB placeholder image specific to TB projects
-        var html = this.renderData.replace(new RegExp('\{ID\}', 'g'), this.id);
-        var frag = document.createRange().createContextualFragment(html);
+        let html = this.renderData.replace(new RegExp('\{ID\}', 'g'), this.id);
+        let frag = document.createRange().createContextualFragment(html);
 
         // set image
         if (this.ProjectData.ProjectImage !== null){
@@ -92,7 +92,7 @@ function LocalCard(Planet){
         // set input text
         frag.getElementById('local-project-input-' + this.id).value = this.ProjectData.ProjectName;
 
-        var that = this;
+        let that = this;
 
         // set edit modify listener
         frag.getElementById('local-project-edit-' + this.id).addEventListener('click', function (evt) {
@@ -136,7 +136,7 @@ function LocalCard(Planet){
 
         // set share button listener
         frag.getElementById('local-project-share-' + this.id).addEventListener('click', function (evt) {
-            var s = document.getElementById('sharebox-' + that.id);
+            let s = document.getElementById('sharebox-' + that.id);
             if (s.style.display === 'none') {
                 if (that.ProjectData.PublishedData !== null) {
                     s.style.display = 'initial';

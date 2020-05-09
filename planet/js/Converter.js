@@ -40,14 +40,14 @@ function Converter(Planet) {
 
     // Unused, but might be useful.
     this.getBlob = function(mime, data) {
-        var rawData = window.atob(data);
-        var len = rawData.length;
-        var arr = new Uint8Array(len);
-        for (var i = 0; i < len; i++){
+        let rawData = window.atob(data);
+        let len = rawData.length;
+        let arr = new Uint8Array(len);
+        for (let i = 0; i < len; i++){
             arr[i] = rawData.charCodeAt(i);
         }
 
-        var blob = new Blob([arr], {type: mime});
+        let blob = new Blob([arr], {type: mime});
         return blob;
     };
 
