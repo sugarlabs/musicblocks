@@ -35,9 +35,9 @@ function format(str, data) {
 }
 
 function canvasPixelRatio() {
-    var devicePixelRatio = window.devicePixelRatio || 1;
-    var context = document.querySelector("#myCanvas").getContext("2d");
-    var backingStoreRatio =
+    let devicePixelRatio = window.devicePixelRatio || 1;
+    let context = document.querySelector("#myCanvas").getContext("2d");
+    let backingStoreRatio =
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||
         context.msBackingStorePixelRatio ||
@@ -48,7 +48,7 @@ function canvasPixelRatio() {
 }
 
 function windowHeight() {
-    var onAndroid = /Android/i.test(navigator.userAgent);
+    let onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
     } else {
@@ -57,7 +57,7 @@ function windowHeight() {
 }
 
 function windowWidth() {
-    var onAndroid = /Android/i.test(navigator.userAgent);
+    let onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
     } else {
@@ -66,7 +66,7 @@ function windowWidth() {
 }
 
 function httpGet(projectName) {
-    var xmlHttp = null;
+    let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
         xmlHttp.open("GET", window.server, false);
@@ -85,7 +85,7 @@ function httpGet(projectName) {
 }
 
 function httpPost(projectName, data) {
-    var xmlHttp = null;
+    let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
     xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
@@ -96,13 +96,13 @@ function httpPost(projectName, data) {
 
 function HttpRequest(url, loadCallback, userCallback) {
     // userCallback is an optional callback-handler.
-    var req = (this.request = new XMLHttpRequest());
+    let req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
     this.userCallback = userCallback;
 
-    var objref = this;
+    let objref = this;
     try {
         req.open("GET", url);
 
@@ -127,11 +127,11 @@ function HttpRequest(url, loadCallback, userCallback) {
 }
 
 function doBrowserCheck() {
-    var matched, browser;
+    let matched, browser;
     jQuery.uaMatch = function( ua ) {
         ua = ua.toLowerCase();
 
-        var match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
+        let match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
             /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
             /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
             /(msie) ([\w.]+)/.exec( ua ) ||
@@ -164,10 +164,10 @@ function doBrowserCheck() {
 // Check for Internet Explorer
 
 window.onload = function() {
-    var userAgent = window.navigator.userAgent;
+    let userAgent = window.navigator.userAgent;
     console.log("run detectIE")
     // For IE 10 or older
-    var MSIE = userAgent.indexOf("MSIE ");
+    let MSIE = userAgent.indexOf("MSIE ");
     if (MSIE > 0) {
         DetectVersionOfIE = parseInt(
             userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
@@ -176,9 +176,9 @@ window.onload = function() {
     }
 
     // For IE 11
-    var IETrident = userAgent.indexOf("Trident/");
+    let IETrident = userAgent.indexOf("Trident/");
     if (IETrident > 0) {
-        var IERv = userAgent.indexOf("rv:");
+        let IERv = userAgent.indexOf("rv:");
         DetectVersionOfIE = parseInt(
             userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
             10
@@ -186,7 +186,7 @@ window.onload = function() {
     }
 
     // For IE 12
-    var IEEDGE = userAgent.indexOf("Edge/");
+    let IEEDGE = userAgent.indexOf("Edge/");
     if (IEEDGE > 0) {
         DetectVersionOfIE = parseInt(
             userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
@@ -229,7 +229,7 @@ function docByName(name) {
 }
 
 function last(myList) {
-    var i = myList.length;
+    let i = myList.length;
     if (i === 0) {
         return null;
     } else {
@@ -239,25 +239,25 @@ function last(myList) {
 
 function getTextWidth(text, font) {
     // re-use canvas object for better performance
-    var canvas =
+    let canvas =
         getTextWidth.canvas ||
         (getTextWidth.canvas = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
+    let context = canvas.getContext("2d");
     context.font = font;
-    var metrics = context.measureText(text);
+    let metrics = context.measureText(text);
     return metrics.width;
 }
 
 function doSVG(canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
-    var turtleSVG = "";
-    for (var turtle in turtles.turtleList) {
+    let turtleSVG = "";
+    for (let turtle in turtles.turtleList) {
         turtles.turtleList[turtle].closeSVG();
         turtleSVG += turtles.turtleList[turtle].svgOutput;
     }
 
-    var svg =
+    let svg =
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' +
         width +
         '" height="' +
@@ -278,7 +278,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
 }
 
 function isSVGEmpty(turtles) {
-    for (var turtle in turtles.turtleList) {
+    for (let turtle in turtles.turtleList) {
         turtles.turtleList[turtle].closeSVG();
         if (turtles.turtleList[turtle].svgOutput !== "") {
             return false;
@@ -292,7 +292,7 @@ function fileExt(file) {
         return "";
     }
 
-    var parts = file.split(".");
+    let parts = file.split(".");
     if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
         return "";
     }
@@ -301,7 +301,7 @@ function fileExt(file) {
 }
 
 function fileBasename(file) {
-    var parts = file.split(".");
+    let parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
     } else if (parts[0] === "" && parts.length === 2) {
@@ -318,8 +318,8 @@ function _(text) {
         return "";
     }
 
-    var replaced = text;
-    var replace = [
+    let replaced = text;
+    let replace = [
         ",",
         "(",
         ")",
@@ -340,21 +340,21 @@ function _(text) {
         "!",
         "¡"
     ];
-    for (var p = 0; p < replace.length; p++) {
+    for (let p = 0; p < replace.length; p++) {
         replaced = replaced.replace(replace[p], "");
     }
 
     replaced = replaced.replace(/ /g, "-");
 
     if (localStorage.kanaPreference === "kana") {
-        var lang = document.webL10n.getLanguage();
+        let lang = document.webL10n.getLanguage();
         if (lang === "ja") {
             replaced = "kana-" + replaced;
         }
     }
 
     try {
-        var translation = document.webL10n.get(replaced);
+        let translation = document.webL10n.get(replaced);
         if (translation === "") {
             translation = text;
         }
@@ -367,7 +367,7 @@ function _(text) {
 
 function toTitleCase(str) {
     if (typeof str !== "string") return;
-    var tempStr = "";
+    let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
 }
@@ -386,12 +386,12 @@ function processRawPluginData(
     evalMacroDict
 ) {
     // console.debug(rawData);
-    var lineData = rawData.split("\n");
-    var cleanData = "";
+    let lineData = rawData.split("\n");
+    let cleanData = "";
 
     // We need to remove blank lines and comments and then
     // join the data back together for processing as JSON.
-    for (var i = 0; i < lineData.length; i++) {
+    for (let i = 0; i < lineData.length; i++) {
         if (lineData[i].length === 0) {
             continue;
         }
@@ -405,8 +405,9 @@ function processRawPluginData(
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
+    let obj;
     try {
-        var obj = processPluginData(
+        obj = processPluginData(
             cleanData.replace(/\n/g, ""),
             palettes,
             blocks,
@@ -419,7 +420,7 @@ function processRawPluginData(
             evalMacroDict
         );
     } catch (e) {
-        var obj = null;
+        obj = null;
         errorMsg("Error loading plugin: " + e);
     }
 
@@ -440,47 +441,47 @@ function processPluginData(
 ) {
     // Plugins are JSON-encoded dictionaries.
     // console.debug(pluginData);
-    var obj = JSON.parse(pluginData);
+    let obj = JSON.parse(pluginData);
 
     // Create a palette entry.
-    var newPalette = false;
+    let newPalette = false;
     if ("PALETTEPLUGINS" in obj) {
-        for (var name in obj["PALETTEPLUGINS"]) {
+        for (let name in obj["PALETTEPLUGINS"]) {
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
-            var fillColor = "#ff0066";
+            let fillColor = "#ff0066";
             if ("PALETTEFILLCOLORS" in obj) {
                 if (name in obj["PALETTEFILLCOLORS"]) {
-                    var fillColor = obj["PALETTEFILLCOLORS"][name];
+                    fillColor = obj["PALETTEFILLCOLORS"][name];
                     // console.debug(fillColor);
                 }
             }
 
             PALETTEFILLCOLORS[name] = fillColor;
 
-            var strokeColor = "#ef003e";
+            let strokeColor = "#ef003e";
             if ("PALETTESTROKECOLORS" in obj) {
                 if (name in obj["PALETTESTROKECOLORS"]) {
-                    var strokeColor = obj["PALETTESTROKECOLORS"][name];
+                    strokeColor = obj["PALETTESTROKECOLORS"][name];
                     // console.debug(strokeColor);
                 }
             }
 
             PALETTESTROKECOLORS[name] = strokeColor;
 
-            var highlightColor = "#ffb1b3";
+            let highlightColor = "#ffb1b3";
             if ("PALETTEHIGHLIGHTCOLORS" in obj) {
                 if (name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-                    var highlightColor = obj["PALETTEHIGHLIGHTCOLORS"][name];
+                    highlightColor = obj["PALETTEHIGHLIGHTCOLORS"][name];
                     // console.debug(highlightColor);
                 }
             }
 
             PALETTEHIGHLIGHTCOLORS[name] = highlightColor;
 
-            var strokeHighlightColor = "#404040";
+            let strokeHighlightColor = "#404040";
             if ("HIGHLIGHTSTROKECOLORS" in obj) {
                 if (name in obj["HIGHLIGHTSTROKECOLORS"]) {
-                    var strokeHighlightColor =
+                    strokeHighlightColor =
                         obj["HIGHLIGHTSTROKECOLORS"][name];
                     // console.debug(highlightColor);
                 }
@@ -516,7 +517,7 @@ function processPluginData(
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (var blkName in obj["IMAGES"]) {
+        for (let blkName in obj["IMAGES"]) {
             pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -524,7 +525,7 @@ function processPluginData(
     // Populate the flow-block dictionary, i.e., the code that is
     // eval'd by this block.
     if ("FLOWPLUGINS" in obj) {
-        for (var flow in obj["FLOWPLUGINS"]) {
+        for (let flow in obj["FLOWPLUGINS"]) {
             evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
         }
     }
@@ -532,7 +533,7 @@ function processPluginData(
     // Populate the arg-block dictionary, i.e., the code that is
     // eval'd by this block.
     if ("ARGPLUGINS" in obj) {
-        for (var arg in obj["ARGPLUGINS"]) {
+        for (let arg in obj["ARGPLUGINS"]) {
             evalArgDict[arg] = obj["ARGPLUGINS"][arg];
         }
     }
@@ -540,7 +541,7 @@ function processPluginData(
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (var macro in obj["MACROPLUGINS"]) {
+        for (let macro in obj["MACROPLUGINS"]) {
             try {
                 evalMacroDict[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -553,7 +554,7 @@ function processPluginData(
     // Populate the setter dictionary, i.e., the code that is
     // used to set a value block.
     if ("SETTERPLUGINS" in obj) {
-        for (var setter in obj["SETTERPLUGINS"]) {
+        for (let setter in obj["SETTERPLUGINS"]) {
             evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
         }
     }
@@ -562,10 +563,10 @@ function processPluginData(
     // FIXME: On Chrome, plugins are broken (They still work on Firefox):
     // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
     // Maybe:
-    // var g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
     if ("BLOCKPLUGINS" in obj) {
-        for (var block in obj["BLOCKPLUGINS"]) {
+        for (let block in obj["BLOCKPLUGINS"]) {
             console.debug("adding plugin block " + block);
             try {
                 eval(obj["BLOCKPLUGINS"][block]);
@@ -581,33 +582,33 @@ function processPluginData(
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (var parameter in obj["PARAMETERPLUGINS"]) {
+        for (let parameter in obj["PARAMETERPLUGINS"]) {
             evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
         }
     }
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (var arg in obj["ONLOAD"]) {
+        for (let arg in obj["ONLOAD"]) {
             eval(obj["ONLOAD"][arg]);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (var arg in obj["ONSTART"]) {
+        for (let arg in obj["ONSTART"]) {
             evalOnStartList[arg] = obj["ONSTART"][arg];
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (var arg in obj["ONSTOP"]) {
+        for (let arg in obj["ONSTOP"]) {
             evalOnStopList[arg] = obj["ONSTOP"][arg];
         }
     }
 
-    for (var protoblock in blocks.protoBlockDict) {
+    for (let protoblock in blocks.protoBlockDict) {
         try {
             // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
@@ -641,38 +642,38 @@ function processPluginData(
 }
 
 function updatePluginObj(obj) {
-    for (var name in obj["PALETTEPLUGINS"]) {
+    for (let name in obj["PALETTEPLUGINS"]) {
         pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    for (var name in obj["PALETTEFILLCOLORS"]) {
+    for (let name in obj["PALETTEFILLCOLORS"]) {
         pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
-    for (var name in obj["PALETTESTROKECOLORS"]) {
+    for (let name in obj["PALETTESTROKECOLORS"]) {
         pluginObjs["PALETTESTROKECOLORS"][name] =
             obj["PALETTESTROKECOLORS"][name];
     }
 
-    for (var name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+    for (let name in obj["PALETTEHIGHLIGHTCOLORS"]) {
         pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
             obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
-    for (var flow in obj["FLOWPLUGINS"]) {
+    for (let flow in obj["FLOWPLUGINS"]) {
         pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
-    for (var arg in obj["ARGPLUGINS"]) {
+    for (let arg in obj["ARGPLUGINS"]) {
         pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
-    for (var block in obj["BLOCKPLUGINS"]) {
+    for (let block in obj["BLOCKPLUGINS"]) {
         pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (var macro in obj["MACROPLUGINS"]) {
+        for (let macro in obj["MACROPLUGINS"]) {
             pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -688,15 +689,15 @@ function updatePluginObj(obj) {
         pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (var name in obj["ONLOAD"]) {
+    for (let name in obj["ONLOAD"]) {
         pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
-    for (var name in obj["ONSTART"]) {
+    for (let name in obj["ONSTART"]) {
         pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
-    for (var name in obj["ONSTOP"]) {
+    for (let name in obj["ONSTOP"]) {
         pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 }
@@ -711,10 +712,10 @@ function preparePluginExports(obj) {
 function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== "{}") {
-        var obj = JSON.parse(macroData);
+        let obj = JSON.parse(macroData);
         palettes.add("myblocks", "black", "#a0a0a0");
 
-        for (var name in obj) {
+        for (let name in obj) {
             console.debug("adding " + name + " to macroDict");
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
@@ -736,12 +737,12 @@ function prepareMacroExports(name, stack, macroDict) {
 
 // Publish to FB
 function doPublish(desc) {
-    var url = doSave();
+    let url = doSave();
     console.debug("push " + url + " to FB");
-    var descElem = docById("description");
-    var msg = desc + " " + descElem.value + " " + url;
+    let descElem = docById("description");
+    let msg = desc + " " + descElem.value + " " + url;
     console.debug("comment: " + msg);
-    var post_cb = function() {
+    let post_cb = function() {
         FB.api("/me/feed", "post", {
             message: msg
         });
@@ -753,7 +754,7 @@ function doPublish(desc) {
 }
 
 // TODO: Move to camera plugin
-var hasSetupCamera = false;
+let hasSetupCamera = false;
 function doUseCamera(
     args,
     turtles,
@@ -763,12 +764,12 @@ function doUseCamera(
     setCameraID,
     errorMsg
 ) {
-    var w = 320;
-    var h = 240;
+    let w = 320;
+    let h = 240;
 
-    var streaming = false;
-    var video = document.querySelector("#camVideo");
-    var canvas = document.querySelector("#camCanvas");
+    let streaming = false;
+    let video = document.querySelector("#camVideo");
+    let canvas = document.querySelector("#camCanvas");
     navigator.getMedia =
         navigator.getUserMedia ||
         navigator.mozGetUserMedia ||
@@ -785,7 +786,7 @@ function doUseCamera(
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
-                    var vendorURL = window.URL || window.webkitURL;
+                    let vendorURL = window.URL || window.webkitURL;
                     video.src = vendorURL.createObjectURL(stream);
                 }
 
@@ -834,7 +835,7 @@ function doUseCamera(
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-        var data = canvas.toDataURL("image/png");
+        let data = canvas.toDataURL("image/png");
         turtles.turtleList[turtle].doShowImage(args[0], data);
     }
 }
@@ -849,17 +850,17 @@ function doStopVideoCam(cameraID, setCameraID) {
 }
 
 function hideDOMLabel() {
-    var textLabel = docById("textLabel");
+    let textLabel = docById("textLabel");
     if (textLabel !== null) {
         textLabel.style.display = "none";
     }
 
-    var numberLabel = docById("numberLabel");
+    let numberLabel = docById("numberLabel");
     if (numberLabel !== null) {
         numberLabel.style.display = "none";
     }
 
-    var piemenu = docById("wheelDiv");
+    let piemenu = docById("wheelDiv");
     if (piemenu !== null) {
         piemenu.style.display = "none";
     }
@@ -867,7 +868,7 @@ function hideDOMLabel() {
 
 function displayMsg(blocks, text) {
     /*
-    var msgContainer = blocks.msgText.parent;
+    let msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
     blocks.msgText.text = text;
     msgContainer.updateCache();
@@ -890,7 +891,7 @@ function safeSVG(label) {
 function toFixed2(d) {
     // Return number as fixed 2 precision
     if (typeof d === "number") {
-        var floor = Math.floor(d);
+        let floor = Math.floor(d);
         if (d !== floor) {
             return d.toFixed(2).toString();
         } else {
@@ -905,9 +906,9 @@ function mixedNumber(d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
-        var floor = Math.floor(d);
+        let floor = Math.floor(d);
         if (d > floor) {
-            var obj = rationalToFraction(d - floor);
+            let obj = rationalToFraction(d - floor);
             if (floor === 0) {
                 return obj[0] + "/" + obj[1];
             } else {
@@ -938,7 +939,7 @@ function GCD(a, b) {
     b = Math.abs(b);
 
     while (b) {
-        var n = b;
+        let n = b;
         b = a % b;
         a = n;
     }
@@ -953,28 +954,29 @@ function rationalSum(a, b) {
     }
 
     // Make sure a and b components are integers.
+    let obja0, objb0, obja1, objb1;
     if (Math.floor(a[0]) !== a[0]) {
-        var obja0 = rationalToFraction(a[0]);
+        obja0 = rationalToFraction(a[0]);
     } else {
-        var obja0 = [a[0], 1];
+        obja0 = [a[0], 1];
     }
 
     if (Math.floor(b[0]) !== b[0]) {
-        var objb0 = rationalToFraction(b[0]);
+        objb0 = rationalToFraction(b[0]);
     } else {
-        var objb0 = [b[0], 1];
+        objb0 = [b[0], 1];
     }
 
     if (Math.floor(a[1]) !== a[1]) {
-        var obja1 = rationalToFraction(a[1]);
+        obja1 = rationalToFraction(a[1]);
     } else {
-        var obja1 = [a[1], 1];
+        obja1 = [a[1], 1];
     }
 
     if (Math.floor(b[1]) !== b[1]) {
-        var objb1 = rationalToFraction(b[1]);
+        objb1 = rationalToFraction(b[1]);
     } else {
-        var objb1 = [b[1], 1];
+        objb1 = [b[1], 1];
     }
 
     a[0] = obja0[0] * obja1[1];
@@ -983,8 +985,8 @@ function rationalSum(a, b) {
     b[1] = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    var lcd = LCD(a[1], b[1]);
-    var c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
+    let lcd = LCD(a[1], b[1]);
+    let c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 }
 
@@ -1005,16 +1007,17 @@ readable-fractions/681534#681534
 
     */
 
+    let invert;
     if (d > 1) {
-        var invert = true;
+        invert = true;
         d = 1 / d;
     } else {
-        var invert = false;
+        invert = false;
     }
 
-    var df = 1.0;
-    var top = 1;
-    var bot = 1;
+    let df = 1.0;
+    let top = 1;
+    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001) {
         if (df < d) {
@@ -1041,9 +1044,9 @@ readable-fractions/681534#681534
 function nearestBeat(d, b) {
     // Find the closest beat for a given fraction.
 
-    var sum = 1 / (2 * b);
-    var count = 0;
-    var dd = d / 100;
+    let sum = 1 / (2 * b);
+    let count = 0;
+    let dd = d / 100;
     while (dd > sum) {
         sum += 1 / b;
         count += 1;
@@ -1235,7 +1238,7 @@ function rgbToHex(r, g, b) {
 }
 
 function hexToRGB(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
               r: parseInt(result[1], 16),
@@ -1258,8 +1261,8 @@ function closeWidgets() {
 };
 
 function closeBlkWidgets (name) {
-    var widgetTitle = document.getElementsByClassName("wftTitle");
-    for (var i = 0; i < widgetTitle.length; i++) {
+    let widgetTitle = document.getElementsByClassName("wftTitle");
+    for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
            break;
