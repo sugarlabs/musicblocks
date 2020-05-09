@@ -1226,7 +1226,7 @@ function Synth() {
 
             if (paramsEffects !== null && paramsEffects !== undefined) {
                 if (paramsEffects.doVibrato) {
-                    let vibrato = new Tone.Vibrato(
+                    var vibrato = new Tone.Vibrato(
                         1 / paramsEffects.vibratoFrequency,
                         paramsEffects.vibratoIntensity
                     );
@@ -1234,14 +1234,14 @@ function Synth() {
                 }
 
                 if (paramsEffects.doDistortion) {
-                    let distort = new Tone.Distortion(
+                    var distort = new Tone.Distortion(
                         paramsEffects.distortionAmount
                     ).toMaster();
                     synth.connect(distort, Tone.Master);
                 }
 
                 if (paramsEffects.doTremolo) {
-                    let tremolo = new Tone.Tremolo({
+                    var tremolo = new Tone.Tremolo({
                         frequency: paramsEffects.tremoloFrequency,
                         depth: paramsEffects.tremoloDepth
                     })
@@ -1251,7 +1251,7 @@ function Synth() {
                 }
 
                 if (paramsEffects.doPhaser) {
-                    let phaser = new Tone.Phaser({
+                    var phaser = new Tone.Phaser({
                         frequency: paramsEffects.rate,
                         octaves: paramsEffects.octaves,
                         baseFrequency: paramsEffects.baseFrequency
@@ -1260,7 +1260,7 @@ function Synth() {
                 }
 
                 if (paramsEffects.doChorus) {
-                    let chorusEffect = new Tone.Chorus({
+                    var chorusEffect = new Tone.Chorus({
                         frequency: paramsEffects.chorusRate,
                         delayTime: paramsEffects.delayTime,
                         depth: paramsEffects.chorusDepth
@@ -1327,7 +1327,7 @@ function Synth() {
                         );
                     }
 
-                    let neighborEffect = new Tone.Part(function(time, value) {
+                    var neighborEffect = new Tone.Part(function(time, value) {
                         synth.triggerAttackRelease(
                             value.note,
                             value.duration,
