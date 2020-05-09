@@ -72,7 +72,7 @@ function _playPitch(args, logo, turtle, blk) {
             // In number to pitch we assume A0 == 0. Here we
             // assume logo C4 == 0, so we need an offset of 39.
             let obj = numberToPitch(
-                Math.floor(arg0 + logo.pitchNumberOffset[turtle]),
+                Math.floor(arg0) + logo.pitchNumberOffset[turtle],
                 logo.synth.inTemperament,
                 logo.synth.startingPitch,
                 logo.pitchNumberOffset[turtle]
@@ -744,7 +744,7 @@ function _playPitch(args, logo, turtle, blk) {
             } else if (logo.blocks.blockList[blk].name === "pitchnumber") {
                 //For pitch number, need to translate number value to pitch
                 let getNumberToPitch = numberToPitch(
-                    Math.floor(arg0 + logo.pitchNumberOffset[turtle]),
+                    Math.floor(arg0) + logo.pitchNumberOffset[turtle],
                     logo.synth.inTemperament,
                     logo.synth.startingPitch,
                     logo.pitchNumberOffset[turtle]
@@ -1188,7 +1188,7 @@ function setupPitchBlocks() {
 
         setter(logo, value, turtle, blk) {
             logo.previousNotePlayed[turtle] = logo.lastNotePlayed[turtle];
-            let obj = numberToPitch(value + logo.pitchNumberOffset[turtle]);
+            let obj = numberToPitch(Math.floor(value) + logo.pitchNumberOffset[turtle]);
             logo.lastNotePlayed[turtle] = [
                 obj[0] + obj[1],
                 logo.lastNotePlayed[turtle][1]
@@ -1387,7 +1387,7 @@ function setupPitchBlocks() {
             let cblk = logo.blocks.blockList[blk].connections[1];
             let num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (num != null && typeof num === "number") {
-                let obj = numberToPitch(num + logo.pitchNumberOffset[turtle]);
+                let obj = numberToPitch(Math.floor(num) + logo.pitchNumberOffset[turtle]);
                 if (logo.blocks.blockList[blk].name === "number2pitch") {
                     return obj[0];
                 } else {
