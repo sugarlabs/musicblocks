@@ -1325,7 +1325,7 @@ function setupPitchBlocks() {
             this.formBlock({
                 args: 2,
                 defaults: ["C", 4],
-                argTypes: ["notein", "anyin"],
+                argTypes: ["anyin", "anyin"],
                 argLabels: [
                     //.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
                     this.lang === "ja" ? _("name2") : _("name"),
