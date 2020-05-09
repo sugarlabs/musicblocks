@@ -169,7 +169,7 @@ const SOLFEGENAMES1 = [
     "la",
     "la" + DOUBLEFLAT,
     "la" + FLAT,
-    "la#",
+    "la" + SHARP,
     "la" + DOUBLESHARP,
     "ti" + DOUBLEFLAT,
     "ti" + FLAT,

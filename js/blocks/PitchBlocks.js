@@ -243,8 +243,7 @@ function _playPitch(args, logo, turtle, blk) {
             note = arg0;
             octave;
             if (
-                SOLFEGENAMES.indexOf(arg0) !== -1 ||
-                SOLFEGENAMES.indexOf(arg0) !== -1
+                SOLFEGENAMES1.indexOf(arg0) !== -1
             ) {
                 useSolfegeName = true;
             }
