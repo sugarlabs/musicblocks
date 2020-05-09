@@ -922,7 +922,7 @@ function Synth() {
                     },
                     envelope: {
                         attack: 0.03,
-                        decay: 0,
+                        decay: 0.001,
                         sustain: 1,
                         release: 0.03
                     }
