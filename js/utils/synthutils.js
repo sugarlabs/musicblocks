@@ -11,7 +11,7 @@
 
 const POLYCOUNT = 3;
 
-let NOISENAMES = [
+const NOISENAMES = [
     //.TRANS: white noise synthesizer
     [_("white noise"), "noise1", "images/synth.svg", "electronic"],
     //.TRANS: brown noise synthesizer
@@ -20,7 +20,7 @@ let NOISENAMES = [
     [_("pink noise"), "noise3", "images/synth.svg", "electronic"]
 ];
 
-let VOICENAMES = [
+const VOICENAMES = [
     //.TRANS: musical instrument
     [_("piano"), "piano", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -96,7 +96,7 @@ let VOICENAMES = [
 
 // drum symbols are from
 // http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
-let DRUMNAMES = [
+const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
@@ -166,7 +166,7 @@ let DRUMNAMES = [
 ];
 
 // Some "drums" are sound effects.
-let EFFECTSNAMES = [
+const EFFECTSNAMES = [
     "duck",
     "dog",
     "cricket",
@@ -176,7 +176,7 @@ let EFFECTSNAMES = [
     "bottle"
 ];
 
-let SOUNDSAMPLESDEFINES = [
+const SOUNDSAMPLESDEFINES = [
     "samples/violin",
     "samples/cello",
     "samples/flute",
