@@ -350,15 +350,16 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let arg;
             if (
                 args.length !== 1 ||
                 args[0] == null ||
                 typeof args[0] !== "string"
             ) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = DEFAULTDRUM;
+                arg = DEFAULTDRUM;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
             let drumname = DEFAULTDRUM;
@@ -416,14 +417,15 @@ function setupDrumBlocks() {
                     drumname
                 );
 
-                if (logo.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    var bpmFactor = TONEBPM / logo._masterBPM;
-                }
+                // let bpmFactor;
+                // if (logo.bpm[turtle].length > 0) {
+                //     bpmFactor = TONEBPM / last(logo.bpm[turtle]);
+                // } else {
+                //     bpmFactor = TONEBPM / logo._masterBPM;
+                // }
+                // let beatValue = bpmFactor / noteBeatValue;
 
                 let noteBeatValue = 4;
-                var beatValue = bpmFactor / noteBeatValue;
 
                 __callback = function() {
                     let j = logo.inNoteBlock[turtle].indexOf(blk);

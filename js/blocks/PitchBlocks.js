@@ -106,7 +106,7 @@ function _playPitch(args, logo, turtle, blk) {
             octave = args[1];
         }
     } else {
-        var arg0, arg1;
+        let arg0, arg1;
         if (args[0] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             arg0 = "sol";
