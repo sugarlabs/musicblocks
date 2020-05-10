@@ -778,10 +778,11 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
+                let bpmFactor;
                 if (logo.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
+                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
                 } else {
-                    var bpmFactor = TONEBPM / logo._masterBPM;
+                    bpmFactor = TONEBPM / logo._masterBPM;
                 }
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
