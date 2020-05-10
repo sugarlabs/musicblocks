@@ -491,6 +491,7 @@ function setupEnsembleBlocks() {
             for (let i = 0; i < logo.turtles.turtleList.length; i++) {
                 let thisTurtle = logo.turtles.turtleList[i];
                 if (targetTurtle === thisTurtle.name) {
+                    let obj;
                     if (logo.lastNotePlayed[i] !== null) {
                         let len = logo.lastNotePlayed[i][0].length;
                         let pitch = logo.lastNotePlayed[i][0].slice(0, len - 1);
@@ -498,9 +499,9 @@ function setupEnsembleBlocks() {
                             logo.lastNotePlayed[i][0].slice(len - 1)
                         );
 
-                        let obj = [pitch, octave];
+                        obj = [pitch, octave];
                     } else if (logo.notePitches[i].length > 0) {
-                        let obj = getNote(
+                        obj = getNote(
                             logo.notePitches[i][0],
                             logo.noteOctaves[i][0],
                             0,
@@ -513,7 +514,7 @@ function setupEnsembleBlocks() {
                     } else {
                         console.debug("Cannot find a note for mouse " + turtle);
                         logo.errorMsg(INVALIDPITCH, blk);
-                        var obj = ["G", 4];
+                        obj = ["G", 4];
                     }
 
                     value =
@@ -537,6 +538,7 @@ function setupEnsembleBlocks() {
                     );
                 }
 
+                let obj;
                 if (logo.lastNotePlayed[turtle] !== null) {
                     let len = logo.lastNotePlayed[turtle][0].length;
                     let pitch = logo.lastNotePlayed[turtle][0].slice(
@@ -546,9 +548,9 @@ function setupEnsembleBlocks() {
                     let octave = parseInt(
                         logo.lastNotePlayed[turtle][0].slice(len - 1)
                     );
-                    let obj = [pitch, octave];
+                    obj = [pitch, octave];
                 } else if (logo.notePitches[turtle].length > 0) {
-                    let obj = getNote(
+                    obj = getNote(
                         logo.notePitches[turtle][
                             last(logo.inNoteBlock[turtle])
                         ][0],
@@ -565,7 +567,7 @@ function setupEnsembleBlocks() {
                 } else {
                     console.debug("Cannot find a note for mouse " + turtle);
                     logo.errorMsg(INVALIDPITCH, blk);
-                    var obj = ["G", 4];
+                    obj = ["G", 4];
                 }
 
                 value =
