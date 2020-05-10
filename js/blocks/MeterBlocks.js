@@ -956,11 +956,12 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let arg0;
             if (args.length !== 1 || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             } else {
-                var arg0 = args[0];
+                arg0 = args[0];
             }
 
             if (arg0 < 0) {
