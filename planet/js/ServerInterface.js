@@ -15,10 +15,10 @@ function ServerInterface(Planet) {
     this.APIKey = '3f2d3a4c-c7a4-4c3c-892e-ac43784f7381';
 
     this.request = function(data, callback) {
-        var that = this;
+        let that = this;
         data['api-key'] = this.APIKey;
 
-        var req = jQuery.ajax({
+        let req = jQuery.ajax({
             type: 'POST',
             url: this.ServerURL,
             data: data
@@ -32,47 +32,47 @@ function ServerInterface(Planet) {
     };
 
     this.getTagManifest = function(callback) {
-        var obj = {'action': 'getTagManifest'};
+        let obj = {'action': 'getTagManifest'};
         this.request(obj, callback);
     };
 
     this.addProject = function(data, callback) {
-        var obj = {'action': 'addProject', 'ProjectJSON': data};
+        let obj = {'action': 'addProject', 'ProjectJSON': data};
         this.request(obj, callback);
     };
 
     this.downloadProjectList = function(ProjectTags, ProjectSort, Start, End, callback) {
-        var obj = {'action': 'downloadProjectList', 'ProjectTags': ProjectTags, 'ProjectSort': ProjectSort, 'Start': Start, 'End': End};
+        let obj = {'action': 'downloadProjectList', 'ProjectTags': ProjectTags, 'ProjectSort': ProjectSort, 'Start': Start, 'End': End};
         this.request(obj, callback);
     };
 
     this.getProjectDetails = function(ProjectID, callback) {
-        var obj = {'action': 'getProjectDetails', 'ProjectID': ProjectID};
+        let obj = {'action': 'getProjectDetails', 'ProjectID': ProjectID};
         this.request(obj, callback);
     };
 
     this.searchProjects = function(Search, ProjectSort, Start, End, callback) {
-        var obj = {'action': 'searchProjects', 'Search': Search, 'ProjectSort': ProjectSort, 'Start': Start, 'End': End};
+        let obj = {'action': 'searchProjects', 'Search': Search, 'ProjectSort': ProjectSort, 'Start': Start, 'End': End};
         this.request(obj, callback);
     };
 
     this.downloadProject = function(ProjectID, callback) {
-        var obj = {'action': 'downloadProject', 'ProjectID': ProjectID};
+        let obj = {'action': 'downloadProject', 'ProjectID': ProjectID};
         this.request(obj, callback);
     };
 
     this.likeProject = function(ProjectID, Like, callback) {
-        var obj = {'action': 'likeProject', 'ProjectID': ProjectID, 'Like': ((Like) ? 'true' : 'false')};
+        let obj = {'action': 'likeProject', 'ProjectID': ProjectID, 'Like': ((Like) ? 'true' : 'false')};
         this.request(obj, callback);
     };
 
     this.reportProject = function(ProjectID, Description, callback) {
-        var obj = {'action': 'reportProject', 'ProjectID': ProjectID, 'Description': Description};
+        let obj = {'action': 'reportProject', 'ProjectID': ProjectID, 'Description': Description};
         this.request(obj, callback);
     };
 
     this.convertFile = function(From, To, Data, callback) {
-        var obj = {'action': 'convertData', 'From': From, 'To': To, 'Data': Data};
+        let obj = {'action': 'convertData', 'From': From, 'To': To, 'Data': Data};
         this.request(obj, callback);
     };
 

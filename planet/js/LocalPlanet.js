@@ -32,13 +32,13 @@ function LocalPlanet(Planet) {
 
     this.refreshProjectArray = function() {
         this.projects = [];
-        for (var project in this.ProjectTable) {
+        for (let project in this.ProjectTable) {
             if (this.ProjectTable.hasOwnProperty(project)) {
                 this.projects.push([project,null]);
             }
         }
 
-        var that = this;
+        let that = this;
 
         this.projects.sort(function(a, b) {
             return that.ProjectTable[b[0]].DateLastModified - that.ProjectTable[a[0]].DateLastModified;
@@ -46,7 +46,7 @@ function LocalPlanet(Planet) {
     };
 
     this.initCards = function() {
-        for (var i = 0; i < this.projects.length; i++) {
+        for (let i = 0; i < this.projects.length; i++) {
             this.projects[i][1] = new LocalCard(Planet);
             this.projects[i][1].init(this.projects[i][0]);
         }
@@ -54,24 +54,24 @@ function LocalPlanet(Planet) {
 
     this.renderAllProjects = function() {
         document.getElementById('local-projects').innerHTML = '';
-        var index = -1;
-        for (var i = 0; i < this.projects.length; i++) {
+        let index = -1;
+        for (let i = 0; i < this.projects.length; i++) {
             this.projects[i][1].render();
             if (this.projects[i][0] === this.currentProjectID) {
                 index = i;
             }
         }
         if (index!=-1) {
-            var id = 'local-project-image-' + this.projects[index][0];
+            let id = 'local-project-image-' + this.projects[index][0];
             console.log(id);
-            var cardimg = document.getElementById(id);
+            let cardimg = document.getElementById(id);
             cardimg.src=this.currentProjectImage;
         }
         jQuery('.tooltipped').tooltip({delay: 50});
     };
 
     this.initDeleteModal = function() {
-        var t = this;
+        let t = this;
         document.getElementById('deleter-button').addEventListener('click', function (evt) {
             if (t.DeleteModalID !== null) {
                 Planet.ProjectStorage.deleteProject(t.DeleteModalID);
@@ -81,7 +81,7 @@ function LocalPlanet(Planet) {
 
     this.openDeleteModal = function(id) {
         this.DeleteModalID = id;
-        var name = this.ProjectTable[id].ProjectName;
+        let name = this.ProjectTable[id].ProjectName;
         document.getElementById('deleter-title').textContent = name;
         document.getElementById('deleter-name').textContent = name;
         jQuery('#deleter').modal('open');
@@ -93,7 +93,7 @@ function LocalPlanet(Planet) {
     };
 
     this.mergeProject = function(id) {
-        var d = this.ProjectStorage.getCurrentProjectData();
+        let d = this.ProjectStorage.getCurrentProjectData();
         if (d === null) {
             this.ProjectStorage.initialiseNewProject();
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);

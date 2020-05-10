@@ -58,9 +58,9 @@ function StringHelper(Planet) {
     ]
 
     this.init = function(){
-        for (var i = 0; i<this.strings.length; i++){
-            var obj = this.strings[i];
-            var elem = document.getElementById(obj[0]);
+        for (let i = 0; i<this.strings.length; i++){
+            let obj = this.strings[i];
+            let elem = document.getElementById(obj[0]);
             if (this.strings[i].length==3){
                 elem.setAttribute(obj[2],obj[1]);
             } else {
