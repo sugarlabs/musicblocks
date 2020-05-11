@@ -144,6 +144,7 @@ function setupEnsembleBlocks() {
                 logo.unhighlightQueue[targetTurtle] = [];
                 logo.parameterQueue[targetTurtle] = [];
                 console.debug("stopping " + targetTurtle);
+		logo.turtles.turtleList[turtle].running = false;
                 logo._doBreak(targetTurtle);
             }
         }
@@ -167,6 +168,7 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+	    console.log('start mouse from mouse ' + turtle);
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -205,6 +207,7 @@ function setupEnsembleBlocks() {
                     }
                 }
                 if (foundStartBlock) {
+                    console.debug("starting " + targetTurtle);
                     logo._runFromBlock(
                         logo,
                         targetTurtle,
@@ -345,8 +348,8 @@ function setupEnsembleBlocks() {
             });
         }
 
-        flow(args, logo, turtle, blk, receivedArg) {
-            targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            let targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle !== null) {
                 logo._runFromBlock(
                     logo,
