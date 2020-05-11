@@ -21,7 +21,7 @@ function setupExtrasBlocks() {
             let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                return "0";
+                return "0/1";
             } else {
                 let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof a === "number") {
@@ -32,7 +32,7 @@ function setupExtrasBlocks() {
                     return mixedNumber(a);
                 }
                 logo.errorMsg(NANERRORMSG, blk);
-                return "0";
+                return "0/1";
             }
         }
     }
