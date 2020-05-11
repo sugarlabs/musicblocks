@@ -201,7 +201,7 @@ function setupEnsembleBlocks() {
                         logo.turtles.turtleList[targetTurtle].startBlock
                     ) {
                         foundStartBlock = true;
-                        return;
+                        break;
                     }
                 }
                 if (foundStartBlock) {
