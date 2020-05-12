@@ -63,7 +63,6 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
 
             let eventName = "__everybeat_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -78,7 +77,6 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
 
             let eventName = "__beat_" + beatValue + "_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -94,7 +92,6 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
 
             let eventName = "__offbeat_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -114,7 +111,6 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
                 );
                 logo.parentFlowQueue[turtle].push(blk);
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                childFlow = null;
 
                 let eventName =
                     "__beat_" +
@@ -125,6 +121,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
                 logo.stage.dispatchEvent(eventName);
             }
         }
+        childFlow = null;
     }
 
     // A note can contain multiple pitch blocks to create
