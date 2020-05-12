@@ -44,11 +44,27 @@ function setupBoxesBlocks() {
 
             if (args.length > 0) {
                 let cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "text") {
+		// A special case for solfege stored in boxes.
+		if (logo.blocks.blockList[cblk].name === "namedbox") {
+		    let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
+		    if (j !== -1) {
+			j += i;
+			if (j >= SOLFEGENAMES.length) {
+			    j = 0;
+			} else if (j < 0) {
+			    j = SOLFEGENAMES.length - 1;
+			}
+
+			let settingBlk = logo.blocks.blockList[blk].connections[1];
+			logo._blockSetter(settingBlk, SOLFEGENAMES[j], turtle);
+			return;
+		    }
+		} else if (logo.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
                     let name = this.blocks.blockList[cblk].value;
                     if (name in this.boxes) {
+			console.log(this.boxes[name]);
                         this.boxes[name] = this.boxes[name] + i;
                         return;
                     }
