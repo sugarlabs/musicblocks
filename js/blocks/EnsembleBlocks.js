@@ -197,21 +197,23 @@ function setupEnsembleBlocks() {
                 logo.parameterQueue[targetTurtle] = [];
                 // Find the start block associated with this turtle.
                 let foundStartBlock = false;
+		let startBlk = null;
                 for (let i = 0; i < logo.blocks.blockList.length; i++) {
                     if (
                         logo.blocks.blockList[i] ===
                         logo.turtles.turtleList[targetTurtle].startBlock
                     ) {
                         foundStartBlock = true;
+			startBlk = i;
                         break;
                     }
                 }
                 if (foundStartBlock) {
-                    console.debug("starting " + targetTurtle);
+                    console.debug("STARTING " + targetTurtle + " " + startBlk);
                     logo._runFromBlock(
                         logo,
                         targetTurtle,
-                        i,
+                        startBlk,
                         isflow,
                         receivedArg
                     );
