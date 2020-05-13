@@ -794,7 +794,7 @@ const MODE_PIE_MENUS = {
     ],
     "7b": [
         "jazz minor",
-        "bebop",
+        "",
         "arabic",
         "byzantine",
         "enigmatic",
@@ -814,7 +814,7 @@ const MODE_PIE_MENUS = {
         " ",
         " ",
         "spanish",
-        " ",
+        "bebop",
         " ",
         "algerian",
         " ",
@@ -849,6 +849,7 @@ const MUSICALMODES = {
     diminished: [2, 1, 2, 1, 2, 1, 2, 1],
     spanish: [1, 2, 1, 1, 1, 2, 2, 2],
     octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
+    bebop: [1, 1, 1, 2, 2, 1, 2, 2],
 
     // 7 notes in an octave
     major: [2, 2, 1, 2, 2, 2, 1],
@@ -866,7 +867,6 @@ const MUSICALMODES = {
     locrian: [1, 2, 2, 1, 2, 2, 2],
 
     "jazz minor": [2, 1, 2, 2, 2, 2, 1],
-    bebop: [1, 1, 1, 2, 2, 1, 2],
 
     arabic: [2, 2, 1, 1, 2, 2, 2],
     byzantine: [1, 3, 1, 2, 1, 3, 1],
