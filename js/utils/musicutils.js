@@ -2594,7 +2594,7 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
+    if (typeof arg === "number" && lastNotePlayed === null) {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
 
@@ -2618,7 +2618,7 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
         // strip off octave from end of note
         lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
     } else {
-        lastNotePlated = "G";
+        lastNotePlayed = "G";
     }
 
     stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
@@ -2655,7 +2655,8 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
             return Math.max(changedCurrent - 1, 1);
         default:
             try {
-                return Math.floor(Number(arg));
+                if(changedCurrent) return changedCurrent;
+                else return Math.floor(Number(arg));
             } catch (e) {
                 console.debug("cannot convert " + arg + " to a number");
                 return currentOctave;

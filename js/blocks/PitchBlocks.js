@@ -205,9 +205,9 @@ function _playPitch(args, logo, turtle, blk) {
                     scaleDegree
                 );
                 logo.currentNote = note;
-                deltaOctave = Math.floor(
-                    (arg0 + modeLength - 2) / modeLength
-                );
+                // deltaOctave = Math.floor(
+                //     (arg0 + modeLength - 2) / modeLength
+                // );
                 octave =
                     Math.floor(
                         calcOctave(
@@ -216,15 +216,18 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    ) - deltaOctave;
+                    );
             } else {
                 note = scaleDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
                 );
                 logo.currentNote = note;
-                deltaOctave = Math.floor((arg0 - 1) / modeLength);
-                octave =
+                // deltaOctave = Math.floor((arg0 - 1) / modeLength);
+                if(logo.lastNotePlayed[turtle] != null && logo.currentNote === logo.lastNotePlayed[turtle][0].substr(0,1) && logo.lastNotePlayed[turtle][0].substr(1).length <= 1) {
+                    octave = arg1;
+                } else {
+                    octave =
                     Math.floor(
                         calcOctave(
                             logo.currentOctave[turtle],
@@ -232,7 +235,8 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    ) + deltaOctave;
+                    );
+                }
             }
 
             console.debug("logo.currentNote = " + logo.currentNote);
