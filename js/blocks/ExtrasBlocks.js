@@ -21,7 +21,7 @@ function setupExtrasBlocks() {
             let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                return "0";
+                return "0/1";
             } else {
                 let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof a === "number") {
@@ -32,7 +32,7 @@ function setupExtrasBlocks() {
                     return mixedNumber(a);
                 }
                 logo.errorMsg(NANERRORMSG, blk);
-                return "0";
+                return "0/1";
             }
         }
     }
@@ -778,10 +778,11 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
+                let bpmFactor;
                 if (logo.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
+                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
                 } else {
-                    var bpmFactor = TONEBPM / logo._masterBPM;
+                    bpmFactor = TONEBPM / logo._masterBPM;
                 }
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);

@@ -28,11 +28,10 @@ function setupSensorsBlocks() {
             logo._doWait(turtle, 120);
 
             // Display the input form.
-            var inputElem = docById("labelDiv");
-            inputElem.innerHTML =
+            docById("labelDiv").innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            var inputElem = docById("textLabel");
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let inputElem = docById("textLabel");
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk !== null) {
                 inputElem.placeholder = logo.blocks.blockList[cblk].value;
             }
@@ -40,16 +39,15 @@ function setupSensorsBlocks() {
             inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
             inputElem.focus();
 
-            var inputElem = docById("labelDiv");
-            inputElem.classList.add("hasKeyboard");
+            docById("labelDiv").classList.add("hasKeyboard");
 
             // Add a handler to continue flow after the input.
             function __keyPressed(event) {
                 if (event.keyCode === 13) { // RETURN
-                    var inputElem = docById("textLabel");
+                    let inputElem = docById("textLabel");
                     console.debug(inputElem.value);
                     console.debug('trying a number');
-                    var value = inputElem.value;
+                    let value = inputElem.value;
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
                     } else {
@@ -63,8 +61,7 @@ function setupSensorsBlocks() {
                 }
             };
 
-            var inputElem = docById("textLabel");
-            inputElem.addEventListener("keypress", __keyPressed);
+            docById("textLabel").addEventListener("keypress", __keyPressed);
         };
     }
 

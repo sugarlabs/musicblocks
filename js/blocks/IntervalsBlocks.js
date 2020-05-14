@@ -900,7 +900,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
-                return logo.keySignature[turtle][0];
+                return logo.keySignature[turtle].split(' ')[0];
             }
         }
     }

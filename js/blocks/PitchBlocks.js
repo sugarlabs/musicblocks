@@ -51,8 +51,8 @@ function _playSynthBlock(args, logo, turtle, blk) {
 function _playPitch(args, logo, turtle, blk) {
     let useSolfegeName = false;
     let note, octave, cents;
+    let arg0, arg1;
     if (logo.blocks.blockList[blk].name === "pitchnumber") {
-        let arg0;
         if (args.length !== 1 || args[0] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             arg0 = 7;
@@ -106,7 +106,6 @@ function _playPitch(args, logo, turtle, blk) {
             octave = args[1];
         }
     } else {
-        var arg0, arg1;
         if (args[0] === null) {
             logo.errorMsg(NOINPUTERRORMSG, blk);
             arg0 = "sol";

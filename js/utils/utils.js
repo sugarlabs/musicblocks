@@ -923,7 +923,7 @@ function mixedNumber(d) {
                 }
             }
         } else {
-            return d.toString();
+            return d.toString() + "/1";
         }
     } else {
         return d;
