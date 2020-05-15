@@ -1808,7 +1808,7 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
     scaleDegree -= 1;
-
+    console.log(scale, scaleDegree);
     // We mod to ensure we don't run out of notes.
     // FixMe: bump octave if we wrap.
     scaleDegree %= scale.length - 1;
@@ -2594,7 +2594,7 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number" && lastNotePlayed === null) {
+    if (typeof arg === "number") {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
 

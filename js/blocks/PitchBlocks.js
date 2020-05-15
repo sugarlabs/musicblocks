@@ -192,10 +192,11 @@ function _playPitch(args, logo, turtle, blk) {
             let obj = keySignatureToMode(logo.keySignature[turtle]);
             let modeLength = MUSICALMODES[obj[1]].length;
             let scaleDegree = Math.floor(arg0 - 1) % modeLength;
-            let deltaOctave;
+            let deltaOctave, semitones, deltaSemi;
             scaleDegree += 1;
-
-            if (neg) {
+            let ref = NOTESTEP[obj[0]] -1;
+            semitones = ref;
+            if (neg) {  
                 if (scaleDegree > 1) {
                     scaleDegree = modeLength - scaleDegree + 2;
                 }
@@ -205,9 +206,17 @@ function _playPitch(args, logo, turtle, blk) {
                     scaleDegree
                 );
                 logo.currentNote = note;
-                // deltaOctave = Math.floor(
-                //     (arg0 + modeLength - 2) / modeLength
-                // );
+                
+                if(NOTESFLAT.indexOf(note) !== -1) {
+                    semitones += (NOTESFLAT.indexOf(note) - ref);
+                } else {
+                    semitones += (NOTESSHARP.indexOf(note) - ref);
+                }
+
+                deltaSemi = semitones > ref ? 1 : 0;
+                deltaOctave = Math.floor(
+                    (arg0 - 1) / modeLength
+                );
                 octave =
                     Math.floor(
                         calcOctave(
@@ -216,18 +225,21 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    );
+                    ) - deltaOctave - deltaSemi;
             } else {
                 note = scaleDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
                 );
                 logo.currentNote = note;
-                // deltaOctave = Math.floor((arg0 - 1) / modeLength);
-                if(logo.lastNotePlayed[turtle] != null && logo.currentNote === logo.lastNotePlayed[turtle][0].substr(0,1) && logo.lastNotePlayed[turtle][0].substr(1).length <= 1) {
-                    octave = arg1;
+                if(NOTESFLAT.indexOf(note) !== -1) {
+                    semitones += (NOTESFLAT.indexOf(note) - ref);
                 } else {
-                    octave =
+                    semitones += (NOTESSHARP.indexOf(note) - ref);
+                }
+                deltaSemi = semitones < ref? 1:0;
+                deltaOctave = Math.floor((arg0 - 1) / modeLength);  
+                octave =
                     Math.floor(
                         calcOctave(
                             logo.currentOctave[turtle],
@@ -235,8 +247,7 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    );
-                }
+                    ) + deltaOctave + deltaSemi;
             }
 
             console.debug("logo.currentNote = " + logo.currentNote);
