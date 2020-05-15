@@ -63,7 +63,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-	    childFlow = null;
+            childFlow = null;
 
             let eventName = "__everybeat_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -78,7 +78,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-	    childFlow = null;
+            childFlow = null;
 
             let eventName = "__beat_" + beatValue + "_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -94,7 +94,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
             );
             logo.parentFlowQueue[turtle].push(blk);
             logo.turtles.turtleList[turtle].queue.push(queueBlock);
-	    childFlow = null;
+            childFlow = null;
 
             let eventName = "__offbeat_" + turtle + "__";
             logo.stage.dispatchEvent(eventName);
@@ -114,7 +114,7 @@ function _playNote(args, logo, turtle, blk, receivedArg) {
                 );
                 logo.parentFlowQueue[turtle].push(blk);
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
-		childFlow = null;
+                childFlow = null;
 
                 let eventName =
                     "__beat_" +

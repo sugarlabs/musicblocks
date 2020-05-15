@@ -1465,11 +1465,11 @@ function Logo() {
         this.runningBlock = blk;
         if (blk == null) return;
 
-        var logo = that; // For plugin backward compatibility
+        let logo = that; // For plugin backward compatibility
 
         this.receivedArg = receivedArg;
 
-        var delay = that.turtleDelay + that.waitTimes[turtle];
+        let delay = that.turtleDelay + that.waitTimes[turtle];
         that.waitTimes[turtle] = 0;
 
         if (!that.stopTurtle) {
@@ -1480,7 +1480,8 @@ function Logo() {
                 }
                 that.stepQueue[turtle].push(blk);
             } else {
-		that.delayParameters[turtle] = {'blk': blk, 'flow': isflow, 'arg': receivedArg};
+                that.delayParameters[turtle] =
+                    {'blk': blk, 'flow': isflow, 'arg': receivedArg};
                 that.delayTimeout[turtle] = setTimeout(function() {
                     that._runFromBlockNow(
                         that,
@@ -1496,16 +1497,22 @@ function Logo() {
 
     // We may need to clear the timeout, e.g., after a successful input.
     this.clearRunBlock = function(turtle) {
-	if (this.delayTimeout[turtle] !== null) {
-	    clearTimeout(this.delayTimeout[turtle]);
-	    this.delayTimeout[turtle] = null;
-	    this.requeueRunBlock(turtle);
-	}
+        if (this.delayTimeout[turtle] !== null) {
+            clearTimeout(this.delayTimeout[turtle]);
+            this.delayTimeout[turtle] = null;
+            this.requeueRunBlock(turtle);
+        }
     };
 
     // If we clear the delay timeout, we need to requeue the runBlock.
     this.requeueRunBlock = function(turtle) {
-	this._runFromBlockNow(this, turtle, this.delayParameters[turtle]['blk'], this.delayParameters[turtle]['flow'], this.delayParameters[turtle]['arg']);
+        this._runFromBlockNow(
+            this,
+            turtle,
+            this.delayParameters[turtle]['blk'],
+            this.delayParameters[turtle]['flow'],
+            this.delayParameters[turtle]['arg']
+        );
     };
 
     /**
@@ -1558,17 +1565,17 @@ function Logo() {
         this.alreadyRunning = true;
         ///////
         // Run a stack of blocks, beginning with blk.
-        var logo = that; // For plugin backward compatibility
+        let logo = that; // For plugin backward compatibility
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
 
         // (1) Evaluate any arguments (beginning with connection[1]);
-        var args = [];
+        let args = [];
         if (that.blocks.blockList[blk].protoblock.args > 0) {
             for (
-                var i = 1;
+                let i = 1;
                 i < that.blocks.blockList[blk].protoblock.args + 1;
                 i++
             ) {
@@ -1595,21 +1602,19 @@ function Logo() {
         }
 
         // (2) Run function associated with the block;
-        if (that.blocks.blockList[blk].isValueBlock()) {
-            var nextFlow = null;
-        } else {
+        let nextFlow = null;
+        if (!that.blocks.blockList[blk].isValueBlock()) {
+            // nextFlow remains null for valueBlock
+
             // All flow blocks have a last connection (nextFlow), but
             // it can be null (i.e., end of a flow).
             if (that.backward[turtle].length > 0) {
                 // We only run backwards in the "first generation" children.
-                if (
-                    that.blocks.blockList[last(that.backward[turtle])].name ===
-                    "backward"
-                ) {
-                    var c = 1;
-                } else {
-                    var c = 2;
-                }
+                let c =
+                    (
+                        that.blocks.blockList[last(that.backward[turtle])].name
+                            === "backward"
+                    ) ? 1 : 2;
 
                 if (
                     !that.blocks.sameGeneration(
@@ -1618,9 +1623,9 @@ function Logo() {
                         blk
                     )
                 ) {
-                    var nextFlow = last(that.blocks.blockList[blk].connections);
+                    nextFlow = last(that.blocks.blockList[blk].connections);
                 } else {
-                    var nextFlow = that.blocks.blockList[blk].connections[0];
+                    nextFlow = that.blocks.blockList[blk].connections[0];
                     if (
                         that.blocks.blockList[nextFlow].name === "action" ||
                         that.blocks.blockList[nextFlow].name === "backward"
@@ -1635,24 +1640,24 @@ function Logo() {
                                 nextFlow
                             )
                         ) {
-                            var nextFlow = last(
+                            nextFlow = last(
                                 that.blocks.blockList[blk].connections
                             );
                         } else {
-                            var nextFlow =
+                            nextFlow =
                                 that.blocks.blockList[blk].connections[0];
                         }
                     }
                 }
             } else {
-                var nextFlow = last(that.blocks.blockList[blk].connections);
+                nextFlow = last(that.blocks.blockList[blk].connections);
             }
 
             if (nextFlow === -1) {
                 nextFlow = null;
             }
 
-            var queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
+            let queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
             if (nextFlow != null) {
                 // This could be the last block
                 that.turtles.turtleList[turtle].queue.push(queueBlock);
@@ -1865,18 +1870,19 @@ function Logo() {
 
         // If there is a child flow, queue it.
         if (childFlow != null) {
+            let queueBlock;
             if (
                 that.blocks.blockList[blk].name === "doArg" ||
                 that.blocks.blockList[blk].name === "nameddoArg"
             ) {
-                var queueBlock = new Queue(
+                queueBlock = new Queue(
                     childFlow,
                     childFlowCount,
                     blk,
                     actionArgs
                 );
             } else {
-                var queueBlock = new Queue(
+                queueBlock = new Queue(
                     childFlow,
                     childFlowCount,
                     blk,
@@ -1895,8 +1901,8 @@ function Logo() {
             }
         }
 
-        var nextBlock = null;
-        var parentBlk = null;
+        let nextBlock = null;
+        let parentBlk = null;
 
         // Run the last flow in the queue.
         if (that.turtles.turtleList[turtle].queue.length > queueStart) {
