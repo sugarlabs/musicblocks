@@ -1523,23 +1523,23 @@ function setupPitchBlocks() {
             let arg0, arg1, arg2;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = "sol";
+                let arg0 = "sol";
             } else {
-                arg0 = args[0];
+                let arg0 = args[0];
             }
 
             if (args[1] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
+                let arg1 = 4;
             } else {
-                arg1 = args[1];
+                let arg1 = args[1];
             }
 
             if (args[2] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg2 = "even";
+                let arg2 = "even";
             } else {
-                arg2 = args[2];
+                let arg2 = args[2];
             }
 
             if (typeof arg2 === "number") {
@@ -1551,11 +1551,11 @@ function setupPitchBlocks() {
             }
 
             if (arg2 === _("even")) {
-                args2 = "even";
+                arg2 = "even";
             } else if (arg2 === _("odd")) {
-                args2 = "odd";
+                arg2 = "odd";
             } else if (arg2 === _("scalar")) {
-                args2 = "scalar";
+                arg2 = "scalar";
             }
 
             if (arg2 === "even" || arg2 === "odd" || arg2 === "scalar") {
