@@ -1523,23 +1523,23 @@ function setupPitchBlocks() {
             let arg0, arg1, arg2;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                let arg0 = "sol";
+                arg0 = "sol";
             } else {
-                let arg0 = args[0];
+                arg0 = args[0];
             }
 
             if (args[1] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                let arg1 = 4;
+                arg1 = 4;
             } else {
-                let arg1 = args[1];
+                arg1 = args[1];
             }
 
             if (args[2] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                let arg2 = "even";
+                arg2 = "even";
             } else {
-                let arg2 = args[2];
+                arg2 = args[2];
             }
 
             if (typeof arg2 === "number") {
