@@ -100,6 +100,7 @@ function Logo() {
     this.invertList = {};
     this.beatList = {};
     this.factorList = {};
+    this.defaultStrongBeats = {}
 
     // We store each case arg and flow by switch block no. and turtle.
     this.switchCases = {};
@@ -1082,6 +1083,7 @@ function Logo() {
         this.inHarmonic[turtle] = [];
         this.partials[turtle] = [];
         this.returns[turtle] = [];
+        this.defaultStrongBeats[turtle] = false;
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.playbackQueue[turtle] = [];
