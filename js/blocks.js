@@ -4700,7 +4700,6 @@ function Blocks(activity) {
             ].indexOf(this.blockList[blk].name) !== -1
         ) {
             var oblk = this.blockList[blk].connections[2];
-            blk.octave = octave;
             if (oblk !== null && this.blockList[oblk].name === "number") {
                 var thisBlock = this.blockList[oblk];
                 thisBlock.value = octave;
