@@ -1100,6 +1100,7 @@ function Blocks(activity) {
        an action block.  Add a box name whenever the user removes
        the name from a storein block.  Add a Silence block
        whenever the user removes all the blocks from a Note block.
+       Add an octave(number) block whenever user removes an octave block.
      * @param - parentblk - new variable
      * @param - oldBlock - old block
      * @param - skipOldBlock
@@ -1198,6 +1199,78 @@ function Blocks(activity) {
 
                 this._makeNewBlockWithConnections(
                     "text",
+                    0,
+                    [parentblk],
+                    postProcess,
+                    [parentblk, oldBlock]
+                );
+            }
+        } else if (this.blockList[parentblk].name === "pitch") {
+            let cblk = this.blockList[parentblk].connections[2];
+            if (cblk == null) {
+                /*
+                 * Adjust Docks
+                 * @param - args - arguments
+                 * @public
+                 * @return {void}
+                 */
+                let postProcess = (args) => {
+                    let parentblk = args[0];
+                    let oldBlock = args[1];
+
+
+                    let blk = this.blockList.length - 1;
+
+                    this.blockList[parentblk].connections[2] = blk;
+
+                    let octave = this.blockList[oldBlock].value;
+                    this.blockList[blk].value = octave;
+                    this.blockList[blk].text.text = octave.toString();
+                    // Make sure text is on top.
+                    let z = this.blockList[blk].container.children.length - 1;
+                    this.blockList[blk].container.setChildIndex(this.blockList[blk].text, z);
+                    this.blockList[blk].container.updateCache();
+
+                    this.adjustDocks(parentblk, true);
+                };
+
+                this._makeNewBlockWithConnections(
+                    "number",
+                    0,
+                    [parentblk],
+                    postProcess,
+                    [parentblk, oldBlock]
+                );
+            }
+            let oblk = this.blockList[parentblk].connections[1];
+            if (oblk == null) {
+                /*
+                 * Adjust Docks
+                 * @param - args - arguments
+                 * @public
+                 * @return {void}
+                 */
+                let postProcess = (args) => {
+                    let parentblk = args[0];
+                    let oldBlock = args[1];
+
+                    let blk = this.blockList.length - 1;
+
+                    this.blockList[parentblk].connections[1] = blk;
+
+                    let pitch = this.blockList[oldBlock].value;
+                    this.blockList[blk].value = pitch;
+                    this.blockList[blk].text.text = pitch.toString();
+                    // Make sure text is on top.
+                    let z = this.blockList[blk].container.children.length - 1;
+                    this.blockList[blk].container.setChildIndex(this.blockList[blk].text, z);
+                    this.blockList[blk].container.updateCache();
+
+                    this.adjustDocks(parentblk, true);
+                };
+
+                this._makeNewBlockWithConnections(
+                    this.blockList[oldBlock].name,
                     0,
                     [parentblk],
                     postProcess,
@@ -4627,6 +4700,7 @@ function Blocks(activity) {
             ].indexOf(this.blockList[blk].name) !== -1
         ) {
             var oblk = this.blockList[blk].connections[2];
+            blk.octave = octave;
             if (oblk !== null && this.blockList[oblk].name === "number") {
                 var thisBlock = this.blockList[oblk];
                 thisBlock.value = octave;
