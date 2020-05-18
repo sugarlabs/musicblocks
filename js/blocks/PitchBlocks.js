@@ -194,7 +194,14 @@ function _playPitch(args, logo, turtle, blk) {
             let scaleDegree = Math.floor(arg0 - 1) % modeLength;
             let deltaOctave, semitones, deltaSemi;
             scaleDegree += 1;
-            let ref = NOTESTEP[obj[0]] -1;
+            let ref = NOTESTEP[obj[0].substr(0,1)] -1;
+            
+            if(obj[0].substr(1) === '♭') {
+                ref--;
+            } else if(obj[0].substr(1) === '♯') {
+                ref++;
+            }
+
             semitones = ref;
             if (neg) {  
                 if (scaleDegree > 1) {
@@ -249,7 +256,6 @@ function _playPitch(args, logo, turtle, blk) {
                         )
                     ) + deltaOctave + deltaSemi;
             }
-
             console.debug("logo.currentNote = " + logo.currentNote);
             cents = 0;
         } else {
