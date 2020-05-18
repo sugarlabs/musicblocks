@@ -1217,8 +1217,6 @@ function Blocks(activity) {
                 let postProcess = (args) => {
                     let parentblk = args[0];
                     let oldBlock = args[1];
-
-
                     let blk = this.blockList.length - 1;
 
                     this.blockList[parentblk].connections[2] = blk;
@@ -1242,6 +1240,7 @@ function Blocks(activity) {
                     [parentblk, oldBlock]
                 );
             }
+
             let oblk = this.blockList[parentblk].connections[1];
             if (oblk == null) {
                 /*
