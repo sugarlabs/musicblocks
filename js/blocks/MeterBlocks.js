@@ -531,6 +531,17 @@ function setupMeterBlocks() {
                     let eventName = "__beat_" + args[0] + "_" + turtle + "__";
                     logo._setListener(turtle, eventName, __listener);
 
+                    //remove any default strong beats other than "everybeat " or  "offbeat"
+                    if (logo.defaultStrongBeats[turtle]) { 
+                        for (let i = 0; i < logo.beatList[turtle].length; i++) {
+                            if (logo.beatList[turtle][i] !== "everybeat" && logo.beatList[turtle][i] !== "offbeat") {
+                                logo.beatList[turtle].splice(i, 1);
+                                i--;
+                            }
+                        }
+                        logo.defaultStrongBeats[turtle] = false;
+                    }
+
                     if (args[0] > logo.beatsPerMeasure[turtle]) {
                         logo.factorList[turtle].push(args[0]);
                     } else {
@@ -1025,6 +1036,29 @@ function setupMeterBlocks() {
 
             if (arg1 <= 0) logo.noteValuePerBeat[turtle] = 4;
             else logo.noteValuePerBeat[turtle] = 1 / arg1;
+
+            // setup default strong / weak beats until any strong beat block is used 
+
+            if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 4) {
+                logo.beatList[turtle].push(1);
+                logo.beatList[turtle].push(3);
+                logo.defaultStrongBeats[turtle] = true;
+            }
+            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 2) {
+                logo.beatList[turtle].push(1);
+                logo.defaultStrongBeats[turtle] = true;
+            }
+            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 3) {
+                logo.beatList[turtle].push(1);
+                logo.defaultStrongBeats[turtle] = true;
+            }
+            else if (logo.noteValuePerBeat[turtle] == 8 && logo.beatsPerMeasure[turtle] == 6) {
+                logo.beatList[turtle].push(1);
+                logo.beatList[turtle].push(4);
+                logo.defaultStrongBeats[turtle] = true;
+            }
+
+            
 
             logo.notationMeter(
                 turtle,

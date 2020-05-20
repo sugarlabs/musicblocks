@@ -495,8 +495,34 @@ function MeterWidget() {
         for (let i = 0; i < numberOfBeats; i++) {
             that._meterWheel.navItems[i].navigateFunction = __setBeat;
             that._beatWheel.navItems[i].navigateFunction = __clearBeat;
-            // Start with all beats hidden.
+            // Start with all beats hidden , except default strong/weak .
             that._beatWheel.navItems[i].navItem.hide();
         }
+
+        this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
     };
+
+    this.setupDefaultStrongWeakBeats = (numberOfBeats, beatValue) => {
+        if (beatValue == 0.25 && numberOfBeats == 4) {
+            this._strongBeats[0] = true;
+            this._strongBeats[2] = true;
+            this._beatWheel.navItems[0].navItem.show();
+            this._beatWheel.navItems[2].navItem.show();
+        }
+        else if (beatValue == 0.25 && numberOfBeats == 2) {
+            this._strongBeats[0] = true;
+            this._beatWheel.navItems[0].navItem.show();
+        }
+        else if (beatValue == 0.25 && numberOfBeats == 3) {
+            this._strongBeats[0] = true;
+            this._beatWheel.navItems[0].navItem.show();
+        }
+        else if (beatValue == 0.125 && numberOfBeats == 6) {
+            this._strongBeats[0] = true;
+            this._strongBeats[3] = true;
+            this._beatWheel.navItems[0].navItem.show();
+            this._beatWheel.navItems[3].navItem.show();
+        }
+    };
+
 }

@@ -59,7 +59,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("mod"),
                 args: 2,
-                defaults: [100, 10]
+                defaults: [100, 12]
             });
         }
 

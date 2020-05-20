@@ -1551,11 +1551,11 @@ function setupPitchBlocks() {
             }
 
             if (arg2 === _("even")) {
-                args2 = "even";
+                arg2 = "even";
             } else if (arg2 === _("odd")) {
-                args2 = "odd";
+                arg2 = "odd";
             } else if (arg2 === _("scalar")) {
-                args2 = "scalar";
+                arg2 = "scalar";
             }
 
             if (arg2 === "even" || arg2 === "odd" || arg2 === "scalar") {

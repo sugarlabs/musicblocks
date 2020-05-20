@@ -898,6 +898,20 @@ function Turtle(name, turtles, drum) {
     };
 
     /**
+    *  checks if x,y out of ctx
+    *
+    * @param  x - on screen x coordinate
+    * @param  y - on screen y coordinate
+    * @param  w - width 
+    * @param  h - height
+    *
+    *
+    */
+    this.outOfBounds = function (x, y, w, h) {
+        return (x > w || x < 0 || y > h || y < 0);
+    }
+
+    /**
      * Takes in turtle functions to reset the turtle position, pen, skin, media
      *
      * @param  steps - the number of steps the turtle goes forward by
@@ -911,39 +925,38 @@ function Turtle(name, turtles, drum) {
             ctx.beginPath();
             ctx.moveTo(this.container.x, this.container.y);
         }
+        // old turtle point
+        let ox = this.turtles.screenX2turtleX(this.container.x);
+        let oy = this.turtles.screenY2turtleY(this.container.y);
 
-        if (!WRAP) {
-            
-            // old turtle point
-            var ox = this.turtles.screenX2turtleX(this.container.x);
-            var oy = this.turtles.screenY2turtleY(this.container.y);
+        let angleRadians = (this.orientation * Math.PI) / 180.0;
 
-            var angleRadians = (this.orientation * Math.PI) / 180.0;
+        // new turtle point
+        let nx = ox + Number(steps) * Math.sin(angleRadians);
+        let ny = oy + Number(steps) * Math.cos(angleRadians);
 
-            // new turtle point
-            var nx = ox + Number(steps) * Math.sin(angleRadians);
-            var ny = oy + Number(steps) * Math.cos(angleRadians);
+        let w = ctx.canvas.width;
+        let h = ctx.canvas.height;
+
+        let out = this.outOfBounds(this.turtles.turtleX2screenX(nx), this.turtles.turtleY2screenY(ny), w, h);
+
+        if (!WRAP || !out) {
+
             this.move(ox, oy, nx, ny, true);
-            this.turtles.refreshCanvas();   
-        
+            this.turtles.refreshCanvas();
+
         } else {
-            var angleRadians = (this.orientation * Math.PI) / 180.0
-            var w = ctx.canvas.width;
-            var h = ctx.canvas.height;
 
-            var ox, oy, nx, ny;
-
-            var stepUnit = 10;
-
+            let stepUnit = 5;
+            let xIncrease, yIncrease;
             if (steps > 0) {
-                var xIncrease = stepUnit * Math.sin(angleRadians);
-                var yIncrease = stepUnit * Math.cos(angleRadians);
+                xIncrease = stepUnit * Math.sin(angleRadians);
+                yIncrease = stepUnit * Math.cos(angleRadians);
             } else {
-                var xIncrease = -stepUnit * Math.sin(angleRadians);
-                var yIncrease = -stepUnit * Math.cos(angleRadians);
-            steps = -steps;
-
-             }
+                xIncrease = -stepUnit * Math.sin(angleRadians);
+                yIncrease = -stepUnit * Math.cos(angleRadians);
+                steps = -steps;
+            }
 
             while (steps >= 0) {
                 if (this.container.x > w) {
