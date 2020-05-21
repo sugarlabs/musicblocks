@@ -192,17 +192,25 @@ function _playPitch(args, logo, turtle, blk) {
             let obj = keySignatureToMode(logo.keySignature[turtle]);
             let modeLength = MUSICALMODES[obj[1]].length;
             let scaleDegree = Math.floor(arg0 - 1) % modeLength;
-            let deltaOctave, semitones, deltaSemi;
+
+            /* deltaOctave calculates changes in reference octave which occur a semitone before the reference key
+               deltaSemi calculates changes in octave when crossing B.
+             */
+            let deltaOctave, deltaSemi;
             scaleDegree += 1;
+
+            // Choose a reference based on the key selected
             let ref = NOTESTEP[obj[0].substr(0,1)] -1;
             
+            //adjust reference if sharps/flats are present
             if(obj[0].substr(1) === '♭') {
                 ref--;
             } else if(obj[0].substr(1) === '♯') {
                 ref++;
             }
 
-            semitones = ref;
+            let semitones = ref;
+
             if (neg) {  
                 if (scaleDegree > 1) {
                     scaleDegree = modeLength - scaleDegree + 2;
