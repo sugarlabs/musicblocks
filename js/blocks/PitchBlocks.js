@@ -203,9 +203,9 @@ function _playPitch(args, logo, turtle, blk) {
             let ref = NOTESTEP[obj[0].substr(0,1)] -1;
             
             //adjust reference if sharps/flats are present
-            if(obj[0].substr(1) === '♭') {
+            if(obj[0].substr(1) === FLAT) {
                 ref--;
-            } else if(obj[0].substr(1) === '♯') {
+            } else if(obj[0].substr(1) === SHARP) {
                 ref++;
             }
 
