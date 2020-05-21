@@ -863,6 +863,7 @@ const MUSICALMODES = {
     phrygian: [1, 2, 2, 2, 1, 2, 2],
     lydian: [2, 2, 2, 1, 2, 2, 1],
     mixolydian: [2, 2, 1, 2, 2, 1, 2],
+    minor: [2, 1, 2, 2, 1, 2, 2],
     aeolian: [2, 1, 2, 2, 1, 2, 2],
     locrian: [1, 2, 2, 1, 2, 2, 2],
 
