@@ -1388,6 +1388,11 @@ function setupPitchBlocks() {
                     _("octave")
                 ]
             });
+            this.makeMacro((x, y) => [
+                [0, "setpitchnumberoffset", x, y, [null, 1, 2]],
+                [1, ["notename", { value: "C" }], 0, 0, [0]],
+                [2, ["number", { value: 4}], 0, 0, [0]]
+            ]);
         }
 
         flow(args, logo, turtle, blk) {
