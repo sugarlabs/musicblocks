@@ -192,10 +192,55 @@ function _playPitch(args, logo, turtle, blk) {
             let obj = keySignatureToMode(logo.keySignature[turtle]);
             let modeLength = MUSICALMODES[obj[1]].length;
             let scaleDegree = Math.floor(arg0 - 1) % modeLength;
-            let deltaOctave;
+
+            /* deltaOctave calculates changes in reference octave which occur a semitone before the reference key
+               deltaSemi calculates changes in octave when crossing B.
+             */
+            let deltaOctave, deltaSemi;
             scaleDegree += 1;
 
-            if (neg) {
+            // Choose a reference based on the key selected. This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8. 
+            // Subtract one to make it zero based.
+            let ref = NOTESTEP[obj[0].substr(0,1)] -1;
+            
+            //adjust reference if sharps/flats are present i.e increase by one for a sharp and decrease by one for a flat
+            if(obj[0].substr(1) === FLAT) {
+                ref--;
+            } else if(obj[0].substr(1) === SHARP) {
+                ref++;
+            }
+
+            /* Number of semitones is used to calculate changes in deltaSemi defined above.
+            Semitones is initialised with reference value. e.g If selected key is G, semitone = ref = 7 (8 - 1)
+            Now we assume our circle of fifths to start from our ref rather than default C note.
+            Whenever a note is played, we add the difference of it's semitones from ref; 
+            e.g. If the selected key is G major: ref = 7 and initially semitones = ref = 7.
+            G major scale: G A B C D E F# 
+            When we play 1st note --> G: semitones = semitones + (position of G on circle of fifths - ref) => 7 + (7 - 7)
+            When we play 2nd note -->> A: semitones = semitones + (position of A of circle of fifths - ref) => 7 + (9 - 7)
+            And so on. In essence we add the relative difference.
+            To change octave we use the following methodology:
+            1. If note number input is positive: Whenever the number of semitones will be less than ref, increment deltaSemi by one.
+            2. If note number input is negative: Whenever the number of semitones will be greater than ref, increment deltaSemi by one.
+            Note that these positions are zero based because we use an array to find indexes.
+            
+            Notice that deltaSemi will attain values : {0, 1}, so if we play scales of greater length where octave may need to increment/decrement multiple times:
+            That is done with the use of deltaOctave: It's value is incremented by one everytime we traverse the modelength of our selected key once. [ e.g 7 in case of any major scale]
+            deltaOctave doesn't directly affect the octave that will play; instead it changes what we say is the reference octave i.e the value connected to the octave argument of this block.
+
+            You may see this as a cyclical process: 
+            e.g Repeat the scale degree block 14 times while in G major starting from note value --> 1 and octave arg --> 4
+            Till we reach B --> Both deltaOctave and deltaSemi are {0,0}
+            As we cross B and reach C --> no. of semitones < ref, deltaSemi = 1, deltaOctave = 0 and this causes note C to play in octave 5
+            This behavious continues till E, as we reach F# (or Gb) --> deltaOctave becomes 1 and deltaSemi goes back to zero since we've traversed
+            our modeLength ( 7 ) once. 
+            Again on C deltaSemi will be 1, deltaOctave was already 1 and thus a total change of 2 octaves --> C6. Thus, deltaOctave brings a change
+            to the reference octave. 
+            So this process can continue indefinitely producing our desired results.
+            */
+            let semitones = ref;
+
+            if (neg) {  
                 if (scaleDegree > 1) {
                     scaleDegree = modeLength - scaleDegree + 2;
                 }
@@ -205,8 +250,16 @@ function _playPitch(args, logo, turtle, blk) {
                     scaleDegree
                 );
                 logo.currentNote = note;
+                
+                if(NOTESFLAT.indexOf(note) !== -1) {
+                    semitones += (NOTESFLAT.indexOf(note) - ref);
+                } else {
+                    semitones += (NOTESSHARP.indexOf(note) - ref);
+                }
+
+                deltaSemi = semitones > ref ? 1 : 0;
                 deltaOctave = Math.floor(
-                    (arg0 + modeLength - 2) / modeLength
+                    (arg0 - 1) / modeLength
                 );
                 octave =
                     Math.floor(
@@ -216,14 +269,20 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    ) - deltaOctave;
+                    ) - deltaOctave - deltaSemi;
             } else {
                 note = scaleDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
                 );
                 logo.currentNote = note;
-                deltaOctave = Math.floor((arg0 - 1) / modeLength);
+                if(NOTESFLAT.indexOf(note) !== -1) {
+                    semitones += (NOTESFLAT.indexOf(note) - ref);
+                } else {
+                    semitones += (NOTESSHARP.indexOf(note) - ref);
+                }
+                deltaSemi = semitones < ref? 1:0;
+                deltaOctave = Math.floor((arg0 - 1) / modeLength);  
                 octave =
                     Math.floor(
                         calcOctave(
@@ -232,9 +291,8 @@ function _playPitch(args, logo, turtle, blk) {
                             logo.lastNotePlayed[turtle],
                             logo.currentNote
                         )
-                    ) + deltaOctave;
+                    ) + deltaOctave + deltaSemi;
             }
-
             console.debug("logo.currentNote = " + logo.currentNote);
             cents = 0;
         } else {
