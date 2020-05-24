@@ -356,6 +356,7 @@ const FLATPREFERENCE = [
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+const SCALENOTES = ["1", "2", "3", "4", "5", "6", "7"];
 const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
 const DRUMS = [
     "snare drum",
@@ -2512,10 +2513,13 @@ function i18nSolfege(note) {
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b
     if (value != null && typeof value === "string") {
+        console.log(value);
         if (SOLFNOTES.indexOf(value) !== -1) {
+            console.log(1);
             var note = value;
             var attr = "";
         } else if (value.slice(0, 3) === "sol") {
+            console.log(2);
             var note = "sol";
             if (value.length === 4) {
                 var attr = value[3];
@@ -2523,6 +2527,7 @@ function splitSolfege(value) {
                 var attr = value[3] + value[4];
             }
         } else {
+            console.log(1);
             var note = value.slice(0, 2);
             if (value.length === 3) {
                 var attr = value[2];

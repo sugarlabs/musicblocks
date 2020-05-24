@@ -40,6 +40,7 @@ const SPECIALINPUTS = [
     "number",
     "solfege",
     "eastindiansolfege",
+    "scaledegree2",
     "notename",
     "voicename",
     "modename",
@@ -70,6 +71,7 @@ const EXTRAWIDENAMES = [];
 const PIEMENUS = [
     "solfege",
     "eastindiansolfege",
+    "scaledegree2",
     "notename",
     "voicename",
     "drumname",
@@ -1138,6 +1140,8 @@ function Block(protoblock, blocks, overrideName) {
                     case "eastindiansolfege":
                         this.value = "sol";
                         break;
+                    case "scaledegree2":
+                        this.value = "1";
                     case "customNote":
                         let len = this.blocks.logo.synth.startingPitch.length;
                         this.value =
@@ -1210,7 +1214,9 @@ function Block(protoblock, blocks, overrideName) {
                 if (attr !== "♮") {
                     label += attr;
                 }
-            } else if (this.name === "drumname") {
+            } else if(this.name === "scaledegree2") {
+                label = 1;
+            } else if (this.name === "drumname") { 
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
@@ -2330,6 +2336,12 @@ function Block(protoblock, blocks, overrideName) {
                             " " +
                             this.blocks.blockList[c2].value
                         );
+                    } else if (this.blocks.blockList[c1].name === "scaledegree2") {
+                        return (
+                            "sol" + 
+                            " " +
+                            this.blocks.blockList[c2].value
+                        );
                     }
                 }
                 break;
@@ -3238,7 +3250,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById("textLabel");
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
-
+            console.log(obj);
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
@@ -3252,6 +3264,21 @@ function Block(protoblock, blocks, overrideName) {
                     obj[1]
                 );
             }
+        } else if (this.name === "scaledegree2") {
+            obj = splitSolfege(this.value);
+            console.log(obj);
+            let scalenotes_ = ("1 2 3 4 5 6 7").split(" ");
+
+            if(this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(
+                    scalenotes_,
+                    SCALENOTES,
+                    SOLFATTRS,
+                    obj[0],
+                    obj[1]
+                )
+            };
+
         } else if (this.name === "customNote") {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
