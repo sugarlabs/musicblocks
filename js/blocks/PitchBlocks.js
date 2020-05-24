@@ -2598,8 +2598,9 @@ function setupPitchBlocks() {
     class ScaleDegree2Block extends ValueBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree2", "scale degree");
+            super("scaledegree2");
             this.setPalette("pitch");
+            this.extraWidth = 10;
             this.formBlock({
                 outType: "scaleout"
             });
