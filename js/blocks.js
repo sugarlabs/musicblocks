@@ -2307,7 +2307,7 @@ function Blocks(activity) {
         }
         if (
             type1 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaleout", "numberout"].indexOf(
                 type2
             ) !== -1
         ) {
@@ -2315,7 +2315,7 @@ function Blocks(activity) {
         }
         if (
             type2 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaleout", "numberout"].indexOf(
                 type1
             ) !== -1
         ) {
