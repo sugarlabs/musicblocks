@@ -2595,6 +2595,18 @@ function setupPitchBlocks() {
         }
     }
 
+    class ScaleDegree2Block extends ValueBlock {
+        constructor() {
+            //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+            super("scaledegree2", "scale degree");
+            this.setPalette("pitch");
+            this.formBlock({
+                outType: "scaleout"
+            });
+        }
+        arg(logo, turtle, blk) {}
+    }
+
     class StepPitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
@@ -2972,7 +2984,11 @@ function setupPitchBlocks() {
     new HertzBlock().setup();
     new PitchNumberBlock().setup();
     new ScaleDegreeBlock().setup();
+<<<<<<< HEAD
     new NthModalPitchBlock().setup();
+=======
+    new ScaleDegree2Block().setup();
+>>>>>>> add scale degree block and scaleout output type
     new StepPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();
