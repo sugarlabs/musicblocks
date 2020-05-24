@@ -255,6 +255,7 @@ function setupBoxesBlocks() {
         constructor() {
             super("storein2");
             this.setPalette("boxes");
+            this.beginnerBlock(true);
             this.setHelpString([
                 _("The Store in block will store a value in a box."),
                 "documentation",
