@@ -1816,12 +1816,8 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     console.log(obj);
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
-<<<<<<< HEAD
     scaleDegree -= 1;
-=======
     // scaleDegree -= 1;
-
->>>>>>> zero based index for nth modal pitch
     // We mod to ensure we don't run out of notes.
     // FixMe: bump octave if we wrap.
     scaleDegree %= scale.length - 1;
