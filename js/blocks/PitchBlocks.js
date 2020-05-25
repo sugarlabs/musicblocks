@@ -2531,8 +2531,19 @@ function setupPitchBlocks() {
     class ScaleDegreeBlock extends FlowBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree", _("scale degree"));
+            super("scaledegree", _("nth modal pitch"));
             this.setPalette("pitch");
+            this.setHelpString([
+                _(
+                    "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+                ) +
+                    " " +
+                    _(
+                        "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+                    ),
+                "documentation",
+                ""
+            ]);
             this.formBlock({
                 args: 2,
                 defaults: [5, 4], // 5 is G in C Majoe
