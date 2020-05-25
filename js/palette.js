@@ -538,17 +538,16 @@ function Palettes() {
         this.hideSearchWidget(true);
 
         for (var i in this.dict) {
-            if (this.dict[i] === this.dict[name]) {
-                this.dict[name]._resetLayout();
-                this.dict[name].showMenu();
-                this.dict[name]._showMenuItems();
-            } else {
+            if (this.dict[i] !== this.dict[name]) {
                 if (this.dict[i].visible) {
                     this.dict[i].hideMenu();
                     this.dict[i]._hideMenuItems();
                 }
             }
         }
+        this.dict[name]._resetLayout();
+        this.dict[name].showMenu();
+        this.dict[name] ._showMenuItems();
     };
 
     this._showMenus = function() {
