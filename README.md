@@ -143,7 +143,7 @@ series of GCI tasks. Bottersnike redesigned the widgets and the Block
 API, AndreaGon made the widgets responsive, Pidddgy refactored the
 update code, resulting in an order-of-magnitude improvement in CPU
 usage, and Nepaltechguy2 updated the local storage mechanism to use
-local storage.
+localforage.
 
 A full list of
 [contributors](https://github.com/sugarlabs/musicblocks/graphs/contributors)
