@@ -63,7 +63,7 @@ $ npm run serve
 
 This works on all Operating Systems with Python.
 
-On Windows sytems with multiple Python installations, it is
+On Windows systems with multiple Python installations, it is
 recommended to use this command instead:
 
 ```
@@ -102,7 +102,7 @@ modules are described in more detail in [js
 README.md](https://github.com/sugarlabs/musicblocks/blob/master/js/README.md)
 
 Note: As with any change, please make your own copy by cloning this
-[respository](https://github.com/sugarlabs/musicblocks.git). Make
+[repository](https://github.com/sugarlabs/musicblocks.git). Make
 your changes, test them, and then make a pull request.
 
 See [Contributing
