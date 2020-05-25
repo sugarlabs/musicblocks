@@ -171,9 +171,9 @@ function _playPitch(args, logo, turtle, blk) {
         ) {
             //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
             //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
-            if (arg0 < 1) {
-                arg0 -= 2;
-            }
+            // if (arg0 < 1) {
+            //     arg0 -= 2;
+            // }
 
             let neg;
             if (arg0 < 0) {
@@ -183,11 +183,11 @@ function _playPitch(args, logo, turtle, blk) {
                 neg = false;
             }
 
-            if (arg0 === 0) {
-                console.debug(arg0);
-                logo.errorMsg(INVALIDPITCH, blk);
-                note = 7;
-            }
+            // if (arg0 === 0) {
+            //     console.debug(arg0);
+            //     logo.errorMsg(INVALIDPITCH, blk);
+            //     note = 7;
+            // }
 
             let obj = keySignatureToMode(logo.keySignature[turtle]);
             let modeLength = MUSICALMODES[obj[1]].length;
@@ -259,7 +259,7 @@ function _playPitch(args, logo, turtle, blk) {
 
                 deltaSemi = semitones > ref ? 1 : 0;
                 deltaOctave = Math.floor(
-                    (arg0 - 1) / modeLength
+                    (arg0) / modeLength
                 );
                 octave =
                     Math.floor(
@@ -282,7 +282,7 @@ function _playPitch(args, logo, turtle, blk) {
                     semitones += (NOTESSHARP.indexOf(note) - ref);
                 }
                 deltaSemi = semitones < ref? 1:0;
-                deltaOctave = Math.floor((arg0 - 1) / modeLength);  
+                deltaOctave = Math.floor((arg0) / modeLength);  
                 octave =
                     Math.floor(
                         calcOctave(
@@ -293,6 +293,7 @@ function _playPitch(args, logo, turtle, blk) {
                         )
                     ) + deltaOctave + deltaSemi;
             }
+            console.log(deltaSemi, deltaOctave);
             console.debug("logo.currentNote = " + logo.currentNote);
             cents = 0;
         } else {
