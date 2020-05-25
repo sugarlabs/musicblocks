@@ -1276,6 +1276,7 @@ function Logo() {
                 // Does the action stack have a name?
                 var c = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[1];
+		// Is there a block in the action clamp?
                 var b = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[2];
                 if (c != null && b != null) {
@@ -1283,7 +1284,10 @@ function Logo() {
                     if (
                         !this.blocks.blockList[this.blocks.stackList[blk]].trash
                     ) {
-                        this.actions[this.blocks.blockList[c].value] = b;
+                        // We need to calculate the value of block c.
+                        // this.actions[this.blocks.blockList[c].value] = b;
+                        let name = this.parseArg(this, 0, c, null);
+                        this.actions[name] = b;
                     }
                 }
             }
@@ -1480,7 +1484,7 @@ function Logo() {
                 }
                 that.stepQueue[turtle].push(blk);
             } else {
-		that.delayParameters[turtle] = {'blk': blk, 'flow': isflow, 'arg': receivedArg};
+                that.delayParameters[turtle] = {'blk': blk, 'flow': isflow, 'arg': receivedArg};
                 that.delayTimeout[turtle] = setTimeout(function() {
                     that._runFromBlockNow(
                         that,
@@ -1496,16 +1500,16 @@ function Logo() {
 
     // We may need to clear the timeout, e.g., after a successful input.
     this.clearRunBlock = function(turtle) {
-	if (this.delayTimeout[turtle] !== null) {
-	    clearTimeout(this.delayTimeout[turtle]);
-	    this.delayTimeout[turtle] = null;
-	    this.requeueRunBlock(turtle);
-	}
+        if (this.delayTimeout[turtle] !== null) {
+            clearTimeout(this.delayTimeout[turtle]);
+            this.delayTimeout[turtle] = null;
+            this.requeueRunBlock(turtle);
+        }
     };
 
     // If we clear the delay timeout, we need to requeue the runBlock.
     this.requeueRunBlock = function(turtle) {
-	this._runFromBlockNow(this, turtle, this.delayParameters[turtle]['blk'], this.delayParameters[turtle]['flow'], this.delayParameters[turtle]['arg']);
+        this._runFromBlockNow(this, turtle, this.delayParameters[turtle]['blk'], this.delayParameters[turtle]['flow'], this.delayParameters[turtle]['arg']);
     };
 
     /**
@@ -2555,6 +2559,7 @@ function Logo() {
             // we need to catch up.
             var d = new Date();
             var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
+
             if (this.drift[turtle] === 0) {
                 // How far behind is this turtle lagging?
                 var turtleLag = Math.max(
