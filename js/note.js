@@ -225,4 +225,66 @@ class NoteController {
     
         return [childFlow, childFlowCount];
     }
+
+    static _playSwing(args, logo, turtle, blk) {
+        let childFlow;
+    
+        // Grab a bit from the next note to give to the current note.
+        if (logo.blocks.blockList[blk].name === "newswing2") {
+            if (args[2] === undefined) {
+                // Nothing to do.
+                return;
+            }
+    
+            let arg0, arg1;
+            if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                arg0 = 1 / 24;
+            } else {
+                arg0 = args[0];
+            }
+    
+            if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                arg1 = 1 / 8;
+            } else {
+                arg1 = args[1];
+            }
+    
+            if (logo.suppressOutput[turtle]) {
+                logo.notationSwing(turtle);
+            } else {
+                logo.swing[turtle].push(1 / arg0);
+                logo.swingTarget[turtle].push(1 / arg1);
+            }
+            childFlow = args[2];
+        } else if (logo.blocks.blockList[blk].name === "newswing") {
+            // deprecated
+            logo.swing[turtle].push(1 / args[0]);
+            logo.swingTarget[turtle].push(null);
+            childFlow = args[1];
+        } else {
+            // deprecated
+            logo.swing[turtle].push(args[0]);
+            logo.swingTarget[turtle].push(null);
+            childFlow = args[1];
+        }
+        logo.swingCarryOver[turtle] = 0;
+    
+        let listenerName = "_swing_" + turtle;
+        logo._setDispatchBlock(blk, turtle, listenerName);
+    
+        let __listener = function(event) {
+            if (!logo.suppressOutput[turtle]) {
+                logo.swingTarget[turtle].pop();
+                logo.swing[turtle].pop();
+            }
+    
+            logo.swingCarryOver[turtle] = 0;
+        };
+    
+        logo._setListener(turtle, listenerName, __listener);
+    
+        return [childFlow, 1];
+    }
 }
