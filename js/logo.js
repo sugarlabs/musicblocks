@@ -1690,25 +1690,25 @@ function Logo() {
             // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
             // deprecated
             case "wholeNote":
-                that._processNote(1, blk, turtle);
+                NoteController._processNote(that, 1, blk, turtle);
                 break;
             case "halfNote":
-                that._processNote(2, blk, turtle);
+                NoteController._processNote(that, 2, blk, turtle);
                 break;
             case "quarterNote":
-                that._processNote(4, blk, turtle);
+                NoteController._processNote(that, 4, blk, turtle);
                 break;
             case "eighthNote":
-                that._processNote(8, blk, turtle);
+                NoteController._processNote(that, 8, blk, turtle);
                 break;
             case "sixteenthNote":
-                that._processNote(16, blk, turtle);
+                NoteController._processNote(that, 16, blk, turtle);
                 break;
             case "thirtysecondNote":
-                that._processNote(32, blk, turtle);
+                NoteController._processNote(that, 32, blk, turtle);
                 break;
             case "sixtyfourthNote":
-                that._processNote(64, blk, turtle);
+                NoteController._processNote(that, 64, blk, turtle);
                 break;
             // Deprecated
             case "darbuka":

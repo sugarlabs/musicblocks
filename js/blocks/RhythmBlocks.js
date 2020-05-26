@@ -429,7 +429,7 @@ function setupRhythmBlocks() {
                     // Graphics will have already been rendered.
                     logo.embeddedGraphics[turtle][saveBlk] = [];
 
-                    logo._processNote(noteValue, saveBlk, turtle);
+                    NoteController._processNote(logo, noteValue, saveBlk, turtle);
                     let bpmFactor;
                     if (logo.bpm[turtle].length > 0) {
                         bpmFactor = TONEBPM / last(logo.bpm[turtle]);
