@@ -434,10 +434,11 @@ function setupDrumBlocks() {
 
                 logo._processNote(noteBeatValue, blk, turtle, __callback);
             } else {
-                logo.errorMsg(
-                    _("Drum Block: Did you mean to use a Note block?"),
-                    blk
-                );
+                // logo.errorMsg(
+                //     _("Drum Block: Did you mean to use a Note block?"),
+                //     blk
+                // );
+		console.debug('PLAY DRUM ERROR: missing context');
                 return;
             }
 
