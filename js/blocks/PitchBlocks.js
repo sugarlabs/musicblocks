@@ -241,10 +241,10 @@ function _playPitch(args, logo, turtle, blk) {
             let semitones = ref;
 
             if (neg) {  
-                if (scaleDegree > 1) {
-                    scaleDegree = modeLength - scaleDegree + 2;
-                }
-
+                // if (scaleDegree > 1) {
+                //     scaleDegree = modeLength - scaleDegree + 2;
+                // }
+                scaleDegree = modeLength - scaleDegree;
                 note = scaleDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
