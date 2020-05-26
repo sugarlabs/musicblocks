@@ -3918,7 +3918,7 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     case "scaledegree":
                         this._piemenuScaleDegree(
-                            [0, 1, 2, 3, 4, 5, 6, 7],
+                            [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7],
                             this.value
                         );
                         break;
@@ -4854,7 +4854,6 @@ function Block(protoblock, blocks, overrideName) {
         for (let i = 0; i < noteValues.length; i++) {
             noteLabels.push(noteValues[i].toString());
         }
-
         docById("wheelDiv").style.display = "";
 
         this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
@@ -4871,8 +4870,8 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.colors = platformColor.pitchWheelcolors;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.35;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.72;
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -4892,8 +4891,8 @@ function Block(protoblock, blocks, overrideName) {
         this._octavesWheel.colors = platformColor.octavesWheelcolors;
         this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
         this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.80;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 1.00;
         this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
         this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
         let octaveLabels = [
@@ -4954,10 +4953,12 @@ function Block(protoblock, blocks, overrideName) {
 
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
-        if (i === -1) {
-            i = 4;
-        }
-
+        // if (i === -1) {
+        //     i = 4;
+        // }
+        console.log(noteLabels);
+        console.log(this._pitchWheel.navItems);
+        console.log(this._pitchWheel.selectedNavItemIndex);
         prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
