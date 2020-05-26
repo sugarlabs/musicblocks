@@ -287,4 +287,62 @@ class NoteController {
     
         return [childFlow, 1];
     }
+
+    static _playDotted(args, logo, turtle, blk) {
+        // Dotting a note will increase its play time by
+        // a(2 - 1/2^n)
+        let arg;
+        if (logo.blocks.blockList[blk].name === "rhythmicdot") {
+            arg = 1;
+        } else {
+            if (args[0] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 0;
+            } else {
+                arg = args[0];
+            }
+        }
+    
+        let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+        logo.beatFactor[turtle] *= currentDotFactor;
+        if (arg >= 0) {
+            logo.dotCount[turtle] += arg;
+        } else if (arg === -1) {
+            logo.errorMsg(
+                _("An argument of -1 results in a note value of 0."),
+                blk
+            );
+            console.debug("ignoring dot arg of -1");
+            arg = 0;
+        } else {
+            logo.dotCount[turtle] += 1 / arg;
+        }
+    
+        let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+        logo.beatFactor[turtle] /= newDotFactor;
+    
+        let listenerName = "_dot_" + turtle;
+        logo._setDispatchBlock(blk, turtle, listenerName);
+    
+        let __listener = function(event) {
+            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] *= currentDotFactor;
+            if (arg >= 0) {
+                logo.dotCount[turtle] -= arg;
+            } else {
+                logo.dotCount[turtle] -= 1 / arg;
+            }
+    
+            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] /= newDotFactor;
+        };
+    
+        logo._setListener(turtle, listenerName, __listener);
+    
+        if (logo.blocks.blockList[blk].name === "rhythmicdot") {
+            return [args[0], 1];
+        } else {
+            return [args[1], 1];
+        }
+    }
 }
