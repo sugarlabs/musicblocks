@@ -3917,7 +3917,7 @@ function Block(protoblock, blocks, overrideName) {
                         );
                         break;
                     case "scaledegree":
-                        this._piemenuScaleDegree(
+                        this._piemenuNthModalPitch(
                             [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7],
                             this.value
                         );
@@ -4841,9 +4841,7 @@ function Block(protoblock, blocks, overrideName) {
         };
     };
 
-    this._piemenuScaleDegree = function(noteValues, note) {
-        let prevPitch = null;
-
+    this._piemenuNthModalPitch = function(noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
@@ -4854,6 +4852,8 @@ function Block(protoblock, blocks, overrideName) {
         for (let i = 0; i < noteValues.length; i++) {
             noteLabels.push(noteValues[i].toString());
         }
+        noteLabels.push(null);
+        
         docById("wheelDiv").style.display = "";
 
         this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
@@ -4953,13 +4953,6 @@ function Block(protoblock, blocks, overrideName) {
 
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
-        // if (i === -1) {
-        //     i = 4;
-        // }
-        console.log(noteLabels);
-        console.log(this._pitchWheel.navItems);
-        console.log(this._pitchWheel.selectedNavItemIndex);
-        prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
 
@@ -5009,22 +5002,9 @@ function Block(protoblock, blocks, overrideName) {
                     .title;
             let i = noteLabels.indexOf(label);
 
-            //Check if passing C
-            if (prevPitch === null) {
-                prevPitch = i;
-            }
-
-            // let deltaPitch = i - prevPitch;
-            // let delta;
-            // if (deltaPitch > 3) {
-            //     delta = deltaPitch - 7;
-            // } else if (deltaPitch < -3) {
-            //     delta = deltaPitch + 7;
-            // } else {
-            //     delta = deltaPitch;
-            // }
-            // //When user passed across C, move one octave higher if going from B to C
-            // //hence, go one octave lower when passing from C to B
+            /* We're using a default of C major ==> -7 to -1 should be one octave lower
+                than the reference, 0-6 in the same octave and 7 should be once octave higher
+            */
             let deltaOctave = 0;
             if (noteLabels[i] == 7) {
                 deltaOctave = 1;
@@ -5045,9 +5025,6 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 8;
             }
 
-            // if (deltaOctave !== 0) {
-            //     that._octavesWheel.navigateWheel(8 - octave);
-            // }
             let note; 
             
             // Use C major as of now; fix this to use current keySignature once that feature is in place
