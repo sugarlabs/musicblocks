@@ -2547,7 +2547,7 @@ function setupPitchBlocks() {
             ]);
             this.formBlock({
                 args: 2,
-                defaults: [5, 4], // 5 is G in C Majoe
+                defaults: [4, 4], // 4 is G in C Major
                 argLabels: [_("number"), _("octave")],
                 argTypes: ["numberin", "anyin"]
             });
