@@ -2529,6 +2529,15 @@ function Blocks(activity) {
                     label += attr;
                 }
                 break;
+            case "scaledegree2":
+                if (myBlock.value === null) myBlock.value = "4";
+                var obj = splitScaleDegree(myBlock.value);
+                var label = obj[0];
+                var attr = obj[1];
+                if (attr !== NATURAL) {
+                    label += attr;
+                }
+                break;
             case "customNote":
                 var label = _(myBlock.value);
                 break;
@@ -3280,6 +3289,8 @@ function Blocks(activity) {
             postProcessArg = [thisBlock, true];
         } else if (name === "solfege") {
             postProcessArg = [thisBlock, "sol"];
+        } else if (name === "scaledegree2") {
+            postProcessArg = [thisBlock, "4"];
         } else if (name === "customNote") {
             var len = this.logo.synth.startingPitch.length;
             postProcessArg = [
@@ -6239,6 +6250,7 @@ function Blocks(activity) {
                     break;
                 case "text":
                 case "solfege":
+                case "scaledegree2":
                 case "customNote":
                 case "eastindiansolfege":
                 case "notename":

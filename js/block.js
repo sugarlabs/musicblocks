@@ -1215,7 +1215,12 @@ function Block(protoblock, blocks, overrideName) {
                     label += attr;
                 }
             } else if(this.name === "scaledegree2") {
-                label = 1;
+                obj = splitScaleDegree(this.value);
+                label = obj[0];
+                attr = obj[1]
+                if(attr !== "♮") {
+                    label += attr;
+                }
             } else if (this.name === "drumname") { 
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
@@ -2337,8 +2342,9 @@ function Block(protoblock, blocks, overrideName) {
                             this.blocks.blockList[c2].value
                         );
                     } else if (this.blocks.blockList[c1].name === "scaledegree2") {
+                        obj = splitScaleDegree(this.blocks.blockList[c1].value);
                         return (
-                            "sol" + 
+                            obj[0] +
                             " " +
                             this.blocks.blockList[c2].value
                         );
@@ -3250,7 +3256,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById("textLabel");
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
-            console.log(obj);
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
@@ -3265,10 +3270,8 @@ function Block(protoblock, blocks, overrideName) {
                 );
             }
         } else if (this.name === "scaledegree2") {
-            obj = splitSolfege(this.value);
-            console.log(obj);
+            obj = splitScaleDegree(this.value);
             let scalenotes_ = ("1 2 3 4 5 6 7").split(" ");
-
             if(this.piemenuOKtoLaunch()) {
                 this._piemenuPitches(
                     scalenotes_,
