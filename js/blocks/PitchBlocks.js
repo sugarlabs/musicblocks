@@ -878,7 +878,7 @@ function _playPitch(args, logo, turtle, blk) {
                 logo.inNoteBlock[turtle].splice(j, 1);
             };
 
-            logo._processNote(noteBeatValue, blk, turtle, __callback);
+            NoteController._processNote(logo, noteBeatValue, blk, turtle, __callback);
         } else {
             logo.errorMsg(
                 _("Pitch Block: Did you mean to use a Note block?"),
