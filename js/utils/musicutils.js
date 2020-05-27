@@ -1779,9 +1779,17 @@ function _buildScale(keySignature) {
     }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
+        if(SHARPPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+            var thisScale = NOTESSHARP;
+        } else {
+            var thisScale = NOTESFLAT;
+        }
     } else {
-        var thisScale = NOTESSHARP;
+        if(FLATPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1){
+            var thisScale = NOTESFLAT;
+        } else {
+            var thisScale = NOTESSHARP;
+        }
     }
 
     var idx = thisScale.indexOf(myKeySignature);
