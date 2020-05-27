@@ -167,7 +167,7 @@ function _playPitch(args, logo, turtle, blk) {
             }
         } else if (
             typeof arg0 === "number" &&
-            logo.blocks.blockList[blk].name === "scaledegree"
+            (logo.blocks.blockList[blk].name === "nthmodalpitch" || logo.blocks.blockList[blk].name === "scaledegree")
         ) {
             //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
             //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
@@ -293,7 +293,6 @@ function _playPitch(args, logo, turtle, blk) {
                         )
                     ) + deltaOctave + deltaSemi;
             }
-            console.log(deltaSemi, deltaOctave);
             console.debug("logo.currentNote = " + logo.currentNote);
             cents = 0;
         } else {
@@ -784,7 +783,7 @@ function _playPitch(args, logo, turtle, blk) {
             }
 
             let noteObj;
-            if (logo.blocks.blockList[blk].name === "scaledegree") {
+            if (logo.blocks.blockList[blk].name === "nthmodalpitch" || logo.blocks.blockList[blk].name === "scaledegree") {
                 noteObj = getNote(
                     logo.currentNote,
                     calcOctave(
@@ -2529,10 +2528,43 @@ function setupPitchBlocks() {
         }
     }
 
+    // Used as a support for older projects. New implementation is NthModalPitch
     class ScaleDegreeBlock extends FlowBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("scaledegree", _("nth modal pitch"));
+            this.setPalette("pitch");
+            this.setHelpString([
+                _(
+                    "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+                ) +
+                    " " +
+                    _(
+                        "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+                    ),
+                "documentation",
+                ""
+            ]);
+            // No need to show this in the palette
+            this.hidden = true;
+            this.formBlock({
+                args: 2,
+                defaults: [4, 4], // 4 is G in C Major
+                argLabels: [_("number"), _("octave")],
+                argTypes: ["numberin", "anyin"]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            args[0] -= 1;
+            return _playPitch(args, logo, turtle, blk);
+        }
+    }
+
+    class NthModalPitchBlock extends FlowBlock {
+        constructor() {
+            //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+            super("nthmodalpitch", _("nth modal pitch"));
             this.setPalette("pitch");
             this.setHelpString([
                 _(
@@ -2936,6 +2968,7 @@ function setupPitchBlocks() {
     new HertzBlock().setup();
     new PitchNumberBlock().setup();
     new ScaleDegreeBlock().setup();
+    new NthModalPitchBlock().setup();
     new StepPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();

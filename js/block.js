@@ -2333,7 +2333,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
                 break;
-            case "scaledegree":
+            case "nthmodalpitch":
                 c1 = this.blocks.blockList[c].connections[1];
                 c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c2].name === "number") {
@@ -3057,7 +3057,7 @@ function Block(protoblock, blocks, overrideName) {
                 "pitchnumber",
                 "meter",
                 "register",
-                "scaledegree",
+                "nthmodalpitch",
                 "rhythmicdot2",
                 "crescendo",
                 "decrescendo",
@@ -3916,7 +3916,7 @@ function Block(protoblock, blocks, overrideName) {
                             this.value
                         );
                         break;
-                    case "scaledegree":
+                    case "nthmodalpitch":
                         this._piemenuNthModalPitch(
                             [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7],
                             this.value
@@ -4392,7 +4392,7 @@ function Block(protoblock, blocks, overrideName) {
                 "setpitchnumberoffset",
                 "invert1",
                 "tofrequency",
-                "scaledegree"
+                "nthmodalpitch"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
             this.blocks.blockList[this.connections[0]].connections[2] ===
             this.blocks.blockList.indexOf(this)

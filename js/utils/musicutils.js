@@ -1813,7 +1813,6 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     // signature. Used for moveable solfege.
     var obj = _buildScale(keySignature);
     var scale = obj[0];
-    console.log(obj);
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
     // scaleDegree -= 1;

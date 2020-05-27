@@ -26,7 +26,7 @@ const PITCHBLOCKS = [
     "steppitch",
     "hertz",
     "pitchnumber",
-    "scaledegree",
+    "nthmodalpitch",
     "playdrum"
 ];
 
@@ -4661,7 +4661,7 @@ function Blocks(activity) {
                 "setpitchnumberoffset",
                 "invert1",
                 "tofrequency",
-                "scaledegree"
+                "nthmodalpitch"
             ].indexOf(this.blockList[blk].name) !== -1
         ) {
             var oblk = this.blockList[blk].connections[2];
@@ -4695,7 +4695,7 @@ function Blocks(activity) {
                 "setpitchnumberoffset",
                 "invert1",
                 "tofrequency",
-                "scaledegree"
+                "nthmodalpitch"
             ].indexOf(this.blockList[blk].name) !== -1
         ) {
             var oblk = this.blockList[blk].connections[2];
@@ -4949,7 +4949,7 @@ function Blocks(activity) {
                 "setpitchnumberoffset",
                 "invert1",
                 "tofrequency",
-                "scaledegree"
+                "nthmodalpitch"
             ].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 &&
             this.blockList[myBlock.connections[0]].connections[2] === blk
         );
