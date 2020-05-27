@@ -5014,27 +5014,25 @@ function Block(protoblock, blocks, overrideName) {
                 prevPitch = i;
             }
 
-            let deltaPitch = i - prevPitch;
-            let delta;
-            if (deltaPitch > 3) {
-                delta = deltaPitch - 7;
-            } else if (deltaPitch < -3) {
-                delta = deltaPitch + 7;
-            } else {
-                delta = deltaPitch;
-            }
-
-            //When user passed across C, move one octave higher if going from B to C
-            //hence, go one octave lower when passing from C to B
+            // let deltaPitch = i - prevPitch;
+            // let delta;
+            // if (deltaPitch > 3) {
+            //     delta = deltaPitch - 7;
+            // } else if (deltaPitch < -3) {
+            //     delta = deltaPitch + 7;
+            // } else {
+            //     delta = deltaPitch;
+            // }
+            // //When user passed across C, move one octave higher if going from B to C
+            // //hence, go one octave lower when passing from C to B
             let deltaOctave = 0;
-
-            if (prevPitch + delta > 6) {
+            if (noteLabels[i] == 7) {
                 deltaOctave = 1;
-            } else if (prevPitch + delta < 0) {
+            } else if (noteLabels[i] < 0) {
                 deltaOctave = -1;
             }
 
-            prevPitch = i;
+            // prevPitch = i;
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
@@ -5047,11 +5045,17 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 8;
             }
 
-            if (deltaOctave !== 0) {
-                that._octavesWheel.navigateWheel(8 - octave);
+            // if (deltaOctave !== 0) {
+            //     that._octavesWheel.navigateWheel(8 - octave);
+            // }
+            let note; 
+            
+            // Use C major as of now; fix this to use current keySignature once that feature is in place
+            if (noteValues[i] >= 0) {
+                note = scaleDegreeToPitch("C major", noteValues[i]);
+            } else {
+                note = scaleDegreeToPitch("C major", 7 + noteValues[i]);
             }
-
-            let note = scaleDegreeToPitch("C major", noteValues[i]);
 
             if (
                 that.blocks.logo.instrumentNames[0] === undefined ||

@@ -1822,7 +1822,6 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     // FixMe: bump octave if we wrap.
     
     scaleDegree %= scale.length - 1;
-    console.log(scaleDegree);
     return scale[scaleDegree];
 }
 
