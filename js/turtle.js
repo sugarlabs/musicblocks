@@ -1722,7 +1722,6 @@ function Turtles() {
     this.gy = null;
     this.canvas1 = null;
 
-
     console.debug("Creating border container");
     this._borderContainer = new createjs.Container();
     this._expandedBoundary = null;
@@ -1743,7 +1742,7 @@ function Turtles() {
     this._locked = false;
     this._queue = [];
 
-    // The list of all of our turtles, one for each start block.
+    // List of all of the turtles, one for each start block
     this.turtleList = [];
 
     this.setGridLabel = function(text) {
@@ -1816,28 +1815,22 @@ function Turtles() {
     };
 
     /**
+     * Makes background for canvas: clears containers, renders buttons.
      *
-     * Makes background for canvas - clears containers, renders buttons
-     *
-     * @param  setCollapsed used to specified whether the background should be collapsed
-     *
+     * @param setCollapsed - specify whether the background should be collapsed
      */
     this.makeBackground = function(setCollapsed) {
-        if (setCollapsed === undefined) {
-            var doCollapse = false;
-        } else {
-            var doCollapse = setCollapsed;
-        }
+        let doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
-        // Remove any old background containers.
-        for (var i = 0; i < this._borderContainer.children.length; i++) {
+        // Remove any old background containers
+        for (let i = 0; i < this._borderContainer.children.length; i++) {
             this._borderContainer.children[i].visible = false;
             this._borderContainer.removeChild(
                 this._borderContainer.children[i]
             );
         }
 
-        // We put the buttons on the stage so they will be on top.
+        // We put the buttons on the stage so they will be on top
         if (this._expandButton !== null) {
             this.stage.removeChild(this._expandButton);
         }
@@ -1854,16 +1847,16 @@ function Turtles() {
             this.stage.removeChild(this._gridButton);
         }
 
-        var that = this;
-        var circles = null;
+        let that = this;
+        let circles = null;
 
         /**
-         * Makes boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
-         *
+         * Makes boundary for graphics (mouse) container by initialising
+         * 'MBOUNDARY' SVG.
          */
         function __makeBoundary() {
             that._locked = true;
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 if (that._expandedBoundary !== null) {
                     that._expandedBoundary.visible = false;
@@ -1876,8 +1869,8 @@ function Turtles() {
                 __makeBoundary2();
             };
 
-            var dx = that.w - 5;
-            var dy = that.h - 55 - LEADING;
+            let dx = that.w - 5;
+            let dy = that.h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1901,11 +1894,10 @@ function Turtles() {
         }
 
         /**
-         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG
-         *
+         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
         function __makeBoundary2() {
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 if (that._collapsedBoundary !== null) {
                     that._collapsedBoundary.visible = false;
@@ -1920,8 +1912,8 @@ function Turtles() {
                 __makeExpandButton();
             };
 
-            var dx = that.w - 20;
-            var dy = that.h - 55 - LEADING;
+            let dx = that.w - 20;
+            let dy = that.h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1947,7 +1939,6 @@ function Turtles() {
         /**
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
          * Assigns click listener function to remove stage and add it at posiion 0.
-         *
          */
         function __makeExpandButton() {
             that._expandButton = new createjs.Container();
@@ -1964,13 +1955,13 @@ function Turtles() {
             that._expandLabel.y = 55;
             that._expandLabel.visible = false;
 
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 if (that._expandButton !== null) {
                     that._expandButton.visible = false;
                 }
 
-                var bitmap = new createjs.Bitmap(img);
+                let bitmap = new createjs.Bitmap(img);
                 that._expandButton.addChild(bitmap);
                 bitmap.visible = true;
                 that._expandButton.addChild(that._expandLabel);
@@ -1990,7 +1981,7 @@ function Turtles() {
                         that._expandLabel.visible = true;
 
                         if (that._expandLabelBG === null) {
-                            var b = that._expandLabel.getBounds();
+                            let b = that._expandLabel.getBounds();
                             that._expandLabelBG = new createjs.Shape();
                             that._expandLabelBG.graphics
                                 .beginFill("#FFF")
@@ -2027,9 +2018,9 @@ function Turtles() {
 
                 that._expandButton.removeAllEventListeners("pressmove");
                 that._expandButton.on("pressmove", function(event) {
-                    var w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-                    var x = event.stageX / that.scale - w;
-                    var y = event.stageY / that.scale - 16;
+                    let w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+                    let x = event.stageX / that.scale - w;
+                    let y = event.stageY / that.scale - 16;
                     that.stage.x = Math.max(0, Math.min((that.w * 3) / 4, x));
                     that.stage.y = Math.max(55, Math.min((that.h * 3) / 4, y));
                     that.refreshCanvas();
@@ -2038,9 +2029,9 @@ function Turtles() {
                 that._expandButton.removeAllEventListeners("click");
                 that._expandButton.on("click", function(event) {
                     // If the aux toolbar is open, close it.
-                    var auxToolbar = docById("aux-toolbar");
+                    let auxToolbar = docById("aux-toolbar");
                     if (auxToolbar.style.display === "block") {
-                        var menuIcon = docById("menu");
+                        let menuIcon = docById("menu");
                         auxToolbar.style.display = "none";
                         menuIcon.innerHTML = "menu";
                         docById("toggleAuxBtn").className -= "blue darken-1";
@@ -2054,7 +2045,7 @@ function Turtles() {
                     that.stage.x = 0;
                     that.stage.y = 0;
                     that.isShrunk = false;
-                    for (var i = 0; i < that.turtleList.length; i++) {
+                    for (let i = 0; i < that.turtleList.length; i++) {
                         that.turtleList[i].container.scaleX = 1;
                         that.turtleList[i].container.scaleY = 1;
                         that.turtleList[i].container.scale = 1;
@@ -2088,8 +2079,7 @@ function Turtles() {
 
         /**
          * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to call collapse() method
-         *
+         * Assigns click listener function to call collapse() method.
          */
         function __makeCollapseButton() {
             that._collapseButton = new createjs.Container();
@@ -2106,13 +2096,13 @@ function Turtles() {
             that._collapseLabel.y = 55;
             that._collapseLabel.visible = false;
 
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 if (that._collapseButton !== null) {
                     that._collapseButton.visible = false;
                 }
 
-                var bitmap = new createjs.Bitmap(img);
+                let bitmap = new createjs.Bitmap(img);
                 that._collapseButton.addChild(bitmap);
                 bitmap.visible = true;
                 that._collapseButton.addChild(that._collapseLabel);
@@ -2128,9 +2118,9 @@ function Turtles() {
                 that._collapseButton.removeAllEventListeners("click");
                 that._collapseButton.on("click", function(event) {
                     // If the aux toolbar is open, close it.
-                    var auxToolbar = docById("aux-toolbar");
+                    let auxToolbar = docById("aux-toolbar");
                     if (auxToolbar.style.display === "block") {
-                        var menuIcon = docById("menu");
+                        let menuIcon = docById("menu");
                         auxToolbar.style.display = "none";
                         menuIcon.innerHTML = "menu";
                         docById("toggleAuxBtn").className -= "blue darken-1";
@@ -2144,7 +2134,7 @@ function Turtles() {
                         that._collapseLabel.visible = true;
 
                         if (that._collapseLabelBG === null) {
-                            var b = that._collapseLabel.getBounds();
+                            let b = that._collapseLabel.getBounds();
                             that._collapseLabelBG = new createjs.Shape();
                             that._collapseLabelBG.graphics
                                 .beginFill("#FFF")
@@ -2166,7 +2156,7 @@ function Turtles() {
                             that._collapseLabelBG.visible = true;
                         }
 
-                        var r = 55 / 2;
+                        let r = 55 / 2;
                         circles = showButtonHighlight(
                             that._collapseButton.x + 28,
                             that._collapseButton.y + 28,
@@ -2201,7 +2191,6 @@ function Turtles() {
         /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call doClear() method.
-         *
          */
         function __makeClearButton() {
             that._clearButton = new createjs.Container();
@@ -2223,9 +2212,9 @@ function Turtles() {
             that._clearLabel.y = 55;
             that._clearLabel.visible = false;
 
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
-                var bitmap = new createjs.Bitmap(img);
+                let bitmap = new createjs.Bitmap(img);
                 that._clearButton.addChild(bitmap);
                 that._clearButton.addChild(that._clearLabel);
 
@@ -2244,7 +2233,7 @@ function Turtles() {
                         that._clearLabel.visible = true;
 
                         if (that._clearLabelBG === null) {
-                            var b = that._clearLabel.getBounds();
+                            let b = that._clearLabel.getBounds();
                             that._clearLabelBG = new createjs.Shape();
                             that._clearLabelBG.graphics
                                 .beginFill("#FFF")
@@ -2263,7 +2252,7 @@ function Turtles() {
                             that._clearLabelBG.visible = true;
                         }
 
-                        var r = 55 / 2;
+                        let r = 55 / 2;
                         circles = showButtonHighlight(
                             that._clearButton.x + 28,
                             that._clearButton.y + 28,
@@ -2295,7 +2284,7 @@ function Turtles() {
                     that.collapse();
                 }
 
-                var language = localStorage.languagePreference;
+                let language = localStorage.languagePreference;
                 // if (!beginnerMode || language !== 'ja') {
                 __makeGridButton();
                 // }
@@ -2308,8 +2297,7 @@ function Turtles() {
 
         /**
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
-         * Assigns click listener function to doGrid() method
-         *
+         * Assigns click listener function to doGrid() method.
          */
         function __makeGridButton() {
             that._gridButton = new createjs.Container();
@@ -2331,9 +2319,9 @@ function Turtles() {
             that._gridLabel.y = 55;
             that._gridLabel.visible = false;
 
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
-                var bitmap = new createjs.Bitmap(img);
+                let bitmap = new createjs.Bitmap(img);
                 that._gridButton.addChild(bitmap);
                 that._gridButton.addChild(that._gridLabel);
 
@@ -2352,7 +2340,7 @@ function Turtles() {
                         that._gridLabel.visible = true;
 
                         if (that._gridLabelBG === null) {
-                            var b = that._gridLabel.getBounds();
+                            let b = that._gridLabel.getBounds();
                             that._gridLabelBG = new createjs.Shape();
                             that._gridLabelBG.graphics
                                 .beginFill("#FFF")
@@ -2371,7 +2359,7 @@ function Turtles() {
                             that._gridLabelBG.visible = true;
                         }
 
-                        var r = 55 / 2;
+                        let r = 55 / 2;
                         circles = showButtonHighlight(
                             that._gridButton.x + 28,
                             that._gridButton.y + 28,
@@ -2423,9 +2411,8 @@ function Turtles() {
 
     /**
      * Toggles visibility of menu and grids.
-     * Scales down all 'turtles' in turtleList
-     * Removes the stage and adds it back at the top
-     *
+     * Scales down all 'turtles' in turtleList.
+     * Removes the stage and adds it back at the top.
      */
     this.collapse = function() {
         this.hideMenu();
@@ -2438,7 +2425,7 @@ function Turtles() {
         this.stage.x = (this.w * 3) / 4 - 10;
         this.stage.y = 55 + LEADING + 6;
         this.isShrunk = true;
-        for (var i = 0; i < this.turtleList.length; i++) {
+        for (let i = 0; i < this.turtleList.length; i++) {
             this.turtleList[i].container.scaleX = SCALEFACTOR;
             this.turtleList[i].container.scaleY = SCALEFACTOR;
             this.turtleList[i].container.scale = SCALEFACTOR;
@@ -2465,11 +2452,10 @@ function Turtles() {
     };
 
     /**
+     * Returns block object.
      *
-     * Returns block object
-     *
-     * @param  blocks
-     * @return blocks object
+     * @param blocks
+     * @return {Object} - blocks object
      */
     this.setBlocks = function(blocks) {
         this.blocks = blocks;
@@ -2477,11 +2463,10 @@ function Turtles() {
     };
 
     /**
-     * Adds drum to start block
+     * Adds drum to start block.
      *
-     * @param  startBlock name of startBlock
-     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
-     *
+     * @param startBlock - name of startBlock
+     * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
     this.addDrum = function(startBlock, infoDict) {
         this._drum = true;
@@ -2489,17 +2474,16 @@ function Turtles() {
     };
 
     /**
-     * Adds turtle to start block
+     * Adds turtle to start block.
      *
-     * @param  startBlock name of startBlock
-     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
-     *
+     * @param startBlock - name of startBlock
+     * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
     this.addTurtle = function(startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
-            var t = last(this.turtleList);
+            let t = last(this.turtleList);
             t.container.scaleX = SCALEFACTOR;
             t.container.scaleY = SCALEFACTOR;
             t.container.scale = SCALEFACTOR;
@@ -2507,11 +2491,11 @@ function Turtles() {
     };
 
     /**
-     * Add a new turtle for each start block. Creates container for each turtle.
+     * Add a new turtle for each start block.
+     * Creates container for each turtle.
      *
-     * @param  startBlock name of startBlock
-     * @param  infoDict contains turtle color, shade, pensize, x, y, heading etc.
-     *
+     * @param startBlock - name of startBlock
+     * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
     this.add = function(startBlock, infoDict) {
         if (startBlock != null) {
@@ -2524,7 +2508,7 @@ function Turtles() {
             console.debug("adding a new turtle startBlock is null");
         }
 
-        var blkInfoAvailable = false;
+        let blkInfoAvailable = false;
 
         if (typeof infoDict === "object") {
             if (Object.keys(infoDict).length > 0) {
@@ -2532,20 +2516,16 @@ function Turtles() {
             }
         }
 
-        var i = this.turtleList.length;
-        if (blkInfoAvailable && "name" in infoDict) {
-            turtleName = infoDict["name"];
-        } else {
-            var turtleName = _("start"); // i.toString();
-        }
-
-        var newTurtle = new Turtle(turtleName, this, this._drum);
+        let i = this.turtleList.length;
+        let turtleName =
+            blkInfoAvailable && "name" in infoDict ?
+                infoDict["name"] : _("start");
+        let newTurtle = new Turtle(turtleName, this, this._drum);
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
                 newTurtle.x = infoDict["xcor"];
             }
-
             if ("ycor" in infoDict) {
                 newTurtle.y = infoDict["ycor"];
             }
@@ -2553,20 +2533,20 @@ function Turtles() {
 
         this.turtleList.push(newTurtle);
 
-        // Each turtle needs its own canvas.
+        // Each turtle needs its own canvas
         newTurtle.imageContainer = new createjs.Container();
         this.stage.addChild(newTurtle.imageContainer);
         newTurtle.penstrokes = new createjs.Bitmap();
         this.stage.addChild(newTurtle.penstrokes);
 
-        var turtleImage = new Image();
+        let turtleImage = new Image();
         i %= 10;
         newTurtle.container = new createjs.Container();
         this.stage.addChild(newTurtle.container);
         newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
         newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
 
-        // Ensure that the buttons are on top.
+        // Ensure that the buttons are on top
         this.stage.removeChild(this._expandButton);
         this.stage.addChild(this._expandButton);
         this.stage.removeChild(this._collapseButton);
@@ -2578,7 +2558,7 @@ function Turtles() {
             this.stage.addChild(this._gridButton);
         }
 
-        var hitArea = new createjs.Shape();
+        let hitArea = new createjs.Shape();
         hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
         hitArea.x = 0;
         hitArea.y = 0;
@@ -2598,8 +2578,8 @@ function Turtles() {
                 newTurtle.decorationBitmap = newTurtle.bitmap.clone();
                 startBlock.container.addChild(newTurtle.decorationBitmap);
                 newTurtle.decorationBitmap.name = "decoration";
-                var width = startBlock.width;
-                var offset = 40;
+                let width = startBlock.width;
+                let offset = 40;
 
                 newTurtle.decorationBitmap.x =
                     width - (offset * startBlock.protoblock.scale) / 2;
@@ -2614,11 +2594,7 @@ function Turtles() {
             that.refreshCanvas();
         }
 
-        if (this._drum) {
-            var artwork = DRUMSVG;
-        } else {
-            var artwork = TURTLESVG;
-        }
+        let artwork = this._drum ? DRUMSVG : TURTLESVG;
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
             this._makeTurtleBitmap(
@@ -2649,14 +2625,14 @@ function Turtles() {
             DEFAULTVALUE,
             DEFAULTCHROMA
         );
-        var that = this;
+        let that = this;
 
         newTurtle.container.on("mousedown", function(event) {
             if (that._rotating) {
                 return;
             }
 
-            var offset = {
+            let offset = {
                 x: newTurtle.container.x - event.stageX / that.scale,
                 y: newTurtle.container.y - event.stageY / that.scale
             };
@@ -2676,7 +2652,7 @@ function Turtles() {
         });
 
         newTurtle.container.on("click", function(event) {
-            // If turtles listen for clicks then they can be used as buttons.
+            // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
             that.stage.dispatchEvent("click" + newTurtle.name);
         });
@@ -2737,23 +2713,21 @@ function Turtles() {
     };
 
     /**
-     * Async creation of bitmap from SVG data
+     * Async creation of bitmap from SVG data.
      *
-     * @param  data     SVG data
-     * @param  name     name of bitmap
-     * @param  callback function executed on load of bitmap
-     * @param  extras
-     *
+     * @param data - SVG data
+     * @param name - name of bitmap
+     * @param callback - function executed on load of bitmap
+     * @param extras
      */
     this._makeTurtleBitmap = function(data, name, callback, extras) {
         // Works with Chrome, Safari, Firefox (untested on IE)
-        var img = new Image();
-        var that = this;
+        let img = new Image();
 
-        img.onload = function() {
+        img.onload = () => {
             complete = true;
-            var bitmap = new createjs.Bitmap(img);
-            callback(that, name, bitmap, extras);
+            let bitmap = new createjs.Bitmap(img);
+            callback(this, name, bitmap, extras);
         };
 
         img.src =
@@ -2762,52 +2736,55 @@ function Turtles() {
     };
 
     /**
-     * Convert on screen x coordinate to turtle x coordinate
-     * @param x x coordinate
+     * Convert on screen x coordinate to turtle x coordinate.
      *
+     * @param x - x coordinate
      */
     this.screenX2turtleX = function(x) {
         return x - this._canvas.width / (2.0 * this.scale);
     };
 
     /**
-     * Convert on screen y coordinate to turtle y coordinate
-     * @param y y coordinate
+     * Convert on screen y coordinate to turtle y coordinate.
+     *
+     * @param y - y coordinate
      */
     this.screenY2turtleY = function(y) {
         return this.invertY(y);
     };
 
     /**
-     * Convert turtle x coordinate to on screen x coordinate
-     * @param x x coordinate
+     * Convert turtle x coordinate to on screen x coordinate.
+     *
+     * @param x - x coordinate
      */
     this.turtleX2screenX = function(x) {
         return this._canvas.width / (2.0 * this.scale) + x;
     };
 
     /**
-     * Convert turtle y coordinate to on screen y coordinate
-     * @param y y coordinate
+     * Convert turtle y coordinate to on screen y coordinate.
+     *
+     * @param y - y coordinate
      */
     this.turtleY2screenY = function(y) {
         return this.invertY(y);
     };
 
     /**
-     * Invert y coordinate
+     * Invert y coordinate.
      */
     this.invertY = function(y) {
         return this._canvas.height / (2.0 * this.scale) - y;
     };
 
     /**
-     * Toggles 'running' boolean value for all turtles
+     * Toggles 'running' boolean value for all turtles.
      */
     this.markAsStopped = function() {
-        for (var turtle in this.turtleList) {
+        for (let turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
-            // Make sure the blink is really stopped.
+            // Make sure the blink is really stopped
             // this.turtleList[turtle].stopBlink();
         }
 
@@ -2815,12 +2792,12 @@ function Turtles() {
     };
 
     /**
-     * Returns boolean value depending on whether turtle is running
+     * Returns boolean value depending on whether turtle is running.
      *
-     * @return {boolean} running
+     * @return {boolean} - running
      */
     this.running = function() {
-        for (var turtle in this.turtleList) {
+        for (let turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
             }
@@ -2832,29 +2809,35 @@ function Turtles() {
 /**
  * Queue entry for managing running blocks.
  *
- * @param  blk      block
- * @param  count    count
- * @param  parentBlk parent block
- * @param  args      arguments
+ * @class
  */
-function Queue(blk, count, parentBlk, args) {
-    this.blk = blk;
-    this.count = count;
-    this.parentBlk = parentBlk;
-    this.args = args;
+class Queue {
+    /**
+     * @constructor
+     * @param blk - block
+     * @param count - count
+     * @param parentBlk - parent block
+     * @param args - arguments
+     */
+    constructor(blk, count, parentBlk, args) {
+        this.blk = blk;
+        this.count = count;
+        this.parentBlk = parentBlk;
+        this.args = args;
+    }
 }
 
 /**
- * Converts hexcode to rgb
+ * Converts hexcode to rgb.
  *
- * @param  {Number} hex hexcode
- * @return {String} rgb values of hexcode + alpha which is 1
+ * @param {Number} hex - hexcode
+ * @return {String} - rgb values of hexcode + alpha which is 1
  */
 function hex2rgb(hex) {
-    var bigint = parseInt(hex, 16);
-    var r = (bigint >> 16) & 255;
-    var g = (bigint >> 8) & 255;
-    var b = bigint & 255;
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
 
     return "rgba(" + r + "," + g + "," + b + ",1)";
 }
