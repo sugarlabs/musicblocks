@@ -1004,7 +1004,7 @@ function setupRhythmBlocks() {
                 [2, ["number", { value: 1 }], 0, 0, [1]],
                 [3, ["number", { value: 4 }], 0, 0, [1]],
                 [4, "vspace", 0, 0, [0, 5]],
-                [5, "scaledegree", 0, 0, [4, 6, 7, null]],
+                [5, "nthmodalpitch", 0, 0, [4, 6, 7, null]],
                 [6, ["number", { value: 5 }], 0, 0, [5]],
                 [7, ["number", { value: 4 }], 0, 0, [5]],
                 [8, "hidden", 0, 0, [0, null]]
