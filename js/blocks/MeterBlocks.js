@@ -1058,8 +1058,6 @@ function setupMeterBlocks() {
                 logo.defaultStrongBeats[turtle] = true;
             }
 
-            
-
             logo.notationMeter(
                 turtle,
                 logo.beatsPerMeasure[turtle],

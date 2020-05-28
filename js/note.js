@@ -350,6 +350,7 @@ class NoteController {
     /**
      * Processes a single note.
      * @privileged
+     * @param   logo
      * @param   {number}    noteValue
      * @param   blk
      * @param   turtle

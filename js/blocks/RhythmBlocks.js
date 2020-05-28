@@ -559,9 +559,8 @@ function setupRhythmBlocks() {
                 );
                 logo.noteCents[turtle][last(logo.inNoteBlock[turtle])].push(0);
                 logo.noteHertz[turtle][last(logo.inNoteBlock[turtle])].push(0);
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+                logo.noteBeatValues[turtle][last(logo.inNoteBlock[turtle])]
+                    .push(logo.beatFactor[turtle]);
                 logo.pushedNote[turtle] = true;
             }
         }
