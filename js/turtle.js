@@ -388,8 +388,8 @@ function Turtle(name, turtles, drum) {
         this.container.x = fx;
         this.container.y = fy;
 
-        // The new heading is the angle between (cp2x, cp2y) and (nx, ny).
-        var degrees = Math.atan2(nx - cp2x, ny - cp2y);
+        // The new heading is the angle between (cp2x, cp2y) and (x2, y2).
+        var degrees = Math.atan2(x2 - cp2x, y2 - cp2y);
         degrees = (180 * degrees) / Math.PI;
         this.doSetHeading(degrees);
     };
