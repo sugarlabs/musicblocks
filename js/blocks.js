@@ -2323,13 +2323,13 @@ function Blocks(activity) {
         }
         if (
             type1 === "notein" &&
-            ["solfegeout", "textout", "noteout"].indexOf(type2) !== -1
+            ["solfegeout", "scaleout", "textout", "noteout"].indexOf(type2) !== -1
         ) {
             return true;
         }
         if (
             type2 === "notein" &&
-            ["solfegeout", "textout", "noteout"].indexOf(type1) !== -1
+            ["solfegeout", "scaleout", "textout", "noteout"].indexOf(type1) !== -1
         ) {
             return true;
         }
@@ -2342,6 +2342,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
+                "scaleout",
                 "noteout"
             ].indexOf(type2) !== -1
         ) {
@@ -2356,6 +2357,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
+                "scaleout",
                 "noteout"
             ].indexOf(type1) !== -1
         ) {
