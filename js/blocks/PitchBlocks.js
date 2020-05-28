@@ -2532,7 +2532,7 @@ function setupPitchBlocks() {
     class ScaleDegreeBlock extends FlowBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree", _("nth modal pitch"));
+            super("scaledegree", _("scale degree"));
             this.setPalette("pitch");
             this.setHelpString([
                 _(
