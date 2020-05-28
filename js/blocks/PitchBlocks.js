@@ -169,7 +169,30 @@ function _playPitch(args, logo, turtle, blk) {
                 octave = obj[1];
                 cents = obj[2];
             }
-        } else if (
+        } 
+        else if (
+            Number(arg0[0]) &&
+            logo.blocks.blockList[blk].name === "pitch"
+        ) {
+            console.log("testing");
+            let attr, scaledegree;
+
+            if (arg0.indexOf(SHARP) !==-1) {
+                attr = SHARP;
+            } else if (arg0.indexOf(FLAT) !== -1) {
+                attr = FLAT;
+            } else if (arg0.indexOf(DOUBLESHARP) !== -1) {
+                attr = DOUBLESHARP;
+            } else if (arg0.indexOf(DOUBLEFLAT) !== -1) {
+                attr = DOUBLEFLAT;
+            } else {
+                attr = NATURAL;
+            }
+            scaledegree = arg0.replace(attr, "");
+            console.log(scaledegree);
+            console.log(attr);
+        }
+        else if (
             typeof arg0 === "number" &&
             (logo.blocks.blockList[blk].name === "nthmodalpitch" || logo.blocks.blockList[blk].name === "scaledegree")
         ) {
@@ -2605,7 +2628,9 @@ function setupPitchBlocks() {
                 outType: "scaleout"
             });
         }
-        arg(logo, turtle, blk) {}
+        arg(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
     }
 
     class StepPitchBlock extends FlowBlock {

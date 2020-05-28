@@ -1145,6 +1145,7 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     case "scaledegree2":
                         this.value = "1";
+                        break;
                     case "customNote":
                         let len = this.blocks.logo.synth.startingPitch.length;
                         this.value =
@@ -2349,8 +2350,12 @@ function Block(protoblock, blocks, overrideName) {
                         );
                     } else if (this.blocks.blockList[c1].name === "scaledegree2") {
                         obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                        let note = obj[0];
+                        if(obj[1] !== NATURAL) {
+                            note += obj[1];
+                        }
                         return (
-                            obj[0] +
+                            note +
                             " " +
                             this.blocks.blockList[c2].value
                         );
