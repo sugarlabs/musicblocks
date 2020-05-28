@@ -3006,11 +3006,8 @@ function setupPitchBlocks() {
     new HertzBlock().setup();
     new PitchNumberBlock().setup();
     new ScaleDegreeBlock().setup();
-<<<<<<< HEAD
     new NthModalPitchBlock().setup();
-=======
     new ScaleDegree2Block().setup();
->>>>>>> add scale degree block and scaleout output type
     new StepPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();
