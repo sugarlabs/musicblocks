@@ -26,7 +26,7 @@
 // need to change the block numbers as they should start with Block 0.
 
 // The macro-block format is described in more detail in
-// https://github.com/sugarlabs/js/README.ms
+// https://github.com/sugarlabs/js/README.md
 // Note that the numbers at the beginning of each block need to
 // adjusted so the first block starts at 0. If you remove all of
 // the blocks except the ones you want in your macro (and one start
