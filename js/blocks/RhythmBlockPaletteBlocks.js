@@ -59,7 +59,7 @@ function setupRhythmBlockPaletteBlocks() {
                 }
 
                 for (let i = 0; i < args[0]; i++) {
-                    logo._processNote(noteBeatValue, blk, turtle);
+                    NoteController._processNote(logo, noteBeatValue, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 // We don't check for balance since we want to support
@@ -128,7 +128,7 @@ function setupRhythmBlockPaletteBlocks() {
                     timeout
                 ) {
                     setTimeout(function() {
-                        logo._processNote(thisBeat, blk, turtle, callback);
+                        NoteController._processNote(logo, thisBeat, blk, turtle, callback);
                     }, timeout);
                 };
                 let __callback;
@@ -511,7 +511,7 @@ function setupRhythmBlockPaletteBlocks() {
                         timeout
                     ) {
                         setTimeout(function() {
-                            logo._processNote(thisBeat, blk, turtle, callback);
+                            NoteController._processNote(logo, thisBeat, blk, turtle, callback);
                         }, timeout);
                     };
 
@@ -672,7 +672,7 @@ function setupRhythmBlockPaletteBlocks() {
                             logo.addingNotesToTuplet = true;
                         }
 
-                        logo._processNote(noteBeatValue, blk, turtle);
+                        NoteController._processNote(logo, noteBeatValue, blk, turtle);
                     }
                 } else {
                     logo.tupletParams.push([1, noteBeatValue]);
@@ -709,7 +709,7 @@ function setupRhythmBlockPaletteBlocks() {
                     timeout
                 ) {
                     setTimeout(function() {
-                        logo._processNote(thisBeat, blk, turtle, callback);
+                        NoteController._processNote(logo, thisBeat, blk, turtle, callback);
                     }, timeout);
                 };
 

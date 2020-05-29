@@ -182,6 +182,7 @@ function Activity() {
         "activity/boundary",
         "activity/turtle",
         "activity/palette",
+        "activity/note",
         "activity/protoblocks",
         "activity/blocks",
         "activity/block",
