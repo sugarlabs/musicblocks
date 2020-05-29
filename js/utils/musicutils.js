@@ -1779,9 +1779,17 @@ function _buildScale(keySignature) {
     }
 
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
+        if(SHARPPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+            var thisScale = NOTESSHARP;
+        } else {
+            var thisScale = NOTESFLAT;
+        }
     } else {
-        var thisScale = NOTESSHARP;
+        if(FLATPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1){
+            var thisScale = NOTESFLAT;
+        } else {
+            var thisScale = NOTESSHARP;
+        }
     }
 
     var idx = thisScale.indexOf(myKeySignature);
@@ -1805,12 +1813,13 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     // signature. Used for moveable solfege.
     var obj = _buildScale(keySignature);
     var scale = obj[0];
-
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
-    scaleDegree -= 1;
+    // scaleDegree -= 1;
+    
     // We mod to ensure we don't run out of notes.
     // FixMe: bump octave if we wrap.
+    
     scaleDegree %= scale.length - 1;
     return scale[scaleDegree];
 }

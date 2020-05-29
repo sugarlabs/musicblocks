@@ -1276,6 +1276,7 @@ function Logo() {
                 // Does the action stack have a name?
                 var c = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[1];
+		            // Is there a block in the action clamp?
                 var b = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[2];
                 if (c != null && b != null) {
@@ -1283,7 +1284,10 @@ function Logo() {
                     if (
                         !this.blocks.blockList[this.blocks.stackList[blk]].trash
                     ) {
-                        this.actions[this.blocks.blockList[c].value] = b;
+                        // We need to calculate the value of block c.
+                        // this.actions[this.blocks.blockList[c].value] = b;
+                        let name = this.parseArg(this, 0, c, null);
+                        this.actions[name] = b;
                     }
                 }
             }

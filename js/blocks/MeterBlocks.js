@@ -390,7 +390,9 @@ function setupMeterBlocks() {
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.drift[turtle] -= 1;
+		if (logo.drift[turtle] > 0) {
+                    logo.drift[turtle] -= 1;
+		}
             };
 
             logo._setListener(turtle, listenerName, __listener);

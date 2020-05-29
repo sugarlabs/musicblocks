@@ -765,7 +765,8 @@ function setupActionBlocks() {
                 name: _("action"),
                 args: 1,
                 argLabels: [""],
-                defaults: [_("action")]
+                defaults: [_("action")],
+                argTypes: ["anyin"]
             });
             this.makeMacro((x, y) => [
                 [0, "action", x, y, [null, 1, 2, null]],

@@ -2334,7 +2334,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
                 break;
-            case "scaledegree":
+            case "nthmodalpitch":
                 c1 = this.blocks.blockList[c].connections[1];
                 c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c2].name === "number") {
@@ -3058,7 +3058,7 @@ function Block(protoblock, blocks, overrideName) {
                 "pitchnumber",
                 "meter",
                 "register",
-                "scaledegree",
+                "nthmodalpitch",
                 "rhythmicdot2",
                 "crescendo",
                 "decrescendo",
@@ -3917,9 +3917,9 @@ function Block(protoblock, blocks, overrideName) {
                             this.value
                         );
                         break;
-                    case "scaledegree":
-                        this._piemenuScaleDegree(
-                            [1, 2, 3, 4, 5, 6, 7],
+                    case "nthmodalpitch":
+                        this._piemenuNthModalPitch(
+                            [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7],
                             this.value
                         );
                         break;
@@ -4393,7 +4393,7 @@ function Block(protoblock, blocks, overrideName) {
                 "setpitchnumberoffset",
                 "invert1",
                 "tofrequency",
-                "scaledegree"
+                "nthmodalpitch"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
             this.blocks.blockList[this.connections[0]].connections[2] ===
             this.blocks.blockList.indexOf(this)
@@ -4842,9 +4842,7 @@ function Block(protoblock, blocks, overrideName) {
         };
     };
 
-    this._piemenuScaleDegree = function(noteValues, note) {
-        let prevPitch = null;
-
+    this._piemenuNthModalPitch = function(noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
         if (this.blocks.stageClick) {
@@ -4855,7 +4853,8 @@ function Block(protoblock, blocks, overrideName) {
         for (let i = 0; i < noteValues.length; i++) {
             noteLabels.push(noteValues[i].toString());
         }
-
+        noteLabels.push(null);
+        
         docById("wheelDiv").style.display = "";
 
         this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
@@ -4872,8 +4871,8 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.colors = platformColor.pitchWheelcolors;
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.35;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.72;
         this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
         this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
 
@@ -4893,8 +4892,8 @@ function Block(protoblock, blocks, overrideName) {
         this._octavesWheel.colors = platformColor.octavesWheelcolors;
         this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
         this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.80;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 1.00;
         this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
         this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
         let octaveLabels = [
@@ -4955,11 +4954,6 @@ function Block(protoblock, blocks, overrideName) {
 
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
-        if (i === -1) {
-            i = 4;
-        }
-
-        prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
 
@@ -5009,32 +5003,17 @@ function Block(protoblock, blocks, overrideName) {
                     .title;
             let i = noteLabels.indexOf(label);
 
-            //Check if passing C
-            if (prevPitch === null) {
-                prevPitch = i;
-            }
-
-            let deltaPitch = i - prevPitch;
-            let delta;
-            if (deltaPitch > 3) {
-                delta = deltaPitch - 7;
-            } else if (deltaPitch < -3) {
-                delta = deltaPitch + 7;
-            } else {
-                delta = deltaPitch;
-            }
-
-            //When user passed across C, move one octave higher if going from B to C
-            //hence, go one octave lower when passing from C to B
+            /* We're using a default of C major ==> -7 to -1 should be one octave lower
+                than the reference, 0-6 in the same octave and 7 should be once octave higher
+            */
             let deltaOctave = 0;
-
-            if (prevPitch + delta > 6) {
+            if (noteLabels[i] == 7) {
                 deltaOctave = 1;
-            } else if (prevPitch + delta < 0) {
+            } else if (noteLabels[i] < 0) {
                 deltaOctave = -1;
             }
 
-            prevPitch = i;
+            // prevPitch = i;
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
@@ -5047,11 +5026,14 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 8;
             }
 
-            if (deltaOctave !== 0) {
-                that._octavesWheel.navigateWheel(8 - octave);
+            let note; 
+            
+            // Use C major as of now; fix this to use current keySignature once that feature is in place
+            if (noteValues[i] >= 0) {
+                note = scaleDegreeToPitch("C major", noteValues[i]);
+            } else {
+                note = scaleDegreeToPitch("C major", 7 + noteValues[i]);
             }
-
-            let note = scaleDegreeToPitch("C major", noteValues[i]);
 
             if (
                 that.blocks.logo.instrumentNames[0] === undefined ||
