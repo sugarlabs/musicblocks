@@ -1688,103 +1688,105 @@ function Turtle(name, turtles, drum) {
     };
 }
 
-function Turtles() {
-    this.masterStage = null;
-    this.doClear = null;
-    this.hideMenu = null;
-    this.doGrid = null;
-    this.hideGrids = null;
-    this.stage = null;
-    this.refreshCanvas = null;
-    this.scale = 1.0;
-    this.w = 1200;
-    this.h = 900;
-    this.backgroundColor = platformColor.background;
-    this._canvas = null;
-    this._rotating = false;
-    this._drum = false;
+class Turtles {
+    constructor() {
+        this.masterStage = null;
+        this.doClear = null;
+        this.hideMenu = null;
+        this.doGrid = null;
+        this.hideGrids = null;
+        this.stage = null;
+        this.refreshCanvas = null;
+        this.scale = 1.0;
+        this.w = 1200;
+        this.h = 900;
+        this.backgroundColor = platformColor.background;
+        this._canvas = null;
+        this._rotating = false;
+        this._drum = false;
 
-    this.gx = null;
-    this.gy = null;
-    this.canvas1 = null;
+        this.gx = null;
+        this.gy = null;
+        this.canvas1 = null;
 
-    console.debug("Creating border container");
-    this._borderContainer = new createjs.Container();
-    this._expandedBoundary = null;
-    this._collapsedBoundary = null;
-    this.isShrunk = false;
-    this._expandButton = null;
-    this._expandLabel = null;
-    this._expandLabelBG = null;
-    this._collapseButton = null;
-    this._collapseLabel = null;
-    this._collapseLabelBG = null;
-    this._clearButton = null;
-    this._clearLabel = null;
-    this._clearLabelBG = null;
-    this._gridButton = null;
-    this._gridLabel = null;
-    this._gridLabelBG = null;
-    this._locked = false;
-    this._queue = [];
+        console.debug("Creating border container");
+        this._borderContainer = new createjs.Container();
+        this._expandedBoundary = null;
+        this._collapsedBoundary = null;
+        this.isShrunk = false;
+        this._expandButton = null;
+        this._expandLabel = null;
+        this._expandLabelBG = null;
+        this._collapseButton = null;
+        this._collapseLabel = null;
+        this._collapseLabelBG = null;
+        this._clearButton = null;
+        this._clearLabel = null;
+        this._clearLabelBG = null;
+        this._gridButton = null;
+        this._gridLabel = null;
+        this._gridLabelBG = null;
+        this._locked = false;
+        this._queue = [];
 
-    // List of all of the turtles, one for each start block
-    this.turtleList = [];
+        // List of all of the turtles, one for each start block
+        this.turtleList = [];
+    }
 
-    this.setGridLabel = function(text) {
+    setGridLabel(text) {
         if (this._gridLabel !== null) {
             this._gridLabel.text = text;
         }
-    };
+    }
 
-    this.setMasterStage = function(stage) {
+    setMasterStage(stage) {
         this.masterStage = stage;
         return this;
-    };
+    }
 
-    this.setClear = function(doClear) {
+    setClear(doClear) {
         this.doClear = doClear;
         return this;
-    };
+    }
 
-    this.setDoGrid = function(doGrid) {
+    setDoGrid(doGrid) {
         this.doGrid = doGrid;
         return this;
-    };
+    }
 
-    this.setHideGrids = function(hideGrids) {
+    setHideGrids(hideGrids) {
         this.hideGrids = hideGrids;
         return this;
-    };
+    }
 
-    this.setHideMenu = function(hideMenu) {
+    setHideMenu(hideMenu) {
         this.hideMenu = hideMenu;
         return this;
-    };
+    }
 
-    this.setCanvas = function(canvas) {
+    setCanvas(canvas) {
         this._canvas = canvas;
         return this;
-    };
+    }
 
-    this.setStage = function(stage) {
+    setStage(stage) {
         this.stage = stage;
         this.stage.addChild(this._borderContainer);
         return this;
-    };
+    }
 
-    this.scaleStage = function(scale) {
+    scaleStage(scale) {
         this.stage.scaleX = scale;
         this.stage.scaleY = scale;
         this.refreshCanvas();
-    };
+    }
 
-    this.setRefreshCanvas = function(refreshCanvas) {
+    setRefreshCanvas(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
-    };
+    }
 
-    this.setScale = function(w, h, scale) {
+    setScale(w, h, scale) {
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
@@ -1794,18 +1796,18 @@ function Turtles() {
         }
 
         this.makeBackground();
-    };
+    }
 
-    this.deltaY = function(dy) {
+    deltaYfunction(dy) {
         this.stage.y += dy;
-    };
+    }
 
     /**
      * Makes background for canvas: clears containers, renders buttons.
      *
      * @param setCollapsed - specify whether the background should be collapsed
      */
-    this.makeBackground = function(setCollapsed) {
+    makeBackground(setCollapsed) {
         let doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
         // Remove any old background containers
@@ -1833,147 +1835,60 @@ function Turtles() {
             this.stage.removeChild(this._gridButton);
         }
 
-        let that = this;
         let circles = null;
 
         /**
-         * Makes boundary for graphics (mouse) container by initialising
-         * 'MBOUNDARY' SVG.
+         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
+         * Assigns click listener function to doGrid() method.
          */
-        function __makeBoundary() {
-            that._locked = true;
-            let img = new Image();
-            img.onload = function() {
-                if (that._expandedBoundary !== null) {
-                    that._expandedBoundary.visible = false;
-                }
+        let __makeGridButton = () => {
+            this._gridButton = new createjs.Container();
+            this._gridLabel = null;
+            this._gridLabelBG = null;
 
-                that._expandedBoundary = new createjs.Bitmap(img);
-                that._expandedBoundary.x = 0;
-                that._expandedBoundary.y = 55 + LEADING;
-                that._borderContainer.addChild(that._expandedBoundary);
-                __makeBoundary2();
-            };
+            this._gridButton.removeAllEventListeners("click");
+            this._gridButton.on("click", event => {
+                this.doGrid();
+            });
 
-            let dx = that.w - 5;
-            let dy = that.h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    unescape(
-                        encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", 10 / SCALEFACTOR)
-                                .replace("X", 10 / SCALEFACTOR)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
-                                .replace("fill_color", that.backgroundColor)
-                                .replace("STROKE", 20 / SCALEFACTOR)
-                        )
-                    )
-                );
-        }
-
-        /**
-         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
-         */
-        function __makeBoundary2() {
-            let img = new Image();
-            img.onload = function() {
-                if (that._collapsedBoundary !== null) {
-                    that._collapsedBoundary.visible = false;
-                }
-
-                that._collapsedBoundary = new createjs.Bitmap(img);
-                that._collapsedBoundary.x = 0;
-                that._collapsedBoundary.y = 55 + LEADING;
-                that._borderContainer.addChild(that._collapsedBoundary);
-                that._collapsedBoundary.visible = false;
-
-                __makeExpandButton();
-            };
-
-            let dx = that.w - 20;
-            let dy = that.h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    unescape(
-                        encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", 10)
-                                .replace("X", 10)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
-                                .replace("fill_color", that.backgroundColor)
-                                .replace("STROKE", 20)
-                        )
-                    )
-                );
-        }
-
-        /**
-         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to remove stage and add it at posiion 0.
-         */
-        function __makeExpandButton() {
-            that._expandButton = new createjs.Container();
-            that._expandLabel = null;
-            that._expandLabelBG = null;
-
-            that._expandLabel = new createjs.Text(
-                _("Expand"),
+            this._gridLabel = new createjs.Text(
+                _("show Cartesian"),
                 "14px Sans",
                 "#282828"
             );
-            that._expandLabel.textAlign = "center";
-            that._expandLabel.x = 11.5;
-            that._expandLabel.y = 55;
-            that._expandLabel.visible = false;
+            this._gridLabel.textAlign = "center";
+            this._gridLabel.x = 27.5;
+            this._gridLabel.y = 55;
+            this._gridLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
-                if (that._expandButton !== null) {
-                    that._expandButton.visible = false;
-                }
-
+            img.onload = () => {
                 let bitmap = new createjs.Bitmap(img);
-                that._expandButton.addChild(bitmap);
+                this._gridButton.addChild(bitmap);
+                this._gridButton.addChild(this._gridLabel);
+
                 bitmap.visible = true;
-                that._expandButton.addChild(that._expandLabel);
+                this._gridButton.x = this.w - 10 - 3 * 55;
+                this._gridButton.y = 70 + LEADING + 6;
+                this._gridButton.visible = true;
 
-                that._expandButton.x = that.w - 10 - 4 * 55;
-                that._expandButton.y = 70 + LEADING + 6;
-                that._expandButton.scaleX = SCALEFACTOR;
-                that._expandButton.scaleY = SCALEFACTOR;
-                that._expandButton.scale = SCALEFACTOR;
-                that._expandButton.visible = false;
-                // that._borderContainer.addChild(that._expandButton);
-                that.stage.addChild(that._expandButton);
+                // this._borderContainer.addChild(this._gridButton);
+                this.stage.addChild(this._gridButton);
+                this.refreshCanvas();
 
-                that._expandButton.removeAllEventListeners("mouseover");
-                that._expandButton.on("mouseover", function(event) {
-                    if (that._expandLabel !== null) {
-                        that._expandLabel.visible = true;
+                this._gridButton.removeAllEventListeners("mouseover");
+                this._gridButton.on("mouseover", event => {
+                    if (this._gridLabel !== null) {
+                        this._gridLabel.visible = true;
 
-                        if (that._expandLabelBG === null) {
-                            let b = that._expandLabel.getBounds();
-                            that._expandLabelBG = new createjs.Shape();
-                            that._expandLabelBG.graphics
+                        if (this._gridLabelBG === null) {
+                            let b = this._gridLabel.getBounds();
+                            this._gridLabelBG = new createjs.Shape();
+                            this._gridLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._expandLabel.x + b.x - 8,
-                                    that._expandLabel.y + b.y - 2,
+                                    this._gridLabel.x + b.x - 8,
+                                    this._gridLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -1981,251 +1896,106 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._expandButton.addChildAt(
-                                that._expandLabelBG,
-                                0
-                            );
+                            this._gridButton.addChildAt(this._gridLabelBG, 0);
                         } else {
-                            that._expandLabelBG.visible = true;
-                        }
-                    }
-
-                    that.refreshCanvas();
-                });
-
-                that._expandButton.removeAllEventListeners("mouseout");
-                that._expandButton.on("mouseout", function(event) {
-                    if (that._expandLabel !== null) {
-                        that._expandLabel.visible = false;
-                        that._expandLabelBG.visible = false;
-                        that.refreshCanvas();
-                    }
-                });
-
-                that._expandButton.removeAllEventListeners("pressmove");
-                that._expandButton.on("pressmove", function(event) {
-                    let w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-                    let x = event.stageX / that.scale - w;
-                    let y = event.stageY / that.scale - 16;
-                    that.stage.x = Math.max(0, Math.min((that.w * 3) / 4, x));
-                    that.stage.y = Math.max(55, Math.min((that.h * 3) / 4, y));
-                    that.refreshCanvas();
-                });
-
-                that._expandButton.removeAllEventListeners("click");
-                that._expandButton.on("click", function(event) {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    that.hideMenu();
-                    that.scaleStage(1.0);
-                    that._expandedBoundary.visible = true;
-                    that._collapseButton.visible = true;
-                    that._collapsedBoundary.visible = false;
-                    that._expandButton.visible = false;
-                    that.stage.x = 0;
-                    that.stage.y = 0;
-                    that.isShrunk = false;
-                    for (let i = 0; i < that.turtleList.length; i++) {
-                        that.turtleList[i].container.scaleX = 1;
-                        that.turtleList[i].container.scaleY = 1;
-                        that.turtleList[i].container.scale = 1;
-                    }
-
-                    that._clearButton.scaleX = 1;
-                    that._clearButton.scaleY = 1;
-                    that._clearButton.scale = 1;
-                    that._clearButton.x = that.w - 5 - 2 * 55;
-
-                    if (that._gridButton !== null) {
-                        that._gridButton.scaleX = 1;
-                        that._gridButton.scaleY = 1;
-                        that._gridButton.scale = 1;
-                        that._gridButton.x = that.w - 10 - 3 * 55;
-                        that._gridButton.visible = true;
-                    }
-
-                    // remove the stage and add it back in position 0
-                    that.masterStage.removeChild(that.stage);
-                    that.masterStage.addChildAt(that.stage, 0);
-                });
-
-                __makeCollapseButton();
-            };
-
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
-        }
-
-        /**
-         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to call collapse() method.
-         */
-        function __makeCollapseButton() {
-            that._collapseButton = new createjs.Container();
-            that._collapseLabel = null;
-            that._collapseLabelBG = null;
-
-            that._collapseLabel = new createjs.Text(
-                _("Collapse"),
-                "14px Sans",
-                "#282828"
-            );
-            that._collapseLabel.textAlign = "center";
-            that._collapseLabel.x = 11.5;
-            that._collapseLabel.y = 55;
-            that._collapseLabel.visible = false;
-
-            let img = new Image();
-            img.onload = function() {
-                if (that._collapseButton !== null) {
-                    that._collapseButton.visible = false;
-                }
-
-                let bitmap = new createjs.Bitmap(img);
-                that._collapseButton.addChild(bitmap);
-                bitmap.visible = true;
-                that._collapseButton.addChild(that._collapseLabel);
-
-                // that._borderContainer.addChild(that._collapseButton);
-                that.stage.addChild(that._collapseButton);
-
-                that._collapseButton.visible = true;
-                that._collapseButton.x = that.w - 55;
-                that._collapseButton.y = 70 + LEADING + 6;
-                that.refreshCanvas();
-
-                that._collapseButton.removeAllEventListeners("click");
-                that._collapseButton.on("click", function(event) {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    that.collapse();
-                });
-
-                that._collapseButton.removeAllEventListeners("mouseover");
-                that._collapseButton.on("mouseover", function(event) {
-                    if (that._collapseLabel !== null) {
-                        that._collapseLabel.visible = true;
-
-                        if (that._collapseLabelBG === null) {
-                            let b = that._collapseLabel.getBounds();
-                            that._collapseLabelBG = new createjs.Shape();
-                            that._collapseLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    that._collapseLabel.x + b.x - 8,
-                                    that._collapseLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            that._collapseButton.addChildAt(
-                                that._collapseLabelBG,
-                                0
-                            );
-                        } else {
-                            that._collapseLabelBG.visible = true;
+                            this._gridLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._collapseButton.x + 28,
-                            that._collapseButton.y + 28,
+                            this._gridButton.x + 28,
+                            this._gridButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._collapseButton.removeAllEventListeners("mouseout");
-                that._collapseButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._collapseLabel !== null) {
-                        that._collapseLabel.visible = false;
-                        that._collapseLabelBG.visible = false;
-                        that.refreshCanvas();
+                this._gridButton.removeAllEventListeners("mouseout");
+                this._gridButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._gridLabel !== null) {
+                        this._gridLabel.visible = false;
+                        this._gridLabelBG.visible = false;
+                        this.refreshCanvas();
                     }
                 });
 
-                __makeClearButton();
+                if (doCollapse) {
+                    this.collapse();
+                }
+
+                this._locked = false;
+                if (this._queue.length === 3) {
+                    this.scale = this._queue[2];
+                    this.w = this._queue[0] / this.scale;
+                    this.h = this._queue[1] / this.scale;
+                    this._queue = [];
+                    this.makeBackground();
+                }
             };
 
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
-        }
+                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
+        };
 
         /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call doClear() method.
          */
-        function __makeClearButton() {
-            that._clearButton = new createjs.Container();
-            that._clearLabel = null;
-            that._clearLabelBG = null;
+        let __makeClearButton = () => {
+            this._clearButton = new createjs.Container();
+            this._clearLabel = null;
+            this._clearLabelBG = null;
 
-            that._clearButton.removeAllEventListeners("click");
-            that._clearButton.on("click", function(event) {
-                that.doClear();
+            this._clearButton.removeAllEventListeners("click");
+            this._clearButton.on("click", event => {
+                this.doClear();
             });
 
-            that._clearLabel = new createjs.Text(
+            this._clearLabel = new createjs.Text(
                 _("Clean"),
                 "14px Sans",
                 "#282828"
             );
-            that._clearLabel.textAlign = "center";
-            that._clearLabel.x = 27.5;
-            that._clearLabel.y = 55;
-            that._clearLabel.visible = false;
+            this._clearLabel.textAlign = "center";
+            this._clearLabel.x = 27.5;
+            this._clearLabel.y = 55;
+            this._clearLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 let bitmap = new createjs.Bitmap(img);
-                that._clearButton.addChild(bitmap);
-                that._clearButton.addChild(that._clearLabel);
+                this._clearButton.addChild(bitmap);
+                this._clearButton.addChild(this._clearLabel);
 
                 bitmap.visible = true;
-                that._clearButton.x = that.w - 5 - 2 * 55;
-                that._clearButton.y = 70 + LEADING + 6;
-                that._clearButton.visible = true;
+                this._clearButton.x = this.w - 5 - 2 * 55;
+                this._clearButton.y = 70 + LEADING + 6;
+                this._clearButton.visible = true;
 
-                // that._borderContainer.addChild(that._clearButton);
-                that.stage.addChild(that._clearButton);
-                that.refreshCanvas();
+                // this._borderContainer.addChild(this._clearButton);
+                this.stage.addChild(this._clearButton);
+                this.refreshCanvas();
 
-                that._clearButton.removeAllEventListeners("mouseover");
-                that._clearButton.on("mouseover", function(event) {
-                    if (that._clearLabel !== null) {
-                        that._clearLabel.visible = true;
+                this._clearButton.removeAllEventListeners("mouseover");
+                this._clearButton.on("mouseover", event => {
+                    if (this._clearLabel !== null) {
+                        this._clearLabel.visible = true;
 
-                        if (that._clearLabelBG === null) {
-                            let b = that._clearLabel.getBounds();
-                            that._clearLabelBG = new createjs.Shape();
-                            that._clearLabelBG.graphics
+                        if (this._clearLabelBG === null) {
+                            let b = this._clearLabel.getBounds();
+                            this._clearLabelBG = new createjs.Shape();
+                            this._clearLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._clearLabel.x + b.x - 8,
-                                    that._clearLabel.y + b.y - 2,
+                                    this._clearLabel.x + b.x - 8,
+                                    this._clearLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -2233,41 +2003,41 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._clearButton.addChildAt(that._clearLabelBG, 0);
+                            this._clearButton.addChildAt(this._clearLabelBG, 0);
                         } else {
-                            that._clearLabelBG.visible = true;
+                            this._clearLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._clearButton.x + 28,
-                            that._clearButton.y + 28,
+                            this._clearButton.x + 28,
+                            this._clearButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._clearButton.removeAllEventListeners("mouseout");
-                that._clearButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._clearLabel !== null) {
-                        that._clearLabel.visible = false;
+                this._clearButton.removeAllEventListeners("mouseout");
+                this._clearButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._clearLabel !== null) {
+                        this._clearLabel.visible = false;
                     }
 
-                    if (that._clearLabelBG !== null) {
-                        that._clearLabelBG.visible = false;
+                    if (this._clearLabelBG !== null) {
+                        this._clearLabelBG.visible = false;
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
                 if (doCollapse) {
-                    that.collapse();
+                    this.collapse();
                 }
 
                 let language = localStorage.languagePreference;
@@ -2279,60 +2049,72 @@ function Turtles() {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(CLEARBUTTON)));
-        }
+        };
 
         /**
-         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
-         * Assigns click listener function to doGrid() method.
+         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to call collapse() method.
          */
-        function __makeGridButton() {
-            that._gridButton = new createjs.Container();
-            that._gridLabel = null;
-            that._gridLabelBG = null;
+        let __makeCollapseButton = () => {
+            this._collapseButton = new createjs.Container();
+            this._collapseLabel = null;
+            this._collapseLabelBG = null;
 
-            that._gridButton.removeAllEventListeners("click");
-            that._gridButton.on("click", function(event) {
-                that.doGrid();
-            });
-
-            that._gridLabel = new createjs.Text(
-                _("show Cartesian"),
+            this._collapseLabel = new createjs.Text(
+                _("Collapse"),
                 "14px Sans",
                 "#282828"
             );
-            that._gridLabel.textAlign = "center";
-            that._gridLabel.x = 27.5;
-            that._gridLabel.y = 55;
-            that._gridLabel.visible = false;
+            this._collapseLabel.textAlign = "center";
+            this._collapseLabel.x = 11.5;
+            this._collapseLabel.y = 55;
+            this._collapseLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
+            img.onload = () => {
+                if (this._collapseButton !== null) {
+                    this._collapseButton.visible = false;
+                }
+
                 let bitmap = new createjs.Bitmap(img);
-                that._gridButton.addChild(bitmap);
-                that._gridButton.addChild(that._gridLabel);
-
+                this._collapseButton.addChild(bitmap);
                 bitmap.visible = true;
-                that._gridButton.x = that.w - 10 - 3 * 55;
-                that._gridButton.y = 70 + LEADING + 6;
-                that._gridButton.visible = true;
+                this._collapseButton.addChild(this._collapseLabel);
 
-                // that._borderContainer.addChild(that._gridButton);
-                that.stage.addChild(that._gridButton);
-                that.refreshCanvas();
+                // this._borderContainer.addChild(this._collapseButton);
+                this.stage.addChild(this._collapseButton);
 
-                that._gridButton.removeAllEventListeners("mouseover");
-                that._gridButton.on("mouseover", function(event) {
-                    if (that._gridLabel !== null) {
-                        that._gridLabel.visible = true;
+                this._collapseButton.visible = true;
+                this._collapseButton.x = this.w - 55;
+                this._collapseButton.y = 70 + LEADING + 6;
+                this.refreshCanvas();
 
-                        if (that._gridLabelBG === null) {
-                            let b = that._gridLabel.getBounds();
-                            that._gridLabelBG = new createjs.Shape();
-                            that._gridLabelBG.graphics
+                this._collapseButton.removeAllEventListeners("click");
+                this._collapseButton.on("click", event => {
+                    // If the aux toolbar is open, close it.
+                    let auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        let menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
+                    }
+                    this.collapse();
+                });
+
+                this._collapseButton.removeAllEventListeners("mouseover");
+                this._collapseButton.on("mouseover", event => {
+                    if (this._collapseLabel !== null) {
+                        this._collapseLabel.visible = true;
+
+                        if (this._collapseLabelBG === null) {
+                            let b = this._collapseLabel.getBounds();
+                            this._collapseLabelBG = new createjs.Shape();
+                            this._collapseLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._gridLabel.x + b.x - 8,
-                                    that._gridLabel.y + b.y - 2,
+                                    this._collapseLabel.x + b.x - 8,
+                                    this._collapseLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -2340,67 +2122,286 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._gridButton.addChildAt(that._gridLabelBG, 0);
+                            this._collapseButton.addChildAt(
+                                this._collapseLabelBG,
+                                0
+                            );
                         } else {
-                            that._gridLabelBG.visible = true;
+                            this._collapseLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._gridButton.x + 28,
-                            that._gridButton.y + 28,
+                            this._collapseButton.x + 28,
+                            this._collapseButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._gridButton.removeAllEventListeners("mouseout");
-                that._gridButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._gridLabel !== null) {
-                        that._gridLabel.visible = false;
-                        that._gridLabelBG.visible = false;
-                        that.refreshCanvas();
+                this._collapseButton.removeAllEventListeners("mouseout");
+                this._collapseButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._collapseLabel !== null) {
+                        this._collapseLabel.visible = false;
+                        this._collapseLabelBG.visible = false;
+                        this.refreshCanvas();
                     }
                 });
 
-                if (doCollapse) {
-                    that.collapse();
-                }
-
-                that._locked = false;
-                if (that._queue.length === 3) {
-                    that.scale = that._queue[2];
-                    that.w = that._queue[0] / that.scale;
-                    that.h = that._queue[1] / that.scale;
-                    that._queue = [];
-                    that.makeBackground();
-                }
+                __makeClearButton();
             };
 
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
-        }
+                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+        };
+
+        /**
+         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to remove stage and add it at posiion 0.
+         */
+        let __makeExpandButton = () => {
+            this._expandButton = new createjs.Container();
+            this._expandLabel = null;
+            this._expandLabelBG = null;
+
+            this._expandLabel = new createjs.Text(
+                _("Expand"),
+                "14px Sans",
+                "#282828"
+            );
+            this._expandLabel.textAlign = "center";
+            this._expandLabel.x = 11.5;
+            this._expandLabel.y = 55;
+            this._expandLabel.visible = false;
+
+            let img = new Image();
+            img.onload = () => {
+                if (this._expandButton !== null) {
+                    this._expandButton.visible = false;
+                }
+
+                let bitmap = new createjs.Bitmap(img);
+                this._expandButton.addChild(bitmap);
+                bitmap.visible = true;
+                this._expandButton.addChild(this._expandLabel);
+
+                this._expandButton.x = this.w - 10 - 4 * 55;
+                this._expandButton.y = 70 + LEADING + 6;
+                this._expandButton.scaleX = SCALEFACTOR;
+                this._expandButton.scaleY = SCALEFACTOR;
+                this._expandButton.scale = SCALEFACTOR;
+                this._expandButton.visible = false;
+                // this._borderContainer.addChild(this._expandButton);
+                this.stage.addChild(this._expandButton);
+
+                this._expandButton.removeAllEventListeners("mouseover");
+                this._expandButton.on("mouseover", event => {
+                    if (this._expandLabel !== null) {
+                        this._expandLabel.visible = true;
+
+                        if (this._expandLabelBG === null) {
+                            let b = this._expandLabel.getBounds();
+                            this._expandLabelBG = new createjs.Shape();
+                            this._expandLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    this._expandLabel.x + b.x - 8,
+                                    this._expandLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
+                            this._expandButton.addChildAt(
+                                this._expandLabelBG,
+                                0
+                            );
+                        } else {
+                            this._expandLabelBG.visible = true;
+                        }
+                    }
+
+                    this.refreshCanvas();
+                });
+
+                this._expandButton.removeAllEventListeners("mouseout");
+                this._expandButton.on("mouseout", event => {
+                    if (this._expandLabel !== null) {
+                        this._expandLabel.visible = false;
+                        this._expandLabelBG.visible = false;
+                        this.refreshCanvas();
+                    }
+                });
+
+                this._expandButton.removeAllEventListeners("pressmove");
+                this._expandButton.on("pressmove", event => {
+                    let w = (this.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+                    let x = event.stageX / this.scale - w;
+                    let y = event.stageY / this.scale - 16;
+                    this.stage.x = Math.max(0, Math.min((this.w * 3) / 4, x));
+                    this.stage.y = Math.max(55, Math.min((this.h * 3) / 4, y));
+                    this.refreshCanvas();
+                });
+
+                this._expandButton.removeAllEventListeners("click");
+                this._expandButton.on("click", event => {
+                    // If the aux toolbar is open, close it.
+                    let auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        let menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
+                    }
+                    this.hideMenu();
+                    this.scaleStage(1.0);
+                    this._expandedBoundary.visible = true;
+                    this._collapseButton.visible = true;
+                    this._collapsedBoundary.visible = false;
+                    this._expandButton.visible = false;
+                    this.stage.x = 0;
+                    this.stage.y = 0;
+                    this.isShrunk = false;
+                    for (let i = 0; i < this.turtleList.length; i++) {
+                        this.turtleList[i].container.scaleX = 1;
+                        this.turtleList[i].container.scaleY = 1;
+                        this.turtleList[i].container.scale = 1;
+                    }
+
+                    this._clearButton.scaleX = 1;
+                    this._clearButton.scaleY = 1;
+                    this._clearButton.scale = 1;
+                    this._clearButton.x = this.w - 5 - 2 * 55;
+
+                    if (this._gridButton !== null) {
+                        this._gridButton.scaleX = 1;
+                        this._gridButton.scaleY = 1;
+                        this._gridButton.scale = 1;
+                        this._gridButton.x = this.w - 10 - 3 * 55;
+                        this._gridButton.visible = true;
+                    }
+
+                    // remove the stage and add it back in position 0
+                    this.masterStage.removeChild(this.stage);
+                    this.masterStage.addChildAt(this.stage, 0);
+                });
+
+                __makeCollapseButton();
+            };
+
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        /**
+         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
+         */
+        let __makeBoundary2 = () => {
+            let img = new Image();
+            img.onload = () => {
+                if (this._collapsedBoundary !== null) {
+                    this._collapsedBoundary.visible = false;
+                }
+
+                this._collapsedBoundary = new createjs.Bitmap(img);
+                this._collapsedBoundary.x = 0;
+                this._collapsedBoundary.y = 55 + LEADING;
+                this._borderContainer.addChild(this._collapsedBoundary);
+                this._collapsedBoundary.visible = false;
+
+                __makeExpandButton();
+            };
+
+            let dx = this.w - 20;
+            let dy = this.h - 55 - LEADING;
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", 10)
+                                .replace("X", 10)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", this.backgroundColor)
+                                .replace("STROKE", 20)
+                        )
+                    )
+                );
+        };
+
+        /**
+         * Makes boundary for graphics (mouse) container by initialising
+         * 'MBOUNDARY' SVG.
+         */
+        let __makeBoundary = () => {
+            this._locked = true;
+            let img = new Image();
+            img.onload = () => {
+                if (this._expandedBoundary !== null) {
+                    this._expandedBoundary.visible = false;
+                }
+
+                this._expandedBoundary = new createjs.Bitmap(img);
+                this._expandedBoundary.x = 0;
+                this._expandedBoundary.y = 55 + LEADING;
+                this._borderContainer.addChild(this._expandedBoundary);
+                __makeBoundary2();
+            };
+
+            let dx = this.w - 5;
+            let dy = this.h - 55 - LEADING;
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", 10 / SCALEFACTOR)
+                                .replace("X", 10 / SCALEFACTOR)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", this.backgroundColor)
+                                .replace("STROKE", 20 / SCALEFACTOR)
+                        )
+                    )
+                );
+        };
 
         if (!this._locked) {
             __makeBoundary();
         }
 
         return this;
-    };
+    }
 
     /**
      * Toggles visibility of menu and grids.
      * Scales down all 'turtles' in turtleList.
      * Removes the stage and adds it back at the top.
      */
-    this.collapse = function() {
+    collapse() {
         this.hideMenu();
         this.hideGrids();
         this.scaleStage(0.25);
@@ -2435,7 +2436,7 @@ function Turtles() {
         this.masterStage.addChild(this.stage);
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Returns block object.
@@ -2443,10 +2444,10 @@ function Turtles() {
      * @param blocks
      * @return {Object} - blocks object
      */
-    this.setBlocks = function(blocks) {
+    setBlocks(blocks) {
         this.blocks = blocks;
         return this;
-    };
+    }
 
     /**
      * Adds drum to start block.
@@ -2454,10 +2455,10 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.addDrum = function(startBlock, infoDict) {
+    addDrum(startBlock, infoDict) {
         this._drum = true;
         this.add(startBlock, infoDict);
-    };
+    }
 
     /**
      * Adds turtle to start block.
@@ -2465,7 +2466,7 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.addTurtle = function(startBlock, infoDict) {
+    addTurtle(startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
@@ -2474,7 +2475,7 @@ function Turtles() {
             t.container.scaleY = SCALEFACTOR;
             t.container.scale = SCALEFACTOR;
         }
-    };
+    }
 
     /**
      * Add a new turtle for each start block.
@@ -2483,7 +2484,7 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.add = function(startBlock, infoDict) {
+    add(startBlock, infoDict) {
         if (startBlock != null) {
             console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
@@ -2550,7 +2551,7 @@ function Turtles() {
         hitArea.y = 0;
         newTurtle.container.hitArea = hitArea;
 
-        function __processTurtleBitmap(that, name, bitmap, startBlock) {
+        let __processTurtleBitmap = (that, name, bitmap, startBlock) => {
             newTurtle.bitmap = bitmap;
             newTurtle.bitmap.regX = 27 | 0;
             newTurtle.bitmap.regY = 27 | 0;
@@ -2578,7 +2579,7 @@ function Turtles() {
             }
 
             that.refreshCanvas();
-        }
+        };
 
         let artwork = this._drum ? DRUMSVG : TURTLESVG;
 
@@ -2611,39 +2612,38 @@ function Turtles() {
             DEFAULTVALUE,
             DEFAULTCHROMA
         );
-        let that = this;
 
-        newTurtle.container.on("mousedown", function(event) {
-            if (that._rotating) {
+        newTurtle.container.on("mousedown", event => {
+            if (this._rotating) {
                 return;
             }
 
             let offset = {
-                x: newTurtle.container.x - event.stageX / that.scale,
-                y: newTurtle.container.y - event.stageY / that.scale
+                x: newTurtle.container.x - event.stageX / this.scale,
+                y: newTurtle.container.y - event.stageY / this.scale
             };
 
             newTurtle.container.removeAllEventListeners("pressmove");
-            newTurtle.container.on("pressmove", function(event) {
+            newTurtle.container.on("pressmove", event => {
                 if (newTurtle.running) {
                     return;
                 }
 
-                newTurtle.container.x = event.stageX / that.scale + offset.x;
-                newTurtle.container.y = event.stageY / that.scale + offset.y;
-                newTurtle.x = that.screenX2turtleX(newTurtle.container.x);
-                newTurtle.y = that.screenY2turtleY(newTurtle.container.y);
-                that.refreshCanvas();
+                newTurtle.container.x = event.stageX / this.scale + offset.x;
+                newTurtle.container.y = event.stageY / this.scale + offset.y;
+                newTurtle.x = this.screenX2turtleX(newTurtle.container.x);
+                newTurtle.y = this.screenY2turtleY(newTurtle.container.y);
+                this.refreshCanvas();
             });
         });
 
-        newTurtle.container.on("click", function(event) {
+        newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
-            that.stage.dispatchEvent("click" + newTurtle.name);
+            this.stage.dispatchEvent("click" + newTurtle.name);
         });
 
-        newTurtle.container.on("mouseover", function(event) {
+        newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
                 return;
             }
@@ -2651,10 +2651,10 @@ function Turtles() {
             newTurtle.container.scaleX *= 1.2;
             newTurtle.container.scaleY = newTurtle.container.scaleX;
             newTurtle.container.scale = newTurtle.container.scaleX;
-            that.refreshCanvas();
+            this.refreshCanvas();
         });
 
-        newTurtle.container.on("mouseout", function(event) {
+        newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
                 return;
             }
@@ -2662,12 +2662,12 @@ function Turtles() {
             newTurtle.container.scaleX /= 1.2;
             newTurtle.container.scaleY = newTurtle.container.scaleX;
             newTurtle.container.scale = newTurtle.container.scaleX;
-            that.refreshCanvas();
+            this.refreshCanvas();
         });
 
         document.getElementById("loader").className = "";
 
-        setTimeout(function() {
+        setTimeout(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     newTurtle.doSetHeading(infoDict["heading"]);
@@ -2696,7 +2696,7 @@ function Turtles() {
         }, 6000);
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Async creation of bitmap from SVG data.
@@ -2706,12 +2706,11 @@ function Turtles() {
      * @param callback - function executed on load of bitmap
      * @param extras
      */
-    this._makeTurtleBitmap = function(data, name, callback, extras) {
+    _makeTurtleBitmap(data, name, callback, extras) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         let img = new Image();
 
         img.onload = () => {
-            complete = true;
             let bitmap = new createjs.Bitmap(img);
             callback(this, name, bitmap, extras);
         };
@@ -2719,55 +2718,55 @@ function Turtles() {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(data)));
-    };
+    }
 
     /**
      * Convert on screen x coordinate to turtle x coordinate.
      *
      * @param x - x coordinate
      */
-    this.screenX2turtleX = function(x) {
+    screenX2turtleX(x) {
         return x - this._canvas.width / (2.0 * this.scale);
-    };
+    }
 
     /**
      * Convert on screen y coordinate to turtle y coordinate.
      *
      * @param y - y coordinate
      */
-    this.screenY2turtleY = function(y) {
+    screenY2turtleY(y) {
         return this.invertY(y);
-    };
+    }
 
     /**
      * Convert turtle x coordinate to on screen x coordinate.
      *
      * @param x - x coordinate
      */
-    this.turtleX2screenX = function(x) {
+    turtleX2screenX(x) {
         return this._canvas.width / (2.0 * this.scale) + x;
-    };
+    }
 
     /**
      * Convert turtle y coordinate to on screen y coordinate.
      *
      * @param y - y coordinate
      */
-    this.turtleY2screenY = function(y) {
+    turtleY2screenY(y) {
         return this.invertY(y);
     };
 
     /**
      * Invert y coordinate.
      */
-    this.invertY = function(y) {
+    invertY(y) {
         return this._canvas.height / (2.0 * this.scale) - y;
-    };
+    }
 
     /**
      * Toggles 'running' boolean value for all turtles.
      */
-    this.markAsStopped = function() {
+    markAsStopped() {
         for (let turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
             // Make sure the blink is really stopped
@@ -2775,21 +2774,21 @@ function Turtles() {
         }
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Returns boolean value depending on whether turtle is running.
      *
      * @return {boolean} - running
      */
-    this.running = function() {
+    running() {
         for (let turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
             }
         }
         return false;
-    };
+    }
 }
 
 /**
