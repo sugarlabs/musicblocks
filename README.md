@@ -10,7 +10,7 @@ Music Blocks is a programming language and collection of manipulative
 tools for exploring musical and mathematical concepts in an
 integrative and fun way.
 
-**Refer the following sections below to get familiar with this awesome project:**
+**Refer the following sections below to get familiar with this project:**
 
 * [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
 * [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
@@ -24,6 +24,8 @@ integrative and fun way.
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
+
+Some background on why music and programming can be found [here](http://github.com/sugarlabs/musicblocks/tree/master/WhyMusicBlocks.md).
 
 ## <a name="RUNNING_MUSIC_BLOCKS"></a>Running Music Blocks
 
