@@ -2346,14 +2346,35 @@ function MusicKeyboard() {
                 ["action", { collapsed: false }],
                 100,
                 100,
-                [null, 1, null, null]
+                [null, 1, 2, null]
             ],
-            [1, ["text", { value: _("action") }], 0, 0, [0]]
+            [1, ["text", { value: _("action") }], 0, 0, [0]],
+            [2, "hidden", 0, 0, [0, selectedNotes.length==0 ?null:3]]
         ];
-        var endOfStackIdx = 0;
 
-        for (var i = 0; i < selectedNotes.length; i++) {
-            note = selectedNotes[i];
+        newNotes = this._optimizeNotes(selectedNotes);
+
+        let prevId = 2;
+        let endOfStackIdx, id;
+
+        for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++){
+
+            selectedNotesGrp = newNotes[noteGrp];
+            let isLast = noteGrp == newNotes.length - 1;
+            id = newStack.length;
+            let voice = selectedNotes[selectedNotesGrp[0]].voice[0];
+
+            newStack.push(
+                [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
+                [id + 1, ["voicename", { value:voice}], 0, 0, [id]],
+                [id + 2, "hidden", 0, 0, [id, isLast ? null : id + 3 + 8 * selectedNotesGrp.length]]
+            );
+
+            prevId = id+2;
+            endOfStackIdx = id ;
+
+        for (var i = 0; i < selectedNotesGrp.length; i++) {
+            note = selectedNotes[selectedNotesGrp[i]];
 
             // Add the Note block and its value
             var idx = newStack.length;
@@ -2373,7 +2394,7 @@ function MusicKeyboard() {
                 newStack[endOfStackIdx][4][n - 1] = idx;
             }
 
-            var endOfStackIdx = idx;
+            endOfStackIdx = idx;
 
             var delta = 5;
 
@@ -2527,6 +2548,7 @@ function MusicKeyboard() {
                 }
             }
         }
+        }
         this._logo.blocks.loadNewBlocks(newStack);
         this._logo.textMsg(_("New action block generated!"));
     };
@@ -2568,4 +2590,22 @@ function MusicKeyboard() {
 
         return cell;
     };
+
+    this._optimizeNotes = function (selectedNotes){
+        let i = 0;
+        let newNotes = [];
+        let prevNote;
+        while ( i < selectedNotes.length )  {
+            if ((i == 0) || (selectedNotes[i].voice[0] != prevNote  )) {
+                newNotes.push([i]);
+            }
+            else {
+                newNotes[newNotes.length-1].push(i);
+            }
+            prevNote = selectedNotes[i].voice[0];
+            i++;
+        }
+        console.log(newNotes);
+        return newNotes;
+    }
 }
