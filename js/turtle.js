@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2019 Walter Bender
+// Copyright (c) 2020 Anindya Kundu
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -22,63 +23,78 @@ const SCALEFACTOR = 4;
 // Turtle sprite
 const TURTLEBASEPATH = "images/";
 
-function Turtle(name, turtles, drum) {
-    this.name = name;
-    this.turtles = turtles;
-    this.drum = drum;
+/**
+ * Class pertaining to each turtle.
+ *
+ * @class
+ * @classdesc This contains variables and methods for all actions
+ * corresponding to a single turtle. Also contains the methods for
+ * blink behavior and caching.
+ */
+class Turtle {
+    /**
+     * @constructor
+     * @param {String} name - name of Turtle
+     * @param {Object} turtles - Turtles object (common to all turtles)
+     * @param {boolean} drum - whether Turtle is a drum
+     */
+    constructor(name, turtles, drum) {
+        this.name = name;
+        this.turtles = turtles;
+        this.drum = drum;
 
-    if (drum) {
-        console.debug("turtle " + name + " is a drum.");
+        if (drum) {
+            console.debug("turtle " + name + " is a drum.");
+        }
+
+        this.running = false;           // is the turtle running?
+        this.trash = false;             // in the trash?
+
+        // Things used for drawing the turtle
+        this.container = null;
+        this.x = 0;
+        this.y = 0;
+        this.bitmap = null;
+        this.skinChanged = false;       // should we reskin the turtle on clear?
+        this.shellSize = 55;
+        this.blinkFinished = true;
+        this.isSkinChanged = false;
+        this._sizeInUse = 1;
+        this._isSkinChanged = false;
+        this.beforeBlinkSize = null;
+
+        // Which start block is associated with this turtle?
+        this.startBlock = null;
+
+        this.decorationBitmap = null;   // start block decoration
+
+        // Queue of blocks this turtle is executing
+        this.queue = [];
+
+        // Listeners
+        this.listeners = {};
+
+        // Things used for what the turtle draws
+        this.penstrokes = null;
+        this.imageContainer = null;
+        this.svgOutput = "";
+        this.svgPath = false;           // are we currently drawing a path?
+        this.color = DEFAULTCOLOR;
+        this.value = DEFAULTVALUE;
+        this.chroma = DEFAULTCHROMA;
+        this.stroke = DEFAULTSTROKE;
+        this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
+        this.canvasAlpha = 1.0;
+        this.orientation = 0;
+        this.fillState = false;
+        this.hollowState = false;
+        this.penState = true;
+        this.font = DEFAULTFONT;
+        this.media = [];        // media (text, images) we need to remove on clear
+        this.canvas = document.getElementById("overlayCanvas");
+        this.ctx = this.canvas.getContext("2d");
+        console.debug(this.ctx.canvas.width + " x " + this.ctx.canvas.height);
     }
-
-    this.running = false;           // is the turtle running?
-
-    this.trash = false;             // in the trash?
-
-    // Things used for drawing the turtle
-    this.container = null;
-    this.x = 0;
-    this.y = 0;
-    this.bitmap = null;
-    this.skinChanged = false;       // should we reskin the turtle on clear?
-    this.shellSize = 55;
-    this.blinkFinished = true;
-    this.isSkinChanged = false;
-    this._sizeInUse = 1;
-    this._isSkinChanged = false;
-    this.beforeBlinkSize = null;
-
-    // Which start block is associated with this turtle?
-    this.startBlock = null;
-
-    this.decorationBitmap = null;   // start block decoration
-
-    // Queue of blocks this turtle is executing
-    this.queue = [];
-
-    // Listeners
-    this.listeners = {};
-
-    // Things used for what the turtle draws
-    this.penstrokes = null;
-    this.imageContainer = null;
-    this.svgOutput = "";
-    this.svgPath = false;           // are we currently drawing a path?
-    this.color = DEFAULTCOLOR;
-    this.value = DEFAULTVALUE;
-    this.chroma = DEFAULTCHROMA;
-    this.stroke = DEFAULTSTROKE;
-    this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
-    this.canvasAlpha = 1.0;
-    this.orientation = 0;
-    this.fillState = false;
-    this.hollowState = false;
-    this.penState = true;
-    this.font = DEFAULTFONT;
-    this.media = [];        // media (text, images) we need to remove on clear
-    let canvas = document.getElementById("overlayCanvas");
-    let ctx = canvas.getContext("2d");
-    console.debug(ctx.canvas.width + " x " + ctx.canvas.height);
 
     /**
      * As the canvas scrolls the turtle is drawn under.
@@ -86,41 +102,52 @@ function Turtle(name, turtles, drum) {
      * @param dx - change in x coordinate
      * @param dy - change in y coordinate
      */
-    this.doScrollXY = function (dx, dy) {
+    doScrollXY(dx, dy) {
         // FIXME: how big?
 
-        let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        let imgData =
+            this.ctx.getImageData(
+                0, 0, this.ctx.canvas.width, this.ctx.canvas.height
+            );
 
         if (this.turtles.canvas1 == null) {
-            this.turtles.gx = ctx.canvas.width;
-            this.turtles.gy = ctx.canvas.height;
+            this.turtles.gx = this.ctx.canvas.width;
+            this.turtles.gy = this.ctx.canvas.height;
             this.turtles.canvas1 = document.createElement("canvas");
-            this.turtles.canvas1.width = 3 * ctx.canvas.width;
-            this.turtles.canvas1.height = 3 * ctx.canvas.height;
+            this.turtles.canvas1.width = 3 * this.ctx.canvas.width;
+            this.turtles.canvas1.height = 3 * this.ctx.canvas.height;
             this.turtles.c1ctx = this.turtles.canvas1.getContext("2d");
-            this.turtles.c1ctx.rect(0, 0, 3 * ctx.canvas.width, 3 * ctx.canvas.height);
+            this.turtles.c1ctx.rect(
+                0, 0, 3 * this.ctx.canvas.width, 3 * this.ctx.canvas.height
+            );
             this.turtles.c1ctx.fillStyle = "#F9F9F9";
             this.turtles.c1ctx.fill();
         }
 
-        this.turtles.c1ctx.putImageData(imgData, this.turtles.gx, this.turtles.gy);
+        this.turtles.c1ctx.putImageData(
+            imgData, this.turtles.gx, this.turtles.gy
+        );
 
         this.turtles.gy -= dy;
         this.turtles.gx -= dx;
-        this.turtles.gx = 2 * ctx.canvas.width > this.turtles.gx ? this.turtles.gx : 2 * ctx.canvas.width;
+        this.turtles.gx =
+            2 * this.ctx.canvas.width > this.turtles.gx ?
+                this.turtles.gx : 2 * this.ctx.canvas.width;
         this.turtles.gx = 0 > this.turtles.gx ? 0 : this.turtles.gx;
-        this.turtles.gy = 2 * ctx.canvas.height > this.turtles.gy ? this.turtles.gy : 2 * ctx.canvas.height;
+        this.turtles.gy =
+            2 * this.ctx.canvas.height > this.turtles.gy ?
+                this.turtles.gy : 2 * this.ctx.canvas.height;
         this.turtles.gy = 0 > this.turtles.gy ? 0 : this.turtles.gy;
 
         let newImgData =
             this.turtles.c1ctx.getImageData(
                 this.turtles.gx,
                 this.turtles.gy,
-                ctx.canvas.width,
-                ctx.canvas.height
+                this.ctx.canvas.width,
+                this.ctx.canvas.height
             );
 
-        ctx.putImageData(newImgData, 0, 0);
+        this.ctx.putImageData(newImgData, 0, 0);
 
         // Draw under the turtle as the canvas moves
         for (let t = 0; t < this.turtles.turtleList.length; t++) {
@@ -130,24 +157,24 @@ function Turtle(name, turtles, drum) {
 
             if (this.turtles.turtleList[t].penState) {
                 this.turtles.turtleList[t].processColor();
-                ctx.lineWidth = this.turtles.turtleList[t].stroke;
-                ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(
+                this.ctx.lineWidth = this.turtles.turtleList[t].stroke;
+                this.ctx.lineCap = 'round';
+                this.ctx.beginPath();
+                this.ctx.moveTo(
                     this.turtles.turtleList[t].container.x + dx,
                     this.turtles.turtleList[t].container.y + dy
                 );
-                ctx.lineTo(
+                this.ctx.lineTo(
                     this.turtles.turtleList[t].container.x,
                     this.turtles.turtleList[t].container.y
                 );
-                ctx.stroke();
-                ctx.closePath();
+                this.ctx.stroke();
+                this.ctx.closePath();
             }
         }
 
         this.turtles.refreshCanvas();
-    };
+    }
 
     /**
      * Simulate an arc with line segments since Tinkercad cannot.
@@ -159,7 +186,7 @@ function Turtle(name, turtles, drum) {
      * @param sa - start angle
      * @param ea - end angle
      */
-    this._svgArc = function(nsteps, cx, cy, radius, sa, ea) {
+    _svgArc(nsteps, cx, cy, radius, sa, ea) {
         // Import SVG arcs reliably
         let a = sa;
         let da = ea == null ? Math.PI / nsteps : (ea - sa) / nsteps;
@@ -170,7 +197,7 @@ function Turtle(name, turtles, drum) {
             this.svgOutput += nx + "," + ny + " ";
             a += da;
         }
-    };
+    }
 
     /**
      * Draws a bezier curve.
@@ -182,7 +209,7 @@ function Turtle(name, turtles, drum) {
      * @param x2 - the x-coordinate of the ending point
      * @param y2 - the y-coordinate of the ending point
      */
-    this.doBezier = function(cp1x, cp1y, cp2x, cp2y, x2, y2) {
+    doBezier(cp1x, cp1y, cp2x, cp2y, x2, y2) {
         // FIXME: Add SVG output
 
         let nx, ny, fx, fy;
@@ -208,8 +235,8 @@ function Turtle(name, turtles, drum) {
             // Save the current stroke width
             let savedStroke = this.stroke;
             this.stroke = 1;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
 
             // Draw a hollow line
             let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -271,7 +298,7 @@ function Turtle(name, turtles, drum) {
             let arccy = iy;
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
-            ctx.arc(arccx, arccy, step, sa, ea, false);
+            this.ctx.arc(arccx, arccy, step, sa, ea, false);
             this._svgArc(
                 steps,
                 arccx * this.turtles.scale,
@@ -287,7 +314,7 @@ function Turtle(name, turtles, drum) {
             arccy = fy;
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
-            ctx.arc(arccx, arccy, step, sa, ea, false);
+            this.ctx.arc(arccx, arccy, step, sa, ea, false);
             this._svgArc(
                 steps,
                 arccx * this.turtles.scale,
@@ -302,23 +329,23 @@ function Turtle(name, turtles, drum) {
             let fxScaled = fx * this.turtles.scale;
             let fyScaled = fy * this.turtles.scale;
 
-            ctx.stroke();
-            ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.closePath();
 
             // Restore stroke
             this.stroke = savedStroke;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.moveTo(fx, fy);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.moveTo(fx, fy);
             this.svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.x = x2;
             this.y = y2;
         } else if (this.penState) {
             this.processColor();
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(this.container.x, this.container.y);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.container.x, this.container.y);
 
             // Convert from turtle coordinates to screen coordinates
             fx = this.turtles.turtleX2screenX(x2);
@@ -328,7 +355,7 @@ function Turtle(name, turtles, drum) {
             let cx2 = this.turtles.turtleX2screenX(cp2x);
             let cy2 = this.turtles.turtleY2screenY(cp2y);
 
-            ctx.bezierCurveTo(
+            this.ctx.bezierCurveTo(
                 cx1 + dxi,
                 cy1 + dyi,
                 cx2 + dxf,
@@ -336,7 +363,7 @@ function Turtle(name, turtles, drum) {
                 cx,
                 cy
             );
-            ctx.bezierCurveTo(
+            this.ctx.bezierCurveTo(
                 cx2 - dxf,
                 cy2 - dyf,
                 cx1 - dxi,
@@ -344,7 +371,7 @@ function Turtle(name, turtles, drum) {
                 ax,
                 ay
             );
-            ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
+            this.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
             if (!this.svgPath) {
                 this.svgPath = true;
@@ -381,9 +408,9 @@ function Turtle(name, turtles, drum) {
 
             this.x = x2;
             this.y = y2;
-            ctx.stroke();
+            this.ctx.stroke();
             if (!this.fillState) {
-                ctx.closePath();
+                this.ctx.closePath();
             }
         } else {
             this.x = x2;
@@ -400,7 +427,7 @@ function Turtle(name, turtles, drum) {
         let degrees = Math.atan2(nx - cp2x, ny - cp2y);
         degrees = (180 * degrees) / Math.PI;
         this.doSetHeading(degrees);
-    };
+    }
 
     /**
      * Moves turtle.
@@ -411,7 +438,7 @@ function Turtle(name, turtles, drum) {
      * @param y - on screen y coordinate
      * @param invert - boolean value regarding whether coordinates are inverted or not
      */
-    this.move = function(ox, oy, x, y, invert) {
+    move(ox, oy, x, y, invert) {
         let nx, ny;
         if (invert) {
             ox = this.turtles.turtleX2screenX(ox);
@@ -432,8 +459,8 @@ function Turtle(name, turtles, drum) {
             // Save the current stroke width
             let savedStroke = this.stroke;
             this.stroke = 1;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
 
             // Draw a hollow line
             let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -442,12 +469,12 @@ function Turtle(name, turtles, drum) {
             let dx = step * Math.sin(capAngleRadians);
             let dy = -step * Math.cos(capAngleRadians);
 
-            ctx.moveTo(ox + dx, oy + dy);
+            this.ctx.moveTo(ox + dx, oy + dy);
             let oxScaled = (ox + dx) * this.turtles.scale;
             let oyScaled = (oy + dy) * this.turtles.scale;
             this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
-            ctx.lineTo(nx + dx, ny + dy);
+            this.ctx.lineTo(nx + dx, ny + dy);
             let nxScaled = (nx + dx) * this.turtles.scale;
             let nyScaled = (ny + dy) * this.turtles.scale;
             this.svgOutput += nxScaled + "," + nyScaled + " ";
@@ -461,7 +488,7 @@ function Turtle(name, turtles, drum) {
             let cy = ny;
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
-            ctx.arc(cx, cy, step, sa, ea, false);
+            this.ctx.arc(cx, cy, step, sa, ea, false);
 
             nxScaled = (nx + dx) * this.turtles.scale;
             nyScaled = (ny + dy) * this.turtles.scale;
@@ -484,7 +511,7 @@ function Turtle(name, turtles, drum) {
             );
             this.svgOutput += nxScaled + "," + nyScaled + " ";
 
-            ctx.lineTo(ox + dx, oy + dy);
+            this.ctx.lineTo(ox + dx, oy + dy);
             nxScaled = (ox + dx) * this.turtles.scale;
             nyScaled = (oy + dy) * this.turtles.scale;
             this.svgOutput += nxScaled + "," + nyScaled + " ";
@@ -498,7 +525,7 @@ function Turtle(name, turtles, drum) {
             cy = oy;
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
-            ctx.arc(cx, cy, step, sa, ea, false);
+            this.ctx.arc(cx, cy, step, sa, ea, false);
 
             nxScaled = (ox + dx) * this.turtles.scale;
             nyScaled = (oy + dy) * this.turtles.scale;
@@ -515,16 +542,16 @@ function Turtle(name, turtles, drum) {
 
             this.closeSVG();
 
-            ctx.stroke();
-            ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.closePath();
 
             // Restore stroke
             this.stroke = savedStroke;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.moveTo(nx, ny);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.moveTo(nx, ny);
         } else if (this.penState) {
-            ctx.lineTo(nx, ny);
+            this.ctx.lineTo(nx, ny);
             if (!this.svgPath) {
                 this.svgPath = true;
                 let oxScaled = ox * this.turtles.scale;
@@ -535,15 +562,15 @@ function Turtle(name, turtles, drum) {
             let nxScaled = nx * this.turtles.scale;
             let nyScaled = ny * this.turtles.scale;
             this.svgOutput += nxScaled + "," + nyScaled + " ";
-            ctx.stroke();
+            this.ctx.stroke();
             if (!this.fillState) {
-                ctx.closePath();
+                this.ctx.closePath();
             }
         } else {
-            ctx.moveTo(nx, ny);
+            this.ctx.moveTo(nx, ny);
         }
 
-        this.penstrokes.image = canvas;
+        this.penstrokes.image = this.canvas;
 
         // Update turtle position on screen
         this.container.x = nx;
@@ -555,23 +582,23 @@ function Turtle(name, turtles, drum) {
             this.x = this.turtles.screenX2turtleX(x);
             this.y = this.turtles.screenY2turtleY(y);
         }
-    };
+    }
 
     /**
      * Returns the turtle's index in turtleList (the turtle's number)
      *
      * @return {Number}
      */
-    this.getNumber = function() {
+    getNumber() {
         return this.turtles.turtleList.indexOf(this);
-    };
+    }
 
     /**
      * Renames start block.
      *
      * @param name - name string which is assigned to startBlock
      */
-    this.rename = function(name) {
+    rename(name) {
         this.name = name;
 
         // Use the name on the label of the start block
@@ -585,7 +612,7 @@ function Turtle(name, turtles, drum) {
             this.startBlock.regenerateArtwork(false);
             this.startBlock.value = this.turtles.turtleList.indexOf(this);
         }
-    };
+    }
 
     /**
      * Draws an arc with turtle pen and moves turtle to the end of the arc.
@@ -602,7 +629,7 @@ function Turtle(name, turtles, drum) {
      * @param anticlockwise - boolean value regarding whether arc is cw or acw
      * @param invert - boolean value regarding whether coordinates are inverted or not
      */
-    this.arc = function(
+    arc(
         cx,
         cy,
         ox,
@@ -644,8 +671,8 @@ function Turtle(name, turtles, drum) {
             // Save the current stroke width
             let savedStroke = this.stroke;
             this.stroke = 1;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
 
             // Draw a hollow line
             let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -656,17 +683,17 @@ function Turtle(name, turtles, drum) {
 
             let oxScaled, oyScaled;
             if (anticlockwise) {
-                ctx.moveTo(ox + dx, oy + dy);
+                this.ctx.moveTo(ox + dx, oy + dy);
                 oxScaled = (ox + dx) * this.turtles.scale;
                 oyScaled = (oy + dy) * this.turtles.scale;
             } else {
-                ctx.moveTo(ox - dx, oy - dy);
+                this.ctx.moveTo(ox - dx, oy - dy);
                 oxScaled = (ox - dx) * this.turtles.scale;
                 oyScaled = (oy - dy) * this.turtles.scale;
             }
             this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
-            ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
+            this.ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
             nsteps = Math.max(Math.floor((radius * Math.abs(sa - ea)) / 2), 2);
             steps = Math.max(Math.floor(savedStroke, 1));
 
@@ -687,7 +714,7 @@ function Turtle(name, turtles, drum) {
             let cy1 = ny;
             let sa1 = ea;
             let ea1 = ea + Math.PI;
-            ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
+            this.ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
             this._svgArc(
                 steps,
                 cx1 * this.turtles.scale,
@@ -696,7 +723,7 @@ function Turtle(name, turtles, drum) {
                 sa1,
                 ea1
             );
-            ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
+            this.ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
             this._svgArc(
                 nsteps,
                 cx * this.turtles.scale,
@@ -709,7 +736,7 @@ function Turtle(name, turtles, drum) {
             let cy2 = oy;
             let sa2 = sa - Math.PI;
             let ea2 = sa;
-            ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
+            this.ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
             this._svgArc(
                 steps,
                 cx2 * this.turtles.scale,
@@ -720,16 +747,16 @@ function Turtle(name, turtles, drum) {
             );
             this.closeSVG();
 
-            ctx.stroke();
-            ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.closePath();
 
             // Restore stroke
             this.stroke = savedStroke;
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.moveTo(nx, ny);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.moveTo(nx, ny);
         } else if (this.penState) {
-            ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
+            this.ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
             if (!this.svgPath) {
                 this.svgPath = true;
                 let oxScaled = ox * this.turtles.scale;
@@ -755,12 +782,12 @@ function Turtle(name, turtles, drum) {
                 "," +
                 nyScaled +
                 " ";
-            ctx.stroke();
+            this.ctx.stroke();
             if (!this.fillState) {
-                ctx.closePath();
+                this.ctx.closePath();
             }
         } else {
-            ctx.moveTo(nx, ny);
+            this.ctx.moveTo(nx, ny);
         }
 
         // Update turtle position on screen
@@ -773,23 +800,26 @@ function Turtle(name, turtles, drum) {
             this.x = this.screenX2turtles.turtleX(x);
             this.y = this.screenY2turtles.turtleY(y);
         }
-    };
+    }
 
     /**
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
      *
-     * @param resetPen - boolean value regarding whether the pen's properties (color, value etc) should be reset
-     * @param resetSkin - boolean value regarding whether the turtle's 'skin' (color, blockname etc) should be reset
-     * @param resetPosition - boolean value regarding whether the turtle's position (orientation, x, y etc) should be reset
+     * @param resetPen - boolean value regarding whether the pen's properties
+     * (color, value etc) should be reset
+     * @param resetSkin - boolean value regarding whether the turtle's 'skin'
+     * (color, blockname etc) should be reset
+     * @param resetPosition - boolean value regarding whether the turtle's
+     * position (orientation, x, y etc) should be reset
      */
-    this.doClear = function (resetPen, resetSkin, resetPosition) {
+    doClear(resetPen, resetSkin, resetPosition) {
         // Reset turtle
         if (resetPosition) {
             this.x = 0;
             this.y = 0;
             this.orientation = 0.0;
-            this.turtles.gx = ctx.canvas.width;
-            this.turtles.gy = ctx.canvas.height;
+            this.turtles.gx = this.ctx.canvas.width;
+            this.turtles.gy = this.ctx.canvas.height;
         }
 
         if (resetPen) {
@@ -861,7 +891,8 @@ function Turtle(name, turtles, drum) {
         this.fillState = false;
         this.hollowState = false;
 
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        this.canvasColor =
+            getMunsellColor(this.color, this.value, this.chroma);
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
@@ -869,40 +900,43 @@ function Turtle(name, turtles, drum) {
         this.svgOutput = "";
         this.svgPath = false;
         this.penstrokes.image = null;
-        ctx.beginPath();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.beginPath();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.turtles.c1ctx != null) {
             this.turtles.c1ctx.beginPath();
-            this.turtles.c1ctx.clearRect(0, 0, 3 * canvas.width, 3 * canvas.height);
+            this.turtles.c1ctx.clearRect(
+                0, 0, 3 * this.canvas.width, 3 * this.canvas.height
+            );
         }
-        this.penstrokes.image = canvas;
+        this.penstrokes.image = this.canvas;
         this.turtles.refreshCanvas();
-    };
+    }
 
     /**
      * Removes penstrokes and clears canvas.
      */
-    this.clearPenStrokes = function () {
+    clearPenStrokes() {
         this.penState = true;
         this.fillState = false;
         this.hollowState = false;
 
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        this.canvasColor =
+            getMunsellColor(this.color, this.value, this.chroma);
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
-        ctx.beginPath();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.beginPath();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.processColor();
-        ctx.lineWidth = this.stroke;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        this.penstrokes.image = canvas;
+        this.ctx.lineWidth = this.stroke;
+        this.ctx.lineCap = "round";
+        this.ctx.beginPath();
+        this.penstrokes.image = this.canvas;
         this.svgOutput = "";
         this.svgPath = false;
         this.turtles.refreshCanvas();
-    };
+    }
 
     /**
     * Checks if x, y is out of ctx.
@@ -912,7 +946,7 @@ function Turtle(name, turtles, drum) {
     * @param w - width 
     * @param h - height
     */
-    this.outOfBounds = function (x, y, w, h) {
+    outOfBounds(x, y, w, h) {
         return (x > w || x < 0 || y > h || y < 0);
     }
 
@@ -921,14 +955,14 @@ function Turtle(name, turtles, drum) {
      *
      * @param steps - the number of steps the turtle goes forward by
      */
-    this.doForward = function (steps) {
+    doForward(steps) {
         this.processColor();
 
         if (!this.fillState) {
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(this.container.x, this.container.y);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.container.x, this.container.y);
         }
 
         // old turtle point
@@ -941,8 +975,8 @@ function Turtle(name, turtles, drum) {
         let nx = ox + Number(steps) * Math.sin(angleRadians);
         let ny = oy + Number(steps) * Math.cos(angleRadians);
 
-        let w = ctx.canvas.width;
-        let h = ctx.canvas.height;
+        let w = this.ctx.canvas.width;
+        let h = this.ctx.canvas.height;
 
         let out =
             this.outOfBounds(
@@ -970,19 +1004,19 @@ function Turtle(name, turtles, drum) {
             while (steps >= 0) {
                 if (this.container.x > w) {
                     this.container.x = 0;
-                    ctx.moveTo(this.container.x, this.container.y);
+                    this.ctx.moveTo(this.container.x, this.container.y);
                 }
                 if (this.container.x < 0) {
                     this.container.x = w;
-                    ctx.moveTo(this.container.x, this.container.y);
+                    this.ctx.moveTo(this.container.x, this.container.y);
                 }
                 if (this.container.y > h) {
                     this.container.y = 0;
-                    ctx.moveTo(this.container.x, this.container.y);
+                    this.ctx.moveTo(this.container.x, this.container.y);
                 }
                 if (this.container.y < 0) {
                     this.container.y = h;
-                    ctx.moveTo(this.container.x, this.container.y);
+                    this.ctx.moveTo(this.container.x, this.container.y);
                 }
 
                 // Get old turtle point
@@ -996,14 +1030,14 @@ function Turtle(name, turtles, drum) {
                 this.move(ox, oy, nx, ny, true)
                 this.container.x = this.turtles.turtleX2screenX(nx);
                 this.container.y = this.turtles.turtleY2screenY(ny);
-                ctx.moveTo(this.container.x, this.container.y);
+                this.ctx.moveTo(this.container.x, this.container.y);
 
                 steps -= stepUnit;
             }
 
             this.turtles.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Moves turtle to specific point (x, y).
@@ -1011,14 +1045,14 @@ function Turtle(name, turtles, drum) {
      * @param x - on-screen x coordinate of the point to where the turtle is moved
      * @param y - on-screen y coordinate of the point to where the turtle is moved
      */
-    this.doSetXY = function(x, y) {
+    doSetXY(x, y) {
         this.processColor();
 
         if (!this.fillState) {
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(this.container.x, this.container.y);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.container.x, this.container.y);
         }
 
         // Get old turtle point
@@ -1031,7 +1065,7 @@ function Turtle(name, turtles, drum) {
 
         this.move(ox, oy, nx, ny, true);
         this.turtles.refreshCanvas();
-    };
+    }
 
     /**
      * Draws arc with specified angle and radius by
@@ -1041,7 +1075,7 @@ function Turtle(name, turtles, drum) {
      * @param angle - angle of arc
      * @param radius - radius of arc
      */
-    this.doArc = function(angle, radius) {
+    doArc(angle, radius) {
         if (radius < 0) {
             radius = -radius;
         }
@@ -1062,7 +1096,7 @@ function Turtle(name, turtles, drum) {
         if (remainder > 0) {
             this._doArcPart(remainder * factor, radius);
         }
-    };
+    }
 
     /**
      * Draws arc parts for eventual combination into one arc.
@@ -1070,14 +1104,14 @@ function Turtle(name, turtles, drum) {
      * @param angle - angle of arc
      * @param radius - radius of arc
      */
-    this._doArcPart = function(angle, radius) {
+    _doArcPart(angle, radius) {
         this.processColor();
 
         if (!this.fillState) {
-            ctx.lineWidth = this.stroke;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(this.container.x, this.container.y);
+            this.ctx.lineWidth = this.stroke;
+            this.ctx.lineCap = "round";
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.container.x, this.container.y);
         }
 
         let adeg = Number(angle);
@@ -1131,7 +1165,7 @@ function Turtle(name, turtles, drum) {
         }
 
         this.turtles.refreshCanvas();
-    };
+    }
 
     /**
      * Adds an image object to the canvas (shows an image).
@@ -1139,32 +1173,31 @@ function Turtle(name, turtles, drum) {
      * @param size - size of image
      * @param myImage - image path
      */
-    this.doShowImage = function(size, myImage) {
+    doShowImage(size, myImage) {
         // Is there a JS test for a valid image path?
         if (myImage === null) {
             return;
         }
 
         let image = new Image();
-        let that = this;
 
-        image.onload = function() {
+        image.onload = () => {
             let bitmap = new createjs.Bitmap(image);
-            that.imageContainer.addChild(bitmap);
-            that.media.push(bitmap);
+            this.imageContainer.addChild(bitmap);
+            this.media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
             bitmap.scaleY = bitmap.scaleX;
             bitmap.scale = bitmap.scaleX;
-            bitmap.x = that.container.x;
-            bitmap.y = that.container.y;
+            bitmap.x = this.container.x;
+            bitmap.y = this.container.y;
             bitmap.regX = image.width / 2;
             bitmap.regY = image.height / 2;
-            bitmap.rotation = that.orientation;
-            that.turtles.refreshCanvas();
+            bitmap.rotation = this.orientation;
+            this.turtles.refreshCanvas();
         };
 
         image.src = myImage;
-    };
+    }
 
     /**
      * Adds an image object from a URL to the canvas (shows an image).
@@ -1172,7 +1205,7 @@ function Turtle(name, turtles, drum) {
      * @param size - size of image
      * @param myImage - URL of image (image address)
      */
-    this.doShowURL = function(size, myURL) {
+    doShowURL(size, myURL) {
         if (myURL === null) {
             return;
         }
@@ -1180,7 +1213,7 @@ function Turtle(name, turtles, drum) {
         image.src = myURL;
         let turtle = this;
 
-        image.onload = function() {
+        image.onload = () => {
             let bitmap = new createjs.Bitmap(image);
             turtle.imageContainer.addChild(bitmap);
             turtle.media.push(bitmap);
@@ -1194,7 +1227,7 @@ function Turtle(name, turtles, drum) {
             bitmap.rotation = turtle.orientation;
             turtle.turtles.refreshCanvas();
         };
-    };
+    }
 
     /**
      * Adds an image object to the turtle.
@@ -1202,33 +1235,32 @@ function Turtle(name, turtles, drum) {
      * @param size - size of image
      * @param myImage - path of image
      */
-    this.doTurtleShell = function(size, myImage) {
+    doTurtleShell(size, myImage) {
         if (myImage === null) {
             return;
         }
 
         let image = new Image();
         image.src = myImage;
-        let that = this;
         this.shellSize = Number(size);
 
-        image.onload = function() {
-            that.container.removeChild(that.bitmap);
-            that.bitmap = new createjs.Bitmap(image);
-            that.container.addChild(that.bitmap);
-            that.bitmap.scaleX = that.shellSize / image.width;
-            that.bitmap.scaleY = that.bitmap.scaleX;
-            that.bitmap.scale = that.bitmap.scaleX;
-            that.bitmap.x = 0;
-            that.bitmap.y = 0;
-            that.bitmap.regX = image.width / 2;
-            that.bitmap.regY = image.height / 2;
-            that.bitmap.rotation = that.orientation;
-            that.skinChanged = true;
+        image.onload = () => {
+            this.container.removeChild(this.bitmap);
+            this.bitmap = new createjs.Bitmap(image);
+            this.container.addChild(this.bitmap);
+            this.bitmap.scaleX = this.shellSize / image.width;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.x = 0;
+            this.bitmap.y = 0;
+            this.bitmap.regX = image.width / 2;
+            this.bitmap.regY = image.height / 2;
+            this.bitmap.rotation = this.orientation;
+            this.skinChanged = true;
 
-            that.container.uncache();
-            let bounds = that.container.getBounds();
-            that.container.cache(
+            this.container.uncache();
+            let bounds = this.container.getBounds();
+            this.container.cache(
                 bounds.x,
                 bounds.y,
                 bounds.width,
@@ -1242,35 +1274,35 @@ function Turtle(name, turtles, drum) {
                 .drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
-            that.container.hitArea = hitArea;
+            this.container.hitArea = hitArea;
 
-            if (that.startBlock != null) {
-                that.startBlock.container.removeChild(that.decorationBitmap);
-                that.decorationBitmap = new createjs.Bitmap(myImage);
-                that.startBlock.container.addChild(that.decorationBitmap);
-                that.decorationBitmap.name = "decoration";
+            if (this.startBlock != null) {
+                this.startBlock.container.removeChild(this.decorationBitmap);
+                this.decorationBitmap = new createjs.Bitmap(myImage);
+                this.startBlock.container.addChild(this.decorationBitmap);
+                this.decorationBitmap.name = "decoration";
 
-                let width = that.startBlock.width;
+                let width = this.startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                that.decorationBitmap.x =
-                    width - (30 * that.startBlock.protoblock.scale) / 2;
-                that.decorationBitmap.y =
-                    (20 * that.startBlock.protoblock.scale) / 2;
-                that.decorationBitmap.scaleX =
-                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.x =
+                    width - (30 * this.startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.y =
+                    (20 * this.startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.scaleX =
+                    ((27.5 / image.width) * this.startBlock.protoblock.scale) /
                     2;
-                that.decorationBitmap.scaleY =
-                    ((27.5 / image.height) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.scaleY =
+                    ((27.5 / image.height) * this.startBlock.protoblock.scale) /
                     2;
-                that.decorationBitmap.scale =
-                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.scale =
+                    ((27.5 / image.width) * this.startBlock.protoblock.scale) /
                     2;
-                that.startBlock.updateCache();
+                this.startBlock.updateCache();
             }
 
-            that.turtles.refreshCanvas();
+            this.turtles.refreshCanvas();
         };
-    };
+    }
 
     /**
      * Resizes decoration by width and scale.
@@ -1278,14 +1310,14 @@ function Turtle(name, turtles, drum) {
      * @param scale - resize decoration by scale
      * @param width - resize decoration by width
      */
-    this.resizeDecoration = function(scale, width) {
+    resizeDecoration(scale, width) {
         this.decorationBitmap.x = width - (30 * scale) / 2;
         this.decorationBitmap.y = (35 * scale) / 2;
         this.decorationBitmap.scaleX =
             this.decorationBitmap.scaleY =
             this.decorationBitmap.scale =
                 (0.5 * scale) / 2;
-    };
+    }
 
     /**
      * Adds a text object to the canvas.
@@ -1293,7 +1325,7 @@ function Turtle(name, turtles, drum) {
      * @param  size - specifies text size
      * @param  myText - string of text to be displayed
      */
-    this.doShowText = function(size, myText) {
+    doShowText(size, myText) {
         if (myText === null) {
             return;
         }
@@ -1337,14 +1369,14 @@ function Turtle(name, turtles, drum) {
 
             this.turtles.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Turn right and display corresponding turtle graphic by rotating bitmap.
      *
      * @param degrees - degrees for right turn
      */
-    this.doRight = function(degrees) {
+    doRight(degrees) {
         this.orientation += Number(degrees);
         while (this.orientation < 0) {
             this.orientation += 360;
@@ -1357,14 +1389,14 @@ function Turtle(name, turtles, drum) {
         if (this.blinkFinished) {
             this.updateCache();
         }
-    };
+    }
 
     /**
      * Sets the direction of where the turtle is heading by rotating bitmap.
      *
      * @param degrees - degrees turned to set the 'heading' of turtle
      */
-    this.doSetHeading = function(degrees) {
+    doSetHeading(degrees) {
         this.orientation = Number(degrees);
         while (this.orientation < 0) {
             this.orientation += 360;
@@ -1377,17 +1409,17 @@ function Turtle(name, turtles, drum) {
         if (this.blinkFinished) {
             this.updateCache();
         }
-    };
+    }
 
     /**
      * Sets font.
      *
      * @param font - font object
      */
-    this.doSetFont = function(font) {
+    doSetFont(font) {
         this.font = font;
         this.updateCache();
-    };
+    }
 
     /**
      * Sets color.
@@ -1395,7 +1427,7 @@ function Turtle(name, turtles, drum) {
      *
      * @param color - hex code specifying color
      */
-    this.doSetColor = function(color) {
+    doSetColor(color) {
         this.closeSVG();
         this.color = Number(color);
         let results = getcolor(this.color);
@@ -1405,133 +1437,133 @@ function Turtle(name, turtles, drum) {
         this.chroma = results[1];
         this.canvasColor = results[2];
         this.processColor();
-    };
+    }
 
     /**
      * Sets pen's alpha value (transparency).
      *
      * @param alpha - alpha value
      */
-    this.doSetPenAlpha = function(alpha) {
+    doSetPenAlpha(alpha) {
         this.canvasAlpha = alpha;
-    };
+    }
 
     /**
      * Splits hex code for rgb number values.
      */
-    this.processColor = function() {
+    processColor() {
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
 
         let subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-        ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
-        ctx.fillStyle = subrgb + this.canvasAlpha + ")";
-    };
+        this.ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
+        this.ctx.fillStyle = subrgb + this.canvasAlpha + ")";
+    }
 
     /**
      * Sets hue for canvas.
      *
      * @param hue - hue hex code
      */
-    this.doSetHue = function(hue) {
+    doSetHue(hue) {
         this.closeSVG();
         this.color = Number(hue);
         this.canvasColor =
             getMunsellColor(this.color, this.value, this.chroma);
         this.processColor();
-    };
+    }
 
     /**
      * Sets shade for canvas.
      *
      * @param shade - shade hex code
      */
-    this.doSetValue = function(shade) {
+    doSetValue(shade) {
         this.closeSVG();
         this.value = Number(shade);
         this.canvasColor =
             getMunsellColor(this.color, this.value, this.chroma);
         this.processColor();
-    };
+    }
 
     /**
      * Sets chroma for canvas.
      *
      * @param chroma - chroma hex code
      */
-    this.doSetChroma = function(chroma) {
+    doSetChroma(chroma) {
         this.closeSVG();
         this.chroma = Number(chroma);
         this.canvasColor =
             getMunsellColor(this.color, this.value, this.chroma);
         this.processColor();
-    };
+    }
 
     /**
      * Sets pen size/thickness.
      *
      * @param size - pen size which is assigned to pen stroke
      */
-    this.doSetPensize = function(size) {
+    doSetPensize(size) {
         this.closeSVG();
         this.stroke = size;
-        ctx.lineWidth = this.stroke;
-    };
+        this.ctx.lineWidth = this.stroke;
+    }
 
     /**
      * Toggles penState: puts pen 'up'.
      */
-    this.doPenUp = function() {
+    doPenUp() {
         this.closeSVG();
         this.penState = false;
-    };
+    }
 
     /**
      * Toggles penState: puts pen 'down'.
      */
-    this.doPenDown = function() {
+    doPenDown() {
         this.penState = true;
-    };
+    }
 
     /**
      * Begins fill path.
      */
-    this.doStartFill = function() {
+    doStartFill() {
         /// Start tracking points here
-        ctx.beginPath();
+        this.ctx.beginPath();
         this.fillState = true;
-    };
+    }
 
     /**
      * Ends fill path.
      */
-    this.doEndFill = function() {
+    doEndFill() {
         // Redraw the points with fill enabled
-        ctx.fill();
-        ctx.closePath();
+        this.ctx.fill();
+        this.ctx.closePath();
         this.closeSVG();
         this.fillState = false;
-    };
+    }
 
     /**
      * Begins hollow line by toggling hollowState (to true).
      */
-    this.doStartHollowLine = function() {
+    doStartHollowLine() {
         this.hollowState = true;    // start tracking points here
-    };
+    }
 
     /**
      * Ends hollow line by toggling hollowState (to false).
      */
-    this.doEndHollowLine = function() {
+    doEndHollowLine() {
         this.hollowState = false;   // redraw the points with fill enabled
-    };
+    }
 
     /**
      * Closes SVG by changing SVG output to the canvas.
      */
-    this.closeSVG = function() {
+    closeSVG() {
         if (this.svgPath) {
             // For the SVG output, we need to replace rgba() with
             // rgb();fill-opacity:1 and rgb();stroke-opacity:1
@@ -1554,13 +1586,13 @@ function Turtle(name, turtles, drum) {
             this.svgOutput += "stroke-width:" + strokeScaled + 'pt;" />';
             this.svgPath = false;
         }
-    };
+    }
 
     /**
      * Internal function for creating cache.
      * Includes workaround for a race condition.
      */
-    this.createCache = function() {
+    createCache() {
         this.bounds = this.container.getBounds();
 
         if (this.bounds == null) {
@@ -1575,7 +1607,7 @@ function Turtle(name, turtles, drum) {
                 this.bounds.height
             );
         }
-    };
+    }
 
     /**
      * Internal function for updating cache.
@@ -1583,7 +1615,7 @@ function Turtle(name, turtles, drum) {
      *
      * @async
      */
-    this.updateCache = async function() {
+    async updateCache() {
         if (this.bounds == null) {
             console.debug(
                 "Block container for " + this.name + " not yet ready."
@@ -1594,14 +1626,14 @@ function Turtle(name, turtles, drum) {
             this.container.updateCache();
             this.turtles.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Stops blinking of turtle if not already finished.
      * Sets timeout to null and blinkFinished boolean to true
      * (if they have not been already changed).
      */
-    this.stopBlink = function() {
+    stopBlink() {
         if (this._blinkTimeout != null || !this.blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
@@ -1622,12 +1654,12 @@ function Turtle(name, turtles, drum) {
             // this.turtles.refreshCanvas();
             // this.blinkFinished = true;
         }
-    };
+    }
 
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    this.blink = async function(duration, volume) {
+    async blink(duration, volume) {
         // this._sizeInUse = this.bitmap.scaleX;
         this._blinkTimeout = null;
 
@@ -1671,120 +1703,133 @@ function Turtle(name, turtles, drum) {
         this.skinChanged = true;
         createjs.Tween.get(this.bitmap).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
 
-        let that = this;
-        this._blinkTimeout = setTimeout(function () {
-            that.bitmap.alpha = 1.0;
-            that.bitmap.scaleX = that._sizeInUse;
-            that.bitmap.scaleY = that.bitmap.scaleX;
-            that.bitmap.scale = that.bitmap.scaleX;
-            that.bitmap.rotation = that.orientation;
-            that.skinChanged = that._isSkinChanged;
-            let bounds = that.container.getBounds();
-            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.blinkFinished = true;
-            that.turtles.refreshCanvas();
+        this._blinkTimeout = setTimeout(() => {
+            this.bitmap.alpha = 1.0;
+            this.bitmap.scaleX = this._sizeInUse;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.rotation = this.orientation;
+            this.skinChanged = this._isSkinChanged;
+            let bounds = this.container.getBounds();
+            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            this.blinkFinished = true;
+            this.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
         */
-    };
+    }
 }
 
-function Turtles() {
-    this.masterStage = null;
-    this.doClear = null;
-    this.hideMenu = null;
-    this.doGrid = null;
-    this.hideGrids = null;
-    this.stage = null;
-    this.refreshCanvas = null;
-    this.scale = 1.0;
-    this.w = 1200;
-    this.h = 900;
-    this.backgroundColor = platformColor.background;
-    this._canvas = null;
-    this._rotating = false;
-    this._drum = false;
+/**
+ * Class for managing all the turtles.
+ *
+ * @class
+ * @classdesc This contains variables for maintaining the canvas
+ * including the canvas background buttons. In additions, it contains
+ * all other methods relevant to the set of all turtles, including
+ * adding them to the turtlelist, maintaining the canvas, etc.
+ */
+class Turtles {
+    /**
+     * @constructor
+     */
+    constructor() {
+        this.masterStage = null;
+        this.doClear = null;
+        this.hideMenu = null;
+        this.doGrid = null;
+        this.hideGrids = null;
+        this.stage = null;
+        this.refreshCanvas = null;
+        this.scale = 1.0;
+        this.w = 1200;
+        this.h = 900;
+        this.backgroundColor = platformColor.background;
+        this._canvas = null;
+        this._rotating = false;
+        this._drum = false;
 
-    this.gx = null;
-    this.gy = null;
-    this.canvas1 = null;
+        this.gx = null;
+        this.gy = null;
+        this.canvas1 = null;
 
-    console.debug("Creating border container");
-    this._borderContainer = new createjs.Container();
-    this._expandedBoundary = null;
-    this._collapsedBoundary = null;
-    this.isShrunk = false;
-    this._expandButton = null;
-    this._expandLabel = null;
-    this._expandLabelBG = null;
-    this._collapseButton = null;
-    this._collapseLabel = null;
-    this._collapseLabelBG = null;
-    this._clearButton = null;
-    this._clearLabel = null;
-    this._clearLabelBG = null;
-    this._gridButton = null;
-    this._gridLabel = null;
-    this._gridLabelBG = null;
-    this._locked = false;
-    this._queue = [];
+        console.debug("Creating border container");
+        this._borderContainer = new createjs.Container();
+        this._expandedBoundary = null;
+        this._collapsedBoundary = null;
+        this.isShrunk = false;
+        this._expandButton = null;
+        this._expandLabel = null;
+        this._expandLabelBG = null;
+        this._collapseButton = null;
+        this._collapseLabel = null;
+        this._collapseLabelBG = null;
+        this._clearButton = null;
+        this._clearLabel = null;
+        this._clearLabelBG = null;
+        this._gridButton = null;
+        this._gridLabel = null;
+        this._gridLabelBG = null;
+        this._locked = false;
+        this._queue = [];
 
-    // List of all of the turtles, one for each start block
-    this.turtleList = [];
+        // List of all of the turtles, one for each start block
+        this.turtleList = [];
+    }
 
-    this.setGridLabel = function(text) {
+    setGridLabel(text) {
         if (this._gridLabel !== null) {
             this._gridLabel.text = text;
         }
-    };
+    }
 
-    this.setMasterStage = function(stage) {
+    setMasterStage(stage) {
         this.masterStage = stage;
         return this;
-    };
+    }
 
-    this.setClear = function(doClear) {
+    setClear(doClear) {
         this.doClear = doClear;
         return this;
-    };
+    }
 
-    this.setDoGrid = function(doGrid) {
+    setDoGrid(doGrid) {
         this.doGrid = doGrid;
         return this;
-    };
+    }
 
-    this.setHideGrids = function(hideGrids) {
+    setHideGrids(hideGrids) {
         this.hideGrids = hideGrids;
         return this;
-    };
+    }
 
-    this.setHideMenu = function(hideMenu) {
+    setHideMenu(hideMenu) {
         this.hideMenu = hideMenu;
         return this;
-    };
+    }
 
-    this.setCanvas = function(canvas) {
+    setCanvas(canvas) {
         this._canvas = canvas;
         return this;
-    };
+    }
 
-    this.setStage = function(stage) {
+    setStage(stage) {
         this.stage = stage;
         this.stage.addChild(this._borderContainer);
         return this;
-    };
+    }
 
-    this.scaleStage = function(scale) {
+    scaleStage(scale) {
         this.stage.scaleX = scale;
         this.stage.scaleY = scale;
         this.refreshCanvas();
-    };
+    }
 
-    this.setRefreshCanvas = function(refreshCanvas) {
+    setRefreshCanvas(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
-    };
+    }
 
-    this.setScale = function(w, h, scale) {
+    setScale(w, h, scale) {
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
@@ -1794,18 +1839,18 @@ function Turtles() {
         }
 
         this.makeBackground();
-    };
+    }
 
-    this.deltaY = function(dy) {
+    deltaYfunction(dy) {
         this.stage.y += dy;
-    };
+    }
 
     /**
      * Makes background for canvas: clears containers, renders buttons.
      *
      * @param setCollapsed - specify whether the background should be collapsed
      */
-    this.makeBackground = function(setCollapsed) {
+    makeBackground(setCollapsed) {
         let doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
         // Remove any old background containers
@@ -1833,147 +1878,60 @@ function Turtles() {
             this.stage.removeChild(this._gridButton);
         }
 
-        let that = this;
         let circles = null;
 
         /**
-         * Makes boundary for graphics (mouse) container by initialising
-         * 'MBOUNDARY' SVG.
+         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
+         * Assigns click listener function to doGrid() method.
          */
-        function __makeBoundary() {
-            that._locked = true;
-            let img = new Image();
-            img.onload = function() {
-                if (that._expandedBoundary !== null) {
-                    that._expandedBoundary.visible = false;
-                }
+        let __makeGridButton = () => {
+            this._gridButton = new createjs.Container();
+            this._gridLabel = null;
+            this._gridLabelBG = null;
 
-                that._expandedBoundary = new createjs.Bitmap(img);
-                that._expandedBoundary.x = 0;
-                that._expandedBoundary.y = 55 + LEADING;
-                that._borderContainer.addChild(that._expandedBoundary);
-                __makeBoundary2();
-            };
+            this._gridButton.removeAllEventListeners("click");
+            this._gridButton.on("click", event => {
+                this.doGrid();
+            });
 
-            let dx = that.w - 5;
-            let dy = that.h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    unescape(
-                        encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", 10 / SCALEFACTOR)
-                                .replace("X", 10 / SCALEFACTOR)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
-                                .replace("fill_color", that.backgroundColor)
-                                .replace("STROKE", 20 / SCALEFACTOR)
-                        )
-                    )
-                );
-        }
-
-        /**
-         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
-         */
-        function __makeBoundary2() {
-            let img = new Image();
-            img.onload = function() {
-                if (that._collapsedBoundary !== null) {
-                    that._collapsedBoundary.visible = false;
-                }
-
-                that._collapsedBoundary = new createjs.Bitmap(img);
-                that._collapsedBoundary.x = 0;
-                that._collapsedBoundary.y = 55 + LEADING;
-                that._borderContainer.addChild(that._collapsedBoundary);
-                that._collapsedBoundary.visible = false;
-
-                __makeExpandButton();
-            };
-
-            let dx = that.w - 20;
-            let dy = that.h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    unescape(
-                        encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", 10)
-                                .replace("X", 10)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
-                                .replace("fill_color", that.backgroundColor)
-                                .replace("STROKE", 20)
-                        )
-                    )
-                );
-        }
-
-        /**
-         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to remove stage and add it at posiion 0.
-         */
-        function __makeExpandButton() {
-            that._expandButton = new createjs.Container();
-            that._expandLabel = null;
-            that._expandLabelBG = null;
-
-            that._expandLabel = new createjs.Text(
-                _("Expand"),
+            this._gridLabel = new createjs.Text(
+                _("show Cartesian"),
                 "14px Sans",
                 "#282828"
             );
-            that._expandLabel.textAlign = "center";
-            that._expandLabel.x = 11.5;
-            that._expandLabel.y = 55;
-            that._expandLabel.visible = false;
+            this._gridLabel.textAlign = "center";
+            this._gridLabel.x = 27.5;
+            this._gridLabel.y = 55;
+            this._gridLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
-                if (that._expandButton !== null) {
-                    that._expandButton.visible = false;
-                }
-
+            img.onload = () => {
                 let bitmap = new createjs.Bitmap(img);
-                that._expandButton.addChild(bitmap);
+                this._gridButton.addChild(bitmap);
+                this._gridButton.addChild(this._gridLabel);
+
                 bitmap.visible = true;
-                that._expandButton.addChild(that._expandLabel);
+                this._gridButton.x = this.w - 10 - 3 * 55;
+                this._gridButton.y = 70 + LEADING + 6;
+                this._gridButton.visible = true;
 
-                that._expandButton.x = that.w - 10 - 4 * 55;
-                that._expandButton.y = 70 + LEADING + 6;
-                that._expandButton.scaleX = SCALEFACTOR;
-                that._expandButton.scaleY = SCALEFACTOR;
-                that._expandButton.scale = SCALEFACTOR;
-                that._expandButton.visible = false;
-                // that._borderContainer.addChild(that._expandButton);
-                that.stage.addChild(that._expandButton);
+                // this._borderContainer.addChild(this._gridButton);
+                this.stage.addChild(this._gridButton);
+                this.refreshCanvas();
 
-                that._expandButton.removeAllEventListeners("mouseover");
-                that._expandButton.on("mouseover", function(event) {
-                    if (that._expandLabel !== null) {
-                        that._expandLabel.visible = true;
+                this._gridButton.removeAllEventListeners("mouseover");
+                this._gridButton.on("mouseover", event => {
+                    if (this._gridLabel !== null) {
+                        this._gridLabel.visible = true;
 
-                        if (that._expandLabelBG === null) {
-                            let b = that._expandLabel.getBounds();
-                            that._expandLabelBG = new createjs.Shape();
-                            that._expandLabelBG.graphics
+                        if (this._gridLabelBG === null) {
+                            let b = this._gridLabel.getBounds();
+                            this._gridLabelBG = new createjs.Shape();
+                            this._gridLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._expandLabel.x + b.x - 8,
-                                    that._expandLabel.y + b.y - 2,
+                                    this._gridLabel.x + b.x - 8,
+                                    this._gridLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -1981,251 +1939,106 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._expandButton.addChildAt(
-                                that._expandLabelBG,
-                                0
-                            );
+                            this._gridButton.addChildAt(this._gridLabelBG, 0);
                         } else {
-                            that._expandLabelBG.visible = true;
-                        }
-                    }
-
-                    that.refreshCanvas();
-                });
-
-                that._expandButton.removeAllEventListeners("mouseout");
-                that._expandButton.on("mouseout", function(event) {
-                    if (that._expandLabel !== null) {
-                        that._expandLabel.visible = false;
-                        that._expandLabelBG.visible = false;
-                        that.refreshCanvas();
-                    }
-                });
-
-                that._expandButton.removeAllEventListeners("pressmove");
-                that._expandButton.on("pressmove", function(event) {
-                    let w = (that.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-                    let x = event.stageX / that.scale - w;
-                    let y = event.stageY / that.scale - 16;
-                    that.stage.x = Math.max(0, Math.min((that.w * 3) / 4, x));
-                    that.stage.y = Math.max(55, Math.min((that.h * 3) / 4, y));
-                    that.refreshCanvas();
-                });
-
-                that._expandButton.removeAllEventListeners("click");
-                that._expandButton.on("click", function(event) {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    that.hideMenu();
-                    that.scaleStage(1.0);
-                    that._expandedBoundary.visible = true;
-                    that._collapseButton.visible = true;
-                    that._collapsedBoundary.visible = false;
-                    that._expandButton.visible = false;
-                    that.stage.x = 0;
-                    that.stage.y = 0;
-                    that.isShrunk = false;
-                    for (let i = 0; i < that.turtleList.length; i++) {
-                        that.turtleList[i].container.scaleX = 1;
-                        that.turtleList[i].container.scaleY = 1;
-                        that.turtleList[i].container.scale = 1;
-                    }
-
-                    that._clearButton.scaleX = 1;
-                    that._clearButton.scaleY = 1;
-                    that._clearButton.scale = 1;
-                    that._clearButton.x = that.w - 5 - 2 * 55;
-
-                    if (that._gridButton !== null) {
-                        that._gridButton.scaleX = 1;
-                        that._gridButton.scaleY = 1;
-                        that._gridButton.scale = 1;
-                        that._gridButton.x = that.w - 10 - 3 * 55;
-                        that._gridButton.visible = true;
-                    }
-
-                    // remove the stage and add it back in position 0
-                    that.masterStage.removeChild(that.stage);
-                    that.masterStage.addChildAt(that.stage, 0);
-                });
-
-                __makeCollapseButton();
-            };
-
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
-        }
-
-        /**
-         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to call collapse() method.
-         */
-        function __makeCollapseButton() {
-            that._collapseButton = new createjs.Container();
-            that._collapseLabel = null;
-            that._collapseLabelBG = null;
-
-            that._collapseLabel = new createjs.Text(
-                _("Collapse"),
-                "14px Sans",
-                "#282828"
-            );
-            that._collapseLabel.textAlign = "center";
-            that._collapseLabel.x = 11.5;
-            that._collapseLabel.y = 55;
-            that._collapseLabel.visible = false;
-
-            let img = new Image();
-            img.onload = function() {
-                if (that._collapseButton !== null) {
-                    that._collapseButton.visible = false;
-                }
-
-                let bitmap = new createjs.Bitmap(img);
-                that._collapseButton.addChild(bitmap);
-                bitmap.visible = true;
-                that._collapseButton.addChild(that._collapseLabel);
-
-                // that._borderContainer.addChild(that._collapseButton);
-                that.stage.addChild(that._collapseButton);
-
-                that._collapseButton.visible = true;
-                that._collapseButton.x = that.w - 55;
-                that._collapseButton.y = 70 + LEADING + 6;
-                that.refreshCanvas();
-
-                that._collapseButton.removeAllEventListeners("click");
-                that._collapseButton.on("click", function(event) {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    that.collapse();
-                });
-
-                that._collapseButton.removeAllEventListeners("mouseover");
-                that._collapseButton.on("mouseover", function(event) {
-                    if (that._collapseLabel !== null) {
-                        that._collapseLabel.visible = true;
-
-                        if (that._collapseLabelBG === null) {
-                            let b = that._collapseLabel.getBounds();
-                            that._collapseLabelBG = new createjs.Shape();
-                            that._collapseLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    that._collapseLabel.x + b.x - 8,
-                                    that._collapseLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            that._collapseButton.addChildAt(
-                                that._collapseLabelBG,
-                                0
-                            );
-                        } else {
-                            that._collapseLabelBG.visible = true;
+                            this._gridLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._collapseButton.x + 28,
-                            that._collapseButton.y + 28,
+                            this._gridButton.x + 28,
+                            this._gridButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._collapseButton.removeAllEventListeners("mouseout");
-                that._collapseButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._collapseLabel !== null) {
-                        that._collapseLabel.visible = false;
-                        that._collapseLabelBG.visible = false;
-                        that.refreshCanvas();
+                this._gridButton.removeAllEventListeners("mouseout");
+                this._gridButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._gridLabel !== null) {
+                        this._gridLabel.visible = false;
+                        this._gridLabelBG.visible = false;
+                        this.refreshCanvas();
                     }
                 });
 
-                __makeClearButton();
+                if (doCollapse) {
+                    this.collapse();
+                }
+
+                this._locked = false;
+                if (this._queue.length === 3) {
+                    this.scale = this._queue[2];
+                    this.w = this._queue[0] / this.scale;
+                    this.h = this._queue[1] / this.scale;
+                    this._queue = [];
+                    this.makeBackground();
+                }
             };
 
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
-        }
+                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
+        };
 
         /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call doClear() method.
          */
-        function __makeClearButton() {
-            that._clearButton = new createjs.Container();
-            that._clearLabel = null;
-            that._clearLabelBG = null;
+        let __makeClearButton = () => {
+            this._clearButton = new createjs.Container();
+            this._clearLabel = null;
+            this._clearLabelBG = null;
 
-            that._clearButton.removeAllEventListeners("click");
-            that._clearButton.on("click", function(event) {
-                that.doClear();
+            this._clearButton.removeAllEventListeners("click");
+            this._clearButton.on("click", event => {
+                this.doClear();
             });
 
-            that._clearLabel = new createjs.Text(
+            this._clearLabel = new createjs.Text(
                 _("Clean"),
                 "14px Sans",
                 "#282828"
             );
-            that._clearLabel.textAlign = "center";
-            that._clearLabel.x = 27.5;
-            that._clearLabel.y = 55;
-            that._clearLabel.visible = false;
+            this._clearLabel.textAlign = "center";
+            this._clearLabel.x = 27.5;
+            this._clearLabel.y = 55;
+            this._clearLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 let bitmap = new createjs.Bitmap(img);
-                that._clearButton.addChild(bitmap);
-                that._clearButton.addChild(that._clearLabel);
+                this._clearButton.addChild(bitmap);
+                this._clearButton.addChild(this._clearLabel);
 
                 bitmap.visible = true;
-                that._clearButton.x = that.w - 5 - 2 * 55;
-                that._clearButton.y = 70 + LEADING + 6;
-                that._clearButton.visible = true;
+                this._clearButton.x = this.w - 5 - 2 * 55;
+                this._clearButton.y = 70 + LEADING + 6;
+                this._clearButton.visible = true;
 
-                // that._borderContainer.addChild(that._clearButton);
-                that.stage.addChild(that._clearButton);
-                that.refreshCanvas();
+                // this._borderContainer.addChild(this._clearButton);
+                this.stage.addChild(this._clearButton);
+                this.refreshCanvas();
 
-                that._clearButton.removeAllEventListeners("mouseover");
-                that._clearButton.on("mouseover", function(event) {
-                    if (that._clearLabel !== null) {
-                        that._clearLabel.visible = true;
+                this._clearButton.removeAllEventListeners("mouseover");
+                this._clearButton.on("mouseover", event => {
+                    if (this._clearLabel !== null) {
+                        this._clearLabel.visible = true;
 
-                        if (that._clearLabelBG === null) {
-                            let b = that._clearLabel.getBounds();
-                            that._clearLabelBG = new createjs.Shape();
-                            that._clearLabelBG.graphics
+                        if (this._clearLabelBG === null) {
+                            let b = this._clearLabel.getBounds();
+                            this._clearLabelBG = new createjs.Shape();
+                            this._clearLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._clearLabel.x + b.x - 8,
-                                    that._clearLabel.y + b.y - 2,
+                                    this._clearLabel.x + b.x - 8,
+                                    this._clearLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -2233,41 +2046,41 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._clearButton.addChildAt(that._clearLabelBG, 0);
+                            this._clearButton.addChildAt(this._clearLabelBG, 0);
                         } else {
-                            that._clearLabelBG.visible = true;
+                            this._clearLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._clearButton.x + 28,
-                            that._clearButton.y + 28,
+                            this._clearButton.x + 28,
+                            this._clearButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._clearButton.removeAllEventListeners("mouseout");
-                that._clearButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._clearLabel !== null) {
-                        that._clearLabel.visible = false;
+                this._clearButton.removeAllEventListeners("mouseout");
+                this._clearButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._clearLabel !== null) {
+                        this._clearLabel.visible = false;
                     }
 
-                    if (that._clearLabelBG !== null) {
-                        that._clearLabelBG.visible = false;
+                    if (this._clearLabelBG !== null) {
+                        this._clearLabelBG.visible = false;
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
                 if (doCollapse) {
-                    that.collapse();
+                    this.collapse();
                 }
 
                 let language = localStorage.languagePreference;
@@ -2279,60 +2092,72 @@ function Turtles() {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(CLEARBUTTON)));
-        }
+        };
 
         /**
-         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
-         * Assigns click listener function to doGrid() method.
+         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to call collapse() method.
          */
-        function __makeGridButton() {
-            that._gridButton = new createjs.Container();
-            that._gridLabel = null;
-            that._gridLabelBG = null;
+        let __makeCollapseButton = () => {
+            this._collapseButton = new createjs.Container();
+            this._collapseLabel = null;
+            this._collapseLabelBG = null;
 
-            that._gridButton.removeAllEventListeners("click");
-            that._gridButton.on("click", function(event) {
-                that.doGrid();
-            });
-
-            that._gridLabel = new createjs.Text(
-                _("show Cartesian"),
+            this._collapseLabel = new createjs.Text(
+                _("Collapse"),
                 "14px Sans",
                 "#282828"
             );
-            that._gridLabel.textAlign = "center";
-            that._gridLabel.x = 27.5;
-            that._gridLabel.y = 55;
-            that._gridLabel.visible = false;
+            this._collapseLabel.textAlign = "center";
+            this._collapseLabel.x = 11.5;
+            this._collapseLabel.y = 55;
+            this._collapseLabel.visible = false;
 
             let img = new Image();
-            img.onload = function() {
+            img.onload = () => {
+                if (this._collapseButton !== null) {
+                    this._collapseButton.visible = false;
+                }
+
                 let bitmap = new createjs.Bitmap(img);
-                that._gridButton.addChild(bitmap);
-                that._gridButton.addChild(that._gridLabel);
-
+                this._collapseButton.addChild(bitmap);
                 bitmap.visible = true;
-                that._gridButton.x = that.w - 10 - 3 * 55;
-                that._gridButton.y = 70 + LEADING + 6;
-                that._gridButton.visible = true;
+                this._collapseButton.addChild(this._collapseLabel);
 
-                // that._borderContainer.addChild(that._gridButton);
-                that.stage.addChild(that._gridButton);
-                that.refreshCanvas();
+                // this._borderContainer.addChild(this._collapseButton);
+                this.stage.addChild(this._collapseButton);
 
-                that._gridButton.removeAllEventListeners("mouseover");
-                that._gridButton.on("mouseover", function(event) {
-                    if (that._gridLabel !== null) {
-                        that._gridLabel.visible = true;
+                this._collapseButton.visible = true;
+                this._collapseButton.x = this.w - 55;
+                this._collapseButton.y = 70 + LEADING + 6;
+                this.refreshCanvas();
 
-                        if (that._gridLabelBG === null) {
-                            let b = that._gridLabel.getBounds();
-                            that._gridLabelBG = new createjs.Shape();
-                            that._gridLabelBG.graphics
+                this._collapseButton.removeAllEventListeners("click");
+                this._collapseButton.on("click", event => {
+                    // If the aux toolbar is open, close it.
+                    let auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        let menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
+                    }
+                    this.collapse();
+                });
+
+                this._collapseButton.removeAllEventListeners("mouseover");
+                this._collapseButton.on("mouseover", event => {
+                    if (this._collapseLabel !== null) {
+                        this._collapseLabel.visible = true;
+
+                        if (this._collapseLabelBG === null) {
+                            let b = this._collapseLabel.getBounds();
+                            this._collapseLabelBG = new createjs.Shape();
+                            this._collapseLabelBG.graphics
                                 .beginFill("#FFF")
                                 .drawRoundRect(
-                                    that._gridLabel.x + b.x - 8,
-                                    that._gridLabel.y + b.y - 2,
+                                    this._collapseLabel.x + b.x - 8,
+                                    this._collapseLabel.y + b.y - 2,
                                     b.width + 16,
                                     b.height + 8,
                                     10,
@@ -2340,67 +2165,286 @@ function Turtles() {
                                     10,
                                     10
                                 );
-                            that._gridButton.addChildAt(that._gridLabelBG, 0);
+                            this._collapseButton.addChildAt(
+                                this._collapseLabelBG,
+                                0
+                            );
                         } else {
-                            that._gridLabelBG.visible = true;
+                            this._collapseLabelBG.visible = true;
                         }
 
                         let r = 55 / 2;
                         circles = showButtonHighlight(
-                            that._gridButton.x + 28,
-                            that._gridButton.y + 28,
+                            this._collapseButton.x + 28,
+                            this._collapseButton.y + 28,
                             r,
                             event,
                             palettes.scale,
-                            that.stage
+                            this.stage
                         );
                     }
 
-                    that.refreshCanvas();
+                    this.refreshCanvas();
                 });
 
-                that._gridButton.removeAllEventListeners("mouseout");
-                that._gridButton.on("mouseout", function(event) {
-                    hideButtonHighlight(circles, that.stage);
-                    if (that._gridLabel !== null) {
-                        that._gridLabel.visible = false;
-                        that._gridLabelBG.visible = false;
-                        that.refreshCanvas();
+                this._collapseButton.removeAllEventListeners("mouseout");
+                this._collapseButton.on("mouseout", event => {
+                    hideButtonHighlight(circles, this.stage);
+                    if (this._collapseLabel !== null) {
+                        this._collapseLabel.visible = false;
+                        this._collapseLabelBG.visible = false;
+                        this.refreshCanvas();
                     }
                 });
 
-                if (doCollapse) {
-                    that.collapse();
-                }
-
-                that._locked = false;
-                if (that._queue.length === 3) {
-                    that.scale = that._queue[2];
-                    that.w = that._queue[0] / that.scale;
-                    that.h = that._queue[1] / that.scale;
-                    that._queue = [];
-                    that.makeBackground();
-                }
+                __makeClearButton();
             };
 
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
-        }
+                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+        };
+
+        /**
+         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to remove stage and add it at posiion 0.
+         */
+        let __makeExpandButton = () => {
+            this._expandButton = new createjs.Container();
+            this._expandLabel = null;
+            this._expandLabelBG = null;
+
+            this._expandLabel = new createjs.Text(
+                _("Expand"),
+                "14px Sans",
+                "#282828"
+            );
+            this._expandLabel.textAlign = "center";
+            this._expandLabel.x = 11.5;
+            this._expandLabel.y = 55;
+            this._expandLabel.visible = false;
+
+            let img = new Image();
+            img.onload = () => {
+                if (this._expandButton !== null) {
+                    this._expandButton.visible = false;
+                }
+
+                let bitmap = new createjs.Bitmap(img);
+                this._expandButton.addChild(bitmap);
+                bitmap.visible = true;
+                this._expandButton.addChild(this._expandLabel);
+
+                this._expandButton.x = this.w - 10 - 4 * 55;
+                this._expandButton.y = 70 + LEADING + 6;
+                this._expandButton.scaleX = SCALEFACTOR;
+                this._expandButton.scaleY = SCALEFACTOR;
+                this._expandButton.scale = SCALEFACTOR;
+                this._expandButton.visible = false;
+                // this._borderContainer.addChild(this._expandButton);
+                this.stage.addChild(this._expandButton);
+
+                this._expandButton.removeAllEventListeners("mouseover");
+                this._expandButton.on("mouseover", event => {
+                    if (this._expandLabel !== null) {
+                        this._expandLabel.visible = true;
+
+                        if (this._expandLabelBG === null) {
+                            let b = this._expandLabel.getBounds();
+                            this._expandLabelBG = new createjs.Shape();
+                            this._expandLabelBG.graphics
+                                .beginFill("#FFF")
+                                .drawRoundRect(
+                                    this._expandLabel.x + b.x - 8,
+                                    this._expandLabel.y + b.y - 2,
+                                    b.width + 16,
+                                    b.height + 8,
+                                    10,
+                                    10,
+                                    10,
+                                    10
+                                );
+                            this._expandButton.addChildAt(
+                                this._expandLabelBG,
+                                0
+                            );
+                        } else {
+                            this._expandLabelBG.visible = true;
+                        }
+                    }
+
+                    this.refreshCanvas();
+                });
+
+                this._expandButton.removeAllEventListeners("mouseout");
+                this._expandButton.on("mouseout", event => {
+                    if (this._expandLabel !== null) {
+                        this._expandLabel.visible = false;
+                        this._expandLabelBG.visible = false;
+                        this.refreshCanvas();
+                    }
+                });
+
+                this._expandButton.removeAllEventListeners("pressmove");
+                this._expandButton.on("pressmove", event => {
+                    let w = (this.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+                    let x = event.stageX / this.scale - w;
+                    let y = event.stageY / this.scale - 16;
+                    this.stage.x = Math.max(0, Math.min((this.w * 3) / 4, x));
+                    this.stage.y = Math.max(55, Math.min((this.h * 3) / 4, y));
+                    this.refreshCanvas();
+                });
+
+                this._expandButton.removeAllEventListeners("click");
+                this._expandButton.on("click", event => {
+                    // If the aux toolbar is open, close it.
+                    let auxToolbar = docById("aux-toolbar");
+                    if (auxToolbar.style.display === "block") {
+                        let menuIcon = docById("menu");
+                        auxToolbar.style.display = "none";
+                        menuIcon.innerHTML = "menu";
+                        docById("toggleAuxBtn").className -= "blue darken-1";
+                    }
+                    this.hideMenu();
+                    this.scaleStage(1.0);
+                    this._expandedBoundary.visible = true;
+                    this._collapseButton.visible = true;
+                    this._collapsedBoundary.visible = false;
+                    this._expandButton.visible = false;
+                    this.stage.x = 0;
+                    this.stage.y = 0;
+                    this.isShrunk = false;
+                    for (let i = 0; i < this.turtleList.length; i++) {
+                        this.turtleList[i].container.scaleX = 1;
+                        this.turtleList[i].container.scaleY = 1;
+                        this.turtleList[i].container.scale = 1;
+                    }
+
+                    this._clearButton.scaleX = 1;
+                    this._clearButton.scaleY = 1;
+                    this._clearButton.scale = 1;
+                    this._clearButton.x = this.w - 5 - 2 * 55;
+
+                    if (this._gridButton !== null) {
+                        this._gridButton.scaleX = 1;
+                        this._gridButton.scaleY = 1;
+                        this._gridButton.scale = 1;
+                        this._gridButton.x = this.w - 10 - 3 * 55;
+                        this._gridButton.visible = true;
+                    }
+
+                    // remove the stage and add it back in position 0
+                    this.masterStage.removeChild(this.stage);
+                    this.masterStage.addChildAt(this.stage, 0);
+                });
+
+                __makeCollapseButton();
+            };
+
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+        };
+
+        /**
+         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
+         */
+        let __makeBoundary2 = () => {
+            let img = new Image();
+            img.onload = () => {
+                if (this._collapsedBoundary !== null) {
+                    this._collapsedBoundary.visible = false;
+                }
+
+                this._collapsedBoundary = new createjs.Bitmap(img);
+                this._collapsedBoundary.x = 0;
+                this._collapsedBoundary.y = 55 + LEADING;
+                this._borderContainer.addChild(this._collapsedBoundary);
+                this._collapsedBoundary.visible = false;
+
+                __makeExpandButton();
+            };
+
+            let dx = this.w - 20;
+            let dy = this.h - 55 - LEADING;
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", 10)
+                                .replace("X", 10)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", this.backgroundColor)
+                                .replace("STROKE", 20)
+                        )
+                    )
+                );
+        };
+
+        /**
+         * Makes boundary for graphics (mouse) container by initialising
+         * 'MBOUNDARY' SVG.
+         */
+        let __makeBoundary = () => {
+            this._locked = true;
+            let img = new Image();
+            img.onload = () => {
+                if (this._expandedBoundary !== null) {
+                    this._expandedBoundary.visible = false;
+                }
+
+                this._expandedBoundary = new createjs.Bitmap(img);
+                this._expandedBoundary.x = 0;
+                this._expandedBoundary.y = 55 + LEADING;
+                this._borderContainer.addChild(this._expandedBoundary);
+                __makeBoundary2();
+            };
+
+            let dx = this.w - 5;
+            let dy = this.h - 55 - LEADING;
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(
+                    unescape(
+                        encodeURIComponent(
+                            MBOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", 10 / SCALEFACTOR)
+                                .replace("X", 10 / SCALEFACTOR)
+                                .replace("DY", dy)
+                                .replace("DX", dx)
+                                .replace(
+                                    "stroke_color",
+                                    platformColor.ruleColor
+                                )
+                                .replace("fill_color", this.backgroundColor)
+                                .replace("STROKE", 20 / SCALEFACTOR)
+                        )
+                    )
+                );
+        };
 
         if (!this._locked) {
             __makeBoundary();
         }
 
         return this;
-    };
+    }
 
     /**
      * Toggles visibility of menu and grids.
      * Scales down all 'turtles' in turtleList.
      * Removes the stage and adds it back at the top.
      */
-    this.collapse = function() {
+    collapse() {
         this.hideMenu();
         this.hideGrids();
         this.scaleStage(0.25);
@@ -2435,7 +2479,7 @@ function Turtles() {
         this.masterStage.addChild(this.stage);
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Returns block object.
@@ -2443,10 +2487,10 @@ function Turtles() {
      * @param blocks
      * @return {Object} - blocks object
      */
-    this.setBlocks = function(blocks) {
+    setBlocks(blocks) {
         this.blocks = blocks;
         return this;
-    };
+    }
 
     /**
      * Adds drum to start block.
@@ -2454,10 +2498,10 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.addDrum = function(startBlock, infoDict) {
+    addDrum(startBlock, infoDict) {
         this._drum = true;
         this.add(startBlock, infoDict);
-    };
+    }
 
     /**
      * Adds turtle to start block.
@@ -2465,7 +2509,7 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.addTurtle = function(startBlock, infoDict) {
+    addTurtle(startBlock, infoDict) {
         this._drum = false;
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
@@ -2474,7 +2518,7 @@ function Turtles() {
             t.container.scaleY = SCALEFACTOR;
             t.container.scale = SCALEFACTOR;
         }
-    };
+    }
 
     /**
      * Add a new turtle for each start block.
@@ -2483,7 +2527,7 @@ function Turtles() {
      * @param startBlock - name of startBlock
      * @param infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
      */
-    this.add = function(startBlock, infoDict) {
+    add(startBlock, infoDict) {
         if (startBlock != null) {
             console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
@@ -2550,7 +2594,7 @@ function Turtles() {
         hitArea.y = 0;
         newTurtle.container.hitArea = hitArea;
 
-        function __processTurtleBitmap(that, name, bitmap, startBlock) {
+        let __processTurtleBitmap = (that, name, bitmap, startBlock) => {
             newTurtle.bitmap = bitmap;
             newTurtle.bitmap.regX = 27 | 0;
             newTurtle.bitmap.regY = 27 | 0;
@@ -2578,7 +2622,7 @@ function Turtles() {
             }
 
             that.refreshCanvas();
-        }
+        };
 
         let artwork = this._drum ? DRUMSVG : TURTLESVG;
 
@@ -2611,39 +2655,38 @@ function Turtles() {
             DEFAULTVALUE,
             DEFAULTCHROMA
         );
-        let that = this;
 
-        newTurtle.container.on("mousedown", function(event) {
-            if (that._rotating) {
+        newTurtle.container.on("mousedown", event => {
+            if (this._rotating) {
                 return;
             }
 
             let offset = {
-                x: newTurtle.container.x - event.stageX / that.scale,
-                y: newTurtle.container.y - event.stageY / that.scale
+                x: newTurtle.container.x - event.stageX / this.scale,
+                y: newTurtle.container.y - event.stageY / this.scale
             };
 
             newTurtle.container.removeAllEventListeners("pressmove");
-            newTurtle.container.on("pressmove", function(event) {
+            newTurtle.container.on("pressmove", event => {
                 if (newTurtle.running) {
                     return;
                 }
 
-                newTurtle.container.x = event.stageX / that.scale + offset.x;
-                newTurtle.container.y = event.stageY / that.scale + offset.y;
-                newTurtle.x = that.screenX2turtleX(newTurtle.container.x);
-                newTurtle.y = that.screenY2turtleY(newTurtle.container.y);
-                that.refreshCanvas();
+                newTurtle.container.x = event.stageX / this.scale + offset.x;
+                newTurtle.container.y = event.stageY / this.scale + offset.y;
+                newTurtle.x = this.screenX2turtleX(newTurtle.container.x);
+                newTurtle.y = this.screenY2turtleY(newTurtle.container.y);
+                this.refreshCanvas();
             });
         });
 
-        newTurtle.container.on("click", function(event) {
+        newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
-            that.stage.dispatchEvent("click" + newTurtle.name);
+            this.stage.dispatchEvent("click" + newTurtle.name);
         });
 
-        newTurtle.container.on("mouseover", function(event) {
+        newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
                 return;
             }
@@ -2651,10 +2694,10 @@ function Turtles() {
             newTurtle.container.scaleX *= 1.2;
             newTurtle.container.scaleY = newTurtle.container.scaleX;
             newTurtle.container.scale = newTurtle.container.scaleX;
-            that.refreshCanvas();
+            this.refreshCanvas();
         });
 
-        newTurtle.container.on("mouseout", function(event) {
+        newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
                 return;
             }
@@ -2662,12 +2705,12 @@ function Turtles() {
             newTurtle.container.scaleX /= 1.2;
             newTurtle.container.scaleY = newTurtle.container.scaleX;
             newTurtle.container.scale = newTurtle.container.scaleX;
-            that.refreshCanvas();
+            this.refreshCanvas();
         });
 
         document.getElementById("loader").className = "";
 
-        setTimeout(function() {
+        setTimeout(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     newTurtle.doSetHeading(infoDict["heading"]);
@@ -2696,7 +2739,7 @@ function Turtles() {
         }, 6000);
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Async creation of bitmap from SVG data.
@@ -2706,12 +2749,11 @@ function Turtles() {
      * @param callback - function executed on load of bitmap
      * @param extras
      */
-    this._makeTurtleBitmap = function(data, name, callback, extras) {
+    _makeTurtleBitmap(data, name, callback, extras) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         let img = new Image();
 
         img.onload = () => {
-            complete = true;
             let bitmap = new createjs.Bitmap(img);
             callback(this, name, bitmap, extras);
         };
@@ -2719,55 +2761,55 @@ function Turtles() {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(data)));
-    };
+    }
 
     /**
      * Convert on screen x coordinate to turtle x coordinate.
      *
      * @param x - x coordinate
      */
-    this.screenX2turtleX = function(x) {
+    screenX2turtleX(x) {
         return x - this._canvas.width / (2.0 * this.scale);
-    };
+    }
 
     /**
      * Convert on screen y coordinate to turtle y coordinate.
      *
      * @param y - y coordinate
      */
-    this.screenY2turtleY = function(y) {
+    screenY2turtleY(y) {
         return this.invertY(y);
-    };
+    }
 
     /**
      * Convert turtle x coordinate to on screen x coordinate.
      *
      * @param x - x coordinate
      */
-    this.turtleX2screenX = function(x) {
+    turtleX2screenX(x) {
         return this._canvas.width / (2.0 * this.scale) + x;
-    };
+    }
 
     /**
      * Convert turtle y coordinate to on screen y coordinate.
      *
      * @param y - y coordinate
      */
-    this.turtleY2screenY = function(y) {
+    turtleY2screenY(y) {
         return this.invertY(y);
     };
 
     /**
      * Invert y coordinate.
      */
-    this.invertY = function(y) {
+    invertY(y) {
         return this._canvas.height / (2.0 * this.scale) - y;
-    };
+    }
 
     /**
      * Toggles 'running' boolean value for all turtles.
      */
-    this.markAsStopped = function() {
+    markAsStopped() {
         for (let turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
             // Make sure the blink is really stopped
@@ -2775,21 +2817,21 @@ function Turtles() {
         }
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Returns boolean value depending on whether turtle is running.
      *
      * @return {boolean} - running
      */
-    this.running = function() {
+    running() {
         for (let turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
             }
         }
         return false;
-    };
+    }
 }
 
 /**
