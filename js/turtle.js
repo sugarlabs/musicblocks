@@ -90,7 +90,10 @@ class Turtle {
     doScrollXY(dx, dy) {
         // FIXME: how big?
 
-        let imgData = this.ctx.getImageData(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        let imgData =
+            this.ctx.getImageData(
+                0, 0, this.ctx.canvas.width, this.ctx.canvas.height
+            );
 
         if (this.turtles.canvas1 == null) {
             this.turtles.gx = this.ctx.canvas.width;
@@ -99,18 +102,26 @@ class Turtle {
             this.turtles.canvas1.width = 3 * this.ctx.canvas.width;
             this.turtles.canvas1.height = 3 * this.ctx.canvas.height;
             this.turtles.c1ctx = this.turtles.canvas1.getContext("2d");
-            this.turtles.c1ctx.rect(0, 0, 3 * this.ctx.canvas.width, 3 * this.ctx.canvas.height);
+            this.turtles.c1ctx.rect(
+                0, 0, 3 * this.ctx.canvas.width, 3 * this.ctx.canvas.height
+            );
             this.turtles.c1ctx.fillStyle = "#F9F9F9";
             this.turtles.c1ctx.fill();
         }
 
-        this.turtles.c1ctx.putImageData(imgData, this.turtles.gx, this.turtles.gy);
+        this.turtles.c1ctx.putImageData(
+            imgData, this.turtles.gx, this.turtles.gy
+        );
 
         this.turtles.gy -= dy;
         this.turtles.gx -= dx;
-        this.turtles.gx = 2 * this.ctx.canvas.width > this.turtles.gx ? this.turtles.gx : 2 * this.ctx.canvas.width;
+        this.turtles.gx =
+            2 * this.ctx.canvas.width > this.turtles.gx ?
+                this.turtles.gx : 2 * this.ctx.canvas.width;
         this.turtles.gx = 0 > this.turtles.gx ? 0 : this.turtles.gx;
-        this.turtles.gy = 2 * this.ctx.canvas.height > this.turtles.gy ? this.turtles.gy : 2 * this.ctx.canvas.height;
+        this.turtles.gy =
+            2 * this.ctx.canvas.height > this.turtles.gy ?
+                this.turtles.gy : 2 * this.ctx.canvas.height;
         this.turtles.gy = 0 > this.turtles.gy ? 0 : this.turtles.gy;
 
         let newImgData =
@@ -779,9 +790,12 @@ class Turtle {
     /**
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
      *
-     * @param resetPen - boolean value regarding whether the pen's properties (color, value etc) should be reset
-     * @param resetSkin - boolean value regarding whether the turtle's 'skin' (color, blockname etc) should be reset
-     * @param resetPosition - boolean value regarding whether the turtle's position (orientation, x, y etc) should be reset
+     * @param resetPen - boolean value regarding whether the pen's properties
+     * (color, value etc) should be reset
+     * @param resetSkin - boolean value regarding whether the turtle's 'skin'
+     * (color, blockname etc) should be reset
+     * @param resetPosition - boolean value regarding whether the turtle's
+     * position (orientation, x, y etc) should be reset
      */
     doClear(resetPen, resetSkin, resetPosition) {
         // Reset turtle
@@ -862,7 +876,8 @@ class Turtle {
         this.fillState = false;
         this.hollowState = false;
 
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        this.canvasColor =
+            getMunsellColor(this.color, this.value, this.chroma);
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
@@ -874,7 +889,9 @@ class Turtle {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.turtles.c1ctx != null) {
             this.turtles.c1ctx.beginPath();
-            this.turtles.c1ctx.clearRect(0, 0, 3 * this.canvas.width, 3 * this.canvas.height);
+            this.turtles.c1ctx.clearRect(
+                0, 0, 3 * this.canvas.width, 3 * this.canvas.height
+            );
         }
         this.penstrokes.image = this.canvas;
         this.turtles.refreshCanvas();
@@ -888,7 +905,8 @@ class Turtle {
         this.fillState = false;
         this.hollowState = false;
 
-        this.canvasColor = getMunsellColor(this.color, this.value, this.chroma);
+        this.canvasColor =
+            getMunsellColor(this.color, this.value, this.chroma);
         if (this.canvasColor[0] === "#") {
             this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
         }
@@ -1147,21 +1165,20 @@ class Turtle {
         }
 
         let image = new Image();
-        let that = this;
 
-        image.onload = function() {
+        image.onload = () => {
             let bitmap = new createjs.Bitmap(image);
-            that.imageContainer.addChild(bitmap);
-            that.media.push(bitmap);
+            this.imageContainer.addChild(bitmap);
+            this.media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
             bitmap.scaleY = bitmap.scaleX;
             bitmap.scale = bitmap.scaleX;
-            bitmap.x = that.container.x;
-            bitmap.y = that.container.y;
+            bitmap.x = this.container.x;
+            bitmap.y = this.container.y;
             bitmap.regX = image.width / 2;
             bitmap.regY = image.height / 2;
-            bitmap.rotation = that.orientation;
-            that.turtles.refreshCanvas();
+            bitmap.rotation = this.orientation;
+            this.turtles.refreshCanvas();
         };
 
         image.src = myImage;
@@ -1181,7 +1198,7 @@ class Turtle {
         image.src = myURL;
         let turtle = this;
 
-        image.onload = function() {
+        image.onload = () => {
             let bitmap = new createjs.Bitmap(image);
             turtle.imageContainer.addChild(bitmap);
             turtle.media.push(bitmap);
@@ -1210,26 +1227,25 @@ class Turtle {
 
         let image = new Image();
         image.src = myImage;
-        let that = this;
         this.shellSize = Number(size);
 
-        image.onload = function() {
-            that.container.removeChild(that.bitmap);
-            that.bitmap = new createjs.Bitmap(image);
-            that.container.addChild(that.bitmap);
-            that.bitmap.scaleX = that.shellSize / image.width;
-            that.bitmap.scaleY = that.bitmap.scaleX;
-            that.bitmap.scale = that.bitmap.scaleX;
-            that.bitmap.x = 0;
-            that.bitmap.y = 0;
-            that.bitmap.regX = image.width / 2;
-            that.bitmap.regY = image.height / 2;
-            that.bitmap.rotation = that.orientation;
-            that.skinChanged = true;
+        image.onload = () => {
+            this.container.removeChild(this.bitmap);
+            this.bitmap = new createjs.Bitmap(image);
+            this.container.addChild(this.bitmap);
+            this.bitmap.scaleX = this.shellSize / image.width;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.x = 0;
+            this.bitmap.y = 0;
+            this.bitmap.regX = image.width / 2;
+            this.bitmap.regY = image.height / 2;
+            this.bitmap.rotation = this.orientation;
+            this.skinChanged = true;
 
-            that.container.uncache();
-            let bounds = that.container.getBounds();
-            that.container.cache(
+            this.container.uncache();
+            let bounds = this.container.getBounds();
+            this.container.cache(
                 bounds.x,
                 bounds.y,
                 bounds.width,
@@ -1243,33 +1259,33 @@ class Turtle {
                 .drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
-            that.container.hitArea = hitArea;
+            this.container.hitArea = hitArea;
 
-            if (that.startBlock != null) {
-                that.startBlock.container.removeChild(that.decorationBitmap);
-                that.decorationBitmap = new createjs.Bitmap(myImage);
-                that.startBlock.container.addChild(that.decorationBitmap);
-                that.decorationBitmap.name = "decoration";
+            if (this.startBlock != null) {
+                this.startBlock.container.removeChild(this.decorationBitmap);
+                this.decorationBitmap = new createjs.Bitmap(myImage);
+                this.startBlock.container.addChild(this.decorationBitmap);
+                this.decorationBitmap.name = "decoration";
 
-                let width = that.startBlock.width;
+                let width = this.startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                that.decorationBitmap.x =
-                    width - (30 * that.startBlock.protoblock.scale) / 2;
-                that.decorationBitmap.y =
-                    (20 * that.startBlock.protoblock.scale) / 2;
-                that.decorationBitmap.scaleX =
-                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.x =
+                    width - (30 * this.startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.y =
+                    (20 * this.startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.scaleX =
+                    ((27.5 / image.width) * this.startBlock.protoblock.scale) /
                     2;
-                that.decorationBitmap.scaleY =
-                    ((27.5 / image.height) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.scaleY =
+                    ((27.5 / image.height) * this.startBlock.protoblock.scale) /
                     2;
-                that.decorationBitmap.scale =
-                    ((27.5 / image.width) * that.startBlock.protoblock.scale) /
+                this.decorationBitmap.scale =
+                    ((27.5 / image.width) * this.startBlock.protoblock.scale) /
                     2;
-                that.startBlock.updateCache();
+                this.startBlock.updateCache();
             }
 
-            that.turtles.refreshCanvas();
+            this.turtles.refreshCanvas();
         };
     }
 
@@ -1672,18 +1688,17 @@ class Turtle {
         this.skinChanged = true;
         createjs.Tween.get(this.bitmap).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
 
-        let that = this;
-        this._blinkTimeout = setTimeout(function () {
-            that.bitmap.alpha = 1.0;
-            that.bitmap.scaleX = that._sizeInUse;
-            that.bitmap.scaleY = that.bitmap.scaleX;
-            that.bitmap.scale = that.bitmap.scaleX;
-            that.bitmap.rotation = that.orientation;
-            that.skinChanged = that._isSkinChanged;
-            let bounds = that.container.getBounds();
-            that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.blinkFinished = true;
-            that.turtles.refreshCanvas();
+        this._blinkTimeout = setTimeout(() => {
+            this.bitmap.alpha = 1.0;
+            this.bitmap.scaleX = this._sizeInUse;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.rotation = this.orientation;
+            this.skinChanged = this._isSkinChanged;
+            let bounds = this.container.getBounds();
+            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            this.blinkFinished = true;
+            this.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
         */
     }
