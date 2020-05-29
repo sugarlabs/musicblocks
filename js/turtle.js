@@ -212,14 +212,12 @@ class Turtle {
     doBezier(cp1x, cp1y, cp2x, cp2y, x2, y2) {
         // FIXME: Add SVG output
 
-        let nx, ny, fx, fy;
+        let fx, fy;
         let ax, ay, bx, by, cx, cy, dx, dy;
         let dxi, dyi, dxf, dyf;
 
         if (this.penState && this.hollowState) {
             // Convert from turtle coordinates to screen coordinates
-            nx = x2;
-            ny = y2;
             fx = this.turtles.turtleX2screenX(x2);
             fy = this.turtles.turtleY2screenY(y2);
             let ix = this.turtles.turtleX2screenX(this.x);
@@ -251,7 +249,7 @@ class Turtle {
             }
 
             // The final heading is the angle between (cp2x, cp2y) and (fx, fy)
-            let degreesFinal = Math.atan2(nx - cp2x, ny - cp2y);
+            let degreesFinal = Math.atan2(x2 - cp2x, y2 - cp2y);
             degreesFinal = (180 * degreesFinal) / Math.PI;
             if (degreesFinal < 0) {
                 degreesFinal += 360;
@@ -423,8 +421,8 @@ class Turtle {
         this.container.x = fx;
         this.container.y = fy;
 
-        // The new heading is the angle between (cp2x, cp2y) and (nx, ny)
-        let degrees = Math.atan2(nx - cp2x, ny - cp2y);
+        // The new heading is the angle between (cp2x, cp2y) and (x2, y2)
+        let degrees = Math.atan2(x2 - cp2x, y2 - cp2y);
         degrees = (180 * degrees) / Math.PI;
         this.doSetHeading(degrees);
     }
@@ -642,6 +640,7 @@ class Turtle {
         anticlockwise,
         invert
     ) {
+	let nx, ny, sa, ea;
         if (invert) {
             cx = this.turtles.turtleX2screenX(cx);
             cy = this.turtles.turtleY2screenY(cy);
