@@ -181,8 +181,6 @@ function Turtle(name, turtles, drum) {
         // FIXME: Add SVG output
         if (this.penState && this.hollowState) {
             // Convert from turtle coordinates to screen coordinates.
-            var nx = x2;
-            var ny = y2;
             var ix = this.turtles.turtleX2screenX(this.x);
             var iy = this.turtles.turtleY2screenY(this.y);
             var fx = this.turtles.turtleX2screenX(x2);
@@ -217,7 +215,7 @@ function Turtle(name, turtles, drum) {
                 degreesInitial += 360;
             }
             // The final heading is the angle between (cp2x, cp2y) and (fx, fy).
-            var degreesFinal = Math.atan2(nx - cp2x, ny - cp2y);
+            var degreesFinal = Math.atan2(x2 - cp2x, y2 - cp2y);
             degreesFinal = (180 * degreesFinal) / Math.PI;
             if (degreesFinal < 0) {
                 degreesFinal += 360;
