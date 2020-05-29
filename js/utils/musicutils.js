@@ -1813,12 +1813,13 @@ function scaleDegreeToPitch(keySignature, scaleDegree) {
     // signature. Used for moveable solfege.
     var obj = _buildScale(keySignature);
     var scale = obj[0];
-
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
-    scaleDegree -= 1;
+    // scaleDegree -= 1;
+    
     // We mod to ensure we don't run out of notes.
     // FixMe: bump octave if we wrap.
+    
     scaleDegree %= scale.length - 1;
     return scale[scaleDegree];
 }
