@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2019 Walter Bender
+// Copyright (c) 2020 Anindya Kundu
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -22,7 +23,21 @@ const SCALEFACTOR = 4;
 // Turtle sprite
 const TURTLEBASEPATH = "images/";
 
+/**
+ * Class pertaining to each turtle.
+ *
+ * @class
+ * @classdesc This contains variables and methods for all actions
+ * corresponding to a single turtle. Also contains the methods for
+ * blink behavior and caching.
+ */
 class Turtle {
+    /**
+     * @constructor
+     * @param {String} name - name of Turtle
+     * @param {Object} turtles - Turtles object (common to all turtles)
+     * @param {boolean} drum - whether Turtle is a drum
+     */
     constructor(name, turtles, drum) {
         this.name = name;
         this.turtles = turtles;
@@ -1704,7 +1719,19 @@ class Turtle {
     }
 }
 
+/**
+ * Class for managing all the turtles.
+ *
+ * @class
+ * @classdesc This contains variables for maintaining the canvas
+ * including the canvas background buttons. In additions, it contains
+ * all other methods relevant to the set of all turtles, including
+ * adding them to the turtlelist, maintaining the canvas, etc.
+ */
 class Turtles {
+    /**
+     * @constructor
+     */
     constructor() {
         this.masterStage = null;
         this.doClear = null;
