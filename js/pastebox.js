@@ -48,6 +48,7 @@ function PasteBox() {
             this._container.visible = false;
             this._refreshCanvas();
             // paste.visible = false;
+	    docById("paste").value = "";
             docById("paste").style.visibility = "hidden";
         }
     };
