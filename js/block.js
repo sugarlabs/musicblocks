@@ -110,6 +110,7 @@ function Block(protoblock, blocks, overrideName) {
     // the box name associated with the block.
     this.image = protoblock.image; // The file path of the image.
     this.imageBitmap = null;
+    this.controller = null; // Note blocks get a controller
 
     // All blocks have at a container and least one bitmap.
     this.container = null;
