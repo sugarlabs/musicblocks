@@ -2806,7 +2806,7 @@ class Logo {
         delay
     ) {
         // When turtle commands (forward, right, arc) are inside of notes,
-        // they are run progressively over the course of the note duration.
+        // they are run progressively over the course of the note duration
         if (!turtle in this.embeddedGraphics) {
             console.debug(
                 "Could not find turtle " + turtle + "in embeddedGraphics."
@@ -2822,16 +2822,14 @@ class Logo {
         if (this.embeddedGraphics[turtle][blk].length === 0) return;
 
         // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics.
+        // slight delay before drawing any new graphics
         if (!this.embeddedGraphicsFinished[turtle]) {
             delay += 0.1;
         }
 
         this.embeddedGraphicsFinished[turtle] = false;
 
-        var inFillClamp = false;
-        var inHollowLineClamp = false;
-        var suppressOutput = this.suppressOutput[turtle];
+        let suppressOutput = this.suppressOutput[turtle];
 
         let __pen = (turtle, name, arg, timeout) => {
             let _penSwitch = name => {
@@ -2872,7 +2870,7 @@ class Logo {
 
         let __clear = (turtle, timeout) => {
             if (this.suppressOutput[turtle]) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doSetXY(0, 0);
                 this.turtles.turtleList[turtle].doSetHeading(0);
@@ -2889,7 +2887,7 @@ class Logo {
 
         let __right = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doRight(arg);
                 this.turtles.turtleList[turtle].penState = savedPenState;
@@ -2914,7 +2912,7 @@ class Logo {
 
         let __forward = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doForward(arg);
                 this.turtles.turtleList[turtle].penState = savedPenState;
@@ -2939,7 +2937,7 @@ class Logo {
 
         let __setxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doSetXY(arg1, arg2);
                 this.turtles.turtleList[turtle].penState = savedPenState;
@@ -2974,7 +2972,7 @@ class Logo {
 
         let __arc = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doArc(arg1, arg2);
                 this.turtles.turtleList[turtle].penState = savedPenState;
@@ -3012,7 +3010,7 @@ class Logo {
 
         let __bezier = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 this.turtles.turtleList[turtle].doBezier(
                     this.cp1x[turtle],
@@ -3037,9 +3035,10 @@ class Logo {
             }
         };
 
+        let inFillClamp = false;
         let __fill = (turtle, timeout) => {
             if (suppressOutput) {
-                var savedPenState = this.turtles.turtleList[turtle].penState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
                 this.turtles.turtleList[turtle].penState = false;
                 if (inFillClamp) {
                     this.turtles.turtleList[turtle].doEndFill();
@@ -3063,6 +3062,7 @@ class Logo {
             }
         };
 
+        let inHollowLineClamp = false;
         let __hollowline = (turtle, timeout) => {
             if (suppressOutput) {
                 if (inHollowLineClamp) {
@@ -3085,39 +3085,37 @@ class Logo {
             }
         };
 
-        var extendedGraphicsCounter = 0;
-        for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            var b = this.embeddedGraphics[turtle][blk][i];
+        let extendedGraphicsCounter = 0;
+        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
+            let b = this.embeddedGraphics[turtle][blk][i];
             switch (this.blocks.blockList[b].name) {
                 case "forward":
                 case "back":
                 case "right":
                 case "left":
                 case "arc":
-                    extendedGraphicsCounter += 1;
+                    ++extendedGraphicsCounter;
                     break;
                 default:
                     break;
             }
         }
 
-        // Cheat by 0.5% so that the mouse has time to complete its work.
-        // var stepTime = beatValue * 1000 / NOTEDIV;
-        var stepTime = ((beatValue - delay) * 995) / NOTEDIV;
-        if (stepTime < 0) {
-            stepTime = 0;
-        }
+        // Cheat by 0.5% so that the mouse has time to complete its work
+        // let stepTime = beatValue * 1000 / NOTEDIV;
+        let stepTime = ((beatValue - delay) * 995) / NOTEDIV;
+        if (stepTime < 0)   stepTime = 0;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
-        // array.
+        // array
         if (extendedGraphicsCounter > 0) {
-            var stepTime = stepTime / extendedGraphicsCounter;
+            stepTime = stepTime / extendedGraphicsCounter;
         }
 
-        var waitTime = delay * 1000;
+        let waitTime = delay * 1000;
 
-        // We want to update the turtle graphics every 50ms within a note.
+        // Update the turtle graphics every 50ms within a note
         if (stepTime > 200) {
             this.dispatchFactor[turtle] = NOTEDIV / 32;
         } else if (stepTime > 100) {
@@ -3132,9 +3130,12 @@ class Logo {
             this.dispatchFactor[turtle] = NOTEDIV;
         }
 
-        for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            var b = this.embeddedGraphics[turtle][blk][i];
-            var name = this.blocks.blockList[b].name;
+        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
+            let b = this.embeddedGraphics[turtle][blk][i];
+            let name = this.blocks.blockList[b].name;
+
+            let arg, arg1, arg2;
+
             switch (name) {
                 case "setcolor":
                 case "sethue":
@@ -3142,7 +3143,7 @@ class Logo {
                 case "settranslucency":
                 case "setgrey":
                 case "setpensize":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3156,7 +3157,9 @@ class Logo {
                         name,
                         arg
                     ]);
+
                     break;
+
                 case "penup":
                 case "pendown":
                     if (!suppressOutput) {
@@ -3167,7 +3170,9 @@ class Logo {
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         name
                     ]);
+
                     break;
+
                 case "clear":
                     __clear(turtle, waitTime);
                     this.playbackQueue[turtle].push([
@@ -3175,6 +3180,7 @@ class Logo {
                         "clear"
                     ]);
                     break;
+
                 case "fill":
                     __fill(turtle, waitTime);
                     this.playbackQueue[turtle].push([
@@ -3182,23 +3188,24 @@ class Logo {
                         "fill"
                     ]);
                     break;
+
                 case "hollowline":
                     __hollowline(turtle, waitTime);
-
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "hollowline"
                     ]);
                     break;
+
                 case "controlpoint1":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3213,16 +3220,18 @@ class Logo {
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "controlpoint2":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3237,18 +3246,22 @@ class Logo {
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "bezier":
-                    // TODO: Is there a reasonable way to break the bezier
-                    // curve up into small steps?
-                    var arg1 = this.parseArg(
+                    /**
+                     * @todo Is there a reasonable way to break the bezier
+                     * curve up into small steps?
+                     */
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3256,15 +3269,18 @@ class Logo {
                         this.receivedArg
                     );
                     __bezier(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "bezier",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "setheading":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3272,31 +3288,36 @@ class Logo {
                         this.receivedArg
                     );
                     __setheading(turtle, arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "setheading",
                         arg
                     ]);
+
                     break;
+
                 case "right":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "right",
@@ -3306,25 +3327,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "left":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, -deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "right",
@@ -3334,25 +3358,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "forward":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "forward",
@@ -3362,25 +3389,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "back":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, -deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "forward",
@@ -3390,15 +3420,16 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "setxy":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3406,22 +3437,25 @@ class Logo {
                         this.receivedArg
                     );
                     __setxy(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "setxy",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "scrollxy":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3429,22 +3463,25 @@ class Logo {
                         this.receivedArg
                     );
                     __scrollxy(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "scrollxy",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "show":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3452,15 +3489,18 @@ class Logo {
                         this.receivedArg
                     );
                     __show(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "show",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "speak":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3468,14 +3508,17 @@ class Logo {
                         this.receivedArg
                     );
                     __speak(turtle, arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "speak",
                         arg
                     ]);
+
                     break;
+
                 case "print":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3483,38 +3526,43 @@ class Logo {
                         this.receivedArg
                     );
                     __print(arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "print",
                         arg
                     ]);
+
                     break;
+
                 case "arc":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg1 / (NOTEDIV / this.dispatchFactor[turtle]);
                         __arc(turtle, deltaArg, arg2, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "arc",
@@ -3525,6 +3573,7 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 default:
                     console.debug(
                         name + " is not supported inside of Note Blocks"
@@ -3533,7 +3582,7 @@ class Logo {
             }
         }
 
-        // Mark the end time of this note's graphics operations.
+        // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
         this.embeddedGraphicsFinished[turtle] = true;
     }
@@ -3571,15 +3620,10 @@ class Logo {
      */
     _setDispatchBlock(blk, turtle, listenerName) {
         if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
-            if (
+            let c =
                 this.blocks.blockList[last(this.backward[turtle])].name ===
-                "backward"
-            ) {
-                var c = 1;
-            } else {
-                var c = 2;
-            }
-
+                    "backward" ?
+                    1 : 2;
             if (
                 this.blocks.sameGeneration(
                     this.blocks.blockList[last(this.backward[turtle])]
@@ -3587,7 +3631,7 @@ class Logo {
                     blk
                 )
             ) {
-                var nextBlock = this.blocks.blockList[blk].connections[0];
+                let nextBlock = this.blocks.blockList[blk].connections[0];
                 if (nextBlock in this.endOfClampSignals[turtle]) {
                     this.endOfClampSignals[turtle][nextBlock].push(
                         listenerName
@@ -3596,7 +3640,7 @@ class Logo {
                     this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                 }
             } else {
-                var nextBlock = last(this.blocks.blockList[blk].connections);
+                let nextBlock = last(this.blocks.blockList[blk].connections);
                 if (nextBlock != null) {
                     if (nextBlock in this.endOfClampSignals[turtle]) {
                         this.endOfClampSignals[turtle][nextBlock].push(
@@ -3610,7 +3654,7 @@ class Logo {
                 }
             }
         } else {
-            var nextBlock = last(this.blocks.blockList[blk].connections);
+            let nextBlock = last(this.blocks.blockList[blk].connections);
             if (nextBlock != null) {
                 if (nextBlock in this.endOfClampSignals[turtle]) {
                     this.endOfClampSignals[turtle][nextBlock].push(
@@ -3636,7 +3680,7 @@ class Logo {
         }
 
         this._setMasterVolume(DEFAULTVOLUME);
-        for (var synth in this.synthVolume[turtle]) {
+        for (let synth in this.synthVolume[turtle]) {
             this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
         }
 
@@ -3652,9 +3696,10 @@ class Logo {
      * @returns {void}
      */
     _processSpeak(text) {
-        var new_text = "";
-        for (var i in text) {
-            if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
+        let new_text = "";
+        for (let i in text) {
+            if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
+                new_text += text[i];
         }
 
         if (this.meSpeak !== null) {
@@ -3674,7 +3719,7 @@ class Logo {
      */
     _processShow(turtle, blk, arg0, arg1) {
         if (typeof arg1 === "string") {
-            var len = arg1.length;
+            let len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
                 doUseCamera(
                     [arg0],
@@ -3742,11 +3787,12 @@ class Logo {
      * @returns {void}
      */
     _doBreak(turtle) {
-        // Look for a parent loopBlock in queue and set its count to 1.
-        var parentLoopBlock = null;
-        var loopBlkIdx = -1;
-        var queueLength = this.turtles.turtleList[turtle].queue.length;
-        for (var i = queueLength - 1; i > -1; i--) {
+        // Look for a parent loopBlock in queue and set its count to 1
+        let parentLoopBlock = null;
+        let loopBlkIdx = -1;
+
+        let queueLength = this.turtles.turtleList[turtle].queue.length;
+        for (let i = queueLength - 1; i > -1; i--) {
             if (
                 this._loopBlock(
                     this.blocks.blockList[
@@ -3757,7 +3803,7 @@ class Logo {
                 // while or until
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue.
+                // Flush the parent from the queue
                 this.turtles.turtleList[turtle].queue.pop();
                 break;
             } else if (
@@ -3770,29 +3816,30 @@ class Logo {
                 // repeat or forever
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue.
+                // Flush the parent from the queue
                 this.turtles.turtleList[turtle].queue.pop();
                 break;
             }
         }
+
         if (parentLoopBlock == null) {
-            // In this case, we flush the child flow.
+            // Flush the child flow
             this.turtles.turtleList[turtle].queue.pop();
             return;
         }
 
         // For while and until, we need to add any childflow from the
-        // parent to the queue.
+        // parent to the queue
         if (
             parentLoopBlock.name === "while" ||
             parentLoopBlock.name === "until"
         ) {
-            var childFlow = last(parentLoopBlock.connections);
+            let childFlow = last(parentLoopBlock.connections);
             if (childFlow != null) {
-                var queueBlock = new Queue(childFlow, 1, loopBlkIdx);
+                let queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the
                 // child flow so we can unlightlight the parent block
-                // after the child flow completes.
+                // after the child flow completes
                 this.parentFlowQueue[turtle].push(loopBlkIdx);
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
             }
@@ -3811,7 +3858,7 @@ class Logo {
      * @returns {mixed}
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
-        // Retrieve the value of a block.
+        // Retrieve the value of a block
         if (blk == null) {
             logo.errorMsg(NOINPUTERRORMSG, parentBlk);
             // logo.stopTurtle = true;
@@ -3828,10 +3875,11 @@ class Logo {
             }
         }
 
-        if (typeof logo.blocks.blockList[blk].protoblock.arg === "function")
+        if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
             return (logo.blocks.blockList[blk].value = logo.blocks.blockList[
                 blk
             ].protoblock.arg(logo, turtle, blk, receivedArg));
+        }
 
         if (logo.blocks.blockList[blk].name === "intervalname") {
             if (typeof logo.blocks.blockList[blk].value === "string") {
@@ -3861,12 +3909,12 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
-                        var cblk = logo.blocks.blockList[blk].connections[1];
+                        let cblk = logo.blocks.blockList[blk].connections[1];
                         if (cblk === null) {
                             logo.errorMsg(NOINPUTERRORMSG, blk);
                             logo.blocks.blockList[blk].value = 0;
                         } else {
-                            var a = logo.parseArg(
+                            let a = logo.parseArg(
                                 logo,
                                 turtle,
                                 cblk,
@@ -3890,6 +3938,7 @@ class Logo {
                         }
                     }
                     break;
+
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
@@ -3903,8 +3952,9 @@ class Logo {
                             logo.turtles.turtleList[turtle].color;
                     }
                     break;
+
+                /** @deprecated */
                 case "returnValue":
-                    // deprecated
                     if (logo.returns[turtle].length > 0) {
                         logo.blocks.blockList[blk].value = logo.returns[
                             turtle
@@ -3914,6 +3964,7 @@ class Logo {
                         logo.blocks.blockList[blk].value = 0;
                     }
                     break;
+
                 default:
                     if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
                         eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
@@ -3941,39 +3992,37 @@ class Logo {
      * @returns {number}
      */
     _noteCounter(turtle, cblk) {
-        if (cblk == null) {
-            return 0;
-        } else {
-            var saveSuppressStatus = this.suppressOutput[turtle];
+        if (cblk != null) {
+            let saveSuppressStatus = this.suppressOutput[turtle];
 
             // We need to save the state of the boxes and heap
             // although there is a potential of a boxes collision with
-            // other turtles.
-            var saveBoxes = JSON.stringify(this.boxes);
-            var saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
-            // And the turtle state
-            var saveX = this.turtles.turtleList[turtle].x;
-            var saveY = this.turtles.turtleList[turtle].y;
-            var saveColor = this.turtles.turtleList[turtle].color;
-            var saveValue = this.turtles.turtleList[turtle].value;
-            var saveChroma = this.turtles.turtleList[turtle].chroma;
-            var saveStroke = this.turtles.turtleList[turtle].stroke;
-            var saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
-            var saveOrientation = this.turtles.turtleList[turtle].orientation;
-            var savePenState = this.turtles.turtleList[turtle].penState;
+            // other turtles
+            let saveBoxes = JSON.stringify(this.boxes);
+            let saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
+            // .. and the turtle state
+            let saveX = this.turtles.turtleList[turtle].x;
+            let saveY = this.turtles.turtleList[turtle].y;
+            let saveColor = this.turtles.turtleList[turtle].color;
+            let saveValue = this.turtles.turtleList[turtle].value;
+            let saveChroma = this.turtles.turtleList[turtle].chroma;
+            let saveStroke = this.turtles.turtleList[turtle].stroke;
+            let saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
+            let saveOrientation = this.turtles.turtleList[turtle].orientation;
+            let savePenState = this.turtles.turtleList[turtle].penState;
 
-            var saveWhichNoteToCount = this.whichNoteToCount[turtle];
+            let saveWhichNoteToCount = this.whichNoteToCount[turtle];
 
-            var savePrevTurtleTime = this.previousTurtleTime[turtle];
-            var saveTurtleTime = this.turtleTime[turtle];
+            let savePrevTurtleTime = this.previousTurtleTime[turtle];
+            let saveTurtleTime = this.turtleTime[turtle];
 
             this.suppressOutput[turtle] = true;
             this.justCounting[turtle].push(true);
 
-            for (var b in this.endOfClampSignals[turtle]) {
+            for (let b in this.endOfClampSignals[turtle]) {
                 this.butNotThese[turtle][b] = [];
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < this.endOfClampSignals[turtle][b].length;
                     i++
                 ) {
@@ -3981,8 +4030,8 @@ class Logo {
                 }
             }
 
-            var actionArgs = [];
-            var saveNoteCount = this.notesPlayed[turtle];
+            let actionArgs = [];
+            let saveNoteCount = this.notesPlayed[turtle];
             this.turtles.turtleList[turtle].running = true;
 
             if (this.inNoteBlock[turtle]) {
@@ -4000,7 +4049,7 @@ class Logo {
                 this.turtles.turtleList[turtle].queue.length
             );
 
-            var returnValue = rationalSum(this.notesPlayed[turtle], [
+            let returnValue = rationalSum(this.notesPlayed[turtle], [
                 -saveNoteCount[0],
                 saveNoteCount[1]
             ]);
@@ -4031,9 +4080,11 @@ class Logo {
             this.suppressOutput[turtle] = saveSuppressStatus;
 
             this.butNotThese[turtle] = {};
+
+            return returnValue[0] / returnValue[1];
         }
 
-        return returnValue[0] / returnValue[1];
+        return 0;
     }
 
     /**
@@ -4064,11 +4115,7 @@ class Logo {
         }
 
         // Check to see if min is > max
-        if (a > b) {
-            var c = a;
-            a = b;
-            b = c;
-        }
+        if (a > b) [a, b] = [b, a];
 
         return Math.floor(
             Math.random() * (Number(b) - Number(a) + 1) + Number(a)
@@ -4316,9 +4363,9 @@ class Logo {
      * @returns {number}
      */
     _calculateInvert(turtle, note, octave) {
-        var delta = 0;
-        var len = this.invertList[turtle].length;
-        var note1 = getNote(
+        let delta = 0;
+        let len = this.invertList[turtle].length;
+        let note1 = getNote(
             note,
             octave,
             0,
@@ -4327,12 +4374,12 @@ class Logo {
             null,
             this.errorMsg
         );
-        var num1 =
+        let num1 =
             pitchToNumber(note1[0], note1[1], this.keySignature[turtle]) -
             this.pitchNumberOffset[turtle];
 
-        for (var i = len - 1; i > -1; i--) {
-            var note2 = getNote(
+        for (let i = len - 1; i > -1; i--) {
+            let note2 = getNote(
                 this.invertList[turtle][i][0],
                 this.invertList[turtle][i][1],
                 0,
@@ -4341,9 +4388,10 @@ class Logo {
                 null,
                 this.errorMsg
             );
-            var num2 =
+            let num2 =
                 pitchToNumber(note2[0], note2[1], this.keySignature[turtle]) -
                 this.pitchNumberOffset[turtle];
+
             if (this.invertList[turtle][i][2] === "even") {
                 delta += num2 - num1;
                 num1 += 2 * delta;
@@ -4351,20 +4399,21 @@ class Logo {
                 delta += num2 - num1 + 0.5;
                 num1 += 2 * delta;
             } else {
-                // We need to calculate the scalar difference.
-                var scalarSteps = this._scalarDistance(turtle, num2, num1);
-                var note3 = this._addScalarTransposition(
+                // We need to calculate the scalar difference
+                let scalarSteps = this._scalarDistance(turtle, num2, num1);
+                let note3 = this._addScalarTransposition(
                     turtle,
                     note2[0],
                     note2[1],
                     -scalarSteps
                 );
-                var num3 =
+                let num3 =
                     pitchToNumber(
                         note3[0],
                         note3[1],
                         this.keySignature[turtle]
                     ) - this.pitchNumberOffset[turtle];
+
                 delta += (num3 - num1) / 2;
                 num1 = num3;
             }
@@ -4384,8 +4433,10 @@ class Logo {
      * @returns {object}
      */
     _addScalarTransposition(turtle, note, octave, n) {
+        let noteObj = null;
+
         if (n > 0) {
-            var noteObj = getNote(
+            noteObj = getNote(
                 note,
                 octave,
                 0,
@@ -4395,8 +4446,9 @@ class Logo {
                 this.errorMsg,
                 this.synth.inTemperament
             );
+
             if (this.synth.inTemperament == "custom") {
-                var value = getStepSizeUp(
+                let value = getStepSizeUp(
                     this.keySignature[turtle],
                     noteObj[0],
                     n,
@@ -4413,8 +4465,8 @@ class Logo {
                     this.synth.inTemperament
                 );
             } else {
-                for (var i = 0; i < n; i++) {
-                    var value = getStepSizeUp(
+                for (let i = 0; i < n; i++) {
+                    let value = getStepSizeUp(
                         this.keySignature[turtle],
                         noteObj[0]
                     );
@@ -4431,7 +4483,7 @@ class Logo {
                 }
             }
         } else if (n < 0) {
-            var noteObj = getNote(
+            noteObj = getNote(
                 note,
                 octave,
                 0,
@@ -4441,9 +4493,9 @@ class Logo {
                 this.errorMsg,
                 this.synth.inTemperament
             );
-            var note1 = noteObj[0];
+
             if (this.synth.inTemperament == "custom") {
-                var value = getStepSizeDown(
+                let value = getStepSizeDown(
                     this.keySignature[turtle],
                     noteObj[0],
                     n,
@@ -4460,8 +4512,8 @@ class Logo {
                     this.synth.inTemperament
                 );
             } else {
-                for (var i = 0; i < -n; i++) {
-                    var value = getStepSizeDown(
+                for (let i = 0; i < -n; i++) {
+                    let value = getStepSizeDown(
                         this.keySignature[turtle],
                         noteObj[0]
                     );
@@ -4478,7 +4530,7 @@ class Logo {
                 }
             }
         } else {
-            var noteObj = [note, octave];
+            noteObj = [note, octave];
         }
 
         return noteObj;
@@ -4496,19 +4548,20 @@ class Logo {
     _scalarDistance(turtle, firstNote, lastNote) {
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
-        // to lastNote pitch.
+        // to lastNote pitch
 
         if (lastNote === firstNote) {
             return 0;
         } else if (lastNote > firstNote) {
-            var noteObj = numberToPitch(
+            let noteObj = numberToPitch(
                 firstNote + this.pitchNumberOffset[turtle]
             );
-            var i = 0;
-            var n = firstNote + this.pitchNumberOffset[turtle];
+            let n = firstNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
             while (i < 100) {
                 n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                i += 1;
+                ++i;
                 if (n >= lastNote + this.pitchNumberOffset[turtle]) {
                     break;
                 }
@@ -4518,14 +4571,15 @@ class Logo {
 
             return i;
         } else {
-            var noteObj = numberToPitch(
+            let noteObj = numberToPitch(
                 lastNote + this.pitchNumberOffset[turtle]
             );
-            var i = 0;
-            var n = lastNote + this.pitchNumberOffset[turtle];
+            let n = lastNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
             while (i < 100) {
                 n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                i += 1;
+                ++i;
                 if (n >= firstNote + this.pitchNumberOffset[turtle]) {
                     break;
                 }
@@ -4546,11 +4600,8 @@ class Logo {
     _prepSynths() {
         this.synth.newTone();
 
-        for (
-            var turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        let turtle = 0;
+        for ( ; turtle < this.turtles.turtleList.length; turtle++) {
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};
                 instrumentsFilters[turtle] = {};
@@ -4563,7 +4614,7 @@ class Logo {
             }
 
             // Copy any preloaded synths from the default turtle
-            for (var instrumentName in instruments[0]) {
+            for (let instrumentName in instruments[0]) {
                 if (!(instrumentName in instruments[turtle])) {
                     this.synth.loadSynth(turtle, instrumentName);
 
@@ -4573,7 +4624,7 @@ class Logo {
                             instrumentsFilters[0][instrumentName];
                     }
 
-                    // and any effects
+                    // .. and any effects
                     if (instrumentName in instrumentsEffects[0]) {
                         instrumentsEffects[turtle][instrumentName] =
                             instrumentsEffects[0][instrumentName];
@@ -4592,11 +4643,11 @@ class Logo {
         if (!this.suppressOutput[turtle]) {
             this._setMasterVolume(DEFAULTVOLUME);
             for (
-                var turtle = 0;
+                let turtle = 0;
                 turtle < this.turtles.turtleList.length;
                 turtle++
             ) {
-                for (var synth in this.synthVolume[turtle]) {
+                for (let synth in this.synthVolume[turtle]) {
                     this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
                 }
             }
@@ -4648,41 +4699,41 @@ class Logo {
         if (this.optimize) return;
 
         // Note: At this point, the note of duration "duration" has
-        // already been added to notesPlayed.
+        // already been added to notesPlayed
 
-        // Don't split the note if we are already splitting the note.
+        // Don't split the note if we are already splitting the note
         if (split == undefined) split = true;
 
-        // Check to see if this note straddles a measure boundary.
-        var durationTime = 1 / duration;
-        var beatsIntoMeasure =
+        // Check to see if this note straddles a measure boundary
+        let durationTime = 1 / duration;
+        let beatsIntoMeasure =
             ((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
                 this.pickup[turtle] -
                 durationTime) *
                 this.noteValuePerBeat[turtle]) %
             this.beatsPerMeasure[turtle];
-        var timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
-        var timeLeftInMeasure =
+        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+        let timeLeftInMeasure =
             this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
             timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
-            var d = durationTime - timeLeftInMeasure;
-            var d2 = timeLeftInMeasure;
-            var b =
+            let d = durationTime - timeLeftInMeasure;
+            let d2 = timeLeftInMeasure;
+            let b =
                 this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.debug("splitting note across measure boundary.");
-            var obj = rationalToFraction(d);
+            let obj = rationalToFraction(d);
 
             if (d2 > 0) {
-                // Check to see if the note straddles multiple measures.
-                var i = 0;
+                // Check to see if the note straddles multiple measures
+                let i = 0;
                 while (d2 > b) {
-                    i += 1;
+                    ++i;
                     d2 -= b;
                 }
 
-                var obj2 = rationalToFraction(d2);
+                let obj2 = rationalToFraction(d2);
                 this.updateNotation(
                     note,
                     obj2[1] / obj2[0],
@@ -4697,10 +4748,10 @@ class Logo {
                         this.notationInsertTie(turtle);
                         this.notationDrumStaging[turtle].push("tie");
                     }
-                    var obj2 = rationalToFraction(1 / b);
+                    obj2 = rationalToFraction(1 / b);
                 }
 
-                // Add any measures we straddled.
+                // Add any measures we straddled
                 while (i > 0) {
                     i -= 1;
                     this.updateNotation(
@@ -4735,10 +4786,10 @@ class Logo {
             return;
         }
 
-        // Otherwise proceed as normal.
-        var obj = durationToNoteValue(duration);
+        // .. otherwise proceed as normal
+        let obj = durationToNoteValue(duration);
 
-        // Deprecated
+        /** @deprecated */
         if (this.turtles.turtleList[turtle].drum) {
             note = "c2";
         }
@@ -4753,8 +4804,8 @@ class Logo {
             this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0
         ]);
 
-        // If no drum is specified, add a rest to the drum
-        // line. Otherwise, add the drum.
+        // If no drum is specified, add a rest to the drum line.
+        // Otherwise, add the drum.
         if (drum.length === 0) {
             this.notationDrumStaging[turtle].push([
                 ["R"],
@@ -4766,7 +4817,7 @@ class Logo {
                 false
             ]);
         } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
-            var drumSymbol = getDrumSymbol(drum[0]);
+            let drumSymbol = getDrumSymbol(drum[0]);
             this.notationDrumStaging[turtle].push([
                 [drumSymbol],
                 obj[0],
@@ -4781,8 +4832,8 @@ class Logo {
         this.pickupPoint[turtle] = null;
 
         if (this.markup[turtle].length > 0) {
-            var markup = "";
-            for (var i = 0; i < this.markup[turtle].length; i++) {
+            let markup = "";
+            for (let i = 0; i < this.markup[turtle].length; i++) {
                 markup += this.markup[turtle][i];
                 if (i < this.markup[turtle].length - 1) {
                     markup += " ";
@@ -4794,10 +4845,10 @@ class Logo {
         }
 
         if (typeof note === "object") {
-            // If it is hertz, add a markup.
+            // If it is hertz, add a markup
             markup = "";
             try {
-                for (var i = 0; i < note.length; i++) {
+                for (let i = 0; i < note.length; i++) {
                     if (typeof note[i] === "number") {
                         if ((markup = "")) {
                             markup = toFixed2(note[i]);
@@ -4805,6 +4856,7 @@ class Logo {
                         }
                     }
                 }
+
                 if (markup.length > 0) {
                     this.notationMarkup(turtle, markup, false);
                 }
@@ -4889,15 +4941,16 @@ class Logo {
     notationMeter(turtle, count, value) {
         if (this.pickupPoint[turtle] != null) {
             // Lilypond prefers meter to be before partials.
-            var d =
+            let d =
                 this.notationStaging[turtle].length - this.pickupPoint[turtle];
-            var pickup = [];
-            for (var i in d) {
+            let pickup = [];
+
+            for (let i in d) {
                 pickup.push(this.notationStaging[turtle].pop());
             }
 
             this.notationStaging[turtle].push("meter", count, value);
-            for (var i in d) {
+            for (let i in d) {
                 this.notationStaging[turtle].push(pickup.pop());
             }
         } else {
@@ -4928,11 +4981,11 @@ class Logo {
      * @returns {void}
      */
     notationTempo(turtle, bpm, beatValue) {
-        var beat = convertFactor(beatValue);
+        let beat = convertFactor(beatValue);
         if (beat !== null) {
             this.notationStaging[turtle].push("tempo", bpm, beat);
         } else {
-            var obj = rationalToFraction(beatValue);
+            let obj = rationalToFraction(beatValue);
             // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
     }
@@ -4951,11 +5004,11 @@ class Logo {
             return;
         }
 
-        var pickupPoint = this.notationStaging[turtle].length;
+        let pickupPoint = this.notationStaging[turtle].length;
 
         // Lilypond partial must be a combination of powers of two.
-        var partial = 1 / factor;
-        var beat = convertFactor(factor);
+        let partial = 1 / factor;
+        let beat = convertFactor(factor);
         if (beat !== null) {
             this.notationStaging[turtle].push("pickup", beat);
             this.pickupPOW2[turtle] = true;
@@ -4971,7 +5024,7 @@ class Logo {
             }
 
             obj = rationalToFraction(1 - factor);
-            for (var i = 0; i < obj[0]; i++) {
+            for (let i = 0; i < obj[0]; i++) {
                 this.updateNotation(["R"], obj[1], turtle, false, "");
             }
         }
