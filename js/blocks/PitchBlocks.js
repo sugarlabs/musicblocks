@@ -188,9 +188,22 @@ function _playPitch(args, logo, turtle, blk) {
             } else {
                 attr = NATURAL;
             }
-            scaledegree = arg0.replace(attr, "");
-            console.log(scaledegree);
-            console.log(attr);
+            scaledegree = Number(arg0.replace(attr, ""));
+            note = scaleDegreeToPitch2(logo.keySignature[turtle], scaledegree);
+            logo.currentNote = note;
+
+            octave =
+                Math.floor(
+                    calcOctave(
+                        logo.currentOctave[turtle],
+                        arg1,
+                        logo.lastNotePlayed[turtle],
+                        logo.currentNote
+                    )
+                );
+            cents = 0;
+            console.log(note);
+            console.log(octave);
         }
         else if (
             typeof arg0 === "number" &&
@@ -380,6 +393,7 @@ function _playPitch(args, logo, turtle, blk) {
         octave,
         logo.scalarTransposition[turtle]
     );
+    console.log(noteObj);
     note = noteObj[0];
     logo.currentNote = note;
     octave = noteObj[1];

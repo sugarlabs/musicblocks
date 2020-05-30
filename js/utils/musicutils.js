@@ -1805,6 +1805,23 @@ function _buildScale(keySignature) {
     return [scale, halfSteps];
 }
 
+function scaleDegreeToPitch2(keySignature, scaleDegree) {
+    let obj1 = keySignatureToMode(keySignature);
+    let obj2 = _buildScale(keySignature);
+    let scale = obj2[0];
+    console.log(scale);
+    console.log(MUSICALMODES[obj1[1]].length);
+
+    if(MUSICALMODES[obj1[1]].length == 7) {
+        scaleDegree -= 1;
+        return scale[scaleDegree];
+    } else if (MUSICALMODES[obj1[1]].length < 7) {
+
+        console.log("err");
+
+    }
+}
+
 function scaleDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
     // signature. Used for moveable solfege.
