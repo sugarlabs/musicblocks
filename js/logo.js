@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2020 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
+// Copyright (c) 2020 Anindya Kundu
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,13 +13,13 @@
 
 const DEFAULTVOLUME = 50;
 const PREVIEWVOLUME = 80;
-const TONEBPM = 240; // Seems to be the default.
-const TARGETBPM = 90; // What we'd like to use for beats per minute
-const DEFAULTDELAY = 500; // milleseconds
-const TURTLESTEP = -1; // Run in step-by-step mode
-const NOTEDIV = 8; // Number of steps to divide turtle graphics
-const OSCVOLUMEADJUSTMENT = 1.5; // The oscillator runs hot. We
-// must scale back its volume.
+const TONEBPM = 240;        // seems to be the default
+const TARGETBPM = 90;       // what we'd like to use for beats per minute
+const DEFAULTDELAY = 500;   // milliseconds
+const TURTLESTEP = -1;      // run in step-by-step mode
+const NOTEDIV = 8;          // number of steps to divide turtle graphics
+// The oscillator runs hot. We must scale back its volume.
+const OSCVOLUMEADJUSTMENT = 1.5;
 
 const NOMICERRORMSG = "The microphone is not available.";
 const NANERRORMSG = "Not a number.";
@@ -37,356 +38,368 @@ const NOTATIONDURATION = 1;
 const NOTATIONDOTCOUNT = 2;
 const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
-const NOTATIONINSIDECHORD = 5; // deprecated
+const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
 
-function Logo() {
-    this.canvas = null;
-    this.blocks = null;
-    this.turtles = null;
-    this.stage = null;
-    this.refreshCanvas = null;
-    this.textMsg = null;
-    this.errorMsg = null;
-    this.hideMsgs = null;
-    this.onStopTurtle = null;
-    this.onRunTurtle = null;
-    this.getStageX = null;
-    this.getStageY = null;
-    this.getStageMouseDown = null;
-    this.getCurrentKeyCode = null;
-    this.clearCurrentKeyCode = null;
-    this.meSpeak = null;
-    this.saveLocally = null;
-    this.showBlocksAfterRun = false;
+/**
+ * Class dealing with executing the programs.
+ *
+ * @class
+ * @classdesc This contains all the variables and the methods which
+ * control the execution of the programs. Contains a method to dispatch
+ * turtle commands which call methods of Turtle and Turles. Also contains
+ * notation code.
+ */
+class Logo {
+    /**
+     * @constructor
+     */
+    constructor() {
+        this.canvas = null;
+        this.blocks = null;
+        this.turtles = null;
+        this.stage = null;
+        this.refreshCanvas = null;
+        this.textMsg = null;
+        this.errorMsg = null;
+        this.hideMsgs = null;
+        this.onStopTurtle = null;
+        this.onRunTurtle = null;
+        this.getStageX = null;
+        this.getStageY = null;
+        this.getStageMouseDown = null;
+        this.getCurrentKeyCode = null;
+        this.clearCurrentKeyCode = null;
+        this.meSpeak = null;
+        this.saveLocally = null;
+        this.showBlocksAfterRun = false;
 
-    this.pitchTimeMatrix = null;
-    this.pitchDrumMatrix = null;
-    this.rhythmRuler = null;
-    this.timbre = null;
-    this.pitchStaircase = null;
-    this.temperament = null;
-    this.tempo = null;
-    this.pitchSlider = null;
-    this.musicKeyboard = null;
-    this.modeWidget = null;
-    this.meterWidget = null;
-    this.statusMatrix = null;
-    this.playbackWidget = null;
+        this.pitchTimeMatrix = null;
+        this.pitchDrumMatrix = null;
+        this.rhythmRuler = null;
+        this.timbre = null;
+        this.pitchStaircase = null;
+        this.temperament = null;
+        this.tempo = null;
+        this.pitchSlider = null;
+        this.musicKeyboard = null;
+        this.modeWidget = null;
+        this.meterWidget = null;
+        this.statusMatrix = null;
+        this.playbackWidget = null;
 
-    this.attack = {};
-    this.decay = {};
-    this.sustain = {};
-    this.release = {};
+        this.attack = {};
+        this.decay = {};
+        this.sustain = {};
+        this.release = {};
 
-    this.evalFlowDict = {};
-    this.evalArgDict = {};
-    this.evalParameterDict = {};
-    this.evalSetterDict = {};
-    this.evalOnStartList = {};
-    this.evalOnStopList = {};
-    this.eventList = {};
-    this.receivedArg = null;
+        this.evalFlowDict = {};
+        this.evalArgDict = {};
+        this.evalParameterDict = {};
+        this.evalSetterDict = {};
+        this.evalOnStartList = {};
+        this.evalOnStopList = {};
+        this.eventList = {};
+        this.receivedArg = null;
 
-    this.parentFlowQueue = {};
-    this.unhighlightQueue = {};
-    this.parameterQueue = {};
+        this.parentFlowQueue = {};
+        this.unhighlightQueue = {};
+        this.parameterQueue = {};
 
-    this.inputValues = {};
-    this.boxes = {};
-    this.actions = {};
-    this.returns = {};
-    this.turtleHeaps = {};
-    this.invertList = {};
-    this.beatList = {};
-    this.factorList = {};
-    this.defaultStrongBeats = {}
+        this.inputValues = {};
+        this.boxes = {};
+        this.actions = {};
+        this.returns = {};
+        this.turtleHeaps = {};
+        this.invertList = {};
+        this.beatList = {};
+        this.factorList = {};
+        this.defaultStrongBeats = {}
 
-    // We store each case arg and flow by switch block no. and turtle.
-    this.switchCases = {};
-    this.switchBlocks = {};
+        // We store each case arg and flow by switch block no. and turtle
+        this.switchCases = {};
+        this.switchBlocks = {};
 
-    // When we leave a clamp block, we need to dispatch a signal.
-    this.endOfClampSignals = {};
-    // Don't dispatch these signals (when exiting note counter or
-    // interval measure.
-    this.butNotThese = {};
+        // When we leave a clamp block, we need to dispatch a signal
+        this.endOfClampSignals = {};
+        // Don't dispatch these signals (when exiting note counter or
+        // interval measure
+        this.butNotThese = {};
 
-    this.lastNoteTimeout = null;
-    this.alreadyRunning = false;
-    this.prematureRestart = false;
-    this.runningBlock = null;
-    this.ignoringBlock = null;
+        this.lastNoteTimeout = null;
+        this.alreadyRunning = false;
+        this.prematureRestart = false;
+        this.runningBlock = null;
+        this.ignoringBlock = null;
 
-    // These are used to halt runtime during input.
-    this.delayTimeout = {};
-    this.delayParameters = {};
+        // Used to halt runtime during input
+        this.delayTimeout = {};
+        this.delayParameters = {};
 
-    this.time = 0;
-    this.firstNoteTime = null;
-    this.waitTimes = {};
-    this.turtleDelay = 0;
-    this.sounds = [];
-    this.cameraID = null;
-    this.stopTurtle = false;
-    this.lastKeyCode = null;
-    this.saveTimeout = 0;
+        this.time = 0;
+        this.firstNoteTime = null;
+        this.waitTimes = {};
+        this.turtleDelay = 0;
+        this.sounds = [];
+        this.cameraID = null;
+        this.stopTurtle = false;
+        this.lastKeyCode = null;
+        this.saveTimeout = 0;
 
-    // Music-related attributes
-    this.notesPlayed = {};
-    this.whichNoteToCount = {};
+        // Music-related attributes
+        this.notesPlayed = {};
+        this.whichNoteToCount = {};
 
-    // Moveable solfege?
-    this.moveable = {};
+        // Moveable solfege?
+        this.moveable = {};
 
-    // When you run Music Blocks, you are "compiling" your code. The
-    // compiled code is stored in the playbackQueue, which can be used
-    // to playback the performance without the overhead of
-    // interpreting the code.
-    this.playbackQueue = {};
-    this.playbackTime = 0;
+        // When you run Music Blocks, you are "compiling" your code. The
+        // compiled code is stored in the playbackQueue, which can be used
+        // to playback the performance without the overhead of
+        // interpreting the code
+        this.playbackQueue = {};
+        this.playbackTime = 0;
 
-    // Optimize for runtime speed
-    if (beginnerMode) {
-        this.optimize = true;
-    } else {
-        this.optimize = false;
+        // Optimize for runtime speed
+        this.optimize = beginnerMode;   // beginnerMode is a boolean value
+
+        // Widget-related attributes
+        this.showPitchDrumMatrix = false;
+        this.inPitchDrumMatrix = false;
+        this.inRhythmRuler = false;
+        this.rhythmRulerMeasure = null;
+        this.inPitchStaircase = false;
+        this.inTempo = false;
+        this.inPitchSlider = false;
+        this.inMusicKeyboard = false;
+        this._currentDrumlock = null;
+        this.inTimbre = false;
+        this.insideModeWidget = false;
+        this.insideMeterWidget = false;
+        this.insideTemperament = false;
+        this.inSetTimbre = {};
+
+        // pitch-rhythm matrix
+        this.inMatrix = false;
+        this.keySignature = {};
+        this.tupletRhythms = [];
+        this.addingNotesToTuplet = false;
+        this.drumBlocks = [];
+        this.pitchBlocks = [];
+        this.inNoteBlock = [];
+        this.multipleVoices = [];
+
+        // Parameters used by pitch
+        this.scalarTransposition = {};
+        this.scalarTranspositionValues = {};
+        this.transposition = {};
+        this.transpositionValues = {};
+
+        // Parameters used by notes
+        this._masterBPM = TARGETBPM;
+        this.defaultBPMFactor = TONEBPM / this._masterBPM;
+
+        this.register = {};
+        this.beatFactor = {};
+        this.dotCount = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.oscList = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.lastNotePlayed = {};
+        this.lastPitchPlayed = {};          // for a stand-alone pitch block
+        this.previousNotePlayed = {};
+        this.noteStatus = {};
+        this.noteDirection = {};
+        this.pitchNumberOffset = [];        // 39, C4
+        this.currentOctave = {};
+        this.currentCalculatedOctave = {};  // for a stand-alone pitch block
+        this.currentNote = {};
+        this.inHarmonic = {};
+        this.partials = {};
+        this.inNeighbor = [];
+        this.neighborStepPitch = {};
+        this.neighborNoteValue = {};
+        this.inDefineMode = {};
+        this.defineMode = {};
+
+        // Parameters used in time signature
+        this.pickup = {};
+        this.beatsPerMeasure = {};
+        this.noteValuePerBeat = {};
+        this.currentBeat = {};
+        this.currentMeasure = {};
+
+        // Parameters used by the note block
+        this.bpm = {};
+        this.previousTurtleTime = [];
+        this.turtleTime = [];
+        this.noteDelay = 0;
+        this.playedNote = {};
+        this.playedNoteTimes = {};
+        this.pushedNote = {};
+        this.connectionStore = {};
+        this.connectionStoreLock = false;
+        this.duplicateFactor = {};
+        this.inDuplicate = {};
+        this.skipFactor = {};
+        this.skipIndex = {};
+        this.instrumentNames = {};
+        this.inCrescendo = {};
+        this.crescendoDelta = {};
+        this.crescendoInitialVolume = {};
+        this.intervals = {};            // relative interval (based on scale degree)
+        this.semitoneIntervals = {};    // absolute interval (based on semitones)
+        this.markup = {};
+        this.staccato = {};
+        this.glide = {};
+        this.glideOverride = {};
+        this.swing = {};
+        this.swingTarget = {};
+        this.swingCarryOver = {};
+        this.tie = {};
+        this.tieNotePitches = {};
+        this.tieNoteExtras = {};
+        this.tieCarryOver = {};
+        this.tieFirstDrums = {};
+        this.masterVolume = [];
+        this.synthVolume = {};
+        this.validNote = true;
+        this.drift = {};
+        this.drumStyle = {};
+        this.voices = {};
+        this.backward = {};
+
+        // Effects parameters
+        this.vibratoIntensity = {};
+        this.vibratoRate = {};
+        this.distortionAmount = {};
+        this.tremoloFrequency = {};
+        this.tremoloDepth = {};
+        this.rate = {};
+        this.octaves = {};
+        this.baseFrequency = {};
+        this.chorusRate = {};
+        this.delayTime = {};
+        this.chorusDepth = {};
+        this.neighborArgNote1 = {};
+        this.neighborArgNote2 = {};
+        this.neighborArgBeat = {};
+        this.neighborArgCurrentBeat = {};
+
+        // When counting notes, measuring intervals, or generating lilypond output
+        this.justCounting = {};
+        this.justMeasuring = {};
+        this.firstPitch = {};
+        this.lastPitch = {};
+        this.suppressOutput = {};
+
+        // Scale factor for turtle graphics embedded in notes
+        this.dispatchFactor = {};
+
+        // tuplet
+        this.tuplet = false;
+        this.tupletParams = [];
+
+        // pitch to drum mapping
+        this.pitchDrumTable = {};
+
+        // parameters used by notations
+        this.notationStaging = {};
+        this.notationDrumStaging = {};
+        this.notationOutput = "";
+        this.notationNotes = {};
+        this.pickupPOW2 = {};
+        this.pickupPoint = {};
+        this.runningLilypond = false;
+        this.runningAbc = false;
+        this.runningMxml = false;
+        this.checkingCompletionState = false;
+        this.compiling = false;
+        this.recording = false;
+        this.lastNote = {};
+        this.restartPlayback = true;
+
+        // Variables for progress bar
+        this.progressBar = docById("myBar");
+        this.progressBarWidth = 0;
+        this.progressBarDivision;
+
+        this.temperamentSelected = [];
+        this.customTemperamentDefined = false;
+
+        // A place to save turtle state in order to store it after a compile
+        this._saveX = {};
+        this._saveY = {};
+        this._saveColor = {};
+        this._saveValue = {};
+        this._saveChroma = {};
+        this._saveStroke = {};
+        this._saveCanvasAlpha = {};
+        this._saveOrientation = {};
+        this._savePenState = {};
+
+        // Things we tweak to optimize performance
+        // this.blinkState = !this.optimize;
+        this.blinkState = true;
+        // if (this.optimize) {
+        //     createjs.Ticker.framerate = 10;
+        // } else {
+        //     createjs.Ticker.framerate = 30;
+        // }
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            // Load the default synthesizer
+            this.synth = new Synth();
+            this.synth.changeInTemperament = false;
+        } else {
+            this.turtleOscs = {};
+        }
+
+        // Mode widget
+        this._modeBlock = null;
+
+        // Meter widget
+        this._meterBlock = null;
+
+        // Status matrix
+        this.inStatusMatrix = false;
+        this.updatingStatusMatrix = false;
+        this.statusFields = [];
+
+        // When running in step-by-step mode, the next command to run is
+        // queued here
+        this.stepQueue = {};
+        this.unhighlightStepQueue = {};
+
+        // Control points for bezier curves
+        this.cp1x = {};
+        this.cp1y = {};
+        this.cp2x = {};
+        this.cp2y = {};
+
+        this.svgOutput = "";
+        this.svgBackground = true;
+
+        this.mic = null;
+        this.volumeAnalyser = null;
+        this.pitchAnalyser = null;
     }
-
-    // Widget-related attributes
-    this.showPitchDrumMatrix = false;
-    this.inPitchDrumMatrix = false;
-    this.inRhythmRuler = false;
-    this.rhythmRulerMeasure = null;
-    this.inPitchStaircase = false;
-    this.inTempo = false;
-    this.inPitchSlider = false;
-    this.inMusicKeyboard = false;
-    this._currentDrumlock = null;
-    this.inTimbre = false;
-    this.insideModeWidget = false;
-    this.insideMeterWidget = false;
-    this.insideTemperament = false;
-    this.inSetTimbre = {};
-
-    // pitch-rhythm matrix
-    this.inMatrix = false;
-    this.keySignature = {};
-    this.tupletRhythms = [];
-    this.addingNotesToTuplet = false;
-    this.drumBlocks = [];
-    this.pitchBlocks = [];
-    this.inNoteBlock = [];
-    this.multipleVoices = [];
-
-    // parameters used by pitch
-    this.scalarTransposition = {};
-    this.scalarTranspositionValues = {};
-    this.transposition = {};
-    this.transpositionValues = {};
-
-    // parameters used by notes
-    this._masterBPM = TARGETBPM;
-    this.defaultBPMFactor = TONEBPM / this._masterBPM;
-
-    this.register = {};
-    this.beatFactor = {};
-    this.dotCount = {};
-    this.noteBeat = {};
-    this.noteValue = {};
-    this.oscList = {};
-    this.noteDrums = {};
-    this.notePitches = {};
-    this.noteOctaves = {};
-    this.noteCents = {};
-    this.noteHertz = {};
-    this.noteBeatValues = {};
-    this.embeddedGraphics = {};
-    this.lastNotePlayed = {};
-    this.lastPitchPlayed = {}; //For a stand-alone pitch block.
-    this.previousNotePlayed = {};
-    this.noteStatus = {};
-    this.noteDirection = {};
-    this.pitchNumberOffset = []; // 39, C4
-    this.currentOctave = {};
-    this.currentCalculatedOctave = {}; //For a stand-alone pitch block.
-    this.currentNote = {};
-    this.inHarmonic = {};
-    this.partials = {};
-    this.inNeighbor = [];
-    this.neighborStepPitch = {};
-    this.neighborNoteValue = {};
-    this.inDefineMode = {};
-    this.defineMode = {};
-
-    // parameters used in time signature
-    this.pickup = {};
-    this.beatsPerMeasure = {};
-    this.noteValuePerBeat = {};
-    this.currentBeat = {};
-    this.currentMeasure = {};
-
-    // parameters used by the note block
-    this.bpm = {};
-    this.previousTurtleTime = [];
-    this.turtleTime = [];
-    this.noteDelay = 0;
-    this.playedNote = {};
-    this.playedNoteTimes = {};
-    this.pushedNote = {};
-    this.connectionStore = {};
-    this.connectionStoreLock = false;
-    this.duplicateFactor = {};
-    this.inDuplicate = {};
-    this.skipFactor = {};
-    this.skipIndex = {};
-    this.instrumentNames = {};
-    this.inCrescendo = {};
-    this.crescendoDelta = {};
-    this.crescendoInitialVolume = {};
-    this.intervals = {}; // relative interval (based on scale degree)
-    this.semitoneIntervals = {}; // absolute interval (based on semitones)
-    this.markup = {};
-    this.staccato = {};
-    this.glide = {};
-    this.glideOverride = {};
-    this.swing = {};
-    this.swingTarget = {};
-    this.swingCarryOver = {};
-    this.tie = {};
-    this.tieNotePitches = {};
-    this.tieNoteExtras = {};
-    this.tieCarryOver = {};
-    this.tieFirstDrums = {};
-    this.masterVolume = [];
-    this.synthVolume = {};
-    this.validNote = true;
-    this.drift = {};
-    this.drumStyle = {};
-    this.voices = {};
-    this.backward = {};
-
-    // Effects parameters
-    this.vibratoIntensity = {};
-    this.vibratoRate = {};
-    this.distortionAmount = {};
-    this.tremoloFrequency = {};
-    this.tremoloDepth = {};
-    this.rate = {};
-    this.octaves = {};
-    this.baseFrequency = {};
-    this.chorusRate = {};
-    this.delayTime = {};
-    this.chorusDepth = {};
-    this.neighborArgNote1 = {};
-    this.neighborArgNote2 = {};
-    this.neighborArgBeat = {};
-    this.neighborArgCurrentBeat = {};
-
-    // When counting notes, measuring intervals, or generating lilypond output
-    this.justCounting = {};
-    this.justMeasuring = {};
-    this.firstPitch = {};
-    this.lastPitch = {};
-    this.suppressOutput = {};
-
-    // scale factor for turtle graphics embedded in notes
-    this.dispatchFactor = {};
-
-    // tuplet
-    this.tuplet = false;
-    this.tupletParams = [];
-
-    // pitch to drum mapping
-    this.pitchDrumTable = {};
-
-    // parameters used by notations
-    this.notationStaging = {};
-    this.notationDrumStaging = {};
-    this.notationOutput = "";
-    this.notationNotes = {};
-    this.pickupPOW2 = {};
-    this.pickupPoint = {};
-    this.runningLilypond = false;
-    this.runningAbc = false;
-    this.runningMxml = false;
-    this.checkingCompletionState = false;
-    this.compiling = false;
-    this.recording = false;
-    this.lastNote = {};
-    this.restartPlayback = true;
-
-    //variables for progress bar
-    this.progressBar = docById("myBar");
-    this.progressBarWidth = 0;
-    this.progressBarDivision;
-
-    this.temperamentSelected = [];
-    this.customTemperamentDefined = false;
-
-    // A place to save turtle state in order to store it after a compile
-    this._saveX = {};
-    this._saveY = {};
-    this._saveColor = {};
-    this._saveValue = {};
-    this._saveChroma = {};
-    this._saveStroke = {};
-    this._saveCanvasAlpha = {};
-    this._saveOrientation = {};
-    this._savePenState = {};
-
-    // Things we tweak to optimize performance
-    // this.blinkState = !this.optimize;
-    this.blinkState = true;
-    if (this.optimize) {
-        // createjs.Ticker.framerate = 10;
-    } else {
-        // createjs.Ticker.framerate = 30;
-    }
-
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        // Load the default synthesizer
-        this.synth = new Synth();
-        this.synth.changeInTemperament = false;
-    } else {
-        this.turtleOscs = {};
-    }
-
-    // Mode widget
-    this._modeBlock = null;
-
-    // Meter widget
-    this._meterBlock = null;
-    // Status matrix
-    this.inStatusMatrix = false;
-    this.updatingStatusMatrix = false;
-    this.statusFields = [];
-
-    // When running in step-by-step mode, the next command to run is
-    // queued here.
-    this.stepQueue = {};
-    this.unhighlightStepQueue = {};
-
-    // Control points for bezier curves
-    this.cp1x = {};
-    this.cp1y = {};
-    this.cp2x = {};
-    this.cp2y = {};
-
-    this.svgOutput = "";
-    this.svgBackground = true;
-
-    this.mic = null;
-    this.volumeAnalyser = null;
-    this.pitchAnalyser = null;
 
     /**
      * Switches optimize mode on if state, off otherwise.
+     *
      * @privileged
-     * @param   {boolean}   state  An object representing a state.
+     * @param {boolean} state - An object representing a state
      * @returns {void}
      */
-    this.setOptimize = function(state) {
+    setOptimize(state) {
         if (state) {
             // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
             // createjs.Ticker.framerate = 10;
@@ -399,234 +412,255 @@ function Logo() {
 
         // this.blinkState = !state;
         this.blinkState = true;
-    };
+    }
 
     /**
      * Sets the setPlaybackStatus property.
+     *
      * @privileged
-     * @param   {Function}  setPlaybackStatus
+     * @param {Function} setPlaybackStatus
      * @returns {this}
      */
-    this.setSetPlaybackStatus = function(setPlaybackStatus) {
+    setSetPlaybackStatus(setPlaybackStatus) {
         this.setPlaybackStatus = setPlaybackStatus;
         return this;
-    };
+    }
 
     /**
      * Sets the canvas property.
+     *
      * @privileged
-     * @param   canvas
+     * @param canvas
      * @returns {this}
      */
-    this.setCanvas = function(canvas) {
+    setCanvas(canvas) {
         this.canvas = canvas;
         return this;
-    };
+    }
 
     /**
      * Sets all the blocks.
+     *
      * @privileged
-     * @param   blocks
+     * @param blocks
      * @returns {this}
      */
-    this.setBlocks = function(blocks) {
+    setBlocks(blocks) {
         this.blocks = blocks;
         return this;
-    };
+    }
 
     /**
      * Sets all the turtles.
+     *
      * @privileged
-     * @param   turtles
+     * @param turtles
      * @returns {this}
      */
-    this.setTurtles = function(turtles) {
+    setTurtles(turtles) {
         this.turtles = turtles;
         return this;
-    };
+    }
 
     /**
      * Sets the stage.
+     *
      * @privileged
-     * @param   stage
+     * @param stage
      * @returns {this}
      */
-    this.setStage = function(stage) {
+    setStage(stage) {
         this.stage = stage;
         return this;
-    };
+    }
 
     /**
      * Sets the refreshCanvas property.
+     *
      * @privileged
-     * @param   {Function}  refreshCanvas
+     * @param {Function} refreshCanvas
      * @returns {this}
      */
-    this.setRefreshCanvas = function(refreshCanvas) {
+    setRefreshCanvas(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
-    };
+    }
 
     /**
      * Sets the textMsg property.
+     *
      * @privileged
-     * @param   {Function}  textMsg A function to produce a text message using exactly one string.
+     * @param {Function} textMsg - function to produce a text message using exactly one string
      * @returns {this}
      */
-    this.setTextMsg = function(textMsg) {
+    setTextMsg(textMsg) {
         this.textMsg = textMsg;
         return this;
-    };
+    }
 
     /**
      * Sets the hideMsgs property.
+     *
      * @privileged
-     * @param   {Function}  hideMsgs
+     * @param {Function} hideMsgs
      * @returns {this}
      */
-    this.setHideMsgs = function(hideMsgs) {
+    setHideMsgs(hideMsgs) {
         this.hideMsgs = hideMsgs;
         return this;
     };
 
     /**
      * Sets the errorMsg property.
+     *
      * @privileged
-     * @param   {Function}  errorMsg    A function to produce an error message using at least a string.
+     * @param {Function} errorMsg - function to produce an error message using at least a string
      * @returns {this}
      */
-    this.setErrorMsg = function(errorMsg) {
+    setErrorMsg(errorMsg) {
         this.errorMsg = errorMsg;
         return this;
-    };
+    }
 
     /**
      * Sets the onStopTurtle property.
+     *
      * @privileged
-     * @param   {Function}  onStopTurtle
+     * @param {Function} onStopTurtle
      * @returns {this}
      */
-    this.setOnStopTurtle = function(onStopTurtle) {
+    setOnStopTurtle(onStopTurtle) {
         this.onStopTurtle = onStopTurtle;
         return this;
-    };
+    }
 
     /**
      * Sets the onRunTurtle property.
+     *
      * @privileged
-     * @param   {Function}  onRunTurtle
+     * @param {Function} onRunTurtle
      * @returns {this}
      */
-    this.setOnRunTurtle = function(onRunTurtle) {
+    setOnRunTurtle(onRunTurtle) {
         this.onRunTurtle = onRunTurtle;
         return this;
-    };
+    }
 
     /**
      * Sets the getStageX property.
+     *
      * @privileged
-     * @param   {Function}  getStageX
+     * @param {Function} getStageX
      * @returns {this}
      */
-    this.setGetStageX = function(getStageX) {
+    setGetStageX(getStageX) {
         this.getStageX = getStageX;
         return this;
-    };
+    }
 
     /**
      * Sets the getStageY property.
+     *
      * @privileged
-     * @param   {Function}  getStageY
+     * @param {Function} getStageY
      * @returns {this}
      */
-    this.setGetStageY = function(getStageY) {
+    setGetStageY(getStageY) {
         this.getStageY = getStageY;
         return this;
     };
 
     /**
      * Sets the getStageMouseDown property.
+     *
      * @privileged
-     * @param   {Function}  getStageMouseDown
+     * @param {Function} getStageMouseDown
      * @returns {this}
      */
-    this.setGetStageMouseDown = function(getStageMouseDown) {
+    setGetStageMouseDown(getStageMouseDown) {
         this.getStageMouseDown = getStageMouseDown;
         return this;
-    };
+    }
 
     /**
      * Sets the getCurrentKeyCode property.
+     *
      * @privileged
-     * @param   {Function}  getCurrentKeyCode
+     * @param {Function} getCurrentKeyCode
      * @returns {this}
      */
-    this.setGetCurrentKeyCode = function(getCurrentKeyCode) {
+    setGetCurrentKeyCode(getCurrentKeyCode) {
         this.getCurrentKeyCode = getCurrentKeyCode;
         return this;
-    };
+    }
 
     /**
      * Sets the clearCurrentKeyCode property.
+     *
      * @privileged
-     * @param   {Function}  clearCurrentKeyCode
+     * @param {Function} clearCurrentKeyCode
      * @returns {this}
      */
-    this.setClearCurrentKeyCode = function(clearCurrentKeyCode) {
+    setClearCurrentKeyCode(clearCurrentKeyCode) {
         this.clearCurrentKeyCode = clearCurrentKeyCode;
         return this;
-    };
+    }
 
     /**
      * Sets the meSpeak property.
+     *
      * @privileged
-     * @param   meSpeak    An object with a speak method that takes a string.
+     * @param meSpeak - an object with a speak method that takes a string
      * @returns {this}
      */
-    this.setMeSpeak = function(meSpeak) {
+    setMeSpeak(meSpeak) {
         this.meSpeak = meSpeak;
         return this;
-    };
+    }
 
     /**
      * Sets the saveLocally property.
+     *
      * @privileged
-     * @param   {Function}  saveLocally
+     * @param {Function} saveLocally
      * @returns {this}
      */
-    this.setSaveLocally = function(saveLocally) {
+    setSaveLocally(saveLocally) {
         this.saveLocally = saveLocally;
         return this;
-    };
+    }
 
     /**
      * Sets the pause between each block as the program executes.
+     *
      * @privileged
-     * @param   {number}    turtleDelay
+     * @param {number} turtleDelay
      * @returns {void}
      */
-    this.setTurtleDelay = function(turtleDelay) {
+    setTurtleDelay(turtleDelay) {
         this.turtleDelay = turtleDelay;
         this.noteDelay = 0;
-    };
+    }
 
     /**
      * Sets the pause between each note as the program executes.
+     *
      * @privileged
-     * @param   {number}    noteDelay
+     * @param {number} noteDelay
      * @returns {void}
      */
-    this.setNoteDelay = function(noteDelay) {
+    setNoteDelay(noteDelay) {
         this.noteDelay = noteDelay;
         this.turtleDelay = 0;
-    };
+    }
 
     /**
      * Takes one step for each turtle in excuting Logo commands.
+     *
      * @privileged
      * @returns {void}
      */
-    this.step = function() {
+    step() {
         for (var turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (
@@ -646,14 +680,16 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
-     * Steps through one note for each turtle in excuting Logo commands, but runs through other blocks at full speed.
+     * Steps through one note for each turtle in excuting Logo commands,
+     * but runs through other blocks at full speed.
+     *
      * @privileged
      * @returns {void}
      */
-    this.stepNote = function() {
+    stepNote() {
         var tempStepQueue = {};
         var notesFinish = {};
         var thisNote = {};
@@ -759,28 +795,31 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
      * Returns whether to record.
+     *
      * @privileged
      * @returns {boolean}
      */
-    this.recordingStatus = function() {
+    recordingStatus() {
         return (
             this.recording ||
             this.runningLilypond ||
             this.runningAbc ||
             this.runningMxml
         );
-    };
+    }
 
     /**
-     * The stop button was pressed. Stops the turtle and cleans up a few odds and ends.
+     * The stop button was pressed.
+     * Stops the turtle and cleans up a few odds and ends.
+     *
      * @privileged
      * @returns {void}
      */
-    this.doStopTurtle = function() {
+    doStopTurtle() {
         this.stopTurtle = true;
         this.turtles.markAsStopped();
         this.playbackTime = 0;
@@ -825,14 +864,15 @@ function Logo() {
         }
 
         this.showBlocksAfterRun = false;
-    };
+    }
 
     /**
      * Restores any broken connections made in duplicate notes clamps.
+     *
      * @privileged
      * @returns {void}
      */
-    this._restoreConnections = function() {
+    _restoreConnections() {
         for (var turtle in this.connectionStore) {
             for (var blk in this.connectionStore[turtle]) {
                 var n = this.connectionStore[turtle][blk].length;
@@ -845,14 +885,15 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
      * Clears all the blocks, updates the cache and refreshes the canvas.
+     *
      * @privileged
      * @returns {void}
      */
-    this._clearParameterBlocks = function() {
+    _clearParameterBlocks() {
         for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
             if (
                 this.blocks.blockList[blk].protoblock.parameter &&
@@ -863,17 +904,18 @@ function Logo() {
             }
         }
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Updates the label on parameter blocks.
+     *
      * @privileged
-     * @param   {this}  that
-     * @param   turtle
-     * @param   blk
+     * @param {this} that
+     * @param turtle
+     * @param blk
      * @returns {void}
      */
-    this._updateParameterBlock = function(that, turtle, blk) {
+    _updateParameterBlock(that, turtle, blk) {
         var logo = that; // For plugin backward compatibility
         var name = this.blocks.blockList[blk].name;
 
@@ -915,14 +957,15 @@ function Logo() {
             this.blocks.blockList[blk].container.updateCache();
             this.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Initialises the microphone.
+     *
      * @privileged
      * @returns {void}
      */
-    this.initMediaDevices = function() {
+    initMediaDevices() {
         var that = this;
         console.debug("INIT MICROPHONE");
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -950,15 +993,16 @@ function Logo() {
                 this.mic = null;
             }
         }
-    };
+    }
 
     /**
      * Initialises a turtle.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.initTurtle = function(turtle) {
+    initTurtle(turtle) {
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
         this.waitTimes[turtle] = 0;
@@ -1111,16 +1155,17 @@ function Logo() {
                 turtle
             ].penState;
         }
-    };
+    }
 
     /**
      * Runs Logo commands.
+     *
      * @privileged
-     * @param   startHere   The index of a block to start from.
-     * @param   env
+     * @param startHere - index of a block to start from
+     * @param env
      * @returns {void}
      */
-    this.runLogoCommands = function(startHere, env) {
+    runLogoCommands(startHere, env) {
         this.prematureRestart = this.alreadyRunning;
         if (this.alreadyRunning && this.runningBlock !== null) {
             this.ignoringBlock = this.runningBlock;
@@ -1276,7 +1321,7 @@ function Logo() {
                 // Does the action stack have a name?
                 var c = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[1];
-		            // Is there a block in the action clamp?
+                // Is there a block in the action clamp?
                 var b = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[2];
                 if (c != null && b != null) {
@@ -1436,9 +1481,9 @@ function Logo() {
         } else {
             console.debug(
                 "Empty start block: " +
-                    turtle +
-                    " " +
-                    this.suppressOutput[turtle]
+                turtle +
+                " " +
+                this.suppressOutput[turtle]
             );
             if (
                 this.suppressOutput[turtle] ||
@@ -1453,19 +1498,20 @@ function Logo() {
         }
 
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Runs from a single block.
+     *
      * @privileged
-     * @param   {this}  that
-     * @param   turtle
-     * @param   blk
-     * @param   isflow
-     * @param   receivedArg
+     * @param {this} that
+     * @param turtle
+     * @param blk
+     * @param isflow
+     * @param receivedArg
      * @returns {void}
      */
-    this._runFromBlock = function(that, turtle, blk, isflow, receivedArg) {
+    _runFromBlock(that, turtle, blk, isflow, receivedArg) {
         this.runningBlock = blk;
         if (blk == null) return;
 
@@ -1485,8 +1531,8 @@ function Logo() {
                 that.stepQueue[turtle].push(blk);
             } else {
                 that.delayParameters[turtle] =
-                    {'blk': blk, 'flow': isflow, 'arg': receivedArg};
-                that.delayTimeout[turtle] = setTimeout(function() {
+                    { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
+                that.delayTimeout[turtle] = setTimeout(function () {
                     that._runFromBlockNow(
                         that,
                         turtle,
@@ -1497,19 +1543,29 @@ function Logo() {
                 }, delay);
             }
         }
-    };
+    }
 
-    // We may need to clear the timeout, e.g., after a successful input.
-    this.clearRunBlock = function(turtle) {
+    /**
+     * We may need to clear the timeout, e.g., after a successful input.
+     *
+     * @param turtle
+     * @returns {void}
+     */
+    clearRunBlock(turtle) {
         if (this.delayTimeout[turtle] !== null) {
             clearTimeout(this.delayTimeout[turtle]);
             this.delayTimeout[turtle] = null;
             this.requeueRunBlock(turtle);
         }
-    };
+    }
 
-    // If we clear the delay timeout, we need to requeue the runBlock.
-    this.requeueRunBlock = function(turtle) {
+    /**
+     * If we clear the delay timeout, we need to requeue the runBlock.
+     * 
+     * @param turtle
+     * @returns {void}
+     */
+    requeueRunBlock(turtle) {
         this._runFromBlockNow(
             this,
             turtle,
@@ -1517,17 +1573,18 @@ function Logo() {
             this.delayParameters[turtle]['flow'],
             this.delayParameters[turtle]['arg']
         );
-    };
+    }
 
     /**
      * Changes a property according to a block name and a value.
+     *
      * @privileged
-     * @param   blk
-     * @param   value
-     * @param   turtle
+     * @param blk
+     * @param value
+     * @param turtle
      * @returns {void}
      */
-    this._blockSetter = function(blk, value, turtle) {
+    _blockSetter(blk, value, turtle) {
         if (
             typeof this.blocks.blockList[blk].protoblock.setter === "function"
         ) {
@@ -1544,20 +1601,21 @@ function Logo() {
                 this.errorMsg(_("Block does not support incrementing."), blk);
             }
         }
-    };
+    }
 
     /**
      * Runs a stack of blocks, beginning with blk.
+     *
      * @privileged
-     * @param   {this}  that
-     * @param   turtle
-     * @param   blk
-     * @param   isflow
-     * @param   receivedArg
-     * @param   {number}    queueStart  Optional.
+     * @param {this} that
+     * @param turtle
+     * @param blk
+     * @param isflow
+     * @param receivedArg
+     * @param {number} [queueStart]
      * @returns {void}
      */
-    this._runFromBlockNow = function(
+    _runFromBlockNow(
         that,
         turtle,
         blk,
@@ -1907,6 +1965,7 @@ function Logo() {
 
         let nextBlock = null;
         let parentBlk = null;
+        let passArg = null;
 
         // Run the last flow in the queue.
         if (that.turtles.turtleList[turtle].queue.length > queueStart) {
@@ -1975,8 +2034,8 @@ function Logo() {
                             if (!turtle in that.unhighlightQueue) {
                                 console.debug(
                                     "turtle " +
-                                        turtle +
-                                        " not found in unhighlightQueue"
+                                    turtle +
+                                    " not found in unhighlightQueue"
                                 );
                                 return;
                             }
@@ -2055,7 +2114,7 @@ function Logo() {
             // Because flow can come from calc blocks, we are not
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
-            __checkCompletionState = function() {
+            let __checkCompletionState = () => {
                 if (
                     !that.turtles.running() &&
                     queueStart === 0 &&
@@ -2108,9 +2167,9 @@ function Logo() {
                     // Give the last note time to play.
                     console.debug(
                         "SETTING LAST NOTE TIMEOUT: " +
-                            that.recording +
-                            " " +
-                            that.suppressOutput[turtle]
+                        that.recording +
+                        " " +
+                        that.suppressOutput[turtle]
                     );
                     that.lastNoteTimeout = setTimeout(function() {
                         console.debug("LAST NOTE PLAYED");
@@ -2213,15 +2272,16 @@ function Logo() {
                 console.debug("fin");
             }
         }
-    };
+    }
 
     /**
      * Sets the master volume to a value of at least 0 and at most 100.
+     *
      * @privileged
-     * @param   {number}    volume
+     * @param {number} volume
      * @returns {void}
      */
-    this._setMasterVolume = function(volume) {
+    _setMasterVolume(volume) {
         if (volume > 100) {
             volume = 100;
         } else if (volume < 0) {
@@ -2240,17 +2300,19 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
-     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
+     * Sets the synth volume to a value of at least 0 and,
+     * unless the synth is noise3, at most 100.
+     *
      * @privileged
-     * @param   turtle
-     * @param   synth
-     * @param   {number}    volume
+     * @param turtle
+     * @param synth
+     * @param {number} volume
      * @returns {void}
      */
-    this.setSynthVolume = function(turtle, synth, volume) {
+    setSynthVolume(turtle, synth, volume) {
         if (volume > 100) {
             volume = 100;
         } else if (volume < 0) {
@@ -2270,16 +2332,17 @@ function Logo() {
                     break;
             }
         }
-    };
+    }
 
     /**
      * Pushes obj to playback queue, if possible.
+     *
      * @privileged
-     * @param   turtle
-     * @param   obj
+     * @param turtle
+     * @param obj
      * @returns {void}
      */
-    this._playbackPush = function(turtle, obj) {
+    _playbackPush(turtle, obj) {
         // We only push for saveWAV, etc.
         if (!this.recordingStatus()) return;
 
@@ -2287,16 +2350,17 @@ function Logo() {
         if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
         }
-    };
+    }
 
     /**
      * Plays back some amount of activity.
+     *
      * @privileged
-     * @param   {number}    whichMouse
-     * @param   {boolean}   recording   Optional.
+     * @param {number} whichMouse
+     * @param {boolean} [recording]
      * @returns {void}
      */
-    this.playback = function(whichMouse, recording) {
+    playback(whichMouse, recording) {
         var that = this;
 
         if (this.restartPlayback) {
@@ -2336,7 +2400,7 @@ function Logo() {
                         playbackList.push([i, this.playbackQueue[t][i]]);
                     }
 
-                    var sortedList = playbackList.sort(function(a, b) {
+                    var sortedList = playbackList.sort(function (a, b) {
                         if (a[1][0] === b[1][0]) {
                             // Preserve original order if the events
                             // have the same time stamp.
@@ -2374,7 +2438,7 @@ function Logo() {
         var turtleCount = 0;
         var inLoop = 0;
 
-        __playbackLoop = function(turtle, idx) {
+        let __playbackLoop = function(turtle, idx) {
             inLoop++;
             that.playbackTime = that.playbackQueue[turtle][idx][0];
 
@@ -2618,14 +2682,14 @@ function Logo() {
             }
         };
 
-        __playback = function(turtle) {
+        let __playback = function(turtle) {
             turtleCount++;
             setTimeout(function() {
                 __playbackLoop(turtle, 0);
             }, that.playbackQueue[turtle][0][0] * 1000);
         };
 
-        __resumePlayback = function(turtle) {
+        let __resumePlayback = function(turtle) {
             turtleCount++;
             for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
                 if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
@@ -2678,18 +2742,20 @@ function Logo() {
             this.turtles.turtleList[whichMouse].running = true;
             __playback(whichMouse);
         }
-    };
+    }
 
     /**
      * Dispatches turtle signals to update turtle graphics.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    beatValue
-     * @param   blk
-     * @param   {number}    delay
+     * @async
+     * @param turtle
+     * @param {number} beatValue
+     * @param blk
+     * @param {number} delay
      * @returns {void}
      */
-    this._dispatchTurtleSignals = async function(
+    async _dispatchTurtleSignals(
         turtle,
         beatValue,
         blk,
@@ -3425,17 +3491,18 @@ function Logo() {
         // Mark the end time of this note's graphics operations.
         await delayExecution(beatValue * 1000);
         this.embeddedGraphicsFinished[turtle] = true;
-    };
+    }
 
     /**
      * Sets a named listener after removing any existing listener in the same place.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {string}    listenerName
-     * @param   {Function}  listener
+     * @param turtle
+     * @param {string} listenerName
+     * @param {Function} listener
      * @returns {void}
      */
-    this._setListener = function(turtle, listenerName, listener) {
+    _setListener(turtle, listenerName, listener) {
         if (listenerName in this.turtles.turtleList[turtle].listeners) {
             this.stage.removeEventListener(
                 listenerName,
@@ -3446,17 +3513,18 @@ function Logo() {
 
         this.turtles.turtleList[turtle].listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
-    };
+    }
 
     /**
      * Sets a single dispatch block.
+     *
      * @privileged
-     * @param   blk
-     * @param   turtle
-     * @param   {string}    listenerName
+     * @param blk
+     * @param turtle
+     * @param {string} listenerName
      * @returns {void}
      */
-    this._setDispatchBlock = function(blk, turtle, listenerName) {
+    _setDispatchBlock(blk, turtle, listenerName) {
         if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
             if (
                 this.blocks.blockList[last(this.backward[turtle])].name ===
@@ -3508,15 +3576,16 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
      * Initialises and starts a default synth.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.resetSynth = function(turtle) {
+    resetSynth(turtle) {
         if (!("electronic synth" in instruments[turtle])) {
             this.synth.createDefaultSynth(turtle);
         }
@@ -3527,15 +3596,17 @@ function Logo() {
         }
 
         this.synth.start();
-    };
+    }
 
     /**
-     * Speaks all characters in the range of comma, full stop, space, A to Z, a to z in the input text.
+     * Speaks all characters in the range of comma,
+     * full stop, space, A to Z, a to z in the input text.
+     *
      * @privileged
-     * @param   {string}    text
+     * @param {string} text
      * @returns {void}
      */
-    this._processSpeak = function(text) {
+    _processSpeak(text) {
         var new_text = "";
         for (var i in text) {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
@@ -3544,18 +3615,19 @@ function Logo() {
         if (this.meSpeak !== null) {
             this.meSpeak.speak(new_text);
         }
-    };
+    }
 
     /**
      * Shows information: with camera, in image form, at URL, as text.
+     *
      * @privileged
-     * @param   turtle
-     * @param   blk
-     * @param   arg0
-     * @param   arg1
+     * @param turtle
+     * @param blk
+     * @param arg0
+     * @param arg1
      * @returns {void}
      */
-    this._processShow = function(turtle, blk, arg0, arg1) {
+    _processShow(turtle, blk, arg0, arg1) {
         if (typeof arg1 === "string") {
             var len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
@@ -3603,24 +3675,28 @@ function Logo() {
         } else {
             this.turtles.turtleList[turtle].doShowText(arg0, arg1);
         }
-    };
+    }
 
     /**
-     * If the input name is forever, repeat, while or until, returns true (false otherwise).
+     * If the input name is forever, repeat, while or until,
+     * returns true (false otherwise).
+     *
      * @privileged
-     * @param   {string}    name
+     * @param {string} name
      * @returns {boolean}
-     */ this._loopBlock = function(name) {
+     */
+    _loopBlock(name) {
         return ["forever", "repeat", "while", "until"].indexOf(name) !== -1;
-    };
+    }
 
     /**
      * Breaks a loop.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this._doBreak = function(turtle) {
+    _doBreak(turtle) {
         // Look for a parent loopBlock in queue and set its count to 1.
         var parentLoopBlock = null;
         var loopBlkIdx = -1;
@@ -3676,19 +3752,20 @@ function Logo() {
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
             }
         }
-    };
+    }
 
     /**
      * Parses receivedArg.
+     *
      * @privileged
-     * @param   that
-     * @param   turtle
-     * @param   blk
-     * @param   parentBlk
-     * @param   receivedArg
+     * @param that
+     * @param turtle
+     * @param blk
+     * @param parentBlk
+     * @param receivedArg
      * @returns {mixed}
      */
-    this.parseArg = function(that, turtle, blk, parentBlk, receivedArg) {
+    parseArg(that, turtle, blk, parentBlk, receivedArg) {
         var logo = that; // For plugin backward compatibility
 
         // Retrieve the value of a block.
@@ -3800,7 +3877,7 @@ function Logo() {
                     } else {
                         console.error(
                             "I do not know how to " +
-                                that.blocks.blockList[blk].name
+                            that.blocks.blockList[blk].name
                         );
                     }
                     break;
@@ -3810,16 +3887,17 @@ function Logo() {
         } else {
             return blk;
         }
-    };
+    }
 
     /**
      * Counts notes, with saving of the box, heap and turtle states.
+     *
      * @privileged
-     * @param   turtle
-     * @param   cblk
+     * @param turtle
+     * @param cblk
      * @returns {number}
      */
-    this._noteCounter = function(turtle, cblk) {
+    _noteCounter(turtle, cblk) {
         if (cblk == null) {
             return 0;
         } else {
@@ -3913,34 +3991,36 @@ function Logo() {
         }
 
         return returnValue[0] / returnValue[1];
-    };
+    }
 
     /**
      * Makes the turtle wait.
+     *
      * @privileged
-     * @param   turtle
-     * @param   secs
+     * @param turtle
+     * @param secs
      * @returns {void}
      */
-    this._doWait = function(turtle, secs) {
+    _doWait(turtle, secs) {
         this.waitTimes[turtle] = Number(secs) * 1000;
-    };
+    }
 
     /**
      * Returns a random integer in a range.
+     *
      * @privileged
-     * @param   a   Preferably the mininimum.
-     * @param   b   Preferably the maximum.
+     * @param a - preferably the minimum
+     * @param b - preferably the maximum
      * @returns {number}
      */
-    this._doRandom = function(a, b) {
+    _doRandom(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
             return 0;
         }
 
-        // Check to see if min is > max.
+        // Check to see if min is > max
         if (a > b) {
             var c = a;
             a = b;
@@ -3950,31 +4030,29 @@ function Logo() {
         return Math.floor(
             Math.random() * (Number(b) - Number(a) + 1) + Number(a)
         );
-    };
+    }
 
     /**
      * Randomly returns either a or b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {*}
      */
-    this._doOneOf = function(a, b) {
-        if (Math.random() < 0.5) {
-            return a;
-        } else {
-            return b;
-        }
-    };
+    _doOneOf(a, b) {
+        return Math.random() < 0.5 ? a : b;
+    }
 
     /**
      * Returns a modulo b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number}
      */
-    this._doMod = function(a, b) {
+    _doMod(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -3982,15 +4060,16 @@ function Logo() {
         }
 
         return Number(a) % Number(b);
-    };
+    }
 
     /**
      * Square-roots a number.
+     *
      * @privileged
-     * @param   a
+     * @param a
      * @returns {number}
      */
-    this._doSqrt = function(a) {
+    _doSqrt(a) {
         if (typeof a === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -3998,43 +4077,36 @@ function Logo() {
         }
 
         return Math.sqrt(Number(a));
-    };
+    }
 
     /**
      * Adds a and b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number|string}
      */
-    this._doPlus = function(a, b) {
+    _doPlus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
-            if (typeof a === "string") {
-                var aString = a;
-            } else {
-                var aString = a.toString();
-            }
-
-            if (typeof b === "string") {
-                var bString = b;
-            } else {
-                var bString = b.toString();
-            }
+            let aString = typeof a === "string" ? a : a.toString();
+            let bString = typeof b === "string" ? b : b.toString();
 
             return aString + bString;
         } else {
             return Number(a) + Number(b);
         }
-    };
+    }
 
     /**
      * Subtracts b from a.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number}
      */
-    this._doMinus = function(a, b) {
+    _doMinus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -4042,16 +4114,17 @@ function Logo() {
         }
 
         return Number(a) - Number(b);
-    };
+    }
 
     /**
      * Multiplies a by b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number}
      */
-    this._doMultiply = function(a, b) {
+    _doMultiply(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -4059,18 +4132,20 @@ function Logo() {
         }
 
         return Number(a) * Number(b);
-    };
+    }
 
     /**
-     * calculate euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y')
+     * Calculates euclidean distance between (cursor x, cursor y)
+     * and (mouse 'x' and mouse 'y').
+     *
      * @privileged
-     * @param   a
-     * @param   b
-     * @param   c
-     * @param   d
+     * @param a
+     * @param b
+     * @param c
+     * @param d
      * @returns {number}
      */
-    this._docalculatedistance = function(x1, y1, x2, y2) {
+    _docalculatedistance(x1, y1, x2, y2) {
         if (
             typeof x1 === "string" ||
             typeof y1 === "string" ||
@@ -4087,16 +4162,17 @@ function Logo() {
         }
 
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    };
+    }
 
     /**
      * Returns a to the power of b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number}
      */
-    this._doPower = function(a, b) {
+    _doPower(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -4104,16 +4180,17 @@ function Logo() {
         }
 
         return Math.pow(a, b);
-    };
+    }
 
     /**
      * Divides a by b.
+     *
      * @privileged
-     * @param   a
-     * @param   b
+     * @param a
+     * @param b
      * @returns {number}
      */
-    this._doDivide = function(a, b) {
+    _doDivide(a, b) {
         if (typeof a === "string" || typeof b === "string") {
             this.errorMsg(NANERRORMSG);
             this.stopTurtle = true;
@@ -4127,70 +4204,75 @@ function Logo() {
         } else {
             return Number(a) / Number(b);
         }
-    };
+    }
 
     /**
      * Changes body background in DOM to current colour.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.setBackgroundColor = function(turtle) {
-        if (turtle === -1) var c = platformColor.background;
-        else {
-            var c = this.turtles.turtleList[turtle].canvasColor;
-        }
-
+    setBackgroundColor(turtle) {
+        let c =
+            turtle === -1 ?
+                platformColor.background :
+                this.turtles.turtleList[turtle].canvasColor;
+        
         // docById('myCanvas').style.background = c;
         this.turtles.backgroundColor = c;
         this.turtles.makeBackground(this.turtles.isShrunk);
 
         this.svgOutput = "";
-    };
+    }
 
     /**
      * Sets the cameraID property.
+     *
      * @privileged
-     * @param   id
+     * @param id
      * @returns {void}
      */
-    this.setCameraID = function(id) {
+    setCameraID(id) {
         this.cameraID = id;
-    };
+    }
 
     /**
      * Hides all the blocks.
+     *
      * @privileged
      * @returns {void}
      */
-    this.hideBlocks = function(show) {
+    hideBlocks(show) {
         this.blocks.palettes.hide();
         this.blocks.hide();
         this.refreshCanvas();
         this.showBlocksAfterRun = show !== undefined && show;
-    };
+    }
 
     /**
      * Shows all the blocks.
+     *
      * @privileged
      * @returns {void}
      */
-    this.showBlocks = function() {
+    showBlocks() {
         this.blocks.palettes.show();
         this.blocks.show();
         this.blocks.bringToTop();
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Calculates the change needed for musical inversion.
+     *
      * @privileged
-     * @param   turtle
-     * @param   note
-     * @param   octave
+     * @param turtle
+     * @param note
+     * @param octave
      * @returns {number}
      */
-    this._calculateInvert = function(turtle, note, octave) {
+    _calculateInvert(turtle, note, octave) {
         var delta = 0;
         var len = this.invertList[turtle].length;
         var note1 = getNote(
@@ -4246,18 +4328,19 @@ function Logo() {
         }
 
         return delta;
-    };
+    }
 
     /**
      * Shifts pitches by n steps relative to the provided scale.
+     *
      * @privileged
-     * @param   turtle
-     * @param   note
-     * @param   octave
-     * @param   {number}    n
+     * @param turtle
+     * @param note
+     * @param octave
+     * @param {number} n
      * @returns {object}
      */
-    this._addScalarTransposition = function(turtle, note, octave, n) {
+    _addScalarTransposition(turtle, note, octave, n) {
         if (n > 0) {
             var noteObj = getNote(
                 note,
@@ -4356,17 +4439,18 @@ function Logo() {
         }
 
         return noteObj;
-    };
+    }
 
     /**
      * Returns a distance for scalar transposition.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    firstNote
-     * @param   {number}    lastNote
+     * @param turtle
+     * @param {number} firstNote
+     * @param {number} lastNote
      * @returns {number}
      */
-    this._scalarDistance = function(turtle, firstNote, lastNote) {
+    _scalarDistance(turtle, firstNote, lastNote) {
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
         // to lastNote pitch.
@@ -4408,14 +4492,15 @@ function Logo() {
 
             return -i;
         }
-    };
+    }
 
     /**
      * Preps synths for each turtle.
+     *
      * @privileged
      * @returns {void}
      */
-    this._prepSynths = function() {
+    _prepSynths() {
         this.synth.newTone();
 
         for (
@@ -4473,17 +4558,18 @@ function Logo() {
                 }
             }
         }
-    };
+    }
 
     /**
      * Clears note params.
+     *
      * @privileged
-     * @param   turtle
-     * @param   blk
-     * @param   drums
+     * @param turtle
+     * @param blk
+     * @param drums
      * @returns {void}
      */
-    this.clearNoteParams = function(turtle, blk, drums) {
+    clearNoteParams(turtle, blk, drums) {
         this.oscList[turtle][blk] = [];
         this.noteBeat[turtle][blk] = [];
         this.noteBeatValues[turtle][blk] = [];
@@ -4493,25 +4579,22 @@ function Logo() {
         this.noteCents[turtle][blk] = [];
         this.noteHertz[turtle][blk] = [];
         this.embeddedGraphics[turtle][blk] = [];
-        if (drums !== null) {
-            this.noteDrums[turtle][blk] = drums;
-        } else {
-            this.noteDrums[turtle][blk] = [];
-        }
-    };
+        this.noteDrums[turtle][blk] = drums !== null ? drums : [];
+    }
 
     /**
      * Updates the music notation used for Lilypond output.
+     *
      * @privileged
-     * @param   note
-     * @param   {number}   duration
-     * @param   turtle
-     * @param   insideChord
-     * @param   drum
-     * @param   {boolean}   split    Optional.
+     * @param note
+     * @param {number} duration
+     * @param turtle
+     * @param insideChord
+     * @param drum
+     * @param {boolean} [split]
      * @returns {void}
      */
-    this.updateNotation = function(
+    updateNotation(
         note,
         duration,
         turtle,
@@ -4686,16 +4769,17 @@ function Logo() {
                 console.debug(e);
             }
         }
-    };
+    }
 
     /**
      * Adds a voice if possible.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    arg
+     * @param turtle
+     * @param {number} arg
      * @returns {void}
      */
-    this.notationVoices = function(turtle, arg) {
+    notationVoices(turtle, arg) {
         switch (arg) {
             case 1:
                 this.notationStaging[turtle].push("voice one");
@@ -4715,17 +4799,18 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Sets the notation markup.
+     *
      * @privileged
-     * @param   turtle
-     * @param   markup
-     * @param   {boolean}   below
+     * @param turtle
+     * @param markup
+     * @param {boolean} below
      * @returns {void}
      */
-    this.notationMarkup = function(turtle, markup, below) {
+    notationMarkup(turtle, markup, below) {
         if (below) {
             this.notationStaging[turtle].push("markdown", markup);
         } else {
@@ -4733,30 +4818,32 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Sets the key and mode in the notation.
+     *
      * @privileged
-     * @param   turtle
-     * @param   key
-     * @param   mode
+     * @param turtle
+     * @param key
+     * @param mode
      * @returns {void}
      */
-    this.notationKey = function(turtle, key, mode) {
+    notationKey(turtle, key, mode) {
         this.notationStaging[turtle].push("key", key, mode);
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Sets the meter.
+     *
      * @privileged
-     * @param   turtle
-     * @param   count
-     * @param   value
+     * @param turtle
+     * @param count
+     * @param value
      * @returns {void}
      */
-    this.notationMeter = function(turtle, count, value) {
+    notationMeter(turtle, count, value) {
         if (this.pickupPoint[turtle] != null) {
             // Lilypond prefers meter to be before partials.
             var d =
@@ -4775,27 +4862,29 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Adds swing.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationSwing = function(turtle) {
+    notationSwing(turtle) {
         this.notationStaging[turtle].push("swing");
-    };
+    }
 
     /**
      * Sets the tempo.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    bpm     The number of beats per minute.
-     * @param   beatValue
+     * @param turtle
+     * @param {number} bpm - number of beats per minute
+     * @param beatValue
      * @returns {void}
      */
-    this.notationTempo = function(turtle, bpm, beatValue) {
+    notationTempo(turtle, bpm, beatValue) {
         var beat = convertFactor(beatValue);
         if (beat !== null) {
             this.notationStaging[turtle].push("tempo", bpm, beat);
@@ -4803,16 +4892,17 @@ function Logo() {
             var obj = rationalToFraction(beatValue);
             // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
-    };
+    }
 
     /**
      * Adds a pickup.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    factor
+     * @param turtle
+     * @param {number} factor
      * @returns {void}
      */
-    this.notationPickup = function(turtle, factor) {
+    notationPickup(turtle, factor) {
         if (factor === 0) {
             console.debug("ignoring pickup of 0");
             return;
@@ -4831,9 +4921,9 @@ function Logo() {
                 obj = rationalToFraction(factor);
                 this.errorMsg(
                     _("Lilypond cannot process pickup of ") +
-                        obj[0] +
-                        "/" +
-                        obj[1]
+                    obj[0] +
+                    "/" +
+                    obj[1]
                 );
             }
 
@@ -4844,60 +4934,66 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = pickupPoint;
-    };
+    }
 
     /**
      * Sets tuning as harmonic.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationHarmonic = function(turtle) {
+    notationHarmonic(turtle) {
         this.notationStaging.push("harmonic");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Adds a line break.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationLineBreak = function(turtle) {
+    notationLineBreak(turtle) {
         // this.notationStaging[turtle].push('break');
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Begins the articulation of an instrument.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationBeginArticulation = function(turtle) {
+    notationBeginArticulation(turtle) {
         this.notationStaging[turtle].push("begin articulation");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Ends articulation.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationEndArticulation = function(turtle) {
+    notationEndArticulation(turtle) {
         this.notationStaging[turtle].push("end articulation");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Begins a crescendo or descrendo.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    factor  If more than 0, we have a crescendo (otherwise, a decrescendo).
+     * @param turtle
+     * @param {number} factor - If more than 0, we have a crescendo
+     * (otherwise, a decrescendo)
      * @returns {void}
      */
-    this.notationBeginCrescendo = function(turtle, factor) {
+    notationBeginCrescendo(turtle, factor) {
         if (factor > 0) {
             this.notationStaging[turtle].push("begin crescendo");
         } else {
@@ -4905,16 +5001,18 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Ends a crescendo or descrendo.
+     *
      * @privileged
-     * @param   turtle
-     * @param   {number}    factor  If more than 0, we have a crescendo (otherwise, a decrescendo).
+     * @param turtle
+     * @param {number} factor - If more than 0, we have a crescendo
+     * (otherwise, a decrescendo)
      * @returns {void}
      */
-    this.notationEndCrescendo = function(turtle, factor) {
+    notationEndCrescendo(turtle, factor) {
         if (factor > 0) {
             this.notationStaging[turtle].push("end crescendo");
         } else {
@@ -4922,71 +5020,77 @@ function Logo() {
         }
 
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Begins a slur.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationBeginSlur = function(turtle) {
+    notationBeginSlur(turtle) {
         this.notationStaging[turtle].push("begin slur");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Ends a slur.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationEndSlur = function(turtle) {
+    notationEndSlur(turtle) {
         this.notationStaging[turtle].push("end slur");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Adds a tie.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationInsertTie = function(turtle) {
+    notationInsertTie(turtle) {
         this.notationStaging[turtle].push("tie");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Removes the last tie.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationRemoveTie = function(turtle) {
+    notationRemoveTie(turtle) {
         this.notationStaging[turtle].pop();
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Begins harmonics.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationBeginHarmonics = function(turtle) {
+    notationBeginHarmonics(turtle) {
         this.notationStaging[turtle].push("begin harmonics");
         this.pickupPoint[turtle] = null;
-    };
+    }
 
     /**
      * Ends harmonics.
+     *
      * @privileged
-     * @param   turtle
+     * @param turtle
      * @returns {void}
      */
-    this.notationEndHarmonics = function(turtle) {
+    notationEndHarmonics(turtle) {
         this.notationStaging[turtle].push("end harmonics");
         this.pickupPoint[turtle] = null;
-    };
+    }
 }
