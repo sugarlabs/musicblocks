@@ -1840,7 +1840,7 @@ class Turtles {
         this.makeBackground();
     }
 
-    deltaYfunction(dy) {
+    deltaY(dy) {
         this.stage.y += dy;
     }
 
