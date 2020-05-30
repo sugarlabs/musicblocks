@@ -1806,19 +1806,32 @@ function _buildScale(keySignature) {
 }
 
 function scaleDegreeToPitch2(keySignature, scaleDegree) {
-    let obj1 = keySignatureToMode(keySignature);
-    let obj2 = _buildScale(keySignature);
-    let scale = obj2[0];
-    console.log(scale);
-    console.log(MUSICALMODES[obj1[1]].length);
-
-    if(MUSICALMODES[obj1[1]].length == 7) {
+    const FALLBACK = {
+        "minor blues": "dorian",
+        "major blues": "ionian",
+        "whole tone": "lydian",
+        "major pentatonic": "mixolydian",
+        "minor pentatonic": "dorian",
+        "chinese": "lydian",
+        "egyptian": "ionian", // FIX ME: Discussion needed
+        "hirajoshi": "locrian",
+        "in": "phrygian",
+        "minyo": "aeolian",
+        "fibonacci": "mixolydian"
+    }
+    let chosenMode = keySignatureToMode(keySignature)[1];
+    let obj1 = _buildScale(keySignature);
+    let chosenModeScale = obj1[0];
+    let chosenModePattern = obj1[1]
+    console.log(chosenMode, chosenModeScale, chosenModePattern);
+    if(chosenModePattern.length == 7) {
         scaleDegree -= 1;
         return scale[scaleDegree];
-    } else if (MUSICALMODES[obj1[1]].length < 7) {
-
-        console.log("err");
-
+    } else if (chosenModePattern.length < 7) {
+        let fallbackScale = _buildScale(FALLBACK[chosenMode]);
+        let fallbackModePattern = MUSICALMODES[FALLBACK[chosenMode]];
+        console.log(fallbackScale);
+        console.log(fallbackModePattern);
     }
 }
 
