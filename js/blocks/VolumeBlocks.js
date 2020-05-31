@@ -693,15 +693,15 @@ function setupVolumeBlocks() {
                 if (!logo.suppressOutput[turtle]) {
                     logo.setSynthVolume(turtle, synth, newVolume);
                 }
-            }
 
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setsynthvolume",
-                    synth,
-                    newVolume
-                ]);
+                if (logo.justCounting[turtle].length === 0) {
+                    logo._playbackPush(turtle, [
+                        logo.previousTurtleTime[turtle],
+                        "setsynthvolume",
+                        synth,
+                        newVolume
+                    ]);
+                }
             }
 
             if (logo.justCounting[turtle].length === 0) {
