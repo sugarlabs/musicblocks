@@ -826,7 +826,7 @@ function setupFlowBlocks() {
             });
         }
 
-        flow(args, logo) {
+        flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
 
             let arg;
