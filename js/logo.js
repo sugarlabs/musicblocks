@@ -661,7 +661,7 @@ class Logo {
      * @returns {void}
      */
     step() {
-        for (var turtle in this.stepQueue) {
+        for (let turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (
                     turtle in this.unhighlightStepQueue &&
@@ -674,7 +674,8 @@ class Logo {
                     }
                     this.unhighlightStepQueue[turtle] = null;
                 }
-                var blk = this.stepQueue[turtle].pop();
+
+                let blk = this.stepQueue[turtle].pop();
                 if (blk != null) {
                     this._runFromBlockNow(this, turtle, blk, 0, null);
                 }
@@ -690,34 +691,33 @@ class Logo {
      * @returns {void}
      */
     stepNote() {
-        var tempStepQueue = {};
-        var notesFinish = {};
-        var thisNote = {};
-        var that = this;
+        let tempStepQueue = {};
+        let notesFinish = {};
+        let thisNote = {};
 
-        __stepNote();
-
-        function __stepNote() {
-            for (var turtle in that.stepQueue) {
+        let __stepNote = () => {
+            for (let turtle in this.stepQueue) {
                 // Have we already played a note for this turtle?
-                if (turtle in that.playedNote && that.playedNote[turtle]) {
+                if (turtle in this.playedNote && this.playedNote[turtle]) {
                     continue;
                 }
-                if (that.stepQueue[turtle].length > 0) {
+
+                if (this.stepQueue[turtle].length > 0) {
                     if (
-                        turtle in that.unhighlightStepQueue &&
-                        that.unhighlightStepQueue[turtle] != null
+                        turtle in this.unhighlightStepQueue &&
+                        this.unhighlightStepQueue[turtle] != null
                     ) {
-                        if (that.blocks.visible) {
-                            that.blocks.unhighlight(
-                                that.unhighlightStepQueue[turtle]
+                        if (this.blocks.visible) {
+                            this.blocks.unhighlight(
+                                this.unhighlightStepQueue[turtle]
                             );
                         }
-                        that.unhighlightStepQueue[turtle] = null;
+                        this.unhighlightStepQueue[turtle] = null;
                     }
-                    var blk = that.stepQueue[turtle].pop();
+
+                    let blk = this.stepQueue[turtle].pop();
                     if (blk != null && blk !== notesFinish[turtle]) {
-                        var block = that.blocks.blockList[blk];
+                        let block = this.blocks.blockList[blk];
                         if (block.name === "newnote") {
                             tempStepQueue[turtle] = blk;
                             notesFinish[turtle] = last(block.connections);
@@ -725,76 +725,84 @@ class Logo {
                                 // end of flow
                                 notesFinish[turtle] =
                                     last(
-                                        that.turtles.turtleList[turtle].queue
+                                        this.turtles.turtleList[turtle].queue
                                     ) &&
-                                    last(that.turtles.turtleList[turtle].queue)
+                                    last(this.turtles.turtleList[turtle].queue)
                                         .blk;
                                 // catch case of null - end of project
                             }
-                            // that.playedNote[turtle] = true;
-                            that.playedNoteTimes[turtle] =
-                                that.playedNoteTimes[turtle] || 0;
+
+                            // this.playedNote[turtle] = true;
+                            this.playedNoteTimes[turtle] =
+                                this.playedNoteTimes[turtle] || 0;
                             thisNote[turtle] = Math.pow(
-                                that.parseArg(
-                                    that,
+                                this.parseArg(
+                                    this,
                                     turtle,
                                     block.connections[1],
                                     blk,
-                                    that.receivedArg
+                                    this.receivedArg
                                 ),
                                 -1
                             );
-                            that.playedNoteTimes[turtle] += thisNote[turtle];
-                            // Keep track of how long the note played for, so we can go back and play it again if needed
+
+                            // Keep track of how long the note played for,
+                            // so we can go back and play it again if needed
+                            this.playedNoteTimes[turtle] += thisNote[turtle];
                         }
-                        that._runFromBlockNow(that, turtle, blk, 0, null);
+
+                        this._runFromBlockNow(this, turtle, blk, 0, null);
                     } else {
-                        that.playedNote[turtle] = true;
+                        this.playedNote[turtle] = true;
                     }
                 }
             }
 
             // At this point, some turtles have played notes and others
             // have not. We need to keep stepping until they all have.
-            var keepGoing = false;
-            for (var turtle in that.stepQueue) {
+            let keepGoing = false;
+            for (let turtle in this.stepQueue) {
                 if (
-                    that.stepQueue[turtle].length > 0 &&
-                    !that.playedNote[turtle]
+                    this.stepQueue[turtle].length > 0 &&
+                    !this.playedNote[turtle]
                 ) {
                     keepGoing = true;
                     break;
                 }
             }
+
             if (keepGoing) {
                 __stepNote();
-                // that.step();
+                // this.step();
             } else {
-                var notesArray = [];
-                for (var turtle in that.playedNote) {
-                    that.playedNote[turtle] = false;
-                    notesArray.push(that.playedNoteTimes[turtle]);
+                let notesArray = [];
+                for (let turtle in this.playedNote) {
+                    this.playedNote[turtle] = false;
+                    notesArray.push(this.playedNoteTimes[turtle]);
                 }
 
                 // If some notes are supposed to play for longer, add
                 // them back to the queue
-                var shortestNote = Math.min.apply(null, notesArray);
-                var continueFrom;
-                for (var turtle in that.playedNoteTimes) {
-                    if (that.playedNoteTimes[turtle] > shortestNote) {
+                let shortestNote = Math.min.apply(null, notesArray);
+                let continueFrom;
+                for (let turtle in this.playedNoteTimes) {
+                    if (this.playedNoteTimes[turtle] > shortestNote) {
                         continueFrom = tempStepQueue[turtle];
                         // Subtract the time, as if we haven't played it yet
-                        that.playedNoteTimes[turtle] -= thisNote[turtle];
+                        this.playedNoteTimes[turtle] -= thisNote[turtle];
                     } else {
                         continueFrom = notesFinish[turtle];
                     }
-                    that._runFromBlock(that, turtle, continueFrom, 0, null);
+                    this._runFromBlock(this, turtle, continueFrom, 0, null);
                 }
+
                 if (shortestNote === Math.max.apply(null, notesArray)) {
-                    that.playedNoteTimes = {};
+                    this.playedNoteTimes = {};
                 }
             }
-        }
+        };
+
+        __stepNote();
     }
 
     /**
@@ -824,7 +832,7 @@ class Logo {
         this.turtles.markAsStopped();
         this.playbackTime = 0;
 
-        for (var sound in this.sounds) {
+        for (let sound in this.sounds) {
             this.sounds[sound].stop();
         }
 
@@ -832,11 +840,11 @@ class Logo {
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             for (
-                var turtle = 0;
+                let turtle = 0;
                 turtle < this.turtles.turtleList.length;
                 turtle++
             ) {
-                for (var instrumentName in instruments[turtle]) {
+                for (let instrumentName in instruments[turtle]) {
                     this.synth.stopSound(turtle, instrumentName);
                 }
             }
@@ -873,11 +881,11 @@ class Logo {
      * @returns {void}
      */
     _restoreConnections() {
-        for (var turtle in this.connectionStore) {
-            for (var blk in this.connectionStore[turtle]) {
-                var n = this.connectionStore[turtle][blk].length;
-                for (var i = 0; i < n; i++) {
-                    var obj = this.connectionStore[turtle][blk].pop();
+        for (let turtle in this.connectionStore) {
+            for (let blk in this.connectionStore[turtle]) {
+                let n = this.connectionStore[turtle][blk].length;
+                for (let i = 0; i < n; i++) {
+                    let obj = this.connectionStore[turtle][blk].pop();
                     this.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
                     if (obj[2] != null) {
                         this.blocks.blockList[obj[2]].connections[0] = obj[0];
@@ -894,7 +902,7 @@ class Logo {
      * @returns {void}
      */
     _clearParameterBlocks() {
-        for (var blk = 0; blk < this.blocks.blockList.length; blk++) {
+        for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
             if (
                 this.blocks.blockList[blk].protoblock.parameter &&
                 this.blocks.blockList[blk].text !== null
@@ -910,27 +918,26 @@ class Logo {
      * Updates the label on parameter blocks.
      *
      * @privileged
-     * @param {this} that
+     * @param {this} logo
      * @param turtle
      * @param blk
      * @returns {void}
      */
-    _updateParameterBlock(that, turtle, blk) {
-        var logo = that; // For plugin backward compatibility
-        var name = this.blocks.blockList[blk].name;
+    _updateParameterBlock(logo, turtle, blk) {
+        let name = this.blocks.blockList[blk].name;
 
         if (
             this.blocks.blockList[blk].protoblock.parameter &&
             this.blocks.blockList[blk].text !== null
         ) {
-            var value = 0;
+            let value = 0;
 
             if (
-                typeof that.blocks.blockList[blk].protoblock.updateParameter ===
+                typeof logo.blocks.blockList[blk].protoblock.updateParameter ===
                 "function"
             ) {
-                value = that.blocks.blockList[blk].protoblock.updateParameter(
-                    that,
+                value = logo.blocks.blockList[blk].protoblock.updateParameter(
+                    logo,
                     turtle,
                     blk
                 );
@@ -966,10 +973,9 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
-        var that = this;
         console.debug("INIT MICROPHONE");
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            var mic = new Tone.UserMedia();
+            let mic = new Tone.UserMedia();
             try {
                 mic.open();
             } catch (e) {
@@ -977,7 +983,7 @@ class Logo {
                 console.debug(e.name + ": " + e.message);
 
                 console.debug(mic);
-                that.errorMsg(NOMICERRORMSG);
+                this.errorMsg(NOMICERRORMSG);
                 mic = null;
             }
 
@@ -986,7 +992,7 @@ class Logo {
         } else {
             try {
                 this.mic = new p5.AudioIn();
-                that.mic.start();
+                this.mic.start();
             } catch (e) {
                 console.debug(e);
                 this.errorMsg(NOMICERRORMSG);
@@ -1102,7 +1108,7 @@ class Logo {
         this.defineMode[turtle] = [];
         this.dispatchFactor[turtle] = 1;
         this.pickup[turtle] = 0;
-        this.beatsPerMeasure[turtle] = 4; // Default is 4/4 time.
+        this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
         this.noteValuePerBeat[turtle] = 4;
         this.currentBeat[turtle] = 0;
         this.currentMeasure[turtle] = 0;
@@ -1114,7 +1120,7 @@ class Logo {
         this.pickupPOW2[turtle] = false;
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
-        this.pitchNumberOffset[turtle] = 39; // C4
+        this.pitchNumberOffset[turtle] = 39;    // C4
         this.suppressOutput[turtle] =
             this.runningLilypond ||
             this.runningAbc ||
@@ -1132,7 +1138,7 @@ class Logo {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.playbackQueue[turtle] = [];
         } else {
-            // Don't empty playback queue of precompiled content.
+            // Don't empty playback queue of precompiled content
             if (!turtle in this.playbackQueue) {
                 this.playbackQueue[turtle] = [];
             }
@@ -1180,29 +1186,26 @@ class Logo {
             this.lastNoteTimeout = null;
         }
 
-        // Restore any broken connections.
-        this._restoreConnections();
+        this._restoreConnections();         // restore any broken connections
 
-        // Save the state before running.
-        this.saveLocally();
+        this.saveLocally();                 // save the state before running
 
-        for (var arg in this.evalOnStartList) {
+        for (let arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);
         }
 
         this.stopTurtle = false;
 
         this.blocks.unhighlightAll();
-        this.blocks.bringToTop(); // Draw under blocks.
+        this.blocks.bringToTop();           // draw under blocks
 
         this.hideMsgs();
 
-        // We run the Logo commands here.
-        var d = new Date();
-        this.time = d.getTime();
+        // Run the Logo commands here
+        this.time = new Date().getTime();
         this.firstNoteTime = null;
 
-        // Ensure we have at least one turtle.
+        // Ensure we have at least one turtle
         if (this.turtles.turtleList.length === 0) {
             this.turtles.add(null);
         }
@@ -1225,10 +1228,9 @@ class Logo {
         this.notationStaging = {};
         this.notationDrumStaging = {};
 
-        // Each turtle needs to keep its own wait time and music
-        // states.
+        // Each turtle needs to keep its own wait time and music states
         for (
-            var turtle = 0;
+            let turtle = 0;
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
@@ -1254,11 +1256,11 @@ class Logo {
 
         // Remove any listeners that might be still active
         for (
-            var turtle = 0;
+            let turtle = 0;
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
-            for (var listener in this.turtles.turtleList[turtle].listeners) {
+            for (let listener in this.turtles.turtleList[turtle].listeners) {
                 this.stage.removeEventListener(
                     listener,
                     this.turtles.turtleList[turtle].listeners[listener],
@@ -1269,9 +1271,9 @@ class Logo {
             this.turtles.turtleList[turtle].listeners = {};
         }
 
-        // Init the graphic state.
+        // Init the graphic state
         for (
-            var turtle = 0;
+            let turtle = 0;
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
@@ -1289,8 +1291,7 @@ class Logo {
 
         // Set up status block
         if (window.widgetWindows.isOpen("status")) {
-            // Ensure widget has been created before trying to
-            // initialize it.
+            // Ensure widget has been created before trying to initialize it
             if (this.statusMatrix === null) {
                 this.statusMatrix = new StatusMatrix();
             }
@@ -1298,19 +1299,24 @@ class Logo {
             this.statusMatrix.init(this);
         }
 
-        // Execute turtle code here...  Find the start block (or the
-        // top of each stack) and build a list of all of the named
-        // action stacks.
-        var startBlocks = [];
+        // Execute turtle code here
+        /*
+        ===========================================================================
+        (1) Find the start block (or the top of each stack) and build a list
+            of all of the named action stacks.
+        ===========================================================================
+        */
+        let startBlocks = [];
         this.blocks.findStacks();
         this.actions = {};
-        for (var blk = 0; blk < this.blocks.stackList.length; blk++) {
+
+        for (let blk = 0; blk < this.blocks.stackList.length; blk++) {
             if (
                 ["start", "drum", "status"].indexOf(
                     this.blocks.blockList[this.blocks.stackList[blk]].name
                 ) !== -1
             ) {
-                // Don't start on a start block in the trash.
+                // Don't start on a start block in the trash
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     startBlocks.push(this.blocks.stackList[blk]);
                 }
@@ -1319,13 +1325,13 @@ class Logo {
                 "action"
             ) {
                 // Does the action stack have a name?
-                var c = this.blocks.blockList[this.blocks.stackList[blk]]
+                let c = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[1];
                 // Is there a block in the action clamp?
-                var b = this.blocks.blockList[this.blocks.stackList[blk]]
+                let b = this.blocks.blockList[this.blocks.stackList[blk]]
                     .connections[2];
                 if (c != null && b != null) {
-                    // Don't use an action block in the trash.
+                    // Don't use an action block in the trash
                     if (
                         !this.blocks.blockList[this.blocks.stackList[blk]].trash
                     ) {
@@ -1342,7 +1348,7 @@ class Logo {
         this.svgBackground = true;
 
         for (
-            var turtle = 0;
+            let turtle = 0;
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
@@ -1360,21 +1366,21 @@ class Logo {
         }
 
         if (this.turtleDelay === 0) {
-            // Don't update parameters when running full speed.
+            // Don't update parameters when running full speed
             this._clearParameterBlocks();
         }
 
         this.onRunTurtle();
 
-        // Make sure that there is atleast one turtle.
+        // Make sure that there is atleast one turtle
         if (this.turtles.turtleList.length === 0) {
             console.debug("No start block... adding a turtle");
             this.turtles.addTurtle(null);
         }
 
-        // And mark all turtles as not running.
+        // Mark all turtles as not running
         for (
-            var turtle = 0;
+            let turtle = 0;
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
@@ -1385,17 +1391,20 @@ class Logo {
             this.turtles.turtleList[turtle].running = false;
         }
 
-        // (2) Execute the stack.
-        // A bit complicated because we have lots of corner cases:
+        /*
+        ===========================================================================
+        (2) Execute the stack. (A bit complicated due to lots of corner cases)
+        ===========================================================================
+        */
         if (startHere != null) {
-            // If a block to start from was passed, find its
-            // associated turtle, i.e., which turtle should we use?
-            var turtle = 0;
+            // If a block to start from was passed, find its associated
+            // turtle, i.e., which turtle should we use?
+            let turtle = 0;
             while (
                 this.turtles.turtleList[turtle].trash &&
                 turtle < this.turtles.turtleList.length
             ) {
-                turtle += 1;
+                ++turtle;
             }
 
             if (
@@ -1418,14 +1427,14 @@ class Logo {
             this.turtles.turtleList[turtle].running = true;
             this._runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
-            var delayStart = 0;
+            let delayStart = 0;
             // Look for a status block
-            for (var b = 0; b < startBlocks.length; b++) {
+            for (let b = 0; b < startBlocks.length; b++) {
                 if (
                     this.blocks.blockList[startBlocks[b]].name === "status" &&
                     !this.blocks.blockList[startBlocks[b]].trash
                 ) {
-                    var turtle = 0;
+                    let turtle = 0;
                     this.turtles.turtleList[turtle].queue = [];
                     this.parentFlowQueue[turtle] = [];
                     this.unhighlightQueue[turtle] = [];
@@ -1441,34 +1450,33 @@ class Logo {
                 }
             }
 
-            var that = this;
-
-            setTimeout(function() {
+            setTimeout(() => {
                 if (delayStart !== 0) {
                     // Launching status block would have hidden the
-                    // Stop Button so show it again.
-                    that.onRunTurtle();
+                    // Stop Button so show it again
+                    this.onRunTurtle();
                 }
 
-                // If there are start blocks, run them all.
-                for (var b = 0; b < startBlocks.length; b++) {
+                // If there are start blocks, run them all
+                for (let b = 0; b < startBlocks.length; b++) {
                     if (
-                        that.blocks.blockList[startBlocks[b]].name !== "status"
+                        this.blocks.blockList[startBlocks[b]].name !== "status"
                     ) {
-                        var turtle =
-                            that.blocks.blockList[startBlocks[b]].value;
-                        that.turtles.turtleList[turtle].queue = [];
-                        that.parentFlowQueue[turtle] = [];
-                        that.unhighlightQueue[turtle] = [];
-                        that.parameterQueue[turtle] = [];
-                        if (!that.turtles.turtleList[turtle].trash) {
-                            if (that.turtles.turtleList[turtle].running) {
+                        let turtle =
+                            this.blocks.blockList[startBlocks[b]].value;
+                        this.turtles.turtleList[turtle].queue = [];
+                        this.parentFlowQueue[turtle] = [];
+                        this.unhighlightQueue[turtle] = [];
+                        this.parameterQueue[turtle] = [];
+
+                        if (!this.turtles.turtleList[turtle].trash) {
+                            if (this.turtles.turtleList[turtle].running) {
                                 console.debug("already running...");
                             }
 
-                            that.turtles.turtleList[turtle].running = true;
-                            that._runFromBlock(
-                                that,
+                            this.turtles.turtleList[turtle].running = true;
+                            this._runFromBlock(
+                                this,
                                 turtle,
                                 startBlocks[b],
                                 0,
@@ -1485,6 +1493,7 @@ class Logo {
                 " " +
                 this.suppressOutput[turtle]
             );
+
             if (
                 this.suppressOutput[turtle] ||
                 this.suppressOutput[turtle] == undefined
@@ -1492,7 +1501,8 @@ class Logo {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
                 this.checkingCompletionState = false;
-                // Reset cursor.
+
+                // Reset cursor
                 document.body.style.cursor = "default";
             }
         }
@@ -1504,37 +1514,35 @@ class Logo {
      * Runs from a single block.
      *
      * @privileged
-     * @param {this} that
+     * @param {this} logo
      * @param turtle
      * @param blk
      * @param isflow
      * @param receivedArg
      * @returns {void}
      */
-    _runFromBlock(that, turtle, blk, isflow, receivedArg) {
+    _runFromBlock(logo, turtle, blk, isflow, receivedArg) {
         this.runningBlock = blk;
         if (blk == null) return;
 
-        let logo = that; // For plugin backward compatibility
-
         this.receivedArg = receivedArg;
 
-        let delay = that.turtleDelay + that.waitTimes[turtle];
-        that.waitTimes[turtle] = 0;
+        let delay = logo.turtleDelay + logo.waitTimes[turtle];
+        logo.waitTimes[turtle] = 0;
 
-        if (!that.stopTurtle) {
-            if (that.turtleDelay === TURTLESTEP) {
+        if (!logo.stopTurtle) {
+            if (logo.turtleDelay === TURTLESTEP) {
                 // Step mode
-                if (!(turtle in that.stepQueue)) {
-                    that.stepQueue[turtle] = [];
+                if (!(turtle in logo.stepQueue)) {
+                    logo.stepQueue[turtle] = [];
                 }
-                that.stepQueue[turtle].push(blk);
+                logo.stepQueue[turtle].push(blk);
             } else {
-                that.delayParameters[turtle] =
+                logo.delayParameters[turtle] =
                     { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
-                that.delayTimeout[turtle] = setTimeout(function () {
-                    that._runFromBlockNow(
-                        that,
+                logo.delayTimeout[turtle] = setTimeout(() => {
+                    logo._runFromBlockNow(
+                        logo,
                         turtle,
                         blk,
                         isflow,
@@ -1607,7 +1615,7 @@ class Logo {
      * Runs a stack of blocks, beginning with blk.
      *
      * @privileged
-     * @param {this} that
+     * @param {this} logo
      * @param turtle
      * @param blk
      * @param isflow
@@ -1616,45 +1624,46 @@ class Logo {
      * @returns {void}
      */
     _runFromBlockNow(
-        that,
+        logo,
         turtle,
         blk,
         isflow,
         receivedArg,
         queueStart
     ) {
-        ///////
         this.alreadyRunning = true;
-        ///////
-        // Run a stack of blocks, beginning with blk.
-        let logo = that; // For plugin backward compatibility
+
         this.receivedArg = receivedArg;
 
-        // Sometimes we don't want to unwind the entire queue.
+        // Sometimes we don't want to unwind the entire queue
         if (queueStart === undefined) queueStart = 0;
 
-        // (1) Evaluate any arguments (beginning with connection[1]);
+        /*
+        ===========================================================================
+        (1) Evaluate any arguments (beginning with connection[1])
+        ===========================================================================
+        */
         let args = [];
-        if (that.blocks.blockList[blk].protoblock.args > 0) {
+        if (logo.blocks.blockList[blk].protoblock.args > 0) {
             for (
                 let i = 1;
-                i < that.blocks.blockList[blk].protoblock.args + 1;
+                i < logo.blocks.blockList[blk].protoblock.args + 1;
                 i++
             ) {
                 if (
-                    that.blocks.blockList[blk].protoblock.dockTypes[i] === "in"
+                    logo.blocks.blockList[blk].protoblock.dockTypes[i] === "in"
                 ) {
-                    if (that.blocks.blockList[blk].connections[i] == null) {
+                    if (logo.blocks.blockList[blk].connections[i] == null) {
                         console.debug("skipping inflow args");
                     } else {
-                        args.push(that.blocks.blockList[blk].connections[i]);
+                        args.push(logo.blocks.blockList[blk].connections[i]);
                     }
                 } else {
                     args.push(
-                        that.parseArg(
-                            that,
+                        logo.parseArg(
+                            logo,
                             turtle,
-                            that.blocks.blockList[blk].connections[i],
+                            logo.blocks.blockList[blk].connections[i],
                             blk,
                             receivedArg
                         )
@@ -1663,56 +1672,59 @@ class Logo {
             }
         }
 
-        // (2) Run function associated with the block;
+        /*
+        ===========================================================================
+        (2) Run function associated with the block
+        ===========================================================================
+        */
         let nextFlow = null;
-        if (!that.blocks.blockList[blk].isValueBlock()) {
-            // nextFlow remains null for valueBlock
+        if (!logo.blocks.blockList[blk].isValueBlock()) {
+            // (nextFlow remains null for valueBlock)
 
             // All flow blocks have a last connection (nextFlow), but
-            // it can be null (i.e., end of a flow).
-            if (that.backward[turtle].length > 0) {
-                // We only run backwards in the "first generation" children.
+            // it can be null (i.e., end of a flow)
+            if (logo.backward[turtle].length > 0) {
+                // We only run backwards in the "first generation" children
                 let c =
                     (
-                        that.blocks.blockList[last(that.backward[turtle])].name
-                            === "backward"
+                        logo.blocks.blockList[last(logo.backward[turtle])].name
+                        === "backward"
                     ) ? 1 : 2;
 
                 if (
-                    !that.blocks.sameGeneration(
-                        that.blocks.blockList[last(that.backward[turtle])]
+                    !logo.blocks.sameGeneration(
+                        logo.blocks.blockList[last(logo.backward[turtle])]
                             .connections[c],
                         blk
                     )
                 ) {
-                    nextFlow = last(that.blocks.blockList[blk].connections);
+                    nextFlow = last(logo.blocks.blockList[blk].connections);
                 } else {
-                    nextFlow = that.blocks.blockList[blk].connections[0];
                     if (
-                        that.blocks.blockList[nextFlow].name === "action" ||
-                        that.blocks.blockList[nextFlow].name === "backward"
+                        logo.blocks.blockList[nextFlow].name === "action" ||
+                        logo.blocks.blockList[nextFlow].name === "backward"
                     ) {
                         nextFlow = null;
                     } else {
                         if (
-                            !that.blocks.sameGeneration(
-                                that.blocks.blockList[
-                                    last(that.backward[turtle])
+                            !logo.blocks.sameGeneration(
+                                logo.blocks.blockList[
+                                    last(logo.backward[turtle])
                                 ].connections[c],
                                 nextFlow
                             )
                         ) {
                             nextFlow = last(
-                                that.blocks.blockList[blk].connections
+                                logo.blocks.blockList[blk].connections
                             );
                         } else {
                             nextFlow =
-                                that.blocks.blockList[blk].connections[0];
+                                logo.blocks.blockList[blk].connections[0];
                         }
                     }
                 }
             } else {
-                nextFlow = last(that.blocks.blockList[blk].connections);
+                nextFlow = last(logo.blocks.blockList[blk].connections);
             }
 
             if (nextFlow === -1) {
@@ -1722,57 +1734,65 @@ class Logo {
             let queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
             if (nextFlow != null) {
                 // This could be the last block
-                that.turtles.turtleList[turtle].queue.push(queueBlock);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
             }
         }
 
-        // Some flow blocks have childflows, e.g., repeat.
-        var childFlow = null;
-        var childFlowCount = 0;
-        var actionArgs = [];
+        // Some flow blocks have childflows, e.g., repeat
+        let childFlow = null;
+        let childFlowCount = 0;
+        let actionArgs = [];
 
-        if (that.blocks.visible) {
+        if (logo.blocks.visible) {
             if (
-                !that.suppressOutput[turtle] &&
-                that.justCounting[turtle].length === 0
+                !logo.suppressOutput[turtle] &&
+                logo.justCounting[turtle].length === 0
             ) {
-                that.blocks.highlight(blk, false);
+                logo.blocks.highlight(blk, false);
             }
         }
 
-        switch (that.blocks.blockList[blk].name) {
-            // Deprecated
+        switch (logo.blocks.blockList[blk].name) {
+            /** @deprecated */
             case "beginhollowline":
-                that.turtles.turtleList[turtle].doStartHollowLine();
+                logo.turtles.turtleList[turtle].doStartHollowLine();
                 break;
-            // Deprecated
+
+            /** @deprecated */
             case "endhollowline":
-                that.turtles.turtleList[turtle].doEndHollowLine();
+                logo.turtles.turtleList[turtle].doEndHollowLine();
                 break;
-            // &#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164;
-            // deprecated
+
+            /** @deprecated */
             case "wholeNote":
-                NoteController._processNote(that, 1, blk, turtle);
+                NoteController._processNote(logo, 1, blk, turtle);
                 break;
+
             case "halfNote":
-                NoteController._processNote(that, 2, blk, turtle);
+                NoteController._processNote(logo, 2, blk, turtle);
                 break;
+
             case "quarterNote":
-                NoteController._processNote(that, 4, blk, turtle);
+                NoteController._processNote(logo, 4, blk, turtle);
                 break;
+
             case "eighthNote":
-                NoteController._processNote(that, 8, blk, turtle);
+                NoteController._processNote(logo, 8, blk, turtle);
                 break;
+
             case "sixteenthNote":
-                NoteController._processNote(that, 16, blk, turtle);
+                NoteController._processNote(logo, 16, blk, turtle);
                 break;
+
             case "thirtysecondNote":
-                NoteController._processNote(that, 32, blk, turtle);
+                NoteController._processNote(logo, 32, blk, turtle);
                 break;
+
             case "sixtyfourthNote":
-                NoteController._processNote(that, 64, blk, turtle);
+                NoteController._processNote(logo, 64, blk, turtle);
                 break;
-            // Deprecated
+
+            /** @deprecated */
             case "darbuka":
             case "clang":
             case "bottle":
@@ -1798,27 +1818,26 @@ class Logo {
             case "clap":
             case "bubbles":
             case "cricket":
-                that.drumStyle[turtle].push(that.blocks.blockList[blk].name);
+                logo.drumStyle[turtle].push(logo.blocks.blockList[blk].name);
                 childFlow = args[0];
                 childFlowCount = 1;
 
-                var listenerName = "_drum_" + turtle;
-                that._setDispatchBlock(blk, turtle, listenerName);
+                let listenerName = "_drum_" + turtle;
+                logo._setDispatchBlock(blk, turtle, listenerName);
 
-                var __listener = function(event) {
-                    that.drumStyle[turtle].pop();
-                };
+                let __listener = event => logo.drumStyle[turtle].pop();
+                logo._setListener(turtle, listenerName, __listener);
 
-                that._setListener(turtle, listenerName, __listener);
                 break;
-            // Deprecated P5 tone generator replaced by macro.
+
+            /** @deprecated - P5 tone generator replaced by macro */
             case "tone2":
                 if (_THIS_IS_TURTLE_BLOCKS_) {
-                    if (typeof that.turtleOscs[turtle] === "undefined") {
-                        that.turtleOscs[turtle] = new p5.TriOsc();
+                    if (typeof logo.turtleOscs[turtle] === "undefined") {
+                        logo.turtleOscs[turtle] = new p5.TriOsc();
                     }
 
-                    osc = that.turtleOscs[turtle];
+                    osc = logo.turtleOscs[turtle];
                     osc.stop();
                     osc.start();
                     osc.amp(0);
@@ -1827,38 +1846,41 @@ class Logo {
                     osc.fade(0.5, 0.2);
 
                     setTimeout(
-                        function(osc) {
-                            osc.fade(0, 0.2);
-                        },
+                        osc => osc.fade(0, 0.2),
                         args[1],
                         osc
                     );
                 }
+
                 break;
-            // Deprecated
+
+            /** @deprecated */
             case "playfwd":
-                that.pitchTimeMatrix.playDirection = 1;
-                that._runFromBlock(that, turtle, args[0]);
+                logo.pitchTimeMatrix.playDirection = 1;
+                logo._runFromBlock(logo, turtle, args[0]);
                 break;
-            // Deprecated
+
+            /** @deprecated */
             case "playbwd":
-                that.pitchTimeMatrix.playDirection = -1;
-                that._runFromBlock(that, turtle, args[0]);
+                logo.pitchTimeMatrix.playDirection = -1;
+                logo._runFromBlock(logo, turtle, args[0]);
                 break;
+
             default:
                 if (
-                    typeof that.blocks.blockList[blk].protoblock.flow ===
+                    typeof logo.blocks.blockList[blk].protoblock.flow ===
                     "function"
                 ) {
-                    let res = that.blocks.blockList[blk].protoblock.flow(
+                    let res = logo.blocks.blockList[blk].protoblock.flow(
                         args,
-                        that,
+                        logo,
                         turtle,
                         blk,
                         receivedArg,
                         actionArgs,
                         isflow
                     );
+
                     if (res) {
                         let [cf, cfc, ret] = res;
                         if (cf !== undefined) childFlow = cf;
@@ -1866,55 +1888,60 @@ class Logo {
                         if (ret) return ret;
                     }
                 } else if (
-                    that.blocks.blockList[blk].name in that.evalFlowDict
+                    logo.blocks.blockList[blk].name in logo.evalFlowDict
                 ) {
-                    eval(that.evalFlowDict[that.blocks.blockList[blk].name]);
+                    eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
                 } else {
-                    // Could be an arg block, so we need to print its value.
+                    // Could be an arg block, so we need to print its value
                     if (
-                        that.blocks.blockList[blk].isArgBlock() ||
+                        logo.blocks.blockList[blk].isArgBlock() ||
                         [
                             "anyout",
                             "numberout",
                             "textout",
                             "booleanout"
                         ].indexOf(
-                            that.blocks.blockList[blk].protoblock.dockTypes[0]
+                            logo.blocks.blockList[blk].protoblock.dockTypes[0]
                         ) !== -1
                     ) {
                         args.push(
-                            that.parseArg(that, turtle, blk, that.receievedArg)
+                            logo.parseArg(logo, turtle, blk, logo.receievedArg)
                         );
-                        if (that.blocks.blockList[blk].value == null) {
-                            that.textMsg("null block value");
+
+                        if (logo.blocks.blockList[blk].value == null) {
+                            logo.textMsg("null block value");
                         } else {
-                            that.textMsg(
-                                that.blocks.blockList[blk].value.toString()
+                            logo.textMsg(
+                                logo.blocks.blockList[blk].value.toString()
                             );
                         }
                     } else {
-                        that.errorMsg(
+                        logo.errorMsg(
                             "I do not know how to " +
-                                that.blocks.blockList[blk].name +
-                                ".",
+                            logo.blocks.blockList[blk].name +
+                            ".",
                             blk
                         );
                     }
-                    that.stopTurtle = true;
+
+                    logo.stopTurtle = true;
                 }
                 break;
         }
 
-        // (3) Queue block below the current block.
-
+        /*
+        ===========================================================================
+        (3) Queue block below the current block
+        ===========================================================================
+        */
         // Is the block in a queued clamp?
-        if (blk !== that.ignoringBlock) {
-            if (blk in that.endOfClampSignals[turtle]) {
-                var n = that.endOfClampSignals[turtle][blk].length;
-                for (var i = 0; i < n; i++) {
-                    var signal = that.endOfClampSignals[turtle][blk].pop();
+        if (blk !== logo.ignoringBlock) {
+            if (blk in logo.endOfClampSignals[turtle]) {
+                let n = logo.endOfClampSignals[turtle][blk].length;
+                for (let i = 0; i < n; i++) {
+                    let signal = logo.endOfClampSignals[turtle][blk].pop();
                     if (signal != null) {
-                        that.stage.dispatchEvent(signal);
+                        logo.stage.dispatchEvent(signal);
                     }
                 }
             }
@@ -1923,19 +1950,19 @@ class Logo {
         }
 
         if (
-            that.statusMatrix &&
-            that.statusMatrix.isOpen &&
-            !that.inStatusMatrix
+            logo.statusMatrix &&
+            logo.statusMatrix.isOpen &&
+            !logo.inStatusMatrix
         ) {
-            that.statusMatrix.updateAll();
+            logo.statusMatrix.updateAll();
         }
 
-        // If there is a child flow, queue it.
+        // If there is a child flow, queue it
         if (childFlow != null) {
             let queueBlock;
             if (
-                that.blocks.blockList[blk].name === "doArg" ||
-                that.blocks.blockList[blk].name === "nameddoArg"
+                logo.blocks.blockList[blk].name === "doArg" ||
+                logo.blocks.blockList[blk].name === "nameddoArg"
             ) {
                 queueBlock = new Queue(
                     childFlow,
@@ -1955,9 +1982,9 @@ class Logo {
             // We need to keep track of the parent block to the child
             // flow so we can unhighlight the parent block after the
             // child flow completes.
-            if (that.parentFlowQueue[turtle] != undefined) {
-                that.parentFlowQueue[turtle].push(blk);
-                that.turtles.turtleList[turtle].queue.push(queueBlock);
+            if (logo.parentFlowQueue[turtle] != undefined) {
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
             } else {
                 console.debug("cannot find queue for turtle " + turtle);
             }
@@ -1967,71 +1994,72 @@ class Logo {
         let parentBlk = null;
         let passArg = null;
 
-        // Run the last flow in the queue.
-        if (that.turtles.turtleList[turtle].queue.length > queueStart) {
-            nextBlock = last(that.turtles.turtleList[turtle].queue).blk;
-            parentBlk = last(that.turtles.turtleList[turtle].queue).parentBlk;
-            passArg = last(that.turtles.turtleList[turtle].queue).args;
-            // Since the forever block starts at -1, it will never === 1.
-            if (last(that.turtles.turtleList[turtle].queue).count === 1) {
-                // Finished child so pop it off the queue.
-                that.turtles.turtleList[turtle].queue.pop();
+        // Run the last flow in the queue
+        if (logo.turtles.turtleList[turtle].queue.length > queueStart) {
+            nextBlock = last(logo.turtles.turtleList[turtle].queue).blk;
+            parentBlk = last(logo.turtles.turtleList[turtle].queue).parentBlk;
+            passArg = last(logo.turtles.turtleList[turtle].queue).args;
+
+            // Since the forever block starts at -1, it will never === 1
+            if (last(logo.turtles.turtleList[turtle].queue).count === 1) {
+                // Finished child so pop it off the queue
+                logo.turtles.turtleList[turtle].queue.pop();
             } else {
-                // Decrement the counter for repeating that flow.
-                last(that.turtles.turtleList[turtle].queue).count -= 1;
+                // Decrement the counter for repeating the flow
+                last(logo.turtles.turtleList[turtle].queue).count -= 1;
             }
         }
 
         if (nextBlock != null) {
             if (parentBlk !== blk) {
                 // The wait block waits waitTimes longer than other
-                // blocks before it is unhighlighted.
-                if (that.turtleDelay === TURTLESTEP) {
-                    that.unhighlightStepQueue[turtle] = blk;
+                // blocks before it is unhighlighted
+                if (logo.turtleDelay === TURTLESTEP) {
+                    logo.unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (
-                        !that.suppressOutput[turtle] &&
-                        that.justCounting[turtle].length === 0
+                        !logo.suppressOutput[turtle] &&
+                        logo.justCounting[turtle].length === 0
                     ) {
-                        setTimeout(function() {
-                            if (that.blocks.visible) {
-                                that.blocks.unhighlight(blk);
+                        setTimeout(() => {
+                            if (logo.blocks.visible) {
+                                logo.blocks.unhighlight(blk);
                             }
-                        }, that.turtleDelay + that.waitTimes[turtle]);
+                        }, logo.turtleDelay + logo.waitTimes[turtle]);
                     }
                 }
             }
 
             if (
-                (that.backward[turtle].length > 0 &&
-                    that.blocks.blockList[blk].connections[0] == null) ||
-                (that.backward[turtle].length === 0 &&
-                    last(that.blocks.blockList[blk].connections) == null)
+                (logo.backward[turtle].length > 0 &&
+                    logo.blocks.blockList[blk].connections[0] == null) ||
+                (logo.backward[turtle].length === 0 &&
+                    last(logo.blocks.blockList[blk].connections) == null)
             ) {
                 if (
-                    !that.suppressOutput[turtle] &&
-                    that.justCounting[turtle].length === 0
+                    !logo.suppressOutput[turtle] &&
+                    logo.justCounting[turtle].length === 0
                 ) {
                     // If we are at the end of the child flow, queue the
-                    // unhighlighting of the parent block to the flow.
-                    if (that.unhighlightQueue[turtle] === undefined) {
+                    // unhighlighting of the parent block to the flow
+                    if (logo.unhighlightQueue[turtle] === undefined) {
                         console.debug(
                             "cannot find highlight queue for turtle " + turtle
                         );
                     } else if (
-                        that.parentFlowQueue[turtle].length > 0 &&
-                        that.turtles.turtleList[turtle].queue.length > 0 &&
-                        last(that.turtles.turtleList[turtle].queue)
-                            .parentBlk !== last(that.parentFlowQueue[turtle])
+                        logo.parentFlowQueue[turtle].length > 0 &&
+                        logo.turtles.turtleList[turtle].queue.length > 0 &&
+                        last(logo.turtles.turtleList[turtle].queue)
+                            .parentBlk !== last(logo.parentFlowQueue[turtle])
                     ) {
-                        that.unhighlightQueue[turtle].push(
-                            last(that.parentFlowQueue[turtle])
+                        logo.unhighlightQueue[turtle].push(
+                            last(logo.parentFlowQueue[turtle])
                         );
-                        // that.unhighlightQueue[turtle].push(that.parentFlowQueue[turtle].pop());
-                    } else if (that.unhighlightQueue[turtle].length > 0) {
-                        // The child flow is finally complete, so unhighlight.
-                        setTimeout(function() {
-                            if (!turtle in that.unhighlightQueue) {
+                        // logo.unhighlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
+                    } else if (logo.unhighlightQueue[turtle].length > 0) {
+                        // The child flow is finally complete, so unhighlight
+                        setTimeout(() => {
+                            if (!turtle in logo.unhighlightQueue) {
                                 console.debug(
                                     "turtle " +
                                     turtle +
@@ -2040,32 +2068,32 @@ class Logo {
                                 return;
                             }
 
-                            if (that.blocks.visible) {
-                                that.blocks.unhighlight(
-                                    that.unhighlightQueue[turtle].pop()
+                            if (logo.blocks.visible) {
+                                logo.blocks.unhighlight(
+                                    logo.unhighlightQueue[turtle].pop()
                                 );
                             } else {
-                                that.unhighlightQueue[turtle].pop();
+                                logo.unhighlightQueue[turtle].pop();
                             }
-                        }, that.turtleDelay);
+                        }, logo.turtleDelay);
                     }
                 }
             }
 
-            // We don't update parameter blocks when running full speed.
-            if (that.turtleDelay !== 0) {
-                for (var pblk in that.parameterQueue[turtle]) {
-                    that._updateParameterBlock(
-                        that,
+            // We don't update parameter blocks when running full speed
+            if (logo.turtleDelay !== 0) {
+                for (let pblk in logo.parameterQueue[turtle]) {
+                    logo._updateParameterBlock(
+                        logo,
                         turtle,
-                        that.parameterQueue[turtle][pblk]
+                        logo.parameterQueue[turtle][pblk]
                     );
                 }
             }
 
             if (isflow) {
-                that._runFromBlockNow(
-                    that,
+                logo._runFromBlockNow(
+                    logo,
                     turtle,
                     nextBlock,
                     isflow,
@@ -2073,42 +2101,42 @@ class Logo {
                     queueStart
                 );
             } else {
-                that._runFromBlock(that, turtle, nextBlock, isflow, passArg);
+                logo._runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
-            that.alreadyRunning = false;
+            logo.alreadyRunning = false;
 
-            if (!that.prematureRestart) {
+            if (!logo.prematureRestart) {
                 // console.debug('Make sure any unissued signals are dispatched.');
-                for (var b in that.endOfClampSignals[turtle]) {
+                for (let b in logo.endOfClampSignals[turtle]) {
                     for (
-                        var i = 0;
-                        i < that.endOfClampSignals[turtle][b].length;
+                        let i = 0;
+                        i < logo.endOfClampSignals[turtle][b].length;
                         i++
                     ) {
-                        if (that.endOfClampSignals[turtle][b][i] != null) {
+                        if (logo.endOfClampSignals[turtle][b][i] != null) {
                             if (
-                                that.butNotThese[turtle][b] == null ||
-                                that.butNotThese[turtle][b].indexOf(i) === -1
+                                logo.butNotThese[turtle][b] == null ||
+                                logo.butNotThese[turtle][b].indexOf(i) === -1
                             ) {
-                                that.stage.dispatchEvent(
-                                    that.endOfClampSignals[turtle][b][i]
+                                logo.stage.dispatchEvent(
+                                    logo.endOfClampSignals[turtle][b][i]
                                 );
                             }
                         }
                     }
                 }
 
-                // Make sure SVG path is closed.
-                that.turtles.turtleList[turtle].closeSVG();
+                // Make sure SVG path is closed
+                logo.turtles.turtleList[turtle].closeSVG();
 
-                // Mark the turtle as not running.
-                that.turtles.turtleList[turtle].running = false;
-                if (!that.turtles.running() && queueStart === 0) {
-                    that.onStopTurtle();
+                // Mark the turtle as not running
+                logo.turtles.turtleList[turtle].running = false;
+                if (!logo.turtles.running() && queueStart === 0) {
+                    logo.onStopTurtle();
                 }
             } else {
-                that.turtles.turtleList[turtle].running = false;
+                logo.turtles.turtleList[turtle].running = false;
             }
 
             // Because flow can come from calc blocks, we are not
@@ -2116,160 +2144,155 @@ class Logo {
             // yet. Hence the timeout.
             let __checkCompletionState = () => {
                 if (
-                    !that.turtles.running() &&
+                    !logo.turtles.running() &&
                     queueStart === 0 &&
-                    that.justCounting[turtle].length === 0
+                    logo.justCounting[turtle].length === 0
                 ) {
-                    if (that.runningLilypond) {
+                    if (logo.runningLilypond) {
                         console.debug("saving lilypond output:");
                         save.afterSaveLilypond();
-                        that.runningLilypond = false;
-                    } else if (that.runningAbc) {
+                        logo.runningLilypond = false;
+                    } else if (logo.runningAbc) {
                         console.debug("saving abc output:");
                         save.afterSaveAbc();
-                        that.runningAbc = false;
-                    } else if (that.runningMxml) {
+                        logo.runningAbc = false;
+                    } else if (logo.runningMxml) {
                         console.log('saving mxml output');
                         save.afterSaveMxml();
-                        that.runningMxml = false;
-                    } else if (that.suppressOutput[turtle]) {
+                        logo.runningMxml = false;
+                    } else if (logo.suppressOutput[turtle]) {
                         console.debug("finishing compiling");
-                        if (!that.recording) {
-                            that.errorMsg(_("Playback is ready."));
+                        if (!logo.recording) {
+                            logo.errorMsg(_("Playback is ready."));
                         }
 
-                        that.setPlaybackStatus();
-                        that.compiling = false;
-                        for (t in that.turtles.turtleList) {
-                            that.turtles.turtleList[t].doPenUp();
-                            that.turtles.turtleList[t].doSetXY(
-                                that._saveX[t],
-                                that._saveY[t]
+                        logo.setPlaybackStatus();
+                        logo.compiling = false;
+                        for (t in logo.turtles.turtleList) {
+                            logo.turtles.turtleList[t].doPenUp();
+                            logo.turtles.turtleList[t].doSetXY(
+                                logo._saveX[t],
+                                logo._saveY[t]
                             );
-                            that.turtles.turtleList[t].color =
-                                that._saveColor[t];
-                            that.turtles.turtleList[t].value =
-                                that._saveValue[t];
-                            that.turtles.turtleList[t].chroma =
-                                that._saveChroma[t];
-                            that.turtles.turtleList[t].stroke =
-                                that._saveStroke[t];
-                            that.turtles.turtleList[t].canvasAlpha =
-                                that._saveCanvasAlpha[t];
-                            that.turtles.turtleList[t].doSetHeading(
-                                that._saveOrientation[t]
+                            logo.turtles.turtleList[t].color =
+                                logo._saveColor[t];
+                            logo.turtles.turtleList[t].value =
+                                logo._saveValue[t];
+                            logo.turtles.turtleList[t].chroma =
+                                logo._saveChroma[t];
+                            logo.turtles.turtleList[t].stroke =
+                                logo._saveStroke[t];
+                            logo.turtles.turtleList[t].canvasAlpha =
+                                logo._saveCanvasAlpha[t];
+                            logo.turtles.turtleList[t].doSetHeading(
+                                logo._saveOrientation[t]
                             );
-                            that.turtles.turtleList[t].penState =
-                                that._savePenState[t];
+                            logo.turtles.turtleList[t].penState =
+                                logo._savePenState[t];
                         }
                     }
 
-                    // Give the last note time to play.
+                    // Give the last note time to play
                     console.debug(
                         "SETTING LAST NOTE TIMEOUT: " +
-                        that.recording +
+                        logo.recording +
                         " " +
-                        that.suppressOutput[turtle]
+                        logo.suppressOutput[turtle]
                     );
-                    that.lastNoteTimeout = setTimeout(function() {
+                    logo.lastNoteTimeout = setTimeout(() => {
                         console.debug("LAST NOTE PLAYED");
-                        that.lastNoteTimeout = null;
-                        if (that.suppressOutput[turtle] && that.recording) {
-                            that.suppressOutput[turtle] = false;
-                            that.checkingCompletionState = false;
-                            that.saveLocally();
+                        logo.lastNoteTimeout = null;
+                        if (logo.suppressOutput[turtle] && logo.recording) {
+                            logo.suppressOutput[turtle] = false;
+                            logo.checkingCompletionState = false;
+                            logo.saveLocally();
                             console.debug("PLAYBACK FOR RECORD");
-                            that.playback(-1, true);
-                            // that.recording = false;
+                            logo.playback(-1, true);
+                            // logo.recording = false;
                         } else {
-                            that.suppressOutput[turtle] = false;
-                            that.checkingCompletionState = false;
+                            logo.suppressOutput[turtle] = false;
+                            logo.checkingCompletionState = false;
 
-                            // Reset the cursor...
+                            // Reset the cursor
                             document.body.style.cursor = "default";
 
-                            // And save the session.
-                            that.saveLocally();
+                            // Save the session
+                            logo.saveLocally();
                         }
                     }, 1000);
-                } else if (that.suppressOutput[turtle]) {
-                    setTimeout(function() {
-                        __checkCompletionState();
-                    }, 250);
+                } else if (logo.suppressOutput[turtle]) {
+                    setTimeout(() => __checkCompletionState(), 250);
                 }
             };
 
             if (
-                !that.turtles.running() &&
+                !logo.turtles.running() &&
                 queueStart === 0 &&
-                that.justCounting[turtle].length === 0
+                logo.justCounting[turtle].length === 0
             ) {
-                if (!that.checkingCompletionState) {
-                    that.checkingCompletionState = true;
-                    setTimeout(function() {
-                        __checkCompletionState();
-                    }, 250);
+                if (!logo.checkingCompletionState) {
+                    logo.checkingCompletionState = true;
+                    setTimeout(() => __checkCompletionState(), 250);
                 }
             }
 
             if (
-                !that.suppressOutput[turtle] &&
-                that.justCounting[turtle].length === 0
+                !logo.suppressOutput[turtle] &&
+                logo.justCounting[turtle].length === 0
             ) {
-                // Nothing else to do... so cleaning up.
+                // Nothing else to do. Clean up.
                 if (
-                    that.turtles.turtleList[turtle].queue.length === 0 ||
+                    logo.turtles.turtleList[turtle].queue.length === 0 ||
                     blk !==
-                        last(that.turtles.turtleList[turtle].queue).parentBlk
+                    last(logo.turtles.turtleList[turtle].queue).parentBlk
                 ) {
-                    setTimeout(function() {
-                        if (that.blocks.visible) {
-                            that.blocks.unhighlight(blk);
+                    setTimeout(() => {
+                        if (logo.blocks.visible) {
+                            logo.blocks.unhighlight(blk);
                         }
-                    }, that.turtleDelay);
+                    }, logo.turtleDelay);
                 }
 
-                // Unhighlight any parent blocks still highlighted.
-                for (var b in that.parentFlowQueue[turtle]) {
-                    if (that.blocks.visible) {
-                        that.blocks.unhighlight(
-                            that.parentFlowQueue[turtle][b]
+                // Unhighlight any parent blocks still highlighted
+                for (let b in logo.parentFlowQueue[turtle]) {
+                    if (logo.blocks.visible) {
+                        logo.blocks.unhighlight(
+                            logo.parentFlowQueue[turtle][b]
                         );
                     }
                 }
 
-                // Make sure the turtles are on top.
-                var i = that.stage.children.length - 1;
-                that.stage.setChildIndex(
-                    that.turtles.turtleList[turtle].container,
+                // Make sure the turtles are on top
+                let i = logo.stage.children.length - 1;
+                logo.stage.setChildIndex(
+                    logo.turtles.turtleList[turtle].container,
                     i
                 );
-                that.refreshCanvas();
+                logo.refreshCanvas();
             }
 
-            for (var arg in that.evalOnStopList) {
-                eval(that.evalOnStopList[arg]);
+            for (let arg in logo.evalOnStopList) {
+                eval(logo.evalOnStopList[arg]);
             }
 
-            if (!that.turtles.running() && queueStart === 0) {
-                // TODO: Enable playback button here
-                if (that.showBlocksAfterRun) {
-                    // If this is a status stack, not run showBlocks.
+            if (!logo.turtles.running() && queueStart === 0) {
+                /** @todo Enable playback button here */
+                if (logo.showBlocksAfterRun) {
+                    // If this is a status stack, not run showBlocks
                     if (
                         blk !== null &&
-                        that.blocks.blockList[blk].connections[0] !== null &&
-                        that.blocks.blockList[
-                            that.blocks.blockList[blk].connections[0]
+                        logo.blocks.blockList[blk].connections[0] !== null &&
+                        logo.blocks.blockList[
+                            logo.blocks.blockList[blk].connections[0]
                         ].name === "status"
                     ) {
                         console.debug("running status block");
                     } else {
-                        that.showBlocks();
-                        that.showBlocksAfterRun = false;
+                        logo.showBlocks();
+                        logo.showBlocksAfterRun = false;
                     }
                 }
                 document.getElementById("stop").style.color = "white";
-                console.debug("fin");
             }
         }
     }
@@ -2324,7 +2347,7 @@ class Logo {
                 case "noise1":
                 case "noise2":
                 case "noise3":
-                    // Noise is very very loud.
+                    // Noise is very very loud
                     this.synth.setVolume(turtle, synth, volume / 25);
                     break;
                 default:
@@ -2346,7 +2369,7 @@ class Logo {
         // We only push for saveWAV, etc.
         if (!this.recordingStatus()) return;
 
-        // Don't record in optimize mode or Turtle Blocks.
+        // Don't record in optimize mode or Turtle Blocks
         if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
             this.playbackQueue[turtle].push(obj);
         }
@@ -2361,13 +2384,11 @@ class Logo {
      * @returns {void}
      */
     playback(whichMouse, recording) {
-        var that = this;
-
         if (this.restartPlayback) {
             this.progressBarWidth = 0;
         }
 
-        if (recording === undefined) recording = false;
+        if (recording === undefined)    recording = false;
 
         this.recording = recording;
 
@@ -2375,17 +2396,17 @@ class Logo {
             this.playbackTime = 0;
         }
 
+        let inFillClamp = false;
+        let inHollowLineClamp = false;
+
         if (this.turtles.running()) {
             console.debug(this.turtles.running() + " PUNTING");
-            if (this.playbackTime === 0) return;
-            else {
+            if (this.playbackTime !== 0) {
                 this.stopTurtle = true;
-                return;
             }
-        } else if (this.playbackTime === 0) {
-            var inFillClamp = false;
-            var inHollowLineClamp = false;
 
+            return;
+        } else if (this.playbackTime === 0) {
             this.hideBlocks();
             this.showBlocksAfterRun = true;
         }
@@ -2395,12 +2416,12 @@ class Logo {
         if (this.turtles.turtleList.length > 0) {
             for (t in this.turtles.turtleList) {
                 if (t in this.playbackQueue) {
-                    var playbackList = [];
-                    for (var i = 0; i < this.playbackQueue[t].length; i++) {
+                    let playbackList = [];
+                    for (let i = 0; i < this.playbackQueue[t].length; i++) {
                         playbackList.push([i, this.playbackQueue[t][i]]);
                     }
 
-                    var sortedList = playbackList.sort(function (a, b) {
+                    let sortedList = playbackList.sort((a, b) => {
                         if (a[1][0] === b[1][0]) {
                             // Preserve original order if the events
                             // have the same time stamp.
@@ -2415,291 +2436,313 @@ class Logo {
 
         console.debug(playbackList.length);
 
-        var d = new Date();
-        this.firstNoteTime = d.getTime() - 1000 * this.playbackTime;
+        this.firstNoteTime = new Date().getTime() - 1000 * this.playbackTime;
 
-        var l = 0;
         if (this.progressBarWidth >= 100) {
             this.progressBarWidth = 0;
         }
 
-        for (var turtle in this.playbackQueue) {
+        let l = 0;
+        for (let turtle in this.playbackQueue) {
             // For multiple voices
             l += this.playbackQueue[turtle].length;
         }
 
-        if (t in this.playbackQueue && l > 0) {
-            this.progressBarDivision = 100 / this.playbackQueue[t].length;
-        } else {
-            // nothing to do...
-            this.progressBarDivision = 100;
-        }
+        this.progressBarDivision =
+            t in this.playbackQueue && l > 0 ?
+                100 / this.playbackQueue[t].length :
+                100;
 
-        var turtleCount = 0;
-        var inLoop = 0;
+        let turtleCount = 0;
+        let inLoop = 0;
 
-        let __playbackLoop = function(turtle, idx) {
+        let __playbackLoop = (turtle, idx) => {
             inLoop++;
-            that.playbackTime = that.playbackQueue[turtle][idx][0];
+            this.playbackTime = this.playbackQueue[turtle][idx][0];
 
             if (turtleCount === 0) {
-                //Not sure if that happens...but just in case
+                // Not sure if it happens, but just in case
                 turtleCount = 1;
             }
 
-            that.progressBarWidth =
-                that.progressBarWidth + that.progressBarDivision / turtleCount;
+            this.progressBarWidth += this.progressBarDivision / turtleCount;
 
-            if (inLoop === l || that.progressBarWidth > 100) {
-                that.progressBarWidth = 100;
+            if (inLoop === l || this.progressBarWidth > 100) {
+                this.progressBarWidth = 100;
             }
 
-            if (that.progressBarWidth === NaN) {
-                //Not sure if that happens...but just in case
-                that.progressBar.style.visibility = "hidden";
+            if (this.progressBarWidth === NaN) {
+                // Not sure if it happens, but just in case
+                this.progressBar.style.visibility = "hidden";
             }
 
-            that.progressBar.style.width = that.progressBarWidth + "%";
-            that.progressBar.innerHTML =
-                parseInt(that.progressBarWidth * 1) + "%";
+            this.progressBar.style.width = this.progressBarWidth + "%";
+            this.progressBar.innerHTML =
+                parseInt(this.progressBarWidth * 1) + "%";
 
-            if (!that.stopTurtle) {
-                switch (that.playbackQueue[turtle][idx][1]) {
+            if (!this.stopTurtle) {
+                switch (this.playbackQueue[turtle][idx][1]) {
                     case "fill":
                         if (inFillClamp) {
-                            that.turtles.turtleList[turtle].doEndFill();
+                            this.turtles.turtleList[turtle].doEndFill();
                             inFillClamp = false;
                         } else {
-                            that.turtles.turtleList[turtle].doStartFill();
+                            this.turtles.turtleList[turtle].doStartFill();
                             inFillClamp = true;
                         }
                         break;
+
                     case "hollowline":
                         if (inHollowLineClamp) {
-                            that.turtles.turtleList[turtle].doEndHollowLine();
+                            this.turtles.turtleList[turtle].doEndHollowLine();
                             inHollowLineClamp = false;
                         } else {
-                            that.turtles.turtleList[turtle].doStartHollowLine();
+                            this.turtles.turtleList[turtle].doStartHollowLine();
                             inHollowLineClamp = true;
                         }
                         break;
+
                     case "notes":
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            if (that.blinkState) {
-                                that.turtles.turtleList[turtle].blink(
-                                    that.playbackQueue[turtle][idx][3],
+                            if (this.blinkState) {
+                                this.turtles.turtleList[turtle].blink(
+                                    this.playbackQueue[turtle][idx][3],
                                     50
                                 );
                             }
 
-                            that.lastNote[turtle] =
-                                that.playbackQueue[turtle][idx][3];
-                            that.synth.trigger(
+                            this.lastNote[turtle] =
+                                this.playbackQueue[turtle][idx][3];
+
+                            this.synth.trigger(
                                 turtle,
-                                that.playbackQueue[turtle][idx][2],
-                                that.playbackQueue[turtle][idx][3],
-                                that.playbackQueue[turtle][idx][4],
-                                that.playbackQueue[turtle][idx][5],
-                                that.playbackQueue[turtle][idx][6]
+                                this.playbackQueue[turtle][idx][2],
+                                this.playbackQueue[turtle][idx][3],
+                                this.playbackQueue[turtle][idx][4],
+                                this.playbackQueue[turtle][idx][5],
+                                this.playbackQueue[turtle][idx][6]
                             );
                         }
                         break;
+
                     case "controlpoint1":
-                        that.cp1x[turtle] = that.playbackQueue[turtle][idx][2];
-                        that.cp1y[turtle] = that.playbackQueue[turtle][idx][3];
+                        this.cp1x[turtle] = this.playbackQueue[turtle][idx][2];
+                        this.cp1y[turtle] = this.playbackQueue[turtle][idx][3];
                         break;
+
                     case "controlpoint2":
-                        that.cp2x[turtle] = that.playbackQueue[turtle][idx][2];
-                        that.cp2y[turtle] = that.playbackQueue[turtle][idx][3];
+                        this.cp2x[turtle] = this.playbackQueue[turtle][idx][2];
+                        this.cp2y[turtle] = this.playbackQueue[turtle][idx][3];
                         break;
+
                     case "bezier":
-                        that.turtles.turtleList[turtle].doBezier(
-                            that.cp1x[turtle],
-                            that.cp1y[turtle],
-                            that.cp2x[turtle],
-                            that.cp2y[turtle],
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                        this.turtles.turtleList[turtle].doBezier(
+                            this.cp1x[turtle],
+                            this.cp1y[turtle],
+                            this.cp2x[turtle],
+                            this.cp2y[turtle],
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "show":
-                        that._processShow(
+                        this._processShow(
                             turtle,
                             null,
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "speak":
-                        that._processSpeak(that.playbackQueue[turtle][idx][2]);
+                        this._processSpeak(this.playbackQueue[turtle][idx][2]);
                         break;
+
                     case "print":
-                        that.textMsg(
-                            that.playbackQueue[turtle][idx][2].toString()
+                        this.textMsg(
+                            this.playbackQueue[turtle][idx][2].toString()
                         );
                         break;
+
                     case "setvolume":
-                        that._setMasterVolume(
-                            that.playbackQueue[turtle][idx][2]
+                        this._setMasterVolume(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "setsynthvolume":
-                        that.setSynthVolume(
+                        this.setSynthVolume(
                             turtle,
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "arc":
-                        that.turtles.turtleList[turtle].doArc(
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                        this.turtles.turtleList[turtle].doArc(
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "setxy":
-                        that.turtles.turtleList[turtle].doSetXY(
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                        this.turtles.turtleList[turtle].doSetXY(
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "scrollxy":
-                        that.turtles.turtleList[turtle].doSetXY(
-                            that.playbackQueue[turtle][idx][2],
-                            that.playbackQueue[turtle][idx][3]
+                        this.turtles.turtleList[turtle].doSetXY(
+                            this.playbackQueue[turtle][idx][2],
+                            this.playbackQueue[turtle][idx][3]
                         );
                         break;
+
                     case "forward":
-                        that.turtles.turtleList[turtle].doForward(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doForward(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "right":
-                        that.turtles.turtleList[turtle].doRight(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doRight(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "setheading":
-                        that.turtles.turtleList[turtle].doSetHeading(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetHeading(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "clear":
-                        that.svgBackground = true;
-                        that.turtles.turtleList[turtle].penState = false;
-                        that.turtles.turtleList[turtle].doSetHeading(0);
-                        that.turtles.turtleList[turtle].doSetXY(0, 0);
-                        that.turtles.turtleList[turtle].penState = true;
-                        // that.turtles.turtleList[turtle].doClear(true, true, true);
+                        this.svgBackground = true;
+                        this.turtles.turtleList[turtle].penState = false;
+                        this.turtles.turtleList[turtle].doSetHeading(0);
+                        this.turtles.turtleList[turtle].doSetXY(0, 0);
+                        this.turtles.turtleList[turtle].penState = true;
+                        // this.turtles.turtleList[turtle].doClear(true, true, true);
                         break;
+
                     case "setcolor":
-                        that.turtles.turtleList[turtle].doSetColor(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetColor(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "sethue":
-                        that.turtles.turtleList[turtle].doSetHue(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetHue(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "setshade":
-                        that.turtles.turtleList[turtle].doSetValue(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetValue(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "settranslucency":
-                        that.turtles.turtleList[turtle].doSetPenAlpha(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetPenAlpha(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "setgrey":
-                        that.turtles.turtleList[turtle].doSetChroma(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetChroma(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "setpensize":
-                        that.turtles.turtleList[turtle].doSetPensize(
-                            that.playbackQueue[turtle][idx][2]
+                        this.turtles.turtleList[turtle].doSetPensize(
+                            this.playbackQueue[turtle][idx][2]
                         );
                         break;
+
                     case "penup":
-                        that.turtles.turtleList[turtle].doPenUp();
+                        this.turtles.turtleList[turtle].doPenUp();
                         break;
+
                     case "pendown":
-                        that.turtles.turtleList[turtle].doPenDown();
+                        this.turtles.turtleList[turtle].doPenDown();
                         break;
+
                     default:
-                        console.debug(that.playbackQueue[turtle][idx][1]);
+                        console.debug(this.playbackQueue[turtle][idx][1]);
                         break;
                 }
 
-                var d = new Date();
-                var elapsedTime = d.getTime() - that.firstNoteTime;
-                idx += 1;
-                if (that.playbackQueue[turtle].length > idx) {
-                    var timeout =
-                        that.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
+                ++idx;
+                let elapsedTime = new Date().getTime() - this.firstNoteTime;
+                if (this.playbackQueue[turtle].length > idx) {
+                    let timeout =
+                        this.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
                     if (timeout < 0) {
                         timeout = 0;
                     }
 
-                    setTimeout(function() {
-                        __playbackLoop(turtle, idx);
-                    }, timeout);
+                    setTimeout(() => __playbackLoop(turtle, idx), timeout);
                 } else {
-                    if (turtle < that.turtles.turtleList.length) {
-                        that.turtles.turtleList[turtle].running = false;
+                    if (turtle < this.turtles.turtleList.length) {
+                        this.turtles.turtleList[turtle].running = false;
                     }
 
-                    if (!that.turtles.running()) {
-                        that.onStopTurtle();
-                        that.playbackTime = 0;
+                    if (!this.turtles.running()) {
+                        this.onStopTurtle();
+                        this.playbackTime = 0;
                         if (recording) {
-                            var lastNote = 0;
-                            for (var turtle in that.playbackQueue) {
-                                if (that.lastNote[turtle] > lastNote) {
-                                    lastNote = that.lastNote[turtle];
+                            let lastNote = 0;
+                            for (let turtle in this.playbackQueue) {
+                                if (this.lastNote[turtle] > lastNote) {
+                                    lastNote = this.lastNote[turtle];
                                 }
                             }
 
-                            setTimeout(function() {
+                            setTimeout(() => {
                                 console.debug("FINISHING RECORDING");
-                                that.synth.recorder.stop();
-                                that.synth.recorder.exportWAV(
+                                this.synth.recorder.stop();
+                                this.synth.recorder.exportWAV(
                                     save.afterSaveWAV.bind(save)
                                 );
-                                that.recording = false;
+                                this.recording = false;
                             }, Math.max(2000, lastNote * 1000));
                         }
                     }
 
-                    that.showBlocks();
-                    that.showBlocksAfterRun = false;
+                    this.showBlocks();
+                    this.showBlocksAfterRun = false;
                 }
             } else {
-                that.turtles.turtleList[turtle].running = false;
-                that.showBlocks();
-                that.showBlocksAfterRun = false;
+                this.turtles.turtleList[turtle].running = false;
+                this.showBlocks();
+                this.showBlocksAfterRun = false;
             }
         };
 
-        let __playback = function(turtle) {
+        let __playback = turtle => {
             turtleCount++;
-            setTimeout(function() {
-                __playbackLoop(turtle, 0);
-            }, that.playbackQueue[turtle][0][0] * 1000);
+            setTimeout(
+                () => __playbackLoop(turtle, 0),
+                this.playbackQueue[turtle][0][0] * 1000
+            );
         };
 
-        let __resumePlayback = function(turtle) {
+        let __resumePlayback = turtle => {
             turtleCount++;
-            for (var idx = 0; idx < that.playbackQueue[turtle].length; idx++) {
-                if (that.playbackQueue[turtle][idx][0] >= that.playbackTime) {
+            let idx = 0;
+            for (; idx < this.playbackQueue[turtle].length; idx++) {
+                if (this.playbackQueue[turtle][idx][0] >= this.playbackTime) {
                     break;
                 }
             }
 
             console.debug("resume index: " + idx);
 
-            if (idx < that.playbackQueue[turtle].length) {
+            if (idx < this.playbackQueue[turtle].length) {
                 __playbackLoop(turtle, idx);
             }
         };
@@ -2720,12 +2763,13 @@ class Logo {
         console.debug(this.playbackQueue);
 
         if (whichMouse < 0) {
-            for (var turtle in this.playbackQueue) {
+            for (let turtle in this.playbackQueue) {
                 this.lastNote[turtle] = 0;
                 if (this.playbackQueue[turtle].length > 0) {
                     if (turtle < this.turtles.turtleList.length) {
                         this.turtles.turtleList[turtle].running = true;
                     }
+
                     if (recording) {
                         console.debug("recording");
                         __playback(turtle);
@@ -2762,7 +2806,7 @@ class Logo {
         delay
     ) {
         // When turtle commands (forward, right, arc) are inside of notes,
-        // they are run progressively over the course of the note duration.
+        // they are run progressively over the course of the note duration
         if (!turtle in this.embeddedGraphics) {
             console.debug(
                 "Could not find turtle " + turtle + "in embeddedGraphics."
@@ -2778,301 +2822,300 @@ class Logo {
         if (this.embeddedGraphics[turtle][blk].length === 0) return;
 
         // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics.
+        // slight delay before drawing any new graphics
         if (!this.embeddedGraphicsFinished[turtle]) {
             delay += 0.1;
         }
 
         this.embeddedGraphicsFinished[turtle] = false;
-        var that = this;
-        var inFillClamp = false;
-        var inHollowLineClamp = false;
-        var suppressOutput = this.suppressOutput[turtle];
 
-        function __pen(turtle, name, arg, timeout) {
-            function _penSwitch(name) {
+        let suppressOutput = this.suppressOutput[turtle];
+
+        let __pen = (turtle, name, arg, timeout) => {
+            let _penSwitch = name => {
                 switch (name) {
                     case "penup":
-                        that.turtles.turtleList[turtle].doPenUp();
+                        this.turtles.turtleList[turtle].doPenUp();
                         break;
                     case "pendown":
-                        that.turtles.turtleList[turtle].doPenDown();
+                        this.turtles.turtleList[turtle].doPenDown();
                         break;
                     case "setcolor":
-                        that.turtles.turtleList[turtle].doSetColor(arg);
+                        this.turtles.turtleList[turtle].doSetColor(arg);
                         break;
                     case "sethue":
-                        that.turtles.turtleList[turtle].doSetHue(arg);
+                        this.turtles.turtleList[turtle].doSetHue(arg);
                         break;
                     case "setshade":
-                        that.turtles.turtleList[turtle].doSetValue(arg);
+                        this.turtles.turtleList[turtle].doSetValue(arg);
                         break;
                     case "settranslucency":
-                        that.turtles.turtleList[turtle].doSetPenAlpha(arg);
+                        this.turtles.turtleList[turtle].doSetPenAlpha(arg);
                         break;
                     case "setgrey":
-                        that.turtles.turtleList[turtle].doSetChroma(arg);
+                        this.turtles.turtleList[turtle].doSetChroma(arg);
                         break;
                     case "setpensize":
-                        that.turtles.turtleList[turtle].doSetPensize(arg);
+                        this.turtles.turtleList[turtle].doSetPensize(arg);
                         break;
                 }
-            }
+            };
 
             if (suppressOutput) {
                 _penSwitch(name);
             } else {
-                setTimeout(function() {
-                    _penSwitch(name);
-                }, timeout);
+                setTimeout(() => _penSwitch(name), timeout);
             }
-        }
+        };
 
-        function __clear(turtle, timeout) {
-            if (that.suppressOutput[turtle]) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doSetXY(0, 0);
-                that.turtles.turtleList[turtle].doSetHeading(0);
-                that.turtles.turtleList[turtle].penState = savedPenState;
-                that.svgBackground = true;
+        let __clear = (turtle, timeout) => {
+            if (this.suppressOutput[turtle]) {
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doSetXY(0, 0);
+                this.turtles.turtleList[turtle].doSetHeading(0);
+                this.turtles.turtleList[turtle].penState = savedPenState;
+                this.svgBackground = true;
             } else {
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doSetHeading(0);
-                that.turtles.turtleList[turtle].doSetXY(0, 0);
-                that.turtles.turtleList[turtle].penState = true;
-                // that.turtles.turtleList[turtle].doClear(true, true, true);
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doSetHeading(0);
+                this.turtles.turtleList[turtle].doSetXY(0, 0);
+                this.turtles.turtleList[turtle].penState = true;
+                // this.turtles.turtleList[turtle].doClear(true, true, true);
             }
-        }
+        };
 
-        function __right(turtle, arg, timeout) {
+        let __right = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doRight(arg);
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doRight(arg);
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doRight(arg);
-                }, timeout);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doRight(arg),
+                    timeout
+                );
             }
-        }
+        };
 
-        function __setheading(turtle, arg, timeout) {
+        let __setheading = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                that.turtles.turtleList[turtle].doSetHeading(arg);
+                this.turtles.turtleList[turtle].doSetHeading(arg);
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doSetHeading(arg);
-                }, timeout);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doSetHeading(arg),
+                    timeout
+                );
             }
-        }
+        };
 
-        function __forward(turtle, arg, timeout) {
+        let __forward = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doForward(arg);
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doForward(arg);
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doForward(arg);
-                }, timeout);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doForward(arg),
+                    timeout
+                );
             }
-        }
+        };
 
-        function __scrollxy(turtle, arg1, arg2, timeout) {
+        let __scrollxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                that.turtles.turtleList[turtle].doScrollXY(arg1, arg2);
+                this.turtles.turtleList[turtle].doScrollXY(arg1, arg2);
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doScrollXY(arg1, arg2);
-                }, timeout);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doScrollXY(arg1, arg2),
+                    timeout
+                );
             }
-        }
+        };
 
-        function __setxy(turtle, arg1, arg2, timeout) {
+        let __setxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doSetXY(arg1, arg2);
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doSetXY(arg1, arg2);
-                }, timeout);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doSetXY(arg1, arg2),
+                    timeout
+                );
             }
-        }
+        };
 
-        function __show(turtle, arg1, arg2, timeout) {
+        let __show = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(function() {
-                that._processShow(turtle, null, arg1, arg2);
-            }, timeout);
+            setTimeout(
+                () => this._processShow(turtle, null, arg1, arg2),
+                timeout
+            );
         }
 
-        function __speak(turtle, arg, timeout) {
+        let __speak = (turtle, arg, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(function() {
-                that._processSpeak(arg);
-            }, timeout);
+            setTimeout(() => this._processSpeak(arg), timeout);
         }
 
-        function __print(arg, timeout) {
+        let __print = (arg, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(function() {
-                that.textMsg(arg.toString());
-            }, timeout);
+            setTimeout(() => this.textMsg(arg.toString()), timeout);
         }
 
-        function __arc(turtle, arg1, arg2, timeout) {
+        let __arc = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doArc(arg1, arg2);
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doArc(arg1, arg2);
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doArc(arg1, arg2);
+                setTimeout(
+                    () => this.turtles.turtleList[turtle].doArc(arg1, arg2),
+                    timeout
+                );
+            }
+        };
+
+        let __cp1 = (turtle, arg1, arg2, timeout) => {
+            if (suppressOutput) {
+                this.cp1x[turtle] = arg1;
+                this.cp1y[turtle] = arg2;
+            } else {
+                setTimeout(() => {
+                    this.cp1x[turtle] = arg1;
+                    this.cp1y[turtle] = arg2;
                 }, timeout);
             }
-        }
+        };
 
-        function __cp1(turtle, arg1, arg2, timeout) {
+        let __cp2 = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                that.cp1x[turtle] = arg1;
-                that.cp1y[turtle] = arg2;
+                this.cp2x[turtle] = arg1;
+                this.cp2y[turtle] = arg2;
             } else {
-                setTimeout(function() {
-                    that.cp1x[turtle] = arg1;
-                    that.cp1y[turtle] = arg2;
+                setTimeout(() => {
+                    this.cp2x[turtle] = arg1;
+                    this.cp2y[turtle] = arg2;
                 }, timeout);
             }
-        }
+        };
 
-        function __cp2(turtle, arg1, arg2, timeout) {
+        let __bezier = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                that.cp2x[turtle] = arg1;
-                that.cp2y[turtle] = arg2;
-            } else {
-                setTimeout(function() {
-                    that.cp2x[turtle] = arg1;
-                    that.cp2y[turtle] = arg2;
-                }, timeout);
-            }
-        }
-
-        function __bezier(turtle, arg1, arg2, timeout) {
-            if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
-                that.turtles.turtleList[turtle].doBezier(
-                    that.cp1x[turtle],
-                    that.cp1y[turtle],
-                    that.cp2x[turtle],
-                    that.cp2y[turtle],
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
+                this.turtles.turtleList[turtle].doBezier(
+                    this.cp1x[turtle],
+                    this.cp1y[turtle],
+                    this.cp2x[turtle],
+                    this.cp2y[turtle],
                     arg1,
                     arg2
                 );
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
-                    that.turtles.turtleList[turtle].doBezier(
-                        that.cp1x[turtle],
-                        that.cp1y[turtle],
-                        that.cp2x[turtle],
-                        that.cp2y[turtle],
+                setTimeout(() => {
+                    this.turtles.turtleList[turtle].doBezier(
+                        this.cp1x[turtle],
+                        this.cp1y[turtle],
+                        this.cp2x[turtle],
+                        this.cp2y[turtle],
                         arg1,
                         arg2
                     );
                 }, timeout);
             }
-        }
+        };
 
-        function __fill(turtle, timeout) {
+        let inFillClamp = false;
+        let __fill = (turtle, timeout) => {
             if (suppressOutput) {
-                var savedPenState = that.turtles.turtleList[turtle].penState;
-                that.turtles.turtleList[turtle].penState = false;
+                let savedPenState = this.turtles.turtleList[turtle].penState;
+                this.turtles.turtleList[turtle].penState = false;
                 if (inFillClamp) {
-                    that.turtles.turtleList[turtle].doEndFill();
+                    this.turtles.turtleList[turtle].doEndFill();
                     inFillClamp = false;
                 } else {
-                    that.turtles.turtleList[turtle].doStartFill();
+                    this.turtles.turtleList[turtle].doStartFill();
                     inFillClamp = true;
                 }
 
-                that.turtles.turtleList[turtle].penState = savedPenState;
+                this.turtles.turtleList[turtle].penState = savedPenState;
             } else {
-                setTimeout(function() {
+                setTimeout(() => {
                     if (inFillClamp) {
-                        that.turtles.turtleList[turtle].doEndFill();
+                        this.turtles.turtleList[turtle].doEndFill();
                         inFillClamp = false;
                     } else {
-                        that.turtles.turtleList[turtle].doStartFill();
+                        this.turtles.turtleList[turtle].doStartFill();
                         inFillClamp = true;
                     }
                 }, timeout);
             }
-        }
+        };
 
-        function __hollowline(turtle, timeout) {
+        let inHollowLineClamp = false;
+        let __hollowline = (turtle, timeout) => {
             if (suppressOutput) {
                 if (inHollowLineClamp) {
-                    that.turtles.turtleList[turtle].doEndHollowLine();
+                    this.turtles.turtleList[turtle].doEndHollowLine();
                     inHollowLineClamp = false;
                 } else {
-                    that.turtles.turtleList[turtle].doStartHollowLine();
+                    this.turtles.turtleList[turtle].doStartHollowLine();
                     inHollowLineClamp = true;
                 }
             } else {
-                setTimeout(function() {
+                setTimeout(() => {
                     if (inHollowLineClamp) {
-                        that.turtles.turtleList[turtle].doEndHollowLine();
+                        this.turtles.turtleList[turtle].doEndHollowLine();
                         inHollowLineClamp = false;
                     } else {
-                        that.turtles.turtleList[turtle].doStartHollowLine();
+                        this.turtles.turtleList[turtle].doStartHollowLine();
                         inHollowLineClamp = true;
                     }
                 }, timeout);
             }
-        }
+        };
 
-        var extendedGraphicsCounter = 0;
-        for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            var b = this.embeddedGraphics[turtle][blk][i];
+        let extendedGraphicsCounter = 0;
+        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
+            let b = this.embeddedGraphics[turtle][blk][i];
             switch (this.blocks.blockList[b].name) {
                 case "forward":
                 case "back":
                 case "right":
                 case "left":
                 case "arc":
-                    extendedGraphicsCounter += 1;
+                    ++extendedGraphicsCounter;
                     break;
                 default:
                     break;
             }
         }
 
-        // Cheat by 0.5% so that the mouse has time to complete its work.
-        // var stepTime = beatValue * 1000 / NOTEDIV;
-        var stepTime = ((beatValue - delay) * 995) / NOTEDIV;
-        if (stepTime < 0) {
-            stepTime = 0;
-        }
+        // Cheat by 0.5% so that the mouse has time to complete its work
+        // let stepTime = beatValue * 1000 / NOTEDIV;
+        let stepTime = ((beatValue - delay) * 995) / NOTEDIV;
+        if (stepTime < 0)   stepTime = 0;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
-        // array.
+        // array
         if (extendedGraphicsCounter > 0) {
-            var stepTime = stepTime / extendedGraphicsCounter;
+            stepTime = stepTime / extendedGraphicsCounter;
         }
 
-        var waitTime = delay * 1000;
+        let waitTime = delay * 1000;
 
-        // We want to update the turtle graphics every 50ms within a note.
+        // Update the turtle graphics every 50ms within a note
         if (stepTime > 200) {
             this.dispatchFactor[turtle] = NOTEDIV / 32;
         } else if (stepTime > 100) {
@@ -3087,9 +3130,12 @@ class Logo {
             this.dispatchFactor[turtle] = NOTEDIV;
         }
 
-        for (var i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            var b = this.embeddedGraphics[turtle][blk][i];
-            var name = this.blocks.blockList[b].name;
+        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
+            let b = this.embeddedGraphics[turtle][blk][i];
+            let name = this.blocks.blockList[b].name;
+
+            let arg, arg1, arg2;
+
             switch (name) {
                 case "setcolor":
                 case "sethue":
@@ -3097,7 +3143,7 @@ class Logo {
                 case "settranslucency":
                 case "setgrey":
                 case "setpensize":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3111,7 +3157,9 @@ class Logo {
                         name,
                         arg
                     ]);
+
                     break;
+
                 case "penup":
                 case "pendown":
                     if (!suppressOutput) {
@@ -3122,7 +3170,9 @@ class Logo {
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         name
                     ]);
+
                     break;
+
                 case "clear":
                     __clear(turtle, waitTime);
                     this.playbackQueue[turtle].push([
@@ -3130,6 +3180,7 @@ class Logo {
                         "clear"
                     ]);
                     break;
+
                 case "fill":
                     __fill(turtle, waitTime);
                     this.playbackQueue[turtle].push([
@@ -3137,23 +3188,24 @@ class Logo {
                         "fill"
                     ]);
                     break;
+
                 case "hollowline":
                     __hollowline(turtle, waitTime);
-
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "hollowline"
                     ]);
                     break;
+
                 case "controlpoint1":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3168,16 +3220,18 @@ class Logo {
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "controlpoint2":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3192,18 +3246,22 @@ class Logo {
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "bezier":
-                    // TODO: Is there a reasonable way to break the bezier
-                    // curve up into small steps?
-                    var arg1 = this.parseArg(
+                    /**
+                     * @todo Is there a reasonable way to break the bezier
+                     * curve up into small steps?
+                     */
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3211,15 +3269,18 @@ class Logo {
                         this.receivedArg
                     );
                     __bezier(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "bezier",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "setheading":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3227,31 +3288,36 @@ class Logo {
                         this.receivedArg
                     );
                     __setheading(turtle, arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "setheading",
                         arg
                     ]);
+
                     break;
+
                 case "right":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "right",
@@ -3261,25 +3327,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "left":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, -deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "right",
@@ -3289,25 +3358,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "forward":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "forward",
@@ -3317,25 +3389,28 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "back":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, -deltaArg, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "forward",
@@ -3345,15 +3420,16 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 case "setxy":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3361,22 +3437,25 @@ class Logo {
                         this.receivedArg
                     );
                     __setxy(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "setxy",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "scrollxy":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3384,22 +3463,25 @@ class Logo {
                         this.receivedArg
                     );
                     __scrollxy(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "scrollxy",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "show":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
@@ -3407,15 +3489,18 @@ class Logo {
                         this.receivedArg
                     );
                     __show(turtle, arg1, arg2, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "show",
                         arg1,
                         arg2
                     ]);
+
                     break;
+
                 case "speak":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3423,14 +3508,17 @@ class Logo {
                         this.receivedArg
                     );
                     __speak(turtle, arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "speak",
                         arg
                     ]);
+
                     break;
+
                 case "print":
-                    var arg = this.parseArg(
+                    arg = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
@@ -3438,38 +3526,43 @@ class Logo {
                         this.receivedArg
                     );
                     __print(arg, waitTime);
+
                     this.playbackQueue[turtle].push([
                         this.previousTurtleTime[turtle] + waitTime / 1000,
                         "print",
                         arg
                     ]);
+
                     break;
+
                 case "arc":
-                    var arg1 = this.parseArg(
+                    arg1 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[1],
                         b,
                         this.receivedArg
                     );
-                    var arg2 = this.parseArg(
+                    arg2 = this.parseArg(
                         this,
                         turtle,
                         this.blocks.blockList[b].connections[2],
                         b,
                         this.receivedArg
                     );
+
                     for (
-                        var t = 0;
+                        let t = 0;
                         t < NOTEDIV / this.dispatchFactor[turtle];
                         t++
                     ) {
-                        var deltaTime =
+                        let deltaTime =
                             waitTime +
                             t * stepTime * this.dispatchFactor[turtle];
-                        var deltaArg =
+                        let deltaArg =
                             arg1 / (NOTEDIV / this.dispatchFactor[turtle]);
                         __arc(turtle, deltaArg, arg2, deltaTime);
+
                         this.playbackQueue[turtle].push([
                             this.previousTurtleTime[turtle] + deltaTime / 1000,
                             "arc",
@@ -3480,6 +3573,7 @@ class Logo {
 
                     waitTime += NOTEDIV * stepTime;
                     break;
+
                 default:
                     console.debug(
                         name + " is not supported inside of Note Blocks"
@@ -3488,7 +3582,7 @@ class Logo {
             }
         }
 
-        // Mark the end time of this note's graphics operations.
+        // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
         this.embeddedGraphicsFinished[turtle] = true;
     }
@@ -3526,15 +3620,10 @@ class Logo {
      */
     _setDispatchBlock(blk, turtle, listenerName) {
         if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
-            if (
+            let c =
                 this.blocks.blockList[last(this.backward[turtle])].name ===
-                "backward"
-            ) {
-                var c = 1;
-            } else {
-                var c = 2;
-            }
-
+                    "backward" ?
+                    1 : 2;
             if (
                 this.blocks.sameGeneration(
                     this.blocks.blockList[last(this.backward[turtle])]
@@ -3542,7 +3631,7 @@ class Logo {
                     blk
                 )
             ) {
-                var nextBlock = this.blocks.blockList[blk].connections[0];
+                let nextBlock = this.blocks.blockList[blk].connections[0];
                 if (nextBlock in this.endOfClampSignals[turtle]) {
                     this.endOfClampSignals[turtle][nextBlock].push(
                         listenerName
@@ -3551,7 +3640,7 @@ class Logo {
                     this.endOfClampSignals[turtle][nextBlock] = [listenerName];
                 }
             } else {
-                var nextBlock = last(this.blocks.blockList[blk].connections);
+                let nextBlock = last(this.blocks.blockList[blk].connections);
                 if (nextBlock != null) {
                     if (nextBlock in this.endOfClampSignals[turtle]) {
                         this.endOfClampSignals[turtle][nextBlock].push(
@@ -3565,7 +3654,7 @@ class Logo {
                 }
             }
         } else {
-            var nextBlock = last(this.blocks.blockList[blk].connections);
+            let nextBlock = last(this.blocks.blockList[blk].connections);
             if (nextBlock != null) {
                 if (nextBlock in this.endOfClampSignals[turtle]) {
                     this.endOfClampSignals[turtle][nextBlock].push(
@@ -3591,7 +3680,7 @@ class Logo {
         }
 
         this._setMasterVolume(DEFAULTVOLUME);
-        for (var synth in this.synthVolume[turtle]) {
+        for (let synth in this.synthVolume[turtle]) {
             this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
         }
 
@@ -3607,9 +3696,10 @@ class Logo {
      * @returns {void}
      */
     _processSpeak(text) {
-        var new_text = "";
-        for (var i in text) {
-            if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
+        let new_text = "";
+        for (let i in text) {
+            if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
+                new_text += text[i];
         }
 
         if (this.meSpeak !== null) {
@@ -3629,7 +3719,7 @@ class Logo {
      */
     _processShow(turtle, blk, arg0, arg1) {
         if (typeof arg1 === "string") {
-            var len = arg1.length;
+            let len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
                 doUseCamera(
                     [arg0],
@@ -3697,11 +3787,12 @@ class Logo {
      * @returns {void}
      */
     _doBreak(turtle) {
-        // Look for a parent loopBlock in queue and set its count to 1.
-        var parentLoopBlock = null;
-        var loopBlkIdx = -1;
-        var queueLength = this.turtles.turtleList[turtle].queue.length;
-        for (var i = queueLength - 1; i > -1; i--) {
+        // Look for a parent loopBlock in queue and set its count to 1
+        let parentLoopBlock = null;
+        let loopBlkIdx = -1;
+
+        let queueLength = this.turtles.turtleList[turtle].queue.length;
+        for (let i = queueLength - 1; i > -1; i--) {
             if (
                 this._loopBlock(
                     this.blocks.blockList[
@@ -3712,7 +3803,7 @@ class Logo {
                 // while or until
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue.
+                // Flush the parent from the queue
                 this.turtles.turtleList[turtle].queue.pop();
                 break;
             } else if (
@@ -3725,29 +3816,30 @@ class Logo {
                 // repeat or forever
                 loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue.
+                // Flush the parent from the queue
                 this.turtles.turtleList[turtle].queue.pop();
                 break;
             }
         }
+
         if (parentLoopBlock == null) {
-            // In this case, we flush the child flow.
+            // Flush the child flow
             this.turtles.turtleList[turtle].queue.pop();
             return;
         }
 
         // For while and until, we need to add any childflow from the
-        // parent to the queue.
+        // parent to the queue
         if (
             parentLoopBlock.name === "while" ||
             parentLoopBlock.name === "until"
         ) {
-            var childFlow = last(parentLoopBlock.connections);
+            let childFlow = last(parentLoopBlock.connections);
             if (childFlow != null) {
-                var queueBlock = new Queue(childFlow, 1, loopBlkIdx);
+                let queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the
                 // child flow so we can unlightlight the parent block
-                // after the child flow completes.
+                // after the child flow completes
                 this.parentFlowQueue[turtle].push(loopBlkIdx);
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
             }
@@ -3758,73 +3850,72 @@ class Logo {
      * Parses receivedArg.
      *
      * @privileged
-     * @param that
+     * @param logo
      * @param turtle
      * @param blk
      * @param parentBlk
      * @param receivedArg
      * @returns {mixed}
      */
-    parseArg(that, turtle, blk, parentBlk, receivedArg) {
-        var logo = that; // For plugin backward compatibility
-
-        // Retrieve the value of a block.
+    parseArg(logo, turtle, blk, parentBlk, receivedArg) {
+        // Retrieve the value of a block
         if (blk == null) {
-            that.errorMsg(NOINPUTERRORMSG, parentBlk);
-            // that.stopTurtle = true;
+            logo.errorMsg(NOINPUTERRORMSG, parentBlk);
+            // logo.stopTurtle = true;
             return null;
         }
 
-        if (that.blocks.blockList[blk].protoblock.parameter) {
-            if (turtle in that.parameterQueue) {
-                if (that.parameterQueue[turtle].indexOf(blk) === -1) {
-                    that.parameterQueue[turtle].push(blk);
+        if (logo.blocks.blockList[blk].protoblock.parameter) {
+            if (turtle in logo.parameterQueue) {
+                if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
+                    logo.parameterQueue[turtle].push(blk);
                 }
             } else {
                 // console.debug('turtle ' + turtle + ' has no parameterQueue');
             }
         }
 
-        if (typeof that.blocks.blockList[blk].protoblock.arg === "function")
-            return (that.blocks.blockList[blk].value = that.blocks.blockList[
+        if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
+            return (logo.blocks.blockList[blk].value = logo.blocks.blockList[
                 blk
-            ].protoblock.arg(that, turtle, blk, receivedArg));
+            ].protoblock.arg(logo, turtle, blk, receivedArg));
+        }
 
-        if (that.blocks.blockList[blk].name === "intervalname") {
-            if (typeof that.blocks.blockList[blk].value === "string") {
-                that.noteDirection[turtle] = getIntervalDirection(
-                    that.blocks.blockList[blk].value
+        if (logo.blocks.blockList[blk].name === "intervalname") {
+            if (typeof logo.blocks.blockList[blk].value === "string") {
+                logo.noteDirection[turtle] = getIntervalDirection(
+                    logo.blocks.blockList[blk].value
                 );
-                return getIntervalNumber(that.blocks.blockList[blk].value);
+                return getIntervalNumber(logo.blocks.blockList[blk].value);
             } else return 0;
-        } else if (that.blocks.blockList[blk].isValueBlock()) {
-            if (that.blocks.blockList[blk].name in that.evalArgDict) {
-                eval(that.evalArgDict[that.blocks.blockList[blk].name]);
+        } else if (logo.blocks.blockList[blk].isValueBlock()) {
+            if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
+                eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
             }
 
-            return that.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value;
         } else if (
             ["anyout", "numberout", "textout", "booleanout"].indexOf(
-                that.blocks.blockList[blk].protoblock.dockTypes[0]
+                logo.blocks.blockList[blk].protoblock.dockTypes[0]
             ) !== -1
         ) {
-            switch (that.blocks.blockList[blk].name) {
+            switch (logo.blocks.blockList[blk].name) {
                 case "dectofrac":
                     if (
-                        that.inStatusMatrix &&
-                        that.blocks.blockList[
-                            that.blocks.blockList[blk].connections[0]
+                        logo.inStatusMatrix &&
+                        logo.blocks.blockList[
+                            logo.blocks.blockList[blk].connections[0]
                         ].name === "print"
                     ) {
-                        that.statusFields.push([blk, "dectofrac"]);
+                        logo.statusFields.push([blk, "dectofrac"]);
                     } else {
-                        var cblk = that.blocks.blockList[blk].connections[1];
+                        let cblk = logo.blocks.blockList[blk].connections[1];
                         if (cblk === null) {
-                            that.errorMsg(NOINPUTERRORMSG, blk);
-                            that.blocks.blockList[blk].value = 0;
+                            logo.errorMsg(NOINPUTERRORMSG, blk);
+                            logo.blocks.blockList[blk].value = 0;
                         } else {
-                            var a = that.parseArg(
-                                that,
+                            let a = logo.parseArg(
+                                logo,
                                 turtle,
                                 cblk,
                                 blk,
@@ -3833,57 +3924,60 @@ class Logo {
                             if (typeof a === "number") {
                                 if (a < 0) {
                                     a = a * -1;
-                                    that.blocks.blockList[blk].value =
+                                    logo.blocks.blockList[blk].value =
                                         "-" + mixedNumber(a);
                                 } else {
-                                    that.blocks.blockList[
+                                    logo.blocks.blockList[
                                         blk
                                     ].value = mixedNumber(a);
                                 }
                             } else {
-                                that.errorMsg(NANERRORMSG, blk);
-                                that.blocks.blockList[blk].value = 0;
+                                logo.errorMsg(NANERRORMSG, blk);
+                                logo.blocks.blockList[blk].value = 0;
                             }
                         }
                     }
                     break;
+
                 case "hue":
                     if (
-                        that.inStatusMatrix &&
-                        that.blocks.blockList[
-                            that.blocks.blockList[blk].connections[0]
+                        logo.inStatusMatrix &&
+                        logo.blocks.blockList[
+                            logo.blocks.blockList[blk].connections[0]
                         ].name === "print"
                     ) {
-                        that.statusFields.push([blk, "color"]);
+                        logo.statusFields.push([blk, "color"]);
                     } else {
-                        that.blocks.blockList[blk].value =
-                            that.turtles.turtleList[turtle].color;
+                        logo.blocks.blockList[blk].value =
+                            logo.turtles.turtleList[turtle].color;
                     }
                     break;
+
+                /** @deprecated */
                 case "returnValue":
-                    // deprecated
-                    if (that.returns[turtle].length > 0) {
-                        that.blocks.blockList[blk].value = that.returns[
+                    if (logo.returns[turtle].length > 0) {
+                        logo.blocks.blockList[blk].value = logo.returns[
                             turtle
                         ].pop();
                     } else {
                         console.debug("WARNING: No return value.");
-                        that.blocks.blockList[blk].value = 0;
+                        logo.blocks.blockList[blk].value = 0;
                     }
                     break;
+
                 default:
-                    if (that.blocks.blockList[blk].name in that.evalArgDict) {
-                        eval(that.evalArgDict[that.blocks.blockList[blk].name]);
+                    if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
+                        eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
                     } else {
                         console.error(
                             "I do not know how to " +
-                            that.blocks.blockList[blk].name
+                            logo.blocks.blockList[blk].name
                         );
                     }
                     break;
             }
 
-            return that.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value;
         } else {
             return blk;
         }
@@ -3898,39 +3992,37 @@ class Logo {
      * @returns {number}
      */
     _noteCounter(turtle, cblk) {
-        if (cblk == null) {
-            return 0;
-        } else {
-            var saveSuppressStatus = this.suppressOutput[turtle];
+        if (cblk != null) {
+            let saveSuppressStatus = this.suppressOutput[turtle];
 
             // We need to save the state of the boxes and heap
             // although there is a potential of a boxes collision with
-            // other turtles.
-            var saveBoxes = JSON.stringify(this.boxes);
-            var saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
-            // And the turtle state
-            var saveX = this.turtles.turtleList[turtle].x;
-            var saveY = this.turtles.turtleList[turtle].y;
-            var saveColor = this.turtles.turtleList[turtle].color;
-            var saveValue = this.turtles.turtleList[turtle].value;
-            var saveChroma = this.turtles.turtleList[turtle].chroma;
-            var saveStroke = this.turtles.turtleList[turtle].stroke;
-            var saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
-            var saveOrientation = this.turtles.turtleList[turtle].orientation;
-            var savePenState = this.turtles.turtleList[turtle].penState;
+            // other turtles
+            let saveBoxes = JSON.stringify(this.boxes);
+            let saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
+            // .. and the turtle state
+            let saveX = this.turtles.turtleList[turtle].x;
+            let saveY = this.turtles.turtleList[turtle].y;
+            let saveColor = this.turtles.turtleList[turtle].color;
+            let saveValue = this.turtles.turtleList[turtle].value;
+            let saveChroma = this.turtles.turtleList[turtle].chroma;
+            let saveStroke = this.turtles.turtleList[turtle].stroke;
+            let saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
+            let saveOrientation = this.turtles.turtleList[turtle].orientation;
+            let savePenState = this.turtles.turtleList[turtle].penState;
 
-            var saveWhichNoteToCount = this.whichNoteToCount[turtle];
+            let saveWhichNoteToCount = this.whichNoteToCount[turtle];
 
-            var savePrevTurtleTime = this.previousTurtleTime[turtle];
-            var saveTurtleTime = this.turtleTime[turtle];
+            let savePrevTurtleTime = this.previousTurtleTime[turtle];
+            let saveTurtleTime = this.turtleTime[turtle];
 
             this.suppressOutput[turtle] = true;
             this.justCounting[turtle].push(true);
 
-            for (var b in this.endOfClampSignals[turtle]) {
+            for (let b in this.endOfClampSignals[turtle]) {
                 this.butNotThese[turtle][b] = [];
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < this.endOfClampSignals[turtle][b].length;
                     i++
                 ) {
@@ -3938,8 +4030,8 @@ class Logo {
                 }
             }
 
-            var actionArgs = [];
-            var saveNoteCount = this.notesPlayed[turtle];
+            let actionArgs = [];
+            let saveNoteCount = this.notesPlayed[turtle];
             this.turtles.turtleList[turtle].running = true;
 
             if (this.inNoteBlock[turtle]) {
@@ -3957,7 +4049,7 @@ class Logo {
                 this.turtles.turtleList[turtle].queue.length
             );
 
-            var returnValue = rationalSum(this.notesPlayed[turtle], [
+            let returnValue = rationalSum(this.notesPlayed[turtle], [
                 -saveNoteCount[0],
                 saveNoteCount[1]
             ]);
@@ -3988,9 +4080,11 @@ class Logo {
             this.suppressOutput[turtle] = saveSuppressStatus;
 
             this.butNotThese[turtle] = {};
+
+            return returnValue[0] / returnValue[1];
         }
 
-        return returnValue[0] / returnValue[1];
+        return 0;
     }
 
     /**
@@ -4021,11 +4115,7 @@ class Logo {
         }
 
         // Check to see if min is > max
-        if (a > b) {
-            var c = a;
-            a = b;
-            b = c;
-        }
+        if (a > b) [a, b] = [b, a];
 
         return Math.floor(
             Math.random() * (Number(b) - Number(a) + 1) + Number(a)
@@ -4218,7 +4308,7 @@ class Logo {
             turtle === -1 ?
                 platformColor.background :
                 this.turtles.turtleList[turtle].canvasColor;
-        
+
         // docById('myCanvas').style.background = c;
         this.turtles.backgroundColor = c;
         this.turtles.makeBackground(this.turtles.isShrunk);
@@ -4273,9 +4363,9 @@ class Logo {
      * @returns {number}
      */
     _calculateInvert(turtle, note, octave) {
-        var delta = 0;
-        var len = this.invertList[turtle].length;
-        var note1 = getNote(
+        let delta = 0;
+        let len = this.invertList[turtle].length;
+        let note1 = getNote(
             note,
             octave,
             0,
@@ -4284,12 +4374,12 @@ class Logo {
             null,
             this.errorMsg
         );
-        var num1 =
+        let num1 =
             pitchToNumber(note1[0], note1[1], this.keySignature[turtle]) -
             this.pitchNumberOffset[turtle];
 
-        for (var i = len - 1; i > -1; i--) {
-            var note2 = getNote(
+        for (let i = len - 1; i > -1; i--) {
+            let note2 = getNote(
                 this.invertList[turtle][i][0],
                 this.invertList[turtle][i][1],
                 0,
@@ -4298,9 +4388,10 @@ class Logo {
                 null,
                 this.errorMsg
             );
-            var num2 =
+            let num2 =
                 pitchToNumber(note2[0], note2[1], this.keySignature[turtle]) -
                 this.pitchNumberOffset[turtle];
+
             if (this.invertList[turtle][i][2] === "even") {
                 delta += num2 - num1;
                 num1 += 2 * delta;
@@ -4308,20 +4399,21 @@ class Logo {
                 delta += num2 - num1 + 0.5;
                 num1 += 2 * delta;
             } else {
-                // We need to calculate the scalar difference.
-                var scalarSteps = this._scalarDistance(turtle, num2, num1);
-                var note3 = this._addScalarTransposition(
+                // We need to calculate the scalar difference
+                let scalarSteps = this._scalarDistance(turtle, num2, num1);
+                let note3 = this._addScalarTransposition(
                     turtle,
                     note2[0],
                     note2[1],
                     -scalarSteps
                 );
-                var num3 =
+                let num3 =
                     pitchToNumber(
                         note3[0],
                         note3[1],
                         this.keySignature[turtle]
                     ) - this.pitchNumberOffset[turtle];
+
                 delta += (num3 - num1) / 2;
                 num1 = num3;
             }
@@ -4341,8 +4433,10 @@ class Logo {
      * @returns {object}
      */
     _addScalarTransposition(turtle, note, octave, n) {
+        let noteObj = null;
+
         if (n > 0) {
-            var noteObj = getNote(
+            noteObj = getNote(
                 note,
                 octave,
                 0,
@@ -4352,8 +4446,9 @@ class Logo {
                 this.errorMsg,
                 this.synth.inTemperament
             );
+
             if (this.synth.inTemperament == "custom") {
-                var value = getStepSizeUp(
+                let value = getStepSizeUp(
                     this.keySignature[turtle],
                     noteObj[0],
                     n,
@@ -4370,8 +4465,8 @@ class Logo {
                     this.synth.inTemperament
                 );
             } else {
-                for (var i = 0; i < n; i++) {
-                    var value = getStepSizeUp(
+                for (let i = 0; i < n; i++) {
+                    let value = getStepSizeUp(
                         this.keySignature[turtle],
                         noteObj[0]
                     );
@@ -4388,7 +4483,7 @@ class Logo {
                 }
             }
         } else if (n < 0) {
-            var noteObj = getNote(
+            noteObj = getNote(
                 note,
                 octave,
                 0,
@@ -4398,9 +4493,9 @@ class Logo {
                 this.errorMsg,
                 this.synth.inTemperament
             );
-            var note1 = noteObj[0];
+
             if (this.synth.inTemperament == "custom") {
-                var value = getStepSizeDown(
+                let value = getStepSizeDown(
                     this.keySignature[turtle],
                     noteObj[0],
                     n,
@@ -4417,8 +4512,8 @@ class Logo {
                     this.synth.inTemperament
                 );
             } else {
-                for (var i = 0; i < -n; i++) {
-                    var value = getStepSizeDown(
+                for (let i = 0; i < -n; i++) {
+                    let value = getStepSizeDown(
                         this.keySignature[turtle],
                         noteObj[0]
                     );
@@ -4435,7 +4530,7 @@ class Logo {
                 }
             }
         } else {
-            var noteObj = [note, octave];
+            noteObj = [note, octave];
         }
 
         return noteObj;
@@ -4453,19 +4548,20 @@ class Logo {
     _scalarDistance(turtle, firstNote, lastNote) {
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
-        // to lastNote pitch.
+        // to lastNote pitch
 
         if (lastNote === firstNote) {
             return 0;
         } else if (lastNote > firstNote) {
-            var noteObj = numberToPitch(
+            let noteObj = numberToPitch(
                 firstNote + this.pitchNumberOffset[turtle]
             );
-            var i = 0;
-            var n = firstNote + this.pitchNumberOffset[turtle];
+            let n = firstNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
             while (i < 100) {
                 n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                i += 1;
+                ++i;
                 if (n >= lastNote + this.pitchNumberOffset[turtle]) {
                     break;
                 }
@@ -4475,14 +4571,15 @@ class Logo {
 
             return i;
         } else {
-            var noteObj = numberToPitch(
+            let noteObj = numberToPitch(
                 lastNote + this.pitchNumberOffset[turtle]
             );
-            var i = 0;
-            var n = lastNote + this.pitchNumberOffset[turtle];
+            let n = lastNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
             while (i < 100) {
                 n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                i += 1;
+                ++i;
                 if (n >= firstNote + this.pitchNumberOffset[turtle]) {
                     break;
                 }
@@ -4503,11 +4600,8 @@ class Logo {
     _prepSynths() {
         this.synth.newTone();
 
-        for (
-            var turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        let turtle = 0;
+        for ( ; turtle < this.turtles.turtleList.length; turtle++) {
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};
                 instrumentsFilters[turtle] = {};
@@ -4520,7 +4614,7 @@ class Logo {
             }
 
             // Copy any preloaded synths from the default turtle
-            for (var instrumentName in instruments[0]) {
+            for (let instrumentName in instruments[0]) {
                 if (!(instrumentName in instruments[turtle])) {
                     this.synth.loadSynth(turtle, instrumentName);
 
@@ -4530,7 +4624,7 @@ class Logo {
                             instrumentsFilters[0][instrumentName];
                     }
 
-                    // and any effects
+                    // .. and any effects
                     if (instrumentName in instrumentsEffects[0]) {
                         instrumentsEffects[turtle][instrumentName] =
                             instrumentsEffects[0][instrumentName];
@@ -4549,11 +4643,11 @@ class Logo {
         if (!this.suppressOutput[turtle]) {
             this._setMasterVolume(DEFAULTVOLUME);
             for (
-                var turtle = 0;
+                let turtle = 0;
                 turtle < this.turtles.turtleList.length;
                 turtle++
             ) {
-                for (var synth in this.synthVolume[turtle]) {
+                for (let synth in this.synthVolume[turtle]) {
                     this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
                 }
             }
@@ -4605,41 +4699,41 @@ class Logo {
         if (this.optimize) return;
 
         // Note: At this point, the note of duration "duration" has
-        // already been added to notesPlayed.
+        // already been added to notesPlayed
 
-        // Don't split the note if we are already splitting the note.
+        // Don't split the note if we are already splitting the note
         if (split == undefined) split = true;
 
-        // Check to see if this note straddles a measure boundary.
-        var durationTime = 1 / duration;
-        var beatsIntoMeasure =
+        // Check to see if this note straddles a measure boundary
+        let durationTime = 1 / duration;
+        let beatsIntoMeasure =
             ((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
                 this.pickup[turtle] -
                 durationTime) *
                 this.noteValuePerBeat[turtle]) %
             this.beatsPerMeasure[turtle];
-        var timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
-        var timeLeftInMeasure =
+        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+        let timeLeftInMeasure =
             this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
             timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
-            var d = durationTime - timeLeftInMeasure;
-            var d2 = timeLeftInMeasure;
-            var b =
+            let d = durationTime - timeLeftInMeasure;
+            let d2 = timeLeftInMeasure;
+            let b =
                 this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.debug("splitting note across measure boundary.");
-            var obj = rationalToFraction(d);
+            let obj = rationalToFraction(d);
 
             if (d2 > 0) {
-                // Check to see if the note straddles multiple measures.
-                var i = 0;
+                // Check to see if the note straddles multiple measures
+                let i = 0;
                 while (d2 > b) {
-                    i += 1;
+                    ++i;
                     d2 -= b;
                 }
 
-                var obj2 = rationalToFraction(d2);
+                let obj2 = rationalToFraction(d2);
                 this.updateNotation(
                     note,
                     obj2[1] / obj2[0],
@@ -4654,10 +4748,10 @@ class Logo {
                         this.notationInsertTie(turtle);
                         this.notationDrumStaging[turtle].push("tie");
                     }
-                    var obj2 = rationalToFraction(1 / b);
+                    obj2 = rationalToFraction(1 / b);
                 }
 
-                // Add any measures we straddled.
+                // Add any measures we straddled
                 while (i > 0) {
                     i -= 1;
                     this.updateNotation(
@@ -4692,10 +4786,10 @@ class Logo {
             return;
         }
 
-        // Otherwise proceed as normal.
-        var obj = durationToNoteValue(duration);
+        // .. otherwise proceed as normal
+        let obj = durationToNoteValue(duration);
 
-        // Deprecated
+        /** @deprecated */
         if (this.turtles.turtleList[turtle].drum) {
             note = "c2";
         }
@@ -4710,8 +4804,8 @@ class Logo {
             this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0
         ]);
 
-        // If no drum is specified, add a rest to the drum
-        // line. Otherwise, add the drum.
+        // If no drum is specified, add a rest to the drum line.
+        // Otherwise, add the drum.
         if (drum.length === 0) {
             this.notationDrumStaging[turtle].push([
                 ["R"],
@@ -4723,7 +4817,7 @@ class Logo {
                 false
             ]);
         } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
-            var drumSymbol = getDrumSymbol(drum[0]);
+            let drumSymbol = getDrumSymbol(drum[0]);
             this.notationDrumStaging[turtle].push([
                 [drumSymbol],
                 obj[0],
@@ -4738,8 +4832,8 @@ class Logo {
         this.pickupPoint[turtle] = null;
 
         if (this.markup[turtle].length > 0) {
-            var markup = "";
-            for (var i = 0; i < this.markup[turtle].length; i++) {
+            let markup = "";
+            for (let i = 0; i < this.markup[turtle].length; i++) {
                 markup += this.markup[turtle][i];
                 if (i < this.markup[turtle].length - 1) {
                     markup += " ";
@@ -4751,10 +4845,10 @@ class Logo {
         }
 
         if (typeof note === "object") {
-            // If it is hertz, add a markup.
+            // If it is hertz, add a markup
             markup = "";
             try {
-                for (var i = 0; i < note.length; i++) {
+                for (let i = 0; i < note.length; i++) {
                     if (typeof note[i] === "number") {
                         if ((markup = "")) {
                             markup = toFixed2(note[i]);
@@ -4762,6 +4856,7 @@ class Logo {
                         }
                     }
                 }
+
                 if (markup.length > 0) {
                     this.notationMarkup(turtle, markup, false);
                 }
@@ -4846,15 +4941,16 @@ class Logo {
     notationMeter(turtle, count, value) {
         if (this.pickupPoint[turtle] != null) {
             // Lilypond prefers meter to be before partials.
-            var d =
+            let d =
                 this.notationStaging[turtle].length - this.pickupPoint[turtle];
-            var pickup = [];
-            for (var i in d) {
+            let pickup = [];
+
+            for (let i in d) {
                 pickup.push(this.notationStaging[turtle].pop());
             }
 
             this.notationStaging[turtle].push("meter", count, value);
-            for (var i in d) {
+            for (let i in d) {
                 this.notationStaging[turtle].push(pickup.pop());
             }
         } else {
@@ -4885,11 +4981,11 @@ class Logo {
      * @returns {void}
      */
     notationTempo(turtle, bpm, beatValue) {
-        var beat = convertFactor(beatValue);
+        let beat = convertFactor(beatValue);
         if (beat !== null) {
             this.notationStaging[turtle].push("tempo", bpm, beat);
         } else {
-            var obj = rationalToFraction(beatValue);
+            let obj = rationalToFraction(beatValue);
             // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
     }
@@ -4908,11 +5004,11 @@ class Logo {
             return;
         }
 
-        var pickupPoint = this.notationStaging[turtle].length;
+        let pickupPoint = this.notationStaging[turtle].length;
 
         // Lilypond partial must be a combination of powers of two.
-        var partial = 1 / factor;
-        var beat = convertFactor(factor);
+        let partial = 1 / factor;
+        let beat = convertFactor(factor);
         if (beat !== null) {
             this.notationStaging[turtle].push("pickup", beat);
             this.pickupPOW2[turtle] = true;
@@ -4928,7 +5024,7 @@ class Logo {
             }
 
             obj = rationalToFraction(1 - factor);
-            for (var i = 0; i < obj[0]; i++) {
+            for (let i = 0; i < obj[0]; i++) {
                 this.updateNotation(["R"], obj[1], turtle, false, "");
             }
         }
