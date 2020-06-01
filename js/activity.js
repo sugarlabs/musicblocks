@@ -2347,9 +2347,9 @@ function Activity() {
                         break;
                     case SPACE:
                         if (turtleContainer.scaleX == 1) {
-                            turtles.scaleStage(0.5);
+                            turtles.setStageScale(0.5);
                         } else {
-                            turtles.scaleStage(1);
+                            turtles.setStageScale(1);
                         }
                         break;
                     case ESC:
@@ -2550,7 +2550,7 @@ function Activity() {
         stage.canvas.width = w;
         stage.canvas.height = h;
 
-        turtles.setScale(w, h, turtleBlocksScale);
+        turtles.doScale(w, h, turtleBlocksScale);
 
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
