@@ -181,6 +181,7 @@ function Activity() {
         "activity/trash",
         "activity/boundary",
         "activity/turtle",
+        "activity/turtles",
         "activity/palette",
         "activity/note",
         "activity/protoblocks",
