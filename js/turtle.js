@@ -31,8 +31,9 @@ const TURTLEBASEPATH = "images/";
  * corresponding to a single turtle. Also contains the methods for
  * blink behavior and caching.
  *
- * Private method's names begin with underscore '_".
+ * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
+ * Internal functions' names are in PascalCase.
  */
 class Turtle {
     /**
@@ -2097,7 +2098,7 @@ class Turtles {
          * Scales down all 'turtles' in turtleList.
          * Removes the stage and adds it back at the top.
          */
-        let __collapse = () => {
+        let Collapse = () => {
             this.hideMenu();
             this.hideGrids();
             this.setStageScale(0.25);
@@ -2138,7 +2139,7 @@ class Turtles {
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
          * Assigns click listener function to doGrid() method.
          */
-        let __makeGridButton = () => {
+        let MakeGridButton = () => {
             this._gridButton = new createjs.Container();
             this._gridLabel = null;
             this._gridLabelBG = null;
@@ -2223,7 +2224,7 @@ class Turtles {
                 });
 
                 if (doCollapse) {
-                    __collapse();
+                    Collapse();
                 }
 
                 this._locked = false;
@@ -2245,7 +2246,7 @@ class Turtles {
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call doClear() method.
          */
-        let __makeClearButton = () => {
+        let MakeClearButton = () => {
             this._clearButton = new createjs.Container();
             this._clearLabel = null;
             this._clearLabelBG = null;
@@ -2334,12 +2335,12 @@ class Turtles {
                 });
 
                 if (doCollapse) {
-                    __collapse();
+                    Collapse();
                 }
 
                 let language = localStorage.languagePreference;
                 // if (!beginnerMode || language !== 'ja') {
-                __makeGridButton();
+                MakeGridButton();
                 // }
             };
 
@@ -2350,9 +2351,9 @@ class Turtles {
 
         /**
          * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to call __collapse() method.
+         * Assigns click listener function to call Collapse() method.
          */
-        let __makeCollapseButton = () => {
+        let MakeCollapseButton = () => {
             this._collapseButton = new createjs.Container();
             this._collapseLabel = null;
             this._collapseLabelBG = null;
@@ -2396,7 +2397,7 @@ class Turtles {
                         menuIcon.innerHTML = "menu";
                         docById("toggleAuxBtn").className -= "blue darken-1";
                     }
-                    __collapse();
+                    Collapse();
                 });
 
                 this._collapseButton.removeAllEventListeners("mouseover");
@@ -2451,7 +2452,7 @@ class Turtles {
                     }
                 });
 
-                __makeClearButton();
+                MakeClearButton();
             };
 
             img.src =
@@ -2463,7 +2464,7 @@ class Turtles {
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
-        let __makeExpandButton = () => {
+        let MakeExpandButton = () => {
             this._expandButton = new createjs.Container();
             this._expandLabel = null;
             this._expandLabelBG = null;
@@ -2592,7 +2593,7 @@ class Turtles {
                     this.masterStage.addChildAt(this.stage, 0);
                 });
 
-                __makeCollapseButton();
+                MakeCollapseButton();
             };
 
             img.src =
@@ -2603,7 +2604,7 @@ class Turtles {
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
-        let __makeBoundary2 = () => {
+        let MakeBoundary2 = () => {
             let img = new Image();
             img.onload = () => {
                 if (this._collapsedBoundary !== null) {
@@ -2616,7 +2617,7 @@ class Turtles {
                 this._borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
 
-                __makeExpandButton();
+                MakeExpandButton();
             };
 
             let dx = this.w - 20;
@@ -2647,7 +2648,7 @@ class Turtles {
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
          */
-        let __makeBoundary = () => {
+        let MakeBoundary = () => {
             this._locked = true;
             let img = new Image();
             img.onload = () => {
@@ -2659,7 +2660,7 @@ class Turtles {
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
                 this._borderContainer.addChild(this._expandedBoundary);
-                __makeBoundary2();
+                MakeBoundary2();
             };
 
             let dx = this.w - 5;
@@ -2687,7 +2688,7 @@ class Turtles {
         };
 
         if (!this._locked) {
-            __makeBoundary();
+            MakeBoundary();
         }
 
         return this;
