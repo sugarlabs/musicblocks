@@ -270,7 +270,6 @@ function setupToneBlocks() {
 
     class PartialBlock extends FlowBlock {
         constructor() {
-            //.TRANS: partials are weighted components in a harmonic series
             super("partial", _("partial"));
             this.setPalette("tone");
             this.setHelpString([
@@ -503,7 +502,7 @@ function setupToneBlocks() {
             let depth = args[1] / 100;
 
             if (depth < 0 || depth > 1) {
-                //.TRANS: Depth is the intesity of the tremolo effect.
+                //.TRANS: Depth is the intesity of the tremolo or chorus effect.
                 logo.errorMsg(_("Depth is out of range."), blk);
                 logo.stopTurtle = true;
             }
@@ -632,7 +631,6 @@ function setupToneBlocks() {
             let chorusDepth = args[2] / 100;
 
             if (chorusDepth < 0 || chorusDepth > 1) {
-                //.TRANS: Depth is the intesity of the chorus effect.
                 logo.errorMsg(_("Depth is out of range."), blk);
                 logo.stopTurtle = true;
             }

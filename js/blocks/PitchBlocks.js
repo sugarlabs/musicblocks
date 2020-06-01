@@ -899,7 +899,6 @@ function setupPitchBlocks() {
 
     class SquareBlock extends FlowBlock {
         constructor() {
-            //.TRANS: square wave
             super("square", _("square"));
             this.setPalette("pitch");
             this.formBlock({ args: 1, defaults: [440] });
@@ -923,7 +922,6 @@ function setupPitchBlocks() {
 
     class TriangleBlock extends FlowBlock {
         constructor() {
-            //.TRANS: triangle wave
             super("triangle", _("triangle"));
             this.setPalette("pitch");
             this.formBlock({ args: 1, defaults: [440] });
@@ -947,7 +945,6 @@ function setupPitchBlocks() {
 
     class SineBlock extends FlowBlock {
         constructor() {
-            //.TRANS: sine wave
             super("sine", _("sine"));
             this.setPalette("pitch");
             this.formBlock({ args: 1, defaults: [440] });
@@ -971,7 +968,6 @@ function setupPitchBlocks() {
 
     class SawtoothBlock extends FlowBlock {
         constructor() {
-            //.TRANS: sawtooth wave
             super("sawtooth", _("sawtooth"));
             this.setPalette("pitch");
             this.formBlock({ args: 1, defaults: [440] });
@@ -1561,7 +1557,6 @@ function setupPitchBlocks() {
                 defaults: ["sol", 4, _("even")],
                 argTypes: ["solfegein", "anyin", "anyin"],
                 argLabels: [
-                    //.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
                     this.lang === "ja" ? _("name2") : _("name"),
                     _("octave"),
                     //.TRANS: invert based on even or odd number or musical scale
@@ -2911,7 +2906,6 @@ function setupPitchBlocks() {
                 defaults: ["sol", 4],
                 argTypes: ["solfegein", "anyin"],
                 argLabels: [
-                    //.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
                     this.lang === "ja" ? _("name2") : _("name"),
                     _("octave")
                 ]

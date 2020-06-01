@@ -365,8 +365,8 @@ function setupMediaBlocks() {
 
     class ToFrequencyBlock extends LeftBlock {
         constructor() {
-            super("tofrequency", _("note to frequency"));
             //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
+            super("tofrequency", _("note to frequency"));
             this.setPalette("media");
             this.parameter = true;
             this.setHelpString([
@@ -382,7 +382,6 @@ function setupMediaBlocks() {
                 defaults: ["G", 4],
                 argTypes: ["notein", "anyin"],
                 argLabels: [
-                    //.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
                     this.lang === "ja" ? _("name2") : _("name"),
                     _("octave")
                 ]

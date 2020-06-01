@@ -217,7 +217,6 @@ function setupVolumeBlocks() {
 
     class SetSynthVolume2Block extends FlowBlock {
         constructor() {
-            //.TRANS: a rapid, slight variation in pitch
             super("setsynthvolume2", _("set synth volume"));
             this.setPalette("volume");
             this.setHelpString();
@@ -378,7 +377,6 @@ function setupVolumeBlocks() {
 
     class SetSynthVolumeBlock extends FlowBlock {
         constructor() {
-            //.TRANS: set the loudness level
             super("setsynthvolume", _("set synth volume"));
             this.setPalette("volume");
             this.beginnerBlock(true);

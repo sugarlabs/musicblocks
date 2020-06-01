@@ -63,7 +63,7 @@ function setupOrnamentBlocks() {
             this.setPalette("ornament");
             this.setHelpString();
             this.formBlock({
-                //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+                //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
                 name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
@@ -121,7 +121,6 @@ function setupOrnamentBlocks() {
             ]);
 
             this.formBlock({
-                //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
                 name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
@@ -270,7 +269,6 @@ function setupOrnamentBlocks() {
             this.setPalette("ornament");
             this.setHelpString();
             this.formBlock({
-                //.TRANS: play each note sharply detached from the others
                 name: _("staccato"),
                 args: 1,
                 defaults: [32]
@@ -331,7 +329,6 @@ function setupOrnamentBlocks() {
             ]);
 
             this.formBlock({
-                //.TRANS: legato: overlap successive notes
                 name: _("slur"),
                 args: 1,
                 defaults: [1 / 16]

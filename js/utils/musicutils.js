@@ -578,13 +578,9 @@ const SELECTORSTRINGS = [
     _("allpass"),
     //.TRANS: peaking filter
     _("peaking"),
-    //.TRANS: sine wave
     _("sine"),
-    //.TRANS: square wave
     _("square"),
-    //.TRANS: triangle wave
     _("triangle"),
-    //.TRANS: sawtooth wave
     _("sawtooth"),
     //.TRANS: even numbers
     _("even"),
@@ -2496,7 +2492,6 @@ function getSolfege(note) {
 
 function i18nSolfege(note) {
     // solfnotes_ is used in the interface for i18n
-    //.TRANS: the note names must be separated by single spaces
     var solfnotes_ = _("ti la sol fa mi re do").split(" ");
     var obj = splitSolfege(note);
 

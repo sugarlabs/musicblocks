@@ -141,7 +141,6 @@ function setupRhythmBlocks() {
             this.setHelpString();
 
             this.formBlock({
-                //.TRANS: swing is a rhythmic variation that emphasises the offbeat
                 name: _("swing"),
                 args: 1,
                 defaults: [32]
@@ -473,7 +472,6 @@ function setupRhythmBlocks() {
             this.setHelpString();
 
             this.formBlock({
-                //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
                 name: _("dot"),
                 canCollapse: true
             });

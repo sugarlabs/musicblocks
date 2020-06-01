@@ -173,9 +173,9 @@ function setupRhythmBlockPaletteBlocks() {
             this.formBlock({
                 name:
                     this.lang === "ja"
-                        ? //.TRANS: rhythm block
+                        ? //.TRANS: translate "rhythm1" as rhythm
                           _("rhythm1")
-                        : //.TRANS: an arrangement of notes based on duration
+                        :
                           _("rhythm"),
                 args: 2,
                 defaults: [3, 4],

@@ -182,8 +182,7 @@ function setupActionBlocks() {
                 ""
             ]);
 
-            //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-            //.TRANS: take (do) some action
+            //.TRANS: translate do1 the same as do (take an action) (JAPANESE ONLY)
             this.formBlock({
                 name: this.lang === "ja" ? _("do1") : _("do"),
                 flows: {
@@ -548,6 +547,7 @@ function setupActionBlocks() {
 
     class DoBlock extends FlowBlock {
         constructor() {
+	    //.TRANS: do is the do something or take an action.
             super("do");
             this.setPalette("action");
             this.beginnerBlock(true);

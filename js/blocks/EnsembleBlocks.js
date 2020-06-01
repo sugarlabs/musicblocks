@@ -295,7 +295,6 @@ function setupEnsembleBlocks() {
                 defaults: [_("Mr. Mouse", 0, 0)],
                 argTypes: ["anyin", "numberin", "numberin"],
                 argLabels: [
-                    //.TRANS: name1 is name as in name of mouse (JAPANESE ONLY)
                     this.lang === "ja" ? _("name1") : _("name"),
                     _("x"),
                     _("y")

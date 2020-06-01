@@ -1189,10 +1189,8 @@ function PopdownPalette(palettes) {
                 /#f{3,6}/gi,
                 PALETTEFILLCOLORS[name]
             );
-            //.TRANS: popout: to detach as a separate window
             var language = localStorage.languagePreference;
             if (language === "ja") {
-                //.TRANS: show2 is show as in make visible (the opposite of hide)
                 html += format(
                     '<h2 data-name="{n}"> \
                                 {i}<span>{n}</span> \
@@ -1205,6 +1203,8 @@ function PopdownPalette(palettes) {
                         '}" /> \
                                 <img class="show-button" src="header-icons/show.svg" \
                                      alt="{' +
+			//.TRANS: show2 is show as in make visible (the opposite of hide)
+
                         _("show2") +
                         '}" \
                                      title="{' +
@@ -1212,6 +1212,7 @@ function PopdownPalette(palettes) {
                         '}" /> \
                                 <img class="popout-button" src="header-icons/popout.svg" \
                                      alt="{' +
+			//.TRANS: popout: to detach as a separate window
                         _("popout") +
                         '}" \
                                      title="{' +

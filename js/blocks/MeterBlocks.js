@@ -1,7 +1,7 @@
 function setupMeterBlocks() {
     class CurrentMeterBlock extends ValueBlock {
         constructor() {
-            //.TRANS: musical meter, e.g., 4:4
+            //.TRANS: musical meter (time signature), e.g., 4:4
             super("currentmeter", _("current meter"));
             this.setPalette("meter");
             this.parameter = true;
@@ -111,7 +111,7 @@ function setupMeterBlocks() {
 
     class MeasureValueBlock extends ValueBlock {
         constructor() {
-            //.TRANS: count of current measure in meter
+            //.TRANS: count of current musical measure in meter
             super("measurevalue", _("measure count"));
             this.setPalette("meter");
             this.parameter = true;
@@ -156,7 +156,7 @@ function setupMeterBlocks() {
 
     class BeatValueBlock extends ValueBlock {
         constructor() {
-            //.TRANS: count of current beat in meter
+            //.TRANS: count of current beat in the meter
             super("beatvalue", _("beat count"));
             this.setPalette("meter");
             this.beginnerBlock(true);
@@ -484,7 +484,6 @@ function setupMeterBlocks() {
                 args: 2,
                 argTypes: ["numberin", "textin"],
                 defaults: [1, _("action")],
-                //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
                 argLabels: [_("beat"), this.lang === "ja" ? _("do1") : _("do")]
             });
         }
@@ -712,7 +711,6 @@ function setupMeterBlocks() {
 
     class SetMasterBPMBlock extends FlowBlock {
         constructor() {
-            //.TRANS: old block to set master tempo which doesn't set value of beat
             super("setmasterbpm", _("master beats per minute"));
             this.setPalette("meter");
             this.setHelpString();
@@ -989,7 +987,7 @@ function setupMeterBlocks() {
 
     class MeterBlock extends FlowBlock {
         constructor() {
-            //.TRANS: musical meter (time signature)
+            //.TRANS: musical meter (time signature), e.g., 4:4
             super("meter", _("meter"));
             this.setPalette("meter");
             this.beginnerBlock(true);

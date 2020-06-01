@@ -907,7 +907,6 @@ function setupIntervalsBlocks() {
 
     class SetKeyBlock extends FlowBlock {
         constructor() {
-            //.TRANS: set the key and mode, e.g. C Major
             super("setkey", _("set key"));
             this.setPalette("intervals");
             this.beginnerBlock(true);

@@ -361,7 +361,6 @@ function setupWidgetBlocks() {
                 null,
                 "meterwidget"
             ]);
-            //.TRANS: musical meter, e.g., 4:4
             this.formBlock({ name: _("meter"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, ["meterwidget", { collapsed: false }], x, y, [null, 1, 7]],
@@ -837,7 +836,6 @@ function setupWidgetBlocks() {
                 "rhythmruler2"
             ]);
 
-            //.TRANS: widget for subdividing a measure into distinct rhythmic elements
             this.formBlock({ name: _("rhythm maker"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "rhythmruler2", x, y, [null, 1, 17]],
