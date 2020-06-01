@@ -2899,24 +2899,3 @@ class Turtles {
         return false;
     }
 }
-
-/**
- * Queue entry for managing running blocks.
- *
- * @class
- */
-class Queue {
-    /**
-     * @constructor
-     * @param blk - block
-     * @param count - count
-     * @param parentBlk - parent block
-     * @param args - arguments
-     */
-    constructor(blk, count, parentBlk, args) {
-        this.blk = blk;
-        this.count = count;
-        this.parentBlk = parentBlk;
-        this.args = args;
-    }
-}
