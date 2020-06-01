@@ -12,6 +12,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("int"),
                 args: 1,
+                argTypes: ["anyin"],
                 defaults: [100]
             });
         }
