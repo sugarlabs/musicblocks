@@ -2920,18 +2920,3 @@ class Queue {
         this.args = args;
     }
 }
-
-/**
- * Converts hexcode to rgb.
- *
- * @param {Number} hex - hexcode
- * @return {String} - rgb values of hexcode + alpha which is 1
- */
-function hex2rgb(hex) {
-    let bigint = parseInt(hex, 16);
-    let r = (bigint >> 16) & 255;
-    let g = (bigint >> 8) & 255;
-    let b = bigint & 255;
-
-    return "rgba(" + r + "," + g + "," + b + ",1)";
-}
