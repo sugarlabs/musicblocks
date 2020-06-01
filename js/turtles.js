@@ -133,27 +133,29 @@ class Turtles {
 
         this.turtleList.push(newTurtle);
 
+        let turtlesStage = this.getStage();
+
         // Each turtle needs its own canvas
         newTurtle.imageContainer = new createjs.Container();
-        this.stage.addChild(newTurtle.imageContainer);
+        turtlesStage.addChild(newTurtle.imageContainer);
         newTurtle.penstrokes = new createjs.Bitmap();
-        this.stage.addChild(newTurtle.penstrokes);
+        turtlesStage.addChild(newTurtle.penstrokes);
 
         newTurtle.container = new createjs.Container();
-        this.stage.addChild(newTurtle.container);
+        turtlesStage.addChild(newTurtle.container);
         newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
         newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
 
         // Ensure that the buttons are on top
-        this.stage.removeChild(this._expandButton);
-        this.stage.addChild(this._expandButton);
-        this.stage.removeChild(this._collapseButton);
-        this.stage.addChild(this._collapseButton);
-        this.stage.removeChild(this._clearButton);
-        this.stage.addChild(this._clearButton);
+        turtlesStage.removeChild(this._expandButton);
+        turtlesStage.addChild(this._expandButton);
+        turtlesStage.removeChild(this._collapseButton);
+        turtlesStage.addChild(this._collapseButton);
+        turtlesStage.removeChild(this._clearButton);
+        turtlesStage.addChild(this._clearButton);
         if (this._gridButton !== null) {
-            this.stage.removeChild(this._gridButton);
-            this.stage.addChild(this._gridButton);
+            turtlesStage.removeChild(this._gridButton);
+            turtlesStage.addChild(this._gridButton);
         }
 
         let hitArea = new createjs.Shape();
@@ -209,7 +211,7 @@ class Turtles {
         newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
-            this.stage.dispatchEvent("click" + newTurtle.name);
+            turtlesStage.dispatchEvent("click" + newTurtle.name);
         });
 
         newTurtle.container.on("mouseover", event => {
@@ -297,7 +299,7 @@ class TurtlesModel {
      */
     constructor() {
         this._masterStage = null;       // createjs stage
-        this.stage = null;              // createjs container for turtle
+        this._stage = null;             // createjs container for turtle
 
         this._canvas = null;            // DOM canvas element
 
@@ -326,8 +328,8 @@ class TurtlesModel {
      * @returns {this}
      */
     setStage(stage) {
-        this.stage = stage;
-        this.stage.addChild(this._borderContainer);
+        this._stage = stage;
+        this._stage.addChild(this._borderContainer);
         return this;
     }
 
@@ -335,7 +337,7 @@ class TurtlesModel {
      * @returns {Object} - stage object
     */
     getStage() {
-        return this.stage;
+        return this._stage;
     }
 
     /**
@@ -345,6 +347,15 @@ class TurtlesModel {
     setCanvas(canvas) {
         this._canvas = canvas;
         return this;
+    }
+
+    /**
+     * Getter for canvas object.
+     *
+     * @return {Object} canvas object
+     */
+    getCanvas() {
+        return this._canvas;
     }
 
     /**
@@ -482,8 +493,8 @@ class TurtlesView {
      * @returns {void}
      */
     setStageScale(scale) {
-        this.stage.scaleX = scale;
-        this.stage.scaleY = scale;
+        this.getStage().scaleX = scale;
+        this.getStage().scaleY = scale;
         this.refreshCanvas();
     }
 
@@ -514,7 +525,7 @@ class TurtlesView {
      * @returns {void}
      */
     deltaY(dy) {
-        this.stage.y += dy;
+        this.getStage().y += dy;
     }
 
     /**
@@ -525,7 +536,7 @@ class TurtlesView {
      * @returns {Number} inverted y coordinate
      */
     _invertY(y) {
-        return this._canvas.height / (2.0 * this.scale) - y;
+        return this.getCanvas().height / (2.0 * this.scale) - y;
     }
 
     /**
@@ -535,7 +546,7 @@ class TurtlesView {
  * @returns {Number} turtle x coordinate
  */
     screenX2turtleX(x) {
-        return x - this._canvas.width / (2.0 * this.scale);
+        return x - this.getCanvas().width / (2.0 * this.scale);
     }
 
     /**
@@ -555,7 +566,7 @@ class TurtlesView {
      * @returns {Number} screen x coordinate
      */
     turtleX2screenX(x) {
-        return this._canvas.width / (2.0 * this.scale) + x;
+        return this.getCanvas().width / (2.0 * this.scale) + x;
     }
 
     /**
@@ -584,21 +595,22 @@ class TurtlesView {
             );
         }
 
+        let turtlesStage = this.getStage();
         // We put the buttons on the stage so they will be on top
         if (this._expandButton !== null) {
-            this.stage.removeChild(this._expandButton);
+            turtlesStage.removeChild(this._expandButton);
         }
 
         if (this._collapseButton !== null) {
-            this.stage.removeChild(this._collapseButton);
+            turtlesStage.removeChild(this._collapseButton);
         }
 
         if (this._clearButton !== null) {
-            this.stage.removeChild(this._clearButton);
+            turtlesStage.removeChild(this._clearButton);
         }
 
         if (this._gridButton !== null) {
-            this.stage.removeChild(this._gridButton);
+            turtlesStage.removeChild(this._gridButton);
         }
 
         let circles = null;
@@ -616,8 +628,8 @@ class TurtlesView {
             this._expandButton.visible = true;
             this._expandedBoundary.visible = false;
             this._collapseButton.visible = false;
-            this.stage.x = (this.w * 3) / 4 - 10;
-            this.stage.y = 55 + LEADING + 6;
+            turtlesStage.x = (this.w * 3) / 4 - 10;
+            turtlesStage.y = 55 + LEADING + 6;
             this.isShrunk = true;
             for (let i = 0; i < this.turtleList.length; i++) {
                 this.turtleList[i].container.scaleX = SCALEFACTOR;
@@ -639,8 +651,8 @@ class TurtlesView {
             }
 
             // remove the stage and add it back at the top
-            this._masterStage.removeChild(this.stage);
-            this._masterStage.addChild(this.stage);
+            this._masterStage.removeChild(turtlesStage);
+            this._masterStage.addChild(turtlesStage);
 
             this.refreshCanvas();
         }
@@ -681,7 +693,7 @@ class TurtlesView {
                 this._gridButton.visible = true;
 
                 // this._borderContainer.addChild(this._gridButton);
-                this.stage.addChild(this._gridButton);
+                turtlesStage.addChild(this._gridButton);
                 this.refreshCanvas();
 
                 this._gridButton.removeAllEventListeners("mouseover");
@@ -716,7 +728,7 @@ class TurtlesView {
                             r,
                             event,
                             palettes.scale,
-                            this.stage
+                            turtlesStage
                         );
                     }
 
@@ -725,7 +737,7 @@ class TurtlesView {
 
                 this._gridButton.removeAllEventListeners("mouseout");
                 this._gridButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, this.stage);
+                    hideButtonHighlight(circles, turtlesStage);
                     if (this._gridLabel !== null) {
                         this._gridLabel.visible = false;
                         this._gridLabelBG.visible = false;
@@ -788,7 +800,7 @@ class TurtlesView {
                 this._clearButton.visible = true;
 
                 // this._borderContainer.addChild(this._clearButton);
-                this.stage.addChild(this._clearButton);
+                turtlesStage.addChild(this._clearButton);
                 this.refreshCanvas();
 
                 this._clearButton.removeAllEventListeners("mouseover");
@@ -823,7 +835,7 @@ class TurtlesView {
                             r,
                             event,
                             palettes.scale,
-                            this.stage
+                            turtlesStage
                         );
                     }
 
@@ -832,7 +844,7 @@ class TurtlesView {
 
                 this._clearButton.removeAllEventListeners("mouseout");
                 this._clearButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, this.stage);
+                    hideButtonHighlight(circles, turtlesStage);
                     if (this._clearLabel !== null) {
                         this._clearLabel.visible = false;
                     }
@@ -890,7 +902,7 @@ class TurtlesView {
                 this._collapseButton.addChild(this._collapseLabel);
 
                 // this._borderContainer.addChild(this._collapseButton);
-                this.stage.addChild(this._collapseButton);
+                turtlesStage.addChild(this._collapseButton);
 
                 this._collapseButton.visible = true;
                 this._collapseButton.x = this.w - 55;
@@ -945,7 +957,7 @@ class TurtlesView {
                             r,
                             event,
                             palettes.scale,
-                            this.stage
+                            turtlesStage
                         );
                     }
 
@@ -954,7 +966,7 @@ class TurtlesView {
 
                 this._collapseButton.removeAllEventListeners("mouseout");
                 this._collapseButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, this.stage);
+                    hideButtonHighlight(circles, turtlesStage);
                     if (this._collapseLabel !== null) {
                         this._collapseLabel.visible = false;
                         this._collapseLabelBG.visible = false;
@@ -1007,7 +1019,7 @@ class TurtlesView {
                 this._expandButton.scale = SCALEFACTOR;
                 this._expandButton.visible = false;
                 // this._borderContainer.addChild(this._expandButton);
-                this.stage.addChild(this._expandButton);
+                turtlesStage.addChild(this._expandButton);
 
                 this._expandButton.removeAllEventListeners("mouseover");
                 this._expandButton.on("mouseover", event => {
@@ -1055,8 +1067,8 @@ class TurtlesView {
                     let w = (this.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
                     let x = event.stageX / this.scale - w;
                     let y = event.stageY / this.scale - 16;
-                    this.stage.x = Math.max(0, Math.min((this.w * 3) / 4, x));
-                    this.stage.y = Math.max(55, Math.min((this.h * 3) / 4, y));
+                    turtlesStage.x = Math.max(0, Math.min((this.w * 3) / 4, x));
+                    turtlesStage.y = Math.max(55, Math.min((this.h * 3) / 4, y));
                     this.refreshCanvas();
                 });
 
@@ -1076,8 +1088,8 @@ class TurtlesView {
                     this._collapseButton.visible = true;
                     this._collapsedBoundary.visible = false;
                     this._expandButton.visible = false;
-                    this.stage.x = 0;
-                    this.stage.y = 0;
+                    turtlesStage.x = 0;
+                    turtlesStage.y = 0;
                     this.isShrunk = false;
                     for (let i = 0; i < this.turtleList.length; i++) {
                         this.turtleList[i].container.scaleX = 1;
@@ -1099,8 +1111,8 @@ class TurtlesView {
                     }
 
                     // remove the stage and add it back in position 0
-                    this._masterStage.removeChild(this.stage);
-                    this._masterStage.addChildAt(this.stage, 0);
+                    this._masterStage.removeChild(turtlesStage);
+                    this._masterStage.addChildAt(turtlesStage, 0);
                 });
 
                 __makeCollapseButton();
