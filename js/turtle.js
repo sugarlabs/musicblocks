@@ -2058,50 +2058,6 @@ class Turtles {
     }
 
     /**
-     * Toggles visibility of menu and grids.
-     * Scales down all 'turtles' in turtleList.
-     * Removes the stage and adds it back at the top.
-     *
-     * @private
-     */
-    _collapse() {
-        this.hideMenu();
-        this.hideGrids();
-        this.setStageScale(0.25);
-        this._collapsedBoundary.visible = true;
-        this._expandButton.visible = true;
-        this._expandedBoundary.visible = false;
-        this._collapseButton.visible = false;
-        this.stage.x = (this.w * 3) / 4 - 10;
-        this.stage.y = 55 + LEADING + 6;
-        this.isShrunk = true;
-        for (let i = 0; i < this.turtleList.length; i++) {
-            this.turtleList[i].container.scaleX = SCALEFACTOR;
-            this.turtleList[i].container.scaleY = SCALEFACTOR;
-            this.turtleList[i].container.scale = SCALEFACTOR;
-        }
-
-        this._clearButton.scaleX = SCALEFACTOR;
-        this._clearButton.scaleY = SCALEFACTOR;
-        this._clearButton.scale = SCALEFACTOR;
-        this._clearButton.x = this.w - 5 - 8 * 55;
-
-        if (this._gridButton !== null) {
-            this._gridButton.scaleX = SCALEFACTOR;
-            this._gridButton.scaleY = SCALEFACTOR;
-            this._gridButton.scale = SCALEFACTOR;
-            this._gridButton.x = this.w - 10 - 12 * 55;
-            this._gridButton.visible = false;
-        }
-
-        // remove the stage and add it back at the top
-        this.masterStage.removeChild(this.stage);
-        this.masterStage.addChild(this.stage);
-
-        this.refreshCanvas();
-    }
-
-    /**
      * Makes background for canvas: clears containers, renders buttons.
      *
      * @param setCollapsed - specify whether the background should be collapsed
@@ -2135,6 +2091,48 @@ class Turtles {
         }
 
         let circles = null;
+
+        /**
+         * Toggles visibility of menu and grids.
+         * Scales down all 'turtles' in turtleList.
+         * Removes the stage and adds it back at the top.
+         */
+        let __collapse = () => {
+            this.hideMenu();
+            this.hideGrids();
+            this.setStageScale(0.25);
+            this._collapsedBoundary.visible = true;
+            this._expandButton.visible = true;
+            this._expandedBoundary.visible = false;
+            this._collapseButton.visible = false;
+            this.stage.x = (this.w * 3) / 4 - 10;
+            this.stage.y = 55 + LEADING + 6;
+            this.isShrunk = true;
+            for (let i = 0; i < this.turtleList.length; i++) {
+                this.turtleList[i].container.scaleX = SCALEFACTOR;
+                this.turtleList[i].container.scaleY = SCALEFACTOR;
+                this.turtleList[i].container.scale = SCALEFACTOR;
+            }
+
+            this._clearButton.scaleX = SCALEFACTOR;
+            this._clearButton.scaleY = SCALEFACTOR;
+            this._clearButton.scale = SCALEFACTOR;
+            this._clearButton.x = this.w - 5 - 8 * 55;
+
+            if (this._gridButton !== null) {
+                this._gridButton.scaleX = SCALEFACTOR;
+                this._gridButton.scaleY = SCALEFACTOR;
+                this._gridButton.scale = SCALEFACTOR;
+                this._gridButton.x = this.w - 10 - 12 * 55;
+                this._gridButton.visible = false;
+            }
+
+            // remove the stage and add it back at the top
+            this.masterStage.removeChild(this.stage);
+            this.masterStage.addChild(this.stage);
+
+            this.refreshCanvas();
+        }
 
         /**
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
@@ -2225,7 +2223,7 @@ class Turtles {
                 });
 
                 if (doCollapse) {
-                    this._collapse();
+                    __collapse();
                 }
 
                 this._locked = false;
@@ -2336,7 +2334,7 @@ class Turtles {
                 });
 
                 if (doCollapse) {
-                    this._collapse();
+                    __collapse();
                 }
 
                 let language = localStorage.languagePreference;
@@ -2352,7 +2350,7 @@ class Turtles {
 
         /**
          * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to call _collapse() method.
+         * Assigns click listener function to call __collapse() method.
          */
         let __makeCollapseButton = () => {
             this._collapseButton = new createjs.Container();
@@ -2398,7 +2396,7 @@ class Turtles {
                         menuIcon.innerHTML = "menu";
                         docById("toggleAuxBtn").className -= "blue darken-1";
                     }
-                    this._collapse();
+                    __collapse();
                 });
 
                 this._collapseButton.removeAllEventListeners("mouseover");
