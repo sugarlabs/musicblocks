@@ -1284,3 +1284,37 @@ function closeBlkWidgets (name) {
         }
     }
 };
+
+/**
+ * Adds dynamic references to methods of one class, to another class' instance.
+ * Thereafter, calls made to methods (in the referencing class) to the adding
+ * class' object, are referred to the corresponding method of the referencing
+ * class' object.
+ * 
+ * Used to implement the Model, View, Controller.
+ * Call this function from the constructor of the adding class.
+ *
+ * @param {Object} addingObj - object of the adding class (to which, methods
+ * are to be added)
+ * @param {Object} refObj - object of the referencing class (whose methods
+ * are to be added)
+ * @returns {void}
+ */
+function addMethodRefs(addingObj, refObj) {
+    let names = Object.getOwnPropertyNames(
+        eval(refObj.constructor.name).prototype
+    );
+    for (let name of names) {
+        if (name !== "constructor") {
+            addingObj[name] =
+                eval(
+                    /** @see {https://stackoverflow.com/a/47468674/10945986} */
+                    Object.keys({addingObj})[0] + "." +
+                    /** @see {https://stackoverflow.com/a/28191966/10945986} */
+                    Object.keys(addingObj).find(
+                        key => addingObj[key] === refObj
+                    ) + "." + name
+                );
+        }
+    }
+}

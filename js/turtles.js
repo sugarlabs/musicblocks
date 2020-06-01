@@ -33,6 +33,9 @@ class Turtles {
      * @constructor
      */
     constructor() {
+        this.model = new TurtlesModel(this);    // instantiate the model
+        addMethodRefs(this, this.model);    // add references to model's methods
+
         this.masterStage = null;        // createjs stage
         this.stage = null;              // createjs container for turtle
 
@@ -1136,5 +1139,23 @@ class Turtles {
             }
         }
         return false;
+    }
+}
+
+/**
+ * Class pertaining to Turtles Model.
+ *
+ * @class
+ * @classdesc This is the prototype of the Model for the Turtles
+ * component. It should store the data structures that control behavior
+ * of the model, and the methods to interact with them.
+ */
+class TurtlesModel {
+    /**
+     * @constructor
+     * @param {Object} controller - Instance of Turtles class
+     */
+    constructor(controller) {
+        this.controller = controller;
     }
 }
