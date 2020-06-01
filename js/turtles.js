@@ -36,6 +36,9 @@ class Turtles {
         this.model = new TurtlesModel(this);    // instantiate the model
         addMethodRefs(this, this.model);    // add references to model's methods
 
+        this.view = new TurtlesView(this);      // instantiate the view
+        addMethodRefs(this, this.view);     // add references to view's methods
+
         this.masterStage = null;        // createjs stage
         this.stage = null;              // createjs container for turtle
 
@@ -1146,11 +1149,31 @@ class Turtles {
  * Class pertaining to Turtles Model.
  *
  * @class
- * @classdesc This is the prototype of the Model for the Turtles
- * component. It should store the data structures that control behavior
- * of the model, and the methods to interact with them.
+ * @classdesc This is the prototype of the Model for the Turtles component.
+ * It should store the data structures that control behavior of the model,
+ * and the methods to interact with them.
  */
 class TurtlesModel {
+    /**
+     * @constructor
+     * @param {Object} controller - Instance of Turtles class
+     */
+    constructor(controller) {
+        this.controller = controller;
+    }
+}
+
+/**
+ * Class pertaining to Turtles View.
+ *
+ * @class
+ * @classdesc This is the prototype of the View for the Turtles component.
+ * It should make changes to the view, while using members of the Model
+ * through Turtles (controller). An action may require updating the state
+ * (of the Model), which it can do by calling methods of the Model, also
+ * through Turtles (controller).
+ */
+class TurtlesView {
     /**
      * @constructor
      * @param {Object} controller - Instance of Turtles class
