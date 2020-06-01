@@ -1728,6 +1728,56 @@ class Turtle {
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
         */
     }
+
+    /**
+     * Async creation of bitmap from SVG data.
+     *
+     * @param {String} data - SVG data
+     * @param {Object} startBlock - corresponding start block
+     * @param {Function} refreshCanvas - callback to refresh canvas
+     * @returns {void}
+     */
+    _makeTurtleBitmap(data, startBlock, refreshCanvas) {
+        // Works with Chrome, Safari, Firefox (untested on IE)
+        let img = new Image();
+
+        img.onload = () => {
+            let bitmap = new createjs.Bitmap(img);
+
+            this.bitmap = bitmap;
+            this.bitmap.regX = 27 | 0;
+            this.bitmap.regY = 27 | 0;
+            this.bitmap.cursor = "pointer";
+            this.container.addChild(this.bitmap);
+            this._createCache();
+
+            this.startBlock = startBlock;
+            if (startBlock != null) {
+                startBlock.updateCache();
+                this.decorationBitmap = this.bitmap.clone();
+                startBlock.container.addChild(this.decorationBitmap);
+                this.decorationBitmap.name = "decoration";
+                let width = startBlock.width;
+                let offset = 40;
+
+                this.decorationBitmap.x =
+                    width - (offset * startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.y =
+                    (35 * startBlock.protoblock.scale) / 2;
+                this.decorationBitmap.scaleX =
+                    this.decorationBitmap.scaleY =
+                    this.decorationBitmap.scale =
+                        (0.5 * startBlock.protoblock.scale) / 2;
+                startBlock.updateCache();
+            }
+
+            refreshCanvas();
+        };
+
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(data)));
+    }
 }
 
 /**
@@ -2646,28 +2696,6 @@ class Turtles {
     }
 
     /**
-     * Async creation of bitmap from SVG data.
-     *
-     * @param data - SVG data
-     * @param name - name of bitmap
-     * @param callback - function executed on load of bitmap
-     * @param extras
-     */
-    _makeTurtleBitmap(data, callback, extras) {
-        // Works with Chrome, Safari, Firefox (untested on IE)
-        let img = new Image();
-
-        img.onload = () => {
-            let bitmap = new createjs.Bitmap(img);
-            callback(this, bitmap, extras);
-        };
-
-        img.src =
-            "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(data)));
-    }
-
-    /**
      * Add a new turtle for each start block.
      * Creates container for each turtle.
      *
@@ -2739,38 +2767,6 @@ class Turtles {
         hitArea.y = 0;
         newTurtle.container.hitArea = hitArea;
 
-        let __processTurtleBitmap = (that, bitmap, startBlock) => {
-            newTurtle.bitmap = bitmap;
-            newTurtle.bitmap.regX = 27 | 0;
-            newTurtle.bitmap.regY = 27 | 0;
-            newTurtle.bitmap.cursor = "pointer";
-            newTurtle.container.addChild(newTurtle.bitmap);
-            newTurtle._createCache();
-
-            newTurtle.startBlock = startBlock;
-            if (startBlock != null) {
-                startBlock.updateCache();
-                newTurtle.decorationBitmap = newTurtle.bitmap.clone();
-                startBlock.container.addChild(newTurtle.decorationBitmap);
-                newTurtle.decorationBitmap.name = "decoration";
-                let width = startBlock.width;
-                let offset = 40;
-
-                newTurtle.decorationBitmap.x =
-                    width - (offset * startBlock.protoblock.scale) / 2;
-
-                newTurtle.decorationBitmap.y =
-                    (35 * startBlock.protoblock.scale) / 2;
-                newTurtle.decorationBitmap.scaleX =
-                    newTurtle.decorationBitmap.scaleY =
-                    newTurtle.decorationBitmap.scale =
-                        (0.5 * startBlock.protoblock.scale) / 2;
-                startBlock.updateCache();
-            }
-
-            that.refreshCanvas();
-        };
-
         let artwork = this._drum ? DRUMSVG : TURTLESVG;
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -2786,7 +2782,7 @@ class Turtles {
                 .replace(/stroke_color/g, STROKECOLORS[i]);
         }
 
-        this._makeTurtleBitmap(artwork, __processTurtleBitmap, startBlock);
+        newTurtle._makeTurtleBitmap(artwork, startBlock, this.refreshCanvas);
 
         newTurtle.color = i * 10;
         newTurtle.canvasColor = getMunsellColor(
