@@ -1049,6 +1049,11 @@ function Activity() {
         refreshCanvas();
     };
 
+    chooseKeyMenu = () => {
+        var wheel = new wheelnav("chooseKeyMenu");
+        wheel.createWheel(["Thank you", "for", "download"]);
+    }
+
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
@@ -4601,6 +4606,7 @@ function Activity() {
         );
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
+        toolbar.renderChooseKeyIcon(chooseKeyMenu);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 

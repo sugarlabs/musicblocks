@@ -397,6 +397,13 @@ function Toolbar() {
         };
     };
 
+    this.renderChooseKeyIcon = function(onclick) {
+        var chooseKeyIcon = docById("chooseKeyIcon")
+        chooseKeyIcon.onclick = () => {
+            onclick();
+        }
+    }
+
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = function() {
