@@ -189,9 +189,10 @@ class Turtles {
         );
 
         newTurtle.container.on("mousedown", event => {
+            let scale = this.getScale();
             let offset = {
-                x: newTurtle.container.x - event.stageX / this.scale,
-                y: newTurtle.container.y - event.stageY / this.scale
+                x: newTurtle.container.x - event.stageX / scale,
+                y: newTurtle.container.y - event.stageY / scale
             };
 
             newTurtle.container.removeAllEventListeners("pressmove");
@@ -200,8 +201,8 @@ class Turtles {
                     return;
                 }
 
-                newTurtle.container.x = event.stageX / this.scale + offset.x;
-                newTurtle.container.y = event.stageY / this.scale + offset.y;
+                newTurtle.container.x = event.stageX / scale + offset.x;
+                newTurtle.container.y = event.stageY / scale + offset.y;
                 newTurtle.x = this.screenX2turtleX(newTurtle.container.x);
                 newTurtle.y = this.screenY2turtleY(newTurtle.container.y);
                 this.refreshCanvas();
@@ -310,6 +311,9 @@ class TurtlesModel {
         this.hideMenu = null;           // function to hide aux menu
         this.doClear = null;            // function to clear the canvas
 
+        // createjs border container
+        this._borderContainer = new createjs.Container();
+
         // List of all of the turtles, one for each start block
         this.turtleList = [];
     }
@@ -395,6 +399,13 @@ class TurtlesModel {
     }
 
     /**
+     * @returns {Object} border container object
+     */
+    getBorderContainer() {
+        return this._borderContainer;
+    }
+
+    /**
      * Returns block object.
      *
      * @param blocks
@@ -443,17 +454,17 @@ class TurtlesView {
      */
     constructor() {
         this.scale = 1.0;               // scale factor in [0, 1]
-        this.w = 1200;                  // stage width
-        this.h = 900;                   // stage height
+        this._w = 1200;                 // stage width
+        this._h = 900;                  // stage height
 
-        /**
-         * @todo write comments to describe each variable
-         */
+        // these 3 are used by outer code only
         this.gx = null;
         this.gy = null;
         this.canvas1 = null;
 
-        this._borderContainer = new createjs.Container();
+        /**
+         * @todo write comments to describe each variable
+         */
         this._expandedBoundary = null;
         this._collapsedBoundary = null;
         this.isShrunk = false;
@@ -470,6 +481,7 @@ class TurtlesView {
         this._gridLabel = null;
         this._gridLabelBG = null;
 
+        // canvas background color
         this.backgroundColor = platformColor.background;
 
         this._locked = false;
@@ -511,11 +523,18 @@ class TurtlesView {
             this._queue = [w, h, scale];
         } else {
             this.scale = scale;
-            this.w = w / scale;
-            this.h = h / scale;
+            this._w = w / scale;
+            this._h = h / scale;
         }
 
         this.makeBackground();
+    }
+
+    /**
+     * @returns {Number} scale factor
+     */
+    getScale() {
+        return this.scale;
     }
 
     /**
@@ -587,11 +606,13 @@ class TurtlesView {
     makeBackground(setCollapsed) {
         let doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
+        let borderContainer = this.getBorderContainer();
+
         // Remove any old background containers
-        for (let i = 0; i < this._borderContainer.children.length; i++) {
-            this._borderContainer.children[i].visible = false;
-            this._borderContainer.removeChild(
-                this._borderContainer.children[i]
+        for (let i = 0; i < borderContainer.children.length; i++) {
+            borderContainer.children[i].visible = false;
+            borderContainer.removeChild(
+                borderContainer.children[i]
             );
         }
 
@@ -628,7 +649,7 @@ class TurtlesView {
             this._expandButton.visible = true;
             this._expandedBoundary.visible = false;
             this._collapseButton.visible = false;
-            turtlesStage.x = (this.w * 3) / 4 - 10;
+            turtlesStage.x = (this._w * 3) / 4 - 10;
             turtlesStage.y = 55 + LEADING + 6;
             this.isShrunk = true;
             for (let i = 0; i < this.turtleList.length; i++) {
@@ -640,13 +661,13 @@ class TurtlesView {
             this._clearButton.scaleX = SCALEFACTOR;
             this._clearButton.scaleY = SCALEFACTOR;
             this._clearButton.scale = SCALEFACTOR;
-            this._clearButton.x = this.w - 5 - 8 * 55;
+            this._clearButton.x = this._w - 5 - 8 * 55;
 
             if (this._gridButton !== null) {
                 this._gridButton.scaleX = SCALEFACTOR;
                 this._gridButton.scaleY = SCALEFACTOR;
                 this._gridButton.scale = SCALEFACTOR;
-                this._gridButton.x = this.w - 10 - 12 * 55;
+                this._gridButton.x = this._w - 10 - 12 * 55;
                 this._gridButton.visible = false;
             }
 
@@ -688,11 +709,11 @@ class TurtlesView {
                 this._gridButton.addChild(this._gridLabel);
 
                 bitmap.visible = true;
-                this._gridButton.x = this.w - 10 - 3 * 55;
+                this._gridButton.x = this._w - 10 - 3 * 55;
                 this._gridButton.y = 70 + LEADING + 6;
                 this._gridButton.visible = true;
 
-                // this._borderContainer.addChild(this._gridButton);
+                // borderContainer.addChild(this._gridButton);
                 turtlesStage.addChild(this._gridButton);
                 this.refreshCanvas();
 
@@ -752,8 +773,8 @@ class TurtlesView {
                 this._locked = false;
                 if (this._queue.length === 3) {
                     this.scale = this._queue[2];
-                    this.w = this._queue[0] / this.scale;
-                    this.h = this._queue[1] / this.scale;
+                    this._w = this._queue[0] / this.scale;
+                    this._h = this._queue[1] / this.scale;
                     this._queue = [];
                     this.makeBackground();
                 }
@@ -795,11 +816,11 @@ class TurtlesView {
                 this._clearButton.addChild(this._clearLabel);
 
                 bitmap.visible = true;
-                this._clearButton.x = this.w - 5 - 2 * 55;
+                this._clearButton.x = this._w - 5 - 2 * 55;
                 this._clearButton.y = 70 + LEADING + 6;
                 this._clearButton.visible = true;
 
-                // this._borderContainer.addChild(this._clearButton);
+                // borderContainer.addChild(this._clearButton);
                 turtlesStage.addChild(this._clearButton);
                 this.refreshCanvas();
 
@@ -901,11 +922,11 @@ class TurtlesView {
                 bitmap.visible = true;
                 this._collapseButton.addChild(this._collapseLabel);
 
-                // this._borderContainer.addChild(this._collapseButton);
+                // borderContainer.addChild(this._collapseButton);
                 turtlesStage.addChild(this._collapseButton);
 
                 this._collapseButton.visible = true;
-                this._collapseButton.x = this.w - 55;
+                this._collapseButton.x = this._w - 55;
                 this._collapseButton.y = 70 + LEADING + 6;
                 this.refreshCanvas();
 
@@ -1012,13 +1033,13 @@ class TurtlesView {
                 bitmap.visible = true;
                 this._expandButton.addChild(this._expandLabel);
 
-                this._expandButton.x = this.w - 10 - 4 * 55;
+                this._expandButton.x = this._w - 10 - 4 * 55;
                 this._expandButton.y = 70 + LEADING + 6;
                 this._expandButton.scaleX = SCALEFACTOR;
                 this._expandButton.scaleY = SCALEFACTOR;
                 this._expandButton.scale = SCALEFACTOR;
                 this._expandButton.visible = false;
-                // this._borderContainer.addChild(this._expandButton);
+                // borderContainer.addChild(this._expandButton);
                 turtlesStage.addChild(this._expandButton);
 
                 this._expandButton.removeAllEventListeners("mouseover");
@@ -1064,11 +1085,11 @@ class TurtlesView {
 
                 this._expandButton.removeAllEventListeners("pressmove");
                 this._expandButton.on("pressmove", event => {
-                    let w = (this.w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+                    let w = (this._w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
                     let x = event.stageX / this.scale - w;
                     let y = event.stageY / this.scale - 16;
-                    turtlesStage.x = Math.max(0, Math.min((this.w * 3) / 4, x));
-                    turtlesStage.y = Math.max(55, Math.min((this.h * 3) / 4, y));
+                    turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
+                    turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
                     this.refreshCanvas();
                 });
 
@@ -1100,13 +1121,13 @@ class TurtlesView {
                     this._clearButton.scaleX = 1;
                     this._clearButton.scaleY = 1;
                     this._clearButton.scale = 1;
-                    this._clearButton.x = this.w - 5 - 2 * 55;
+                    this._clearButton.x = this._w - 5 - 2 * 55;
 
                     if (this._gridButton !== null) {
                         this._gridButton.scaleX = 1;
                         this._gridButton.scaleY = 1;
                         this._gridButton.scale = 1;
-                        this._gridButton.x = this.w - 10 - 3 * 55;
+                        this._gridButton.x = this._w - 10 - 3 * 55;
                         this._gridButton.visible = true;
                     }
 
@@ -1136,21 +1157,21 @@ class TurtlesView {
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.x = 0;
                 this._collapsedBoundary.y = 55 + LEADING;
-                this._borderContainer.addChild(this._collapsedBoundary);
+                borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
 
                 __makeExpandButton();
             };
 
-            let dx = this.w - 20;
-            let dy = this.h - 55 - LEADING;
+            let dx = this._w - 20;
+            let dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     unescape(
                         encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", this.h)
-                                .replace("WIDTH", this.w)
+                            MBOUNDARY.replace("HEIGHT", this._h)
+                                .replace("WIDTH", this._w)
                                 .replace("Y", 10)
                                 .replace("X", 10)
                                 .replace("DY", dy)
@@ -1181,19 +1202,19 @@ class TurtlesView {
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
-                this._borderContainer.addChild(this._expandedBoundary);
+                borderContainer.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
 
-            let dx = this.w - 5;
-            let dy = this.h - 55 - LEADING;
+            let dx = this._w - 5;
+            let dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     unescape(
                         encodeURIComponent(
-                            MBOUNDARY.replace("HEIGHT", this.h)
-                                .replace("WIDTH", this.w)
+                            MBOUNDARY.replace("HEIGHT", this._h)
+                                .replace("WIDTH", this._w)
                                 .replace("Y", 10 / SCALEFACTOR)
                                 .replace("X", 10 / SCALEFACTOR)
                                 .replace("DY", dy)
