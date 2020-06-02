@@ -732,7 +732,7 @@ class Turtle {
         for (let i = 0; i < this.media.length; i++) {
             // Could be in the image Container or the Stage
             this.imageContainer.removeChild(this.media[i]);
-            this.turtles.stage.removeChild(this.media[i]);
+            this.turtles.getStage().removeChild(this.media[i]);
             delete this.media[i];
         }
 
@@ -1353,7 +1353,7 @@ class Turtle {
             );
             text.textAlign = "left";
             text.textBaseline = "alphabetic";
-            this.turtles.stage.addChild(text);
+            this.turtles.getStage().addChild(text);
             this.media.push(text);
             text.x = this.container.x;
             text.y = this.container.y + i * size;
