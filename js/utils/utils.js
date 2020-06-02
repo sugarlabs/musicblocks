@@ -1286,25 +1286,23 @@ function closeBlkWidgets (name) {
 };
 
 /**
- * Adds dynamic references to methods of one class, to another class' instance.
- * Thereafter, calls made to methods (in the referencing class) to the adding
- * class' object, are referred to the corresponding method of the referencing
- * class' object.
- * 
+ * Adds methods and variables of one class, to another class' instance.
  * Used to implement the Model, View, Controller.
  * Call this function from the constructor of the adding class.
  *
  * @param {Object} addingObj - object of the adding class (to which, methods
- * are to be added)
+ * and variables are to be added)
  * @param {Object} refObj - object of the referencing class (whose methods
- * are to be added)
+ * and variables are to be added)
  * @returns {void}
  */
-function addMethodRefs(addingObj, refObj) {
+function addMembers(addingObj, refObj) {
+    // Add methods of refObj's class to addingObj
     let names = Object.getOwnPropertyNames(
         eval(refObj.constructor.name).prototype
     );
     for (let name of names) {
+        // Don't add the constructor
         if (name !== "constructor") {
             addingObj[name] =
                 eval(
@@ -1316,5 +1314,19 @@ function addMethodRefs(addingObj, refObj) {
                     ) + "." + name
                 );
         }
+    }
+
+    // Add variables of refObj to addingObj
+    for (let name of Object.keys(refObj)) {
+        let refVar = eval("refObj." + name);
+        // Don't add the variable that references the addingObj itself
+        if (refVar !== addingObj) {
+            addingObj[name] = refVar;
+        }
+
+        // Remove variable entry from refObj (removing each entry right after
+        // adding it to addingObj saves the overhead of dealing with double
+        // memory usage until the entire object is removed)
+        delete refObj[name];
     }
 }

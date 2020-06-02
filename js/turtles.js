@@ -33,11 +33,13 @@ class Turtles {
      * @constructor
      */
     constructor() {
-        this.model = new TurtlesModel(this);    // instantiate the model
-        addMethodRefs(this, this.model);    // add references to model's methods
+        this.model = new TurtlesModel();    // instantiate the model
+        addMembers(this, this.model);       // add model's members
+        delete this.model;                  // remove object to save memory
 
-        this.view = new TurtlesView(this);      // instantiate the view
-        addMethodRefs(this, this.view);     // add references to view's methods
+        this.view = new TurtlesView();  // instantiate the view
+        addMembers(this, this.view);    // add view's members
+        delete this.view;               // remove object to save memory
 
         this.masterStage = null;        // createjs stage
         this.stage = null;              // createjs container for turtle
@@ -1156,10 +1158,9 @@ class Turtles {
 class TurtlesModel {
     /**
      * @constructor
-     * @param {Object} controller - Instance of Turtles class
      */
-    constructor(controller) {
-        this.controller = controller;
+    constructor() {
+
     }
 }
 
@@ -1176,9 +1177,8 @@ class TurtlesModel {
 class TurtlesView {
     /**
      * @constructor
-     * @param {Object} controller - Instance of Turtles class
      */
-    constructor(controller) {
-        this.controller = controller;
+    constructor() {
+
     }
 }
