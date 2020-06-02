@@ -884,4 +884,5 @@ function setupActionBlocks() {
     new StartBlock().setup();
     new ActionBlock().setup();
     new NamedDoBlock().setup();
+    new Temperament1Block().setup();
 }
