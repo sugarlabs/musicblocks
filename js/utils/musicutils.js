@@ -1819,19 +1819,68 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
         "minyo": "aeolian",
         "fibonacci": "mixolydian"
     }
-    let chosenMode = keySignatureToMode(keySignature)[1];
+    let chosenMode = keySignatureToMode(keySignature);
     let obj1 = _buildScale(keySignature);
     let chosenModeScale = obj1[0];
     let chosenModePattern = obj1[1]
-    console.log(chosenMode, chosenModeScale, chosenModePattern);
-    if(chosenModePattern.length == 7) {
+
+    if (chosenModePattern.length == 7) {
         scaleDegree -= 1;
-        return scale[scaleDegree];
+        return chosenModeScale[scaleDegree];
+
     } else if (chosenModePattern.length < 7) {
-        let fallbackScale = _buildScale(FALLBACK[chosenMode]);
-        let fallbackModePattern = MUSICALMODES[FALLBACK[chosenMode]];
-        console.log(fallbackScale);
-        console.log(fallbackModePattern);
+        let fallBackMode = chosenMode[0] + " " + FALLBACK[chosenMode[1]];
+        let fallBackScale = _buildScale(fallBackMode)[0];
+        let semitones = [0];
+        let definedScaleDegree = [];
+        for(let i=0; i<chosenModePattern.length; i++) {
+            switch (semitones[i]) {
+                case 0:
+                    definedScaleDegree.push(1);
+                    break;
+                case 1:
+                case 2:
+                    definedScaleDegree.push(2);
+                    break;
+                case 3:
+                case 4:
+                    definedScaleDegree.push(3);
+                    break;
+                case 5:
+                case 6:
+                    definedScaleDegree.push(4);
+                    break;
+                case 6:
+                case 7:
+                    definedScaleDegree.push(5);
+                    break;
+                case 8:
+                case 9:
+                    definedScaleDegree.push(6);
+                    break;
+                case 10:
+                case 11:
+                    definedScaleDegree.push(7);
+                    break;
+            }
+            semitones.push(semitones[i]+chosenModePattern[i]);
+        }
+        let finalScale = [], k = 0;
+        for(let i=0; i<7; i++) {
+            if(definedScaleDegree.indexOf(i+1) !== -1) {
+                console.log("if", i);
+                finalScale.push(chosenModeScale[k]);
+                k++;
+            } else {
+                console.log("else", i);
+                finalScale.push(fallBackScale[i]);
+            }
+        }
+        scaleDegree -= 1;
+        return finalScale[scaleDegree];
+
+    } else {
+        errorMsg("Cannot use for scale containing more than 8 notes. Use nth modal pitch instead");
     }
 }
 
