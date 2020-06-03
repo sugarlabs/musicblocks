@@ -555,6 +555,103 @@ function setupMeterBlocks() {
         }
     }
 
+    class EveryBeatDoBlockNew extends FlowBlock {
+        constructor() {
+            // .TRANS: on every note played, do some action
+            super("everybeatdonew", _("on every beat do"));
+            this.setPalette("meter");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The On-every-beat block let you specify actions to take on every beat."
+                ),
+                "documentation",
+                null,
+                "everybeathelp"
+            ]);
+
+
+            this.formBlock({
+                args: 1,
+                argTypes: ["textin"],
+                defaults: [_("action")]
+            });
+
+            this.makeMacro((x, y) => {
+                this.linkTurtle =
+                    turtles.turtleList.length;
+                return [
+                    [0, ["start", { "collapsed": true, "name": "Beat" }], x + 100, y + 100, [null, 3, null]],
+
+                    [1, "dispatch", 0, 0, [8, 2, null]],
+                    [2, ["text", { "value": "__everybeat_" + this.linkTurtle + "__" }], 0, 0, [1]],
+
+                    [3, "forever", 0, 0, [0, 4, null]],
+
+                    [4, ["newnote", { "collapsed": false }], 0, 0, [3, 5, 8, null]],
+                    [5, "divide", 0, 279, [4, 6, 7]],
+                    [6, ["number", { "value": 1 }], 0, 0, [5]],
+                    [7, ["number", { "value": 4 }], 0, 0, [5]],
+                    [8, "vspace", 0, 0, [4, 1]],
+
+                    [9, "everybeatdonew", x, y, [null, 10, null]],
+                    [10, ["text", { "value": "action" }], 0, 0, [9]]
+
+                ]
+            });
+        }
+
+        
+
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            // Set up a listener for every beat for this turtle.
+            turtle = this.linkTurtle;
+            console.log(turtle)
+            if (!(args[0] in logo.actions)) {
+                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+            } else {
+                let __listener = function(event) {
+                    if (logo.turtles.turtleList[turtle].running) {
+                        let queueBlock = new Queue(
+                            logo.actions[args[0]],
+                            1,
+                            blk
+                        );
+                        logo.parentFlowQueue[turtle].push(blk);
+                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                    } else {
+                        // Since the turtle has stopped
+                        // running, we need to run the stack
+                        // from here.
+                        if (isflow) {
+                            logo._runFromBlockNow(
+                                logo,
+                                turtle,
+                                logo.actions[args[0]],
+                                isflow,
+                                receivedArg
+                            );
+                        } else {
+                            logo._runFromBlock(
+                                logo,
+                                turtle,
+                                logo.actions[args[0]],
+                                isflow,
+                                receivedArg
+                            );
+                        }
+                    }
+                };
+
+                let eventName = "__everybeat_" + this.linkTurtle + "__";
+                logo._setListener(turtle, eventName, __listener);
+                console.log("send " + this.linkTurtle);
+                logo.beatList[turtle].push("everybeat");
+            }
+        }
+    }
+
     class EveryBeatDoBlock extends FlowBlock {
         constructor() {
             // .TRANS: on every note played, do some action
@@ -1080,6 +1177,7 @@ function setupMeterBlocks() {
     new DriftBlock().setup();
     new OffBeatDoBlock().setup();
     new OnBeatDoBlock().setup();
+    new EveryBeatDoBlockNew().setup();
     new EveryBeatDoBlock().setup();
     new SetMasterBPM2Block().setup();
     new SetMasterBPMBlock().setup();
