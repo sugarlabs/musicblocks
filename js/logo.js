@@ -4846,7 +4846,7 @@ class Logo {
 
         if (typeof note === "object") {
             // If it is hertz, add a markup
-            markup = "";
+            let markup = "";
             try {
                 for (let i = 0; i < note.length; i++) {
                     if (typeof note[i] === "number") {

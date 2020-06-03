@@ -559,11 +559,11 @@ class TurtlesView {
     }
 
     /**
- * Convert on screen x coordinate to turtle x coordinate.
- *
- * @param {Number} x - screen x coordinate
- * @returns {Number} turtle x coordinate
- */
+     * Convert on screen x coordinate to turtle x coordinate.
+     *
+     * @param {Number} x - screen x coordinate
+     * @returns {Number} turtle x coordinate
+     */
     screenX2turtleX(x) {
         return x - this.getCanvas().width / (2.0 * this.scale);
     }
