@@ -190,6 +190,10 @@ function _playPitch(args, logo, turtle, blk) {
             }
             scaledegree = Number(arg0.replace(attr, ""));
             note = scaleDegreeToPitch2(logo.keySignature[turtle], scaledegree);
+
+            if(attr != NATURAL) {
+                note += attr;
+            }
             logo.currentNote = note;
 
             octave =
