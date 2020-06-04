@@ -974,7 +974,6 @@ function Activity() {
      * Stops all mid-way synths
      */
     this.doHardStopButton = function(onblur) {
-        console.log(blocks);
         blocks.activeBlock = null;
         hideDOMLabel();
 

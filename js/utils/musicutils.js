@@ -1823,7 +1823,6 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
     let obj1 = _buildScale(keySignature);
     let chosenModeScale = obj1[0];
     let chosenModePattern = obj1[1]
-
     if (chosenModePattern.length == 7) {
         scaleDegree -= 1;
         return chosenModeScale[scaleDegree];
@@ -1840,6 +1839,9 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
                     break;
                 case 1:
                 case 2:
+                    if(definedScaleDegree[definedScaleDegree.length - 1] == 2) {
+                        definedScaleDegree[definedScaleDegree.length - 1] = 1 + SHARP;
+                    }
                     definedScaleDegree.push(2);
                     break;
                 case 3:
@@ -1847,10 +1849,20 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
                     definedScaleDegree.push(3);
                     break;
                 case 5:
-                case 6:
                     definedScaleDegree.push(4);
                     break;
                 case 6:
+                    let lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
+                    if(lastAdded === 4 && semitones[i]+chosenModePattern[i] === 7) {
+                        definedScaleDegree.push(4+SHARP);
+                    } else {
+                        if(semitones[i]+chosenModePattern[i] === 7) {
+                            definedScaleDegree.push(4);
+                        } else {
+                            definedScaleDegree.push(5);
+                        }
+                    }
+                    break;
                 case 7:
                     definedScaleDegree.push(5);
                     break;
@@ -1862,17 +1874,27 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
                 case 11:
                     definedScaleDegree.push(7);
                     break;
+                default:
+                    continue;
             }
             semitones.push(semitones[i]+chosenModePattern[i]);
+        }
+
+        if(semitones[semitones.length - 1] !== 12) {
+            definedScaleDegree.push((semitones[semitones.length - 1] + 1) / 2 + 1);
+        }
+
+        for(let i=1; i<definedScaleDegree.length; i++) {
+            if(definedScaleDegree[i] === definedScaleDegree[i-1]) {
+                definedScaleDegree[i] = definedScaleDegree[i] + SHARP;
+            }
         }
         let finalScale = [], k = 0;
         for(let i=0; i<7; i++) {
             if(definedScaleDegree.indexOf(i+1) !== -1) {
-                console.log("if", i);
                 finalScale.push(chosenModeScale[k]);
                 k++;
             } else {
-                console.log("else", i);
                 finalScale.push(fallBackScale[i]);
             }
         }
