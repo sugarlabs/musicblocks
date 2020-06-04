@@ -1284,3 +1284,49 @@ function closeBlkWidgets (name) {
         }
     }
 };
+
+/**
+ * Adds methods and variables of one class, to another class' instance.
+ * Used to implement the Model, View, Controller.
+ * Call this function from the constructor of the adding class.
+ *
+ * @param {Object} addingObj - object of the adding class (to which, methods
+ * and variables are to be added)
+ * @param {Object} refObj - object of the referencing class (whose methods
+ * and variables are to be added)
+ * @returns {void}
+ */
+function addMembers(addingObj, refObj) {
+    // Add methods of refObj's class to addingObj
+    let names = Object.getOwnPropertyNames(
+        eval(refObj.constructor.name).prototype
+    );
+    for (let name of names) {
+        // Don't add the constructor
+        if (name !== "constructor") {
+            addingObj[name] =
+                eval(
+                    /** @see {https://stackoverflow.com/a/47468674/10945986} */
+                    Object.keys({addingObj})[0] + "." +
+                    /** @see {https://stackoverflow.com/a/28191966/10945986} */
+                    Object.keys(addingObj).find(
+                        key => addingObj[key] === refObj
+                    ) + "." + name
+                );
+        }
+    }
+
+    // Add variables of refObj to addingObj
+    for (let name of Object.keys(refObj)) {
+        let refVar = eval("refObj." + name);
+        // Don't add the variable that references the addingObj itself
+        if (refVar !== addingObj) {
+            addingObj[name] = refVar;
+        }
+
+        // Remove variable entry from refObj (removing each entry right after
+        // adding it to addingObj saves the overhead of dealing with double
+        // memory usage until the entire object is removed)
+        delete refObj[name];
+    }
+}
