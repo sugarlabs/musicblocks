@@ -1294,23 +1294,31 @@ function closeBlkWidgets (name) {
  *
  * @param {Object} obj - component object (controller) to which member
  * of its model and view are to be imported
+ * @param {*[]} modelArgs - constructor arguments for model
+ * @param {*[]} viewArgs - constructor arguments for view
  * @returns {void}
  */
-function importMembers(obj) {
+function importMembers(obj, modelArgs, viewArgs) {
     /**
      * Adds methods and variables of one class, to another class' instance.
      *
      * @param {Object} obj - object of component (controller)
      * @param {Function} ctype - static class type (model or view)
+     * @param {*[]} args - array of constructor arguments
+     * @returns {void}
      */
-    let addMembers = (obj, ctype) => {
+    let addMembers = (obj, ctype, args) => {
         // If class type doesn't exist (no model class or no view class)
         if (ctype === undefined) {
             return;
         }
 
         // Add class type's instance to adding object
-        obj.added = new ctype();
+        if (args === undefined || args === []) {
+            obj.added = new ctype();
+        } else {
+            obj.added = new ctype(...args);
+        }
 
         // Loop for all method names of class type
         for (let name of Object.getOwnPropertyNames(ctype.prototype)) {
@@ -1337,8 +1345,8 @@ function importMembers(obj) {
     let cname = obj.constructor.name;   // class name of component object
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"));
+    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"));
+    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
 }
