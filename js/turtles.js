@@ -38,7 +38,8 @@ class Turtles {
      * @constructor
      */
     constructor() {
-        importMembers(this);            // import members of model and view
+        // Import members of model and view (no arguments for model or view)
+        importMembers(this);
 
         this.refreshCanvas = null;      // function to refresh canvas
 
