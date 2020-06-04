@@ -18,21 +18,34 @@
 
 // Turtles
 const DEFAULTCOLOR = 0;
-const DEFAULTVALUE = 50;
-const DEFAULTCHROMA = 100;
+const DEFAULTVALUE = 50;                // also used in turtles.js
+const DEFAULTCHROMA = 100;              // also used in turtles.js
 const DEFAULTSTROKE = 5;
-const DEFAULTFONT = "sans-serif";
+const DEFAULTFONT = "sans-serif";       // also used in PenBlocks.js
 
 // Turtle sprite
-const TURTLEBASEPATH = "images/";
+const TURTLEBASEPATH = "images/";       // unused
 
 /**
  * Class pertaining to each turtle.
  *
  * @class
- * @classdesc This contains variables and methods for all actions
+ * @classdesc
+ */
+/**
+ * Class pertaining to each turtle.
+ *
+ * @class
+ * @classdesc This is the prototype of the Turtles controller which
+ * acts as a bridge between the Turtle model and the Turtle view, and
+ * serves as a gateway to any external code.
+ *
+ * External code instantiates this class, and can access all the members
+ * of TurtleView and TurtleModel.
+ *
+ * This component contains properties and controls for all actions
  * corresponding to a single turtle. Also contains the methods for
- * blink behavior and caching.
+ * caching.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -46,6 +59,14 @@ class Turtle {
      * @param {boolean} drum - whether Turtle is a drum
      */
     constructor(name, turtles, drum) {
+        this.model = new TurtleModel();     // instantiate the model
+        addMembers(this, this.model);       // add model's members
+        delete this.model;                  // remove object to save memory
+
+        this.view = new TurtleView();   // instantiate the view
+        addMembers(this, this.view);    // add view's members
+        delete this.view;               // remove object to save memory
+
         this.name = name;
         this.turtles = turtles;
         this.drum = drum;
@@ -1782,4 +1803,47 @@ class Turtle {
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(data)));
     }
+}
+
+/**
+ * Class pertaining to Turtle Model.
+ *
+ * @class
+ * @classdesc This is the prototype of the Model for the Turtle component.
+ * It should store the data structures that control behavior of the model,
+ * and the methods to interact with them.
+ *
+ * Private methods' names begin with underscore '_".
+ * Unused methods' names begin with double underscore '__'.
+ * Internal functions' names are in PascalCase.
+ */
+class TurtleModel {
+    /**
+     * @constructor
+     */
+    constructor() {
+        
+    }
+}
+
+/** Class pertaining to Turtles View.
+ *
+ * @class
+ * @classdesc This is the prototype of the View for the Turtles component.
+ * It should make changes to the view, while using members of the Model
+ * through Turtles (controller). An action may require updating the state
+ * (of the Model), which it can do by calling methods of the Model, also
+ * through Turtles (controller).
+ *
+ * Private methods' names begin with underscore '_".
+ * Unused methods' names begin with double underscore '__'.
+ * Internal functions' names are in PascalCase.
+ */
+class TurtleView {
+   /**
+    * @constructor
+    */
+   constructor() {
+        
+   }
 }
