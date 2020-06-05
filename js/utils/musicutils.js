@@ -2607,6 +2607,10 @@ function i18nSolfege(note) {
 }
 
 function splitScaleDegree(value) {
+    if (!value) {
+        return [5, NATURAL];
+    }
+    
     let note = value.slice(0, 1);
     let attr = value.slice(1);
     return [note, attr];

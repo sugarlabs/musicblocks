@@ -2642,6 +2642,11 @@ function setupPitchBlocks() {
             this.formBlock({
                 outType: "scaledegreeout"
             });
+            this.makeMacro((x, y) => [
+                [0, "pitch", x, y, [null, 1, 2, null]],
+                [1, ["scaledegree2", { value: "5" }], 0, 0, [0]],
+                [2, ["number", { value: 4 }], 0, 0, [0]]
+            ]);
         }
         arg(logo, turtle, blk) {
             return logo.blocks.blockList[blk].value;
