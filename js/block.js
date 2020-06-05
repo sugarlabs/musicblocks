@@ -553,8 +553,8 @@ function Block(protoblock, blocks, overrideName) {
                     turtle++
                 ) {
                     if (
-                        that.blocks.turtles.turtleList[turtle].startBlock ===
-                        that
+                        that.blocks.turtles.turtleList[turtle].getStartBlock()
+                            === that
                     ) {
                         that.blocks.turtles.turtleList[turtle].resizeDecoration(
                             scale,
@@ -3164,8 +3164,8 @@ function Block(protoblock, blocks, overrideName) {
                     turtle++
                 ) {
                     if (
-                        this.blocks.turtles.turtleList[turtle].startBlock ===
-                        this
+                        this.blocks.turtles.turtleList[turtle].getStartBlock()
+                            === this
                     ) {
                         this.blocks.turtles.turtleList[
                             turtle
@@ -4854,7 +4854,7 @@ function Block(protoblock, blocks, overrideName) {
             noteLabels.push(noteValues[i].toString());
         }
         noteLabels.push(null);
-        
+
         docById("wheelDiv").style.display = "";
 
         this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
@@ -5026,8 +5026,8 @@ function Block(protoblock, blocks, overrideName) {
                 octave = 8;
             }
 
-            let note; 
-            
+            let note;
+
             // Use C major as of now; fix this to use current keySignature once that feature is in place
             if (noteValues[i] >= 0) {
                 note = scaleDegreeToPitch("C major", noteValues[i]);

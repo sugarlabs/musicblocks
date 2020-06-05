@@ -74,9 +74,6 @@ class Turtle {
         this._isSkinChanged = false;
         this.beforeBlinkSize = null;
 
-        // Which start block is associated with this turtle?
-        this.startBlock = null;
-
         this.decorationBitmap = null;   // start block decoration
 
         // Queue of blocks this turtle is executing
@@ -263,6 +260,9 @@ class Turtle {
             this.name = name;           // name of the turtle
             this.turtles = turtles;     // object handling behavior of all turtles
 
+            // Which start block is associated with this turtle?
+            this._startBlock = null;
+
             this.running = false;           // is the turtle running?
             this.trash = false;             // in the trash?
         }
@@ -282,6 +282,23 @@ class Turtle {
         }
 
         /**
+         * @param {Object} startBlock - start block object associated with
+         * this Turtle
+         * @returns {this}
+         */
+        setStartBlock(startBlock) {
+            this._startBlock = startBlock;
+            return this;
+        }
+
+        /**
+         * @returns {Object} start block object
+         */
+        getStartBlock() {
+            return this._startBlock;
+        }
+
+        /**
          * Returns the turtle's index in turtleList (the turtle's number)
          *
          * @return {Number}
@@ -291,7 +308,8 @@ class Turtle {
         }
     };
 
-    /** Class pertaining to Turtles View.
+    /**
+     * Class pertaining to Turtles View.
      *
      * @static
      * @class
@@ -402,12 +420,13 @@ class Turtle {
         rename(name) {
             this.name = name;
 
+            let startBlock = this.getStartBlock();
             // Use the name on the label of the start block
-            if (this.startBlock != null) {
-                this.startBlock.overrideName = this.name;
-                this.startBlock.collapseText.text = this.name;
-                this.startBlock.regenerateArtwork(false);
-                this.startBlock.value =
+            if (startBlock != null) {
+                startBlock.overrideName = this.name;
+                startBlock.collapseText.text = this.name;
+                startBlock.regenerateArtwork(false);
+                startBlock.value =
                     this.getTurtles().getTurtleList().indexOf(this);
             }
         }
@@ -1493,28 +1512,29 @@ class Turtle {
                 hitArea.y = -bounds.height / 2;
                 this.container.hitArea = hitArea;
 
-                if (this.startBlock != null) {
-                    this.startBlock.container.removeChild(this.decorationBitmap);
+                let startBlock = this.getStartBlock();
+                if (startBlock != null) {
+                    startBlock.container.removeChild(this.decorationBitmap);
                     this.decorationBitmap = new createjs.Bitmap(myImage);
-                    this.startBlock.container.addChild(this.decorationBitmap);
+                    startBlock.container.addChild(this.decorationBitmap);
                     this.decorationBitmap.name = "decoration";
 
-                    let width = this.startBlock.width;
+                    let width = startBlock.width;
                     // FIXME: Why is the position off? Does it need a scale factor?
                     this.decorationBitmap.x =
-                        width - (30 * this.startBlock.protoblock.scale) / 2;
+                        width - (30 * startBlock.protoblock.scale) / 2;
                     this.decorationBitmap.y =
-                        (20 * this.startBlock.protoblock.scale) / 2;
+                        (20 * startBlock.protoblock.scale) / 2;
                     this.decorationBitmap.scaleX =
-                        ((27.5 / image.width) * this.startBlock.protoblock.scale) /
+                        ((27.5 / image.width) * startBlock.protoblock.scale) /
                         2;
                     this.decorationBitmap.scaleY =
-                        ((27.5 / image.height) * this.startBlock.protoblock.scale) /
+                        ((27.5 / image.height) * startBlock.protoblock.scale) /
                         2;
                     this.decorationBitmap.scale =
-                        ((27.5 / image.width) * this.startBlock.protoblock.scale) /
+                        ((27.5 / image.width) * startBlock.protoblock.scale) /
                         2;
-                    this.startBlock.updateCache();
+                    startBlock.updateCache();
                 }
 
                 this.getTurtles().refreshCanvas();
@@ -1811,11 +1831,10 @@ class Turtle {
          * Async creation of bitmap from SVG data.
          *
          * @param {String} data - SVG data
-         * @param {Object} startBlock - corresponding start block
          * @param {Function} refreshCanvas - callback to refresh canvas
          * @returns {void}
          */
-        _makeTurtleBitmap(data, startBlock, refreshCanvas) {
+        _makeTurtleBitmap(data, refreshCanvas) {
             // Works with Chrome, Safari, Firefox (untested on IE)
             let img = new Image();
 
@@ -1829,7 +1848,7 @@ class Turtle {
                 this.container.addChild(this.bitmap);
                 this._createCache();
 
-                this.startBlock = startBlock;
+                let startBlock = this.getStartBlock();
                 if (startBlock != null) {
                     startBlock.updateCache();
                     this.decorationBitmap = this.bitmap.clone();

@@ -101,6 +101,7 @@ class Turtles {
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
         let newTurtle = new Turtle(turtleName, this);
+        newTurtle.setStartBlock(startBlock);
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
@@ -159,7 +160,7 @@ class Turtles {
                 .replace(/stroke_color/g, STROKECOLORS[i]);
         }
 
-        newTurtle._makeTurtleBitmap(artwork, startBlock, this.refreshCanvas);
+        newTurtle._makeTurtleBitmap(artwork, this.refreshCanvas);
 
         newTurtle.color = i * 10;
         newTurtle.canvasColor = getMunsellColor(
