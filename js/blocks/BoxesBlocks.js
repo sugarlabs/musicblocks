@@ -298,7 +298,7 @@ function setupBoxesBlocks() {
                 argLabels:
                     this.lang === "ja"
                         ? [_("name1"), _("value1")]
-                        : [_("name"), _("name")]
+                        : [_("name"), _("value")]
             });
         }
 
