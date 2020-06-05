@@ -1286,47 +1286,67 @@ function closeBlkWidgets (name) {
 };
 
 /**
- * Adds methods and variables of one class, to another class' instance.
- * Used to implement the Model, View, Controller.
- * Call this function from the constructor of the adding class.
+ * Adds methods and variables of model and view objects to controller
+ * object (which in turn acts as the entire component).
  *
- * @param {Object} addingObj - object of the adding class (to which, methods
- * and variables are to be added)
- * @param {Object} refObj - object of the referencing class (whose methods
- * and variables are to be added)
+ * Call this function from the constructor of the controller class
+ * passing its self object ('this').
+ *
+ * @param {Object} obj - component object (controller) to which member
+ * of its model and view are to be imported
+ * @param {*[]} modelArgs - constructor arguments for model
+ * @param {*[]} viewArgs - constructor arguments for view
  * @returns {void}
  */
-function addMembers(addingObj, refObj) {
-    // Add methods of refObj's class to addingObj
-    let names = Object.getOwnPropertyNames(
-        eval(refObj.constructor.name).prototype
-    );
-    for (let name of names) {
-        // Don't add the constructor
-        if (name !== "constructor") {
-            addingObj[name] =
-                eval(
-                    /** @see {https://stackoverflow.com/a/47468674/10945986} */
-                    Object.keys({addingObj})[0] + "." +
-                    /** @see {https://stackoverflow.com/a/28191966/10945986} */
-                    Object.keys(addingObj).find(
-                        key => addingObj[key] === refObj
-                    ) + "." + name
-                );
-        }
-    }
-
-    // Add variables of refObj to addingObj
-    for (let name of Object.keys(refObj)) {
-        let refVar = eval("refObj." + name);
-        // Don't add the variable that references the addingObj itself
-        if (refVar !== addingObj) {
-            addingObj[name] = refVar;
+function importMembers(obj, modelArgs, viewArgs) {
+    /**
+     * Adds methods and variables of one class, to another class' instance.
+     *
+     * @param {Object} obj - object of component (controller)
+     * @param {Function} ctype - static class type (model or view)
+     * @param {*[]} args - array of constructor arguments
+     * @returns {void}
+     */
+    let addMembers = (obj, ctype, args) => {
+        // If class type doesn't exist (no model class or no view class)
+        if (ctype === undefined) {
+            return;
         }
 
-        // Remove variable entry from refObj (removing each entry right after
-        // adding it to addingObj saves the overhead of dealing with double
-        // memory usage until the entire object is removed)
-        delete refObj[name];
-    }
+        // Add class type's instance to adding object
+        if (args === undefined || args === []) {
+            obj.added = new ctype();
+        } else {
+            obj.added = new ctype(...args);
+        }
+
+        // Loop for all method names of class type
+        for (let name of Object.getOwnPropertyNames(ctype.prototype)) {
+            // Don't add the constructor
+            if (name !== "constructor") {
+                obj[name] = obj.added[name];
+            }
+        }
+
+        // Loop for all variables of class type's instance
+        for (let name of Object.keys(obj.added)) {
+            obj[name] = obj.added[name];
+
+            // Remove variable entry from obj (removing each entry right after
+            // adding it to addingObj saves the overhead of dealing with double
+            // memory usage until the entire object is removed)
+            delete obj.added[name];
+        }
+
+        // Delete the instantiated object since this is now redundant
+        delete obj.added;
+    };
+
+    let cname = obj.constructor.name;   // class name of component object
+
+    // Add members of Model (class type has to be controller's name + "Model")
+    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+
+    // Add members of View (class type has to be controller's name + "View")
+    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
 }
