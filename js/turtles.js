@@ -42,8 +42,6 @@ class Turtles {
         importMembers(this);
 
         this.refreshCanvas = null;      // function to refresh canvas
-
-        this._drum = false;
     }
 
     /**
@@ -56,18 +54,6 @@ class Turtles {
     }
 
     /**
-     * Adds drum to start block.
-     *
-     * @param {Object} startBlock - name of startBlock
-     * @param {Object} infoDict - contains turtle color, shade, pensize, x, y, heading, etc.
-     * @returns {void}
-     */
-    addDrum(startBlock, infoDict) {
-        this._drum = true;
-        this.add(startBlock, infoDict);
-    }
-
-    /**
      * Adds turtle to start block.
      *
      * @param {Object} startBlock - name of startBlock
@@ -75,7 +61,6 @@ class Turtles {
      * @returns {void}
      */
     addTurtle(startBlock, infoDict) {
-        this._drum = false;
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
             let t = last(this.turtleList);
@@ -115,7 +100,7 @@ class Turtles {
         let turtleName =
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
-        let newTurtle = new Turtle(turtleName, this, this._drum);
+        let newTurtle = new Turtle(turtleName, this);
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
@@ -159,7 +144,7 @@ class Turtles {
         hitArea.y = 0;
         newTurtle.container.hitArea = hitArea;
 
-        let artwork = this._drum ? DRUMSVG : TURTLESVG;
+        let artwork = TURTLESVG;
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
             artwork = artwork

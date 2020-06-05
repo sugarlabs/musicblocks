@@ -54,17 +54,12 @@ const TURTLEBASEPATH = "images/";       // unused
 class Turtle {
     /**
      * @constructor
-     * @param {boolean} drum - whether Turtle is a drum
+     * @param {String} name - name of Turtle
+     * @param {Object} turtles - Turtles object (common to all turtles)
      */
-    constructor(name, turtles, drum) {
+    constructor(name, turtles) {
         // Import members of model and view (arguments only for model)
         importMembers(this, [ name, turtles ]);
-
-        this.drum = drum;               // phase out
-
-        if (drum) {
-            console.debug("turtle " + name + " is a drum.");
-        }
 
         // Things used for drawing the turtle
         this.container = null;
@@ -410,11 +405,7 @@ class Turtle {
             // Use the name on the label of the start block
             if (this.startBlock != null) {
                 this.startBlock.overrideName = this.name;
-                if (this.name === _("start drum")) {
-                    this.startBlock.collapseText.text = _("drum");
-                } else {
-                    this.startBlock.collapseText.text = this.name;
-                }
+                this.startBlock.collapseText.text = this.name;
                 this.startBlock.regenerateArtwork(false);
                 this.startBlock.value =
                     this.getTurtles().getTurtleList().indexOf(this);
@@ -902,14 +893,8 @@ class Turtle {
             this.container.y = turtles.turtleY2screenY(this.y);
 
             if (resetSkin) {
-                if (this.drum) {
-                    if (this.name !== _("start drum")) {
-                        this.rename(_("start drum"));
-                    }
-                } else {
-                    if (this.name !== _("start")) {
-                        this.rename(_("start"));
-                    }
+                if (this.name !== _("start")) {
+                    this.rename(_("start"));
                 }
 
                 if (this.skinChanged) {

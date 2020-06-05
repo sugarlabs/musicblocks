@@ -3270,14 +3270,6 @@ function Blocks(activity) {
             };
 
             postProcessArg = thisBlock;
-        } else if (name === "drum") {
-            var postProcess = function(thisBlock) {
-                that.blockList[thisBlock].value =
-                    that.turtles.turtleList.length;
-                that.turtles.addDrum(that.blockList[thisBlock]);
-            };
-
-            postProcessArg = thisBlock;
         } else if (name === "text") {
             postProcessArg = [thisBlock, _("text")];
         } else if (name === "boolean") {
@@ -5901,33 +5893,6 @@ function Blocks(activity) {
                         postProcess,
                         [thisBlock, blkInfo[1]]
                     );
-                    break;
-                case "drum":
-                    blkData[4][0] = null;
-                    blkData[4][2] = null;
-                    var postProcess = function(args) {
-                        var thisBlock = args[0];
-                        var blkInfo = args[1];
-                        that.blockList[thisBlock].value =
-                            that.turtles.turtleList.length;
-                        that.turtles.addDrum(
-                            that.blockList[thisBlock],
-                            blkInfo
-                        );
-                    };
-
-                    this._makeNewBlockWithConnections(
-                        name,
-                        blockOffset,
-                        blkData[4],
-                        postProcess,
-                        [thisBlock, blkInfo[1]]
-                    );
-
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        // Load the synth for this drum
-                        this.logo.synth.loadSynth(0, DEFAULTDRUM);
-                    }
                     break;
                 case "action":
                 case "hat":
