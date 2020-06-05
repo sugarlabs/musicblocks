@@ -190,7 +190,7 @@ class Turtle {
         // this._sizeInUse = this.bitmap.scaleX;
         this._blinkTimeout = null;
 
-        // No time to blick for really short notes. (t = 1 / duration)
+        // No time to blink for really short notes. (t = 1 / duration)
         if (duration > 16) {
             return;
         }
