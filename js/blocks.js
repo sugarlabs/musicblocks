@@ -3294,7 +3294,7 @@ function Blocks(activity) {
         } else if (name === "solfege") {
             postProcessArg = [thisBlock, "sol"];
         } else if (name === "scaledegree2") {
-            postProcessArg = [thisBlock, "4"];
+            postProcessArg = [thisBlock, "5"];
         } else if (name === "customNote") {
             var len = this.logo.synth.startingPitch.length;
             postProcessArg = [
