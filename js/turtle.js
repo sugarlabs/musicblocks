@@ -61,18 +61,11 @@ class Turtle {
         // Import members of model and view (arguments only for model)
         importMembers(this, [ name, turtles ]);
 
-        // Things used for drawing the turtle
-        this.container = null;
-        this.x = 0;
-        this.y = 0;
-        this.bitmap = null;
-        this.skinChanged = false;       // should we reskin the turtle on clear?
-        this.shellSize = 55;
-        this.blinkFinished = true;
-        this.isSkinChanged = false;
-        this._sizeInUse = 1;
-        this._isSkinChanged = false;
-        this.beforeBlinkSize = null;
+        this.blinkFinished = true;      // whether not blinking or blinking
+
+        // this._sizeInUse = 1;
+        // this._isSkinChanged = false;
+        // this.beforeBlinkSize = null;
 
         // Things used for what the turtle draws
         this.penstrokes = null;
@@ -96,6 +89,10 @@ class Turtle {
         console.debug(this.ctx.canvas.width + " x " + this.ctx.canvas.height);
     }
 
+    blinking() {
+        return !this.blinkFinished;
+    }
+
     /**
      * Internal function for creating cache.
      * Includes workaround for a race condition.
@@ -103,14 +100,14 @@ class Turtle {
      * @private
      */
     _createCache() {
-        this.bounds = this.container.getBounds();
+        this.bounds = this.getContainer().getBounds();
 
         if (this.bounds == null) {
             setTimeout(() => {
                 this._createCache();
             }, 200);
         } else {
-            this.container.cache(
+            this.getContainer().cache(
                 this.bounds.x,
                 this.bounds.y,
                 this.bounds.width,
@@ -134,7 +131,7 @@ class Turtle {
             await delayExecution(300);
             this._updateCache();
         } else {
-            this.container.updateCache();
+            this.getContainer().updateCache();
             this.getTurtles().refreshCanvas();
         }
     }
@@ -149,19 +146,19 @@ class Turtle {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
 
-            this.container.visible = true;
+            this.getContainer().visible = true;
             this.getTurtles().refreshCanvas();
             this.blinkFinished = true;
 
-            // this.bitmap.alpha = 1.0;
-            // this.bitmap.scaleX = this._sizeInUse;
-            // this.bitmap.scaleY = this.bitmap.scaleX;
-            // this.bitmap.scale = this.bitmap.scaleX;
-            // this.bitmap.rotation = this.orientation;
+            // this.getBitmap().alpha = 1.0;
+            // this.getBitmap().scaleX = this._sizeInUse;
+            // this.getBitmap().scaleY = this.getBitmap().scaleX;
+            // this.getBitmap().scale = this.getBitmap().scaleX;
+            // this.getBitmap().rotation = this.orientation;
             // this.skinChanged = this._isSkinChanged;
-            // let bounds = this.container.getBounds();
-            // this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            // this.container.visible = true;
+            // let bounds = this.getContainer().getBounds();
+            // this.getContainer().cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            // this.getContainer().visible = true;
             // this.getTurtles().refreshCanvas();
             // this.blinkFinished = true;
         }
@@ -171,7 +168,7 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
     async blink(duration, volume) {
-        // this._sizeInUse = this.bitmap.scaleX;
+        // this._sizeInUse = this.getBitmap().scaleX;
         this._blinkTimeout = null;
 
         // No time to blink for really short notes. (t = 1 / duration)
@@ -182,47 +179,47 @@ class Turtle {
         this.stopBlink();
         this.blinkFinished = false;
 
-        this.container.visible = false;
+        this.getContainer().visible = false;
         this.getTurtles().refreshCanvas();
         this._blinkTimeout = await delayExecution(100);
         this.blinkFinished = true;
-        this.container.visible = true;
+        this.getContainer().visible = true;
         this.getTurtles().refreshCanvas();
 
         /*
         if (this.beforeBlinkSize == null) {
-            this.beforeBlinkSize = this.bitmap.scaleX;
+            this.beforeBlinkSize = this.getBitmap().scaleX;
         }
 
         if (this.blinkFinished) {
-            this._sizeInUse = this.bitmap.scaleX;
+            this._sizeInUse = this.getBitmap().scaleX;
         } else {
             this._sizeInUse = this.beforeBlinkSize;
         }
 
         this.stopBlink();
         this.blinkFinished = false;
-        this.container.uncache();
+        this.getContainer().uncache();
         let scalefactor = 60 / 55;
         let volumescalefactor = 4 * (volume + 200) / 1000;
         // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
-        this.bitmap.alpha = 0.5;
-        this.bitmap.scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
-        this.bitmap.scaleY = this.bitmap.scaleX;
-        this.bitmap.scale = this.bitmap.scaleX;
+        this.getBitmap().alpha = 0.5;
+        this.getBitmap().scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
+        this.getBitmap().scaleY = this.getBitmap().scaleX;
+        this.getBitmap().scale = this.getBitmap().scaleX;
         this._isSkinChanged = this.skinChanged;
         this.skinChanged = true;
-        createjs.Tween.get(this.bitmap).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
+        createjs.Tween.get(this.getBitmap()).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
 
         this._blinkTimeout = setTimeout(() => {
-            this.bitmap.alpha = 1.0;
-            this.bitmap.scaleX = this._sizeInUse;
-            this.bitmap.scaleY = this.bitmap.scaleX;
-            this.bitmap.scale = this.bitmap.scaleX;
-            this.bitmap.rotation = this.orientation;
+            this.getBitmap().alpha = 1.0;
+            this.getBitmap().scaleX = this._sizeInUse;
+            this.getBitmap().scaleY = this.getBitmap().scaleX;
+            this.getBitmap().scale = this.getBitmap().scaleX;
+            this.getBitmap().rotation = this.orientation;
             this.skinChanged = this._isSkinChanged;
-            let bounds = this.container.getBounds();
-            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            let bounds = this.getContainer().getBounds();
+            this.getContainer().cache(bounds.x, bounds.y, bounds.width, bounds.height);
             this.blinkFinished = true;
             this.getTurtles().refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
@@ -260,6 +257,9 @@ class Turtle {
 
             // Listeners
             this.listeners = {};
+
+            this.x = 0;                 // x coordinate
+            this.y = 0;                 // y coordinate
 
             this.running = false;           // is the turtle running?
             this.trash = false;             // in the trash?
@@ -311,6 +311,38 @@ class Turtle {
         }
 
         /**
+         * @param {Number} x - x coordinate
+         * @return {this}
+         */
+        setX(x) {
+            this.x = x;
+            return this;
+        }
+
+        /**
+         * @returns {Number} x coordinate
+         */
+        getX() {
+            return this.x;
+        }
+
+        /**
+         * @param {Number} y - y coordinate
+         * @return {this}
+         */
+        setY(y) {
+            this.y = y;
+            return this;
+        }
+
+        /**
+         * @returns {Number} y coordinate
+         */
+        getY() {
+            return this.y;
+        }
+
+        /**
          * Returns the turtle's index in turtleList (the turtle's number)
          *
          * @return {Number}
@@ -342,6 +374,12 @@ class Turtle {
         constructor() {
             // createjs object of start block (decoration)
             this._decorationBitmap = null;
+
+            // Things used for drawing the turtle
+            this.container = null;      // createjs container
+            this.bitmap = null;         // createjs bitmap
+
+            this.skinChanged = false;   // should we reskin the turtle on clear?
         }
 
         /**
@@ -349,6 +387,29 @@ class Turtle {
          */
         getDecorationBitmap() {
             return this._decorationBitmap;
+        }
+
+        /**
+         * @param {Object} container - createjs container for Turtle
+         * @returns {this}
+         */
+        setContainer(container) {
+            this.container = container;
+            return this;
+        }
+
+        /**
+         * @returns {Object} createjs container for Turtle
+         */
+        getContainer() {
+            return this.container;
+        }
+
+        /**
+         * @returns {Object} createjs bitmap object for Turtle
+         */
+        getBitmap() {
+            return this.bitmap;
         }
 
         /**
@@ -499,8 +560,8 @@ class Turtle {
                 // Convert from turtle coordinates to screen coordinates
                 fx = turtles.turtleX2screenX(x2);
                 fy = turtles.turtleY2screenY(y2);
-                let ix = turtles.turtleX2screenX(this.x);
-                let iy = turtles.turtleY2screenY(this.y);
+                let ix = turtles.turtleX2screenX(this.getX());
+                let iy = turtles.turtleY2screenY(this.getY());
                 let cx1 = turtles.turtleX2screenX(cp1x);
                 let cy1 = turtles.turtleY2screenY(cp1y);
                 let cx2 = turtles.turtleX2screenX(cp2x);
@@ -520,8 +581,9 @@ class Turtle {
                 let steps = Math.max(Math.floor(savedStroke, 1));
 
                 /* We need both the initial and final headings */
-                // The initial heading is the angle between (cp1x, cp1y) and (this.x, this.y)
-                let degreesInitial = Math.atan2(cp1x - this.x, cp1y - this.y);
+                // The initial heading is the angle between (cp1x, cp1y) and (this.getX(), this.getY())
+                let degreesInitial =
+                    Math.atan2(cp1x - this.getX(), cp1y - this.getY());
                 degreesInitial = (180 * degreesInitial) / Math.PI;
                 if (degreesInitial < 0) {
                     degreesInitial += 360;
@@ -615,8 +677,8 @@ class Turtle {
                 this.ctx.lineCap = "round";
                 this.ctx.moveTo(fx, fy);
                 this.svgOutput += "M " + fxScaled + "," + fyScaled + " ";
-                this.x = x2;
-                this.y = y2;
+                this.setX(x2);
+                this.setY(y2);
             } else if (this.penState) {
                 this._processColor();
                 this.ctx.lineWidth = this.stroke;
@@ -652,8 +714,8 @@ class Turtle {
 
                 if (!this.svgPath) {
                     this.svgPath = true;
-                    let ix = turtles.turtleX2screenX(this.x);
-                    let iy = turtles.turtleY2screenY(this.y);
+                    let ix = turtles.turtleX2screenX(this.getX());
+                    let iy = turtles.turtleY2screenY(this.getY());
                     let ixScaled = ix * turtlesScale;
                     let iyScaled = iy * turtlesScale;
                     this.svgOutput +=
@@ -683,15 +745,15 @@ class Turtle {
                     fyScaled;
                 this.closeSVG();
 
-                this.x = x2;
-                this.y = y2;
+                this.setX(x2);
+                this.setY(y2);
                 this.ctx.stroke();
                 if (!this.fillState) {
                     this.ctx.closePath();
                 }
             } else {
-                this.x = x2;
-                this.y = y2;
+                this.setX(x2);
+                this.setY(y2);
                 fx = turtles.turtleX2screenX(x2);
                 fy = turtles.turtleY2screenY(y2);
             }
@@ -891,11 +953,11 @@ class Turtle {
             this.container.x = nx;
             this.container.y = ny;
             if (invert) {
-                this.x = x;
-                this.y = y;
+                this.setX(x);
+                this.setY(y);
             } else {
-                this.x = this.screenX2turtles.turtleX(x);
-                this.y = this.screenY2turtles.turtleY(y);
+                this.setX(this.screenX2turtles.turtleX(x));
+                this.setY(this.screenY2turtles.turtleY(y));
             }
         }
 
@@ -914,8 +976,8 @@ class Turtle {
 
             // Reset turtle
             if (resetPosition) {
-                this.x = 0;
-                this.y = 0;
+                this.setX(0);
+                this.setY(0);
                 this.orientation = 0.0;
                 turtles.gx = this.ctx.canvas.width;
                 turtles.gy = this.ctx.canvas.height;
@@ -930,8 +992,8 @@ class Turtle {
                 this.font = DEFAULTFONT;
             }
 
-            this.container.x = turtles.turtleX2screenX(this.x);
-            this.container.y = turtles.turtleY2screenY(this.y);
+            this.container.x = turtles.turtleX2screenX(this.getX());
+            this.container.y = turtles.turtleY2screenY(this.getY());
 
             if (resetSkin) {
                 if (this.name !== _("start")) {
@@ -1045,15 +1107,15 @@ class Turtle {
         }
 
         /**
-     * Moves turtle.
-     *
-     * @private
-     * @param ox - the old x-coordinate of the turtle
-     * @param oy - the old y-coordinate of the turtle
-     * @param x - on screen x coordinate
-     * @param y - on screen y coordinate
-     * @param invert - boolean value regarding whether coordinates are inverted or not
-     */
+         * Moves turtle.
+         *
+         * @private
+         * @param ox - the old x-coordinate of the turtle
+         * @param oy - the old y-coordinate of the turtle
+         * @param x - on screen x coordinate
+         * @param y - on screen y coordinate
+         * @param invert - boolean value regarding whether coordinates are inverted or not
+         */
         _move(ox, oy, x, y, invert) {
             let turtles = this.getTurtles();
             let turtlesScale = turtles.getScale();
@@ -1195,11 +1257,11 @@ class Turtle {
             this.container.x = nx;
             this.container.y = ny;
             if (invert) {
-                this.x = x;
-                this.y = y;
+                this.setX(x);
+                this.setY(y);
             } else {
-                this.x = turtles.screenX2turtleX(x);
-                this.y = turtles.screenY2turtleY(y);
+                this.setX(turtles.screenX2turtleX(x));
+                this.setY(turtles.screenY2turtleY(y));
             }
         }
 
@@ -1496,15 +1558,15 @@ class Turtle {
                 return;
             }
 
+            let shellSize = Number(size);
             let image = new Image();
             image.src = myImage;
-            this.shellSize = Number(size);
 
             image.onload = () => {
                 this.container.removeChild(this.bitmap);
                 this.bitmap = new createjs.Bitmap(image);
                 this.container.addChild(this.bitmap);
-                this.bitmap.scaleX = this.shellSize / image.width;
+                this.bitmap.scaleX = shellSize / image.width;
                 this.bitmap.scaleY = this.bitmap.scaleX;
                 this.bitmap.scale = this.bitmap.scaleX;
                 this.bitmap.x = 0;
@@ -1643,7 +1705,7 @@ class Turtle {
             this.container.rotation = this.orientation;
 
             // We cannot update the cache during the 'tween'
-            if (this.blinkFinished) {
+            if (!this.blinking()) {
                 this._updateCache();
             }
         }
@@ -1663,7 +1725,7 @@ class Turtle {
             this.container.rotation = this.orientation;
 
             // We cannot update the cache during the 'tween'
-            if (this.blinkFinished) {
+            if (!this.blinking()) {
                 this._updateCache();
             }
         }

@@ -122,10 +122,10 @@ class Turtles {
         newTurtle.penstrokes = new createjs.Bitmap();
         turtlesStage.addChild(newTurtle.penstrokes);
 
-        newTurtle.container = new createjs.Container();
-        turtlesStage.addChild(newTurtle.container);
-        newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
-        newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
+        newTurtle.setContainer(new createjs.Container());
+        turtlesStage.addChild(newTurtle.getContainer());
+        newTurtle.getContainer().x = this.turtleX2screenX(newTurtle.x);
+        newTurtle.getContainer().y = this.turtleY2screenY(newTurtle.y);
 
         // Ensure that the buttons are on top
         turtlesStage.removeChild(this._expandButton);
