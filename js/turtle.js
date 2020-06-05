@@ -66,27 +66,6 @@ class Turtle {
         // this._sizeInUse = 1;
         // this._isSkinChanged = false;
         // this.beforeBlinkSize = null;
-
-        // Things used for what the turtle draws
-        this.penstrokes = null;
-        this.imageContainer = null;
-        this.svgOutput = "";
-        this.svgPath = false;           // are we currently drawing a path?
-        this.color = DEFAULTCOLOR;
-        this.value = DEFAULTVALUE;
-        this.chroma = DEFAULTCHROMA;
-        this.stroke = DEFAULTSTROKE;
-        this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
-        this.canvasAlpha = 1.0;
-        this.orientation = 0;
-        this.fillState = false;
-        this.hollowState = false;
-        this.penState = true;
-        this.font = DEFAULTFONT;
-        this.media = [];        // media (text, images) we need to remove on clear
-        this.canvas = document.getElementById("overlayCanvas");
-        this.ctx = this.canvas.getContext("2d");
-        console.debug(this.ctx.canvas.width + " x " + this.ctx.canvas.height);
     }
 
     blinking() {
@@ -380,6 +359,31 @@ class Turtle {
             this.bitmap = null;         // createjs bitmap
 
             this.skinChanged = false;   // should we reskin the turtle on clear?
+            this.orientation = 0;       // orientation of the turtle sprite
+
+            // Things used for what the turtle draws
+            this.penstrokes = null;
+            this.imageContainer = null;
+            this.svgOutput = "";
+            this.svgPath = false;       // are we currently drawing a path?
+
+            this.color = DEFAULTCOLOR;
+            this.value = DEFAULTVALUE;
+            this.chroma = DEFAULTCHROMA;
+            this.stroke = DEFAULTSTROKE;
+
+            this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
+            this.canvasAlpha = 1.0;
+            this.fillState = false;
+            this.hollowState = false;
+            this.penState = true;
+            this.font = DEFAULTFONT;
+
+            this.media = [];     // media (text, images) we need to remove on clear
+
+            this.canvas = document.getElementById("overlayCanvas");
+            this.ctx = this.canvas.getContext("2d");
+            console.debug(this.ctx.canvas.width + " x " + this.ctx.canvas.height);
         }
 
         /**
