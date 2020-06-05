@@ -1144,7 +1144,7 @@ function Block(protoblock, blocks, overrideName) {
                         this.value = "sol";
                         break;
                     case "scaledegree2":
-                        this.value = "1";
+                        this.value = "5";
                         break;
                     case "customNote":
                         let len = this.blocks.logo.synth.startingPitch.length;
@@ -1224,7 +1224,8 @@ function Block(protoblock, blocks, overrideName) {
             } else if(this.name === "scaledegree2") {
                 obj = splitScaleDegree(this.value);
                 label = obj[0];
-                attr = obj[1]
+                attr = obj[1];
+
                 if(attr !== "♮") {
                     label += attr;
                 }
@@ -4819,8 +4820,16 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
 
+
+            if (Number(note.substr(0,1)) == note.substr(0,1)) {
+                let obj1 = splitScaleDegree(note);
+                note = SOLFEGENAMES[obj1[0] - 1];
+                if(obj1[1] != NATURAL) {
+                    note += obj1[1]
+                }
+            }
             // FIX ME: get key signature if available
-            // FIX ME: get moveable if available
+            // FIX ME: get moveable if availableconsole.log(note);
             let obj = getNote(
                 note,
                 octave,

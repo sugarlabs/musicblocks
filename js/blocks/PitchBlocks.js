@@ -174,7 +174,6 @@ function _playPitch(args, logo, turtle, blk) {
             Number(arg0[0]) &&
             logo.blocks.blockList[blk].name === "pitch"
         ) {
-            console.log("testing");
             let attr, scaledegree;
 
             if (arg0.indexOf(SHARP) !==-1) {
@@ -206,8 +205,6 @@ function _playPitch(args, logo, turtle, blk) {
                     )
                 );
             cents = 0;
-            console.log(note);
-            console.log(octave);
         }
         else if (
             typeof arg0 === "number" &&
