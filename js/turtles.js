@@ -63,7 +63,7 @@ class Turtles {
     addTurtle(startBlock, infoDict) {
         this.add(startBlock, infoDict);
         if (this.isShrunk) {
-            let t = last(this.turtleList);
+            let t = last(this.getTurtleList());
             t.container.scaleX = SCALEFACTOR;
             t.container.scaleY = SCALEFACTOR;
             t.container.scale = SCALEFACTOR;
@@ -80,8 +80,8 @@ class Turtles {
     add(startBlock, infoDict) {
         if (startBlock != null) {
             console.debug("adding a new turtle " + startBlock.name);
-            if (startBlock.value !== this.turtleList.length) {
-                startBlock.value = this.turtleList.length;
+            if (startBlock.value !== this.getTurtleList().length) {
+                startBlock.value = this.getTurtleList().length;
                 console.debug("turtle #" + startBlock.value);
             }
         } else {
@@ -96,7 +96,7 @@ class Turtles {
             }
         }
 
-        let i = this.turtleList.length % 10;
+        let i = this.getTurtleList().length % 10;
         let turtleName =
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
@@ -111,7 +111,7 @@ class Turtles {
             }
         }
 
-        this.turtleList.push(newTurtle);
+        this.getTurtleList().push(newTurtle);
 
         let turtlesStage = this.getStage();
 
@@ -259,7 +259,7 @@ class Turtles {
         for (let turtle in this.getTurtleList()) {
             this.getTurtleList()[turtle].running = false;
             // Make sure the blink is really stopped
-            // this.turtleList[turtle].stopBlink();
+            // getTurtleList()[turtle].stopBlink();
         }
 
         this.refreshCanvas();
@@ -282,14 +282,14 @@ class Turtles {
             this._masterStage = null;       // createjs stage
             this._stage = null;             // createjs container for turtle
 
-            this._canvas = null;            // DOM canvas element
+            this.canvas = null;             // DOM canvas element
 
+            // These functions are directly called by TurtlesView
+            this.hideMenu = null;           // function to hide aux menu
+            this.doClear = null;            // function to clear the canvas
             this.hideGrids = null;          // function to hide all grids
             this.doGrid = null;             // function that renders Cartesian/Polar
                                             //  grids and changes button labels
-
-            this.hideMenu = null;           // function to hide aux menu
-            this.doClear = null;            // function to clear the canvas
 
             // createjs border container
             this._borderContainer = new createjs.Container();
@@ -305,6 +305,13 @@ class Turtles {
         setMasterStage(stage) {
             this._masterStage = stage;
             return this;
+        }
+
+        /**
+         * @returns {Object} - master stage object
+         */
+        getMasterStage() {
+            return this._masterStage;
         }
 
         /**
@@ -398,8 +405,8 @@ class Turtles {
          * @return {Boolean} - running
          */
         running() {
-            for (let turtle in this.getTurtleList()) {
-                if (this.getTurtleList()[turtle].running) {
+            for (let turtle in this.turtleList) {
+                if (this.turtleList[turtle].running) {
                     return true;
                 }
             }
@@ -622,10 +629,12 @@ class Turtles {
                 turtlesStage.x = (this._w * 3) / 4 - 10;
                 turtlesStage.y = 55 + LEADING + 6;
                 this.isShrunk = true;
-                for (let i = 0; i < this.turtleList.length; i++) {
-                    this.turtleList[i].container.scaleX = SCALEFACTOR;
-                    this.turtleList[i].container.scaleY = SCALEFACTOR;
-                    this.turtleList[i].container.scale = SCALEFACTOR;
+
+                let turtleList = this.getTurtleList();
+                for (let i = 0; i < turtleList.length; i++) {
+                    turtleList[i].container.scaleX = SCALEFACTOR;
+                    turtleList[i].container.scaleY = SCALEFACTOR;
+                    turtleList[i].container.scale = SCALEFACTOR;
                 }
 
                 this._clearButton.scaleX = SCALEFACTOR;
@@ -642,8 +651,8 @@ class Turtles {
                 }
 
                 // remove the stage and add it back at the top
-                this._masterStage.removeChild(turtlesStage);
-                this._masterStage.addChild(turtlesStage);
+                this.getMasterStage().removeChild(turtlesStage);
+                this.getMasterStage().addChild(turtlesStage);
 
                 this.refreshCanvas();
             }
@@ -1082,10 +1091,12 @@ class Turtles {
                         turtlesStage.x = 0;
                         turtlesStage.y = 0;
                         this.isShrunk = false;
-                        for (let i = 0; i < this.turtleList.length; i++) {
-                            this.turtleList[i].container.scaleX = 1;
-                            this.turtleList[i].container.scaleY = 1;
-                            this.turtleList[i].container.scale = 1;
+
+                        let turtleList = this.getTurtleList();
+                        for (let i = 0; i < turtleList.length; i++) {
+                            turtleList[i].container.scaleX = 1;
+                            turtleList[i].container.scaleY = 1;
+                            turtleList[i].container.scale = 1;
                         }
 
                         this._clearButton.scaleX = 1;
@@ -1102,8 +1113,8 @@ class Turtles {
                         }
 
                         // remove the stage and add it back in position 0
-                        this._masterStage.removeChild(turtlesStage);
-                        this._masterStage.addChildAt(turtlesStage, 0);
+                        this.getMasterStage().removeChild(turtlesStage);
+                        this.getMasterStage().addChildAt(turtlesStage, 0);
                     });
 
                     __makeCollapseButton();
