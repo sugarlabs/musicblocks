@@ -282,7 +282,7 @@ class Turtles {
             this._masterStage = null;       // createjs stage
             this._stage = null;             // createjs container for turtle
 
-            this.canvas = null;             // DOM canvas element
+            this._canvas = null;            // DOM canvas element
 
             // These functions are directly called by TurtlesView
             this.hideMenu = null;           // function to hide aux menu
