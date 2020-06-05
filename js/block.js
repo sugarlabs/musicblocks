@@ -3169,7 +3169,7 @@ function Block(protoblock, blocks, overrideName) {
                     ) {
                         this.blocks.turtles.turtleList[
                             turtle
-                            ].decorationBitmap.x =
+                            ].getDecorationBitmap().x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }

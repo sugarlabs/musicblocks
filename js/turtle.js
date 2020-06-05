@@ -74,14 +74,6 @@ class Turtle {
         this._isSkinChanged = false;
         this.beforeBlinkSize = null;
 
-        this.decorationBitmap = null;   // start block decoration
-
-        // Queue of blocks this turtle is executing
-        this.queue = [];
-
-        // Listeners
-        this.listeners = {};
-
         // Things used for what the turtle draws
         this.penstrokes = null;
         this.imageContainer = null;
@@ -263,6 +255,12 @@ class Turtle {
             // Which start block is associated with this turtle?
             this._startBlock = null;
 
+            // Queue of blocks this turtle is executing
+            this.queue = [];
+
+            // Listeners
+            this.listeners = {};
+
             this.running = false;           // is the turtle running?
             this.trash = false;             // in the trash?
         }
@@ -299,6 +297,20 @@ class Turtle {
         }
 
         /**
+         * @returns {Object[]} queue of blocks executed by this Turtle
+         */
+        getQueue() {
+            return this.queue;
+        }
+
+        /**
+         * @returns {Function[]} list of listeners
+         */
+        getListeners() {
+            return this.listeners;
+        }
+
+        /**
          * Returns the turtle's index in turtleList (the turtle's number)
          *
          * @return {Number}
@@ -328,7 +340,15 @@ class Turtle {
         * @constructor
         */
         constructor() {
+            // createjs object of start block (decoration)
+            this._decorationBitmap = null;
+        }
 
+        /**
+         * @returns {Object} createjs object of start block (decoration)
+         */
+        getDecorationBitmap() {
+            return this._decorationBitmap;
         }
 
         /**
@@ -1514,24 +1534,24 @@ class Turtle {
 
                 let startBlock = this.getStartBlock();
                 if (startBlock != null) {
-                    startBlock.container.removeChild(this.decorationBitmap);
-                    this.decorationBitmap = new createjs.Bitmap(myImage);
-                    startBlock.container.addChild(this.decorationBitmap);
-                    this.decorationBitmap.name = "decoration";
+                    startBlock.container.removeChild(this._decorationBitmap);
+                    this._decorationBitmap = new createjs.Bitmap(myImage);
+                    startBlock.container.addChild(this._decorationBitmap);
+                    this._decorationBitmap.name = "decoration";
 
                     let width = startBlock.width;
                     // FIXME: Why is the position off? Does it need a scale factor?
-                    this.decorationBitmap.x =
+                    this._decorationBitmap.x =
                         width - (30 * startBlock.protoblock.scale) / 2;
-                    this.decorationBitmap.y =
+                    this._decorationBitmap.y =
                         (20 * startBlock.protoblock.scale) / 2;
-                    this.decorationBitmap.scaleX =
+                    this._decorationBitmap.scaleX =
                         ((27.5 / image.width) * startBlock.protoblock.scale) /
                         2;
-                    this.decorationBitmap.scaleY =
+                    this._decorationBitmap.scaleY =
                         ((27.5 / image.height) * startBlock.protoblock.scale) /
                         2;
-                    this.decorationBitmap.scale =
+                    this._decorationBitmap.scale =
                         ((27.5 / image.width) * startBlock.protoblock.scale) /
                         2;
                     startBlock.updateCache();
@@ -1548,11 +1568,11 @@ class Turtle {
          * @param width - resize decoration by width
          */
         resizeDecoration(scale, width) {
-            this.decorationBitmap.x = width - (30 * scale) / 2;
-            this.decorationBitmap.y = (35 * scale) / 2;
-            this.decorationBitmap.scaleX =
-                this.decorationBitmap.scaleY =
-                this.decorationBitmap.scale =
+            this._decorationBitmap.x = width - (30 * scale) / 2;
+            this._decorationBitmap.y = (35 * scale) / 2;
+            this._decorationBitmap.scaleX =
+                this._decorationBitmap.scaleY =
+                this._decorationBitmap.scale =
                     (0.5 * scale) / 2;
         }
 
@@ -1851,19 +1871,19 @@ class Turtle {
                 let startBlock = this.getStartBlock();
                 if (startBlock != null) {
                     startBlock.updateCache();
-                    this.decorationBitmap = this.bitmap.clone();
-                    startBlock.container.addChild(this.decorationBitmap);
-                    this.decorationBitmap.name = "decoration";
+                    this._decorationBitmap = this.bitmap.clone();
+                    startBlock.container.addChild(this._decorationBitmap);
+                    this._decorationBitmap.name = "decoration";
                     let width = startBlock.width;
                     let offset = 40;
 
-                    this.decorationBitmap.x =
+                    this._decorationBitmap.x =
                         width - (offset * startBlock.protoblock.scale) / 2;
-                    this.decorationBitmap.y =
+                    this._decorationBitmap.y =
                         (35 * startBlock.protoblock.scale) / 2;
-                    this.decorationBitmap.scaleX =
-                        this.decorationBitmap.scaleY =
-                        this.decorationBitmap.scale =
+                    this._decorationBitmap.scaleX =
+                        this._decorationBitmap.scaleY =
+                        this._decorationBitmap.scale =
                             (0.5 * startBlock.protoblock.scale) / 2;
                     startBlock.updateCache();
                 }
