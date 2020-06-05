@@ -386,17 +386,6 @@ class Turtles {
         }
 
         /**
-         * Returns block object.
-         *
-         * @param blocks
-         * @returns {this}
-         */
-        setBlocks(blocks) {
-            this.blocks = blocks;
-            return this;
-        }
-
-        /**
          * @returns {Object[]} list of Turtle objects
          */
         getTurtleList() {

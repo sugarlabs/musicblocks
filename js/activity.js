@@ -1461,7 +1461,7 @@ function Activity() {
         }
 
         __heightBasedScroll();
-		
+
 		let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
@@ -4576,7 +4576,7 @@ function Activity() {
          */
 
         doBrowserCheck();
-        
+
         if(!jQuery.browser.mozilla){
             window.onblur = function() {
                 that.doHardStopButton(true);
@@ -4685,8 +4685,6 @@ function Activity() {
             .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(errorMsg)
             .setHomeContainers(setHomeContainers, boundary);
-
-        turtles.setBlocks(blocks);
 
         palettes = new Palettes();
         palettes
