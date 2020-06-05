@@ -1569,7 +1569,7 @@ class Logo {
 
     /**
      * If we clear the delay timeout, we need to requeue the runBlock.
-     * 
+     *
      * @param turtle
      * @returns {void}
      */
@@ -4310,8 +4310,8 @@ class Logo {
                 this.turtles.turtleList[turtle].canvasColor;
 
         // docById('myCanvas').style.background = c;
-        this.turtles.backgroundColor = c;
-        this.turtles.makeBackground(this.turtles.isShrunk);
+        this.turtles.setBackgroundColor(c);
+        this.turtles.makeBackground(this.turtles.isShrunk());
 
         this.svgOutput = "";
     }

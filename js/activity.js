@@ -886,7 +886,7 @@ function Activity() {
 
         if (!turtles.running()) {
             console.debug("RUNNING");
-            if (!turtles.isShrunk) {
+            if (!turtles.isShrunk()) {
                 logo.hideBlocks(true);
             }
 
@@ -1461,8 +1461,8 @@ function Activity() {
         }
 
         __heightBasedScroll();
-		
-		let closeAnyOpenMenusAndLabels = function () {
+
+        let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
             if (docById("textLabel") != null) docById("textLabel").style.display = "none";
@@ -1471,7 +1471,7 @@ function Activity() {
 
         let __wheelHandler = function(event) {
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-				closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
+                closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
                 if (palettes.paletteVisible) {
                     if (event.clientX > cellSize + MENUWIDTH) {
                         blocksContainer.y -= event.deltaY;
@@ -1486,7 +1486,7 @@ function Activity() {
             // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-					closeAnyOpenMenusAndLabels();
+                    closeAnyOpenMenusAndLabels();
                     if (palettes.paletteVisible) {
                         if (event.clientX > cellSize + MENUWIDTH) {
                             blocksContainer.x -= event.deltaX;
@@ -2823,8 +2823,8 @@ function Activity() {
 
         update = true;
 
-	// Close any open widgets.
-	closeWidgets();
+        // Close any open widgets.
+        closeWidgets();
     };
 
     // function _changePaletteVisibility() {
@@ -3276,7 +3276,7 @@ function Activity() {
     textMsg = function(msg) {
         if (msgTimeoutID !== null) {
             clearTimeout(msgTimeoutID);
-	    msgTimeoutID = null;
+            msgTimeoutID = null;
         }
 
         if (msgText == null) {
@@ -3294,7 +3294,7 @@ function Activity() {
 
         msgTimeoutID = setTimeout(function() {
             printText.classList.remove("show");
-	    msgTimeoutID = null;
+            msgTimeoutID = null;
         }, _MSGTIMEOUT_);
     };
 
@@ -4576,7 +4576,7 @@ function Activity() {
          */
 
         doBrowserCheck();
-        
+
         if(!jQuery.browser.mozilla){
             window.onblur = function() {
                 that.doHardStopButton(true);
@@ -4685,8 +4685,6 @@ function Activity() {
             .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(errorMsg)
             .setHomeContainers(setHomeContainers, boundary);
-
-        turtles.setBlocks(blocks);
 
         palettes = new Palettes();
         palettes
