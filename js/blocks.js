@@ -2307,7 +2307,7 @@ function Blocks(activity) {
         }
         if (
             type1 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "scaleout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
                 type2
             ) !== -1
         ) {
@@ -2315,7 +2315,7 @@ function Blocks(activity) {
         }
         if (
             type2 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "scaleout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
                 type1
             ) !== -1
         ) {
@@ -2323,7 +2323,7 @@ function Blocks(activity) {
         }
         if (
             type1 === "notein" &&
-            ["solfegeout", "scaleout", "textout", "noteout"].indexOf(type2) !== -1
+            ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type2) !== -1
         ) {
             return true;
         }
@@ -2334,7 +2334,7 @@ function Blocks(activity) {
         }
         if (
             type2 === "notein" &&
-            ["solfegeout", "scaleout", "textout", "noteout"].indexOf(type1) !== -1
+            ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type1) !== -1
         ) {
             return true;
         }
@@ -2347,7 +2347,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
-                "scaleout",
+                "scaledegreeout",
                 "noteout"
             ].indexOf(type2) !== -1
         ) {
@@ -2362,7 +2362,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
-                "scaleout",
+                "scaledegreeout",
                 "noteout"
             ].indexOf(type1) !== -1
         ) {

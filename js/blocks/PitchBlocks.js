@@ -2640,7 +2640,7 @@ function setupPitchBlocks() {
             this.setPalette("pitch");
             this.extraWidth = 10;
             this.formBlock({
-                outType: "scaleout"
+                outType: "scaledegreeout"
             });
         }
         arg(logo, turtle, blk) {
