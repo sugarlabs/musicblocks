@@ -101,6 +101,7 @@ class Turtles {
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
         let newTurtle = new Turtle(turtleName, this);
+        newTurtle.setStartBlock(startBlock);
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
@@ -121,10 +122,10 @@ class Turtles {
         newTurtle.penstrokes = new createjs.Bitmap();
         turtlesStage.addChild(newTurtle.penstrokes);
 
-        newTurtle.container = new createjs.Container();
-        turtlesStage.addChild(newTurtle.container);
-        newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
-        newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
+        newTurtle.setContainer(new createjs.Container());
+        turtlesStage.addChild(newTurtle.getContainer());
+        newTurtle.getContainer().x = this.turtleX2screenX(newTurtle.x);
+        newTurtle.getContainer().y = this.turtleY2screenY(newTurtle.y);
 
         // Ensure that the buttons are on top
         turtlesStage.removeChild(this._expandButton);
@@ -159,7 +160,7 @@ class Turtles {
                 .replace(/stroke_color/g, STROKECOLORS[i]);
         }
 
-        newTurtle._makeTurtleBitmap(artwork, startBlock, this.refreshCanvas);
+        newTurtle._makeTurtleBitmap(artwork, this.refreshCanvas);
 
         newTurtle.color = i * 10;
         newTurtle.canvasColor = getMunsellColor(
