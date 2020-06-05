@@ -886,7 +886,7 @@ function Activity() {
 
         if (!turtles.running()) {
             console.debug("RUNNING");
-            if (!turtles.isShrunk) {
+            if (!turtles.isShrunk()) {
                 logo.hideBlocks(true);
             }
 

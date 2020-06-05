@@ -22,12 +22,12 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                logo.turtles._canvas.width / (2.0 * logo.turtles.scale)
+                logo.turtles._canvas.width / (2.0 * logo.turtles.getScale())
             );
         }
 
         arg(logo) {
-            return logo.turtles._canvas.width / (2.0 * logo.turtles.scale);
+            return logo.turtles._canvas.width / (2.0 * logo.turtles.getScale());
         }
     }
 
@@ -54,13 +54,13 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
+                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.getScale()))
             );
         }
 
         arg(logo) {
             return (
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
+                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.getScale()))
             );
         }
     }
@@ -87,12 +87,12 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                logo.turtles._canvas.height / (2.0 * logo.turtles.scale)
+                logo.turtles._canvas.height / (2.0 * logo.turtles.getScale())
             );
         }
 
         arg(logo) {
-            return logo.turtles._canvas.height / (2.0 * logo.turtles.scale);
+            return logo.turtles._canvas.height / (2.0 * logo.turtles.getScale());
         }
     }
 
@@ -118,13 +118,13 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
+                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.getScale()))
             );
         }
 
         arg(logo) {
             return (
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
+                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.getScale()))
             );
         }
     }
@@ -143,11 +143,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.width / logo.turtles.scale);
+            return toFixed2(logo.turtles._canvas.width / logo.turtles.getScale());
         }
 
         arg(logo) {
-            return logo.turtles._canvas.width / logo.turtles.scale;
+            return logo.turtles._canvas.width / logo.turtles.getScale();
         }
     }
 
@@ -165,11 +165,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.height / logo.turtles.scale);
+            return toFixed2(logo.turtles._canvas.height / logo.turtles.getScale());
         }
 
         arg(logo) {
-            return logo.turtles._canvas.height / logo.turtles.scale;
+            return logo.turtles._canvas.height / logo.turtles.getScale();
         }
     }
 

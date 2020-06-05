@@ -62,7 +62,7 @@ class Turtles {
      */
     addTurtle(startBlock, infoDict) {
         this.add(startBlock, infoDict);
-        if (this.isShrunk) {
+        if (this.isShrunk()) {
             let t = last(this.getTurtleList());
             t.container.scaleX = SCALEFACTOR;
             t.container.scaleY = SCALEFACTOR;
@@ -430,49 +430,44 @@ class Turtles {
          * @constructor
          */
         constructor() {
-            this.scale = 1.0;               // scale factor in [0, 1]
+            this._scale = 1.0;              // scale factor in [0, 1]
             this._w = 1200;                 // stage width
             this._h = 900;                  // stage height
 
-            // these 3 are used by outer code only
+            /**
+             * These 3 are used by Turtle only.
+             *
+             * @todo reorganize position of these
+             */
             this.gx = null;
             this.gy = null;
             this.canvas1 = null;
+
+            this._isShrunk = false;         // whether canvas is collapsed
 
             /**
              * @todo write comments to describe each variable
              */
             this._expandedBoundary = null;
             this._collapsedBoundary = null;
-            this.isShrunk = false;
-            this._expandButton = null;
+            this._expandButton = null;      // add method
             this._expandLabel = null;
             this._expandLabelBG = null;
-            this._collapseButton = null;
+            this._collapseButton = null;    // add method
             this._collapseLabel = null;
             this._collapseLabelBG = null;
-            this._clearButton = null;
+            this._clearButton = null;       // add method
             this._clearLabel = null;
             this._clearLabelBG = null;
-            this._gridButton = null;
+            this._gridButton = null;        // add method
             this._gridLabel = null;
             this._gridLabelBG = null;
 
             // canvas background color
-            this.backgroundColor = platformColor.background;
+            this._backgroundColor = platformColor.background;
 
             this._locked = false;
             this._queue = [];               // temporarily stores [w, h, scale]
-        }
-
-        /**
-         * @param {String} text
-         * @returns {void}
-         */
-        setGridLabel(text) {
-            if (this._gridLabel !== null) {
-                this._gridLabel.text = text;
-            }
         }
 
         /**
@@ -499,7 +494,7 @@ class Turtles {
             if (this._locked) {
                 this._queue = [w, h, scale];
             } else {
-                this.scale = scale;
+                this._scale = scale;
                 this._w = w / scale;
                 this._h = h / scale;
             }
@@ -511,7 +506,31 @@ class Turtles {
          * @returns {Number} scale factor
          */
         getScale() {
-            return this.scale;
+            return this._scale;
+        }
+
+        /**
+         * @returns {Boolean} - whether canvas is collapsed
+         */
+        isShrunk() {
+            return this._isShrunk;
+        }
+
+        /**
+         * @param {String} text
+         * @returns {void}
+         */
+        setGridLabel(text) {
+            if (this._gridLabel !== null) {
+                this._gridLabel.text = text;
+            }
+        }
+
+        /**
+         * @param {String} color - background color
+         */
+        setBackgroundColor(color) {
+            this._backgroundColor = color;
         }
 
         /**
@@ -532,7 +551,7 @@ class Turtles {
          * @returns {Number} inverted y coordinate
          */
         _invertY(y) {
-            return this.getCanvas().height / (2.0 * this.scale) - y;
+            return this.getCanvas().height / (2.0 * this._scale) - y;
         }
 
         /**
@@ -542,7 +561,7 @@ class Turtles {
          * @returns {Number} turtle x coordinate
          */
         screenX2turtleX(x) {
-            return x - this.getCanvas().width / (2.0 * this.scale);
+            return x - this.getCanvas().width / (2.0 * this._scale);
         }
 
         /**
@@ -562,7 +581,7 @@ class Turtles {
          * @returns {Number} screen x coordinate
          */
         turtleX2screenX(x) {
-            return this.getCanvas().width / (2.0 * this.scale) + x;
+            return this.getCanvas().width / (2.0 * this._scale) + x;
         }
 
         /**
@@ -628,7 +647,7 @@ class Turtles {
                 this._collapseButton.visible = false;
                 turtlesStage.x = (this._w * 3) / 4 - 10;
                 turtlesStage.y = 55 + LEADING + 6;
-                this.isShrunk = true;
+                this._isShrunk = true;
 
                 let turtleList = this.getTurtleList();
                 for (let i = 0; i < turtleList.length; i++) {
@@ -751,9 +770,9 @@ class Turtles {
 
                     this._locked = false;
                     if (this._queue.length === 3) {
-                        this.scale = this._queue[2];
-                        this._w = this._queue[0] / this.scale;
-                        this._h = this._queue[1] / this.scale;
+                        this._scale = this._queue[2];
+                        this._w = this._queue[0] / this._scale;
+                        this._h = this._queue[1] / this._scale;
                         this._queue = [];
                         this.makeBackground();
                     }
@@ -1065,8 +1084,8 @@ class Turtles {
                     this._expandButton.removeAllEventListeners("pressmove");
                     this._expandButton.on("pressmove", event => {
                         let w = (this._w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
-                        let x = event.stageX / this.scale - w;
-                        let y = event.stageY / this.scale - 16;
+                        let x = event.stageX / this._scale - w;
+                        let y = event.stageY / this._scale - 16;
                         turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
                         turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
                         this.refreshCanvas();
@@ -1090,7 +1109,7 @@ class Turtles {
                         this._expandButton.visible = false;
                         turtlesStage.x = 0;
                         turtlesStage.y = 0;
-                        this.isShrunk = false;
+                        this._isShrunk = false;
 
                         let turtleList = this.getTurtleList();
                         for (let i = 0; i < turtleList.length; i++) {
@@ -1161,7 +1180,7 @@ class Turtles {
                                         "stroke_color",
                                         platformColor.ruleColor
                                     )
-                                    .replace("fill_color", this.backgroundColor)
+                                    .replace("fill_color", this._backgroundColor)
                                     .replace("STROKE", 20)
                             )
                         )
@@ -1204,7 +1223,7 @@ class Turtles {
                                         "stroke_color",
                                         platformColor.ruleColor
                                     )
-                                    .replace("fill_color", this.backgroundColor)
+                                    .replace("fill_color", this._backgroundColor)
                                     .replace("STROKE", 20 / SCALEFACTOR)
                             )
                         )

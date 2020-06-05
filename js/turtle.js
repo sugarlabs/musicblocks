@@ -454,6 +454,7 @@ class Turtle {
             let dxi, dyi, dxf, dyf;
 
             let turtles = this.getTurtles();
+            let turtlesScale = turtles.getScale();
 
             if (this.penState && this.hollowState) {
                 // Convert from turtle coordinates to screen coordinates
@@ -506,26 +507,26 @@ class Turtle {
                 // The four 'corners'
                 ax = ix - dxi;
                 ay = iy - dyi;
-                let axScaled = ax * turtles.scale;
-                let ayScaled = ay * turtles.scale;
+                let axScaled = ax * turtlesScale;
+                let ayScaled = ay * turtlesScale;
                 bx = fx - dxf;
                 by = fy - dyf;
-                let bxScaled = bx * turtles.scale;
-                let byScaled = by * turtles.scale;
+                let bxScaled = bx * turtlesScale;
+                let byScaled = by * turtlesScale;
                 cx = fx + dxf;
                 cy = fy + dyf;
-                let cxScaled = cx * turtles.scale;
-                let cyScaled = cy * turtles.scale;
+                let cxScaled = cx * turtlesScale;
+                let cyScaled = cy * turtlesScale;
                 dx = ix + dxi;
                 dy = iy + dyi;
-                let dxScaled = dx * turtles.scale;
-                let dyScaled = dy * turtles.scale;
+                let dxScaled = dx * turtlesScale;
+                let dyScaled = dy * turtlesScale;
 
                 // Control points scaled for SVG output
-                let cx1Scaled = (cx1 + dxi) * turtles.scale;
-                let cy1Scaled = (cy1 + dyi) * turtles.scale;
-                let cx2Scaled = (cx2 + dxf) * turtles.scale;
-                let cy2Scaled = (cy2 + dyf) * turtles.scale;
+                let cx1Scaled = (cx1 + dxi) * turtlesScale;
+                let cy1Scaled = (cy1 + dyi) * turtlesScale;
+                let cx2Scaled = (cx2 + dxf) * turtlesScale;
+                let cy2Scaled = (cy2 + dyf) * turtlesScale;
 
                 this.svgPath = true;
 
@@ -538,9 +539,9 @@ class Turtle {
                 this.ctx.arc(arccx, arccy, step, sa, ea, false);
                 this._svgArc(
                     steps,
-                    arccx * turtles.scale,
-                    arccy * turtles.scale,
-                    step * turtles.scale,
+                    arccx * turtlesScale,
+                    arccy * turtlesScale,
+                    step * turtlesScale,
                     sa,
                     ea
                 );
@@ -554,17 +555,17 @@ class Turtle {
                 this.ctx.arc(arccx, arccy, step, sa, ea, false);
                 this._svgArc(
                     steps,
-                    arccx * turtles.scale,
-                    arccy * turtles.scale,
-                    step * turtles.scale,
+                    arccx * turtlesScale,
+                    arccy * turtlesScale,
+                    step * turtlesScale,
                     sa,
                     ea
                 );
 
                 fx = turtles.turtleX2screenX(x2);
                 fy = turtles.turtleY2screenY(y2);
-                let fxScaled = fx * turtles.scale;
-                let fyScaled = fy * turtles.scale;
+                let fxScaled = fx * turtlesScale;
+                let fyScaled = fy * turtlesScale;
 
                 this.ctx.stroke();
                 this.ctx.closePath();
@@ -614,18 +615,18 @@ class Turtle {
                     this.svgPath = true;
                     let ix = turtles.turtleX2screenX(this.x);
                     let iy = turtles.turtleY2screenY(this.y);
-                    let ixScaled = ix * turtles.scale;
-                    let iyScaled = iy * turtles.scale;
+                    let ixScaled = ix * turtlesScale;
+                    let iyScaled = iy * turtlesScale;
                     this.svgOutput +=
                         '<path d="M ' + ixScaled + "," + iyScaled + " ";
                 }
 
-                let cx1Scaled = cx1 * turtles.scale;
-                let cy1Scaled = cy1 * turtles.scale;
-                let cx2Scaled = cx2 * turtles.scale;
-                let cy2Scaled = cy2 * turtles.scale;
-                let fxScaled = fx * turtles.scale;
-                let fyScaled = fy * turtles.scale;
+                let cx1Scaled = cx1 * turtlesScale;
+                let cy1Scaled = cy1 * turtlesScale;
+                let cx2Scaled = cx2 * turtlesScale;
+                let cy2Scaled = cy2 * turtlesScale;
+                let fxScaled = fx * turtlesScale;
+                let fyScaled = fy * turtlesScale;
 
                 // Curve to: ControlPointX1, ControlPointY1 >> ControlPointX2, ControlPointY2 >> X, Y
                 this.svgOutput +=
@@ -697,6 +698,7 @@ class Turtle {
             let nx, ny, sa, ea;
 
             let turtles = this.getTurtles();
+            let turtlesScale = turtles.getScale();
 
             if (invert) {
                 cx = turtles.turtleX2screenX(cx);
@@ -740,12 +742,12 @@ class Turtle {
                 let oxScaled, oyScaled;
                 if (anticlockwise) {
                     this.ctx.moveTo(ox + dx, oy + dy);
-                    oxScaled = (ox + dx) * turtles.scale;
-                    oyScaled = (oy + dy) * turtles.scale;
+                    oxScaled = (ox + dx) * turtlesScale;
+                    oyScaled = (oy + dy) * turtlesScale;
                 } else {
                     this.ctx.moveTo(ox - dx, oy - dy);
-                    oxScaled = (ox - dx) * turtles.scale;
-                    oyScaled = (oy - dy) * turtles.scale;
+                    oxScaled = (ox - dx) * turtlesScale;
+                    oyScaled = (oy - dy) * turtlesScale;
                 }
                 this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
@@ -755,9 +757,9 @@ class Turtle {
 
                 this._svgArc(
                     nsteps,
-                    cx * turtles.scale,
-                    cy * turtles.scale,
-                    (radius + step) * turtles.scale,
+                    cx * turtlesScale,
+                    cy * turtlesScale,
+                    (radius + step) * turtlesScale,
                     sa,
                     ea
                 );
@@ -773,18 +775,18 @@ class Turtle {
                 this.ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
                 this._svgArc(
                     steps,
-                    cx1 * turtles.scale,
-                    cy1 * turtles.scale,
-                    step * turtles.scale,
+                    cx1 * turtlesScale,
+                    cy1 * turtlesScale,
+                    step * turtlesScale,
                     sa1,
                     ea1
                 );
                 this.ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
                 this._svgArc(
                     nsteps,
-                    cx * turtles.scale,
-                    cy * turtles.scale,
-                    (radius - step) * turtles.scale,
+                    cx * turtlesScale,
+                    cy * turtlesScale,
+                    (radius - step) * turtlesScale,
                     ea,
                     sa
                 );
@@ -795,9 +797,9 @@ class Turtle {
                 this.ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
                 this._svgArc(
                     steps,
-                    cx2 * turtles.scale,
-                    cy2 * turtles.scale,
-                    step * turtles.scale,
+                    cx2 * turtlesScale,
+                    cy2 * turtlesScale,
+                    step * turtlesScale,
                     sa2,
                     ea2
                 );
@@ -815,17 +817,17 @@ class Turtle {
                 this.ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
                 if (!this.svgPath) {
                     this.svgPath = true;
-                    let oxScaled = ox * turtles.scale;
-                    let oyScaled = oy * turtles.scale;
+                    let oxScaled = ox * turtlesScale;
+                    let oyScaled = oy * turtlesScale;
                     this.svgOutput +=
                         '<path d="M ' + oxScaled + "," + oyScaled + " ";
                 }
 
                 let sweep = anticlockwise ? 0 : 1;
 
-                let nxScaled = nx * turtles.scale;
-                let nyScaled = ny * turtles.scale;
-                let radiusScaled = radius * turtles.scale;
+                let nxScaled = nx * turtlesScale;
+                let nyScaled = ny * turtlesScale;
+                let radiusScaled = radius * turtlesScale;
                 this.svgOutput +=
                     "A " +
                     radiusScaled +
@@ -1015,6 +1017,7 @@ class Turtle {
      */
         _move(ox, oy, x, y, invert) {
             let turtles = this.getTurtles();
+            let turtlesScale = turtles.getScale();
 
             let nx, ny;
             if (invert) {
@@ -1047,13 +1050,13 @@ class Turtle {
                 let dy = -step * Math.cos(capAngleRadians);
 
                 this.ctx.moveTo(ox + dx, oy + dy);
-                let oxScaled = (ox + dx) * turtles.scale;
-                let oyScaled = (oy + dy) * turtles.scale;
+                let oxScaled = (ox + dx) * turtlesScale;
+                let oyScaled = (oy + dy) * turtlesScale;
                 this.svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
                 this.ctx.lineTo(nx + dx, ny + dy);
-                let nxScaled = (nx + dx) * turtles.scale;
-                let nyScaled = (ny + dy) * turtles.scale;
+                let nxScaled = (nx + dx) * turtlesScale;
+                let nyScaled = (ny + dy) * turtlesScale;
                 this.svgOutput += nxScaled + "," + nyScaled + " ";
 
                 capAngleRadians = ((this.orientation + 90) * Math.PI) / 180.0;
@@ -1067,10 +1070,10 @@ class Turtle {
                 let ea = oAngleRadians;
                 this.ctx.arc(cx, cy, step, sa, ea, false);
 
-                nxScaled = (nx + dx) * turtles.scale;
-                nyScaled = (ny + dy) * turtles.scale;
+                nxScaled = (nx + dx) * turtlesScale;
+                nyScaled = (ny + dy) * turtlesScale;
 
-                let radiusScaled = step * turtles.scale;
+                let radiusScaled = step * turtlesScale;
 
                 // Simulate an arc with line segments since Tinkercad
                 // cannot import SVG arcs reliably.
@@ -1081,16 +1084,16 @@ class Turtle {
                 let steps = Math.max(Math.floor(savedStroke, 1));
                 this._svgArc(
                     steps,
-                    cx * turtles.scale,
-                    cy * turtles.scale,
+                    cx * turtlesScale,
+                    cy * turtlesScale,
                     radiusScaled,
                     sa
                 );
                 this.svgOutput += nxScaled + "," + nyScaled + " ";
 
                 this.ctx.lineTo(ox + dx, oy + dy);
-                nxScaled = (ox + dx) * turtles.scale;
-                nyScaled = (oy + dy) * turtles.scale;
+                nxScaled = (ox + dx) * turtlesScale;
+                nyScaled = (oy + dy) * turtlesScale;
                 this.svgOutput += nxScaled + "," + nyScaled + " ";
 
                 capAngleRadians = ((this.orientation - 90) * Math.PI) / 180.0;
@@ -1104,14 +1107,14 @@ class Turtle {
                 ea = oAngleRadians;
                 this.ctx.arc(cx, cy, step, sa, ea, false);
 
-                nxScaled = (ox + dx) * turtles.scale;
-                nyScaled = (oy + dy) * turtles.scale;
+                nxScaled = (ox + dx) * turtlesScale;
+                nyScaled = (oy + dy) * turtlesScale;
 
-                radiusScaled = step * turtles.scale;
+                radiusScaled = step * turtlesScale;
                 this._svgArc(
                     steps,
-                    cx * turtles.scale,
-                    cy * turtles.scale,
+                    cx * turtlesScale,
+                    cy * turtlesScale,
                     radiusScaled,
                     sa
                 );
@@ -1131,13 +1134,13 @@ class Turtle {
                 this.ctx.lineTo(nx, ny);
                 if (!this.svgPath) {
                     this.svgPath = true;
-                    let oxScaled = ox * turtles.scale;
-                    let oyScaled = oy * turtles.scale;
+                    let oxScaled = ox * turtlesScale;
+                    let oyScaled = oy * turtlesScale;
                     this.svgOutput +=
                         '<path d="M ' + oxScaled + "," + oyScaled + " ";
                 }
-                let nxScaled = nx * turtles.scale;
-                let nyScaled = ny * turtles.scale;
+                let nxScaled = nx * turtlesScale;
+                let nyScaled = ny * turtlesScale;
                 this.svgOutput += nxScaled + "," + nyScaled + " ";
                 this.ctx.stroke();
                 if (!this.fillState) {
