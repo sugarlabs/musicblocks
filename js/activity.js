@@ -35,6 +35,7 @@ function Activity() {
 
     let cartesianBitmap = null;
     let polarBitmap = null;
+    let staffBitmap = null;
 
     let ERRORARTWORK = [
         "emptybox",
@@ -1345,16 +1346,17 @@ function Activity() {
     // };
 
     /*
-     * Hides all grids (Cartesian/polar)
+     * Hides all grids (Cartesian/polar/staff)
      */
     hideGrids = function() {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
+	_hideStaff();
     };
 
     /*
-     * Renders Cartesian/Polar grids and changes button labels accordingly
+     * Renders Cartesian/Polar/Staff grids and changes button labels accordingly
      */
     _doCartesianPolar = function() {
         if (cartesianBitmap.visible && polarBitmap.visible) {
@@ -1363,6 +1365,11 @@ function Activity() {
             turtles.setGridLabel(_("hide Polar"));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
+	    _showStaff();
+            //.TRANS: show musical staff
+            turtles.setGridLabel(_("show staff"));
+        } else if (staffBitmap.visible) {
+            _hideStaff();
             //.TRANS: show Cartesian coordinate overlay grid
             turtles.setGridLabel(_("show Cartesian"));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
@@ -2568,6 +2575,8 @@ function Activity() {
         cartesianBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
         polarBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
         polarBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
+        staffBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
+        staffBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
         update = true;
 
         // Hide tooltips on mobile
@@ -3489,6 +3498,24 @@ function Activity() {
     _showPolar = function() {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
+        update = true;
+    };
+
+    /*
+     * Hides musical staff
+     */
+    _hideStaff = function() {
+        staffBitmap.visible = false;
+        staffBitmap.updateCache();
+        update = true;
+    };
+
+    /*
+     * Shows musical staff
+     */
+    _showStaff = function() {
+        staffBitmap.visible = true;
+        staffBitmap.updateCache();
         update = true;
     };
 
@@ -5493,6 +5520,10 @@ function Activity() {
         polarBitmap = _createGrid(
             "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(POLAR)))
+        );
+        staffBitmap = _createGrid(
+            "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(STAFF)))
         );
 
         let URL = window.location.href;
