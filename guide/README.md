@@ -2196,10 +2196,10 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | master beats per second | | | broadcast | | | scroll xy |
 | | on every note do | | | on event do | | | x |
 | | notes played | | | do | | | y |
-| | beat count | | Boxes | store in box 1 | | | heading |
-| Pitch | pitch | | | box 1 | | Pen | set color |
-| | pitch G4 | | | store in box 2 | | | set shade |
-| | scalar step (+/-) | | | box 2 | | | set pen size |
+| | beat count | | Boxes | store in box1 | | | heading |
+| Pitch | pitch | | | box1 | | Pen | set color |
+| | pitch G4 | | | store in box2 | | | set shade |
+| | scalar step (+/-) | | | box2 | | | set pen size |
 | | pitch number | | | store in | | | pen down |
 | | hertz | | | box | | | pen up |
 | | fourth | | | add | | | fill |
@@ -2278,10 +2278,10 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | sixth | | | calculate | | | set font |
 | | seventh | | | return to URL | | | pen size |
 | | down third | | | return | | | color |
-| | down sixth | | Boxes | store in box 1 | | | shade |
-| | octave | | | box 1 | | | grey |
-| | semi-tone transpose | | | store in box 2 | | | black |
-| | register | | | box 2 | | | white |
+| | down sixth | | Boxes | store in box1 | | | shade |
+| | octave | | | box1 | | | grey |
+| | semi-tone transpose | | | store in box2 | | | black |
+| | register | | | box2 | | | white |
 | | invert | | | store in | | | red |
 | | sol | | | store in box | | | orange |
 | | G | | | box | | | yellow |

@@ -3396,9 +3396,9 @@ function Blocks(activity) {
                         } else {
                             that.blockList[c].privateData = args[1];
                             if (args[1] === "box1") {
-                                that.blockList[c].overrideName = _("box 1");
+                                that.blockList[c].overrideName = _("box1");
                             } else if (args[1] === "box2") {
-                                that.blockList[c].overrideName = _("box 2");
+                                that.blockList[c].overrideName = _("box2");
                             } else {
                                 that.blockList[c].overrideName = args[1];
                             }
@@ -3859,9 +3859,9 @@ function Blocks(activity) {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     if (newName === "box1") {
-                        this.blockList[blk].overrideName = _("box 1");
+                        this.blockList[blk].overrideName = _("box1");
                     } else if (newName === "box2") {
-                        this.blockList[blk].overrideName = _("box 2");
+                        this.blockList[blk].overrideName = _("box2");
                     } else {
                         this.blockList[blk].overrideName = newName;
                     }
@@ -3893,9 +3893,9 @@ function Blocks(activity) {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     if (newName === "box1") {
-                        this.blockList[blk].overrideName = _("box 1");
+                        this.blockList[blk].overrideName = _("box1");
                     } else if (newName === "box2") {
-                        this.blockList[blk].overrideName = _("box 2");
+                        this.blockList[blk].overrideName = _("box2");
                     } else {
                         this.blockList[blk].overrideName = newName;
                     }
@@ -3927,9 +3927,9 @@ function Blocks(activity) {
                 if (this.blockList[blk].privateData === oldName) {
                     this.blockList[blk].privateData = newName;
                     if (newName === "box1") {
-                        this.blockList[blk].overrideName = _("box 1");
+                        this.blockList[blk].overrideName = _("box1");
                     } else if (newName === "box2") {
-                        this.blockList[blk].overrideName = _("box 2");
+                        this.blockList[blk].overrideName = _("box2");
                     } else {
                         this.blockList[blk].overrideName = newName;
                     }
@@ -5897,9 +5897,9 @@ function Blocks(activity) {
                         that.blockList[thisBlock].privateData = value;
                         that.blockList[thisBlock].value = null;
                         if (value === "box1") {
-                            that.blockList[thisBlock].overrideName = _("box 1");
+                            that.blockList[thisBlock].overrideName = _("box1");
                         } else if (value === "box2") {
-                            that.blockList[thisBlock].overrideName = _("box 2");
+                            that.blockList[thisBlock].overrideName = _("box2");
                         } else {
                             that.blockList[thisBlock].overrideName = value;
                         }
@@ -5922,9 +5922,9 @@ function Blocks(activity) {
                         that.blockList[thisBlock].privateData = value;
 
                         if (value === "box1") {
-                            that.blockList[thisBlock].overrideName = _("box 1");
+                            that.blockList[thisBlock].overrideName = _("box1");
                         } else if (value === "box2") {
-                            that.blockList[thisBlock].overrideName = _("box 2");
+                            that.blockList[thisBlock].overrideName = _("box2");
                         } else {
                             that.blockList[thisBlock].overrideName = value;
                         }
