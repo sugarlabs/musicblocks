@@ -35,7 +35,8 @@ function Activity() {
 
     let cartesianBitmap = null;
     let polarBitmap = null;
-    let staffBitmap = null;
+    let trebleBitmap = null;
+    let bassBitmap = null;
 
     let ERRORARTWORK = [
         "emptybox",
@@ -1346,30 +1347,37 @@ function Activity() {
     // };
 
     /*
-     * Hides all grids (Cartesian/polar/staff)
+     * Hides all grids (Cartesian/polar/treble/bass)
      */
     hideGrids = function() {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
-	_hideStaff();
+	_hideTreble();
+	_hideBass();
     };
 
     /*
-     * Renders Cartesian/Polar/Staff grids and changes button labels accordingly
+     * Renders Cartesian/Polar/Treble/Bass grids and changes button
+     * labels accordingly
      */
     _doCartesianPolar = function() {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
-            //.TRANS: hide Polar coordinate overlay grid
-            turtles.setGridLabel(_("hide Polar"));
+            //.TRANS: show treble treble
+            turtles.setGridLabel(_("show treble"));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
-	    _showStaff();
-            //.TRANS: hide musical staff
-            turtles.setGridLabel(_("hide staff"));
-        } else if (staffBitmap.visible) {
-            _hideStaff();
+	    _showTreble();
+            //.TRANS: show bass staff
+            turtles.setGridLabel(_("show bass"));
+        } else if (trebleBitmap.visible) {
+            _hideTreble();
+	    _showBass();
+            //.TRANS: hide bass staff
+            turtles.setGridLabel(_("hide bass"));
+        } else if (bassBitmap.visible) {
+            _hideBass();
             //.TRANS: show Cartesian coordinate overlay grid
             turtles.setGridLabel(_("show Cartesian"));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
@@ -2575,8 +2583,10 @@ function Activity() {
         cartesianBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
         polarBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
         polarBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        staffBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        staffBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
+        trebleBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
+        trebleBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
+        bassBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
+        bassBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
         update = true;
 
         // Hide tooltips on mobile
@@ -3502,20 +3512,38 @@ function Activity() {
     };
 
     /*
-     * Hides musical staff
+     * Hides musical treble staff
      */
-    _hideStaff = function() {
-        staffBitmap.visible = false;
-        staffBitmap.updateCache();
+    _hideTreble = function() {
+        trebleBitmap.visible = false;
+        trebleBitmap.updateCache();
         update = true;
     };
 
     /*
-     * Shows musical staff
+     * Shows musical treble staff
      */
-    _showStaff = function() {
-        staffBitmap.visible = true;
-        staffBitmap.updateCache();
+    _showTreble = function() {
+        trebleBitmap.visible = true;
+        trebleBitmap.updateCache();
+        update = true;
+    };
+
+    /*
+     * Hides musical bass staff
+     */
+    _hideBass = function() {
+        bassBitmap.visible = false;
+        bassBitmap.updateCache();
+        update = true;
+    };
+
+    /*
+     * Shows musical bass staff
+     */
+    _showBass = function() {
+        bassBitmap.visible = true;
+        bassBitmap.updateCache();
         update = true;
     };
 
@@ -5521,9 +5549,13 @@ function Activity() {
             "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(POLAR)))
         );
-        staffBitmap = _createGrid(
+        trebleBitmap = _createGrid(
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(STAFF)))
+                window.btoa(unescape(encodeURIComponent(TREBLE)))
+        );
+        bassBitmap = _createGrid(
+            "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(BASS)))
         );
 
         let URL = window.location.href;
