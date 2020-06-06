@@ -453,6 +453,19 @@ function MusicKeyboard() {
             that._createAddRowPieSubmenu();
         };
 
+        let midiButton = widgetWindow.addButton(
+            null,
+            ICONSIZE,
+            _("MIDI")
+        )
+        midiButton.onclick = function () {
+            if (navigator.requestMIDIAccess) {
+                that.doMIDI();
+            } else {
+                logo.textMsg(' MIDI is not supported in this browser.');
+            }
+        };
+
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
 
         //that._createKeyboard();
@@ -2628,4 +2641,111 @@ function MusicKeyboard() {
         return cell;
     };
 
+    this.doMIDI = () => {
+
+        var duration = 0;
+        var startTime = 0;
+
+        this.getElement = {};
+
+        for (let idx = 0; idx < this.layout.length; idx++) {
+            key = this.layout[idx];
+            this.getElement[key.noteName.toString()+ key.noteOctave.toString()] = key.objId;
+        }
+
+        let __startNote = (event, element) => { 
+            if (!element) return;
+            startTime = event.timeStamp ; // Milliseconds();
+            element.style.backgroundColor = platformColor.orange;
+            this._logo.synth.trigger(
+                0,
+                this.noteMapper[element.id],
+                1,
+                this.instrumentMapper[element.id],
+                null,
+                null
+            );
+        };
+
+        let __endNote = (event, element) => {
+            if (!element) return;
+
+            var id = element.id;
+            if (id.includes("blackRow")) {
+                element.style.backgroundColor = "black";
+            } else {
+                element.style.backgroundColor = "white";
+            }
+
+            var now = event.timeStamp;
+            duration = now - startTime;
+            duration /= 1000;
+            this._logo.synth.stopSound(
+                0,
+                this.instrumentMapper[element.id],
+                this.noteMapper[element.id]
+            );
+            if (beginnerMode === "true") {
+                duration = parseFloat(
+                    (Math.round(duration * 8) / 8).toFixed(3)
+                );
+            } else {
+                duration = parseFloat(
+                    (Math.round(duration * 16) / 16).toFixed(4)
+                );
+            }
+
+            if (duration === 0) {
+                duration = 0.125;
+            } else if (duration < 0) {
+                duration = -duration;
+            }
+
+            this._notesPlayed.push({
+                startTime: startTime,
+                noteOctave: this.noteMapper[element.id],
+                objId: element.id,
+                duration: duration,
+                voice: this.instrumentMapper[element.id],
+                blockNumber: this.blockNumberMapper[element.id]
+            });
+            this._createTable();
+        };
+
+        let numberToPitch = (num) => {
+            let offset = 4;
+            let octave = offset + Math.floor((num - 60) / 12);
+            let pitch = PITCHES[num % 12];
+            return [pitch, octave];
+        }
+
+        //event attributes : timeStamp , data 
+        //data : length -3 [0] : 144/128 : noteOn/NoteOff
+        //                 [1] : noteNumber : middle C always 60 
+        //                 [2] : velocity ,(currently not used).
+ 
+        let onMIDIMessage = (event) => {
+            let pitch = numberToPitch(event.data[1] )[0];
+            let octave = numberToPitch(event.data[1] )[1];
+            console.debug(pitch, octave);
+            if (event.data[0] == 144 && event.data[2] != 0) {
+                __startNote(event, docById(this.getElement[pitch + "" + octave]));
+
+            }
+            else {
+                __endNote(event, docById(this.getElement[pitch + "" + octave]));
+            }
+        }
+
+        let onMIDISuccess = ( midiAccess) => {
+            midiAccess.inputs.forEach((input) => { input.onmidimessage = onMIDIMessage; });
+        }
+
+        if (this.midiON) return;
+        this.midiON = true;
+
+        navigator.requestMIDIAccess()
+            .then(onMIDISuccess);
+
+    }
 }
