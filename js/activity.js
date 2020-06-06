@@ -1366,8 +1366,8 @@ function Activity() {
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
 	    _showStaff();
-            //.TRANS: show musical staff
-            turtles.setGridLabel(_("show staff"));
+            //.TRANS: hide musical staff
+            turtles.setGridLabel(_("hide staff"));
         } else if (staffBitmap.visible) {
             _hideStaff();
             //.TRANS: show Cartesian coordinate overlay grid
