@@ -782,7 +782,7 @@ saveLilypondOutput = function(logo) {
             if (tNumber > startDrums - 1) {
                 instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                 instrumentName = instrumentName
-                    .replace(/ /g, "_")
+                    .replace(/ /g, "")
                     .replace(".", "");
                 logo.notationOutput += instrumentName + " = {\n";
                 logo.notationOutput += "\\drummode {\n";
@@ -814,7 +814,7 @@ saveLilypondOutput = function(logo) {
                 }
 
                 instrumentName = instrumentName
-                    .replace(/ /g, "_")
+                    .replace(/ /g, "")
                     .replace(".", "");
 
                 console.log("L604: " + instrumentName);
@@ -907,7 +907,7 @@ saveLilypondOutput = function(logo) {
             }
 
             logo.notationOutput +=
-                instrumentName.replace(/ /g, "_").replace(".", "") + "Voice = ";
+                instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
             if (tNumber > startDrums - 1) {
                 logo.notationOutput += "\\new DrumStaff \\with {\n";
             } else {
@@ -934,7 +934,7 @@ saveLilypondOutput = function(logo) {
                 '\n} { \\clef "' +
                 last(clef) +
                 '" \\' +
-                instrumentName.replace(/ /g, "_").replace(".", "") +
+                instrumentName.replace(/ /g, "").replace(".", "") +
                 " }\n\n";
         } else {
             clef.push("");
@@ -990,7 +990,7 @@ saveLilypondOutput = function(logo) {
                     }
 
                     instrumentName = instrumentName
-                        .replace(/ /g, "_")
+                        .replace(/ /g, "")
                         .replace(".", "");
                     logo.notationOutput +=
                         "      \\" + instrumentName + "Voice\n";
@@ -1037,13 +1037,13 @@ saveLilypondOutput = function(logo) {
                     }
 
                     instrumentName = instrumentName
-                        .replace(/ /g, "_")
+                        .replace(/ /g, "")
                         .replace(".", "");
                     logo.notationOutput +=
                         '         \\context TabVoice = "' +
                         instrumentName +
                         '" \\' +
-                        instrumentName.replace(/ /g, "_").replace(".", "") +
+                        instrumentName.replace(/ /g, "").replace(".", "") +
                         "\n";
                 }
             }
