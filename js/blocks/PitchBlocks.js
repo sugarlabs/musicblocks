@@ -175,6 +175,12 @@ function _playPitch(args, logo, turtle, blk) {
             //     arg0 -= 2;
             // }
 
+            // Add a check if arg0 is float
+            // round off to closest integer
+            if (arg0 % 1 !== 0) {
+                arg0 = Math.floor(arg0 + 0.5);
+            }
+
             let neg;
             if (arg0 < 0) {
                 neg = true;

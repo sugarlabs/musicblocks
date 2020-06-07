@@ -4845,6 +4845,13 @@ function Block(protoblock, blocks, overrideName) {
     this._piemenuNthModalPitch = function(noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
+        // check if a non-integer value is connected to note argument
+        // Pie menu would crash; so in such case navigate to closest integer
+        
+        if (note % 1 !== 0) {
+            note = Math.floor(note + 0.5);
+        }
+
         if (this.blocks.stageClick) {
             return;
         }
