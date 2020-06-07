@@ -86,6 +86,11 @@ function LanguageBox() {
         this.hide();
     };
 
+    this.quz_onclick = function() {
+        language = "quz";
+        this.hide();
+    };
+
     this.gug_onclick = function() {
         language = "gug";
         this.hide();
@@ -115,8 +120,8 @@ function LanguageBox() {
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
             ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
-            ayc:
-                "Actualice su navegador para cambiar su preferencia de idioma.",
+            ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
+            quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
 
