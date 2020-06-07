@@ -2504,7 +2504,7 @@ msgstr "O bloco Caixa 2 retorna o valor armazenado na Caixa 2."
 
 #: js/BoxesBlocks.js:324
 msgid "box2"
-msgstr "caixa 2"
+msgstr "caixa2"
 
 #: js/BoxesBlocks.js:347
 msgid "store in box2"
@@ -2516,7 +2516,7 @@ msgstr "O bloco Caixa 1 retorna o valor armazenado na Caixa 1."
 
 #: js/BoxesBlocks.js:371
 msgid "box1"
-msgstr "caixa 1"
+msgstr "caixa1"
 
 #: js/BoxesBlocks.js:394
 msgid "store in box1"

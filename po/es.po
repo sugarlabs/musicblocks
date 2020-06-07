@@ -1639,7 +1639,7 @@ msgid "The box2 block returns the value stored in box2."
 msgstr "El bloque Caja 2 devuelve el valor almacenado en caja 2."
 
 msgid "box2"
-msgstr "caja 2"
+msgstr "caja2"
 
 msgid "store in box2"
 msgstr "guardar en caja 2"
@@ -1648,7 +1648,7 @@ msgid "The box1 block returns the value stored in box1."
 msgstr "El bloque Caja 1 devuelve el valor almacenado en caja 1."
 
 msgid "box1"
-msgstr "caja 1"
+msgstr "caja1"
 
 msgid "store in box1"
 msgstr "guardar en caja 1"
