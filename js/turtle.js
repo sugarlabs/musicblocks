@@ -2643,6 +2643,10 @@ function Turtles() {
                 return;
             }
 
+            if (newTurtle.running) {
+                that.stage.dispatchEvent("mousedown" + newTurtle.name);
+            }
+
             var offset = {
                 x: newTurtle.container.x - event.stageX / that.scale,
                 y: newTurtle.container.y - event.stageY / that.scale
@@ -2662,6 +2666,12 @@ function Turtles() {
             });
         });
 
+        newTurtle.container.on("pressup", function(event) {
+            if (newTurtle.running) {
+                that.stage.dispatchEvent("mouseup" + newTurtle.name);
+            }
+        });
+
         newTurtle.container.on("click", function(event) {
             // If turtles listen for clicks then they can be used as buttons.
             console.debug("--> [click " + newTurtle.name + "]");
@@ -2670,6 +2680,7 @@ function Turtles() {
 
         newTurtle.container.on("mouseover", function(event) {
             if (newTurtle.running) {
+                that.stage.dispatchEvent("mouseover" + newTurtle.name);
                 return;
             }
 
@@ -2681,6 +2692,7 @@ function Turtles() {
 
         newTurtle.container.on("mouseout", function(event) {
             if (newTurtle.running) {
+                that.stage.dispatchEvent("mouseout" + newTurtle.name);
                 return;
             }
 
