@@ -454,6 +454,12 @@ function Toolbar() {
                 languageBox.ayc_onclick();
             };
 
+            var quz = docById("quz");
+
+            quz.onclick = function() {
+                languageBox.quz_onclick();
+            };
+
             var gug = docById("gug");
 
             gug.onclick = function() {
