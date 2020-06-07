@@ -32,10 +32,10 @@ function setupNumberBlocks() {
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                     if (typeof a === "number") {
-                        return Math.floor(a);
+                        return Math.floor(a + 0.5);
                     } else {
                         try {
-                            return Math.floor(Number(a));
+                            return Math.floor(Number(a) + 0.5);
                         } catch (e) {
                             console.debug(e);
                             logo.errorMsg(NANERRORMSG, blk);
