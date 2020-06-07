@@ -4530,32 +4530,32 @@ msgstr "eñongatu... pe"
 
 #: js/BoxesBlocks.js:318
 #.TRANS: El bloque Caja 2 devuelve el valor almacenado en caja 2.
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr ""
 
 #: js/BoxesBlocks.js:324
 #.TRANS: caja 2
-msgid "box 2"
+msgid "box2"
 msgstr ""
 
 #: js/BoxesBlocks.js:347
 #.TRANS: guardar en caja 2
-msgid "store in box 2"
+msgid "store in box2"
 msgstr ""
 
 #: js/BoxesBlocks.js:365
 #.TRANS: El bloque Caja 1 devuelve el valor almacenado en caja 1.
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr ""
 
 #: js/BoxesBlocks.js:371
 #.TRANS: caja 1
-msgid "box 1"
+msgid "box1"
 msgstr ""
 
 #: js/BoxesBlocks.js:394
 #.TRANS: guardar en caja 1
-msgid "store in box 1"
+msgid "store in box1"
 msgstr ""
 
 #: js/IntervalsBlocks.js:4
@@ -8506,12 +8506,12 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:341
 
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr ""
 
 #: js/turtledefs.js:343
 
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr ""
 
 #: js/turtledefs.js:345
@@ -9579,7 +9579,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:253
 
-#~msgid "The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>."
+#~msgid "The <em>Store in box1</em> block is used to store a value in <em>box1</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:265
@@ -10508,7 +10508,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> block returns the value stored in <em>Box 2</em>."
+#~msgid "The <em>box2</em> block returns the value stored in <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:116
@@ -10773,7 +10773,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> returns the value stored on <em>Box 2</em>."
+#~msgid "The <em>box2</em> returns the value stored on <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:213
@@ -11604,7 +11604,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> returns the value stored on <em>Box 1</em>."
+#~msgid "The <em>box1</em> returns the value stored on <em>box1</em>."
 #~msgstr ""
 
 #: js/logo.js:2520
@@ -11708,7 +11708,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:255
 
-#~msgid "The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>."
+#~msgid "The <em>Store in box2</em> block is used to store a value in <em>box2</em>."
 #~msgstr ""
 
 #: js/toolbar.js:339
@@ -12055,7 +12055,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> block returns the value stored in <em>Box 1</em>."
+#~msgid "The <em>box1</em> block returns the value stored in <em>box1</em>."
 #~msgstr ""
 
 #: js/musicutils.js:278

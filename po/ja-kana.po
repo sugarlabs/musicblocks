@@ -2573,27 +2573,27 @@ msgid "store in"
 msgstr "いれる"
 
 #: js/BoxesBlocks.js:318
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr "<h2>すうちブロック</h2><br>すうちブロック として、 はこ２の すうちを つかう。"
 
 #: js/BoxesBlocks.js:324
-msgid "box 2"
+msgid "box2"
 msgstr "はこ２の すうち"
 
 #: js/BoxesBlocks.js:347
-msgid "store in box 2"
+msgid "store in box2"
 msgstr "はこ２に すうちを いれる"
 
 #: js/BoxesBlocks.js:365
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr "<h2>すうちブロック</h2><br>すうちブロック として、 はこ１の すうちを つかう。"
 
 #: js/BoxesBlocks.js:371
-msgid "box 1"
+msgid "box1"
 msgstr "はこ１の すうち"
 
 #: js/BoxesBlocks.js:394
-msgid "store in box 1"
+msgid "store in box1"
 msgstr "はこ１に すうちを いれる"
 
 #: js/IntervalsBlocks.js:4
@@ -6335,12 +6335,12 @@ msgstr "えらんだ ファイルには、ただしい ヒープが ふくまれ
 
 #: js/turtledefs.js:348
 
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr "<h2>かずのはこ（あたいをいれる）</h2><br>はこ１に してい した すうちを いれる。"
 
 #: js/turtledefs.js:350
 
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr "<h2>かずのはこ（あたいをいれる）</h2><br>はこ２に してい した すうちを いれる。"
 
 #: js/turtledefs.js:352

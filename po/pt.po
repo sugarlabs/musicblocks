@@ -2499,27 +2499,27 @@ msgid "store in"
 msgstr "guardar em"
 
 #: js/BoxesBlocks.js:318
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr "O bloco Caixa 2 retorna o valor armazenado na Caixa 2."
 
 #: js/BoxesBlocks.js:324
-msgid "box 2"
+msgid "box2"
 msgstr "caixa 2"
 
 #: js/BoxesBlocks.js:347
-msgid "store in box 2"
+msgid "store in box2"
 msgstr "armazenar na caixa 2"
 
 #: js/BoxesBlocks.js:365
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr "O bloco Caixa 1 retorna o valor armazenado na Caixa 1."
 
 #: js/BoxesBlocks.js:371
-msgid "box 1"
+msgid "box1"
 msgstr "caixa 1"
 
 #: js/BoxesBlocks.js:394
-msgid "store in box 1"
+msgid "store in box1"
 msgstr "armazenar na caixa 1"
 
 #: js/IntervalsBlocks.js:4
@@ -6174,12 +6174,12 @@ msgstr "O arquivo escolhido não tem uma pilha válida."
 
 #: js/turtledefs.js:348
 
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr "O bloco Armazenar na Caixa 1 é usado para armazenar um valor na Caixa 1."
 
 #: js/turtledefs.js:350
 
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr "O bloco Armazenar na Caixa 2 é usado para armazenar um valor na Caixa 2."
 
 #: js/turtledefs.js:352

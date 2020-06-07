@@ -3594,19 +3594,19 @@ msgid "In the example, it is used with the One of block to choose a random phase
 msgstr ""
 
 #: js/turtledefs.js:341
-msgid "The Store in Box 1 block is used to store a value in Box 1."
+msgid "The Store in box1 block is used to store a value in box1."
 msgstr ""
 
 #: js/turtledefs.js:342
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr ""
 
 #: js/turtledefs.js:343
-msgid "The Store in Box 2 block is used to store a value in Box 2."
+msgid "The Store in box2 block is used to store a value in box2."
 msgstr ""
 
 #: js/turtledefs.js:344
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr ""
 
 #: js/turtledefs.js:345
@@ -6131,19 +6131,19 @@ msgid "name1"
 msgstr ""
 
 #: js/basicblocks.js:3940
-msgid "box 2"
+msgid "box2"
 msgstr ""
 
 #: js/basicblocks.js:3953
-msgid "store in box 2"
+msgid "store in box2"
 msgstr ""
 
 #: js/basicblocks.js:3966
-msgid "box 1"
+msgid "box1"
 msgstr ""
 
 #: js/basicblocks.js:3979
-msgid "store in box 1"
+msgid "store in box1"
 msgstr ""
 
 #: js/basicblocks.js:4013
@@ -8234,7 +8234,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:253
 
-#~msgid "The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>."
+#~msgid "The <em>Store in box1</em> block is used to store a value in <em>box1</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:265
@@ -9305,7 +9305,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> block returns the value stored in <em>Box 2</em>."
+#~msgid "The <em>box2</em> block returns the value stored in <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:82
@@ -9591,7 +9591,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> returns the value stored on <em>Box 2</em>."
+#~msgid "The <em>box2</em> returns the value stored on <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:213
@@ -10503,7 +10503,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> returns the value stored on <em>Box 1</em>."
+#~msgid "The <em>box1</em> returns the value stored on <em>box1</em>."
 #~msgstr ""
 
 #: js/logo.js:3705
@@ -10628,7 +10628,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:255
 
-#~msgid "The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>."
+#~msgid "The <em>Store in box2</em> block is used to store a value in <em>box2</em>."
 #~msgstr ""
 
 #: js/toolbar.js:339
@@ -11033,7 +11033,7 @@ msgstr "你必须选择文件"
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> block returns the value stored in <em>Box 1</em>."
+#~msgid "The <em>box1</em> block returns the value stored in <em>box1</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:99

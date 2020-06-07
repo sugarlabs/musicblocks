@@ -2573,27 +2573,27 @@ msgid "store in"
 msgstr "入れる"
 
 #: js/BoxesBlocks.js:318
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の数値を使う。"
 
 #: js/BoxesBlocks.js:324
-msgid "box 2"
+msgid "box2"
 msgstr "箱２のすうち"
 
 #: js/BoxesBlocks.js:347
-msgid "store in box 2"
+msgid "store in box2"
 msgstr "箱２にすうちを入れる"
 
 #: js/BoxesBlocks.js:365
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の数値を使う。"
 
 #: js/BoxesBlocks.js:371
-msgid "box 1"
+msgid "box1"
 msgstr "箱１のすうち"
 
 #: js/BoxesBlocks.js:394
-msgid "store in box 1"
+msgid "store in box1"
 msgstr "箱１にすうちを入れる"
 
 #: js/IntervalsBlocks.js:4
@@ -5472,10 +5472,10 @@ msgstr "選んだファイルには、正しいヒープが含まれません。
 #~msgid "In the example, it is used with the One of block to choose a random phase."
 #~msgstr "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
 
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱１に指定したすうちを入れる。"
 
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱２に指定したすうちを入れる。"
 
 #~msgid "The Add-to block is used to add to the value stored in a box."

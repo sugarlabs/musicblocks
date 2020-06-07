@@ -4204,27 +4204,27 @@ msgid "store in"
 msgstr ""
 
 #: js/BoxesBlocks.js:318
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr ""
 
 #: js/BoxesBlocks.js:324
-msgid "box 2"
+msgid "box2"
 msgstr ""
 
 #: js/BoxesBlocks.js:347
-msgid "store in box 2"
+msgid "store in box2"
 msgstr ""
 
 #: js/BoxesBlocks.js:365
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr ""
 
 #: js/BoxesBlocks.js:371
-msgid "box 1"
+msgid "box1"
 msgstr ""
 
 #: js/BoxesBlocks.js:394
-msgid "store in box 1"
+msgid "store in box1"
 msgstr ""
 
 #: js/IntervalsBlocks.js:4
@@ -7879,12 +7879,12 @@ msgstr ""
 
 #: js/turtledefs.js:348
 
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr ""
 
 #: js/turtledefs.js:350
 
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr ""
 
 #: js/turtledefs.js:352
@@ -8974,7 +8974,7 @@ msgstr ""
 
 #: js/turtledefs.js:253
 
-#~msgid "The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>."
+#~msgid "The <em>Store in box1</em> block is used to store a value in <em>box1</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:265
@@ -10052,7 +10052,7 @@ msgstr ""
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> block returns the value stored in <em>Box 2</em>."
+#~msgid "The <em>box2</em> block returns the value stored in <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:82
@@ -10352,7 +10352,7 @@ msgstr ""
 
 #: js/turtledefs.js:256
 
-#~msgid "The <em>Box 2</em> returns the value stored on <em>Box 2</em>."
+#~msgid "The <em>box2</em> returns the value stored on <em>box2</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:213
@@ -11259,7 +11259,7 @@ msgstr ""
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> returns the value stored on <em>Box 1</em>."
+#~msgid "The <em>box1</em> returns the value stored on <em>box1</em>."
 #~msgstr ""
 
 #: js/logo.js:3705
@@ -11384,7 +11384,7 @@ msgstr ""
 
 #: js/turtledefs.js:255
 
-#~msgid "The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>."
+#~msgid "The <em>Store in box2</em> block is used to store a value in <em>box2</em>."
 #~msgstr ""
 
 #: js/toolbar.js:339
@@ -11780,7 +11780,7 @@ msgstr ""
 
 #: js/turtledefs.js:254
 
-#~msgid "The <em>Box 1</em> block returns the value stored in <em>Box 1</em>."
+#~msgid "The <em>box1</em> block returns the value stored in <em>box1</em>."
 #~msgstr ""
 
 #: js/turtledefs.js:99

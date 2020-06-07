@@ -2091,27 +2091,27 @@ msgid "store in"
 msgstr "imaña"
 
 #.TRANS: El bloque Caja 2 devuelve el valor almacenado en caja 2.
-msgid "The Box 2 block returns the value stored in Box 2."
+msgid "The box2 block returns the value stored in box2."
 msgstr ""
 
 #.TRANS: caja 2
-msgid "box 2"
+msgid "box2"
 msgstr ""
 
 #.TRANS: guardar en caja 2
-msgid "store in box 2"
+msgid "store in box2"
 msgstr ""
 
 #.TRANS: El bloque Caja 1 devuelve el valor almacenado en caja 1.
-msgid "The Box 1 block returns the value stored in Box 1."
+msgid "The box1 block returns the value stored in box1."
 msgstr ""
 
 #.TRANS: caja 1
-msgid "box 1"
+msgid "box1"
 msgstr ""
 
 #.TRANS: guardar en caja 1
-msgid "store in box 1"
+msgid "store in box1"
 msgstr ""
 
 #.TRANS: fijar temperamento
@@ -4863,11 +4863,11 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgstr ""
 
 #.TRANS: El bloque Guardar en caja 1 se utiliza para almacenar un valor en la caja 1.
-#~msgid "The Store in Box 1 block is used to store a value in Box 1."
+#~msgid "The Store in box1 block is used to store a value in box1."
 #~msgstr ""
 
 #.TRANS: El bloque Guardar en caja 2 se utiliza para almacenar un valor en la caja 2.
-#~msgid "The Store in Box 2 block is used to store a value in Box 2."
+#~msgid "The Store in box2 block is used to store a value in box2."
 #~msgstr ""
 
 #.TRANS: 
@@ -5587,7 +5587,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "The <em>Time</em> block returns the number of seconds that the program has been running."
 #~msgstr ""
 
-#~msgid "The <em>Store in Box 1</em> block is used to store a value in <em>Box 1</em>."
+#~msgid "The <em>Store in box1</em> block is used to store a value in <em>box1</em>."
 #~msgstr ""
 
 #~msgid "The <em>Multiply</em> block is used to multiply."
@@ -6169,7 +6169,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "The <em>Int</em> block returns an integer."
 #~msgstr ""
 
-#~msgid "The <em>Box 2</em> block returns the value stored in <em>Box 2</em>."
+#~msgid "The <em>box2</em> block returns the value stored in <em>box2</em>."
 #~msgstr ""
 
 #~msgid "Click to run just the music in slow mode."
@@ -6328,7 +6328,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "The <em>Dot</em> block extends the duration of a note by 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
 #~msgstr ""
 
-#~msgid "The <em>Box 2</em> returns the value stored on <em>Box 2</em>."
+#~msgid "The <em>box2</em> returns the value stored on <em>box2</em>."
 #~msgstr ""
 
 #~msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
@@ -6835,7 +6835,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "Clear the screen and return the turtles to their initial positions."
 #~msgstr "Uñtaña wakichata apsusa Tortuga wakichata qalltaparu kuttayma"
 
-#~msgid "The <em>Box 1</em> returns the value stored on <em>Box 1</em>."
+#~msgid "The <em>box1</em> returns the value stored on <em>box1</em>."
 #~msgstr ""
 
 #~msgid "The Step Pitch Block must be used inside of a Note Block."
@@ -6907,7 +6907,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "step pitch"
 #~msgstr "tunu arka"
 
-#~msgid "The <em>Store in Box 2</em> block is used to store a value in <em>Box 2</em>."
+#~msgid "The <em>Store in box2</em> block is used to store a value in <em>box2</em>."
 #~msgstr ""
 
 #~msgid "Save as png"
@@ -7126,7 +7126,7 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "The <em>Set mouse</em> block sends a stack of blocks to be run by the specified mouse."
 #~msgstr ""
 
-#~msgid "The <em>Box 1</em> block returns the value stored in <em>Box 1</em>."
+#~msgid "The <em>box1</em> block returns the value stored in <em>box1</em>."
 #~msgstr ""
 
 #~msgid "You can also use Alt+P to paste a stack of blocks. "
