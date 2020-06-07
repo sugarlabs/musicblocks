@@ -535,6 +535,7 @@ function Toolbar() {
             ["zhCN", _("中文"), "innerHTML"],
             ["th", _("ภาษาไทย"), "innerHTML"],
             ["ayc", _("aymara"), "innerHTML"],
+	    ["quz", _("quechua"), "innerHTML"],
             ["gug", _("guarani"), "innerHTML"],
             ["hi", _("हिंदी"), "innerHTML"],
             ["ibo", _("igbo"), "innerHTML"],
