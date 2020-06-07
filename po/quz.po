@@ -1,4 +1,4 @@
-"Project-Id-Version: PACKAGE VERSION\n"
+﻿"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-26 00:31-0400\n"
 "PO-Revision-Date: 2013-08-07 03:02+0200\n"
@@ -20,11 +20,11 @@ msgstr ""
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: ritmo
 msgid "rhythm"
-msgstr ""
+msgstr "taki muyuchik"
 
 #.TRANS: número de notas
 msgid "number of notes"
-msgstr ""
+msgstr "Yupay waqaykuna"
 
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 #.TRANS: valor de la nota
@@ -33,39 +33,39 @@ msgstr ""
 
 #.TRANS: ritmo polifónico
 msgid "polyphonic rhythm"
-msgstr ""
+msgstr "Achka waqaykunap Munay muyuchik"
 
 #.TRANS: El bloque Ritmo se utiliza para generar patrones de ritmo.
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "Munay purichiqa kinkinman hina qatipaq"
 
 #.TRANS: 1/64 nota
 msgid "1/64 note"
-msgstr ""
+msgstr "1/64 kunka"
 
 #.TRANS: 1/32 nota
 msgid "1/32 note"
-msgstr ""
+msgstr "Kunkaq tahasqan"
 
 #.TRANS: 1/16 nota
 msgid "1/16 note"
-msgstr ""
+msgstr "1/6 kunka"
 
 #.TRANS: 1/8 nota
 msgid "eighth note"
-msgstr ""
+msgstr "1/8 kunka"
 
 #.TRANS: 1/4 nota
 msgid "quarter note"
-msgstr ""
+msgstr "1/4 kunka"
 
 #.TRANS: 1/2 nota
 msgid "half note"
-msgstr ""
+msgstr "1/2 kunka"
 
 #.TRANS: nota completa
 msgid "whole note"
-msgstr ""
+msgstr "hunt’asqa kunka"
 
 #.TRANS: A tuplet is a note value divided into irregular time values.
 #.TRANS: 
@@ -75,12 +75,12 @@ msgstr ""
 #.TRANS: A tuplet divided into 7 time values.
 #.TRANS: septeto
 msgid "septuplet"
-msgstr ""
+msgstr "Qanchikmanta"
 
 #.TRANS: A tuplet divided into 5 time values.
 #.TRANS: quinteto
 msgid "quintuplet"
-msgstr ""
+msgstr "Phisqamanta"
 
 #.TRANS: A tuplet divided into 3 time values.
 #.TRANS: 
@@ -93,7 +93,7 @@ msgstr ""
 
 #.TRANS: milisegundos
 msgid "milliseconds"
-msgstr ""
+msgstr "k’ata tip"
 
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
 #.TRANS: swing
@@ -112,22 +112,22 @@ msgstr ""
 #.TRANS: substitute rests on notes being skipped
 #.TRANS: saltar notas
 msgid "skip notes"
-msgstr ""
+msgstr "kunkakuna p’itay"
 
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 #.TRANS: ritmo multiplican
 msgid "multiply note value"
-msgstr ""
+msgstr "Muyuq miracchiq"
 
 #.TRANS: tie notes together into one longer note
 #.TRANS: atar
 msgid "tie"
-msgstr ""
+msgstr "Watay"
 
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 #.TRANS: punto
 msgid "dot"
-msgstr ""
+msgstr "Ch’iku)"
 
 #.TRANS: El bloque Punto extiende la duración de una nota en un 50%.
 msgid "The Dot block extends the duration of a note by 50%."
@@ -135,7 +135,7 @@ msgstr ""
 
 #.TRANS: silencio
 msgid "silence"
-msgstr ""
+msgstr "ch’in"
 
 #.TRANS: Japanese only: note value block for drum
 #.TRANS: Valor de nota tambor
@@ -148,12 +148,12 @@ msgstr ""
 
 #.TRANS: 
 msgid "392 hertz"
-msgstr ""
+msgstr "329 kaparina"
 
 #.TRANS: a musical note consisting of pitch and duration
 #.TRANS: nota
 msgid "note"
-msgstr ""
+msgstr "kunka"
 
 #.TRANS: 
 msgid "value2"
@@ -161,7 +161,7 @@ msgstr ""
 
 #.TRANS: valor
 msgid "value"
-msgstr "chani"
+msgstr "tupu"
 
 #.TRANS: definir frecuencia
 msgid "define frequency"
@@ -169,23 +169,23 @@ msgstr ""
 
 #.TRANS: espacio de octava
 msgid "octave space"
-msgstr ""
+msgstr "pusaqpa pachan"
 
 #.TRANS: morado
 msgid "purple"
-msgstr ""
+msgstr "Kulli"
 
 #.TRANS: azur
 msgid "blue"
-msgstr ""
+msgstr "Anqas"
 
 #.TRANS: verde
 msgid "green"
-msgstr ""
+msgstr "Qunir"
 
 #.TRANS: amarillo
 msgid "yellow"
-msgstr ""
+msgstr "Q’illu"
 
 #.TRANS: naranja
 msgid "orange"
@@ -193,32 +193,32 @@ msgstr "q'illmu"
 
 #.TRANS: rojo
 msgid "red"
-msgstr ""
+msgstr "Puka"
 
 #.TRANS: blanco
 msgid "white"
-msgstr ""
+msgstr "Yuraq"
 
 #.TRANS: negro
 msgid "black"
-msgstr ""
+msgstr "Yana"
 
 #.TRANS: iniciar relleno
 msgid "begin fill"
-msgstr ""
+msgstr "Hunt’achiyta qallariy"
 
 #.TRANS: Cargar proyecto desde archivo
 msgid "end fill"
-msgstr "huntach'iyta tukuy"
+msgstr "pusariqta waqaychanamanta hunt’achimuy"
 
 #.TRANS: set the background color
 #.TRANS: rellenar pantalla
 msgid "background"
-msgstr ""
+msgstr " qhawanata hunt’achiy"
 
 #.TRANS: gris
 msgid "grey"
-msgstr ""
+msgstr "uqi"
 
 #.TRANS: 
 msgid "The Grey block returns the current pen grey value."
@@ -226,7 +226,7 @@ msgstr ""
 
 #.TRANS: sombra
 msgid "shade"
-msgstr "llimp'iynin"
+msgstr "llanthu"
 
 #.TRANS: 
 msgid "The Shade block returns the current pen shade value."
@@ -238,11 +238,11 @@ msgstr "llimp'i"
 
 #.TRANS: El bloque Color devuelve el color actual de la pluma.
 msgid "The Color block returns the current pen color."
-msgstr ""
+msgstr "sayaq llimp’i kutichin llimp’ita kunan llimp’qman"
 
 #.TRANS: tamaño de la pluma
 msgid "pen size"
-msgstr "sayan"
+msgstr "Qillqanq sayayanin"
 
 #.TRANS: 
 msgid "The Pen size block returns the current pen size value."
@@ -250,7 +250,7 @@ msgstr ""
 
 #.TRANS: fijar font
 msgid "set font"
-msgstr ""
+msgstr "tahachiy font"
 
 #.TRANS: 
 msgid "The Set font block sets the font used by the Show block."
@@ -267,7 +267,7 @@ msgstr ""
 #.TRANS: draw a line logo has a hollow space down its center
 #.TRANS: linea sin relleno
 msgid "hollow line"
-msgstr ""
+msgstr "Hunt’achina siq’i"
 
 #.TRANS: 
 msgid "The Fill block fills in a shape with a color."
@@ -276,16 +276,16 @@ msgstr ""
 #.TRANS: fill in as a solid color
 #.TRANS: relleno
 msgid "fill"
-msgstr ""
+msgstr "Hunt’achina"
 
 #.TRANS: riase up the pen so logo it does not draw when it is moved
 #.TRANS: subir pluma
 msgid "pen up"
-msgstr "qillqanata huqariy"
+msgstr "qillqanata uqariy"
 
 #.TRANS: El bloque Subir pluma levanta la pluma para que no dibuje.
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "Sayaqpi, qillqanata uqariy mana siq’inanpaq”
 
 #.TRANS: put down the pen so logo it draws when it is moved
 #.TRANS: bajar pluma
@@ -299,16 +299,16 @@ msgstr ""
 #.TRANS: set the width of the line drawn by the pen
 #.TRANS: fijar pluma
 msgid "set pen size"
-msgstr "sayayninta akllay"
+msgstr "Qillqanata tahachiy"
 
 #.TRANS: El bloque Fijar tamaño de la pluma de ajuste cambia el tamaño de la pluma.
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr ""
+msgstr "Sayaq, qillqanaq tahachinanmi kutichin qillqaqa rakhuyanata, ñañuyachinata"
 
 #.TRANS: set degree of translucence of the pen color
 #.TRANS: fijar translucidez
 msgid "set translucency"
-msgstr ""
+msgstr " K’anchayninta tahachiy "
 
 #.TRANS: 
 msgid "The Set translucency block changes the opacity of the pen."
@@ -316,7 +316,7 @@ msgstr ""
 
 #.TRANS: fijar matiz
 msgid "set hue"
-msgstr ""
+msgstr " Llimp’inta tahachiy "
 
 #.TRANS: 
 msgid "The Set hue block changes the color of the pen."
@@ -324,12 +324,12 @@ msgstr ""
 
 #.TRANS: fijar sombra
 msgid "set shade"
-msgstr "llimp'ita churay"
+msgstr " Llanthunta tahachiy "
 
 #.TRANS: set the level of vividness of the pen color
 #.TRANS: fijar gris
 msgid "set grey"
-msgstr ""
+msgstr " Uqinta tahachiy "
 
 #.TRANS: 
 msgid "The Set grey block changes the vividness of the pen color."
@@ -337,28 +337,28 @@ msgstr ""
 
 #.TRANS: fijar color
 msgid "set color"
-msgstr "llimp'ita akllay"
+msgstr "Llinpinta tahachiy"
 
 #.TRANS: El bloque Fijar color cambia el color de la pluma.
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "Sayaq, tahachiy llmp’iyta qillqanaq llimp’iynita kutichin"
 
 #.TRANS: El bloque Nombre del tambor se utiliza para seleccionar un tambor.
 msgid "The Drum name block is used to select a drum."
-msgstr ""
+msgstr "Tambor sayaq sutinqa, tambor akllanapaqmi"
 
 #.TRANS: El bloque Nombre de efectos se utiliza para seleccionar un efecto de sonido.
-msgid "The Effects name block is used to select a sound effect."
-msgstr ""
+msgid " he Effects name block is used to select a sound effect."
+msgstr "Pantanchina Sayaqa, pantachina akllanapaqmi "
 
 #.TRANS: ruido
 msgid "noise"
-msgstr ""
+msgstr "rakhaqaqaq"
 
 #.TRANS: white noise synthesizer
 #.TRANS: ruido blanco
 msgid "white noise"
-msgstr ""
+msgstr "Yuraq rakhaqaqaq"
 
 #.TRANS: Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -371,7 +371,7 @@ msgstr ""
 #.TRANS: map a pitch to a drum sound
 #.TRANS: 
 msgid "map pitch to drum"
-msgstr ""
+msgstr "saywa"
 
 #.TRANS: set the current drum sound for playback
 #.TRANS: fijar tambor
@@ -380,11 +380,11 @@ msgstr ""
 
 #.TRANS: efecto de sonido
 msgid "sound effect"
-msgstr ""
+msgstr "t’uqyaq pantachiq"
 
 #.TRANS: Puede utilizar varios bloques de percusión dentro de un bloque de notas.
 msgid "You can use multiple Drum blocks within a Note block."
-msgstr ""
+msgstr "Sayaq uhpi atiwaqmi achka kunkakunaq takaykunanpi"
 
 #.TRANS: Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?
 msgid "Drum Block: Did you mean to use a Note block?"
@@ -403,17 +403,17 @@ msgstr ""
 #.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 #.TRANS: decaer
 msgid "decay"
-msgstr ""
+msgstr "Pisipayay"
 
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 #.TRANS: sostener
 msgid "sustain"
-msgstr ""
+msgstr "hap’ipay"
 
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 #.TRANS: liberar
 msgid "release"
-msgstr ""
+msgstr " waqmanta ñawinchay"
 
 #.TRANS: El valor de atacar debe estar entre 0 y 100.
 msgid "Attack value should be from 0 to 100."
@@ -421,15 +421,15 @@ msgstr ""
 
 #.TRANS: El valor de decaer debe estar entre 0 y 100.
 msgid "Decay value should be from 0 to 100."
-msgstr ""
+msgstr "Pisipayachiyqa 0 – 100 kaman kanan"
 
 #.TRANS: El valor de sostener debe estar entre 0 y 100.
 msgid "Sustain value should be from 0 to 100."
-msgstr ""
+msgstr "Hap’paypa tupuynin ch’usaqmanta pachaqkamann kanan"
 
 #.TRANS: El valor de liberar debe estar entre 0 y 100.
 msgid "Release value should be from 0-100."
-msgstr ""
+msgstr "Kachariya tupun kanan 0 – 100 kama"
 
 #.TRANS: Está agregando varios bloques de envolvente.
 msgid "You are adding multiple envelope blocks."
@@ -438,7 +438,7 @@ msgstr ""
 #.TRANS: a filter removes some unwanted components from a signal
 #.TRANS: filtrar
 msgid "filter"
-msgstr ""
+msgstr "suysuy"
 
 #.TRANS: highpass filter
 #.TRANS: 
@@ -458,7 +458,7 @@ msgstr ""
 
 #.TRANS: frecuencia
 msgid "frequency"
-msgstr ""
+msgstr "Kutipayaq"
 
 #.TRANS: rolloff is the steepness of a change in frequency.
 #.TRANS: La Herramienta temperamento se utiliza para definir la afinación personalizada.
@@ -467,27 +467,27 @@ msgstr ""
 
 #.TRANS: temperamento
 msgid "temperament"
-msgstr ""
+msgstr "munasqanman tikrakuq"
 
 #.TRANS: timbre is the character or quality of a musical sound
 #.TRANS: timbre
 msgid "timbre"
-msgstr ""
+msgstr "kunkariq"
 
 #.TRANS: customize voice
 #.TRANS: personalizado
 msgid "custom"
-msgstr ""
+msgstr "Runachasqa"
 
 #.TRANS: musical meter (time signature), e.g., 4:4
 #.TRANS: metro
 msgid "meter"
-msgstr ""
+msgstr "tupuna"
 
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 #.TRANS: modo personalizado
 msgid "custom mode"
-msgstr ""
+msgstr "huk hinayuq runachasqa"
 
 #.TRANS: El bloque Tempo abre un metrónomo para visualizar el ritmo.
 msgid "The Tempo block opens a metronome to visualize the beat."
@@ -501,12 +501,12 @@ msgstr ""
 #.TRANS: makes a mapping between pitches and drum sounds
 #.TRANS: matriz de tono en tambor
 msgid "pitch-drum mapper"
-msgstr ""
+msgstr "taki purihiq"
 
 #.TRANS: widget to generate pitches using a slider
 #.TRANS: deslizante de tono
 msgid "pitch slider"
-msgstr ""
+msgstr "Kunka lluskhachik"
 
 #.TRANS: 
 msgid "chromatic keyboard"
@@ -515,30 +515,30 @@ msgstr ""
 #.TRANS: widget to generate pitches using a slider
 #.TRANS: teclado musical
 msgid "music keyboard"
-msgstr ""
+msgstr "taki t’upuna"
 
 #.TRANS: generate a progressive sequence of pitches
 #.TRANS: escalera de tono
 msgid "pitch staircase"
-msgstr ""
+msgstr "Kunka siqachina"
 
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 #.TRANS: hacer un ritmo
 msgid "rhythm maker"
-msgstr ""
+msgstr " kunka ruray"
 
 #.TRANS: escala mayor G
 msgid "G major scale"
-msgstr ""
+msgstr "Kuraq G wichachina"
 
 #.TRANS: escala mayor C
 msgid "C major scale"
-msgstr ""
+msgstr "Kuraq C wichachina"
 
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 #.TRANS: matriz de tono en tiempo
 msgid "phrase maker"
-msgstr ""
+msgstr "Kunka pachapi paqarichiq "
 
 #.TRANS: estatus
 msgid "status"
@@ -546,24 +546,24 @@ msgstr ""
 
 #.TRANS: El bloque Volver (Return) devolverá un valor de una acción.
 msgid "The Return block will return a value from an action."
-msgstr ""
+msgstr "Kutiq Saya, kutichinqa huk  rurayta "
 
 #.TRANS: retorno
 msgid "return"
-msgstr ""
+msgstr "kuti"
 
 #.TRANS: El bloque Volver a URL devolverá un valor a una página web.
 msgid "The Return to URL block will return a value to a webpage."
-msgstr ""
+msgstr "Kutichiq Saya URLman qupunqa huk chaninta web qhawanaman"
 
 #.TRANS: return value from a function to a URL
 #.TRANS: retorno a URL
 msgid "return to URL"
-msgstr ""
+msgstr "Kutichimuy URLman"
 
 #.TRANS: calcular
 msgid "calculate"
-msgstr ""
+msgstr "Yuyakukuy"
 
 #.TRANS: acción
 msgid "action"
@@ -581,29 +581,29 @@ msgstr ""
 
 #.TRANS: hacer
 msgid "do"
-msgstr ""
+msgstr "Ruray"
 
 #.TRANS: 
 msgid "arg"
-msgstr ""
+msgstr "ruray"
 
 #.TRANS: argumento no válido
 msgid "Invalid argument"
-msgstr ""
+msgstr "Mana chaninniyuq rimay"
 
 #.TRANS: Cuando ocurre el evento, se realiza una acción.
 msgid "When the event happens, an action is taken."
-msgstr ""
+msgstr "Sichus kanqa ruray, chayqa kuyukachay kanqa"
 
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
-#.TRANS: cuando
+#.TRANS: cuando (aqui no se puede porque el cuando es un sufico, tendria que saber cuando que)
 msgid "on"
 msgstr ""
 
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: señal
 msgid "event"
-msgstr ""
+msgstr "riqsichi" 
 
 #.TRANS: El bloque Emitir se utiliza para desencadenar un evento.
 msgid "The Broadcast block is used to trigger an event."
@@ -612,7 +612,7 @@ msgstr ""
 #.TRANS: dispatch an event to trigger a listener
 #.TRANS: emitir
 msgid "broadcast"
-msgstr ""
+msgstr "lluqsichiy"
 
 #.TRANS: Cada bloque de inicio es una voz separada.
 msgid "Each Start block is a separate voice."
@@ -620,7 +620,7 @@ msgstr ""
 
 #.TRANS: iniciar
 msgid "start"
-msgstr "qallariy"
+msgstr "qallariy
 
 #.TRANS: iniciar tambor
 msgid "start drum"
@@ -628,23 +628,23 @@ msgstr ""
 
 #.TRANS: definir el temperamento
 msgid "define temperament"
-msgstr ""
+msgstr "akllay"
 
 #.TRANS: hacia atrás
 msgid "backward"
-msgstr ""
+msgstr "Qhipaman"
 
 #.TRANS: El bloque Duplicado ejecutará cada bloque varias veces.
 msgid "The Duplicate block will run each block multiple times."
-msgstr ""
+msgstr "Iskay kikinyachiq sayaq, ruranqa sapanka sayaqta achka kutita"
 
 #.TRANS: duplicar
 msgid "duplicate"
-msgstr ""
+msgstr "iskay kikiyachiy"
 
 #.TRANS: el caso de forma predeterminada
 msgid "default"
-msgstr ""
+msgstr "Chhaynapaq rurasqa"
 
 #.TRANS: El bloque Caso debe utilizarse dentro de un bloque de switch.
 msgid "The Case Block must be used inside of a Switch Block."
@@ -660,7 +660,7 @@ msgstr ""
 
 #.TRANS: 
 msgid "switch"
-msgstr ""
+msgstr "tinkuchiy"
 
 #.TRANS: El bloque Parar detendrá un bucle.
 msgid "The Stop block will stop a loop"
@@ -688,7 +688,7 @@ msgstr ""
 
 #.TRANS: hasta
 msgid "until"
-msgstr "kaykama"
+msgstr "kay kama"
 
 #.TRANS: hacer
 msgid "do2"
@@ -700,7 +700,7 @@ msgstr ""
 
 #.TRANS: mientras
 msgid "while"
-msgstr "chaykamaqa"
+msgstr "chaykamataq"
 
 #.TRANS: si
 msgid "if"
@@ -708,7 +708,7 @@ msgstr "arí"
 
 #.TRANS: entonces
 msgid "then"
-msgstr "chayna-kaptinqa"
+msgstr "chaynaqa"
 
 #.TRANS: sino
 msgid "else"
@@ -737,15 +737,17 @@ msgstr ""
 
 #.TRANS: 
 msgid "mouse index heap"
-msgstr ""
+msgstr "Huk’ucha /qillqa purichina"
 
 #.TRANS: Sr. Ratón
+
+
 msgid "Mr. Mouse"
 msgstr ""
 
 #.TRANS: renombrar ratón
 msgid "mouse name"
-msgstr ""
+msgstr "Sutichay huk’uchata"
 
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 #.TRANS: posición en la pila
@@ -770,7 +772,7 @@ msgstr ""
 
 #.TRANS: No se puede encontrar ratón
 msgid "Cannot find mouse"
-msgstr ""
+msgstr "Manan huk’uchata tarikunchu"
 
 #.TRANS: No se puede encontrar tortuga.
 msgid "Cannot find turtle"
@@ -786,7 +788,7 @@ msgstr ""
 
 #.TRANS: Ratón ya ha comenzado.
 msgid "Mouse is already running."
-msgstr ""
+msgstr "Huk’ucha qallarinña"
 
 #.TRANS: Tortuga ya ha comenzado.
 msgid "Turtle is already running."
@@ -794,12 +796,12 @@ msgstr ""
 
 #.TRANS: No se puede encontrar el bloque de inicar.
 msgid "Cannot find start block"
-msgstr ""
+msgstr "Manan qallariq saya tarikunchu"
 
 #.TRANS: pen color for this mouse
 #.TRANS: color de ratón
 msgid "mouse color"
-msgstr ""
+msgstr "Llimp’iyniyuq huk’ucha"
 
 #.TRANS: heading (compass direction) for this mouse
 #.TRANS: rumbo de ratón
@@ -818,7 +820,7 @@ msgstr ""
 #.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
 #.TRANS: nombre
 msgid "name1"
-msgstr ""
+msgstr "Suti"
 
 #.TRANS: nombre
 msgid "name"
@@ -866,11 +868,11 @@ msgstr ""
 
 #.TRANS: encontré el raton
 msgid "found mouse"
-msgstr ""
+msgstr "Huk’uchata tarini"
 
 #.TRANS: nuevo ratón
 msgid "new mouse"
-msgstr ""
+msgstr "Musuq huk’ucha"
 
 #.TRANS: 
 msgid "The New mouse block will create a new mouse."
@@ -878,7 +880,7 @@ msgstr ""
 
 #.TRANS: El bloque Nombre del ratón devuelve el nombre de un ratón.
 msgid "The Mouse-name block returns the name of a mouse."
-msgstr ""
+msgstr "Huk’uha sayaq kutichin huk’ucha  sutiman"
 
 #.TRANS: 
 msgid "mouse count"
@@ -898,15 +900,15 @@ msgstr ""
 
 #.TRANS: fijar nombre
 msgid "set name"
-msgstr ""
+msgstr "Sutita tahachik"
 
 #.TRANS: origen
 msgid "source"
-msgstr ""
+msgstr "paqarina"
 
 #.TRANS: destino
 msgid "target"
-msgstr ""
+msgstr "chayana"
 
 #.TRANS: El bloque Fijar nombre se usa para nombrar un ratón.
 msgid "The Set-name block is used to name a mouse."
@@ -925,7 +927,7 @@ msgstr ""
 #.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
 #.TRANS: vecino
 msgid "neighbor"
-msgstr ""
+msgstr "wasimasi"
 
 #.TRANS: calculate a relative step between notes based on semi-tones
 #.TRANS: intervalo semitono
@@ -965,7 +967,7 @@ msgstr ""
 #.TRANS: the volume at which notes are played
 #.TRANS: volumen maestro
 msgid "master volume"
-msgstr ""
+msgstr "t’uqya kamay"
 
 #.TRANS: 
 msgid "The Master volume block returns the master volume."
@@ -1028,15 +1030,21 @@ msgstr ""
 #.TRANS: decrescendo
 msgid "decrescendo"
 msgstr ""
+NOTA:  Que significa en este contexto: 
+Atacar
+Tambor
+Sostener
+
+…………………………………………………………
 
 #.TRANS: a gradual increase in loudness
 #.TRANS: crescendo
 msgid "crescendo"
-msgstr ""
+msgstr "wiñachkan"
 
 #.TRANS: 
 msgid "fraction"
-msgstr ""
+msgstr "phatmi"
 
 #.TRANS: 
 msgid "Convert a float to a fraction"
@@ -1048,7 +1056,7 @@ msgstr ""
 
 #.TRANS: abrir la paleta
 msgid "open palette"
-msgstr ""
+msgstr "llimp’ipa taqinta kichay"
 
 #.TRANS: 
 msgid "The Delete block block removes a block."
@@ -1057,7 +1065,7 @@ msgstr ""
 #.TRANS: Move this block to the trash.
 #.TRANS: eliminar bloque
 msgid "delete block"
-msgstr ""
+msgstr "kay chiqasta chanqapuy"
 
 #.TRANS: 
 msgid "The Move block block moves a block."
@@ -1066,16 +1074,16 @@ msgstr ""
 #.TRANS: Move the position of a block on the screen.
 #.TRANS: mover bloque
 msgid "move block"
-msgstr ""
+msgstr "kay chiqasta kuyuchiy"
 
 #.TRANS: número de bloque
 msgid "block number"
-msgstr ""
+msgstr "kay chiqaspa payupaynin"
 
 #.TRANS: Run program beginning at this block.
 #.TRANS: ejecutar bloque
 msgid "run block"
-msgstr ""
+msgstr "kay chiqasta ruray"
 
 #.TRANS: 
 msgid "The Dock block block connections two blocks."
@@ -1084,15 +1092,15 @@ msgstr ""
 #.TRANS: We can connect a block to another block.
 #.TRANS: connectar block
 msgid "connect blocks"
-msgstr ""
+msgstr "chiqasta hap’ichiy"
 
 #.TRANS: bloque de destino
 msgid "target block"
-msgstr ""
+msgstr "mayman chiqas riq "
 
 #.TRANS: número de conexion
 msgid "connection number"
-msgstr ""
+msgstr "hap’ichiypa yupaynin" 
 
 #.TRANS: 
 msgid "The Make block block creates a new block."
@@ -1101,35 +1109,35 @@ msgstr ""
 #.TRANS: Create a new block programmatically.
 #.TRANS: crear bloque
 msgid "make block"
-msgstr ""
+msgstr " chiqasta paqarichiy"
 
 #.TRANS: No se puede encontrar el bloque.
 msgid "Cannot find block"
-msgstr ""
+msgstr "Manam chiqas tarikunchu"
 
 #.TRANS: guardar como ABC
 msgid "save as ABC"
-msgstr ""
+msgstr "ABC hinaman waqaychay"
 
 #.TRANS: título
 msgid "title"
-msgstr ""
+msgstr "umalliq suti"
 
 #.TRANS: guardar como Lilypond
 msgid "save as Lilypond"
-msgstr ""
+msgstr "Lilypondtahina waqaychay"
 
 #.TRANS: guardar como SVG
 msgid "save as SVG"
-msgstr ""
+msgstr "SVGtahina waqaychay"
 
 #.TRANS: sin fondo
 msgid "no background"
-msgstr ""
+msgstr "Mana imayuq"
 
 #.TRANS: mostrar bloques
 msgid "show blocks"
-msgstr "bloques nisqakunata rikuchiy"
+msgstr " chiqaskunata qhawachiy"
 
 #.TRANS: 
 msgid "The Show blocks block shows the blocks."
@@ -1137,7 +1145,7 @@ msgstr ""
 
 #.TRANS: ocultar bloques
 msgid "hide blocks"
-msgstr "bloques nisqakunata pakay"
+msgstr " chiqaskunata pakay"
 
 #.TRANS: 
 msgid "The Hide blocks block hides the blocks."
@@ -1145,15 +1153,15 @@ msgstr ""
 
 #.TRANS: abierto proyecto
 msgid "open project"
-msgstr ""
+msgstr "rurana kichasqa"
 
 #.TRANS: Por favor introduzca un URL válido.
 msgid "Please enter a valid URL."
-msgstr ""
+msgstr "Ama hina waliq URLta haykuchiy"
 
 #.TRANS: El bloque Espacio se utiliza para agregar espacio entre bloques.
 msgid "The Space block is used to add space between blocks."
-msgstr ""
+msgstr " Qaylla chiqasqa chiqaspurakuna qayllayuq kanankupaq yapaq yapanapaq"
 
 #.TRANS: esperar
 msgid "wait"
@@ -1169,195 +1177,195 @@ msgstr "ñit'iy"
 
 #.TRANS: El bloque Imprimir muestra texto en la parte superior de la pantalla.
 msgid "The Print block displays text at the top of the screen."
-msgstr ""
+msgstr "Nit’iy chiqasqa pantallapa hawanpi qillqata qhawachikun"
 
 #.TRANS: desconocido
 msgid "unknown"
-msgstr ""
+msgstr "Mana riqsisqa"
 
 #.TRANS: musical meter (time signature), e.g., 4:4
 #.TRANS: meter actuale
 msgid "current meter"
-msgstr ""
+msgstr "actualita haykuchiy"
 
 #.TRANS: number of beats per minute
 #.TRANS: factor de ritmo
 msgid "beat factor"
-msgstr ""
+msgstr "p’ullpuqiy"
 
 #.TRANS: number of beats played per minute
 #.TRANS: 
 msgid "beats per minute2"
-msgstr ""
+msgstr "minutupi p’ullpuqiy"
 
 #.TRANS: sets tempo by defniing a beat and beats per minute
 #.TRANS: pulsaciones por minuto
 msgid "beats per minute"
-msgstr ""
+msgstr "minutupi p’ullpuqiy"
 
 #.TRANS: count of current musical measure in meter
 #.TRANS: cuenta de medidas
 msgid "measure count"
-msgstr ""
+msgstr "tupusqakunapa yupaynin"
 
 #.TRANS: El bloque de conteo de medidas devuelve la medida actual.
 msgid "The Measure count block returns the current measure."
-msgstr ""
+msgstr "tupunakuna yupay chiqasqa kunan tupunata kutichipun"
 
 #.TRANS: count of current beat in the meter
 #.TRANS: cuenta de latidos
 msgid "beat count"
-msgstr ""
+msgstr "p’ullpuqiyta yupay"
 
 #.TRANS: por ejemplo, 1, 2, 3, o 4.
 msgid "eg 1, 2, 3, or 4."
-msgstr ""
+msgstr "kanman huk, iskay, kimsa, kallanmantaq tawa"
 
 #.TRANS: count the number of notes
 #.TRANS: 
 msgid "sum note values"
-msgstr ""
+msgstr "nota yupay"
 
 #.TRANS: number of whole notes that have been played
 #.TRANS: notas completa jugadas
 msgid "whole notes played"
-msgstr ""
+msgstr "hunt’asqa nota pukllasqakuna"
 
 #.TRANS: number of notes that have been played
 #.TRANS: notas jugadas
 msgid "notes played"
-msgstr ""
+msgstr "notakuna pukllasqakuna"
 
 #.TRANS: (De forma predeterminada, cuenta las notas de un cuarto.)
 msgid "(By default, it counts quarter notes.)"
-msgstr ""
+msgstr "kaqpuni kasqan, cuartopa notan yupay"
 
 #.TRANS: don't lock notes to master clock
 #.TRANS: sin reloj
 msgid "no clock"
-msgstr ""
+msgstr "mana intiwatanayuq"
 
 #.TRANS: en latido débil hacer
 msgid "on weak beat do"
-msgstr ""
+msgstr "mana kallpayuq p’ullpuqiypi rurana"
 
 #.TRANS: en latido fuerte hacer
 msgid "on strong beat"
-msgstr ""
+msgstr "kallpayuq p’ullpuqiypi rurana"
 
 #.TRANS: latidos
 msgid "beat"
-msgstr ""
+msgstr "p’ullpuqiy"
 
 #.TRANS: en cada latido hacer
 msgid "on every note do"
-msgstr ""
+msgstr "sapanka p’ullpuqiypi rurana"
 
 #.TRANS: sets tempo by defniing a beat and beats per minute
 #.TRANS: latidos por minuto de dominar
 msgid "master beats per minute"
-msgstr ""
+msgstr "minutupi p’ullpuqiy hap’iy"
 
 #.TRANS: 
 msgid "bpm"
-msgstr ""
+msgstr "bmp"
 
 #.TRANS: valor de latidos
 msgid "beat value"
-msgstr ""
+msgstr "p’ullpuqiypa kaqnin"
 
 #.TRANS: 
 msgid "beats per minute must be greater than"
-msgstr ""
+msgstr "minutupi p’ullpuqiyqa kurak kanan"
 
 #.TRANS: 
 msgid "maximum"
-msgstr ""
+msgstr "tukupunankama"
 
 #.TRANS: 
 msgid "beats per minute is"
-msgstr ""
+msgstr "minutupi p’ullpuqiyninqa"
 
 #.TRANS: Latidos por minuto debe ser > 30.
 msgid "Beats per minute must be > 30."
-msgstr ""
+msgstr "minutupi p’ullpuqiyniqa 30 kurakmi kanan"
 
 #.TRANS: Los latidos por minuto como máximo es de 1000.
 msgid "Maximum beats per minute is 1000."
-msgstr ""
+msgstr " minutupi p’ullpuqiyniqa may tukupunankamaqa waranqan (1000) kanan"
 
 #.TRANS: anacrusis
 #.TRANS: 
 msgid "pickup"
-msgstr ""
+msgstr "pallay"
 
 #.TRANS: número de latidos
 msgid "number of beats"
-msgstr ""
+msgstr "p’ullpuqiypa yupanan"
 
 #.TRANS: oscilador
 msgid "oscillator"
-msgstr ""
+msgstr "maymikuynin"
 
 #.TRANS: triangle wave
 #.TRANS: triángulo
 msgid "triangle"
-msgstr ""
+msgstr "kimsa k’uchu"
 
 #.TRANS: Partials refers to the number of sine waves combined into the sound.
 #.TRANS: parciales
 msgid "partials"
-msgstr ""
+msgstr "chawakuna"
 
 #.TRANS: Está agregando varios bloques de oscilador.
 msgid "You are adding multiple oscillator blocks."
-msgstr ""
+msgstr "maymikuqmanmi achka chiqasta yapachkan"
 
 #.TRANS: a duo synthesizer combines a synth with a sequencer
 #.TRANS: duo sintetizador
 msgid "duo synth"
-msgstr ""
+msgstr "iskayman pisiyachiqnin"
 
 #.TRANS: velocidad del vibrato
 msgid "vibrato rate"
-msgstr ""
+msgstr "vibratupa usqhachiq"
 
 #.TRANS: intensidad de vibrato
 msgid "vibrato intensity"
-msgstr ""
+msgstr "vibratupa kallpachaynin"
 
 #.TRANS: No se puede usar el sintetizador debido al bloqueo del oscilador.
 msgid "Unable to use synth due to existing oscillator"
-msgstr ""
+msgstr "Manam pisiyachiqta hap’ikunmanchu imaraykuchus maymikuq hark’asqa kaptin"
 
 #.TRANS: AM (amplitude modulation) synthesizer
 #.TRANS: AM sintetizador
 msgid "AM synth"
-msgstr ""
+msgstr "AM pisiyachiqnin"
 
 #.TRANS: La entrada no puede ser negativa.
 msgid "The input cannot be negative."
-msgstr ""
+msgstr "haykunanqa manam manaqa kanmanchu"
 
 #.TRANS: FM (frequency modulation) synthesizer
 #.TRANS: FM sintetizador
 msgid "FM synth"
-msgstr ""
+msgstr "FM pisiyachiqnin "
 
 #.TRANS: parcial
 msgid "partial"
-msgstr ""
+msgstr "chawa"
 
 #.TRANS: partials are weighted components in a harmonic series
 #.TRANS: El peso parcial debe estar entre 0 y 1.
 msgid "Partial weight must be between 0 and 1."
-msgstr ""
+msgstr "chawapa llasayninqa chúsaqpi hinallataq huk chawpipin kanan"
 
 #.TRANS: partials are weighted components in a harmonic series
 #.TRANS: partials are weighted components in a harmonic series
 #.TRANS: parcial ponderada
 msgid "weighted partials"
-msgstr ""
+msgstr "chawa chaninchasqa"
 
 #.TRANS: A harmonic is a overtone.
 #.TRANS: armónico
@@ -1367,117 +1375,117 @@ msgstr ""
 #.TRANS: partials components in a harmonic series
 #.TRANS: Parcial debe ser mayor o igual a 0.
 msgid "Partial must be greater than or equal to 0."
-msgstr ""
+msgstr "chawaqa ch’usaqamanta kurakpas kikinpas kanan"
 
 #.TRANS: El bloque Distorsión agrega distorsión al tono.
 msgid "The Distortion block adds distortion to the pitch."
-msgstr ""
+msgstr "q’iwiy chiqasqa kunkaman q’iwiyninta yapam"
 
 #.TRANS: distortion is an alteration in the sound
 #.TRANS: distorsión
 msgid "distortion"
-msgstr ""
+msgstr "q’íwiy"
 
 #.TRANS: El valor de distorsión debe ser de 0 a 100.
 msgid "Distortion must be from 0 to 100."
-msgstr ""
+msgstr "q’iwisqapa chaninninqa ch’usaqmanta pachakkama kanan"
 
 #.TRANS: El bloque Tremolo añade un efecto de vacilación.
 msgid "The Tremolo block adds a wavering effect."
-msgstr ""
+msgstr "Thalay chiqasqa iskayananpaq yapaykun"
 
 #.TRANS: a wavering effect in a musical tone
 #.TRANS: 
 msgid "tremolo"
-msgstr ""
+msgstr "Thalay"
 
 #.TRANS: rate at which tremolo wavers
 #.TRANS: velocidad
 msgid "rate"
-msgstr ""
+msgstr "utqay"
 
 #.TRANS: amplitude of tremolo waver
 #.TRANS: intensidad
 msgid "depth"
-msgstr ""
+msgstr "kallpa"
 
 #.TRANS: Depth is the intesity of the tremolo or chorus effect.
 #.TRANS: El valor de profundidad está fuera de rango.
 msgid "Depth is out of range."
-msgstr ""
+msgstr "ukhunchasqa chaninninqa manam t’aqanpichu kachkan"
 
 #.TRANS: El bloque Phaser añade un sonido de barrido.
 msgid "The Phaser block adds a sweeping sound."
-msgstr ""
+msgstr "Phaser chiqasqa pichana kunkatan yapan"
 
 #.TRANS: alter the phase of the sound
 #.TRANS: 
 msgid "phaser"
-msgstr ""
+msgstr "phaser"
 
 #.TRANS: octavas
 msgid "octaves"
-msgstr ""
+msgstr "pusaq patakuna"
 
 #.TRANS: frecuencia de base
 msgid "base frequency"
-msgstr ""
+msgstr "tiyananpi sapakuti ruranan "
 
 #.TRANS: El bloque Chorus añade un efecto chorus.
 msgid "The Chorus block adds a chorus effect."
-msgstr ""
+msgstr "takich’unku chiqasqa takich’unku kayninta yapan"
 
 #.TRANS: musical effect to simulate a choral sound
 #.TRANS: coro
 msgid "chorus"
-msgstr ""
+msgstr "takich’unku"
 
 #.TRANS: retraso
 msgid "delay"
-msgstr ""
+msgstr "qhipay"
 
 #.TRANS: El bloque Vibrato agrega una variación rápida y leve en el tono.
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
-msgstr ""
+msgstr "Khatatay chiqasqa utqay chaninchayninta hinallataq pisi kunkanta yapan"
 
 #.TRANS: a rapid, slight variation in pitch
 #.TRANS: 
 msgid "vibrato"
-msgstr ""
+msgstr "khatatay"
 
 #.TRANS: intensidad
 msgid "intensity"
-msgstr ""
+msgstr "kallpa"
 
 #.TRANS: La intensidad del vibrato debe estar entre 1 y 100.
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr ""
+msgstr " khatataypa kallpanqa huk hinallataq pachakpi kachkanan"
 
 #.TRANS: La velocidad del vibrato debe ser mayor que 0.
 msgid "Vibrato rate must be greater than 0."
-msgstr ""
+msgstr " khatataypa utqayninqa ch’usaqpa kurakninmi kanan"
 
 #.TRANS: select synthesizer
 #.TRANS: fijar synth
 msgid "set synth"
-msgstr ""
+msgstr "synth watay"
 
 #.TRANS: nombre del sintetizador
 msgid "synth name"
-msgstr ""
+msgstr " pisiyachiqninpa sutin"
 
 #.TRANS: Por ejemplo, guitarra, piano, violín o cello
 msgid "eg guitar piano violin or cello."
-msgstr ""
+msgstr "kitara, piyanu, wiyulin kallamanta wiyula hina"
 
 #.TRANS: set the characteristics of a custom instrument
 #.TRANS: 
 msgid "set instrument"
-msgstr ""
+msgstr "ruk’awita churana"
 
 #.TRANS: 
 msgid "input"
-msgstr ""
+msgstr "haykuna"
 
 #.TRANS: 
 msgid "Input a value"
@@ -1485,28 +1493,28 @@ msgstr ""
 
 #.TRANS: 
 msgid "input value"
-msgstr ""
+msgstr "chaninchaqta haykuchiy"
 
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 #.TRANS: tono
 msgid "pitch"
-msgstr ""
+msgstr "kunka"
 
 #.TRANS: volumen
 msgid "loudness"
-msgstr "qhapariynin"
+msgstr "p’ulin"
 
 #.TRANS: click
 msgid "click"
-msgstr ""
+msgstr "liq"
 
 #.TRANS: El bloque Clic devuelve Verdadero si se ha hecho clic en un ratón.
 msgid "The Click block returns True if a mouse has been clicked."
-msgstr ""
+msgstr "Huk’uchaman liqta churarqunki chayqa,  liq chiqasqa chiqaq nisqantan kutichin "
 
 #.TRANS: color del pixel
 msgid "pixel color"
-msgstr ""
+msgstr " llimp’iy k’anchaypa phatmin"
 
 #.TRANS: tiempo
 msgid "time"
@@ -1514,27 +1522,27 @@ msgstr "pacha"
 
 #.TRANS: cursor y
 msgid "cursor y"
-msgstr ""
+msgstr "y t’uqpina"
 
 #.TRANS: cursor x
 msgid "cursor x"
-msgstr ""
+msgstr "t’uqpina"
 
 #.TRANS: botón del ratón
 msgid "mouse button"
-msgstr ""
+msgstr "Huk’uchapa ñup’unan"
 
 #.TRANS: verdadero
 msgid "true"
-msgstr ""
+msgstr "chiqaq"
 
 #.TRANS: falso
 msgid "false"
-msgstr ""
+msgstr "llulla"
 
 #.TRANS: a ASCII
 msgid "to ASCII"
-msgstr ""
+msgstr "ASCIIman"
 
 #.TRANS: 
 msgid "The To ASCII block converts numbers to letters."
@@ -1542,7 +1550,7 @@ msgstr ""
 
 #.TRANS: teclado
 msgid "keyboard"
-msgstr "teclado nisqa"
+msgstr "ñup’una taqi"
 
 #.TRANS: 
 msgid "The Keyboard block returns computer keyboard input."
@@ -1551,46 +1559,46 @@ msgstr ""
 #.TRANS: right side of the screen
 #.TRANS: 
 msgid "right (screen)"
-msgstr ""
+msgstr "pantallapa pañanpi"
 
 #.TRANS: left side of the screen
 #.TRANS: 
 msgid "left (screen)"
-msgstr ""
+msgstr "pantallapa lluq’ínpi"
 
 #.TRANS: superior
 msgid "top (screen)"
-msgstr ""
+msgstr "hanan"
 
 #.TRANS: inferior
 msgid "bottom (screen)"
-msgstr ""
+msgstr "uran"
 
 #.TRANS: anchura
 msgid "width"
-msgstr ""
+msgstr "chutariynin"
 
 #.TRANS: El bloque Ancho devuelve el ancho del lienzo.
 msgid "The Width block returns the width of the canvas."
-msgstr ""
+msgstr "chutariynin chiqasqa qillqana llikapa chutariyninta kutichin"
 
 #.TRANS: altura
 msgid "height"
-msgstr ""
+msgstr "sayaynin"
 
 #.TRANS: El bloque Altura devuelve la altura del lienzo.
 msgid "The Height block returns the height of the canvas."
-msgstr ""
+msgstr "sayaynin chiqasqa qillqana llikapa sayayninta kutichin"
 
 #.TRANS: stops playback of an audio recording
 #.TRANS: detener
 msgid "stop play"
-msgstr ""
+msgstr "sayachiy"
 
 #.TRANS: play an audio recording
 #.TRANS: reproducir
 msgid "play back"
-msgstr ""
+msgstr "puririchiy"
 
 #.TRANS: hablar
 msgid "speak"
@@ -1598,11 +1606,11 @@ msgstr "rimay"
 
 #.TRANS: El bloque Habla emite al sintetizador de texto a voz.
 msgid "The Speak block outputs to the text-to-speech synthesizer"
-msgstr ""
+msgstr "Rimay chiqasqa kunkawan rimasqa pisiyachisqanmanta riman "
 
 #.TRANS: 
 msgid "The Camera block connects a webcam to the Show block."
-msgstr ""
+msgstr "Cámarata webman hap’ichiy"
 
 #.TRANS: 
 msgid "The Video block selects video for use with the Show block."
@@ -1610,7 +1618,7 @@ msgstr ""
 
 #.TRANS: detener medios
 msgid "stop media"
-msgstr ""
+msgstr "ruranakunata sayachiy"
 
 #.TRANS: 
 msgid "The Stop media block stops audio or video playback."
@@ -1619,53 +1627,53 @@ msgstr ""
 #.TRANS: a measure of frequency: one cycle per second
 #.TRANS: hertz
 msgid "hertz"
-msgstr ""
+msgstr "hertz"
 
 #.TRANS: duración (ms)
 msgid "duration (ms)"
-msgstr ""
+msgstr "kawsapakuy"
 
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 #.TRANS: nota a frecuencia
 msgid "note to frequency"
-msgstr ""
+msgstr "kuti kuti ruranaman huch’uy willakuy"
 
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 #.TRANS: nombre
 msgid "name2"
-msgstr ""
+msgstr "suti"
 
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 #.TRANS: octava
 msgid "octave"
-msgstr ""
+msgstr "pusaq pata"
 
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 #.TRANS: avatar
 msgid "avatar"
-msgstr ""
+msgstr "siq’isqa"
 
 #.TRANS: a media object
 #.TRANS: tamaño
 msgid "size"
-msgstr ""
+msgstr "sayay"
 
 #.TRANS: imagen
 msgid "image"
-msgstr "wanki"
+msgstr "rikch’aynin"
 
 #.TRANS: show1 is show as in display an image or text on the screen.
 #.TRANS: mostrar
 msgid "show1"
-msgstr ""
+msgstr "qhawachiy"
 
 #.TRANS: mostrar
 msgid "show"
-msgstr "rikuchiy"
+msgstr "qhawachiy"
 
 #.TRANS: objeto
 msgid "obj"
-msgstr ""
+msgstr "ima"
 
 #.TRANS: texto
 msgid "text"
@@ -1673,25 +1681,25 @@ msgstr "qillqa"
 
 #.TRANS: El bloque Medios se utiliza para importar una imagen.
 msgid "The Media block is used to import an image."
-msgstr ""
+msgstr "Kaqkuna chiqastaqa llimp’ita apamunapaq hap’ikun"
 
 #.TRANS: "video material" is used instead of an image in Japanese
 #.TRANS: material de video
 msgid "video material"
-msgstr ""
+msgstr "video llamk’ana"
 
 #.TRANS: El bloque Texto contiene una cadena de texto.
 msgid "The Text block holds a text string."
-msgstr ""
+msgstr "Qillqa t’aqaqa watuchasqa qillqakuna kaqniyuqmi"
 
 #.TRANS: Bloque de tono: Quizás quiso decir utilizar un bloque de nota?
 msgid "Pitch Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "kunka chiqas: ¿yaqapas huch’uy willakuy chiqaspi llamk’ayta munawaq karqan?"
 
 #.TRANS: square wave
 #.TRANS: cuadrado
 msgid "square"
-msgstr ""
+msgstr "tawa k’uchu"
 
 #.TRANS: sine wave
 #.TRANS: 
@@ -1706,22 +1714,22 @@ msgstr ""
 #.TRANS: musical transposition (adjustment of pitch up or down)
 #.TRANS: transposición
 msgid "transposition"
-msgstr ""
+msgstr "haywapuynin"
 
 #.TRANS: step down one note in current musical scale
 #.TRANS: escalar bajar
 msgid "scalar step down"
-msgstr ""
+msgstr "wichay uraqay"
 
 #.TRANS: step up one note in current musical scale
 #.TRANS: escalar aumentar
 msgid "scalar step up"
-msgstr ""
+msgstr "wichay yapaykuy"
 
 #.TRANS: the change measured in half-steps between the current pitch and the previous pitch
 #.TRANS: cambio en tono
 msgid "change in pitch"
-msgstr ""
+msgstr "kunkan t’ikrasqa"
 
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 #.TRANS: 
@@ -1732,132 +1740,132 @@ msgstr ""
 #.TRANS: a mapping of pitch to the 88 piano keys
 #.TRANS: número de tono
 msgid "pitch number"
-msgstr ""
+msgstr "kunkapa yupaynin"
 
 #.TRANS: the current pitch expressed in Hertz
 #.TRANS: tono en hertz
 msgid "pitch in hertz"
-msgstr ""
+msgstr "hertzpi kunkan"
 
 #.TRANS: MIDI is a technical standard for electronic music
 #.TRANS: 
 msgid "MIDI"
-msgstr ""
+msgstr "MIDI"
 
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 #.TRANS: fijar offset del número de tono
 msgid "set pitch number offset"
-msgstr ""
+msgstr "kunkapa yupayninta watapuna "
 
 #.TRANS: convert piano key number (1-88) to pitch
 #.TRANS: número a tono
 msgid "number to pitch"
-msgstr ""
+msgstr "yupay kunkaman"
 
 #.TRANS: convert piano key number (1-88) to octave
 #.TRANS: número a octava
 msgid "number to octave"
-msgstr ""
+msgstr "yupay pusaq pataman"
 
 #.TRANS: El tono puede especificarse en términos de ni dha pa ma ga re sa.
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
-msgstr ""
+msgstr "kunkaqa kay tukuykunapi ni dha pa ma ga re sa alayrichikun "
 
 #.TRANS: El tono puede especificarse en términos de C D E F G A B.
 msgid "Pitch can be specified in terms of C D E F G A B."
-msgstr ""
+msgstr " kunkaqa kay tukuykunapi C D E F G A B alayrichikun "
 
 #.TRANS: El tono puede especificarse en términos de do re mi fa sol la si.
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
-msgstr ""
+msgstr " kunkaqa kay tukuykunapi do re mi fa sol la si alayrichikun "
 
 #.TRANS: pitch inversion rotates a pitch around another pitch
 #.TRANS: invertir
 msgid "invert"
-msgstr ""
+msgstr "t’ikray"
 
 #.TRANS: invert based on even or odd number or musical scale
 #.TRANS: even numbers
 #.TRANS: par
 msgid "even"
-msgstr ""
+msgstr "masa"
 
 #.TRANS: odd numbers
 #.TRANS: impar
 msgid "odd"
-msgstr ""
+msgstr "sapallan"
 
 #.TRANS: escalar
 msgid "scalar"
-msgstr ""
+msgstr "siqay"
 
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 #.TRANS: invertir (impar)
 msgid "invert (odd)"
-msgstr ""
+msgstr "t’ikray (sapallan"
 
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 #.TRANS: invertir (par)
 msgid "invert (even)"
-msgstr ""
+msgstr "t’ikray (masantin)"
 
 #.TRANS: register is the octave of the current pitch
 #.TRANS: registro
 msgid "register"
-msgstr ""
+msgstr "waqaychasqa"
 
 #.TRANS: En el ejemplo que se muestra arriba, sol se desplaza hasta sol#.
 msgid "In the example shown above, sol is shifted up to sol#."
-msgstr ""
+msgstr "wichaypi qhawachisqapi hina, solqa solkama purin"
 
 #.TRANS: adjust the amount of shift (up or down) of a pitch
 #.TRANS: transposición semitono
 msgid "semi-tone transpose"
-msgstr ""
+msgstr "kuskan kunka Haywapuynin"
 
 #.TRANS: personalizado tono
 msgid "custom pitch"
-msgstr ""
+msgstr "sapallanpa kunka"
 
 #.TRANS: down sixth means the note is five scale degrees below current note
 #.TRANS: sexto abajo
 msgid "down sixth"
-msgstr ""
+msgstr "uraypi suqta pata"
 
 #.TRANS: down third means the note is two scale degrees below current note
 #.TRANS: tercero abajo
 msgid "down third"
-msgstr ""
+msgstr "uraypi kimsa pata"
 
 #.TRANS: seventh means the note is the six scale degrees above current note
 #.TRANS: séptimo
 msgid "seventh"
-msgstr ""
+msgstr "qanchis pata"
 
 #.TRANS: sixth means the note is the five scale degrees above current note
 #.TRANS: sexto
 msgid "sixth"
-msgstr ""
+msgstr "suqta pata"
 
 #.TRANS: fifth means the note is the four scale degrees above current note
 #.TRANS: quinto
 msgid "fifth"
-msgstr ""
+msgstr "phichqa pata"
 
 #.TRANS: fourth means the note is three scale degrees above current note
 #.TRANS: cuarto
 msgid "fourth"
-msgstr ""
+msgstr "tawa pata"
 
 #.TRANS: third means the note is two scale degrees above current note
 #.TRANS: tercio
 msgid "third"
-msgstr ""
+msgstr "kimsa pata"
 
 #.TRANS: second means the note is one scale degree above current note
 #.TRANS: segundo
 msgid "second"
-msgstr ""
+msgstr "iskay pata"
 
 #.TRANS: unison means the note is the same as the current note
 #.TRANS: unison is a music term related to intervals
@@ -1872,32 +1880,32 @@ msgstr ""
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 #.TRANS: transposición escalar
 msgid "scalar transpose"
-msgstr ""
+msgstr "  sayayninta  tupachiy haywapuynin"
 
 #.TRANS: El bloque Accidental se utiliza para crear objetos punzantes y pisos.
 msgid "The Accidental block is used to create sharps and flats"
-msgstr ""
+msgstr "Yanapaqnin chiqasqa chhukuna hinallataq saruna imakunapas paqarichiy llamk’anam"
 
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 #.TRANS: accidental
 msgid "accidental"
-msgstr ""
+msgstr "yanapaqnin"
 
 #.TRANS: sharp is a half-step up in pitch
 #.TRANS: sharp is a music term related to pitch
 #.TRANS: agudas
 msgid "sharp"
-msgstr ""
+msgstr "allin uyarikuy"
 
 #.TRANS: flat is a half-step down in pitch
 #.TRANS: flat is a music term related to pitch
 #.TRANS: planas
 msgid "flat"
-msgstr ""
+msgstr "pampa"
 
 #.TRANS: Bloque de Hertz: Quizás quiso decir utilizar un bloque de nota?
 msgid "Hertz Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Hertz chiqas: ¿yaqapas huch’uy willakuy chiqaspi llamk’ayta munawaq karqan "
 
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
@@ -1912,7 +1920,7 @@ msgstr "yupana"
 #.TRANS: step some number of notes in current musical scale
 #.TRANS: paso escalar
 msgid "scalar step"
-msgstr ""
+msgstr "wichayman challqa"
 
 #.TRANS: orientation or compass direction
 #.TRANS: rumbo
@@ -1926,60 +1934,62 @@ msgstr ""
 #.TRANS: y coordinate
 #.TRANS: El bloque Y devuelve la posición horizontal del ratón.
 msgid "The Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "chiqasqa huk’ucha pampallanpi kasqanta kutichipun"
 
 #.TRANS: y
 msgid "y3"
-msgstr ""
+msgstr "y3"
 
 #.TRANS: x coordinate
 #.TRANS: El bloque X devuelve la posición horizontal del ratón.
 msgid "The X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "X chiqasqa huk’ucha pampallanpi kasqanta kutichipun"
 
 #.TRANS: x
 msgid "x3"
-msgstr ""
+msgstr "x3"
 
 #.TRANS: scroll canvas image by x, y position
 #.TRANS: desplazar xy
 msgid "scroll xy"
-msgstr ""
+msgstr "xy purichiy"
 
 #.TRANS: El bloque Desplazar XY mueve el lienzo.
 msgid "The Scroll XY block moves the canvas."
-msgstr ""
+msgstr "Purichiy chiqasqa XY llikata kuyuchin"
+
+…………………………………………..
 
 #.TRANS: x
 msgid "x2"
-msgstr ""
+msgstr "x2"
 
 #.TRANS: y
 msgid "y2"
-msgstr ""
+msgstr "y2"
 
 #.TRANS: erase the screen and return the mice to the center position
 #.TRANS: limpiar
 msgid "clear"
-msgstr ""
+msgstr "pichay"
 
 #.TRANS: control point in a bezier curve
 #.TRANS: punto de control 2
 msgid "control point 2"
-msgstr ""
+msgstr "arariwaq 2"
 
 #.TRANS: x
 msgid "x1"
-msgstr ""
+msgstr "x1"
 
 #.TRANS: y
 msgid "y1"
-msgstr ""
+msgstr "y1"
 
 #.TRANS: control point in a bezier curve
 #.TRANS: punto de control 1
 msgid "control point 1"
-msgstr ""
+msgstr "arariwaq 1"
 
 #.TRANS: 
 msgid "The Bezier block draws a Bezier curve."
@@ -1997,7 +2007,7 @@ msgstr ""
 #.TRANS: draws a part of the circumference of a circle
 #.TRANS: arco
 msgid "arc"
-msgstr "arco nisqa"
+msgstr “k’umu”
 
 #.TRANS: ángulo
 msgid "angle"
@@ -2005,7 +2015,7 @@ msgstr "k'uchu"
 
 #.TRANS: radio
 msgid "radius"
-msgstr "radio nisqa"
+msgstr "illwa"
 
 #.TRANS: set compass heading
 #.TRANS: fijar rumbo
@@ -2019,7 +2029,7 @@ msgstr ""
 #.TRANS: set xy (Cartesian) position
 #.TRANS: fijar xy
 msgid "set xy"
-msgstr "xy nisqata churay"
+msgstr "xy nisqata churay" "xy k’askachiy"
 
 #.TRANS: El bloque Derecha gira el ratón hacia la derecha.
 msgid "The Right block turns the mouse to the right."
@@ -2028,7 +2038,7 @@ msgstr ""
 #.TRANS: right1 and right are when turning right (clockwise)
 #.TRANS: derecha
 msgid "right1"
-msgstr ""
+msgstr "paña"
 
 #.TRANS: derecha
 msgid "right"
@@ -2036,54 +2046,54 @@ msgstr "paña"
 
 #.TRANS: El bloque Izquierdo gira el ratón hacia la izquierda.
 msgid "The Left block turns the mouse to the left."
-msgstr ""
+msgstr "lluq’i t’aqa huk’uchawan lluq’iman muyun"
 
 #.TRANS: left and left1 are when turning left (counter-clockwise)
 #.TRANS: izquierda
 msgid "left1"
-msgstr ""
+msgstr "lluq’i"
 
 #.TRANS: izquierda
 msgid "left"
-msgstr "lluqi"
+msgstr "lluq’i"
 
 #.TRANS: move backward (in the opposite direction of the current heading)
 #.TRANS: atrás
 msgid "back"
-msgstr "kutichiy"
+msgstr "qhipa"
 
 #.TRANS: El bloque Atrás mueve el ratón hacia atrás.
 msgid "The Back block moves the mouse backward."
-msgstr ""
+msgstr "qhipa t’aqa huk’uchawan qhipaman muyun"
 
 #.TRANS: move forward (in the direction of the current heading)
 #.TRANS: adelante
 msgid "forward"
-msgstr "ñawpaqman"
+msgstr "ñawpaq"
 
 #.TRANS: El bloque Adelante mueve el ratón hacia adelante.
 msgid "The Forward block moves the mouse forward."
-msgstr ""
+msgstr "ñawpaq t’aqa huk’uchawan ñawpaqman muyun"
 
 #.TRANS: sumar
 msgid "add"
-msgstr ""
+msgstr "yapay"
 
 #.TRANS: para
 msgid "to"
-msgstr ""
+msgstr "sayay"
 
 #.TRANS: valor
 msgid "value1"
-msgstr ""
+msgstr "chanin"
 
 #.TRANS: El bloque Sumar-1-a agrega uno al valor almacenado en un cuadro.
 msgid "The Add-1-to block adds one to the value stored in a box."
-msgstr ""
+msgstr "Yapay-1 t’aqa hukta tawa k’uchu wayqaychasqaman yapan"
 
 #.TRANS: sumar 1 a
 msgid "add 1 to"
-msgstr ""
+msgstr "1 yapay" "hukta yapay"
 
 #.TRANS: 
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
@@ -2091,7 +2101,7 @@ msgstr ""
 
 #.TRANS: restar 1 de
 msgid "subtract 1 from"
-msgstr ""
+msgstr "1 qichuy" "hukta qichuy"
 
 #.TRANS: El bloque Caja devuelve el valor almacenado en una caja .
 msgid "The Box block returns the value stored in a box."
@@ -2100,7 +2110,7 @@ msgstr ""
 #.TRANS: a container into which to put something
 #.TRANS: caja
 msgid "box"
-msgstr "tawak'uchu"
+msgstr "tawa k'uchu"
 
 #.TRANS: El bloque Guardar en caja se utiliza para almacenar un valor en una caja.
 msgid "The Store in block will store a value in a box."
@@ -2108,63 +2118,63 @@ msgstr ""
 
 #.TRANS: guardar en caja
 msgid "store in box"
-msgstr ""
+msgstr "tawa k’uchupi waqaychay"
 
 #.TRANS: put something into a container for later reference
 #.TRANS: guardar en
 msgid "store in"
-msgstr "imapi waqaychanki"
+msgstr "imapi waqaychanki" "maypi waqaychanki"
 
 #.TRANS: El bloque Caja 2 devuelve el valor almacenado en caja 2.
 msgid "The box2 block returns the value stored in box2."
-msgstr ""
+msgstr "2 tawa k’uchu t’aqa  2 tawa k’uchu waqaychasqaman chaninta kutichin"
 
 #.TRANS: caja 2
 msgid "box2"
-msgstr ""
+msgstr "2 tawa k’uchu"
 
 #.TRANS: guardar en caja 2
 msgid "store in box2"
-msgstr ""
+msgstr "2 tawa k’uchupi waqaychay"
 
 #.TRANS: El bloque Caja 1 devuelve el valor almacenado en caja 1.
 msgid "The box1 block returns the value stored in box1."
-msgstr ""
+msgstr "1 tawa k’uchu t’aqa 1 tawa k’uchuta chanin waqaychasqata kutichin"
 
 #.TRANS: caja 1
 msgid "box1"
-msgstr ""
+msgstr "1 tawa k’uchu"
 
 #.TRANS: guardar en caja 1
 msgid "store in box1"
-msgstr ""
+msgstr "1 tawa k’uchupi waqaychay"
 
 #.TRANS: fijar temperamento
 msgid "set temperament"
-msgstr ""
+msgstr "q’uñipi k’askachiy"
 
 #.TRANS: doble
 msgid "doubly"
-msgstr ""
+msgstr "iskaycha"
 
 #.TRANS: El bloque doble duplicará el tamaño de un intervalo.
 msgid "The Doubly block will double the size of an interval."
-msgstr ""
+msgstr "iskaycha t’aqata iskaychanqa sayayninta unaymanta"
 
 #.TRANS: measure the distance between two pitches in semi-tones
 #.TRANS: medida de intervalo semitono
 msgid "semi-tone interval measure"
-msgstr ""
+msgstr "tupuy unaymanta kuskan kunka"
 
 #.TRANS: measure the distance between two pitches in steps of musical scale
 #.TRANS: medida de intervalo escalar
 msgid "scalar interval measure"
-msgstr ""
+msgstr "tupuy unaymanta siqaq"
 
 #.TRANS: perfect is a music term related to intervals
 #.TRANS: perfecto
 msgid "perfect"
-msgstr ""
+msgstr "allinpuni"
 
 #.TRANS: En la figura, agregamos sol# a sol.
 msgid "In the figure, we add sol# to sol."
@@ -2172,19 +2182,19 @@ msgstr ""
 
 #.TRANS: acorde V
 msgid "chord5"
-msgstr ""
+msgstr "5 tinkuq kunka"
 
 #.TRANS: acorde
 msgid "chord"
-msgstr ""
+msgstr "tinkuq kunka"
 
 #.TRANS: acorde 4
 msgid "chord4"
-msgstr ""
+msgstr "4 tinkuq kunka"
 
 #.TRANS: acorde 1
 msgid "chord1"
-msgstr ""
+msgstr "1 tinkuq kunka"
 
 #.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
 #.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
@@ -2212,7 +2222,7 @@ msgstr ""
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 #.TRANS: longitud de modo
 msgid "mode length"
-msgstr ""
+msgstr "Hina kay sunin"
 
 #.TRANS: La mayoría de las escalas occidentales tienen 7 notas.
 msgid "Most Western scales have 7 notes."
@@ -2221,12 +2231,12 @@ msgstr ""
 #.TRANS: the mode in music is 'major', 'minor', etc.
 #.TRANS: modo actual
 msgid "current mode"
-msgstr ""
+msgstr "Chaynalla kunka"
 
 #.TRANS: the key is a group of pitches with which a music composition is created
 #.TRANS: clave actual
 msgid "current key"
-msgstr ""
+msgstr "kunan kichaq"
 
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: fijar clave
@@ -2239,17 +2249,17 @@ msgstr ""
 
 #.TRANS: por ejemplo, C Mayor
 msgid "eg C Major"
-msgstr ""
+msgstr "C kuraq"
 
 #.TRANS: key, e.g., C in C Major
 #.TRANS: clave
 msgid "key"
-msgstr ""
+msgstr "kichanapaq"
 
 #.TRANS: mode, e.g., Major in C Major
 #.TRANS: modo
 msgid "mode"
-msgstr ""
+msgstr "Tupasqa kunkakuna"
 
 #.TRANS: El bloque Int devuelve un entero.
 msgid "The Int block returns an integer."
@@ -2265,7 +2275,7 @@ msgstr ""
 
 #.TRANS: módulo
 msgid "mod"
-msgstr "kuyuchiy"
+msgstr "kunka tupachiy"
 
 #.TRANS: El bloque de potencia calcula una función de potencia.
 msgid "The Power block calculates a power function."
@@ -2277,7 +2287,7 @@ msgstr ""
 
 #.TRANS: raíz
 msgid "sqrt"
-msgstr ""
+msgstr "saphi"
 
 #.TRANS: El bloque Abs devuelve el valor absoluto.
 msgid "The Abs block returns the absolute value."
@@ -2289,23 +2299,23 @@ msgstr ""
 
 #.TRANS: distancia
 msgid "distance"
-msgstr ""
+msgstr "karukay"
 
 #.TRANS: El bloque División se usa para dividir.
 msgid "The Divide block is used to divide."
-msgstr ""
+msgstr "rakiy t’aqaqa rakinapaq apaykachakun"
 
 #.TRANS: El bloque Multiplicar se usa para multiplicar.
 msgid "The Multiply block is used to multiply."
-msgstr ""
+msgstr "Mirachiy t’aqaqa mirachinapaq apaykachay"
 
 #.TRANS: El bloque Minus se usa para restar.
 msgid "The Minus block is used to subtract."
-msgstr ""
+msgstr "Qichuy/minus t’aqaqa qichunapaq apaykachakun"
 
 #.TRANS: El bloque Plus se utiliza para agregar.
 msgid "The Plus block is used to add."
-msgstr ""
+msgstr "Plus t’aqaqa yapanapaq apaykachakun"
 
 #.TRANS: El bloque Uno de estos devuelve una de dos opciones.
 msgid "The One-of block returns one of two choices."
@@ -2313,15 +2323,15 @@ msgstr ""
 
 #.TRANS: uno de estos
 msgid "one of"
-msgstr ""
+msgstr "huk kaykunamanta"
 
 #.TRANS: éste
 msgid "this"
-msgstr ""
+msgstr "kay"
 
 #.TRANS: ése
 msgid "that"
-msgstr ""
+msgstr "chay"
 
 #.TRANS: El bloque Aleatorio devuelve un número aleatorio.
 msgid "The Random block returns a random number."
@@ -2329,7 +2339,7 @@ msgstr ""
 
 #.TRANS: aleatorio
 msgid "random"
-msgstr "muyumuyuriq"
+msgstr "chaqrusqa"
 
 #.TRANS: min
 msgid "min"
@@ -2341,7 +2351,7 @@ msgstr "achkha"
 
 #.TRANS: El bloque Numérico contiene un número.
 msgid "The Number block holds a number."
-msgstr ""
+msgstr "Yupay t’aqaqa huk yupayniyuq"
 
 #.TRANS: load the heap contents from a URL
 #.TRANS: cargar pila desde aplicación
@@ -2354,7 +2364,7 @@ msgstr ""
 
 #.TRANS: 404: Página no encontrada.
 msgid "404: Page not found"
-msgstr ""
+msgstr "mana tarisqa p’anqa"
 
 #.TRANS: El bloque Guardar-pila-en-app guarda la pila en una página web.
 msgid "The Save-heap-to-app block saves the heap to a web page."
@@ -2363,16 +2373,16 @@ msgstr ""
 #.TRANS: save the heap contents to a URL
 #.TRANS: guardar pila a aplicación
 msgid "save heap to App"
-msgstr ""
+msgstr "Llapanta kay qutupi waqaychana"
 
 #.TRANS: Pilas tortuga no contiene un montón válida para
 msgid "Cannot find a valid heap for"
-msgstr ""
+msgstr "Manam llapan qutupi tarikunchu"
 
 #.TRANS: Display the heap contents
 #.TRANS: mostrar pila
 msgid "show heap"
-msgstr "tawqata rikuchiy"
+msgstr "qutu rikuchiy"
 
 #.TRANS: El bloque Longitud de la pila devuelve la longitud de la pila.
 msgid "The Heap-length block returns the length of the heap."
@@ -2381,7 +2391,7 @@ msgstr ""
 #.TRANS: How many entries are in the heap?
 #.TRANS: tamaño de la pila
 msgid "heap length"
-msgstr ""
+msgstr "qutuq sunin"
 
 #.TRANS: El bloque Pila-vacío? devuelve verdadero si la pila está vacío.
 msgid "The Heap-empty? block returns true if the heap is empty."
@@ -2390,7 +2400,7 @@ msgstr ""
 #.TRANS: Is the heap empty?
 #.TRANS: ¿pila vacía?
 msgid "heap empty?"
-msgstr ""
+msgstr "Llapan qutupi mana kanchu?"
 
 #.TRANS: El bloque Vacío pila vacía la pila.
 msgid "The Empty-heap block empties the heap."
@@ -2399,7 +2409,7 @@ msgstr ""
 #.TRANS: empty the heap
 #.TRANS: vaciar pila
 msgid "empty heap"
-msgstr "tawqata qasichiy"
+msgstr "ch’usaq qutu"
 
 #.TRANS: El bloque Guardar pila guarda la pila en un archivo.
 msgid "The Save-heap block saves the heap to a file."
@@ -2408,7 +2418,7 @@ msgstr ""
 #.TRANS: save the heap to a file
 #.TRANS: guardar pila
 msgid "save heap"
-msgstr ""
+msgstr "Qutupi waqaychay"
 
 #.TRANS: El bloque Cargar pila carga la pila de un archivo.
 msgid "The Load-heap block loads the heap from a file."
@@ -2417,11 +2427,11 @@ msgstr ""
 #.TRANS: load the heap from a file
 #.TRANS: cargar pila
 msgid "load heap"
-msgstr ""
+msgstr "Qututa apachiy"
 
 #.TRANS: Debe seleccionar un archivo.
 msgid "You must select a file."
-msgstr ""
+msgstr "Huk waqaychasqata ch’ikuy"
 
 #.TRANS: El bloque Pila de carga necesita un bloque de archivo de carga.
 msgid "The loadHeap block needs a loadFile block."
@@ -2434,7 +2444,7 @@ msgstr ""
 #.TRANS: reverse the order of the heap
 #.TRANS: revertir la pila
 msgid "reverse heap"
-msgstr ""
+msgstr "Qutu tikray"
 
 #.TRANS: retrieve a value from the heap at index position in the heap
 #.TRANS: valor en la pila
@@ -2443,7 +2453,7 @@ msgstr ""
 
 #.TRANS: modificar valor en pila
 msgid "set heap"
-msgstr ""
+msgstr "Qutu kutichiy"
 
 #.TRANS: El bloque Pop elimina el valor en la parte superior del pila.
 msgid "The Pop block removes the value at the top of the heap."
@@ -2461,7 +2471,7 @@ msgstr ""
 #.TRANS: push a value onto the top of the heap
 #.TRANS: apilar
 msgid "push"
-msgstr "tanqay"
+msgstr "tawqay"
 
 #.TRANS: El bloque No es el operador lógico no.
 msgid "The Not block is the logical not operator."
@@ -2505,23 +2515,23 @@ msgstr ""
 
 #.TRANS: 
 msgid "Take a tour"
-msgstr ""
+msgstr "pusay"
 
 #.TRANS: Bienvenido a Bloques de Música
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "Takiy t’aqaman allin hamunki"
 
 #.TRANS: Conoce Sr. Ratón
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "Wiraqucha huk’uchata riqsinki"
 
 #.TRANS: Guía
 msgid "Guide"
-msgstr ""
+msgstr "pusaq"
 
 #.TRANS: Acerca
 msgid "About"
-msgstr ""
+msgstr "qayllampi"
 
 #.TRANS: Felicitaciones.
 msgid "Congratulations."
@@ -2529,16 +2539,16 @@ msgstr ""
 
 #.TRANS: Tocar
 msgid "Play"
-msgstr ""
+msgstr "waqachiy"
 
 #.TRANS: Guardar
 msgid "Save"
-msgstr ""
+msgstr "waqaychay"
 
 #.TRANS: clear all subdivisions from the ruler.
 #.TRANS: Borrar
 msgid "Clear"
-msgstr ""
+msgstr "pichay"
 
 #.TRANS: 
 msgid "Add note"
@@ -2546,26 +2556,26 @@ msgstr ""
 
 #.TRANS: Tabla
 msgid "Table"
-msgstr ""
+msgstr "tawla"
 
 #.TRANS: duración
 msgid "duration"
-msgstr "unayaynin"
+msgstr "unaykachiy"
 
 #.TRANS: double sharp is a music term related to pitch
 #.TRANS: doble agudas
 msgid "double sharp"
-msgstr ""
+msgstr "iskay ñañu kunka"
 
 #.TRANS: natural is a music term related to pitch
 #.TRANS: normal
 msgid "natural"
-msgstr ""
+msgstr "purum"
 
 #.TRANS: double flat is a music term related to pitch
 #.TRANS: doble planas
 msgid "double flat"
-msgstr ""
+msgstr "iskay t’aqlla"
 
 #.TRANS: 
 msgid "New action block generated!"
@@ -2573,11 +2583,11 @@ msgstr ""
 
 #.TRANS: Cerrar
 msgid "Close"
-msgstr ""
+msgstr "wisq’ay"
 
 #.TRANS: descanso
 msgid "rest"
-msgstr ""
+msgstr "samay"
 
 #.TRANS: Haga clic en la cuadrícula para asignar notas a sonidos de tambors
 msgid "Click in the grid to map notes to drums."
@@ -2585,11 +2595,11 @@ msgstr ""
 
 #.TRANS: Ascender
 msgid "Move up"
-msgstr ""
+msgstr "wichay"
 
 #.TRANS: Descender
 msgid "Move down"
-msgstr ""
+msgstr "uraqay"
 
 #.TRANS: 
 msgid "Click on the slider to create a note block."
@@ -2597,11 +2607,11 @@ msgstr ""
 
 #.TRANS: Exportar
 msgid "Export"
-msgstr ""
+msgstr "hurquy"
 
 #.TRANS: Ordenar
 msgid "Sort"
-msgstr ""
+msgstr "ñiq’ichay"
 
 #.TRANS: Haga clic en la tabla para agregar notas.
 msgid "Click on the table to add notes."
@@ -2609,11 +2619,11 @@ msgstr ""
 
 #.TRANS: gráficos
 msgid "graphics"
-msgstr ""
+msgstr "siq’ikuna"
 
 #.TRANS: pluma
 msgid "pen"
-msgstr ""
+msgstr "qillqana"
 
 #.TRANS: valor del tuplet
 msgid "tuplet value"
@@ -2621,7 +2631,7 @@ msgstr ""
 
 #.TRANS: Jugar todo
 msgid "Play all"
-msgstr ""
+msgstr "llapanta pukllay"
 
 #.TRANS: Detener
 msgid "Stop"
@@ -2633,32 +2643,32 @@ msgstr ""
 
 #.TRANS: Sintetizador
 msgid "Synthesizer"
-msgstr ""
+msgstr "Huch’uyachispa tikraq"
 
 #.TRANS: Oscilador
 msgid "Oscillator"
-msgstr ""
+msgstr "Tikraq"
 
 #.TRANS: Envolvente
 msgid "Envelope"
-msgstr ""
+msgstr "patapi"
 
 #.TRANS: On the Planet, we use labels to tag projects.
 #.TRANS: Efectos
 msgid "Effects"
-msgstr ""
+msgstr "Tikrasqa kunka"
 
 #.TRANS: Filtrar
 msgid "Filter"
-msgstr ""
+msgstr "ch’uyay"
 
 #.TRANS: Agregar un filtro
 msgid "Add filter"
-msgstr ""
+msgstr "Ch’uyaqta churay"
 
 #.TRANS: Deshacer
 msgid "Undo"
-msgstr ""
+msgstr "paskay"
 
 #.TRANS: Haga clic en los botones para abrir las herramientas de diseño de timbre.
 msgid "Click on buttons to open the timbre design tools."
@@ -2666,15 +2676,15 @@ msgstr ""
 
 #.TRANS: armonía
 msgid "harmonicity"
-msgstr ""
+msgstr "tupasqa"
 
 #.TRANS: índice de modulación
 msgid "modulation index"
-msgstr ""
+msgstr "imanas kunka tupasqa"
 
 #.TRANS: cantidad de vibrato
 msgid "vibrato amount"
-msgstr ""
+msgstr "kunkachasqa"
 
 #.TRANS: 
 msgid "Filter already present."
@@ -2682,7 +2692,7 @@ msgstr ""
 
 #.TRANS: retraso (MS)
 msgid "delay (MS)"
-msgstr ""
+msgstr "qhipariy"
 
 #.TRANS: cantidad de distorsión
 msgid "distortion amount"
@@ -2694,19 +2704,19 @@ msgstr ""
 
 #.TRANS: Pausa
 msgid "Pause"
-msgstr ""
+msgstr "sayay"
 
 #.TRANS: 
 msgid "Save tempo"
-msgstr ""
+msgstr "Pacha waqaychay"
 
 #.TRANS: acelerar
 msgid "speed up"
-msgstr ""
+msgstr "utqhaychay"
 
 #.TRANS: retardar
 msgid "slow down"
-msgstr ""
+msgstr "qhipariy"
 
 #.TRANS: Ajusta el tempo con los botones.
 msgid "Adjust the tempo with the buttons."
@@ -2726,7 +2736,7 @@ msgstr ""
 
 #.TRANS: cerrar
 msgid "close"
-msgstr ""
+msgstr "wisq’ay"
 
 #.TRANS: 
 msgid "drag"
@@ -2743,20 +2753,20 @@ msgstr ""
 #.TRANS: musical instrument
 #.TRANS: tambor militar pequeño
 msgid "snare drum"
-msgstr ""
+msgstr "wankar"
 
 #.TRANS: musical instrument
 #.TRANS: guitarra
 msgid "guitar"
-msgstr ""
+msgstr "guitarra"
 
 #.TRANS: Guardar ritmos
 msgid "Save rhythms"
-msgstr ""
+msgstr "T’impuchisqata waqaychay"
 
 #.TRANS: Guardar la caja de ritmos
 msgid "Save drum machine"
-msgstr ""
+msgstr "tawa k’uchu t’impumusqakuna waqaychana"
 
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
 #.TRANS: Toca un ritmo
@@ -2769,7 +2779,7 @@ msgstr ""
 
 #.TRANS: añadir tonos
 msgid "Add pitches"
-msgstr ""
+msgstr "kunkakuna yapay"
 
 #.TRANS: Girar en sentido antihorario
 msgid "Rotate counter clockwise"
@@ -2777,11 +2787,11 @@ msgstr ""
 
 #.TRANS: Girar en sentido horario
 msgid "Rotate clockwise"
-msgstr ""
+msgstr "lluq’iman muyuy"
 
 #.TRANS: Invertir
 msgid "Invert"
-msgstr ""
+msgstr "Tikray"
 
 #.TRANS: A circle of notes represents the musical mode.
 #.TRANS: Haga clic en el círculo para seleccionar notas para el modo.
@@ -2803,27 +2813,27 @@ msgstr ""
 #.TRANS: brown noise synthesizer
 #.TRANS: ruido marrón
 msgid "brown noise"
-msgstr ""
+msgstr "ch’umpi chanraray"
 
 #.TRANS: pink noise synthesizer
 #.TRANS: ruido rosa
 msgid "pink noise"
-msgstr ""
+msgstr "rosa chanraray"
 
 #.TRANS: musical instrument
 #.TRANS: violín
 msgid "violin"
-msgstr ""
+msgstr "violin"
 
 #.TRANS: viola musical instrument
 #.TRANS: 
 msgid "viola"
-msgstr ""
+msgstr "viola"
 
 #.TRANS: musical instrument
 #.TRANS: violonchelo
 msgid "cello"
-msgstr ""
+msgstr "violonchelo"
 
 #.TRANS: musical instrument
 #.TRANS: 
@@ -2833,37 +2843,37 @@ msgstr ""
 #.TRANS: viola musical instrument
 #.TRANS: 
 msgid "double bass"
-msgstr ""
+msgstr "Viola takina waqachina"
 
 #.TRANS: musical instrument
 #.TRANS: guitarra acustica
 msgid "acoustic guitar"
-msgstr ""
+msgstr "aswan kunkayuq guitarra"
 
 #.TRANS: musical instrument
 #.TRANS: flauta
 msgid "flute"
-msgstr ""
+msgstr "flauta"
 
 #.TRANS: musical instrument
 #.TRANS: clarinete
 msgid "clarinet"
-msgstr ""
+msgstr "clarinete"
 
 #.TRANS: musical instrument
 #.TRANS: saxofón
 msgid "saxophone"
-msgstr ""
+msgstr "saxofón"
 
 #.TRANS: musical instrument
 #.TRANS: tuba
 msgid "tuba"
-msgstr ""
+msgstr "tuba"
 
 #.TRANS: musical instrument
 #.TRANS: trompeta
 msgid "trumpet"
-msgstr ""
+msgstr "trompeta"
 
 #.TRANS: musical instrument
 #.TRANS: 
@@ -2873,7 +2883,7 @@ msgstr ""
 #.TRANS: musical instrument
 #.TRANS: 
 msgid "trombone"
-msgstr ""
+msgstr "trombón"
 
 #.TRANS: musical instrument
 #.TRANS: 
@@ -2893,7 +2903,7 @@ msgstr ""
 #.TRANS: musical instrument
 #.TRANS: guitarra electrica
 msgid "electric guitar"
-msgstr ""
+msgstr "tawtinku phinchikilla"
 
 #.TRANS: musical instrument
 #.TRANS: 
@@ -2903,7 +2913,7 @@ msgstr ""
 #.TRANS: musical instrument
 #.TRANS: 
 msgid "celeste"
-msgstr ""
+msgstr "yuraq anqhas"
 
 #.TRANS: xylophone musical instrument
 #.TRANS: 
@@ -2913,22 +2923,22 @@ msgstr ""
 #.TRANS: simple monotone synthesizer
 #.TRANS: 
 msgid "simple 1"
-msgstr ""
+msgstr "qasi-1"
 
 #.TRANS: simple monotone synthesizer
 #.TRANS: 
 msgid "simple-2"
-msgstr ""
+msgstr "qasi-2"
 
 #.TRANS: simple monotone synthesizer
 #.TRANS: 
 msgid "simple-3"
-msgstr ""
+msgstr "qasi-3"
 
 #.TRANS: simple monotone synthesizer
 #.TRANS: 
 msgid "simple-4"
-msgstr ""
+msgstr "qasi-4"
 
 #.TRANS: vibraphone musical instrument
 #.TRANS: 
@@ -2938,12 +2948,12 @@ msgstr ""
 #.TRANS: musical instrument
 #.TRANS: tambor de patada
 msgid "kick drum"
-msgstr ""
+msgstr "Hayt’ana wankar"
 
 #.TRANS: musical instrument
 #.TRANS: 
 msgid "tom tom"
-msgstr ""
+msgstr "tum tum"
 
 #.TRANS: musical instrument
 #.TRANS: piso tom
@@ -2953,17 +2963,17 @@ msgstr ""
 #.TRANS: a drum made from an inverted cup
 #.TRANS: taza de tambor
 msgid "cup drum"
-msgstr ""
+msgstr "qiru wankar"
 
 #.TRANS: musical instrument
 #.TRANS: darbuka
 msgid "darbuka drum"
-msgstr ""
+msgstr "wankar darbuka"
 
 #.TRANS: musical instrument
 #.TRANS: 
 msgid "taiko"
-msgstr ""
+msgstr "chakiyuq wankar"
 
 #.TRANS: musical instrument
 #.TRANS: 
@@ -2973,1057 +2983,24 @@ msgstr ""
 #.TRANS: a small metal bell
 #.TRANS: campana de paseo
 msgid "ride bell"
-msgstr ""
+msgstr "puriq kampana/kalanka"
 
 #.TRANS: musical instrument
 #.TRANS: campana de vaca
 msgid "cow bell"
-msgstr ""
+msgstr "waka kampana/kalanka"
 
 #.TRANS: musical instrument
 #.TRANS: campana triangular
 msgid "triangle bell"
-msgstr ""
+msgstr "kimsa k’uchu kampana/kalanka"
 
 #.TRANS: musical instrument
 #.TRANS: castañuelas
 msgid "finger cymbals"
-msgstr ""
+msgstr "kastañuylas"
 
-#.TRANS: musical instrument
-#.TRANS: 
-msgid "japanese bell"
-msgstr ""
 
-#.TRANS: a musically tuned set of bells
-#.TRANS: campaneo
-msgid "chime"
-msgstr ""
 
-#.TRANS: a musical instrument
-#.TRANS: 
-msgid "gong"
-msgstr ""
 
-#.TRANS: sound effect
-#.TRANS: estruendo
-msgid "clang"
-msgstr ""
 
-#.TRANS: sound effect
-#.TRANS: choque
-msgid "crash"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: botella
-msgid "bottle"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: palmada
-msgid "clap"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: bofetada
-msgid "slap"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: salpicadura
-msgid "splash"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: burbujas
-msgid "bubbles"
-msgstr ""
-
-#.TRANS: sound effect
-#.TRANS: 
-msgid "raindrop"
-msgstr ""
-
-#.TRANS: animal sound effect
-#.TRANS: gato
-msgid "cat"
-msgstr ""
-
-#.TRANS: animal sound effect
-#.TRANS: grillo
-msgid "cricket"
-msgstr ""
-
-#.TRANS: animal sound effect
-#.TRANS: perro
-msgid "dog"
-msgstr ""
-
-#.TRANS: animal sound effect
-#.TRANS: pato
-msgid "duck"
-msgstr ""
-
-#.TRANS: ordinal number. Please keep exactly one space between each number.
-#.TRANS: 1º 2º 3º 4º 5º 6º 7º 8º 9º 10º 11º 12º
-msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
-msgstr ""
-
-#.TRANS: augmented is a music term related to intervals
-#.TRANS: aumentado
-msgid "augmented"
-msgstr ""
-
-#.TRANS: diminished is a music term related to intervals and mode
-#.TRANS: disminuido
-msgid "diminished"
-msgstr ""
-
-#.TRANS: minor is a music term related to intervals and mode
-#.TRANS: menor
-msgid "minor"
-msgstr ""
-
-#.TRANS: major is a music term related to intervals and mode
-#.TRANS: mayor
-msgid "major"
-msgstr ""
-
-#.TRANS: twelve semi-tone scale for music
-#.TRANS: cromático
-msgid "chromatic"
-msgstr ""
-
-#.TRANS: argelino
-msgid "algerian"
-msgstr ""
-
-#.TRANS: español
-msgid "spanish"
-msgstr ""
-
-#.TRANS: modal scale in music
-#.TRANS: 
-msgid "octatonic"
-msgstr ""
-
-#.TRANS: harmonic major scale in music
-#.TRANS: armónico mayor
-msgid "harmonic major"
-msgstr ""
-
-#.TRANS: natural minor scales in music
-#.TRANS: natural menor
-msgid "natural minor"
-msgstr ""
-
-#.TRANS: harmonic minor scale in music
-#.TRANS: armónico menor
-msgid "harmonic minor"
-msgstr ""
-
-#.TRANS: melodic minor scale in music
-#.TRANS: melódico menor
-msgid "melodic minor"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: ionian
-msgid "ionian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: 
-msgid "dorian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: 
-msgid "phrygian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: 
-msgid "lydian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: 
-msgid "mixolydian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: aeolian
-msgid "aeolian"
-msgstr ""
-
-#.TRANS: modal scale for music
-#.TRANS: 
-msgid "locrian"
-msgstr ""
-
-#.TRANS: minor jazz scale for music
-#.TRANS: jazz menor
-msgid "jazz minor"
-msgstr ""
-
-#.TRANS: bebop scale for music
-#.TRANS: 
-msgid "bebop"
-msgstr ""
-
-#.TRANS: arábica
-msgid "arabic"
-msgstr ""
-
-#.TRANS: bizantino
-msgid "byzantine"
-msgstr ""
-
-#.TRANS: musical scale for music by Verdi
-#.TRANS: enigmático
-msgid "enigmatic"
-msgstr ""
-
-#.TRANS: etíope
-msgid "ethiopian"
-msgstr ""
-
-#.TRANS: Ethiopic scale for music
-#.TRANS: 
-msgid "geez"
-msgstr ""
-
-#.TRANS: hindú
-msgid "hindu"
-msgstr ""
-
-#.TRANS: húngaro
-msgid "hungarian"
-msgstr ""
-
-#.TRANS: minor Romanian scale for music
-#.TRANS: romano menor
-msgid "romanian minor"
-msgstr ""
-
-#.TRANS: gitana española
-msgid "spanish gypsy"
-msgstr ""
-
-#.TRANS: musical scale for Mid-Eastern music
-#.TRANS: 
-msgid "maqam"
-msgstr ""
-
-#.TRANS: minor blues scale for music
-#.TRANS: blues menor
-msgid "minor blues"
-msgstr ""
-
-#.TRANS: major blues scale for music
-#.TRANS: blues mayor
-msgid "major blues"
-msgstr ""
-
-#.TRANS: tono completo
-msgid "whole tone"
-msgstr ""
-
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
-#.TRANS: pentatonic minor
-msgid "minor pentatonic"
-msgstr ""
-
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
-#.TRANS: pentatonic mayor
-msgid "major pentatonic"
-msgstr ""
-
-#.TRANS: chino
-msgid "chinese"
-msgstr ""
-
-#.TRANS: egipcio
-msgid "egyptian"
-msgstr ""
-
-#.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
-#.TRANS: 
-msgid "hirajoshi"
-msgstr ""
-
-#.TRANS: Japón
-msgid "Japan"
-msgstr ""
-
-#.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-#.TRANS: in
-msgid "in"
-msgstr ""
-
-#.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
-#.TRANS: minyo
-msgid "minyo"
-msgstr ""
-
-#.TRANS: Italian mathematician
-#.TRANS: 
-msgid "fibonacci"
-msgstr ""
-
-#.TRANS: lowpass filter
-#.TRANS: 
-msgid "lowpass"
-msgstr ""
-
-#.TRANS: bandpass filter
-#.TRANS: 
-msgid "bandpass"
-msgstr ""
-
-#.TRANS: high-shelf filter
-#.TRANS: 
-msgid "highshelf"
-msgstr ""
-
-#.TRANS: low-shelf filter
-#.TRANS: 
-msgid "lowshelf"
-msgstr ""
-
-#.TRANS: notch-shelf filter
-#.TRANS: 
-msgid "notch"
-msgstr ""
-
-#.TRANS: all-pass filter
-#.TRANS: 
-msgid "allpass"
-msgstr ""
-
-#.TRANS: peaking filter
-#.TRANS: 
-msgid "peaking"
-msgstr ""
-
-#.TRANS: 
-msgid "simple 2"
-msgstr ""
-
-#.TRANS: 
-msgid "simple 3"
-msgstr ""
-
-#.TRANS: 
-msgid "simple 4"
-msgstr ""
-
-#.TRANS: 
-msgid "japanese drum"
-msgstr ""
-
-#.TRANS: musical temperament
-#.TRANS: igual
-msgid "equal"
-msgstr ""
-
-#.TRANS: musical temperament
-#.TRANS: 
-msgid "Pythagorean"
-msgstr ""
-
-#.TRANS: musical temperament
-#.TRANS: solo entonación
-msgid "just intonation"
-msgstr ""
-
-#.TRANS: musical temperament
-#.TRANS: 
-msgid "meantone"
-msgstr ""
-
-#.TRANS: the note names must be separated by single spaces
-#.TRANS: si la sol fa mi re do
-msgid "ti la sol fa mi re do"
-msgstr ""
-
-#.TRANS: actuales
-msgid "current"
-msgstr ""
-
-#.TRANS: próximo
-msgid "next"
-msgstr ""
-
-#.TRANS: anterior
-msgid "previous"
-msgstr ""
-
-#.TRANS: Planeta
-msgid "Planet"
-msgstr ""
-
-#.TRANS: Cerrar Planeta
-msgid "Close Planet"
-msgstr ""
-
-#.TRANS: Abrir proyecto desde archivo
-msgid "Open project from file"
-msgstr ""
-
-#.TRANS: Nuevo proyecto
-msgid "New project"
-msgstr ""
-
-#.TRANS: 
-msgid "Local"
-msgstr ""
-
-#.TRANS: 
-msgid "Global"
-msgstr ""
-
-#.TRANS: Buscar un proyecto
-msgid "Search for a project"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: Mis proyectos
-msgid "My Projects"
-msgstr ""
-
-#.TRANS: Publicar el proyecto
-msgid "Publish Project"
-msgstr ""
-
-#.TRANS: Título del proyecto
-msgid "Project title"
-msgstr ""
-
-#.TRANS: Etiquetas (max 5)
-msgid "Tags (max 5)"
-msgstr ""
-
-#.TRANS: Descripción
-msgid "Description"
-msgstr ""
-
-#.TRANS: Presentar
-msgid "Submit"
-msgstr ""
-
-#.TRANS: Cancelar
-msgid "Cancel"
-msgstr ""
-
-#.TRANS: Borrar \\"<span id=\\"deleter-title\\"></span>\\"?
-msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
-
-#.TRANS: Eliminar permanentemente el proyecto \\"<span id=\\"deleter-name\\"></span>\\"?
-msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
-
-#.TRANS: Borrar
-msgid "Delete"
-msgstr ""
-
-#.TRANS: Explorar proyectos
-msgid "Explore Projects"
-msgstr ""
-
-#.TRANS: Mostrar más etiquetas
-msgid "Show more tags"
-msgstr ""
-
-#.TRANS: Más reciente
-msgid "Most recent"
-msgstr ""
-
-#.TRANS: Más gustado
-msgid "Most liked"
-msgstr ""
-
-#.TRANS: Más descargados
-msgid "Most downloaded"
-msgstr ""
-
-#.TRANS: 
-msgid "A-Z"
-msgstr ""
-
-#.TRANS: Ordenar por
-msgid "Sort by"
-msgstr ""
-
-#.TRANS: Cargar más proyectos
-msgid "Load More Projects"
-msgstr ""
-
-#.TRANS: Última actualización
-msgid "Last Updated"
-msgstr ""
-
-#.TRANS: Fecha de creación
-msgid "Creation Date"
-msgstr ""
-
-#.TRANS: Numero de descargas:
-msgid "Number of Downloads:"
-msgstr ""
-
-#.TRANS: Número de me gusta:
-msgid "Number of Likes:"
-msgstr ""
-
-#.TRANS: Etiquetas:
-msgid "Tags:"
-msgstr ""
-
-#.TRANS: Informe de proyecto
-msgid "Report Project"
-msgstr ""
-
-#.TRANS: Proyecto informado
-msgid "Project Reported"
-msgstr ""
-
-#.TRANS: Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>.
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr ""
-
-#.TRANS: Razón para informar el proyecto
-msgid "Reason for reporting project"
-msgstr ""
-
-#.TRANS: Descargar como archivo
-msgid "Download as File"
-msgstr ""
-
-#.TRANS: Abrir en bloques de música
-msgid "Open in Music Blocks"
-msgstr ""
-
-#.TRANS: Más detalles
-msgid "More Details"
-msgstr ""
-
-#.TRANS: 
-msgid "Unlike project"
-msgstr ""
-
-#.TRANS: Proyecto \"Me gusta\"
-msgid "Like project"
-msgstr ""
-
-#.TRANS: Compartir proyecto
-msgid "Share project"
-msgstr ""
-
-#.TRANS: Compartir
-msgid "Share"
-msgstr ""
-
-#.TRANS: Copiar enlace al portapapeles
-msgid "Copy link to clipboard"
-msgstr ""
-
-#.TRANS: Banderas
-msgid "Flags"
-msgstr ""
-
-#.TRANS: Ejecutar código al inicio.
-msgid "Run project on startup."
-msgstr ""
-
-#.TRANS: Mostrar código al inicio.
-msgid "Show code blocks on startup."
-msgstr ""
-
-#.TRANS: Contraer bloques al inicio.
-msgid "Collapse code blocks on startup."
-msgstr ""
-
-#.TRANS: Opciones avanzadas
-msgid "Advanced Options"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: todos los proyectos
-msgid "All Projects"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: ejemplos
-msgid "Examples"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: música
-msgid "Music"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: arte
-msgid "Art"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: mates
-msgid "Math"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: interactivo
-msgid "Interactive"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: diseño
-msgid "Design"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: juego
-msgid "Game"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: medios
-msgid "Media"
-msgstr ""
-
-#.TRANS: On the Planet, we use labels to tag projects.
-#.TRANS: sensores
-msgid "Sensors"
-msgstr ""
-
-#.TRANS: Mi proyecto
-msgid "My Project"
-msgstr ""
-
-#.TRANS: anónimo
-msgid "anonymous"
-msgstr ""
-
-#.TRANS: Error: No se pudo enviar el informe. Inténtalo de nuevo más tarde.
-msgid "Error: Report could not be submitted. Try again later."
-msgstr ""
-
-#.TRANS: Gracias por reportar este proyecto. Un moderador revisará el proyecto en breve para verificar la violación del Código de conducta de Sugar Labs.
-msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr ""
-
-#.TRANS: Descripción requerida
-msgid "Report description required"
-msgstr ""
-
-#.TRANS: La descripción es demasiado larga.
-msgid "Report description too long"
-msgstr ""
-
-#.TRANS: Ninguna descripción provista
-msgid "No description provided"
-msgstr ""
-
-#.TRANS: Característica no disponible: no se puede conectar al servidor. Vuelve a cargar Music Blocks para intentarlo de nuevo.
-msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
-msgstr ""
-
-#.TRANS: Volver a publicar el proyecto
-msgid "Republish Project"
-msgstr ""
-
-#.TRANS: Este campo es requerido.
-msgid "This field is required"
-msgstr ""
-
-#.TRANS: Título es demasiado largo.
-msgid "Title too long"
-msgstr ""
-
-#.TRANS: La descripción es demasiado largo.
-msgid "Description too long"
-msgstr ""
-
-#.TRANS: Error del Servidor
-msgid "Server Error"
-msgstr ""
-
-#.TRANS: Inténtalo de nuevo
-msgid "Try Again"
-msgstr ""
-
-#.TRANS: Mostrar menos etiquetas
-msgid "Show fewer tags"
-msgstr ""
-
-#.TRANS: Copiar
-msgid "Copy"
-msgstr "Kikinchay"
-
-#.TRANS: Ver proyecto publicado
-msgid "View published project"
-msgstr ""
-
-#.TRANS: Publicar proyecto
-msgid "Publish project"
-msgstr ""
-
-#.TRANS: Editar proyecto
-msgid "Edit project"
-msgstr ""
-
-#.TRANS: Borrar proyecto
-msgid "Delete project"
-msgstr ""
-
-#.TRANS: Descargar proyecto
-msgid "Download project"
-msgstr ""
-
-#.TRANS: Unir con el proyecto actual
-msgid "Merge with current project"
-msgstr ""
-
-#.TRANS: Duplucar proyecto
-msgid "Duplicate project"
-msgstr ""
-
-#.TRANS: No se han encontrado resultados.
-msgid "No results found."
-msgstr ""
-
-#.TRANS: Remix de
-msgid "Remix of"
-msgstr ""
-
-#.TRANS: No es posible conectar con el servidor.
-msgid "Cannot connect to server"
-msgstr ""
-
-#.TRANS: moneda
-msgid "currency"
-msgstr ""
-
-#.TRANS: desde
-msgid "from"
-msgstr ""
-
-#.TRANS: valor de acción
-msgid "stock price"
-msgstr ""
-
-#.TRANS: traducir
-msgid "translate"
-msgstr ""
-
-#.TRANS: hola
-msgid "hello"
-msgstr "allillanchu"
-
-#.TRANS: detectar idioma
-msgid "detect lang"
-msgstr ""
-
-#.TRANS: cambiar idioma
-msgid "set lang"
-msgstr ""
-
-#.TRANS: latitud de la ciudad
-msgid "city latitude"
-msgstr ""
-
-#.TRANS: longitud de la ciudad
-msgid "city longitude"
-msgstr ""
-
-#.TRANS: Coordinar datos no disponibles.
-msgid "Coordinate data not available."
-msgstr ""
-
-#.TRANS: Mapa de Google
-msgid "Google map"
-msgstr ""
-
-#.TRANS: coordenadas
-msgid "coordinates"
-msgstr ""
-
-#.TRANS: factor de zoom
-msgid "zoom factor"
-msgstr ""
-
-#.TRANS: zoom
-msgid "zoom"
-msgstr ""
-
-#.TRANS: latitud
-msgid "latitude"
-msgstr ""
-
-#.TRANS: longitud
-msgid "longitude"
-msgstr ""
-
-#.TRANS: poder
-msgid "power"
-msgstr ""
-
-#.TRANS: base
-msgid "base"
-msgstr ""
-
-#.TRANS: exp
-msgid "exp"
-msgstr ""
-
-#.TRANS: piso
-msgid "floor"
-msgstr ""
-
-#.TRANS: techo
-msgid "ceiling"
-msgstr ""
-
-#.TRANS: grados
-msgid "degrees"
-msgstr ""
-
-#.TRANS: a grados
-msgid "to degrees"
-msgstr ""
-
-#.TRANS: radianes
-msgid "radians"
-msgstr ""
-
-#.TRANS: a radianes
-msgid "to radians"
-msgstr ""
-
-#.TRANS: x del acelerómetro
-msgid "motion x"
-msgstr ""
-
-#.TRANS: y del acelerómetro
-msgid "motion y"
-msgstr ""
-
-#.TRANS: z del acelerómetro
-msgid "motion z"
-msgstr ""
-
-#.TRANS: definir
-msgid "define"
-msgstr ""
-
-#.TRANS: obtener calorías
-msgid "get calories"
-msgstr ""
-
-#.TRANS: obtener proteínas
-msgid "get protein"
-msgstr ""
-
-#.TRANS: obtener carbohidratos
-msgid "get carbs"
-msgstr ""
-
-#.TRANS: obtener fibra
-msgid "get fiber"
-msgstr ""
-
-#.TRANS: obtener grasas
-msgid "get fat"
-msgstr ""
-
-#.TRANS: obtener nombre
-msgid "get name"
-msgstr ""
-
-#.TRANS: calorías
-msgid "calories"
-msgstr ""
-
-#.TRANS: proteína
-msgid "protein"
-msgstr ""
-
-#.TRANS: carbohidratos
-msgid "carbs"
-msgstr ""
-
-#.TRANS: fibra
-msgid "fiber"
-msgstr ""
-
-#.TRANS: grasa
-msgid "fat"
-msgstr ""
-
-#.TRANS: comer
-msgid "eat"
-msgstr ""
-
-#.TRANS: digerir
-msgid "digest meal"
-msgstr ""
-
-#.TRANS: manzana
-msgid "apple"
-msgstr ""
-
-#.TRANS: banana
-msgid "banana"
-msgstr ""
-
-#.TRANS: pan
-msgid "wheat bread"
-msgstr ""
-
-#.TRANS: maíz
-msgid "corn"
-msgstr ""
-
-#.TRANS: papa
-msgid "potato"
-msgstr ""
-
-#.TRANS: boñato
-msgid "sweet potato"
-msgstr ""
-
-#.TRANS: tomate
-msgid "tomato"
-msgstr ""
-
-#.TRANS: brócoli
-msgid "broccoli"
-msgstr ""
-
-#.TRANS: arroz y frijoles
-msgid "rice and beans"
-msgstr ""
-
-#.TRANS: tamal
-msgid "tamale"
-msgstr ""
-
-#.TRANS: queso
-msgid "cheese"
-msgstr ""
-
-#.TRANS: pollo
-msgid "chicken"
-msgstr ""
-
-#.TRANS: pescado
-msgid "fish"
-msgstr ""
-
-#.TRANS: carne de res
-msgid "beef"
-msgstr ""
-
-#.TRANS: pastel
-msgid "cake"
-msgstr ""
-
-#.TRANS: galleta
-msgid "cookie"
-msgstr ""
-
-#.TRANS: agua
-msgid "water"
-msgstr ""
-
-#.TRANS: bitcoin
-msgid "bitcoin"
-msgstr ""
-
-#.TRANS: publicar
-msgid "publish"
-msgstr ""
-
-#.TRANS: tortuga x
-msgid "turtle x"
-msgstr ""
-
-#.TRANS: tortuga y
-msgid "turtle y"
-msgstr ""
-
-#.TRANS: iniciar tortuga
-msgid "start turtle"
-msgstr ""
-
-#.TRANS: detener tortuga
-msgid "stop turtle"
-msgstr ""
-
-#.TRANS: renombrar tortuga
-msgid "turtle name"
-msgstr ""
-
-#.TRANS: Los días siguientes deben estar en el rango de -1 a 5.
-msgid "Days ahead must be in the range of -1 to 5."
-msgstr ""
-
-#.TRANS: pronóstico
-msgid "forecast"
-msgstr ""
-
-#.TRANS: ciudad
-msgid "city"
-msgstr ""
-
-#.TRANS: día
-msgid "day"
-msgstr ""
-
-#.TRANS: alta
-msgid "high"
-msgstr ""
-
-#.TRANS: baja
-msgid "low"
-msgstr ""
-
-#.TRANS: parpadear
-msgid "blink"
-msgstr ""
-
-#.TRANS: tocar
-msgid "play"
-msgstr ""
-
-#.TRANS: 
-msgid "led"
-msgstr ""
-
-#.TRANS: intensidad de luz
-msgid "light intensity"
-msgstr ""
-
-#.TRANS: luz infrarroja (izquierda)
-msgid "infrared light (left)"
-msgstr ""
-
-#.TRANS: luz infrarroja (derecha)
-msgid "infrared light (right)"
-msgstr ""
-
-#.TRANS: mover
-msgid "move"
-msgstr ""
-
-#.TRANS: Debe seleccionar un archivo.
-msgid "You need to select a file."
-msgstr ""
-
-#.TRANS: El archivo seleccionado no contiene un pila válida.
-msgid "The file you selected does not contain a valid heap."
-msgstr ""
