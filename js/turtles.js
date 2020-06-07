@@ -176,6 +176,10 @@ class Turtles {
                 y: newTurtle.container.y - event.stageY / scale
             };
 
+            if (newTurtle.running) {
+                turtlesStage.dispatchEvent("mousedown" + newTurtle.name);
+            }
+
             newTurtle.container.removeAllEventListeners("pressmove");
             newTurtle.container.on("pressmove", event => {
                 if (newTurtle.running) {
@@ -190,6 +194,12 @@ class Turtles {
             });
         });
 
+        newTurtle.container.on("pressup", event => {
+            if (newTurtle.running) {
+                turtlesStage.dispatchEvent("mouseup" + newTurtle.name);
+            }
+        });
+
         newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
@@ -198,6 +208,7 @@ class Turtles {
 
         newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
+                turtlesStage.dispatchEvent("mouseover" + newTurtle.name);
                 return;
             }
 
@@ -209,6 +220,7 @@ class Turtles {
 
         newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
+                turtlesStage.dispatchEvent("mouseout" + newTurtle.name);
                 return;
             }
 
