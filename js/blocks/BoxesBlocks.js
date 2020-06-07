@@ -315,13 +315,13 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Box 2 block returns the value stored in Box 2."),
+                _("The Box2 block returns the value stored in Box2."),
                 "documentation",
                 null,
                 "box2help"
             ]);
 
-            this.formBlock({ name: _("box 2") });
+            this.formBlock({ name: _("box2") });
             this.makeMacro((x, y) => [
                 [0, ["namedbox", { value: "box2" }], x, y, [null]]
             ]);
@@ -336,7 +336,7 @@ function setupBoxesBlocks() {
 
             this.setHelpString([
                 _(
-                    "The Store in Box 2 block is used to store a value in Box 2."
+                    "The Store in Box2 block is used to store a value in Box2."
                 ),
                 "documentation",
                 null,
@@ -344,7 +344,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({
-                name: _("store in box 2"),
+                name: _("store in box2"),
                 args: 1,
                 defaults: [4]
             });
@@ -362,13 +362,13 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Box 1 block returns the value stored in Box 1."),
+                _("The Box1 block returns the value stored in Box1."),
                 "documentation",
                 null,
                 "box1help"
             ]);
 
-            this.formBlock({ name: _("box 1") });
+            this.formBlock({ name: _("box1") });
             this.makeMacro((x, y) => [
                 [0, ["namedbox", { value: "box1" }], x, y, [null]]
             ]);
@@ -383,7 +383,7 @@ function setupBoxesBlocks() {
 
             this.setHelpString([
                 _(
-                    "The Store in Box 1 block is used to store a value in Box 1."
+                    "The Store in Box1 block is used to store a value in Box1."
                 ),
                 "documentation",
                 null,
@@ -391,7 +391,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({
-                name: _("store in box 1"),
+                name: _("store in box1"),
                 args: 1,
                 defaults: [4]
             });
