@@ -177,7 +177,7 @@ class Turtles {
             };
 
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("mousedown" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorDown" + newTurtle.name);
             }
 
             newTurtle.container.removeAllEventListeners("pressmove");
@@ -196,7 +196,7 @@ class Turtles {
 
         newTurtle.container.on("pressup", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("mouseup" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorUp" + newTurtle.name);
             }
         });
 
@@ -208,7 +208,7 @@ class Turtles {
 
         newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("mouseover" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOver" + newTurtle.name);
                 return;
             }
 
@@ -220,7 +220,7 @@ class Turtles {
 
         newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("mouseout" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOut" + newTurtle.name);
                 return;
             }
 
