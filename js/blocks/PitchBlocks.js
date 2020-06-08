@@ -1435,6 +1435,50 @@ function setupPitchBlocks() {
         }
     }
 
+    class SolfegeSyllableBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: print the solfege e.g. do, re, mi 
+            super("solfegesyllable", _("solfege syllable"));
+            this.setPalette("pitch");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Solfege Syllable block return the solfege subject to note currently being played and whether or not moveable do is present"
+                ),
+                "documentation",
+                ""
+            ]);
+            this.beginnerBlock(true);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "solfegesyllable"]);
+            } else {
+                if (logo.noteStatus[turtle] != null){
+                    let letterClass = logo.noteStatus[turtle][0][0][0];
+                    if (logo.moveable[turtle] === false) {
+                        return SOLFEGECONVERSIONTABLE[letterClass];
+                    } else {
+                        let scale = _buildScale(logo.keySignature[turtle])[0];
+                        let i = scale.indexOf(letterClass);
+                        return SOLFEGENAMES[i];
+                    }
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
@@ -3049,6 +3093,7 @@ function setupPitchBlocks() {
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
     new LetterClassBlock().setup();
+    new SolfegeSyllableBlock().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
