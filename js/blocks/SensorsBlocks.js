@@ -204,75 +204,75 @@ function setupSensorsBlocks() {
         }
     }
 
-    class MyMouseoverBlock extends ValueBlock {
+    class MyCursoroverBlock extends ValueBlock {
         constructor() {
-            super("mymouseover", _("mouseover"));
+            super("mycursorover", _("CursorOver"));
             this.setPalette("sensors");
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Mouseover block returns hover associated event"),
+                _("The CursorOver block returns hover associated event"),
                 "documentation",
                 null,
             ]);
         }
 
         arg(logo, turtle) {
-            return "mouseover" + logo.turtles.turtleList[turtle].name;
+            return "CursorOver" + logo.turtles.turtleList[turtle].name;
         }
     }
 
-    class MyMouseoutBlock extends ValueBlock {
+    class MyCursoroutBlock extends ValueBlock {
         constructor() {
-            super("mymouseout", _("mouseout"));
+            super("mycursorout", _("CursorOut"));
             this.setPalette("sensors");
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Mouseout block returns hover associated event"),
+                _("The CursorOut block returns hover associated event"),
                 "documentation",
                 null,
             ]);
         }
 
         arg(logo, turtle) {
-            return "mouseout" + logo.turtles.turtleList[turtle].name;
+            return "CursorOut" + logo.turtles.turtleList[turtle].name;
         }
     }
 
-    class MyMousedownBlock extends ValueBlock {
+    class MyCursordownBlock extends ValueBlock {
         constructor() {
-            super("mymousedown", _("mousedown"));
+            super("mycursordown", _("CursorDown"));
             this.setPalette("sensors");
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Mousedown Block returns the MouseDown event "),
+                _("The CursorDown Block returns the CursorDown event "),
                 "documentation",
                 null,
             ]);
         }
 
         arg(logo, turtle) {
-            return "mousedown" + logo.turtles.turtleList[turtle].name;
+            return "CursorDown" + logo.turtles.turtleList[turtle].name;
         }
     }
 
-    class MyMouseupBlock extends ValueBlock {
+    class MyCursorupBlock extends ValueBlock {
         constructor() {
-            super("mymouseup", _("mouseup"));
+            super("mycursorup", _("CursorUp"));
             this.setPalette("sensors");
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Mouseup Block returns the MouseUp event "),
+                _("The CursorUp Block returns the CursorUp event "),
                 "documentation",
                 null,
             ]);
         }
 
         arg(logo, turtle) {
-            return "mouseup" + logo.turtles.turtleList[turtle].name;
+            return "CursorUp" + logo.turtles.turtleList[turtle].name;
         }
     }
 
@@ -586,10 +586,10 @@ function setupSensorsBlocks() {
     new PitchnessBlock().setup();
     new LoudnessBlock().setup();
     new MyClickBlock().setup();
-    new MyMouseoverBlock().setup();
-    new MyMouseoutBlock().setup();
-    new MyMouseupBlock().setup();
-    new MyMousedownBlock().setup();
+    new MyCursoroverBlock().setup();
+    new MyCursoroutBlock().setup();
+    new MyCursorupBlock().setup();
+    new MyCursordownBlock().setup();
     new GetBlueBlock().setup();
     new GetGreenBlock().setup();
     new GetRedBlock().setup();
