@@ -45,6 +45,7 @@ function Blocks(activity) {
         storage = localStorage;
     }
 
+    this.activity = activity;
     this.canvas = null;
     this.stage = null;
     this.refreshCanvas = null;

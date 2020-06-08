@@ -1357,51 +1357,51 @@ function Activity() {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
-	_hideTreble();
-	_hideGrand();
-	_hideSoprano();
-	_hideAlto();
-	_hideTenor();
-	_hideBass();
+        _hideTreble();
+        _hideGrand();
+        _hideSoprano();
+        _hideAlto();
+        _hideTenor();
+        _hideBass();
     };
 
     /*
      * Renders Cartesian/Polar/Treble/et al. grids and changes button
      * labels accordingly
      */
-    _doCartesianPolar = function() {
+    let _doCartesianPolar = () => {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
             //.TRANS: show treble clef
             turtles.setGridLabel(_("show treble"));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
-	    _showTreble();
+	        this._showTreble();
             //.TRANS: show bass clef
             turtles.setGridLabel(_("show bass"));
         } else if (trebleBitmap.visible) {
             _hideTreble();
-	    _showGrand();
+	        this._showGrand();
             //.TRANS: show mezza-soprano staff
             turtles.setGridLabel(_("show mezza-soprano"));
         } else if (grandBitmap.visible) {
             _hideGrand();
-	    _showSoprano();
+	        this._showSoprano();
             //.TRANS: show alto clef
             turtles.setGridLabel(_("show alto"));
         } else if (sopranoBitmap.visible) {
             _hideSoprano();
-	    _showAlto();
+	        this._showAlto();
             //.TRANS: show tenor clef
             turtles.setGridLabel(_("show tenor"));
         } else if (altoBitmap.visible) {
             _hideAlto();
-	    _showTenor();
+	        this._showTenor();
             //.TRANS: show bass clef
             turtles.setGridLabel(_("show bass"));
         } else if (tenorBitmap.visible) {
             _hideTenor();
-	    _showBass();
+	        this._showBass();
             //.TRANS: hide bass clef
             turtles.setGridLabel(_("hide bass"));
         } else if (bassBitmap.visible) {
@@ -1409,10 +1409,10 @@ function Activity() {
             //.TRANS: show Cartesian coordinate overlay grid
             turtles.setGridLabel(_("show Cartesian"));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-            _showCartesian();
+            this._showCartesian();
             turtles.setGridLabel(_("show Polar"));
         } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-            _showPolar();
+            this._showPolar();
             //.TRANS: show Polar coordinate overlay grid
             turtles.setGridLabel(_("hide Cartersian"));
         }
@@ -3523,7 +3523,7 @@ function Activity() {
     /*
      * Shows cartesian grid
      */
-    _showCartesian = function() {
+    this._showCartesian = function() {
         cartesianBitmap.visible = true;
         cartesianBitmap.updateCache();
         update = true;
@@ -3541,7 +3541,7 @@ function Activity() {
     /*
      * Shows polar grid
      */
-    _showPolar = function() {
+    this._showPolar = function() {
         polarBitmap.visible = true;
         polarBitmap.updateCache();
         update = true;
@@ -3559,7 +3559,7 @@ function Activity() {
     /*
      * Shows musical treble staff
      */
-    _showTreble = function() {
+    this._showTreble = function() {
         trebleBitmap.visible = true;
         trebleBitmap.updateCache();
         update = true;
@@ -3577,7 +3577,7 @@ function Activity() {
     /*
      * Shows musical grand staff
      */
-    _showGrand = function() {
+    this._showGrand = function() {
         grandBitmap.visible = true;
         grandBitmap.updateCache();
         update = true;
@@ -3595,7 +3595,7 @@ function Activity() {
     /*
      * Shows musical soprano staff
      */
-    _showSoprano = function() {
+    this._showSoprano = function() {
         sopranoBitmap.visible = true;
         sopranoBitmap.updateCache();
         update = true;
@@ -3613,7 +3613,7 @@ function Activity() {
     /*
      * Shows musical alto staff
      */
-    _showAlto = function() {
+    this._showAlto = function() {
         altoBitmap.visible = true;
         altoBitmap.updateCache();
         update = true;
@@ -3631,7 +3631,7 @@ function Activity() {
     /*
      * Shows musical tenor staff
      */
-    _showTenor = function() {
+    this._showTenor = function() {
         tenorBitmap.visible = true;
         tenorBitmap.updateCache();
         update = true;
@@ -3649,7 +3649,7 @@ function Activity() {
     /*
      * Shows musical bass staff
      */
-    _showBass = function() {
+    this._showBass = function() {
         bassBitmap.visible = true;
         bassBitmap.updateCache();
         update = true;
@@ -4836,7 +4836,7 @@ function Activity() {
         boundary = new Boundary();
         boundary.setStage(blocksContainer).init();
 
-        blocks = new Blocks();
+        blocks = new Blocks(this);
         blocks
             .setCanvas(canvas)
             .setStage(blocksContainer)
