@@ -5656,6 +5656,11 @@ function Block(protoblock, blocks, overrideName) {
             i = 0;
         }
 
+        // In case of float value, navigate to the nearest integer
+        if (selectedValue % 1 !== 0) {
+            i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
+        }
+
         this._numberWheel.navigateWheel(i);
 
         this.label.style.fontSize =
