@@ -1372,13 +1372,13 @@ function Activity() {
     _doCartesianPolar = function() {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
-            //.TRANS: show treble treble
+            //.TRANS: show treble clef
             turtles.setGridLabel(_("show treble"));
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
 	    _showTreble();
-            //.TRANS: show bass staff
-            turtles.setGridLabel(_("show grand"));
+            //.TRANS: show bass clef
+            turtles.setGridLabel(_("show bass"));
         } else if (trebleBitmap.visible) {
             _hideTreble();
 	    _showGrand();
@@ -1387,22 +1387,22 @@ function Activity() {
         } else if (grandBitmap.visible) {
             _hideGrand();
 	    _showSoprano();
-            //.TRANS: show alto staff
+            //.TRANS: show alto clef
             turtles.setGridLabel(_("show alto"));
         } else if (sopranoBitmap.visible) {
             _hideSoprano();
 	    _showAlto();
-            //.TRANS: show tenor staff
+            //.TRANS: show tenor clef
             turtles.setGridLabel(_("show tenor"));
         } else if (altoBitmap.visible) {
             _hideAlto();
 	    _showTenor();
-            //.TRANS: show bass staff
+            //.TRANS: show bass clef
             turtles.setGridLabel(_("show bass"));
         } else if (tenorBitmap.visible) {
             _hideTenor();
 	    _showBass();
-            //.TRANS: hide bass staff
+            //.TRANS: hide bass clef
             turtles.setGridLabel(_("hide bass"));
         } else if (bassBitmap.visible) {
             _hideBass();
