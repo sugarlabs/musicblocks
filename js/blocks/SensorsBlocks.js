@@ -204,6 +204,78 @@ function setupSensorsBlocks() {
         }
     }
 
+    class MyMouseoverBlock extends ValueBlock {
+        constructor() {
+            super("mymouseover", _("mouseover"));
+            this.setPalette("sensors");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Mouseover block returns hover associated event"),
+                "documentation",
+                null,
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "mouseover" + logo.turtles.turtleList[turtle].name;
+        }
+    }
+
+    class MyMouseoutBlock extends ValueBlock {
+        constructor() {
+            super("mymouseout", _("mouseout"));
+            this.setPalette("sensors");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Mouseout block returns hover associated event"),
+                "documentation",
+                null,
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "mouseout" + logo.turtles.turtleList[turtle].name;
+        }
+    }
+
+    class MyMousedownBlock extends ValueBlock {
+        constructor() {
+            super("mymousedown", _("mousedown"));
+            this.setPalette("sensors");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Mousedown Block returns the MouseDown event "),
+                "documentation",
+                null,
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "mousedown" + logo.turtles.turtleList[turtle].name;
+        }
+    }
+
+    class MyMouseupBlock extends ValueBlock {
+        constructor() {
+            super("mymouseup", _("mouseup"));
+            this.setPalette("sensors");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Mouseup Block returns the MouseUp event "),
+                "documentation",
+                null,
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "mouseup" + logo.turtles.turtleList[turtle].name;
+        }
+    }
+
     class GetBlueBlock extends ValueBlock {
         constructor() {
             super("getblue", _("blue"));
@@ -514,6 +586,10 @@ function setupSensorsBlocks() {
     new PitchnessBlock().setup();
     new LoudnessBlock().setup();
     new MyClickBlock().setup();
+    new MyMouseoverBlock().setup();
+    new MyMouseoutBlock().setup();
+    new MyMouseupBlock().setup();
+    new MyMousedownBlock().setup();
     new GetBlueBlock().setup();
     new GetGreenBlock().setup();
     new GetRedBlock().setup();
