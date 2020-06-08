@@ -1398,6 +1398,43 @@ function setupPitchBlocks() {
         }
     }
 
+    class LetterClassBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: print the current Letter class e.g A, B, C without any accidental 
+            super("letterclass", _("letter class"));
+            this.setPalette("pitch");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Letter Class block is the alphabetical value of the note currently being played."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.beginnerBlock(true);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "letterclass"]);
+            } else {
+                if (logo.noteStatus[turtle] !== null) {
+                    return (logo.noteStatus[turtle][0][0][0]);
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
@@ -3011,6 +3048,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new LetterClassBlock().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
