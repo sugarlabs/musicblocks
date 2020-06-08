@@ -2329,6 +2329,11 @@ function Blocks(activity) {
             return true;
         }
         if (
+            type1 === "gridout" && type2 ==="gridin" 
+        ) {
+            return true;
+        }
+        if (
             type2 === "notein" &&
             ["solfegeout", "textout", "noteout"].indexOf(type1) !== -1
         ) {
@@ -6220,6 +6225,7 @@ function Blocks(activity) {
                 case "oscillatortype":
                 case "accidentalname":
                 case "intervalname":
+                case "grid":
                 case "boolean":
                     var postProcess = function(args) {
                         var thisBlock = args[0];

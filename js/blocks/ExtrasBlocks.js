@@ -886,6 +886,66 @@ function setupExtrasBlocks() {
         }
     }
 
+    class DisplayGridBlock extends FlowBlock {
+        constructor() {
+            super("displaygrid", _("Display Grid"));
+            this.setPalette("extras");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Display Grid Block changes the grid type"),
+                "documentation",
+                null
+            ]);
+
+            this.formBlock({
+                args: 1,
+                defaults: ["Cartesian"],
+                argTypes: ["gridin"],
+            });
+            this.makeMacro((x, y) => [
+                [0, "displaygrid", x, y, [null, 1, null]],
+                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (!args || !args[0]){
+                args = ["Cartesian"];
+            }
+            let act = logo.blocks.activity ;
+            let getFunc = {
+                "Cartesian" : act._showCartesian,
+                "Polar" : act._showPolar,
+                "Cartesian+Polar" : () => {
+                    act._showPolar();
+                    act._showCartesian();
+                },
+                "Treble" : act._showTreble,
+                "Grand Staff" : () => {
+                    act._showTreble();
+                    act._showBass();
+                },
+                "Mezzo-Soprano" : act._showSoprano,
+                "Alto" : act._showAlto,
+                "Tenor" : act._showTenor,
+                "Bass" : act._showBass,
+                "None" : logo.turtles.hideGrids
+            };
+            logo.turtles.hideGrids() ;
+            getFunc[args[0]]() ;
+        }
+    }
+
+    class GridBlock extends ValueBlock {
+        constructor() {
+            super("grid");
+            this.setPalette("extras");
+            this.setHelpString();
+            this.formBlock({ outType: "gridout" });
+        }
+    }
+
     // NOP blocks (used as placeholders when loaded blocks not found)
     class NOPValueBlock extends ValueBlock {
         constructor() {
@@ -997,6 +1057,8 @@ function setupExtrasBlocks() {
     new CommentBlock().setup();
     new PrintBlock().setup();
     new DrumBlock().setup();
+    new GridBlock().setup();
+    new DisplayGridBlock().setup();
     // NOP blocks
     new NOPValueBlock().setup();
     new NOPOneArgMathBlock().setup();
