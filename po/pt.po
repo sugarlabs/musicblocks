@@ -4807,7 +4807,7 @@ msgstr "O arquivo escolhido não tem uma pilha válida."
 
 #: js/activity.js:1240
 
-#~msgid "hide Cartersian"
+#~msgid "hide Cartesian"
 #~msgstr "ocultar Cartesiano"
 
 #: js/activity.js:1707

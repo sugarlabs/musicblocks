@@ -6515,7 +6515,7 @@ msgstr ""
 
 #: js/activity.js:1240
 
-#~msgid "hide Cartersian"
+#~msgid "hide Cartesian"
 #~msgstr ""
 
 #: js/activity.js:1707

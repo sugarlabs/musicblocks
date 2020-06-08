@@ -3162,8 +3162,8 @@ msgstr "El archivo seleccionado no contiene un pila válida."
 #~msgid "show Polar"
 #~msgstr "Mostrar Polar"
 
-#~msgid "hide Cartersian"
-#~msgstr "Ocultar Cartersian"
+#~msgid "hide Cartesian"
+#~msgstr "Ocultar Cartesian"
 
 #~msgid "This block is deprecated."
 #~msgstr "Este bloque está en desuso."
