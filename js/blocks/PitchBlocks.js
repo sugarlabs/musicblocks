@@ -59,6 +59,10 @@ function _playPitch(args, logo, turtle, blk) {
         } else {
             arg0 = args[0];
         }
+        // check if arg0 is a float value and round-off to the nearest integer
+        if (arg0 % 1 !== 0) {
+            arg0 = Math.floor(arg0 + 0.5);
+        }
 
         if (typeof arg0 !== "number") {
             logo.errorMsg(NANERRORMSG, blk);
