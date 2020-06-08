@@ -1479,6 +1479,51 @@ function setupPitchBlocks() {
         }
     }
 
+    class PitchCLassBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: print the solfege e.g. do, re, mi 
+            super("pitchclass", _("pitch class"));
+            this.setPalette("pitch");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Pitch Class block returns the letter class of note currently being played and also the accidental data"
+                ),
+                "documentation",
+                ""
+            ]);
+            this.beginnerBlock(true);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "letterclass"]);
+            } else {
+                if (logo.noteStatus[turtle] !== null) {
+                    let note = logo.lastPitchPlayed[0][0];
+                    let pitchClass = note[0];
+                    console.log(note);
+                    if (note.indexOf("#") != -1) {
+                        pitchClass += "#";
+                    } else if (note.indexOf("b") != -1) {
+                        pitchClass += "b";
+                    }
+                    return (pitchClass);
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
@@ -3094,6 +3139,7 @@ function setupPitchBlocks() {
     new PitchInHertzBlock().setup();
     new LetterClassBlock().setup();
     new SolfegeSyllableBlock().setup();
+    new PitchCLassBlock().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
