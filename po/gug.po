@@ -7220,7 +7220,7 @@ msgstr "Pe mba’e ñongatupyre ndo rekói chovi oikóva"
 
 #: js/activity.js:1141
 
-#~msgid "hide Cartersian"
+#~msgid "hide Cartesian"
 #~msgstr ""
 
 #: js/activity.js:1620
