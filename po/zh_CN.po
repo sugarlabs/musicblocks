@@ -2047,7 +2047,7 @@ msgstr ""
 
 #: js/activity.js:1141
 #.TRANS: show Polar coordinate overlay grid
-msgid "hide Cartersian"
+msgid "hide Cartesian"
 msgstr ""
 
 #: js/activity.js:1620

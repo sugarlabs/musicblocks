@@ -4973,7 +4973,7 @@ msgstr "えらんだ ファイルには、ただしい ヒープが ふくまれ
 
 #: js/activity.js:1240
 
-#~msgid "hide Cartersian"
+#~msgid "hide Cartesian"
 #~msgstr "ほうがん（ざひょう）を かくす"
 
 #: js/activity.js:1707
