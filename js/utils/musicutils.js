@@ -1806,6 +1806,7 @@ function _buildScale(keySignature) {
 }
 
 function scaleDegreeToPitch2(keySignature, scaleDegree) {
+    scaleDegree -= 1;
     const FALLBACK = {
         "minor blues": "dorian",
         "major blues": "ionian",
@@ -1819,27 +1820,30 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
         "minyo": "aeolian",
         "fibonacci": "mixolydian"
     }
+
     let chosenMode = keySignatureToMode(keySignature);
     let obj1 = _buildScale(keySignature);
     let chosenModeScale = obj1[0];
-    let chosenModePattern = obj1[1]
+    let chosenModePattern = obj1[1];
+    let semitones = [0];
+    let definedScaleDegree = [];
+    let finalScale = [];
+
     if (chosenModePattern.length == 7) {
-        scaleDegree -= 1;
         return chosenModeScale[scaleDegree];
 
     } else if (chosenModePattern.length < 7) {
         let fallBackMode = chosenMode[0] + " " + FALLBACK[chosenMode[1]];
         let fallBackScale = _buildScale(fallBackMode)[0];
-        let semitones = [0];
-        let definedScaleDegree = [];
-        for(let i=0; i<chosenModePattern.length; i++) {
+
+        for(let i = 0; i < chosenModePattern.length; i++) {
             switch (semitones[i]) {
                 case 0:
                     definedScaleDegree.push(1);
                     break;
                 case 1:
                 case 2:
-                    if(definedScaleDegree[definedScaleDegree.length - 1] == 2) {
+                    if (definedScaleDegree[definedScaleDegree.length - 1] === 2) {
                         definedScaleDegree[definedScaleDegree.length - 1] = 1 + SHARP;
                     }
                     definedScaleDegree.push(2);
@@ -1853,10 +1857,10 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
                     break;
                 case 6:
                     let lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
-                    if(lastAdded === 4 && semitones[i]+chosenModePattern[i] === 7) {
+                    if (lastAdded === 4 && semitones[i] + chosenModePattern[i] === 7) {
                         definedScaleDegree.push(4+SHARP);
                     } else {
-                        if(semitones[i]+chosenModePattern[i] === 7) {
+                        if (semitones[i]+chosenModePattern[i] === 7) {
                             definedScaleDegree.push(4);
                         } else {
                             definedScaleDegree.push(5);
@@ -1877,32 +1881,120 @@ function scaleDegreeToPitch2(keySignature, scaleDegree) {
                 default:
                     continue;
             }
-            semitones.push(semitones[i]+chosenModePattern[i]);
+
+            semitones.push(semitones[i] + chosenModePattern[i]);
         }
 
-        if(semitones[semitones.length - 1] !== 12) {
+        if (semitones[semitones.length - 1] !== 12) {
             definedScaleDegree.push((semitones[semitones.length - 1] + 1) / 2 + 1);
         }
 
-        for(let i=1; i<definedScaleDegree.length; i++) {
-            if(definedScaleDegree[i] === definedScaleDegree[i-1]) {
+        for(let i = 1; i < definedScaleDegree.length; i++) {
+            if (definedScaleDegree[i] === definedScaleDegree[i-1]) {
                 definedScaleDegree[i] = definedScaleDegree[i] + SHARP;
             }
         }
-        let finalScale = [], k = 0;
-        for(let i=0; i<7; i++) {
-            if(definedScaleDegree.indexOf(i+1) !== -1) {
+
+        let k = 0;
+        for(let i = 0; i < 7; i++) {
+            if (definedScaleDegree.indexOf(i+1) !== -1) {
                 finalScale.push(chosenModeScale[k]);
                 k++;
             } else {
                 finalScale.push(fallBackScale[i]);
             }
         }
-        scaleDegree -= 1;
+
         return finalScale[scaleDegree];
 
     } else {
-        errorMsg("Cannot use for scale containing more than 8 notes. Use nth modal pitch instead");
+
+        for(let i = 0; i < chosenModePattern.length; i++) {
+            semitones.push(semitones[i]+chosenModePattern[i]);
+        }
+
+        for(let i = 0; i < semitones.length; i++) {
+            if (
+                semitones[i] == 0
+            ) {
+                finalScale.push(chosenModeScale[i]);
+            } else if (
+                semitones[i] == 1
+            ) {
+                if (semitones[i+1] == 2) {
+                    finalScale.push(chosenModeScale[i+1]);
+                } else {
+                    finalScale.push(chosenModeScale[i]);
+                }
+            } else if (
+                semitones[i] == 2
+            ) {
+                if (semitones[i-1] == 1) continue;
+             
+                else finalScale.push(chosenModeScale[i]);
+
+            } else if (
+                semitones[i] == 3
+            ) {
+                if (semitones[i+1] == 4) {
+                    finalScale.push(chosenModeScale[i+1]);
+                } else {
+                    finalScale.push(chosenModeScale[i]);
+                }
+            } else if (
+                semitones[i] == 4
+            ) {        
+                if (semitones[i-1] == 3) continue;
+            
+                else finalScale.push(chosenModeScale[i]);
+            } else if (
+                semitones[i] == 5
+            ) {
+                finalScale.push(chosenModeScale[i]);
+            } else if (
+                semitones[i] == 6
+            ) {
+                if (
+                    semitones[i-1] == 5 && semitones[i+1] != 7 ||
+                    semitones[i-1] != 5 && semitones[i+1] == 7
+                ) { 
+                    finalScale.push(chosenModeScale[i]);        
+                }
+            } else if (
+                semitones[i] == 7
+            ) {
+                finalScale.push(chosenModeScale[i]);
+            } else if (
+                semitones[i] == 8
+            ) {
+                if (semitones[i+1] == 9) {
+                    finalScale.push(chosenModeScale[i+1]);
+                } else {
+                    finalScale.push(chosenModeScale[i]);
+                }
+            } else if (
+                semitones[i] == 9
+            ) {
+                if (semitones[i-1] == 8) continue;
+            
+                else finalScale.push(chosenModeScale[i]);
+            } else if (
+                semitones[i] == 10
+            ) {
+                if (semitones[i+1] == 11) {
+                    finalScale.push(chosenModeScale[i+1]);
+                } else {
+                    finalScale.push(chosenModeScale[i]);
+                }
+            } else if (
+                semitones[i] == 11
+            ) {
+                if (semitones[i-1] == 10) continue;
+            
+                else finalScale.push(chosenModeScale[i]);
+            }
+        }
+        return finalScale[scaleDegree];
     }
 }
 

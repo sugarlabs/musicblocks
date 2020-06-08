@@ -394,7 +394,6 @@ function _playPitch(args, logo, turtle, blk) {
         octave,
         logo.scalarTransposition[turtle]
     );
-    console.log(noteObj);
     note = noteObj[0];
     logo.currentNote = note;
     octave = noteObj[1];
