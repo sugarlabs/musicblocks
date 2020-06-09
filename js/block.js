@@ -3626,7 +3626,18 @@ function Block(protoblock, blocks, overrideName) {
             
             selectedvalue = this.value;
 
-            let Labels = ["Cartesian", "Polar" , "Cartesian+Polar" , "Treble" , "Grand Staff" , "Mezzo-Soprano" , "Alto" , "Tenor" , "Bass" , "None"];
+            let Labels = [
+                _("Cartesian"), 
+                _("polar"),
+                _("cartesian+polar") ,
+                _("treble") ,
+                _("grand staff") ,
+                _("mezzo-soprano") ,
+                _("alto") ,
+                _("tenor"),
+                _("bass") ,
+                _("none")
+            ];
             let Values = Labels ;
 
             this._piemenuBasic(

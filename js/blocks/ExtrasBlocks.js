@@ -888,7 +888,7 @@ function setupExtrasBlocks() {
 
     class DisplayGridBlock extends FlowBlock {
         constructor() {
-            super("displaygrid", _("Display Grid"));
+            super("displaygrid", _("display grid"));
             this.setPalette("extras");
             this.beginnerBlock(true);
 
@@ -916,21 +916,21 @@ function setupExtrasBlocks() {
             let act = logo.blocks.activity ;
             let getFunc = {
                 "Cartesian" : act._showCartesian,
-                "Polar" : act._showPolar,
-                "Cartesian+Polar" : () => {
+                "polar" : act._showPolar,
+                "cartesian+polar" : () => {
                     act._showPolar();
                     act._showCartesian();
                 },
-                "Treble" : act._showTreble,
-                "Grand Staff" : () => {
+                "treble" : act._showTreble,
+                "grand staff" : () => {
                     act._showTreble();
                     act._showBass();
                 },
-                "Mezzo-Soprano" : act._showSoprano,
-                "Alto" : act._showAlto,
-                "Tenor" : act._showTenor,
-                "Bass" : act._showBass,
-                "None" : logo.turtles.hideGrids
+                "mezzo-soprano" : act._showSoprano,
+                "alto" : act._showAlto,
+                "tenor" : act._showTenor,
+                "bass" : act._showBass,
+                "none" : logo.turtles.hideGrids
             };
             logo.turtles.hideGrids() ;
             getFunc[args[0]]() ;
