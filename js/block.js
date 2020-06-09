@@ -3629,7 +3629,7 @@ function Block(protoblock, blocks, overrideName) {
             let Labels = [
                 _("Cartesian"), 
                 _("polar"),
-                _("cartesian+polar") ,
+                _("Cartesian+polar") ,
                 _("treble") ,
                 _("grand staff") ,
                 _("mezzo-soprano") ,

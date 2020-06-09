@@ -914,26 +914,40 @@ function setupExtrasBlocks() {
                 args = ["Cartesian"];
             }
             let act = logo.blocks.activity ;
-            let getFunc = {
-                "Cartesian" : act._showCartesian,
-                "polar" : act._showPolar,
-                "cartesian+polar" : () => {
+            logo.turtles.hideGrids() ;
+            switch (args[0]){
+                case (_("Cartesian")) : 
+                    act._showCartesian();
+                    break;
+                case (_("polar")) : 
+                    act._showPolar();
+                    break;
+                case (_("Cartesian+polar")) : 
                     act._showPolar();
                     act._showCartesian();
-                },
-                "treble" : act._showTreble,
-                "grand staff" : () => {
+                    break;
+                case (_("treble")) :
+                     act._showTreble();
+                     break;
+                case (_("grand staff")) :
                     act._showTreble();
                     act._showBass();
-                },
-                "mezzo-soprano" : act._showSoprano,
-                "alto" : act._showAlto,
-                "tenor" : act._showTenor,
-                "bass" : act._showBass,
-                "none" : logo.turtles.hideGrids
-            };
-            logo.turtles.hideGrids() ;
-            getFunc[args[0]]() ;
+                    break;
+                case (_("mezzo-soprano")):
+                    act._showSoprano();
+                    break;
+                case (_("alto")) :
+                     act._showAlto();
+                     break;
+                case (_("tenor")) : 
+                    act._showTenor();
+                    break;
+                case (_("bass")) : 
+                    act._showBass();
+                    break;
+                case (_("none")) : 
+                    break;
+            }
         }
     }
 
