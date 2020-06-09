@@ -4899,7 +4899,7 @@ msgstr "選んだファイルには、正しいヒープが含まれません。
 #~msgid "show Polar"
 #~msgstr "ほうがんと角度を表示"
 
-#~msgid "hide Cartersian"
+#~msgid "hide Cartesian"
 #~msgstr "ほうがん（ざひょう）をかくす"
 
 #~msgid "This block is deprecated."

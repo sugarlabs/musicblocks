@@ -4062,8 +4062,8 @@ msgstr "Wakichata chhijllata yaqha wakichataniwa"
 #~msgid "show Polar"
 #~msgstr ""
 
-#.TRANS: Ocultar Cartersian
-#~msgid "hide Cartersian"
+#.TRANS: Ocultar Cartesian
+#~msgid "hide Cartesian"
 #~msgstr ""
 
 #.TRANS: Este bloque está en desuso.

@@ -790,7 +790,7 @@ const MODE_PIE_MENUS = {
     ],
     "7b": [
         "jazz minor",
-        "",
+        " ",
         "arabic",
         "byzantine",
         "enigmatic",
