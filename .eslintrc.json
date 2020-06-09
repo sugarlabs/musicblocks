@@ -1,0 +1,56 @@
+{
+    "parser": "babel-eslint",
+    "env": { 
+        "es6": true, 
+        "browser": true,
+        "node": true
+    },
+    "rules": {
+        "indent": [
+            "error", 
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "no-mixed-spaces-and-tabs": "warn",
+        // "no-unused-vars": "warn",
+        "quotes": [
+            "error",
+            "double",
+            { 
+                "avoidEscape": true 
+            }
+        ],
+        "semi": [
+            "error",
+            "always",
+            { 
+                "omitLastInOneLineBlock": true 
+            }
+        ],
+        "max-len": [
+            "warn",
+            {
+                "code": 100,
+                "ignoreTrailingComments": true,
+                "ignoreComments": true,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true
+            }
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-trailing-spaces": [
+            "error",
+            {
+                "skipBlankLines": true,
+                "ignoreComments": true
+            }
+        ],
+        "no-duplicate-case": "error",
+        "no-irregular-whitespace": "error"
+    }
+}
