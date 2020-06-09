@@ -886,6 +886,80 @@ function setupExtrasBlocks() {
         }
     }
 
+    class DisplayGridBlock extends FlowBlock {
+        constructor() {
+            super("displaygrid", _("display grid"));
+            this.setPalette("extras");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Display Grid Block changes the grid type"),
+                "documentation",
+                null
+            ]);
+
+            this.formBlock({
+                args: 1,
+                defaults: ["Cartesian"],
+                argTypes: ["gridin"],
+            });
+            this.makeMacro((x, y) => [
+                [0, "displaygrid", x, y, [null, 1, null]],
+                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (!args || !args[0]){
+                args = ["Cartesian"];
+            }
+            let act = logo.blocks.activity ;
+            logo.turtles.hideGrids() ;
+            switch (args[0]){
+                case (_("Cartesian")) : 
+                    act._showCartesian();
+                    break;
+                case (_("polar")) : 
+                    act._showPolar();
+                    break;
+                case (_("Cartesian+polar")) : 
+                    act._showPolar();
+                    act._showCartesian();
+                    break;
+                case (_("treble")) :
+                     act._showTreble();
+                     break;
+                case (_("grand staff")) :
+                    act._showTreble();
+                    act._showBass();
+                    break;
+                case (_("mezzo-soprano")):
+                    act._showSoprano();
+                    break;
+                case (_("alto")) :
+                     act._showAlto();
+                     break;
+                case (_("tenor")) : 
+                    act._showTenor();
+                    break;
+                case (_("bass")) : 
+                    act._showBass();
+                    break;
+                case (_("none")) : 
+                    break;
+            }
+        }
+    }
+
+    class GridBlock extends ValueBlock {
+        constructor() {
+            super("grid");
+            this.setPalette("extras");
+            this.setHelpString();
+            this.formBlock({ outType: "gridout" });
+        }
+    }
+
     // NOP blocks (used as placeholders when loaded blocks not found)
     class NOPValueBlock extends ValueBlock {
         constructor() {
@@ -997,6 +1071,8 @@ function setupExtrasBlocks() {
     new CommentBlock().setup();
     new PrintBlock().setup();
     new DrumBlock().setup();
+    new GridBlock().setup();
+    new DisplayGridBlock().setup();
     // NOP blocks
     new NOPValueBlock().setup();
     new NOPOneArgMathBlock().setup();

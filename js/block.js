@@ -53,7 +53,8 @@ const SPECIALINPUTS = [
     "accidentalname",
     "temperamentname",
     "noisename",
-    "customNote"
+    "customNote",
+    "grid"
 ];
 const WIDENAMES = [
     "intervalname",
@@ -83,7 +84,8 @@ const PIEMENUS = [
     "modename",
     "temperamentname",
     "noisename",
-    "customNote"
+    "customNote",
+    "grid"
 ];
 
 // Define block instance objects and any methods that are intra-block.
@@ -1191,6 +1193,9 @@ function Block(protoblock, blocks, overrideName) {
                         break;
                     case "temperamentname":
                         this.value = "equal";
+                        break;
+                    case "grid":
+                        this.value = "Cartesian";
                         break;
                 }
             }
@@ -3617,6 +3622,30 @@ function Block(protoblock, blocks, overrideName) {
             let booleanValues = [true, false];
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
+        } else if (this.name === "grid") {
+            
+            selectedvalue = this.value;
+
+            let Labels = [
+                _("Cartesian"), 
+                _("polar"),
+                _("Cartesian+polar") ,
+                _("treble") ,
+                _("grand staff") ,
+                _("mezzo-soprano") ,
+                _("alto") ,
+                _("tenor"),
+                _("bass") ,
+                _("none")
+            ];
+            let Values = Labels ;
+
+            this._piemenuBasic(
+                Labels,
+                Values,
+                selectedvalue,
+                platformColor.piemenuBasic
+            );
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
