@@ -2708,7 +2708,7 @@ function Activity() {
             blocks.blockList[thisBlock].name === "drum"
         ) {
             let turtle = blocks.blockList[thisBlock].value;
-            turtles.turtleList[turtle].trash = false;
+            turtles.turtleList[turtle].inTrash = false;
             turtles.turtleList[turtle].container.visible = true;
         } else if (blocks.blockList[thisBlock].name === "action") {
             // We need to add a palette entry for this action.
@@ -2856,7 +2856,7 @@ function Activity() {
                 let turtle = blocks.blockList[blk].value;
                 if (!blocks.blockList[blk].trash && turtle != null) {
                     console.debug("sending turtle " + turtle + " to trash");
-                    turtles.turtleList[turtle].trash = true;
+                    turtles.turtleList[turtle].inTrash = true;
                     turtles.turtleList[turtle].container.visible = false;
                 }
             } else if (blocks.blockList[blk].name === "action") {
@@ -3728,6 +3728,7 @@ function Activity() {
                         let turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
                             args = {
+                                id: Infinity,
                                 collapsed: false,
                                 xcor: 0,
                                 ycor: 0,
@@ -3739,6 +3740,7 @@ function Activity() {
                             };
                         } else {
                             args = {
+                                id: turtle.id,
                                 collapsed: myBlock.collapsed,
                                 xcor: turtle.x,
                                 ycor: turtle.y,

@@ -459,7 +459,8 @@ function setupMeterBlocks() {
                     }
                 };
 
-                let eventName = "__offbeat_" + turtle + "__";
+                let turtleID = logo.turtles.turtleList[turtle].id;
+                let eventName = "__offbeat_" + turtleID + "__";
                 logo._setListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("offbeat");
@@ -529,11 +530,12 @@ function setupMeterBlocks() {
                         }
                     };
 
-                    let eventName = "__beat_" + args[0] + "_" + turtle + "__";
+                    let turtleID = logo.turtles.turtleList[turtle].id;
+                    let eventName = "__beat_" + args[0] + "_" + turtleID + "__";
                     logo._setListener(turtle, eventName, __listener);
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
-                    if (logo.defaultStrongBeats[turtle]) { 
+                    if (logo.defaultStrongBeats[turtle]) {
                         for (let i = 0; i < logo.beatList[turtle].length; i++) {
                             if (logo.beatList[turtle][i] !== "everybeat" && logo.beatList[turtle][i] !== "offbeat") {
                                 logo.beatList[turtle].splice(i, 1);
@@ -614,7 +616,8 @@ function setupMeterBlocks() {
                     }
                 };
 
-                let eventName = "__everybeat_" + turtle + "__";
+                let turtleID = logo.turtles.turtleList[turtle].id;
+                let eventName = "__everybeat_" + turtleID + "__";
                 logo._setListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("everybeat");
@@ -1037,7 +1040,7 @@ function setupMeterBlocks() {
             if (arg1 <= 0) logo.noteValuePerBeat[turtle] = 4;
             else logo.noteValuePerBeat[turtle] = 1 / arg1;
 
-            // setup default strong / weak beats until any strong beat block is used 
+            // setup default strong / weak beats until any strong beat block is used
 
             if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 4) {
                 logo.beatList[turtle].push(1);

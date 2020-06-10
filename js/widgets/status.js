@@ -77,7 +77,7 @@ function StatusMatrix() {
             turtle < this._logo.turtles.turtleList.length;
             turtle++
         ) {
-            if (this._logo.turtles.turtleList[turtle].trash) {
+            if (this._logo.turtles.turtleList[turtle].inTrash) {
                 continue;
             }
 
@@ -216,7 +216,7 @@ function StatusMatrix() {
             turtle < this._logo.turtles.turtleList.length;
             turtle++
         ) {
-            if (this._logo.turtles.turtleList[turtle].trash) {
+            if (this._logo.turtles.turtleList[turtle].inTrash) {
                 continue;
             }
 

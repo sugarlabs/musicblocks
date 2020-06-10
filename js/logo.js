@@ -1401,7 +1401,7 @@ class Logo {
             // turtle, i.e., which turtle should we use?
             let turtle = 0;
             while (
-                this.turtles.turtleList[turtle].trash &&
+                this.turtles.turtleList[turtle].inTrash &&
                 turtle < this.turtles.turtleList.length
             ) {
                 ++turtle;
@@ -1469,7 +1469,7 @@ class Logo {
                         this.unhighlightQueue[turtle] = [];
                         this.parameterQueue[turtle] = [];
 
-                        if (!this.turtles.turtleList[turtle].trash) {
+                        if (!this.turtles.turtleList[turtle].inTrash) {
                             if (this.turtles.turtleList[turtle].running) {
                                 console.debug("already running...");
                             }

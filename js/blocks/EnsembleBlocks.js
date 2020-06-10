@@ -11,7 +11,7 @@ function _getTargetTurtle(turtles, targetTurtle) {
     }
 
     for (let i = 0; i < turtles.turtleList.length; i++) {
-        if (!turtles.turtleList[i].trash) {
+        if (!turtles.turtleList[i].inTrash) {
             let turtleName = turtles.turtleList[i].name;
             if (typeof turtleName === "number") {
                 turtleName = turtleName.toString();
@@ -201,7 +201,7 @@ function setupEnsembleBlocks() {
                 for (let i = 0; i < logo.blocks.blockList.length; i++) {
                     if (
                         logo.blocks.blockList[i] ===
-                        logo.turtles.turtleList[targetTurtle].getStartBlock()
+                        logo.turtles.turtleList[targetTurtle].startBlock
                     ) {
                         foundStartBlock = true;
                         startBlk = i;
