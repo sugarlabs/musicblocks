@@ -1,1 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="321.5" height="192.5"><g transform="translate(0, 0)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 56.5 0.5 L 59.5 0.5 L 59.5 2.5 A 8 8 90 0 0 51.5 10.5 A 8 8 90 0 0 59.5 18.5 L 59.5 20.5 L 56.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z" style="fill:#D98A43;fill-opacity:1;stroke:#B7651A;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="49" y="14">wait for</tspan></text></g></g><g transform="translate(78, 0)"><g transform="scale(1.5, 1.5)"><path d="m0.5 10.5 A 7 7 90 0 1 7.5 3.5 L 8.5 3.5 L 8.5 2.5 L 8.5 0.5 L 110.5 0.5 L 110.5 16.5 L 110.5 20.5 L 8.5 20.5 L 8.5 18.5 L 8.5 17.5 L 7.5 17.5 A 7 7 90 0 1 0.5 10.5 z" style="fill:#FF664B;fill-opacity:1;stroke:#EA4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="98" y="14">mouse button</tspan></text></g></g><g><g transform="translate(0, 32)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z" style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="20" y="15">note</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="85" y="12">value</tspan></text></g></g><g transform="translate(0, 36) scale(0.5 0.5)"><g style="isolation:isolate"><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="42" height="42" rx="5" ry="5" style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"/><path d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z" style="fill:#fff"/><path d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z" style="fill:#fff"/><path d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z" style="fill:#fff"/><path d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z" style="fill:#fff"/></g></g></g></g></g><g transform="translate(132, 32)"><g transform="scale(1.5, 1.5)"><path d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="23">/</tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="12"></tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="33"></tspan></text></g></g><g transform="translate(218, 32)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">1</tspan></text></g></g><g transform="translate(218, 64)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g transform="translate(14, 64)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z" style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="36" y="14">↓</tspan></text></g></g><g transform="translate(14, 96)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="24">pitch</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="12">name</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="33">octave</tspan></text></g></g><g transform="translate(88, 96)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">sol</tspan></text></g></g><g transform="translate(88, 128)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2108"
+   version="1.1"
+   height="34.5"
+   width="247.39355">
+  <metadata
+     id="metadata2114">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2112" />
+  <g
+     id="g1938">
+    <g
+       id="g1936"
+       transform="scale(1.5)">
+      <path
+         id="path1930"
+         style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 27.231445 3 v 2 a 8,8 90 0 0 -8,8 8,8 90 0 0 8,8 v 2 h -3 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text1934"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1932"
+           y="14"
+           x="39">wait for</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g1948"
+     transform="translate(62)">
+    <g
+       id="g1946"
+       transform="scale(1.5)">
+      <path
+         id="path1940"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,10.5 a 7,7 90 0 1 7,-7 h 1 v -1 -2 h 114.5957 v 16 4 H 8.5 v -2 -1 h -1 a 7,7 90 0 1 -7,-7 z" />
+      <text
+         id="text1944"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1942"
+           y="14"
+           x="110">mouse button</tspan></text>
+    </g>
+  </g>
+</svg>
