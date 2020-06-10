@@ -407,10 +407,10 @@ class Turtle {
             this._svgOutput = "";
             this._svgPath = false;      // are we currently drawing a path?
 
-            this.color = DEFAULTCOLOR;
-            this.value = DEFAULTVALUE;
-            this.chroma = DEFAULTCHROMA;
-            this.stroke = DEFAULTSTROKE;
+            this._color = DEFAULTCOLOR;
+            this._value = DEFAULTVALUE;
+            this._chroma = DEFAULTCHROMA;
+            this._stroke = DEFAULTSTROKE;
 
             this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
             this.canvasAlpha = 1.0;
@@ -505,6 +505,54 @@ class Turtle {
          */
         get svgOutput() {
             return this._svgOutput;
+        }
+
+        /**
+         * @param {Number} color
+         * @returns {void}
+         */
+        set color(color) {
+            this._color = color;
+        }
+
+        get color() {
+            return this._color;
+        }
+
+        /**
+         * @param {Number} value
+         * @returns {void}
+         */
+        set value(value) {
+            this._value = value;
+        }
+
+        get value() {
+            return this._value;
+        }
+
+        /**
+         * @param {Number} chroma
+         * @returns {void}
+         */
+        set chroma(chroma) {
+            this._chroma = chroma;
+        }
+
+        get chroma() {
+            return this._chroma;
+        }
+
+        /**
+         * @param {Number} stroke
+         * @returns {void}
+         */
+        set stroke(stroke) {
+            this._stroke = stroke;
+        }
+
+        get stroke() {
+            return this._stroke;
         }
 
         /**
@@ -1836,6 +1884,21 @@ class Turtle {
         }
 
         /**
+         * Splits hex code for rgb number values.
+         *
+         * @private
+         */
+        _processColor() {
+            if (this.canvasColor[0] === "#") {
+                this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
+            }
+
+            let subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
+            this.ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
+            this.ctx.fillStyle = subrgb + this.canvasAlpha + ")";
+        }
+
+        /**
          * Sets color.
          * Color sets hue but also selects maximum chroma.
          *
@@ -1851,30 +1914,6 @@ class Turtle {
             this.chroma = results[1];
             this.canvasColor = results[2];
             this._processColor();
-        }
-
-        /**
-         * Sets pen's alpha value (transparency).
-         *
-         * @param alpha - alpha value
-         */
-        doSetPenAlpha(alpha) {
-            this.canvasAlpha = alpha;
-        }
-
-        /**
-         * Splits hex code for rgb number values.
-         *
-         * @private
-         */
-        _processColor() {
-            if (this.canvasColor[0] === "#") {
-                this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
-            }
-
-            let subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            this.ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
-            this.ctx.fillStyle = subrgb + this.canvasAlpha + ")";
         }
 
         /**
@@ -1914,6 +1953,15 @@ class Turtle {
             this.canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
             this._processColor();
+        }
+
+        /**
+         * Sets pen's alpha value (transparency).
+         *
+         * @param alpha - alpha value
+         */
+        doSetPenAlpha(alpha) {
+            this.canvasAlpha = alpha;
         }
 
         /**
