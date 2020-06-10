@@ -356,7 +356,7 @@ const FLATPREFERENCE = [
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
-const SCALENOTES = ["1", "2", "3", "4", "5", "6", "7"];
+const SCALENOTES = ["7", "6", "5", "4", "3", "2", "1"];
 const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
 const DRUMS = [
     "snare drum",
