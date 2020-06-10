@@ -415,7 +415,6 @@ function Blocks(activity) {
             this.blockMoved(blk);
 
             if (adjustDock && firstConnection != null) {
-                this.blockMoved(firstConnection);
                 this.adjustDocks(firstConnection, true);
                 if (clampList.length > 0) {
                     this.clampBlocksToCheck = clampList;
