@@ -98,7 +98,12 @@ class Turtles {
 
         let i = this.getTurtleList().length % 10;
 
-        let id = Date.now();    // unique ID of turtle is time of instantiation
+        // Unique ID of turtle is time of instantiation for the first time
+        let id =
+            blkInfoAvailable &&
+            "id" in infoDict &&
+            infoDict["id"] !== Infinity ?
+                infoDict["id"] : Date.now();
 
         let turtleName =
             blkInfoAvailable && "name" in infoDict ?
