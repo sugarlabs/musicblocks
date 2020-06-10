@@ -45,6 +45,7 @@ function Blocks(activity) {
         storage = localStorage;
     }
 
+    this.activity = activity;
     this.canvas = null;
     this.stage = null;
     this.refreshCanvas = null;
@@ -2324,6 +2325,11 @@ function Blocks(activity) {
         if (
             type1 === "notein" &&
             ["solfegeout", "textout", "noteout"].indexOf(type2) !== -1
+        ) {
+            return true;
+        }
+        if (
+            type1 === "gridout" && type2 ==="gridin" 
         ) {
             return true;
         }
@@ -6219,6 +6225,7 @@ function Blocks(activity) {
                 case "oscillatortype":
                 case "accidentalname":
                 case "intervalname":
+                case "grid":
                 case "boolean":
                     var postProcess = function(args) {
                         var thisBlock = args[0];
