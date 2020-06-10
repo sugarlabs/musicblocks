@@ -54,12 +54,13 @@ const TURTLEBASEPATH = "images/";       // unused
 class Turtle {
     /**
      * @constructor
+     * @param {Number} id - unique ID of Turtle
      * @param {String} name - name of Turtle
      * @param {Object} turtles - Turtles object (common to all turtles)
      */
-    constructor(name, turtles) {
+    constructor(id, name, turtles) {
         // Import members of model and view (arguments only for model)
-        importMembers(this, [ name, turtles ]);
+        importMembers(this, [ id, name, turtles ]);
 
         this._blinkFinished = true;     // whether not blinking or blinking
 
@@ -221,10 +222,12 @@ class Turtle {
     static TurtleModel = class {
         /**
          * @constructor
+         * @param {Number} id - unique ID of Turtle
          * @param {String} name - name of Turtle
          * @param {Object} turtles - Turtles object (common to all turtles)
          */
-        constructor(name, turtles) {
+        constructor(id, name, turtles) {
+            this._id = id;              // unique ID of turtle
             this._name = name;          // name of the turtle
             this._turtles = turtles;    // object handling behavior of all turtles
 
@@ -242,6 +245,13 @@ class Turtle {
 
             this._running = false;          // is the turtle running?
             this._trash = false;            // in the trash?
+        }
+
+        /**
+         * @returns {Number} unique ID of Turtle
+         */
+        get id() {
+            return this._id;
         }
 
         /**

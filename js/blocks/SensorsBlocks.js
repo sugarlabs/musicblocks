@@ -200,7 +200,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "click" + logo.turtles.turtleList[turtle].name;
+            return "click" + logo.turtles.turtleList[turtle].id;
         }
     }
 
@@ -218,7 +218,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "CursorOver" + logo.turtles.turtleList[turtle].name;
+            return "CursorOver" + logo.turtles.turtleList[turtle].id;
         }
     }
 
@@ -236,7 +236,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "CursorOut" + logo.turtles.turtleList[turtle].name;
+            return "CursorOut" + logo.turtles.turtleList[turtle].id;
         }
     }
 
@@ -254,7 +254,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "CursorDown" + logo.turtles.turtleList[turtle].name;
+            return "CursorDown" + logo.turtles.turtleList[turtle].id;
         }
     }
 
@@ -272,7 +272,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "CursorUp" + logo.turtles.turtleList[turtle].name;
+            return "CursorUp" + logo.turtles.turtleList[turtle].id;
         }
     }
 
