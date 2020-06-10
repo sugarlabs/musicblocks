@@ -101,7 +101,7 @@ class Turtles {
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
         let newTurtle = new Turtle(turtleName, this);
-        newTurtle.setStartBlock(startBlock);
+        newTurtle.startBlock = startBlock;
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
