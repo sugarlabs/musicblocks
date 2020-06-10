@@ -3283,7 +3283,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (this.name === "scaledegree2") {
             obj = splitScaleDegree(this.value);
-            let scalenotes_ = ("1 2 3 4 5 6 7").split(" ");
+            let scalenotes_ = ("7 6 5 4 3 2 1").split(" ");
             if(this.piemenuOKtoLaunch()) {
                 this._piemenuPitches(
                     scalenotes_,
