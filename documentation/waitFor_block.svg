@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2108"
+   version="1.1"
+   height="34.5"
+   width="247.39355">
+  <metadata
+     id="metadata2114">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2112" />
+  <g
+     id="g1938">
+    <g
+       id="g1936"
+       transform="scale(1.5)">
+      <path
+         id="path1930"
+         style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 27.231445 3 v 2 a 8,8 90 0 0 -8,8 8,8 90 0 0 8,8 v 2 h -3 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text1934"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1932"
+           y="14"
+           x="39">wait for</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g1948"
+     transform="translate(62)">
+    <g
+       id="g1946"
+       transform="scale(1.5)">
+      <path
+         id="path1940"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,10.5 a 7,7 90 0 1 7,-7 h 1 v -1 -2 h 114.5957 v 16 4 H 8.5 v -2 -1 h -1 a 7,7 90 0 1 -7,-7 z" />
+      <text
+         id="text1944"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1942"
+           y="14"
+           x="110">mouse button</tspan></text>
+    </g>
+  </g>
+</svg>
