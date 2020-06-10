@@ -79,14 +79,14 @@ class Turtle {
      * @private
      */
     _createCache() {
-        this.bounds = this.getContainer().getBounds();
+        this.bounds = this.container.getBounds();
 
         if (this.bounds == null) {
             setTimeout(() => {
                 this._createCache();
             }, 200);
         } else {
-            this.getContainer().cache(
+            this.container.cache(
                 this.bounds.x,
                 this.bounds.y,
                 this.bounds.width,
@@ -110,7 +110,7 @@ class Turtle {
             await delayExecution(300);
             this._updateCache();
         } else {
-            this.getContainer().updateCache();
+            this.container.updateCache();
             this.turtles.refreshCanvas();
         }
     }
@@ -125,19 +125,19 @@ class Turtle {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
 
-            this.getContainer().visible = true;
+            this.container.visible = true;
             this.turtles.refreshCanvas();
             this._blinkFinished = true;
 
-            // this.getBitmap().alpha = 1.0;
-            // this.getBitmap().scaleX = this._sizeInUse;
-            // this.getBitmap().scaleY = this.getBitmap().scaleX;
-            // this.getBitmap().scale = this.getBitmap().scaleX;
-            // this.getBitmap().rotation = this.orientation;
+            // this.bitmap.alpha = 1.0;
+            // this.bitmap.scaleX = this._sizeInUse;
+            // this.bitmap.scaleY = this.bitmap.scaleX;
+            // this.bitmap.scale = this.bitmap.scaleX;
+            // this.bitmap.rotation = this.orientation;
             // this.skinChanged = this._isSkinChanged;
-            // let bounds = this.getContainer().getBounds();
-            // this.getContainer().cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            // this.getContainer().visible = true;
+            // let bounds = this.container.getBounds();
+            // this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            // this.container.visible = true;
             // this.turtles.refreshCanvas();
             // this._blinkFinished = true;
         }
@@ -147,7 +147,7 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
     async blink(duration, volume) {
-        // this._sizeInUse = this.getBitmap().scaleX;
+        // this._sizeInUse = this.bitmap.scaleX;
         this._blinkTimeout = null;
 
         // No time to blink for really short notes. (t = 1 / duration)
@@ -158,47 +158,47 @@ class Turtle {
         this.stopBlink();
         this._blinkFinished = false;
 
-        this.getContainer().visible = false;
+        this.container.visible = false;
         this.turtles.refreshCanvas();
         this._blinkTimeout = await delayExecution(100);
         this._blinkFinished = true;
-        this.getContainer().visible = true;
+        this.container.visible = true;
         this.turtles.refreshCanvas();
 
         /*
         if (this.beforeBlinkSize == null) {
-            this.beforeBlinkSize = this.getBitmap().scaleX;
+            this.beforeBlinkSize = this.bitmap.scaleX;
         }
 
         if (this._blinkFinished) {
-            this._sizeInUse = this.getBitmap().scaleX;
+            this._sizeInUse = this.bitmap.scaleX;
         } else {
             this._sizeInUse = this.beforeBlinkSize;
         }
 
         this.stopBlink();
         this._blinkFinished = false;
-        this.getContainer().uncache();
+        this.container.uncache();
         let scalefactor = 60 / 55;
         let volumescalefactor = 4 * (volume + 200) / 1000;
         // Conversion: volume of 1 = 0.804, volume of 50 = 1, volume of 100 = 1.1
-        this.getBitmap().alpha = 0.5;
-        this.getBitmap().scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
-        this.getBitmap().scaleY = this.getBitmap().scaleX;
-        this.getBitmap().scale = this.getBitmap().scaleX;
+        this.bitmap.alpha = 0.5;
+        this.bitmap.scaleX *= scalefactor * volumescalefactor;  // sizeInUse * scalefactor * volumescalefactor;
+        this.bitmap.scaleY = this.bitmap.scaleX;
+        this.bitmap.scale = this.bitmap.scaleX;
         this._isSkinChanged = this.skinChanged;
         this.skinChanged = true;
-        createjs.Tween.get(this.getBitmap()).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
+        createjs.Tween.get(this.bitmap).to({alpha: 1, scaleX: this._sizeInUse, scaleY: this._sizeInUse, scale: this._sizeInUse}, 500 / duration);
 
         this._blinkTimeout = setTimeout(() => {
-            this.getBitmap().alpha = 1.0;
-            this.getBitmap().scaleX = this._sizeInUse;
-            this.getBitmap().scaleY = this.getBitmap().scaleX;
-            this.getBitmap().scale = this.getBitmap().scaleX;
-            this.getBitmap().rotation = this.orientation;
+            this.bitmap.alpha = 1.0;
+            this.bitmap.scaleX = this._sizeInUse;
+            this.bitmap.scaleY = this.bitmap.scaleX;
+            this.bitmap.scale = this.bitmap.scaleX;
+            this.bitmap.rotation = this.orientation;
             this.skinChanged = this._isSkinChanged;
-            let bounds = this.getContainer().getBounds();
-            this.getContainer().cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            let bounds = this.container.getBounds();
+            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
             this._blinkFinished = true;
             this.turtles.refreshCanvas();
         }, 500 / duration);  // 500 / duration == (1000 * (1 / duration)) / 2
@@ -395,8 +395,8 @@ class Turtle {
             this._decorationBitmap = null;
 
             // Things used for drawing the turtle
-            this.container = null;      // createjs container
-            this.bitmap = null;         // createjs bitmap
+            this._container = null;     // createjs container
+            this._bitmap = null;        // createjs bitmap
 
             this.skinChanged = false;   // should we reskin the turtle on clear?
             this.orientation = 0;       // orientation of the turtle sprite
@@ -435,25 +435,24 @@ class Turtle {
 
         /**
          * @param {Object} container - createjs container for Turtle
-         * @returns {this}
+         * @returns {void}
          */
-        setContainer(container) {
-            this.container = container;
-            return this;
+        set container(container) {
+            this._container = container;
         }
 
         /**
          * @returns {Object} createjs container for Turtle
          */
-        getContainer() {
-            return this.container;
+        get container() {
+            return this._container;
         }
 
         /**
          * @returns {Object} createjs bitmap object for Turtle
          */
-        getBitmap() {
-            return this.bitmap;
+        get bitmap() {
+            return this._bitmap;
         }
 
         /**
@@ -1072,7 +1071,7 @@ class Turtle {
             }
 
             this.container.rotation = this.orientation;
-            this.bitmap.rotation = this.orientation;
+            this._bitmap.rotation = this.orientation;
             this._updateCache();
 
             // Clear all media
@@ -1607,17 +1606,17 @@ class Turtle {
             image.src = myImage;
 
             image.onload = () => {
-                this.container.removeChild(this.bitmap);
-                this.bitmap = new createjs.Bitmap(image);
-                this.container.addChild(this.bitmap);
-                this.bitmap.scaleX = shellSize / image.width;
-                this.bitmap.scaleY = this.bitmap.scaleX;
-                this.bitmap.scale = this.bitmap.scaleX;
-                this.bitmap.x = 0;
-                this.bitmap.y = 0;
-                this.bitmap.regX = image.width / 2;
-                this.bitmap.regY = image.height / 2;
-                this.bitmap.rotation = this.orientation;
+                this.container.removeChild(this._bitmap);
+                this._bitmap = new createjs.Bitmap(image);
+                this.container.addChild(this._bitmap);
+                this._bitmap.scaleX = shellSize / image.width;
+                this._bitmap.scaleY = this._bitmap.scaleX;
+                this._bitmap.scale = this._bitmap.scaleX;
+                this._bitmap.x = 0;
+                this._bitmap.y = 0;
+                this._bitmap.regX = image.width / 2;
+                this._bitmap.regY = image.height / 2;
+                this._bitmap.rotation = this.orientation;
                 this.skinChanged = true;
 
                 this.container.uncache();
@@ -1967,17 +1966,17 @@ class Turtle {
             img.onload = () => {
                 let bitmap = new createjs.Bitmap(img);
 
-                this.bitmap = bitmap;
-                this.bitmap.regX = 27 | 0;
-                this.bitmap.regY = 27 | 0;
-                this.bitmap.cursor = "pointer";
-                this.container.addChild(this.bitmap);
+                this._bitmap = bitmap;
+                this._bitmap.regX = 27 | 0;
+                this._bitmap.regY = 27 | 0;
+                this._bitmap.cursor = "pointer";
+                this.container.addChild(this._bitmap);
                 this._createCache();
 
                 let startBlock = this.startBlock;
                 if (startBlock != null) {
                     startBlock.updateCache();
-                    this._decorationBitmap = this.bitmap.clone();
+                    this._decorationBitmap = this._bitmap.clone();
                     startBlock.container.addChild(this._decorationBitmap);
                     this._decorationBitmap.name = "decoration";
                     let width = startBlock.width;
