@@ -411,19 +411,18 @@ class Turtle {
             this._value = DEFAULTVALUE;
             this._chroma = DEFAULTCHROMA;
             this._stroke = DEFAULTSTROKE;
+            this._font = DEFAULTFONT;
 
-            this.canvasColor = "rgba(255,0,49,1)";  // '#ff0031';
-            this.canvasAlpha = 1.0;
-            this.fillState = false;
-            this.hollowState = false;
-            this.penState = true;
-            this.font = DEFAULTFONT;
+            this._canvasColor = "rgba(255,0,49,1)"; // '#ff0031';
+            this._canvasAlpha = 1.0;
+            this._fillState = false;
+            this._hollowState = false;
+            this._penState = true;
 
-            this.media = [];     // media (text, images) we need to remove on clear
+            this._media = [];   // media (text, images) we need to remove on clear
 
-            this.canvas = document.getElementById("overlayCanvas");
-            this.ctx = this.canvas.getContext("2d");
-            console.debug(this.ctx.canvas.width + " x " + this.ctx.canvas.height);
+            this._canvas = document.getElementById("overlayCanvas");
+            this._ctx = this._canvas.getContext("2d");
         }
 
         /**
@@ -515,6 +514,9 @@ class Turtle {
             this._color = color;
         }
 
+        /**
+         * @returns {Number}
+         */
         get color() {
             return this._color;
         }
@@ -527,6 +529,9 @@ class Turtle {
             this._value = value;
         }
 
+        /**
+         * @returns {Number}
+         */
         get value() {
             return this._value;
         }
@@ -539,6 +544,9 @@ class Turtle {
             this._chroma = chroma;
         }
 
+        /**
+         * @returns {Number}
+         */
         get chroma() {
             return this._chroma;
         }
@@ -551,8 +559,56 @@ class Turtle {
             this._stroke = stroke;
         }
 
+        /**
+         * @returns {Number}
+         */
         get stroke() {
             return this._stroke;
+        }
+
+        /**
+         * @param {String} canvasColor
+         * @returns {void}
+         */
+        set canvasColor(canvasColor) {
+            this._canvasColor = canvasColor;
+        }
+
+        /**
+         * @returns {String}
+         */
+        get canvasColor() {
+            return this._canvasColor;
+        }
+
+        /**
+         * @param {Number} canvasAlpha
+         * @returns {void}
+         */
+        set canvasAlpha(canvasAlpha) {
+            this._canvasAlpha = canvasAlpha;
+        }
+
+        /**
+         * @returns {Number}
+         */
+        get canvasAlpha() {
+            return this._canvasAlpha;
+        }
+
+        /**
+         * @param {Boolean} penState - whether pen is up or down
+         * @returns {void}
+         */
+        set penState(penState) {
+            this._penState = penState;
+        }
+
+        /**
+         * @returns {Boolean} whether pen is up or down
+         */
+        get penState() {
+            return this._penState;
         }
 
         /**
@@ -565,20 +621,20 @@ class Turtle {
             // FIXME: how big?
 
             let imgData =
-                this.ctx.getImageData(
-                    0, 0, this.ctx.canvas.width, this.ctx.canvas.height
+                this._ctx.getImageData(
+                    0, 0, this._ctx.canvas.width, this._ctx.canvas.height
                 );
 
             let turtles = this.turtles;
             if (turtles.canvas1 == null) {
-                turtles.gx = this.ctx.canvas.width;
-                turtles.gy = this.ctx.canvas.height;
+                turtles.gx = this._ctx.canvas.width;
+                turtles.gy = this._ctx.canvas.height;
                 turtles.canvas1 = document.createElement("canvas");
-                turtles.canvas1.width = 3 * this.ctx.canvas.width;
-                turtles.canvas1.height = 3 * this.ctx.canvas.height;
+                turtles.canvas1.width = 3 * this._ctx.canvas.width;
+                turtles.canvas1.height = 3 * this._ctx.canvas.height;
                 turtles.c1ctx = turtles.canvas1.getContext("2d");
                 turtles.c1ctx.rect(
-                    0, 0, 3 * this.ctx.canvas.width, 3 * this.ctx.canvas.height
+                    0, 0, 3 * this._ctx.canvas.width, 3 * this._ctx.canvas.height
                 );
                 turtles.c1ctx.fillStyle = "#F9F9F9";
                 turtles.c1ctx.fill();
@@ -591,23 +647,23 @@ class Turtle {
             turtles.gy -= dy;
             turtles.gx -= dx;
             turtles.gx =
-                2 * this.ctx.canvas.width > turtles.gx ?
-                    turtles.gx : 2 * this.ctx.canvas.width;
+                2 * this._ctx.canvas.width > turtles.gx ?
+                    turtles.gx : 2 * this._ctx.canvas.width;
             turtles.gx = 0 > turtles.gx ? 0 : turtles.gx;
             turtles.gy =
-                2 * this.ctx.canvas.height > turtles.gy ?
-                    turtles.gy : 2 * this.ctx.canvas.height;
+                2 * this._ctx.canvas.height > turtles.gy ?
+                    turtles.gy : 2 * this._ctx.canvas.height;
             turtles.gy = 0 > turtles.gy ? 0 : turtles.gy;
 
             let newImgData =
                 turtles.c1ctx.getImageData(
                     turtles.gx,
                     turtles.gy,
-                    this.ctx.canvas.width,
-                    this.ctx.canvas.height
+                    this._ctx.canvas.width,
+                    this._ctx.canvas.height
                 );
 
-            this.ctx.putImageData(newImgData, 0, 0);
+            this._ctx.putImageData(newImgData, 0, 0);
 
             // Draw under the turtle as the canvas moves
             for (let t = 0; t < turtles.turtleList.length; t++) {
@@ -617,19 +673,19 @@ class Turtle {
 
                 if (turtles.turtleList[t].penState) {
                     turtles.turtleList[t]._processColor();
-                    this.ctx.lineWidth = turtles.turtleList[t].stroke;
-                    this.ctx.lineCap = 'round';
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(
+                    this._ctx.lineWidth = turtles.turtleList[t].stroke;
+                    this._ctx.lineCap = 'round';
+                    this._ctx.beginPath();
+                    this._ctx.moveTo(
                         turtles.turtleList[t].container.x + dx,
                         turtles.turtleList[t].container.y + dy
                     );
-                    this.ctx.lineTo(
+                    this._ctx.lineTo(
                         turtles.turtleList[t].container.x,
                         turtles.turtleList[t].container.y
                     );
-                    this.ctx.stroke();
-                    this.ctx.closePath();
+                    this._ctx.stroke();
+                    this._ctx.closePath();
                 }
             }
 
@@ -699,7 +755,7 @@ class Turtle {
             let turtles = this.turtles;
             let turtlesScale = turtles.getScale();
 
-            if (this.penState && this.hollowState) {
+            if (this._penState && this._hollowState) {
                 // Convert from turtle coordinates to screen coordinates
                 fx = turtles.turtleX2screenX(x2);
                 fy = turtles.turtleY2screenY(y2);
@@ -716,8 +772,8 @@ class Turtle {
                 // Save the current stroke width
                 let savedStroke = this.stroke;
                 this.stroke = 1;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
 
                 // Draw a hollow line
                 let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -780,7 +836,7 @@ class Turtle {
                 let arccy = iy;
                 let sa = oAngleRadians - Math.PI;
                 let ea = oAngleRadians;
-                this.ctx.arc(arccx, arccy, step, sa, ea, false);
+                this._ctx.arc(arccx, arccy, step, sa, ea, false);
                 this._svgArc(
                     steps,
                     arccx * turtlesScale,
@@ -796,7 +852,7 @@ class Turtle {
                 arccy = fy;
                 sa = oAngleRadians - Math.PI;
                 ea = oAngleRadians;
-                this.ctx.arc(arccx, arccy, step, sa, ea, false);
+                this._ctx.arc(arccx, arccy, step, sa, ea, false);
                 this._svgArc(
                     steps,
                     arccx * turtlesScale,
@@ -811,23 +867,23 @@ class Turtle {
                 let fxScaled = fx * turtlesScale;
                 let fyScaled = fy * turtlesScale;
 
-                this.ctx.stroke();
-                this.ctx.closePath();
+                this._ctx.stroke();
+                this._ctx.closePath();
 
                 // Restore stroke
                 this.stroke = savedStroke;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.moveTo(fx, fy);
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.moveTo(fx, fy);
                 this._svgOutput += "M " + fxScaled + "," + fyScaled + " ";
                 this.x = x2;
                 this.y = y2;
-            } else if (this.penState) {
+            } else if (this._penState) {
                 this._processColor();
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.container.x, this.container.y);
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.beginPath();
+                this._ctx.moveTo(this.container.x, this.container.y);
 
                 // Convert from turtle coordinates to screen coordinates
                 fx = turtles.turtleX2screenX(x2);
@@ -837,7 +893,7 @@ class Turtle {
                 let cx2 = turtles.turtleX2screenX(cp2x);
                 let cy2 = turtles.turtleY2screenY(cp2y);
 
-                this.ctx.bezierCurveTo(
+                this._ctx.bezierCurveTo(
                     cx1 + dxi,
                     cy1 + dyi,
                     cx2 + dxf,
@@ -845,7 +901,7 @@ class Turtle {
                     cx,
                     cy
                 );
-                this.ctx.bezierCurveTo(
+                this._ctx.bezierCurveTo(
                     cx2 - dxf,
                     cy2 - dyf,
                     cx1 - dxi,
@@ -853,7 +909,7 @@ class Turtle {
                     ax,
                     ay
                 );
-                this.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
+                this._ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
                 if (!this._svgPath) {
                     this._svgPath = true;
@@ -890,9 +946,9 @@ class Turtle {
 
                 this.x = x2;
                 this.y = y2;
-                this.ctx.stroke();
-                if (!this.fillState) {
-                    this.ctx.closePath();
+                this._ctx.stroke();
+                if (!this._fillState) {
+                    this._ctx.closePath();
                 }
             } else {
                 this.x = x2;
@@ -965,7 +1021,7 @@ class Turtle {
             }
 
             // Draw an arc if the pen is down
-            if (this.penState && this.hollowState) {
+            if (this._penState && this._hollowState) {
                 // Close the current SVG path
                 this.closeSVG();
                 this._svgPath = true;
@@ -973,8 +1029,8 @@ class Turtle {
                 // Save the current stroke width
                 let savedStroke = this.stroke;
                 this.stroke = 1;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
 
                 // Draw a hollow line
                 let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -985,17 +1041,17 @@ class Turtle {
 
                 let oxScaled, oyScaled;
                 if (anticlockwise) {
-                    this.ctx.moveTo(ox + dx, oy + dy);
+                    this._ctx.moveTo(ox + dx, oy + dy);
                     oxScaled = (ox + dx) * turtlesScale;
                     oyScaled = (oy + dy) * turtlesScale;
                 } else {
-                    this.ctx.moveTo(ox - dx, oy - dy);
+                    this._ctx.moveTo(ox - dx, oy - dy);
                     oxScaled = (ox - dx) * turtlesScale;
                     oyScaled = (oy - dy) * turtlesScale;
                 }
                 this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
-                this.ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
+                this._ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
                 let nsteps = Math.max(Math.floor((radius * Math.abs(sa - ea)) / 2), 2);
                 let steps = Math.max(Math.floor(savedStroke, 1));
 
@@ -1016,7 +1072,7 @@ class Turtle {
                 let cy1 = ny;
                 let sa1 = ea;
                 let ea1 = ea + Math.PI;
-                this.ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
+                this._ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
                 this._svgArc(
                     steps,
                     cx1 * turtlesScale,
@@ -1025,7 +1081,7 @@ class Turtle {
                     sa1,
                     ea1
                 );
-                this.ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
+                this._ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
                 this._svgArc(
                     nsteps,
                     cx * turtlesScale,
@@ -1038,7 +1094,7 @@ class Turtle {
                 let cy2 = oy;
                 let sa2 = sa - Math.PI;
                 let ea2 = sa;
-                this.ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
+                this._ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
                 this._svgArc(
                     steps,
                     cx2 * turtlesScale,
@@ -1049,16 +1105,16 @@ class Turtle {
                 );
                 this.closeSVG();
 
-                this.ctx.stroke();
-                this.ctx.closePath();
+                this._ctx.stroke();
+                this._ctx.closePath();
 
                 // Restore stroke
                 this.stroke = savedStroke;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.moveTo(nx, ny);
-            } else if (this.penState) {
-                this.ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.moveTo(nx, ny);
+            } else if (this._penState) {
+                this._ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
                 if (!this._svgPath) {
                     this._svgPath = true;
                     let oxScaled = ox * turtlesScale;
@@ -1084,12 +1140,12 @@ class Turtle {
                     "," +
                     nyScaled +
                     " ";
-                this.ctx.stroke();
-                if (!this.fillState) {
-                    this.ctx.closePath();
+                this._ctx.stroke();
+                if (!this._fillState) {
+                    this._ctx.closePath();
                 }
             } else {
-                this.ctx.moveTo(nx, ny);
+                this._ctx.moveTo(nx, ny);
             }
 
             // Update turtle position on screen
@@ -1122,8 +1178,8 @@ class Turtle {
                 this.x = 0;
                 this.y = 0;
                 this.orientation = 0.0;
-                turtles.gx = this.ctx.canvas.width;
-                turtles.gy = this.ctx.canvas.height;
+                turtles.gx = this._ctx.canvas.width;
+                turtles.gy = this._ctx.canvas.height;
             }
 
             if (resetPen) {
@@ -1132,7 +1188,7 @@ class Turtle {
                 this.value = DEFAULTVALUE;
                 this.chroma = DEFAULTCHROMA;
                 this.stroke = DEFAULTSTROKE;
-                this.font = DEFAULTFONT;
+                this._font = DEFAULTFONT;
             }
 
             this.container.x = turtles.turtleX2screenX(this.x);
@@ -1175,38 +1231,38 @@ class Turtle {
             this._updateCache();
 
             // Clear all media
-            for (let i = 0; i < this.media.length; i++) {
+            for (let i = 0; i < this._media.length; i++) {
                 // Could be in the image Container or the Stage
-                this.imageContainer.removeChild(this.media[i]);
-                turtles.getStage().removeChild(this.media[i]);
-                delete this.media[i];
+                this.imageContainer.removeChild(this._media[i]);
+                turtles.getStage().removeChild(this._media[i]);
+                delete this._media[i];
             }
 
-            this.media = [];
+            this._media = [];
 
             // Clear all graphics
-            this.penState = true;
-            this.fillState = false;
-            this.hollowState = false;
+            this._penState = true;
+            this._fillState = false;
+            this._hollowState = false;
 
-            this.canvasColor =
+            this._canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
-            if (this.canvasColor[0] === "#") {
-                this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
+            if (this._canvasColor[0] === "#") {
+                this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
             }
 
             this._svgOutput = "";
             this._svgPath = false;
             this.penstrokes.image = null;
-            this.ctx.beginPath();
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this._ctx.beginPath();
+            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
             if (turtles.c1ctx != null) {
                 turtles.c1ctx.beginPath();
                 turtles.c1ctx.clearRect(
-                    0, 0, 3 * this.canvas.width, 3 * this.canvas.height
+                    0, 0, 3 * this._canvas.width, 3 * this._canvas.height
                 );
             }
-            this.penstrokes.image = this.canvas;
+            this.penstrokes.image = this._canvas;
             turtles.refreshCanvas();
         }
 
@@ -1214,23 +1270,23 @@ class Turtle {
          * Removes penstrokes and clears canvas.
          */
         __clearPenStrokes() {
-            this.penState = true;
-            this.fillState = false;
-            this.hollowState = false;
+            this._penState = true;
+            this._fillState = false;
+            this._hollowState = false;
 
-            this.canvasColor =
+            this._canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
-            if (this.canvasColor[0] === "#") {
-                this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
+            if (this._canvasColor[0] === "#") {
+                this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
             }
 
-            this.ctx.beginPath();
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this._ctx.beginPath();
+            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
             this._processColor();
-            this.ctx.lineWidth = this.stroke;
-            this.ctx.lineCap = "round";
-            this.ctx.beginPath();
-            this.penstrokes.image = this.canvas;
+            this._ctx.lineWidth = this.stroke;
+            this._ctx.lineCap = "round";
+            this._ctx.beginPath();
+            this.penstrokes.image = this._canvas;
             this._svgOutput = "";
             this._svgPath = false;
             this.turtles.refreshCanvas();
@@ -1275,7 +1331,7 @@ class Turtle {
             }
 
             // Draw a line if the pen is down
-            if (this.penState && this.hollowState) {
+            if (this._penState && this._hollowState) {
                 // Close the current SVG path
                 this.closeSVG();
                 this._svgPath = true;
@@ -1283,8 +1339,8 @@ class Turtle {
                 // Save the current stroke width
                 let savedStroke = this.stroke;
                 this.stroke = 1;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
 
                 // Draw a hollow line
                 let step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -1293,12 +1349,12 @@ class Turtle {
                 let dx = step * Math.sin(capAngleRadians);
                 let dy = -step * Math.cos(capAngleRadians);
 
-                this.ctx.moveTo(ox + dx, oy + dy);
+                this._ctx.moveTo(ox + dx, oy + dy);
                 let oxScaled = (ox + dx) * turtlesScale;
                 let oyScaled = (oy + dy) * turtlesScale;
                 this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
-                this.ctx.lineTo(nx + dx, ny + dy);
+                this._ctx.lineTo(nx + dx, ny + dy);
                 let nxScaled = (nx + dx) * turtlesScale;
                 let nyScaled = (ny + dy) * turtlesScale;
                 this._svgOutput += nxScaled + "," + nyScaled + " ";
@@ -1312,7 +1368,7 @@ class Turtle {
                 let cy = ny;
                 let sa = oAngleRadians - Math.PI;
                 let ea = oAngleRadians;
-                this.ctx.arc(cx, cy, step, sa, ea, false);
+                this._ctx.arc(cx, cy, step, sa, ea, false);
 
                 nxScaled = (nx + dx) * turtlesScale;
                 nyScaled = (ny + dy) * turtlesScale;
@@ -1335,7 +1391,7 @@ class Turtle {
                 );
                 this._svgOutput += nxScaled + "," + nyScaled + " ";
 
-                this.ctx.lineTo(ox + dx, oy + dy);
+                this._ctx.lineTo(ox + dx, oy + dy);
                 nxScaled = (ox + dx) * turtlesScale;
                 nyScaled = (oy + dy) * turtlesScale;
                 this._svgOutput += nxScaled + "," + nyScaled + " ";
@@ -1349,7 +1405,7 @@ class Turtle {
                 cy = oy;
                 sa = oAngleRadians - Math.PI;
                 ea = oAngleRadians;
-                this.ctx.arc(cx, cy, step, sa, ea, false);
+                this._ctx.arc(cx, cy, step, sa, ea, false);
 
                 nxScaled = (ox + dx) * turtlesScale;
                 nyScaled = (oy + dy) * turtlesScale;
@@ -1366,16 +1422,16 @@ class Turtle {
 
                 this.closeSVG();
 
-                this.ctx.stroke();
-                this.ctx.closePath();
+                this._ctx.stroke();
+                this._ctx.closePath();
 
                 // Restore stroke
                 this.stroke = savedStroke;
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.moveTo(nx, ny);
-            } else if (this.penState) {
-                this.ctx.lineTo(nx, ny);
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.moveTo(nx, ny);
+            } else if (this._penState) {
+                this._ctx.lineTo(nx, ny);
                 if (!this._svgPath) {
                     this._svgPath = true;
                     let oxScaled = ox * turtlesScale;
@@ -1386,15 +1442,15 @@ class Turtle {
                 let nxScaled = nx * turtlesScale;
                 let nyScaled = ny * turtlesScale;
                 this._svgOutput += nxScaled + "," + nyScaled + " ";
-                this.ctx.stroke();
-                if (!this.fillState) {
-                    this.ctx.closePath();
+                this._ctx.stroke();
+                if (!this._fillState) {
+                    this._ctx.closePath();
                 }
             } else {
-                this.ctx.moveTo(nx, ny);
+                this._ctx.moveTo(nx, ny);
             }
 
-            this.penstrokes.image = this.canvas;
+            this.penstrokes.image = this._canvas;
 
             // Update turtle position on screen
             this.container.x = nx;
@@ -1416,11 +1472,11 @@ class Turtle {
         doForward(steps) {
             this._processColor();
 
-            if (!this.fillState) {
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.container.x, this.container.y);
+            if (!this._fillState) {
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.beginPath();
+                this._ctx.moveTo(this.container.x, this.container.y);
             }
 
             let turtles = this.turtles;
@@ -1435,8 +1491,8 @@ class Turtle {
             let nx = ox + Number(steps) * Math.sin(angleRadians);
             let ny = oy + Number(steps) * Math.cos(angleRadians);
 
-            let w = this.ctx.canvas.width;
-            let h = this.ctx.canvas.height;
+            let w = this._ctx.canvas.width;
+            let h = this._ctx.canvas.height;
 
             let out =
                 this._outOfBounds(
@@ -1464,19 +1520,19 @@ class Turtle {
                 while (steps >= 0) {
                     if (this.container.x > w) {
                         this.container.x = 0;
-                        this.ctx.moveTo(this.container.x, this.container.y);
+                        this._ctx.moveTo(this.container.x, this.container.y);
                     }
                     if (this.container.x < 0) {
                         this.container.x = w;
-                        this.ctx.moveTo(this.container.x, this.container.y);
+                        this._ctx.moveTo(this.container.x, this.container.y);
                     }
                     if (this.container.y > h) {
                         this.container.y = 0;
-                        this.ctx.moveTo(this.container.x, this.container.y);
+                        this._ctx.moveTo(this.container.x, this.container.y);
                     }
                     if (this.container.y < 0) {
                         this.container.y = h;
-                        this.ctx.moveTo(this.container.x, this.container.y);
+                        this._ctx.moveTo(this.container.x, this.container.y);
                     }
 
                     // Get old turtle point
@@ -1490,7 +1546,7 @@ class Turtle {
                     this._move(ox, oy, nx, ny, true)
                     this.container.x = turtles.turtleX2screenX(nx);
                     this.container.y = turtles.turtleY2screenY(ny);
-                    this.ctx.moveTo(this.container.x, this.container.y);
+                    this._ctx.moveTo(this.container.x, this.container.y);
 
                     steps -= stepUnit;
                 }
@@ -1508,11 +1564,11 @@ class Turtle {
         doSetXY(x, y) {
             this._processColor();
 
-            if (!this.fillState) {
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.container.x, this.container.y);
+            if (!this._fillState) {
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.beginPath();
+                this._ctx.moveTo(this.container.x, this.container.y);
             }
 
             // Get old turtle point
@@ -1537,11 +1593,11 @@ class Turtle {
         _doArcPart(angle, radius) {
             this._processColor();
 
-            if (!this.fillState) {
-                this.ctx.lineWidth = this.stroke;
-                this.ctx.lineCap = "round";
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.container.x, this.container.y);
+            if (!this._fillState) {
+                this._ctx.lineWidth = this.stroke;
+                this._ctx.lineCap = "round";
+                this._ctx.beginPath();
+                this._ctx.moveTo(this.container.x, this.container.y);
             }
 
             let adeg = Number(angle);
@@ -1645,7 +1701,7 @@ class Turtle {
             image.onload = () => {
                 let bitmap = new createjs.Bitmap(image);
                 this.imageContainer.addChild(bitmap);
-                this.media.push(bitmap);
+                this._media.push(bitmap);
                 bitmap.scaleX = Number(size) / image.width;
                 bitmap.scaleY = bitmap.scaleX;
                 bitmap.scale = bitmap.scaleX;
@@ -1677,7 +1733,7 @@ class Turtle {
             image.onload = () => {
                 let bitmap = new createjs.Bitmap(image);
                 turtle.imageContainer.addChild(bitmap);
-                turtle.media.push(bitmap);
+                turtle._media.push(bitmap);
                 bitmap.scaleX = Number(size) / image.width;
                 bitmap.scaleY = bitmap.scaleX;
                 bitmap.scale = bitmap.scaleX;
@@ -1796,17 +1852,17 @@ class Turtle {
                 typeof myText !== "string" ?
                     [myText.toString()] : myText.split("\\n");
 
-            let textSize = size.toString() + "px " + this.font;
+            let textSize = size.toString() + "px " + this._font;
             for (i = 0; i < textList.length; i++) {
                 let text = new createjs.Text(
                     textList[i],
                     textSize,
-                    this.canvasColor
+                    this._canvasColor
                 );
                 text.textAlign = "left";
                 text.textBaseline = "alphabetic";
                 this.turtles.getStage().addChild(text);
-                this.media.push(text);
+                this._media.push(text);
                 text.x = this.container.x;
                 text.y = this.container.y + i * size;
                 text.rotation = this.orientation;
@@ -1820,9 +1876,9 @@ class Turtle {
                     '" y = "' +
                     yScaled +
                     '" fill="' +
-                    this.canvasColor +
+                    this._canvasColor +
                     '" font-family = "' +
-                    this.font +
+                    this._font +
                     '" font-size = "' +
                     sizeScaled +
                     '">' +
@@ -1879,7 +1935,7 @@ class Turtle {
          * @param font - font object
          */
         doSetFont(font) {
-            this.font = font;
+            this._font = font;
             this._updateCache();
         }
 
@@ -1889,13 +1945,13 @@ class Turtle {
          * @private
          */
         _processColor() {
-            if (this.canvasColor[0] === "#") {
-                this.canvasColor = hex2rgb(this.canvasColor.split("#")[1]);
+            if (this._canvasColor[0] === "#") {
+                this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
             }
 
-            let subrgb = this.canvasColor.substr(0, this.canvasColor.length - 2);
-            this.ctx.strokeStyle = subrgb + this.canvasAlpha + ")";
-            this.ctx.fillStyle = subrgb + this.canvasAlpha + ")";
+            let subrgb = this._canvasColor.substr(0, this._canvasColor.length - 2);
+            this._ctx.strokeStyle = subrgb + this._canvasAlpha + ")";
+            this._ctx.fillStyle = subrgb + this._canvasAlpha + ")";
         }
 
         /**
@@ -1912,7 +1968,7 @@ class Turtle {
             this.value = results[0];
             this.canvasChroma = results[1];
             this.chroma = results[1];
-            this.canvasColor = results[2];
+            this._canvasColor = results[2];
             this._processColor();
         }
 
@@ -1924,7 +1980,7 @@ class Turtle {
         doSetHue(hue) {
             this.closeSVG();
             this.color = Number(hue);
-            this.canvasColor =
+            this._canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
             this._processColor();
         }
@@ -1937,7 +1993,7 @@ class Turtle {
         doSetValue(shade) {
             this.closeSVG();
             this.value = Number(shade);
-            this.canvasColor =
+            this._canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
             this._processColor();
         }
@@ -1950,7 +2006,7 @@ class Turtle {
         doSetChroma(chroma) {
             this.closeSVG();
             this.chroma = Number(chroma);
-            this.canvasColor =
+            this._canvasColor =
                 getMunsellColor(this.color, this.value, this.chroma);
             this._processColor();
         }
@@ -1972,7 +2028,7 @@ class Turtle {
         doSetPensize(size) {
             this.closeSVG();
             this.stroke = size;
-            this.ctx.lineWidth = this.stroke;
+            this._ctx.lineWidth = this.stroke;
         }
 
         /**
@@ -1980,14 +2036,14 @@ class Turtle {
          */
         doPenUp() {
             this.closeSVG();
-            this.penState = false;
+            this._penState = false;
         }
 
         /**
          * Toggles penState: puts pen 'down'.
          */
         doPenDown() {
-            this.penState = true;
+            this._penState = true;
         }
 
         /**
@@ -1995,8 +2051,8 @@ class Turtle {
          */
         doStartFill() {
             /// Start tracking points here
-            this.ctx.beginPath();
-            this.fillState = true;
+            this._ctx.beginPath();
+            this._fillState = true;
         }
 
         /**
@@ -2004,24 +2060,24 @@ class Turtle {
          */
         doEndFill() {
             // Redraw the points with fill enabled
-            this.ctx.fill();
-            this.ctx.closePath();
+            this._ctx.fill();
+            this._ctx.closePath();
             this.closeSVG();
-            this.fillState = false;
+            this._fillState = false;
         }
 
         /**
          * Begins hollow line by toggling hollowState (to true).
          */
         doStartHollowLine() {
-            this.hollowState = true;    // start tracking points here
+            this._hollowState = true;    // start tracking points here
         }
 
         /**
          * Ends hollow line by toggling hollowState (to false).
          */
         doEndHollowLine() {
-            this.hollowState = false;   // redraw the points with fill enabled
+            this._hollowState = false;   // redraw the points with fill enabled
         }
 
         /**
@@ -2032,19 +2088,19 @@ class Turtle {
                 // For the SVG output, we need to replace rgba() with
                 // rgb();fill-opacity:1 and rgb();stroke-opacity:1
 
-                let svgColor = this.canvasColor.replace(/rgba/g, "rgb");
-                svgColor = svgColor.substr(0, this.canvasColor.length - 4) + ");";
+                let svgColor = this._canvasColor.replace(/rgba/g, "rgb");
+                svgColor = svgColor.substr(0, this._canvasColor.length - 4) + ");";
 
                 this._svgOutput += '" style="stroke-linecap:round;fill:';
                 this._svgOutput +=
-                    this.fillState ?
-                        svgColor + "fill-opacity:" + this.canvasAlpha + ";" :
+                    this._fillState ?
+                        svgColor + "fill-opacity:" + this._canvasAlpha + ";" :
                         "none;";
                 this._svgOutput +=
                     "stroke:" +
                     svgColor +
                     "stroke-opacity:" +
-                    this.canvasAlpha +
+                    this._canvasAlpha +
                     ";";
                 let strokeScaled = this.stroke * this.turtles.scale;
                 this._svgOutput += "stroke-width:" + strokeScaled + 'pt;" />';
