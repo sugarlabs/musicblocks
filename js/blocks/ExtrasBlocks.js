@@ -1065,14 +1065,14 @@ function setupExtrasBlocks() {
     new HideBlocksBlock().setup();
     new OpenProjectBlock().setup();
     new FloatToStringBlock().setup();
+    new DrumBlock().setup();
+    new GridBlock().setup();
+    new DisplayGridBlock().setup();
     new VSpaceBlock().setup();
     new HSpaceBlock().setup();
     new WaitBlock().setup();
     new CommentBlock().setup();
     new PrintBlock().setup();
-    new DrumBlock().setup();
-    new GridBlock().setup();
-    new DisplayGridBlock().setup();
     // NOP blocks
     new NOPValueBlock().setup();
     new NOPOneArgMathBlock().setup();
