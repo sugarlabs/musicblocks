@@ -1357,12 +1357,14 @@ function Activity() {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
-        _hideTreble();
-        _hideGrand();
-        _hideSoprano();
-        _hideAlto();
-        _hideTenor();
-        _hideBass();
+	if (_THIS_IS_MUSIC_BLOCKS_) {
+	    _hideTreble();
+	    _hideGrand();
+	    _hideSoprano();
+	    _hideAlto();
+	    _hideTenor();
+	    _hideBass();
+	}
     };
 
     /*
@@ -1381,14 +1383,19 @@ function Activity() {
 	    }
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
-	        this._showTreble();
-            //.TRANS: show bass clef
-            turtles.setGridLabel(_("show bass"));
+	    if (_THIS_IS_MUSIC_BLOCKS_) {
+		this._showTreble();
+		//.TRANS: show bass clef
+		turtles.setGridLabel(_("show bass"));
+	    } else {
+		//.TRANS: show Cartesian coordinate overlay grid
+		turtles.setGridLabel(_("show Cartesian"));
+	    }
         } else if (trebleBitmap.visible) {
             _hideTreble();
-	        this._showGrand();
-            //.TRANS: show mezza-soprano staff
-            turtles.setGridLabel(_("show mezza-soprano"));
+	    this._showGrand();
+            //.TRANS: show mezzo-soprano staff
+            turtles.setGridLabel(_("show mezzo-soprano"));
         } else if (grandBitmap.visible) {
             _hideGrand();
 	        this._showSoprano();
@@ -1414,11 +1421,12 @@ function Activity() {
             turtles.setGridLabel(_("show Cartesian"));
         } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
             this._showCartesian();
+            //.TRANS: show Polar coordinate overlay grid
             turtles.setGridLabel(_("show Polar"));
         } else if (cartesianBitmap.visible && !polarBitmap.visible) {
             this._showPolar();
-            //.TRANS: show Polar coordinate overlay grid
-            turtles.setGridLabel(_("hide Cartersian"));
+            //.TRANS: hide Cartesian coordinate overlay grid
+            turtles.setGridLabel(_("hide Cartesian"));
         }
 
         update = true;
