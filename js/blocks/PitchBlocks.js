@@ -188,7 +188,7 @@ function _playPitch(args, logo, turtle, blk) {
                 attr = NATURAL;
             }
             scaledegree = Number(arg0.replace(attr, ""));
-            note = scaleDegreeToPitch2(logo.keySignature[turtle], scaledegree);
+            note = scaleDegreeToPitch2(logo.keySignature[turtle], scaledegree, logo.moveable[turtle]);
 
             if(attr != NATURAL) {
                 note += attr;
