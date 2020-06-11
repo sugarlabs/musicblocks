@@ -97,11 +97,20 @@ class Turtles {
         }
 
         let i = this.getTurtleList().length % 10;
+
+        // Unique ID of turtle is time of instantiation for the first time
+        let id =
+            blkInfoAvailable &&
+            "id" in infoDict &&
+            infoDict["id"] !== Infinity ?
+                infoDict["id"] : Date.now();
+
         let turtleName =
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
-        let newTurtle = new Turtle(turtleName, this);
-        newTurtle.setStartBlock(startBlock);
+
+        let newTurtle = new Turtle(id, turtleName, this);
+        newTurtle.startBlock = startBlock;
 
         if (blkInfoAvailable) {
             if ("xcor" in infoDict) {
@@ -122,10 +131,10 @@ class Turtles {
         newTurtle.penstrokes = new createjs.Bitmap();
         turtlesStage.addChild(newTurtle.penstrokes);
 
-        newTurtle.setContainer(new createjs.Container());
-        turtlesStage.addChild(newTurtle.getContainer());
-        newTurtle.getContainer().x = this.turtleX2screenX(newTurtle.x);
-        newTurtle.getContainer().y = this.turtleY2screenY(newTurtle.y);
+        newTurtle.container = new createjs.Container();
+        turtlesStage.addChild(newTurtle.container);
+        newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
+        newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
 
         // Ensure that the buttons are on top
         turtlesStage.removeChild(this._expandButton);
@@ -177,7 +186,7 @@ class Turtles {
             };
 
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorDown" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
             }
 
             newTurtle.container.removeAllEventListeners("pressmove");
@@ -196,19 +205,19 @@ class Turtles {
 
         newTurtle.container.on("pressup", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorUp" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorUp" + newTurtle.id);
             }
         });
 
         newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("click" + newTurtle.name);
+            turtlesStage.dispatchEvent("click" + newTurtle.id);
         });
 
         newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOver" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
                 return;
             }
 
@@ -220,7 +229,7 @@ class Turtles {
 
         newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOut" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
                 return;
             }
 

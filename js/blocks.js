@@ -2329,7 +2329,7 @@ function Blocks(activity) {
             return true;
         }
         if (
-            type1 === "gridout" && type2 ==="gridin" 
+            type1 === "gridout" && type2 ==="gridin"
         ) {
             return true;
         }
@@ -6694,7 +6694,7 @@ function Blocks(activity) {
                     firstTurtle < that.turtles.turtleList.length;
                     firstTurtle++
                 ) {
-                    if (!that.turtles.turtleList[firstTurtle].trash) {
+                    if (!that.turtles.turtleList[firstTurtle].inTrash) {
                         break;
                     }
                 }
@@ -7070,14 +7070,14 @@ function Blocks(activity) {
             turtle = myBlock.value;
             var turtleNotInTrash = 0;
             for (var i = 0; i < this.turtles.turtleList.length; i++) {
-                if (!this.turtles.turtleList[i].trash) {
+                if (!this.turtles.turtleList[i].inTrash) {
                     turtleNotInTrash += 1;
                 }
             }
 
             if (turtle != null && turtleNotInTrash > 1) {
                 console.debug("putting turtle " + turtle + " in the trash");
-                this.turtles.turtleList[turtle].trash = true;
+                this.turtles.turtleList[turtle].inTrash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
             } else {
                 this.errorMsg(

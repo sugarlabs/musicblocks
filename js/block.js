@@ -555,7 +555,7 @@ function Block(protoblock, blocks, overrideName) {
                     turtle++
                 ) {
                     if (
-                        that.blocks.turtles.turtleList[turtle].getStartBlock()
+                        that.blocks.turtles.turtleList[turtle].startBlock
                             === that
                     ) {
                         that.blocks.turtles.turtleList[turtle].resizeDecoration(
@@ -3169,7 +3169,7 @@ function Block(protoblock, blocks, overrideName) {
                     turtle++
                 ) {
                     if (
-                        this.blocks.turtles.turtleList[turtle].getStartBlock()
+                        this.blocks.turtles.turtleList[turtle].startBlock
                             === this
                     ) {
                         this.blocks.turtles.turtleList[
@@ -3623,11 +3623,11 @@ function Block(protoblock, blocks, overrideName) {
 
             this._piemenuBoolean(booleanLabels, booleanValues, selectedvalue);
         } else if (this.name === "grid") {
-            
+
             selectedvalue = this.value;
 
             let Labels = [
-                _("Cartesian"), 
+                _("Cartesian"),
                 _("polar"),
                 _("Cartesian+polar") ,
                 _("treble") ,
@@ -4876,7 +4876,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // check if a non-integer value is connected to note argument
         // Pie menu would crash; so in such case navigate to closest integer
-        
+
         if (note % 1 !== 0) {
             note = Math.floor(note + 0.5);
         }
