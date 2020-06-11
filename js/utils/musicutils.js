@@ -1806,27 +1806,41 @@ function _buildScale(keySignature) {
 }
 
 function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
+    // Subtract one to make it zero-based as we're working with arrays
     scaleDegree -= 1
 
+    // Info variables according to chosen mode
     let chosenMode = keySignatureToMode(keySignature);
     let obj1 = _buildScale(keySignature);
     let chosenModeScale = obj1[0];
     let chosenModePattern = obj1[1];
+    
+    // Pitch numbers of the chosen mode
     let semitones = [0];
+
+    // Scale degrees defined for chosen mode;
+    // Rest would require arbitration
     let definedScaleDegree = [];
+
+    // Final 7 note scale combining chosen mode and arbitration
     let finalScale = [];
 
+    // if moveable do is present just return the major/perfect tones
     if (moveable) {
         finalScale = _buildScale(chosenMode[0] + " major")[0];
         return finalScale[scaleDegree];
 
     } else {
 
+        // For 7 note systems scale degrees have a one-one relation
         if (chosenModePattern.length == 7) {
             return chosenModeScale[scaleDegree];
     
         } else if (chosenModePattern.length < 7) {
+            // Major scale of the choosen key is used as fallback
             let majorScale = _buildScale(chosenMode[0] + " major")[0];
+            
+            // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
                 switch (semitones[i]) {
                     case 0:
@@ -1869,6 +1883,8 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
                 semitones.push(semitones[i] + chosenModePattern[i]);
             }
 
+            // For scale degrees which are defined --> Use choosen Mode's notes
+            // For scale degrees which are undefined --> Use fallback notes
             let k = 0;
             for(let i = 0; i < 7; i++) {
                 if (definedScaleDegree.indexOf(i+1) !== -1) {
@@ -1882,7 +1898,9 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
             return finalScale[scaleDegree];
     
         } else {
-    
+            // For scales with greater than 7 notes 
+            // All scales degrees are defined, just prefer the perfect/major ones
+            
             for(let i = 0; i < chosenModePattern.length; i++) {
                 semitones.push(semitones[i]+chosenModePattern[i]);
             }

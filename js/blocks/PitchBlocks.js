@@ -176,6 +176,7 @@ function _playPitch(args, logo, turtle, blk) {
         ) {
             let attr, scaledegree;
 
+            // Check for accidentals
             if (arg0.indexOf(SHARP) !==-1) {
                 attr = SHARP;
             } else if (arg0.indexOf(FLAT) !== -1) {
@@ -187,6 +188,8 @@ function _playPitch(args, logo, turtle, blk) {
             } else {
                 attr = NATURAL;
             }
+
+            // separate the accidental from the scaledegree
             scaledegree = Number(arg0.replace(attr, ""));
             note = scaleDegreeToPitch(logo.keySignature[turtle], scaledegree, logo.moveable[turtle]);
 
