@@ -142,7 +142,7 @@ function _playPitch(args, logo, turtle, blk) {
                     arg0 = 7; // throws an error
                 }
 
-                note = scaleDegreeToPitch(
+                note = nthDegreeToPitch(
                     logo.keySignature[turtle],
                     Math.floor(arg0)
                 );
@@ -188,7 +188,7 @@ function _playPitch(args, logo, turtle, blk) {
                 attr = NATURAL;
             }
             scaledegree = Number(arg0.replace(attr, ""));
-            note = scaleDegreeToPitch2(logo.keySignature[turtle], scaledegree, logo.moveable[turtle]);
+            note = scaleDegreeToPitch(logo.keySignature[turtle], scaledegree, logo.moveable[turtle]);
 
             if(attr != NATURAL) {
                 note += attr;
@@ -292,7 +292,7 @@ function _playPitch(args, logo, turtle, blk) {
                 //     scaleDegree = modeLength - scaleDegree + 2;
                 // }
                 scaleDegree = modeLength - scaleDegree;
-                note = scaleDegreeToPitch(
+                note = nthDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
                 );
@@ -318,7 +318,7 @@ function _playPitch(args, logo, turtle, blk) {
                         )
                     ) - deltaOctave - deltaSemi;
             } else {
-                note = scaleDegreeToPitch(
+                note = nthDegreeToPitch(
                     logo.keySignature[turtle],
                     scaleDegree
                 );

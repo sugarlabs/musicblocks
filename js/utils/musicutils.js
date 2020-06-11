@@ -1805,7 +1805,7 @@ function _buildScale(keySignature) {
     return [scale, halfSteps];
 }
 
-function scaleDegreeToPitch2(keySignature, scaleDegree, moveable) {
+function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
     scaleDegree -= 1
 
     let chosenMode = keySignatureToMode(keySignature);
@@ -1815,8 +1815,7 @@ function scaleDegreeToPitch2(keySignature, scaleDegree, moveable) {
     let semitones = [0];
     let definedScaleDegree = [];
     let finalScale = [];
-    console.log(keySignature);
-    console.log(chosenModeScale, chosenModePattern);
+
     if (moveable) {
         finalScale = _buildScale(chosenMode[0] + " major")[0];
         return finalScale[scaleDegree];
@@ -1869,7 +1868,7 @@ function scaleDegreeToPitch2(keySignature, scaleDegree, moveable) {
     
                 semitones.push(semitones[i] + chosenModePattern[i]);
             }
-            console.log(definedScaleDegree);
+
             let k = 0;
             for(let i = 0; i < 7; i++) {
                 if (definedScaleDegree.indexOf(i+1) !== -1) {
@@ -1969,13 +1968,13 @@ function scaleDegreeToPitch2(keySignature, scaleDegree, moveable) {
                     else finalScale.push(chosenModeScale[i]);
                 }
             }
-            console.log(finalScale);
+
             return finalScale[scaleDegree];
         }
     }
 }
 
-function scaleDegreeToPitch(keySignature, scaleDegree) {
+function nthDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
     // signature. Used for moveable solfege.
     var obj = _buildScale(keySignature);

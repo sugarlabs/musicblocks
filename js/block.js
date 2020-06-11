@@ -5110,9 +5110,9 @@ function Block(protoblock, blocks, overrideName) {
 
             // Use C major as of now; fix this to use current keySignature once that feature is in place
             if (noteValues[i] >= 0) {
-                note = scaleDegreeToPitch("C major", noteValues[i]);
+                note = nthDegreeToPitch("C major", noteValues[i]);
             } else {
-                note = scaleDegreeToPitch("C major", 7 + noteValues[i]);
+                note = nthDegreeToPitch("C major", 7 + noteValues[i]);
             }
 
             if (
