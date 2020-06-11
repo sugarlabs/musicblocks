@@ -96,7 +96,7 @@ class Turtles {
             }
         }
 
-        let i = this.getTurtleList().length % 10;
+        let i = this.turtleList.length % 10;
 
         // Unique ID of turtle is time of instantiation for the first time
         let id =
