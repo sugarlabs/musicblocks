@@ -1505,7 +1505,7 @@ function setupPitchBlocks() {
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
                     .name === "print"
             ) {
-                logo.statusFields.push([blk, "letterclass"]);
+                logo.statusFields.push([blk, "pitchclass"]);
             } else {
                 if (logo.noteStatus[turtle] !== null) {
                     let note = logo.lastPitchPlayed[0][0];
@@ -1517,6 +1517,46 @@ function setupPitchBlocks() {
                         pitchClass += "b";
                     }
                     return (pitchClass);
+                } else {
+                    return "";  
+                }
+            }
+        }
+    }
+
+    class NthDegreeofModeBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: print the solfege e.g. do, re, mi 
+            super("nthdegree", _("nth degree"));
+            this.setPalette("pitch");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Nth Degree of Mode block returns the zero based degree of current note being played"
+                ),
+                "documentation",
+                ""
+            ]);
+            this.beginnerBlock(true);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "nthdegree"]);
+            } else {
+                if (logo.noteStatus[turtle] !== null) {
+                    let note = logo.lastPitchPlayed[0][0];
+                    note = note.substr(0, note.length - 1);
+                    let scale = _buildScale(logo.keySignature[turtle])[0];
+                    return scale.indexOf(note);
                 } else {
                     return "";
                 }
@@ -3137,6 +3177,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new NthDegreeofModeBlock().setup();
     new LetterClassBlock().setup();
     new SolfegeSyllableBlock().setup();
     new PitchCLassBlock().setup();
