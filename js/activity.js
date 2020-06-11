@@ -3728,6 +3728,7 @@ function Activity() {
                         let turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
                             args = {
+                                id: Infinity,
                                 collapsed: false,
                                 xcor: 0,
                                 ycor: 0,
@@ -3739,6 +3740,7 @@ function Activity() {
                             };
                         } else {
                             args = {
+                                id: turtle.id,
                                 collapsed: myBlock.collapsed,
                                 xcor: turtle.x,
                                 ycor: turtle.y,

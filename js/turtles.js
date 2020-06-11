@@ -96,11 +96,20 @@ class Turtles {
             }
         }
 
-        let i = this.turtleList.length % 10;
+        let i = this.getTurtleList().length % 10;
+
+        // Unique ID of turtle is time of instantiation for the first time
+        let id =
+            blkInfoAvailable &&
+            "id" in infoDict &&
+            infoDict["id"] !== Infinity ?
+                infoDict["id"] : Date.now();
+
         let turtleName =
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
-        let newTurtle = new Turtle(turtleName, this);
+
+        let newTurtle = new Turtle(id, turtleName, this);
         newTurtle.startBlock = startBlock;
 
         if (blkInfoAvailable) {
@@ -177,7 +186,7 @@ class Turtles {
             };
 
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorDown" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
             }
 
             newTurtle.container.removeAllEventListeners("pressmove");
@@ -196,19 +205,19 @@ class Turtles {
 
         newTurtle.container.on("pressup", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorUp" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorUp" + newTurtle.id);
             }
         });
 
         newTurtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("click" + newTurtle.name);
+            turtlesStage.dispatchEvent("click" + newTurtle.id);
         });
 
         newTurtle.container.on("mouseover", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOver" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
                 return;
             }
 
@@ -220,7 +229,7 @@ class Turtles {
 
         newTurtle.container.on("mouseout", event => {
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOut" + newTurtle.name);
+                turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
                 return;
             }
 
