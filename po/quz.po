@@ -15,7 +15,7 @@
 #.TRANS: translate "rhythm1" as rhythm
 #.TRANS: ritmo
 msgid "rhythm1"
-msgstr ""
+msgstr "taki muyuchik"
 
 #.TRANS: an arrangement of notes based on duration
 #.TRANS: ritmo
@@ -740,8 +740,6 @@ msgid "mouse index heap"
 msgstr "Huk’ucha /qillqa purichina"
 
 #.TRANS: Sr. Ratón
-
-
 msgid "Mr. Mouse"
 msgstr ""
 
@@ -814,7 +812,7 @@ msgid "set mouse"
 msgstr ""
 
 #.TRANS: 
-msgid "Mr. Mouse\", 0, 0)]"
+msgid "Mr. Mouse"
 msgstr ""
 
 #.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
@@ -3000,7 +2998,662 @@ msgstr "kimsa k’uchu kampana/kalanka"
 msgid "finger cymbals"
 msgstr "kastañuylas"
 
+#.TRANS: Más descargados
+msgid "Most downloaded"
+msgstr "achka apaqasqakuna"
 
+#.TRANS: 
+msgid "A-Z"
+msgstr ""
 
+#.TRANS: Ordenar por
+msgid "Sort by"
+msgstr "kamachisqa”
 
+#.TRANS: Cargar más proyectos
+msgid "Load More Projects"
+msgstr "astawan hatun llamk’aykunata q’ipichay"
 
+#.TRANS: Última actualización
+msgid "Last Updated"
+msgstr "qhipa kunanchay"
+
+#.TRANS: Fecha de creación
+msgid "Creation Date"
+msgstr "paqarichisqa p’unchaw"
+
+#.TRANS: Numero de descargas:
+msgid "Number of Downloads:"
+msgstr "apaqasqa yupay"
+
+#.TRANS: Número de me gusta:
+msgid "Number of Likes:"
+msgstr "munasqay yupay"
+
+#.TRANS: Etiquetas:
+msgid "Tags:"
+msgstr "sutichasqakuna"
+
+#.TRANS: Informar proyecto
+msgid "Report Project"
+msgstr "hatun llamk’aymanta willakuy"
+
+#.TRANS: Proyecto informado
+msgid "Project Reported"
+msgstr "hatun llamk’asqa willasqa"
+
+#.TRANS: Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>.
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+msgstr " hatun llamk’aymanta willakuy may llik'iy"
+
+#.TRANS: Razón para informar el proyecto
+msgid "Reason for reporting project"
+msgstr "Ima rayku hatun llamk’anamanta willakuy"
+
+#.TRANS: Descargar como archivo
+msgid "Download as File"
+msgstr "waqaychasqatahina apaqana"
+
+#.TRANS: Abrir en bloques de música
+msgid "Open in Music Blocks"
+msgstr "Taki chiqaspi kichay"
+
+#.TRANS: Más detalles
+msgid "More Details"
+msgstr "astawan imankunatapas"
+
+#.TRANS: Proyecto que no gusta
+msgid "Unlike project"
+msgstr " hatun llamk’ay \mana munani "
+
+#.TRANS: Proyecto \"Me gusta\"
+msgid "Like project"
+msgstr "Hatun llamk’ay / munani"
+
+#.TRANS: Compartir proyecto
+msgid "Share project"
+msgstr "hatun llamk’anata rakiykunakuy"
+
+#.TRANS: Compartir
+msgid "Share"
+msgstr "rakinakuy"
+
+#.TRANS: Copiar enlace al portapapeles
+msgid "Copy link to clipboard"
+msgstr "aypachinata raphi apaykachanaman Kikinchay "
+
+#.TRANS: Banderas
+msgid "Flags"
+msgstr "wiphalakuna"
+
+#.TRANS: Ejecutar código al inicio.
+msgid "Run project on startup."
+msgstr "qallariypi riqsinata hatarichiy "
+
+#.TRANS: Mostrar código al inicio.
+msgid "Show code blocks on startup."
+msgstr "qallariypi riqsinata qhawachiy"
+
+#.TRANS: Contraer bloques al inicio.
+msgid "Collapse code blocks on startup."
+msgstr "qallariypi riqsinata ch’uytuchiy"
+
+#.TRANS: Opciones avanzadas
+msgid "Advanced Options"
+msgstr "akllanakuna utqhasqakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: todos los proyectos
+msgid "All Projects"
+msgstr "llapam hatun llamk’anakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: ejemplos
+msgid "Examples"
+msgstr "ahinakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: música
+msgid "Music"
+msgstr "taki"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: arte
+msgid "Art"
+msgstr "imapas t’ikray"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: mates
+msgid "Math"
+msgstr "mati"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: interactivo
+msgid "Interactive"
+msgstr "llapam llamk’aq"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: diseño
+msgid "Design"
+msgstr ""
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: juego
+msgid "Game"
+msgstr "pukllay"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: medios
+msgid "Media"
+msgstr "imayna llamk’anapaq"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: sensores
+msgid "Sensors"
+msgstr "musyapakuq"
+
+#.TRANS: Mi proyecto
+msgid "My Project"
+msgstr "hatun llamk’anay"
+
+#.TRANS: anónimo
+msgid "anonymous"
+msgstr "mana sutiyuq"
+
+#.TRANS: Error: No se pudo enviar el informe. Inténtalo de nuevo más tarde.
+msgid "Error: Report could not be submitted. Try again later."
+msgstr "pantay: manam willakuy apachiy atikunchu. Wakmanta ch’isiyaykuyman atipayay"
+
+#.TRANS: Gracias por reportar este proyecto. Un moderador revisará el proyecto en breve para verificar la violación del Código de conducta de Sugar Labs.
+msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
+msgstr "Añay kay hatun llamk’aymanta willawasqaykimanta. Pisillamantan huk allipunaq hatun llamk’anata qhawanqa, Sugar labspa riqsichinanta qhillichasqanta qhawananpaq"
+
+#.TRANS: Descripción requerida
+msgid "Report description required"
+msgstr "willakusqa mañay"
+
+#.TRANS: La descripción es demasiado larga.
+msgid "Report description too long"
+msgstr "willakuyqa sinchi chutasqa"
+
+#.TRANS: Ninguna descripción provista
+msgid "No description provided"
+msgstr "Mana mayqin willakuypas kamasqachu"
+
+#.TRANS: Característica no disponible: no se puede conectar al servidor. Vuelve a cargar Music Blocks para intentarlo de nuevo.
+msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
+msgstr " manan imayna kasqan kanchu: manam qarakuqman hap’ichiy atikunchu "
+
+#.TRANS: Volver a publicar el proyecto
+msgid "Republish Project"
+msgstr "wakmanta hatun llamk’anata riqsichiy "
+
+#.TRANS: Este campo es requerido.
+msgid "This field is required"
+msgstr "kay chiqasqa mañasqa"
+
+#.TRANS: Título es demasiado largo.
+msgid "Title too long"
+msgstr "Sutinqa sinchi hatun"
+
+#.TRANS: La descripción es demasiado largo.
+msgid "Description too long"
+msgstr "riqsichikuyqa sinchi hatun"
+
+#.TRANS: Error del Servidor
+msgid "Server Error"
+msgstr "qarakuqpa pantasqan"
+
+#.TRANS: Inténtalo de nuevo
+msgid "Try Again"
+msgstr "wakmanta rurapakuy"
+
+#.TRANS: Mostrar menos etiquetas
+msgid "Show fewer tags"
+msgstr "pisi sutichasqakuna qhawachiy "
+
+#.TRANS: Copiar
+msgid "Copy"
+msgstr "Kikinchay"
+
+#.TRANS: musical instrument
+#.TRANS: 
+msgid "japanese bell"
+msgstr ""
+
+#.TRANS: a musically tuned set of bells
+#.TRANS: campaneo
+msgid "chime"
+msgstr " "
+
+#.TRANS: a musical instrument
+#.TRANS: 
+msgid "gong"
+msgstr ""                         
+
+#.TRANS: sound effect
+#.TRANS: estruendo
+msgid "clang"
+msgstr "raqhaqaqay"	
+
+#.TRANS: sound effect
+#.TRANS: choque
+msgid "crash"
+msgstr "Takanakuy"
+
+#.TRANS: sound effect
+#.TRANS: botella
+msgid "bottle"
+msgstr "wutilla"
+
+#.TRANS: sound effect
+#.TRANS: palmada
+msgid "clap"
+msgstr "T’aklla"
+
+#.TRANS: sound effect
+#.TRANS: bofetada
+msgid "slap"
+msgstr "ch’aqllay"
+
+#.TRANS: sound effect
+#.TRANS: salpicadura
+msgid "splash"
+msgstr "ch’iqiy"
+
+#.TRANS: sound effect
+#.TRANS: burbujas
+msgid "bubbles"
+msgstr "phullpu"
+
+#.TRANS: sound effect
+#.TRANS: 
+msgid "raindrop"
+msgstr " unu sut’u"
+
+#.TRANS: animal sound effect
+#.TRANS: gato
+msgid "cat"
+msgstr "Misi"
+
+#.TRANS: animal sound effect
+#.TRANS: grillo
+msgid "cricket"
+msgstr "ch’illiku"
+
+#.TRANS: animal sound effect
+#.TRANS: perro
+msgid "dog"
+msgstr "Allqu"
+
+#.TRANS: animal sound effect
+#.TRANS: pato
+msgid "duck"
+msgstr "Waswa"
+
+#.TRANS: ordinal number. Please keep exactly one space between each number.
+#.TRANS: 1º 2º 3º 4º 5º 6º 7º 8º 9º 10º 11º 12º
+msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
+msgstr "1ñ (huk ñiqi) 2ñ (iskay ñiqi) 3ñ (kimsa ñiqi) 4ñ(kimsa ñiqi) 5ñ (phisqa ñiqi)6ñ (suqta ñiqi) 7ñ qanchik ñiqi) 8ñ (pusaq ñiqi)9ñ (isqun ñiqi) 10ñ (chunka ñiqi) 11ñ (chunka hukniyuq ñuqi) 12ñ (chunka iskayniyuq ñiqi)
+
+#.TRANS: augmented is a music term related to intervals
+#.TRANS: aumentado
+msgid "augmented"
+msgstr "yapaspa"
+
+#.TRANS: diminished is a music term related to intervals and mode
+#.TRANS: disminuido
+msgid "diminished"
+msgstr "pisiyachiy"
+
+#.TRANS: minor is a music term related to intervals and mode
+#.TRANS: menor
+msgid "minor"
+msgstr "sullk’a"
+
+#.TRANS: major is a music term related to intervals and mode
+#.TRANS: mayor
+msgid "major"
+msgstr "kuraq"
+
+#.TRANS: twelve semi-tone scale for music
+#.TRANS: cromático
+msgid "chromatic"
+msgstr "llimp’I sapa"
+
+#.TRANS: argelino
+msgid "algerian"
+msgstr "alhiriyan"
+
+#.TRANS: español
+msgid "spanish"
+msgstr "ispañul"
+
+#.TRANS: modal scale in music
+#.TRANS: 
+msgid "octatonic"
+msgstr ""
+
+#.TRANS: harmonic major scale in music
+#.TRANS: armónico mayor
+msgid "harmonic major"
+msgstr "kuraq muyurichiq"
+
+#.TRANS: natural minor scales in music
+#.TRANS: natural menor
+msgid "natural minor"
+msgstr "sullk’a kikin"
+
+#.TRANS: harmonic minor scale in music
+#.TRANS: armónico menor
+msgid "harmonic minor"
+msgstr "Sullk’a muyurichiq"
+
+#.TRANS: melodic minor scale in music
+#.TRANS: melódico menor
+msgid "melodic minor"
+msgstr "sullk’a sumaq kunka "
+
+#.TRANS: modal scale for music 
+#.TRANS: ionian
+msgid "ionian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: 
+msgid "dorian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: 
+msgid "phrygian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: 
+msgid "lydian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: 
+msgid "mixolydian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: aeolian
+msgid "aeolian"
+msgstr ""
+
+#.TRANS: modal scale for music
+#.TRANS: 
+msgid "locrian"
+msgstr ""
+
+#.TRANS: minor jazz scale for music
+#.TRANS: jazz menor
+msgid "jazz minor"
+msgstr ""
+
+#.TRANS: bebop scale for music
+#.TRANS: 
+msgid "bebop"
+msgstr ""
+
+#.TRANS: arábica
+msgid "arabic"
+msgstr ""
+
+#.TRANS: bizantino
+msgid "byzantine"
+msgstr ""
+
+#.TRANS: musical scale for music by Verdi
+#.TRANS: enigmático
+msgid "enigmatic"
+msgstr "mana riqsichikuq"
+
+#.TRANS: etíope
+msgid "ethiopian"
+msgstr ""
+
+#.TRANS: Ethiopic scale for music
+#.TRANS: 
+msgid "geez"
+msgstr ""
+
+#.TRANS: hindú
+msgid "hindu"
+msgstr ""
+
+#.TRANS: húngaro
+msgid "hungarian"
+msgstr ""
+
+#.TRANS: minor Romanian scale for music
+#.TRANS: romano menor
+msgid "romanian minor"
+msgstr "sullqa romanian"
+
+#.TRANS: gitana española
+msgid "spanish gypsy"
+msgstr "ispaña guitarra"
+
+#.TRANS: minor blues scale for music
+#.TRANS: blues menor
+msgid "minor blues"
+msgstr "Sullqa anqaskuna"
+
+#.TRANS: major blues scale for music
+#.TRANS: blues mayor
+msgid "major blues"
+msgstr "kuraq anqas"
+
+#.TRANS: Ordenar por
+msgid "Sort by"
+msgstr "kamachisqa”
+
+#.TRANS: Cargar más proyectos
+msgid "Load More Projects"
+msgstr "astawan hatun llamk’aykunata q’ipichay"
+
+#.TRANS: Última actualización
+msgid "Last Updated"
+msgstr "qhipa kunanchay"
+
+#.TRANS: Fecha de creación
+msgid "Creation Date"
+msgstr "paqarichisqa p’unchaw"
+
+#.TRANS: Numero de descargas:
+msgid "Number of Downloads:"
+msgstr "apaqasqa yupay"
+
+#.TRANS: Número de me gusta:
+msgid "Number of Likes:"
+msgstr "munasqay yupay"
+
+#.TRANS: Etiquetas:
+msgid "Tags:"
+msgstr "sutichasqakuna"
+
+#.TRANS: Informar proyecto
+msgid "Report Project"
+msgstr "hatun llamk’aymanta willakuy"
+
+#.TRANS: Proyecto informado
+msgid "Project Reported"
+msgstr "hatun llamk’asqa willasqa"
+
+#.TRANS: Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>.
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+msgstr " hatun llamk’aymanta willakuy may llik'iy"
+
+#.TRANS: Razón para informar el proyecto
+msgid "Reason for reporting project"
+msgstr "Ima rayku hatun llamk’anamanta willakuy"
+
+#.TRANS: Descargar como archivo
+msgid "Download as File"
+msgstr "waqaychasqatahina apaqana"
+
+#.TRANS: Abrir en bloques de música
+msgid "Open in Music Blocks"
+msgstr "Taki chiqaspi kichay"
+
+#.TRANS: Más detalles
+msgid "More Details"
+msgstr "astawan imankunatapas"
+
+#.TRANS: Proyecto que no gusta
+msgid "Unlike project"
+msgstr " hatun llamk’ay \mana munani "
+
+#.TRANS: Proyecto \"Me gusta\"
+msgid "Like project"
+msgstr "Hatun llamk’ay / munani"
+
+#.TRANS: Compartir proyecto
+msgid "Share project"
+msgstr "hatun llamk’anata rakiykunakuy"
+
+#.TRANS: Compartir
+msgid "Share"
+msgstr "rakinakuy"
+
+#.TRANS: Copiar enlace al portapapeles
+msgid "Copy link to clipboard"
+msgstr "aypachinata raphi apaykachanaman Kikinchay "
+
+#.TRANS: Banderas
+msgid "Flags"
+msgstr "wiphalakuna"
+
+#.TRANS: Ejecutar código al inicio.
+msgid "Run project on startup."
+msgstr "qallariypi riqsinata hatarichiy "
+
+#.TRANS: Mostrar código al inicio.
+msgid "Show code blocks on startup."
+msgstr "qallariypi riqsinata qhawachiy"
+
+#.TRANS: Contraer bloques al inicio.
+msgid "Collapse code blocks on startup."
+msgstr "qallariypi riqsinata ch’uytuchiy"
+
+#.TRANS: Opciones avanzadas
+msgid "Advanced Options"
+msgstr "akllanakuna utqhasqakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: todos los proyectos
+msgid "All Projects"
+msgstr "llapam hatun llamk’anakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: ejemplos
+msgid "Examples"
+msgstr "ahinakuna"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: música
+msgid "Music"
+msgstr "taki"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: arte
+msgid "Art"
+msgstr "imapas t’ikray"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: mates
+msgid "Math"
+msgstr "mati"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: interactivo
+msgid "Interactive"
+msgstr "llapam llamk’aq"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: diseño
+msgid "Design"
+msgstr ""
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: juego
+msgid "Game"
+msgstr "pukllay"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: medios
+msgid "Media"
+msgstr "imayna llamk’anapaq"
+
+#.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: sensores
+msgid "Sensors"
+msgstr "musyapakuq"
+
+#.TRANS: Mi proyecto
+msgid "My Project"
+msgstr "hatun llamk’anay"
+
+#.TRANS: anónimo
+msgid "anonymous"
+msgstr "mana sutiyuq"
+
+#.TRANS: Error: No se pudo enviar el informe. Inténtalo de nuevo más tarde.
+msgid "Error: Report could not be submitted. Try again later."
+msgstr "pantay: manam willakuy apachiy atikunchu. Wakmanta ch’isiyaykuyman atipayay"
+
+#.TRANS: Gracias por reportar este proyecto. Un moderador revisará el proyecto en breve para verificar la violación del Código de conducta de Sugar Labs.
+msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
+msgstr "Añay kay hatun llamk’aymanta willawasqaykimanta. Pisillamantan huk allipunaq hatun llamk’anata qhawanqa, Sugar labspa riqsichinanta qhillichasqanta qhawananpaq"
+
+#.TRANS: Descripción requerida
+msgid "Report description required"
+msgstr "willakusqa mañay"
+
+#.TRANS: La descripción es demasiado larga.
+msgid "Report description too long"
+msgstr "willakuyqa sinchi chutasqa"
+
+#.TRANS: Ninguna descripción provista
+msgid "No description provided"
+msgstr "Mana mayqin willakuypas kamasqachu"
+
+#.TRANS: Característica no disponible: no se puede conectar al servidor. Vuelve a cargar Music Blocks para intentarlo de nuevo.
+msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
+msgstr " manan imayna kasqan kanchu: manam qarakuqman hap’ichiy atikunchu "
+
+#.TRANS: Volver a publicar el proyecto
+msgid "Republish Project"
+msgstr "wakmanta hatun llamk’anata riqsichiy "
+
+#.TRANS: Este campo es requerido.
+msgid "This field is required"
+msgstr "kay chiqasqa mañasqa"
+
+#.TRANS: Título es demasiado largo.
+msgid "Title too long"
+msgstr "Sutinqa sinchi hatun"
+
+#.TRANS: La descripción es demasiado largo.
+msgid "Description too long"
+msgstr "riqsichikuyqa sinchi hatun"
+
+#.TRANS: Error del Servidor
+msgid "Server Error"
+msgstr "qarakuqpa pantasqan"
+
+#.TRANS: Inténtalo de nuevo
+msgid "Try Again"
+msgstr "wakmanta rurapakuy"
+
+#.TRANS: Mostrar menos etiquetas
+msgid "Show fewer tags"
+msgstr "pisi sutichasqakuna qhawachiy "
+
+#.TRANS: Copiar
+msgid "Copy"
+msgstr "Kikinchay"
