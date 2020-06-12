@@ -4995,7 +4995,25 @@ function Block(protoblock, blocks, overrideName) {
         this._octavesWheel.animatetime = 0; // 300;
         this._octavesWheel.createWheel(octaveLabels);
 
-        // Position the widget over the note block.
+        // enable changing values while pie-menu is open
+        let labelElem = docById("labelDiv");
+        labelElem.innerHTML =
+            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
+            note +
+            '" />';
+        labelElem.classList.add("hasKeyboard");
+
+        this.label = docById("numberLabel");
+        this.label.addEventListener(
+            "keypress",
+            this._exitKeyPressed.bind(this)
+        );
+
+        this.label.addEventListener("change", function() {
+            that._labelChanged(false, false);
+        });
+
+        // Position the widget above/below note block.
         let x = this.container.x;
         let y = this.container.y;
 
@@ -5007,29 +5025,38 @@ function Block(protoblock, blocks, overrideName) {
         docById("wheelDiv").style.position = "absolute";
         docById("wheelDiv").style.height = "300px";
         docById("wheelDiv").style.width = "300px";
+
+        let selectorWidth = 150;
+        let left = Math.round(
+            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
+        );
+        let top = Math.round(
+            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
+        );
+        this.label.style.left = left + "px";
+        this.label.style.top = top + "px";
+
         docById("wheelDiv").style.left =
             Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
+                Math.max(left - (300 - selectorWidth) / 2, 0),
+                this.blocks.turtles._canvas.width - 300
             ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
+
+        if (top - 300 < 0) {
+            docById("wheelDiv").style.top = top + 40 + "px";
+        } else {
+            docById("wheelDiv").style.top = top - 300 + "px";
+        }
+
+        this.label.style.width =
+            (Math.round(selectorWidth * this.blocks.blockScale) *
+                this.protoblock.scale) /
+            2 +
+            "px";
+
+        this.label.style.fontSize =
+            Math.round(
+                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
             ) + "px";
 
         // Navigate to a the current note value.
@@ -5722,7 +5749,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.protoblock.scale) /
             2 +
             "px";
-
+        console.log(this.label.style.width);
         // Navigate to a the current number value.
         let i = wheelValues.indexOf(selectedValue);
         if (i === -1) {
