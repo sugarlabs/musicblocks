@@ -1510,7 +1510,6 @@ function setupPitchBlocks() {
                 if (logo.noteStatus[turtle] !== null) {
                     let note = logo.lastPitchPlayed[0][0];
                     let pitchClass = note[0];
-                    console.log(note);
                     if (note.indexOf("#") != -1) {
                         pitchClass += "#";
                     } else if (note.indexOf("b") != -1) {
@@ -1553,8 +1552,11 @@ function setupPitchBlocks() {
                 logo.statusFields.push([blk, "nthdegree"]);
             } else {
                 if (logo.noteStatus[turtle] !== null) {
-                    let note = logo.lastPitchPlayed[0][0];
+                    let note = logo.noteStatus[0][0][0];
                     note = note.substr(0, note.length - 1);
+                    note = note
+                            .replace("#", SHARP)
+                            .replace("b", FLAT);
                     let scale = _buildScale(logo.keySignature[turtle])[0];
                     return scale.indexOf(note);
                 } else {
