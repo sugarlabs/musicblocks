@@ -7090,7 +7090,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // Look for the selected mode.
-            for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+            for (i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
                 if (MODE_PIE_MENUS[grp][i] === selectedMode) {
                     break;
                 }
