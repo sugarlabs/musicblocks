@@ -579,10 +579,9 @@ function setupMeterBlocks() {
             });
 
             this.makeMacro((x, y) => {
-                this.linkTurtle =
-                    turtles.turtleList.length;
+
                 return [
-                    [0, ["start", { "collapsed": true, "name": "Beat" }], x + 100, y + 100, [null, 3, null]],
+                    [0, ["start", { "collapsed": true, "name": "beat" }], x + 100, y + 100, [null, 3, null]],
 
                     [1, "dispatch", 0, 0, [8, 2, null]],
                     [2, ["text", { "value": "__everybeat_" + this.linkTurtle + "__" }], 0, 0, [1]],
@@ -595,7 +594,7 @@ function setupMeterBlocks() {
                     [7, ["number", { "value": 4 }], 0, 0, [5]],
                     [8, "vspace", 0, 0, [4, 1]],
 
-                    [9, "everybeatdonew", x, y, [null, 10, null]],
+                    [9, ["everybeatdonew", {"turtleID": null} ], x, y, [null, 10, null]],
                     [10, ["text", { "value": "action" }], 0, 0, [9]]
 
                 ]
@@ -606,8 +605,37 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
-            turtle = this.linkTurtle;
-            console.log(turtle)
+            let findTurtle=(id)=>{
+                for(let tur in turtles.getTurtleList()){
+                    if (id == turtles.getTurtleList()[tur].id) return tur;
+                }
+            };
+            let org =turtle ;
+            let turtleID =logo.blocks.blockList[blk].turtleID ;
+            turtle = findTurtle(turtleID);
+            console.log(turtle,turtleID);
+
+            let ans = null ;
+            let done = {} ;
+            let findBlock = (bk, blockName) => { // dfs 
+                if (!bk) return ;
+                if (bk in done) return ;
+                done[bk]= true ;
+                if (logo.blocks.blockList[bk].name == blockName){ans = bk; return ;}
+                for ( let con of blocks.blockList[bk].connections ){
+                    findBlock(con,blockName);
+                }
+            }
+            done ={};
+            findBlock(logo.blocks.blockList.indexOf(turtles.turtleList[turtle].startBlock),"dispatch");
+            let dispatchTextBlock  = logo.blocks.blockList[ans].connections[1];
+            done ={};
+            findBlock(logo.blocks.blockList.indexOf(turtles.turtleList[turtle].startBlock),"newnote");
+            let divideBlock  = logo.blocks.blockList[ans].connections[1];
+            let den = logo.blocks.blockList[divideBlock].connections[2];
+            console.log(dispatchTextBlock,divideBlock,den);
+
+            logo.blocks.blockList[den].value = logo.noteValuePerBeat[org];
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
@@ -644,10 +672,10 @@ function setupMeterBlocks() {
                     }
                 };
 
-                let eventName = "__everybeat_" + this.linkTurtle + "__";
+                let eventName = "__everybeat_" + turtleID + "__";
+                logo.blocks.blockList[dispatchTextBlock].value = eventName ;
                 logo._setListener(turtle, eventName, __listener);
-                console.log("send " + this.linkTurtle);
-                logo.beatList[turtle].push("everybeat");
+                console.log("send " +this.turtleID);
             }
         }
     }

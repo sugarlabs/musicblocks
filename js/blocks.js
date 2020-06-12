@@ -6521,6 +6521,29 @@ function Blocks(activity) {
                         [thisBlock, value]
                     );
                     break;
+                case "everybeatdonew":
+                    var postProcess = (args) => {
+                        if (args[1].turtleID==null) {
+                            setTimeout(() => {
+                                console.log(args[1] , last(turtles.turtleList));
+                                that.blockList[args[0]].turtleID = last(turtles.turtleList).id;
+                            }
+                            ,2000);
+                        }
+                        //wait for some time to let the beat turtle load . 
+                        else {
+                            console.log(args[0],args[1]);
+                            that.blockList[args[0]].turtleID = args[1]["turtleID"] ;
+                        }
+                    }
+                    this._makeNewBlockWithConnections(
+                        name,
+                        blockOffset,
+                        blkData[4],
+                        postProcess,
+                        [thisBlock, blkInfo[1]]
+                    );
+                    break;
                 default:
                     // Check that name is in the proto list
                     if (

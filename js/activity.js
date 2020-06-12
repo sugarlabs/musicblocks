@@ -892,7 +892,7 @@ function Activity() {
 
         if (!turtles.running()) {
             console.debug("RUNNING");
-            if (!turtles.isShrunk) {
+            if (!turtles.isShrunk()) {
                 logo.hideBlocks(true);
             }
 
@@ -3805,6 +3805,11 @@ function Activity() {
                             count: window.savedMatricesCount
                         };
                         hasMatrixDataBlock = true;
+                        break;
+                    case "everybeatdonew":
+                        args ={
+                            turtleID: myBlock.turtleID
+                        }
                         break;
                     default:
                         break;
