@@ -7092,13 +7092,14 @@ function Blocks(activity) {
                 console.debug("putting turtle " + turtle + " in the trash");
                 this.turtles.turtleList[turtle].inTrash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
-            } else {
-                this.errorMsg(
-                    _("You must always have at least one start block.")
-                );
-                console.debug("null turtle");
-                return;
-            }
+            } 
+            // else {
+            //     this.errorMsg(
+            //         _("You must always have at least one start block.")
+            //     );
+            //     console.debug("null turtle");
+            //     return;
+            // }
         } else if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);

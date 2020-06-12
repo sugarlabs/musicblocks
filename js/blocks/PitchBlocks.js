@@ -2613,11 +2613,11 @@ function setupPitchBlocks() {
             this.setPalette("pitch");
             this.setHelpString([
                 _(
-                    "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+                    "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
                 ) +
                     " " +
                     _(
-                        "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+                        "The pitches change according to the mode specified without any need for respellings."
                     ),
                 "documentation",
                 ""
@@ -2641,6 +2641,17 @@ function setupPitchBlocks() {
             super("scaledegree2");
             this.setPalette("pitch");
             this.extraWidth = 10;
+            this.setHelpString([
+                _(
+                    "Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals."
+                ) +
+                    " " +
+                    _(
+                        "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
+                    ),
+                "documentation",
+                ""
+            ]);
             this.formBlock({
                 outType: "scaledegreeout"
             });
