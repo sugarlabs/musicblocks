@@ -848,4 +848,5 @@ function setupRhythmBlocks() {
     new NoteBlock().setup();
     new NewNoteBlock().setup();
     new DefineFrequencyBlock().setup();
+    new OctaveSpaceBlock().setup();
 }
