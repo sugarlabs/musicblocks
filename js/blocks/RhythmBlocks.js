@@ -650,7 +650,7 @@ function setupRhythmBlocks() {
 
     class Note7Block extends _NoteValueBlock {
         constructor() {
-            super("note7", "5 4");
+            super("note7", "4 4");
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 8]],
@@ -659,7 +659,27 @@ function setupRhythmBlocks() {
                 [3, ["number", { value: 4 }], 0, 0, [1]],
                 [4, "vspace", 0, 0, [0, 5]],
                 [5, "nthmodalpitch", 0, 0, [4, 6, 7, null]],
-                [6, ["number", { value: 5 }], 0, 0, [5]],
+                [6, ["number", { value: 4 }], 0, 0, [5]],
+                [7, ["number", { value: 4 }], 0, 0, [5]],
+                [8, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+    }
+
+    class Note8Block extends _NoteValueBlock {
+        constructor() {
+            super("note8", "scale degree");
+            this.setHelpString();
+            this.makeMacro((x, y) => [
+                [0, "newnote", x, y, [null, 1, 4, 8]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 1 }], 0, 0, [1]],
+                [3, ["number", { value: 4 }], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, 5]],
+                [5, "pitch", 0, 0, [4, 6, 7, null]],
+                [6, ["scaledegree2", { value: "5" }], 0, 0, [5]],
                 [7, ["number", { value: 4 }], 0, 0, [5]],
                 [8, "hidden", 0, 0, [0, null]]
             ]);
@@ -841,6 +861,7 @@ function setupRhythmBlocks() {
     new Note4Block().setup();
     new Note3Block().setup();
     new Note5Block().setup();
+    new Note8Block().setup();
     new Note7Block().setup();
     new Note6Block().setup();
     new Note2Block().setup();

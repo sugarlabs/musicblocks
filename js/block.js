@@ -40,6 +40,7 @@ const SPECIALINPUTS = [
     "number",
     "solfege",
     "eastindiansolfege",
+    "scaledegree2",
     "notename",
     "voicename",
     "modename",
@@ -71,6 +72,7 @@ const EXTRAWIDENAMES = [];
 const PIEMENUS = [
     "solfege",
     "eastindiansolfege",
+    "scaledegree2",
     "notename",
     "voicename",
     "drumname",
@@ -1141,6 +1143,9 @@ function Block(protoblock, blocks, overrideName) {
                     case "eastindiansolfege":
                         this.value = "sol";
                         break;
+                    case "scaledegree2":
+                        this.value = "5";
+                        break;
                     case "customNote":
                         let len = this.blocks.logo.synth.startingPitch.length;
                         this.value =
@@ -1216,7 +1221,15 @@ function Block(protoblock, blocks, overrideName) {
                 if (attr !== "♮") {
                     label += attr;
                 }
-            } else if (this.name === "drumname") {
+            } else if(this.name === "scaledegree2") {
+                obj = splitScaleDegree(this.value);
+                label = obj[0];
+                attr = obj[1];
+
+                if(attr !== "♮") {
+                    label += attr;
+                }
+            } else if (this.name === "drumname") { 
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
@@ -2336,6 +2349,17 @@ function Block(protoblock, blocks, overrideName) {
                             " " +
                             this.blocks.blockList[c2].value
                         );
+                    } else if (this.blocks.blockList[c1].name === "scaledegree2") {
+                        obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                        let note = obj[0];
+                        if(obj[1] !== NATURAL) {
+                            note += obj[1];
+                        }
+                        return (
+                            note +
+                            " " +
+                            this.blocks.blockList[c2].value
+                        );
                     }
                 }
                 break;
@@ -3244,7 +3268,6 @@ function Block(protoblock, blocks, overrideName) {
             this.label = docById("textLabel");
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
-
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
@@ -3258,6 +3281,19 @@ function Block(protoblock, blocks, overrideName) {
                     obj[1]
                 );
             }
+        } else if (this.name === "scaledegree2") {
+            obj = splitScaleDegree(this.value);
+            let scalenotes_ = ("7 6 5 4 3 2 1").split(" ");
+            if(this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(
+                    scalenotes_,
+                    SCALENOTES,
+                    SOLFATTRS,
+                    obj[0],
+                    obj[1]
+                )
+            };
+
         } else if (this.name === "customNote") {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -4784,8 +4820,16 @@ function Block(protoblock, blocks, overrideName) {
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
 
+
+            if (Number(note.substr(0,1)) == note.substr(0,1)) {
+                let obj1 = splitScaleDegree(note);
+                note = SOLFEGENAMES[obj1[0] - 1];
+                if(obj1[1] != NATURAL) {
+                    note += obj1[1]
+                }
+            }
             // FIX ME: get key signature if available
-            // FIX ME: get moveable if available
+            // FIX ME: get moveable if availableconsole.log(note);
             let obj = getNote(
                 note,
                 octave,
@@ -4951,7 +4995,25 @@ function Block(protoblock, blocks, overrideName) {
         this._octavesWheel.animatetime = 0; // 300;
         this._octavesWheel.createWheel(octaveLabels);
 
-        // Position the widget over the note block.
+        // enable changing values while pie-menu is open
+        let labelElem = docById("labelDiv");
+        labelElem.innerHTML =
+            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
+            note +
+            '" />';
+        labelElem.classList.add("hasKeyboard");
+
+        this.label = docById("numberLabel");
+        this.label.addEventListener(
+            "keypress",
+            this._exitKeyPressed.bind(this)
+        );
+
+        this.label.addEventListener("change", function() {
+            that._labelChanged(false, false);
+        });
+
+        // Position the widget above/below note block.
         let x = this.container.x;
         let y = this.container.y;
 
@@ -4963,29 +5025,38 @@ function Block(protoblock, blocks, overrideName) {
         docById("wheelDiv").style.position = "absolute";
         docById("wheelDiv").style.height = "300px";
         docById("wheelDiv").style.width = "300px";
+
+        let selectorWidth = 150;
+        let left = Math.round(
+            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
+        );
+        let top = Math.round(
+            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
+        );
+        this.label.style.left = left + "px";
+        this.label.style.top = top + "px";
+
         docById("wheelDiv").style.left =
             Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
+                Math.max(left - (300 - selectorWidth) / 2, 0),
+                this.blocks.turtles._canvas.width - 300
             ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
+
+        if (top - 300 < 0) {
+            docById("wheelDiv").style.top = top + 40 + "px";
+        } else {
+            docById("wheelDiv").style.top = top - 300 + "px";
+        }
+
+        this.label.style.width =
+            (Math.round(selectorWidth * this.blocks.blockScale) *
+                this.protoblock.scale) /
+            2 +
+            "px";
+
+        this.label.style.fontSize =
+            Math.round(
+                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
             ) + "px";
 
         // Navigate to a the current note value.
@@ -5066,9 +5137,9 @@ function Block(protoblock, blocks, overrideName) {
 
             // Use C major as of now; fix this to use current keySignature once that feature is in place
             if (noteValues[i] >= 0) {
-                note = scaleDegreeToPitch("C major", noteValues[i]);
+                note = nthDegreeToPitch("C major", noteValues[i]);
             } else {
-                note = scaleDegreeToPitch("C major", 7 + noteValues[i]);
+                note = nthDegreeToPitch("C major", 7 + noteValues[i]);
             }
 
             if (
@@ -5678,7 +5749,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.protoblock.scale) /
             2 +
             "px";
-
+        console.log(this.label.style.width);
         // Navigate to a the current number value.
         let i = wheelValues.indexOf(selectedValue);
         if (i === -1) {
@@ -7019,7 +7090,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // Look for the selected mode.
-            for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
+            for (i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
                 if (MODE_PIE_MENUS[grp][i] === selectedMode) {
                     break;
                 }

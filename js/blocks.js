@@ -2307,7 +2307,7 @@ function Blocks(activity) {
         }
         if (
             type1 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
                 type2
             ) !== -1
         ) {
@@ -2315,7 +2315,7 @@ function Blocks(activity) {
         }
         if (
             type2 === "solfegein" &&
-            ["anyout", "solfegeout", "textout", "noteout", "numberout"].indexOf(
+            ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
                 type1
             ) !== -1
         ) {
@@ -2323,7 +2323,7 @@ function Blocks(activity) {
         }
         if (
             type1 === "notein" &&
-            ["solfegeout", "textout", "noteout"].indexOf(type2) !== -1
+            ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type2) !== -1
         ) {
             return true;
         }
@@ -2334,7 +2334,7 @@ function Blocks(activity) {
         }
         if (
             type2 === "notein" &&
-            ["solfegeout", "textout", "noteout"].indexOf(type1) !== -1
+            ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type1) !== -1
         ) {
             return true;
         }
@@ -2347,6 +2347,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
+                "scaledegreeout",
                 "noteout"
             ].indexOf(type2) !== -1
         ) {
@@ -2361,6 +2362,7 @@ function Blocks(activity) {
                 "anyout",
                 "fileout",
                 "solfegeout",
+                "scaledegreeout",
                 "noteout"
             ].indexOf(type1) !== -1
         ) {
@@ -2530,6 +2532,15 @@ function Blocks(activity) {
                 var label = i18nSolfege(obj[0]);
                 var attr = obj[1];
 
+                if (attr !== NATURAL) {
+                    label += attr;
+                }
+                break;
+            case "scaledegree2":
+                if (myBlock.value === null) myBlock.value = "4";
+                var obj = splitScaleDegree(myBlock.value);
+                var label = obj[0];
+                var attr = obj[1];
                 if (attr !== NATURAL) {
                     label += attr;
                 }
@@ -3282,6 +3293,8 @@ function Blocks(activity) {
             postProcessArg = [thisBlock, true];
         } else if (name === "solfege") {
             postProcessArg = [thisBlock, "sol"];
+        } else if (name === "scaledegree2") {
+            postProcessArg = [thisBlock, "5"];
         } else if (name === "customNote") {
             var len = this.logo.synth.startingPitch.length;
             postProcessArg = [
@@ -6214,6 +6227,7 @@ function Blocks(activity) {
                     break;
                 case "text":
                 case "solfege":
+                case "scaledegree2":
                 case "customNote":
                 case "eastindiansolfege":
                 case "notename":
@@ -7078,13 +7092,14 @@ function Blocks(activity) {
                 console.debug("putting turtle " + turtle + " in the trash");
                 this.turtles.turtleList[turtle].inTrash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
-            } else {
-                this.errorMsg(
-                    _("You must always have at least one start block.")
-                );
-                console.debug("null turtle");
-                return;
-            }
+            } 
+            // else {
+            //     this.errorMsg(
+            //         _("You must always have at least one start block.")
+            //     );
+            //     console.debug("null turtle");
+            //     return;
+            // }
         } else if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);
