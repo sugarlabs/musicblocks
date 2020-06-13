@@ -717,7 +717,7 @@ class Turtle {
                 startBlock.collapseText.text = this.name;
                 startBlock.regenerateArtwork(false);
                 startBlock.value =
-                    this.turtles.getTurtleList().indexOf(this);
+                    this.turtles.turtleList.indexOf(this);
             }
         }
 
