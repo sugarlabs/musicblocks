@@ -183,9 +183,9 @@ function Block(protoblock, blocks, overrideName) {
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
+                        await delayExecution(100);
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
-                        await that.pause(100);
                     } else {
                         that.container.cache(
                             that.bounds.x,
