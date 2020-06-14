@@ -571,7 +571,7 @@ function Activity() {
             sendAllToTrash(false, true);
             setTimeout(function() {
                 let message =
-                    blocks.blockList[blocks.activeBlock].protoblock.helpString;
+		    blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just
                     // load the block.
@@ -617,10 +617,18 @@ function Activity() {
     _saveHelpBlocks = function() {
         // Save the artwork for every help block.
         let i = 0;
-        for (let name in BLOCKHELP) {
-            console.debug(name);
-            __saveHelpBlock(name, i * 2000);
+	let blockHelpList = [];
+        for (let key in blocks.protoBlockDict){
+            if (blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
+                blockHelpList.push(key);
+            }
+        }
+
+        for (let name in blockHelpList) {
+            console.debug(name + ' ' + blockHelpList[name]);
+            __saveHelpBlock(blockHelpList[name], i * 2000);
             i += 1;
+	    if (i == 5) break;
         }
 
         sendAllToTrash(true, true);
