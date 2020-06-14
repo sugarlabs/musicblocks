@@ -185,9 +185,7 @@ class Turtles {
                 y: newTurtle.container.y - event.stageY / scale
             };
 
-            if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
-            }
+            turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
 
             newTurtle.container.removeAllEventListeners("pressmove");
             newTurtle.container.on("pressmove", event => {
@@ -204,9 +202,8 @@ class Turtles {
         });
 
         newTurtle.container.on("pressup", event => {
-            if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorUp" + newTurtle.id);
-            }
+            console.debug("--> [CursorUp " + newTurtle.name + "]");
+            turtlesStage.dispatchEvent("CursorUp" + newTurtle.id);
         });
 
         newTurtle.container.on("click", event => {
@@ -216,8 +213,10 @@ class Turtles {
         });
 
         newTurtle.container.on("mouseover", event => {
+            console.debug("--> [mouseover " + newTurtle.name + "]");
+            turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
+            
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
                 return;
             }
 
@@ -228,8 +227,10 @@ class Turtles {
         });
 
         newTurtle.container.on("mouseout", event => {
+            console.debug("--> [mouseout " + newTurtle.name + "]");
+            turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
+            
             if (newTurtle.running) {
-                turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
                 return;
             }
 
