@@ -145,6 +145,9 @@ function setupSensorsBlocks() {
             super("loudness", _("loudness"));
             this.setPalette("sensors");
             this.parameter = true;
+	    // Put this block on the beginner palette except in Japanese.
+            this.beginnerBlock(!(this.lang === "ja"));
+
             this.setHelpString([
                 _(
                     "The Loudness block returns the volume detected by the microphone."
@@ -192,7 +195,7 @@ function setupSensorsBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Click block returns True if a mouse has been clicked."),
+                _("The Click block triggers an event if a mouse has been clicked."),
                 "documentation",
                 null,
                 "clickhelp"
@@ -206,12 +209,12 @@ function setupSensorsBlocks() {
 
     class MyCursoroverBlock extends ValueBlock {
         constructor() {
-            super("mycursorover", _("CursorOver"));
+	    // TRANS: The mouse cursor is over the mouse icon
+            super("mycursorover", _("cursor over"));
             this.setPalette("sensors");
-            this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The CursorOver block returns hover associated event"),
+                _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
                 "documentation",
                 null,
             ]);
@@ -224,12 +227,13 @@ function setupSensorsBlocks() {
 
     class MyCursoroutBlock extends ValueBlock {
         constructor() {
-            super("mycursorout", _("CursorOut"));
+	    // TRANS: The cursor is "out" -- it is no longer over the mouse.
+            super("mycursorout", _("cursor out"));
             this.setPalette("sensors");
-            this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The CursorOut block returns hover associated event"),
+		// TRANS: hover
+                _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                 "documentation",
                 null,
             ]);
@@ -242,12 +246,11 @@ function setupSensorsBlocks() {
 
     class MyCursordownBlock extends ValueBlock {
         constructor() {
-            super("mycursordown", _("CursorDown"));
+            super("mycursordown", _("cursor button down"));
             this.setPalette("sensors");
-            this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The CursorDown Block returns the CursorDown event "),
+                _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
                 "documentation",
                 null,
             ]);
@@ -260,12 +263,11 @@ function setupSensorsBlocks() {
 
     class MyCursorupBlock extends ValueBlock {
         constructor() {
-            super("mycursorup", _("CursorUp"));
+            super("mycursorup", _("cursor button up"));
             this.setPalette("sensors");
-            this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The CursorUp Block returns the CursorUp event "),
+                _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
                 "documentation",
                 null,
             ]);
@@ -409,6 +411,9 @@ function setupSensorsBlocks() {
             super("time", _("time"));
             this.setPalette("sensors");
             this.parameter = true;
+	    // Put this block on the beginner palette except in Japanese.
+            this.beginnerBlock(!(this.lang === "ja"));
+
             this.setHelpString([
                 _(
                     "The Time block returns the number of seconds that the program has been running."
@@ -581,23 +586,23 @@ function setupSensorsBlocks() {
         }
     }
 
-    new InputValueBlock().setup();
-    new InputBlock().setup();
-    new PitchnessBlock().setup();
-    new LoudnessBlock().setup();
-    new MyClickBlock().setup();
-    new MyCursoroverBlock().setup();
-    new MyCursoroutBlock().setup();
-    new MyCursorupBlock().setup();
-    new MyCursordownBlock().setup();
     new GetBlueBlock().setup();
     new GetGreenBlock().setup();
     new GetRedBlock().setup();
     new GetColorPixelBlock().setup();
-    new TimeBlock().setup();
-    new MouseYBlock().setup();
-    new MouseXBlock().setup();
-    new MouseButtonBlock().setup();
     new ToASCIIBlock().setup();
     new KeyboardBlock().setup();
+    new InputValueBlock().setup();
+    new InputBlock().setup();
+    new TimeBlock().setup();
+    new PitchnessBlock().setup();
+    new LoudnessBlock().setup();
+    new MyCursoroutBlock().setup();
+    new MyCursoroverBlock().setup();
+    new MyCursorupBlock().setup();
+    new MyCursordownBlock().setup();
+    new MyClickBlock().setup();
+    new MouseButtonBlock().setup();
+    new MouseYBlock().setup();
+    new MouseXBlock().setup();
 }

@@ -356,6 +356,7 @@ const FLATPREFERENCE = [
 
 // SOLFNOTES is the internal representation used in selectors
 const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+const SCALENOTES = ["7", "6", "5", "4", "3", "2", "1"];
 const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
 const DRUMS = [
     "snare drum",
@@ -1804,7 +1805,194 @@ function _buildScale(keySignature) {
     return [scale, halfSteps];
 }
 
-function scaleDegreeToPitch(keySignature, scaleDegree) {
+function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
+    // Subtract one to make it zero-based as we're working with arrays
+    scaleDegree -= 1
+
+    // Info variables according to chosen mode
+    let chosenMode = keySignatureToMode(keySignature);
+    let obj1 = _buildScale(keySignature);
+    let chosenModeScale = obj1[0];
+    let chosenModePattern = obj1[1];
+    
+    // Pitch numbers of the chosen mode
+    let semitones = [0];
+
+    // Scale degrees defined for chosen mode;
+    // Rest would require arbitration
+    let definedScaleDegree = [];
+
+    // Final 7 note scale combining chosen mode and arbitration
+    let finalScale = [];
+
+    // if moveable do is present just return the major/perfect tones
+    if (moveable) {
+        finalScale = _buildScale(chosenMode[0] + " major")[0];
+        return finalScale[scaleDegree];
+
+    } else {
+
+        // For 7 note systems scale degrees have a one-one relation
+        if (chosenModePattern.length == 7) {
+            return chosenModeScale[scaleDegree];
+    
+        } else if (chosenModePattern.length < 7) {
+            // Major scale of the choosen key is used as fallback
+            let majorScale = _buildScale(chosenMode[0] + " major")[0];
+            
+            // according to the choosenModePattern, calculate defined scale degrees
+            for (let i = 0; i < chosenModePattern.length; i++) {
+                switch (semitones[i]) {
+                    case 0:
+                        definedScaleDegree.push(1);
+                        break;
+                    case 1:
+                    case 2:
+                        definedScaleDegree.push(2);
+                        break;
+                    case 3:
+                    case 4: 
+                        definedScaleDegree.push(3);
+                        break;
+                    case 5:
+                        definedScaleDegree.push(4);
+                        break;
+                    case 6:
+                        let lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
+                        if (lastAdded != 4) {
+                            definedScaleDegree.push(4);
+                        } else if (semitones[i] + chosenModeScale[i] != 7) {
+                            definedScaleDegree.push(5);
+                        }
+                        break; 
+                    case 7:
+                        definedScaleDegree.push(5);
+                        break;
+                    case 8:
+                    case 9:
+                        definedScaleDegree.push(6);
+                        break;
+                    case 10:
+                    case 11:
+                        definedScaleDegree.push(7);
+                        break;
+                    default:
+                        continue;
+                }
+    
+                semitones.push(semitones[i] + chosenModePattern[i]);
+            }
+
+            // For scale degrees which are defined --> Use choosen Mode's notes
+            // For scale degrees which are undefined --> Use fallback notes
+            let k = 0;
+            for(let i = 0; i < 7; i++) {
+                if (definedScaleDegree.indexOf(i+1) !== -1) {
+                    finalScale.push(chosenModeScale[k]);
+                    k++;
+                } else {
+                    finalScale.push(majorScale[i]);
+                }
+            }
+
+            return finalScale[scaleDegree];
+    
+        } else {
+            // For scales with greater than 7 notes 
+            // All scales degrees are defined, just prefer the perfect/major ones
+            
+            for(let i = 0; i < chosenModePattern.length; i++) {
+                semitones.push(semitones[i]+chosenModePattern[i]);
+            }
+    
+            for(let i = 0; i < semitones.length; i++) {
+                if (
+                    semitones[i] == 0
+                ) {
+                    finalScale.push(chosenModeScale[i]);
+                } else if (
+                    semitones[i] == 1
+                ) {
+                    if (semitones[i+1] == 2) {
+                        finalScale.push(chosenModeScale[i+1]);
+                    } else {
+                        finalScale.push(chosenModeScale[i]);
+                    }
+                } else if (
+                    semitones[i] == 2
+                ) {
+                    if (semitones[i-1] == 1) continue;
+                 
+                    else finalScale.push(chosenModeScale[i]);
+    
+                } else if (
+                    semitones[i] == 3
+                ) {
+                    if (semitones[i+1] == 4) {
+                        finalScale.push(chosenModeScale[i+1]);
+                    } else {
+                        finalScale.push(chosenModeScale[i]);
+                    }
+                } else if (
+                    semitones[i] == 4
+                ) {        
+                    if (semitones[i-1] == 3) continue;
+                
+                    else finalScale.push(chosenModeScale[i]);
+                } else if (
+                    semitones[i] == 5
+                ) {
+                    finalScale.push(chosenModeScale[i]);
+                } else if (
+                    semitones[i] == 6
+                ) {
+                    if (
+                        semitones[i-1] == 5 && semitones[i+1] != 7 ||
+                        semitones[i-1] != 5 && semitones[i+1] == 7
+                    ) { 
+                        finalScale.push(chosenModeScale[i]);        
+                    }
+                } else if (
+                    semitones[i] == 7
+                ) {
+                    finalScale.push(chosenModeScale[i]);
+                } else if (
+                    semitones[i] == 8
+                ) {
+                    if (semitones[i+1] == 9) {
+                        finalScale.push(chosenModeScale[i+1]);
+                    } else {
+                        finalScale.push(chosenModeScale[i]);
+                    }
+                } else if (
+                    semitones[i] == 9
+                ) {
+                    if (semitones[i-1] == 8) continue;
+                
+                    else finalScale.push(chosenModeScale[i]);
+                } else if (
+                    semitones[i] == 10
+                ) {
+                    if (semitones[i+1] == 11) {
+                        finalScale.push(chosenModeScale[i+1]);
+                    } else {
+                        finalScale.push(chosenModeScale[i]);
+                    }
+                } else if (
+                    semitones[i] == 11
+                ) {
+                    if (semitones[i-1] == 10) continue;
+                
+                    else finalScale.push(chosenModeScale[i]);
+                }
+            }
+
+            return finalScale[scaleDegree];
+        }
+    }
+}
+
+function nthDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
     // signature. Used for moveable solfege.
     var obj = _buildScale(keySignature);
@@ -2503,6 +2691,17 @@ function i18nSolfege(note) {
         return note;
     }
 }
+
+function splitScaleDegree(value) {
+    if (!value) {
+        return [5, NATURAL];
+    }
+    
+    let note = value.slice(0, 1);
+    let attr = value.slice(1);
+    return [note, attr];
+}
+
 
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b

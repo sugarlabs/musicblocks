@@ -988,6 +988,9 @@ function PaletteModel(palette, palettes, name) {
                 case "eastindiansolfege":
                     label = "sargam";
                     break;
+                case "scaledegree2":
+                    label = "scale degree";
+                    break;
                 case "modename":
                     label = _("mode name");
                     break;
