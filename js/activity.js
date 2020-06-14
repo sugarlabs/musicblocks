@@ -628,7 +628,6 @@ function Activity() {
             console.debug(name + ' ' + blockHelpList[name]);
             __saveHelpBlock(blockHelpList[name], i * 2000);
             i += 1;
-	    if (i == 5) break;
         }
 
         sendAllToTrash(true, true);
