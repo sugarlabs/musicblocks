@@ -292,7 +292,7 @@ function setupEnsembleBlocks() {
 
             this.formBlock({
                 args: 3,
-                defaults: [_("Mr. Mouse", 0, 0)],
+                defaults: [_("Mr. Mouse"), 0, 0],
                 argTypes: ["anyin", "numberin", "numberin"],
                 argLabels: [
                     this.lang === "ja" ? _("name1") : _("name"),
