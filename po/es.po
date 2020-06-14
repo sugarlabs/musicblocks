@@ -122,7 +122,7 @@ msgid "note"
 msgstr "nota"
 
 msgid "value2"
-msgstr ""
+msgstr "valor"
 
 msgid "value"
 msgstr "valor"
@@ -171,44 +171,44 @@ msgid "grey"
 msgstr "gris"
 
 msgid "The Grey block returns the current pen grey value."
-msgstr ""
+msgstr "El bloque gris devuelve el valor gris actual de la pluma."
 
 msgid "shade"
 msgstr "sombra"
 
 msgid "The Shade block returns the current pen shade value."
-msgstr ""
+msgstr "El bloque sombra devuelve la sombra actual de la pluma."
 
 msgid "color"
 msgstr "color"
 
 msgid "The Color block returns the current pen color."
-msgstr "El bloque Color devuelve el color actual de la pluma."
+msgstr "El bloque color devuelve el color actual de la pluma."
 
 msgid "pen size"
 msgstr "tamaño de la pluma"
 
 msgid "The Pen size block returns the current pen size value."
-msgstr ""
+msgstr "El bloque tamaño de la pluma devuelve el tamaño actual de la pluma."
 
 msgid "set font"
 msgstr "fijar font"
 
 msgid "The Set font block sets the font used by the Show block."
-msgstr ""
+msgstr "El bloque fijar font establece el font utilizada por el bloque mostrar."
 
 msgid "The Background block sets the window background color."
-msgstr ""
+msgstr "El bloque Fondo establece el color de fondo de la ventana."
 
 msgid "The Hollow line block creates a line with a hollow center."
-msgstr ""
+msgstr "El bloque de línea sin relleno crea una línea con un centro hueco."
 
 #.TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
 msgstr "linea sin relleno"
 
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "El bloque relleno rellena una forma con un color."
 
 #.TRANS: fill in as a solid color
 msgid "fill"
@@ -240,13 +240,13 @@ msgid "set translucency"
 msgstr "fijar translucidez"
 
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "El bloque fijar translucidez cambia la opacidad de la pluma."
 
 msgid "set hue"
 msgstr "fijar matiz"
 
 msgid "The Set hue block changes the color of the pen."
-msgstr ""
+msgstr "El bloque fijar matiz cambia la color de la pluma."
 
 msgid "set shade"
 msgstr "fijar sombra"
@@ -256,19 +256,19 @@ msgid "set grey"
 msgstr "fijar gris"
 
 msgid "The Set grey block changes the vividness of the pen color."
-msgstr ""
+msgstr "El bloque fijar gris cambia la intensidad de la pluma."
 
 msgid "set color"
 msgstr "fijar color"
 
 msgid "The Set-color block changes the pen color."
-msgstr "El bloque Fijar color cambia el color de la pluma."
+msgstr "El bloque fijar color cambia el color de la pluma."
 
 msgid "The Drum name block is used to select a drum."
-msgstr "El bloque Nombre del tambor se utiliza para seleccionar un tambor."
+msgstr "El bloque nombre del tambor se utiliza para seleccionar un tambor."
 
 msgid "The Effects name block is used to select a sound effect."
-msgstr "El bloque Nombre de efectos se utiliza para seleccionar un efecto de sonido."
+msgstr "El bloque nombre de efectos se utiliza para seleccionar un efecto de sonido."
 
 msgid "noise"
 msgstr "ruido"
@@ -281,11 +281,11 @@ msgid "Noise Block: Did you mean to use a Note block?"
 msgstr "Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?"
 
 msgid "Replace every instance of a pitch with a drum sound."
-msgstr ""
+msgstr "Reemplace cada instancia de un tono con un sonido de tambor."
 
 #.TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
-msgstr ""
+msgstr "mapa de tono al tambor"
 
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
@@ -394,7 +394,7 @@ msgid "pitch slider"
 msgstr "deslizante de tono"
 
 msgid "chromatic keyboard"
-msgstr ""
+msgstr "teclado cromático"
 
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
@@ -446,7 +446,7 @@ msgstr "El bloque Hacer se utiliza para iniciar una acción."
 
 #.TRANS: translate do1 the same as do (take an action) (JAPANESE ONLY)
 msgid "do1"
-msgstr ""
+msgstr "do"
 
 msgid "do"
 msgstr "hacer"
@@ -567,7 +567,7 @@ msgid "duplicate factor"
 msgstr "duplicar factor"
 
 msgid "mouse index heap"
-msgstr ""
+msgstr "valor en la pila de ratón"
 
 msgid "Mr. Mouse"
 msgstr "Sr. Ratón"
@@ -589,7 +589,7 @@ msgid "stop mouse"
 msgstr "parar ratón"
 
 msgid "The Stop mouse block stops the specified mouse."
-msgstr ""
+msgstr "El bloque parar ratón parar el ratón especificado."
 
 msgid "Cannot find mouse"
 msgstr "No se puede encontrar ratón"
@@ -601,7 +601,7 @@ msgid "start mouse"
 msgstr "comenzar ratón"
 
 msgid "The Start mouse block starts the specified mouse."
-msgstr ""
+msgstr "El bloque comenzar ratón inicia el ratón especificado."
 
 msgid "Mouse is already running."
 msgstr "Ratón ya ha comenzado."
@@ -623,9 +623,6 @@ msgstr "rumbo de ratón"
 #.TRANS: set xy position for this mouse
 msgid "set mouse"
 msgstr "fijar ratón"
-
-msgid "Mr. Mouse\", 0, 0)]"
-msgstr ""
 
 #.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
 msgid "name1"
@@ -663,7 +660,7 @@ msgid "mouse sync"
 msgstr "sincronizar"
 
 msgid "The Mouse sync block aligns the beat count between mice."
-msgstr ""
+msgstr "El bloque sincronizar alinea el conteo de latidos entre ratones."
 
 msgid "found mouse"
 msgstr "encontré el raton"
@@ -672,22 +669,22 @@ msgid "new mouse"
 msgstr "nuevo ratón"
 
 msgid "The New mouse block will create a new mouse."
-msgstr ""
+msgstr "El bloque nuevo ratón crea un nuevo ratón."
 
 msgid "The Mouse-name block returns the name of a mouse."
 msgstr "El bloque Nombre del ratón devuelve el nombre de un ratón."
 
 msgid "mouse count"
-msgstr ""
+msgstr "recuento de ratones"
 
 msgid "The Mouse-count block returns the number of mice."
-msgstr ""
+msgstr "El bloque recuento de ratones devuelve el número de ratones."
 
 msgid "nth mouse name"
-msgstr ""
+msgstr "nombre de nth ratón"
 
 msgid "The Nth-Mouse name block returns the name of the nth mice."
-msgstr ""
+msgstr "El bloque nombre de nth ratón devuelve el nombre de nth ratón"
 
 msgid "set name"
 msgstr "fijar nombre"
@@ -735,7 +732,7 @@ msgstr "staccato"
 
 #.TRANS: the volume for this synth
 msgid "synth volume"
-msgstr ""
+msgstr "volumen del sintetizador"
 
 #.TRANS: musical instrument
 msgid "piano"
@@ -746,7 +743,7 @@ msgid "master volume"
 msgstr "volumen maestro"
 
 msgid "The Master volume block returns the master volume."
-msgstr ""
+msgstr "El bloque volumen maestro devuelve nivel de volumen maestro."
 
 msgid "set synth volume"
 msgstr "fijar volumen del sintetizador"
@@ -798,26 +795,26 @@ msgid "crescendo"
 msgstr "crescendo"
 
 msgid "fraction"
-msgstr ""
+msgstr "fracción"
 
 msgid "Convert a float to a fraction"
-msgstr ""
+msgstr "convertir un número racional en fracción"
 
 msgid "The Open palette block opens a palette."
-msgstr ""
+msgstr "El bloque abrir la paleta abre una paleta"
 
 msgid "open palette"
 msgstr "abrir la paleta"
 
 msgid "The Delete block block removes a block."
-msgstr ""
+msgstr "El bloque eliminar bloque elimina un bloque"
 
 #.TRANS: Move this block to the trash.
 msgid "delete block"
 msgstr "eliminar bloque"
 
 msgid "The Move block block moves a block."
-msgstr ""
+msgstr "El bloque mover bloque mueve un bloque."
 
 #.TRANS: Move the position of a block on the screen.
 msgid "move block"
@@ -831,7 +828,7 @@ msgid "run block"
 msgstr "ejecutar bloque"
 
 msgid "The Dock block block connections two blocks."
-msgstr ""
+msgstr "El bloque connectar conecta dos bloques"
 
 #.TRANS: We can connect a block to another block.
 msgid "connect blocks"
@@ -844,7 +841,7 @@ msgid "connection number"
 msgstr "número de conexion"
 
 msgid "The Make block block creates a new block."
-msgstr ""
+msgstr "El bloque crear bloque crea un bloque."
 
 #.TRANS: Create a new block programmatically.
 msgid "make block"
@@ -872,13 +869,13 @@ msgid "show blocks"
 msgstr "mostrar bloques"
 
 msgid "The Show blocks block shows the blocks."
-msgstr ""
+msgstr "El bloque mostrar bloques muestra los bloques."
 
 msgid "hide blocks"
 msgstr "ocultar bloques"
 
 msgid "The Hide blocks block hides the blocks."
-msgstr ""
+msgstr "El bloque ocultar esconde los bloques."
 
 msgid "open project"
 msgstr "abierto proyecto"
@@ -914,7 +911,7 @@ msgstr "factor de ritmo"
 
 #.TRANS: number of beats played per minute
 msgid "beats per minute2"
-msgstr ""
+msgstr "pulsaciones por minuto"
 
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "beats per minute"
@@ -936,7 +933,7 @@ msgstr "por ejemplo, 1, 2, 3, o 4."
 
 #.TRANS: count the number of notes
 msgid "sum note values"
-msgstr ""
+msgstr "cuenta las notas"
 
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
@@ -970,19 +967,19 @@ msgid "master beats per minute"
 msgstr "latidos por minuto de dominar"
 
 msgid "bpm"
-msgstr ""
+msgstr "lpm"
 
 msgid "beat value"
 msgstr "valor de latidos"
 
 msgid "beats per minute must be greater than"
-msgstr ""
+msgstr "latidos por minuto deben ser mayores que"
 
 msgid "maximum"
-msgstr ""
+msgstr "máximo"
 
 msgid "beats per minute is"
-msgstr ""
+msgstr "latidos por minuto es"
 
 msgid "Beats per minute must be > 30."
 msgstr "Latidos por minuto debe ser > 30."
@@ -1135,16 +1132,16 @@ msgstr "Por ejemplo, guitarra, piano, violín o cello"
 
 #.TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
-msgstr ""
+msgstr "fijar instrumento"
 
 msgid "input"
-msgstr ""
+msgstr "el input"
 
 msgid "Input a value"
-msgstr ""
+msgstr "ingrese un valor"
 
 msgid "input value"
-msgstr ""
+msgstr "valor de entrada"
 
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
@@ -1184,21 +1181,21 @@ msgid "to ASCII"
 msgstr "a ASCII"
 
 msgid "The To ASCII block converts numbers to letters."
-msgstr ""
+msgstr "El bloque a ASCII convierte números a letras."
 
 msgid "keyboard"
 msgstr "teclado"
 
 msgid "The Keyboard block returns computer keyboard input."
-msgstr ""
+msgstr "El bloque teclado devuelve entrada de teclado."
 
 #.TRANS: right side of the screen
 msgid "right (screen)"
-msgstr ""
+msgstr "derecha"
 
 #.TRANS: left side of the screen
 msgid "left (screen)"
-msgstr ""
+msgstr "izquierdo"
 
 msgid "top (screen)"
 msgstr "superior"
@@ -1210,13 +1207,13 @@ msgid "width"
 msgstr "anchura"
 
 msgid "The Width block returns the width of the canvas."
-msgstr "El bloque Ancho devuelve el ancho del lienzo."
+msgstr "El bloque ancho devuelve el ancho del lienzo."
 
 msgid "height"
 msgstr "altura"
 
 msgid "The Height block returns the height of the canvas."
-msgstr "El bloque Altura devuelve la altura del lienzo."
+msgstr "El bloque altura devuelve la altura del lienzo."
 
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
@@ -1233,16 +1230,16 @@ msgid "The Speak block outputs to the text-to-speech synthesizer"
 msgstr "El bloque Habla emite al sintetizador de texto a voz."
 
 msgid "The Camera block connects a webcam to the Show block."
-msgstr ""
+msgstr "El bloque cámara conecta una cámara web al bloque mostrar."
 
 msgid "The Video block selects video for use with the Show block."
-msgstr ""
+msgstr "El bloque video selecciona video para al bloque mostrar."
 
 msgid "stop media"
 msgstr "detener medios"
 
 msgid "The Stop media block stops audio or video playback."
-msgstr ""
+msgstr "El bloque detener medios detiene la reproducción de audio o video."
 
 #.TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
@@ -1330,7 +1327,7 @@ msgstr "cambio en tono"
 
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
-msgstr ""
+msgstr "cambio en tono escalar"
 
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
@@ -1471,7 +1468,7 @@ msgstr "Bloque de Hertz: Quizás quiso decir utilizar un bloque de nota?"
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "nth modal pitch"
-msgstr ""
+msgstr "nth tono modal"
 
 msgid "number"
 msgstr "número"
@@ -1485,7 +1482,7 @@ msgid "heading"
 msgstr "rumbo"
 
 msgid "The Heading block returns the orientation of the mouse."
-msgstr ""
+msgstr "El bloque rumbo devuelve la orientación del ratón."
 
 #.TRANS: y coordinate
 msgid "The Y block returns the vertical position of the mouse."
@@ -1533,7 +1530,7 @@ msgid "control point 1"
 msgstr "punto de control 1"
 
 msgid "The Bezier block draws a Bezier curve."
-msgstr ""
+msgstr "El bloque bezier dibuja una curva bezier."
 
 #.TRANS: Bézier curves employ at least three points to define a curve
 msgid "bezier"
@@ -1557,7 +1554,7 @@ msgid "set heading"
 msgstr "fijar rumbo"
 
 msgid "The Set heading block sets the heading of the mouse."
-msgstr ""
+msgstr "El bloque fijar rumbo establece el rumbo del mouse."
 
 #.TRANS: set xy (Cartesian) position
 msgid "set xy"
@@ -1574,7 +1571,7 @@ msgid "right"
 msgstr "derecha"
 
 msgid "The Left block turns the mouse to the left."
-msgstr "El bloque Izquierdo gira el ratón hacia la izquierda."
+msgstr "El bloque izquierdo gira el ratón hacia la izquierda."
 
 #.TRANS: left and left1 are when turning left (counter-clockwise)
 msgid "left1"
@@ -1613,7 +1610,7 @@ msgid "add 1 to"
 msgstr "sumar 1 a"
 
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
-msgstr ""
+msgstr "El bloque restar-1-de resta uno al valor almacenado en un cuadro."
 
 msgid "subtract 1 from"
 msgstr "restar 1 de"
@@ -1921,7 +1918,7 @@ msgid "or"
 msgstr "o"
 
 msgid "The XOR block is the logical XOR operator."
-msgstr ""
+msgstr "El bloque XOR es el lógico XOR el operador."
 
 msgid "xor"
 msgstr ""
@@ -1933,7 +1930,7 @@ msgid "The Boolean block is used to specify true or false."
 msgstr "El bloque Booleano se utiliza para especificar verdadero o falso."
 
 msgid "Take a tour"
-msgstr ""
+msgstr "Hacer un recorrido"
 
 msgid "Welcome to Music Blocks"
 msgstr "Bienvenido a Bloques de Música"
@@ -1961,7 +1958,7 @@ msgid "Clear"
 msgstr "Borrar"
 
 msgid "Add note"
-msgstr ""
+msgstr "Agrega una nota"
 
 msgid "Table"
 msgstr "Tabla"
@@ -1982,7 +1979,7 @@ msgid "double flat"
 msgstr "doble planas"
 
 msgid "New action block generated!"
-msgstr ""
+msgstr "Nuevo bloque de acción creado!"
 
 msgid "Close"
 msgstr "Cerrar"
@@ -2000,7 +1997,7 @@ msgid "Move down"
 msgstr "Descender"
 
 msgid "Click on the slider to create a note block."
-msgstr ""
+msgstr "Haga clic en el control deslizante para crear un bloque de notas."
 
 msgid "Export"
 msgstr "Exportar"
@@ -2027,7 +2024,7 @@ msgid "Stop"
 msgstr "Detener"
 
 msgid "Click in the circle to select strong beats for the meter."
-msgstr ""
+msgstr "Haga clic en el círculo para seleccionar ritmos fuertes para el medidor."
 
 msgid "Synthesizer"
 msgstr "Sintetizador"
@@ -2311,7 +2308,7 @@ msgstr "castañuelas"
 
 #.TRANS: musical instrument
 msgid "japanese bell"
-msgstr ""
+msgstr "campana japonesa"
 
 #.TRANS: a musically tuned set of bells
 msgid "chime"
@@ -2351,7 +2348,7 @@ msgstr "burbujas"
 
 #.TRANS: sound effect
 msgid "raindrop"
-msgstr ""
+msgstr "gota de agua"
 
 #.TRANS: animal sound effect
 msgid "cat"
@@ -2571,7 +2568,7 @@ msgid "simple 4"
 msgstr ""
 
 msgid "japanese drum"
-msgstr ""
+msgstr "tambor japonés"
 
 #.TRANS: musical temperament
 msgid "equal"
@@ -2715,7 +2712,7 @@ msgid "More Details"
 msgstr "Más detalles"
 
 msgid "Unlike project"
-msgstr ""
+msgstr "Proyecto \"No me gusta\""
 
 msgid "Like project"
 msgstr "Proyecto \"Me gusta\""
