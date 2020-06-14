@@ -7089,6 +7089,13 @@ function Blocks(activity) {
             this.addDefaultBlock(parentBlock, thisBlock);
         }
 
+        if (myBlock.name == "everybeatdonew"){
+            let turtleID = myBlock.turtleID ;
+            let tur;
+            for(tur of turtles.getTurtleList())if (turtleID == tur.id)break;
+            this.sendStackToTrash(tur.startBlock);
+        }
+
         if (myBlock.name === "start" || myBlock.name === "drum") {
             turtle = myBlock.value;
             var turtleNotInTrash = 0;
