@@ -2651,6 +2651,7 @@ function MusicKeyboard() {
         for (let idx = 0; idx < this.layout.length; idx++) {
             key = this.layout[idx];
             this.getElement[key.noteName.toString()+ key.noteOctave.toString()] = key.objId;
+            this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] = key.objId ; //convet solfege to alphabetic.
         }
 
         let __startNote = (event, element) => { 
@@ -2715,8 +2716,9 @@ function MusicKeyboard() {
         let numberToPitch = (num) => {
             let offset = 4;
             let octave = offset + Math.floor((num - 60) / 12);
-            let pitch = PITCHES[num % 12];
-            return [pitch, octave];
+            let pitch1 = NOTESSHARP[num % 12];
+            let pitch2 = NOTESFLAT[num % 12];
+            return [pitch1, pitch2, octave];
         }
 
         //event attributes : timeStamp , data 
@@ -2725,15 +2727,18 @@ function MusicKeyboard() {
         //                 [2] : velocity ,(currently not used).
  
         let onMIDIMessage = (event) => {
-            let pitch = numberToPitch(event.data[1] )[0];
-            let octave = numberToPitch(event.data[1] )[1];
-            console.debug(pitch, octave);
+            let pitchOctave = numberToPitch(event.data[1]);
+            let pitch1 = pitchOctave[0];
+            let pitch2 = pitchOctave[1];
+            let octave = pitchOctave[2];
+            let key = this.getElement[pitch1 +""+ octave] || this.getElement[pitch2 +"" + octave];
+            console.debug(pitch1, octave);
             if (event.data[0] == 144 && event.data[2] != 0) {
-                __startNote(event, docById(this.getElement[pitch + "" + octave]));
+                __startNote(event, docById(key));
 
             }
             else {
-                __endNote(event, docById(this.getElement[pitch + "" + octave]));
+                __endNote(event, docById(key));
             }
         }
 
