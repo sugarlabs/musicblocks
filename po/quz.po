@@ -235,7 +235,7 @@ msgstr "kunka"
 #: js/RhythmBlocks.js:780
 #.TRANS: 
 msgid "value2"
-msgstr ""
+msgstr "tupu"
 
 #: js/RhythmBlocks.js:780
 #: js/BoxesBlocks.js:35
@@ -858,7 +858,7 @@ msgstr ""
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 #.TRANS: señal
 msgid "event"
-msgstr "riqsichi""
+msgstr "riqsichi"
 
 #: js/ActionBlocks.js:676
 #.TRANS: El bloque Emitir se utiliza para desencadenar un evento.
@@ -1172,7 +1172,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:295
 #.TRANS: 
-msgid "Mr. Mouse\", 0, 0)]"
+msgid "Mr. Mouse"
 msgstr ""
 
 #: js/EnsembleBlocks.js:298
@@ -1377,7 +1377,7 @@ msgstr ""
 
 #: js/VolumeBlocks.js:5
 #.TRANS: the volume for this synth
-#.TRANS: 
+#.TRANS: volumen del sintetizador
 msgid "synth volume"
 msgstr ""
 
@@ -2097,12 +2097,12 @@ msgid "input"
 msgstr "haykuna"
 
 #: js/SensorsBlocks.js:19
-#.TRANS: 
+#.TRANS: ingrese un valor
 msgid "Input a value"
 msgstr ""
 
 #: js/SensorsBlocks.js:70
-#.TRANS: 
+#.TRANS: valor de entrada
 msgid "input value"
 msgstr "chaninchaqta haykuchiy"
 
