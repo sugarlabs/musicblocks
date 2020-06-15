@@ -186,6 +186,7 @@ class Turtles {
             };
 
             turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
+            console.debug("--> [CursorDown " + newTurtle.name + "]");
 
             newTurtle.container.removeAllEventListeners("pressmove");
             newTurtle.container.on("pressmove", event => {
