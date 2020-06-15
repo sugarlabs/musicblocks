@@ -930,8 +930,7 @@ function setupExtrasBlocks() {
                      act._showTreble();
                      break;
                 case (_("grand staff")) :
-                    act._showTreble();
-                    act._showBass();
+                    act._showGrand();
                     break;
                 case (_("mezzo-soprano")):
                     act._showSoprano();
