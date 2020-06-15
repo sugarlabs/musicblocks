@@ -1509,13 +1509,8 @@ function setupPitchBlocks() {
             } else {
                 if (logo.noteStatus[turtle] !== null) {
                     let note = logo.lastPitchPlayed[0][0];
-                    let pitchClass = note[0];
-                    if (note.indexOf("#") != -1) {
-                        pitchClass += "#";
-                    } else if (note.indexOf("b") != -1) {
-                        pitchClass += "b";
-                    }
-                    return (pitchClass);
+                    let num = pitchToNumber(note.substr(0, note.length - 1), note[note.length - 1], logo.keySignature[turtle]);
+                    return num % 12;
                 } else {
                     return "";  
                 }
