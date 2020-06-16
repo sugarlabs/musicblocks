@@ -835,8 +835,9 @@ function setupFlowBlocks() {
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                if (args[0] < 0)  
+                    logo.errorMsg(POSNUMBER, blk);
+                return [null , 0];  
             } else {
                 arg = args[0];
             }
