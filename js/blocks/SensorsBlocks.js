@@ -217,6 +217,7 @@ function setupSensorsBlocks() {
                 _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
                 "documentation",
                 null,
+                "cursoroverhelp"
             ]);
         }
 
@@ -236,6 +237,7 @@ function setupSensorsBlocks() {
                 _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                 "documentation",
                 null,
+                "cursorouthelp"
             ]);
         }
 
