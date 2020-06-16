@@ -255,6 +255,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
                 "documentation",
                 null,
+                "cursordownhelp"
             ]);
         }
 
@@ -272,6 +273,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
                 "documentation",
                 null,
+                "cursoruphelp"
             ]);
         }
 
