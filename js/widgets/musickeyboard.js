@@ -420,7 +420,7 @@ function MusicKeyboard() {
         );
 
         this.playButton.onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
             that.processSelected();
             that.playAll();
         };
@@ -2371,17 +2371,17 @@ function MusicKeyboard() {
             }
             return newNotes;
         }
-     
+
         // finds Position of next setTimbre block
         this.findLen = (selectedNotesGrp, selectedNotes) => {
             let ans = 0;
             for (let i = 0; i < selectedNotesGrp.length; i++) {
                 note = selectedNotes[selectedNotesGrp[i]];
                 if (note.noteOctave[0] === "R") {
-                    ans += 6;   //rest note uses 6 
+                    ans += 6;   //rest note uses 6
                 }
                 else {
-                    ans += 5 + (3 * note.noteOctave.length);   // notes with pitches 
+                    ans += 5 + (3 * note.noteOctave.length);   // notes with pitches
                 }
             }
             return ans;

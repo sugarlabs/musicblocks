@@ -1043,7 +1043,7 @@ function RhythmRuler() {
             '" width="' +
             iconSize +
             '" vertical-align="middle">';
-        this._logo.setTurtleDelay(0);
+        this._logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;
         this._playingOne = false;
@@ -2563,7 +2563,7 @@ function RhythmRuler() {
                         } else {
                             if (that._playingOne === false) {
                                 that._rulerSelected = id;
-                                that._logo.setTurtleDelay(0);
+                                that._logo.turtleDelay = 0;
                                 that._playing = true;
                                 that._playingOne = true;
                                 that._playingAll = false;

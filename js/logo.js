@@ -55,23 +55,23 @@ class Logo {
      * @constructor
      */
     constructor() {
-        this.canvas = null;
-        this.blocks = null;
-        this.turtles = null;
-        this.stage = null;
-        this.refreshCanvas = null;
-        this.textMsg = null;
-        this.errorMsg = null;
-        this.hideMsgs = null;
-        this.onStopTurtle = null;
-        this.onRunTurtle = null;
-        this.getStageX = null;
-        this.getStageY = null;
-        this.getStageMouseDown = null;
-        this.getCurrentKeyCode = null;
-        this.clearCurrentKeyCode = null;
-        this.meSpeak = null;
-        this.saveLocally = null;
+        this._canvas = null;
+        this._blocks = null;
+        this._turtles = null;
+        this._stage = null;
+        this._refreshCanvas = null;
+        this._textMsg = null;
+        this._errorMsg = null;
+        this._hideMsgs = null;
+        this._onStopTurtle = null;
+        this._onRunTurtle = null;
+        this._getStageX = null;
+        this._getStageY = null;
+        this._getStageMouseDown = null;
+        this._getCurrentKeyCode = null;
+        this._clearCurrentKeyCode = null;
+        this._meSpeak = null;
+        this._saveLocally = null;
         this.showBlocksAfterRun = false;
 
         this.pitchTimeMatrix = null;
@@ -139,7 +139,7 @@ class Logo {
         this.time = 0;
         this.firstNoteTime = null;
         this.waitTimes = {};
-        this.turtleDelay = 0;
+        this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
         this.stopTurtle = false;
@@ -240,7 +240,7 @@ class Logo {
         this.bpm = {};
         this.previousTurtleTime = [];
         this.turtleTime = [];
-        this.noteDelay = 0;
+        this._noteDelay = 0;
         this.playedNote = {};
         this.playedNoteTimes = {};
         this.pushedNote = {};
@@ -415,243 +415,289 @@ class Logo {
     }
 
     /**
-     * Sets the setPlaybackStatus property.
-     *
-     * @privileged
-     * @param {Function} setPlaybackStatus
-     * @returns {this}
+     * @param {Function} setPlaybackStatus - setPlaybackStatus property
      */
-    setSetPlaybackStatus(setPlaybackStatus) {
-        this.setPlaybackStatus = setPlaybackStatus;
-        return this;
+    set setPlaybackStatus(setPlaybackStatus) {
+        this._setPlaybackStatus = setPlaybackStatus;
     }
 
     /**
-     * Sets the canvas property.
-     *
-     * @privileged
-     * @param canvas
-     * @returns {this}
+     * @returns {Function} setPlaybackStatus property
      */
-    setCanvas(canvas) {
-        this.canvas = canvas;
-        return this;
+    get setPlaybackStatus() {
+        return this._setPlaybackStatus;
     }
 
     /**
-     * Sets all the blocks.
-     *
-     * @privileged
-     * @param blocks
-     * @returns {this}
+     * @param {Object} canvas - createjs canvas
      */
-    setBlocks(blocks) {
-        this.blocks = blocks;
-        return this;
+    set canvas(canvas) {
+        this._canvas = canvas;
     }
 
     /**
-     * Sets all the turtles.
-     *
-     * @privileged
-     * @param turtles
-     * @returns {this}
+     * @returns {Object} createjs canvas
      */
-    setTurtles(turtles) {
-        this.turtles = turtles;
-        return this;
+    get canvas() {
+        return this._canvas;
     }
 
     /**
-     * Sets the stage.
-     *
-     * @privileged
-     * @param stage
-     * @returns {this}
+     * @param {Object} blocks - Blocks object
      */
-    setStage(stage) {
-        this.stage = stage;
-        return this;
+    set blocks(blocks) {
+        this._blocks = blocks;
     }
 
     /**
-     * Sets the refreshCanvas property.
-     *
-     * @privileged
-     * @param {Function} refreshCanvas
-     * @returns {this}
+     * @returns {Object} Blocks object
      */
-    setRefreshCanvas(refreshCanvas) {
-        this.refreshCanvas = refreshCanvas;
-        return this;
+    get blocks() {
+        return this._blocks;
     }
 
     /**
-     * Sets the textMsg property.
-     *
-     * @privileged
+     * @param {Object} turtles - Turtles object
+     */
+    set turtles(turtles) {
+        this._turtles = turtles;
+    }
+
+    /**
+     * @returns {Object} Turtles object
+     */
+    get turtles() {
+        return this._turtles;
+    }
+
+    /**
+     * @param {Object} stage - createjs stage
+     */
+    set stage(stage) {
+        this._stage = stage;
+    }
+
+    /**
+     * @returns {Object} createjs stage
+     */
+    get stage() {
+        return this._stage;
+    }
+
+    /**
+     * @param {Function} refreshCanvas - function to update canvas changes
+     */
+    set refreshCanvas(refreshCanvas) {
+        this._refreshCanvas = refreshCanvas;
+    }
+
+    /**
+     * @returns {Function} function to update canvas changes
+     */
+    get refreshCanvas() {
+        return this._refreshCanvas;
+    }
+
+    /**
      * @param {Function} textMsg - function to produce a text message using exactly one string
-     * @returns {this}
      */
-    setTextMsg(textMsg) {
-        this.textMsg = textMsg;
-        return this;
+    set textMsg(textMsg) {
+        this._textMsg = textMsg;
     }
 
     /**
-     * Sets the hideMsgs property.
-     *
-     * @privileged
-     * @param {Function} hideMsgs
-     * @returns {this}
+     * @returns {Function} function to produce a text message using exactly one string
      */
-    setHideMsgs(hideMsgs) {
-        this.hideMsgs = hideMsgs;
-        return this;
-    };
+    get textMsg() {
+        return this._textMsg;
+    }
 
     /**
-     * Sets the errorMsg property.
-     *
-     * @privileged
      * @param {Function} errorMsg - function to produce an error message using at least a string
-     * @returns {this}
      */
-    setErrorMsg(errorMsg) {
-        this.errorMsg = errorMsg;
-        return this;
+    set errorMsg(errorMsg) {
+        this._errorMsg = errorMsg;
     }
 
     /**
-     * Sets the onStopTurtle property.
-     *
-     * @privileged
+     * @returns {Function} function to produce an error message using at least a string
+     */
+    get errorMsg() {
+        return this._errorMsg;
+    }
+
+    /**
+     * @param {Function} hideMsgs - function to hide messages
+     */
+    set hideMsgs(hideMsgs) {
+        this._hideMsgs = hideMsgs;
+    }
+
+    /**
+     * @returns {Function} function to hide messages
+     */
+    get hideMsgs() {
+        return this._hideMsgs;
+    }
+
+    /**
      * @param {Function} onStopTurtle
-     * @returns {this}
      */
-    setOnStopTurtle(onStopTurtle) {
-        this.onStopTurtle = onStopTurtle;
-        return this;
+    set onStopTurtle(onStopTurtle) {
+        this._onStopTurtle = onStopTurtle;
     }
 
     /**
-     * Sets the onRunTurtle property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get onStopTurtle() {
+        return this._onStopTurtle;
+    }
+
+    /**
      * @param {Function} onRunTurtle
-     * @returns {this}
      */
-    setOnRunTurtle(onRunTurtle) {
-        this.onRunTurtle = onRunTurtle;
-        return this;
+    set onRunTurtle(onRunTurtle) {
+        this._onRunTurtle = onRunTurtle;
     }
 
     /**
-     * Sets the getStageX property.
-     *
-     * @privileged
-     * @param {Function} getStageX
-     * @returns {this}
+     * @returns {Function}
      */
-    setGetStageX(getStageX) {
-        this.getStageX = getStageX;
-        return this;
+    get onRunTurtle() {
+        return this._onRunTurtle;
     }
 
     /**
-     * Sets the getStageY property.
-     *
-     * @privileged
-     * @param {Function} getStageY
-     * @returns {this}
+     * @param {Function} getStageX - function to get corresponding screen
+     * x - coordinate (from Turtle)
      */
-    setGetStageY(getStageY) {
-        this.getStageY = getStageY;
-        return this;
-    };
+    set getStageX(getStageX) {
+        this._getStageX = getStageX;
+    }
 
     /**
-     * Sets the getStageMouseDown property.
-     *
-     * @privileged
+     * @returns {Function} function to get corresponding screen x - coordinate
+     * (from Turtle)
+     */
+    get getStageX() {
+        return this._getStageX;
+    }
+
+    /**
+     * @param {Function} getStageY - function to get corresponding screen
+     * y - coordinate (from Turtle)
+     */
+    set getStageY(getStageY) {
+        this._getStageY = getStageY;
+    }
+
+    /**
+     * @returns {Function} function to get corresponding screen y - coordinate
+     * (from Turtle)
+     */
+    get getStageY() {
+        return this._getStageY;
+    }
+
+    /**
      * @param {Function} getStageMouseDown
-     * @returns {this}
      */
-    setGetStageMouseDown(getStageMouseDown) {
-        this.getStageMouseDown = getStageMouseDown;
-        return this;
+    set getStageMouseDown(getStageMouseDown) {
+        this._getStageMouseDown = getStageMouseDown;
     }
 
     /**
-     * Sets the getCurrentKeyCode property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get getStageMouseDown() {
+        return this._getStageMouseDown;
+    }
+
+    /**
      * @param {Function} getCurrentKeyCode
-     * @returns {this}
      */
-    setGetCurrentKeyCode(getCurrentKeyCode) {
-        this.getCurrentKeyCode = getCurrentKeyCode;
-        return this;
+    set getCurrentKeyCode(getCurrentKeyCode) {
+        this._getCurrentKeyCode = getCurrentKeyCode;
     }
 
     /**
-     * Sets the clearCurrentKeyCode property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get getCurrentKeyCode() {
+        return this._getCurrentKeyCode;
+    }
+
+    /**
      * @param {Function} clearCurrentKeyCode
-     * @returns {this}
      */
-    setClearCurrentKeyCode(clearCurrentKeyCode) {
-        this.clearCurrentKeyCode = clearCurrentKeyCode;
-        return this;
+    set clearCurrentKeyCode(clearCurrentKeyCode) {
+        this._clearCurrentKeyCode = clearCurrentKeyCode;
     }
 
     /**
-     * Sets the meSpeak property.
-     *
-     * @privileged
-     * @param meSpeak - an object with a speak method that takes a string
-     * @returns {this}
+     * @returns {Function}
      */
-    setMeSpeak(meSpeak) {
-        this.meSpeak = meSpeak;
-        return this;
+    get clearCurrentKeyCode() {
+        return this._clearCurrentKeyCode;
     }
 
     /**
-     * Sets the saveLocally property.
-     *
-     * @privileged
-     * @param {Function} saveLocally
-     * @returns {this}
+     * @param {Object} meSpeak - an object with a speak method that takes a string
      */
-    setSaveLocally(saveLocally) {
-        this.saveLocally = saveLocally;
-        return this;
+    set meSpeak(meSpeak) {
+        this._meSpeak = meSpeak;
     }
 
     /**
-     * Sets the pause between each block as the program executes.
-     *
-     * @privileged
-     * @param {number} turtleDelay
-     * @returns {void}
+     * @returns {Object} an object with a speak method that takes a string
      */
-    setTurtleDelay(turtleDelay) {
-        this.turtleDelay = turtleDelay;
-        this.noteDelay = 0;
+    get meSpeak() {
+        return this._meSpeak;
     }
 
     /**
-     * Sets the pause between each note as the program executes.
-     *
-     * @privileged
-     * @param {number} noteDelay
-     * @returns {void}
+     * @param {Function} saveLocally - function used for local caching
      */
-    setNoteDelay(noteDelay) {
-        this.noteDelay = noteDelay;
-        this.turtleDelay = 0;
+    set saveLocally(saveLocally) {
+        this._saveLocally = saveLocally;
+    }
+
+    /**
+     * @returns {Function} function used for local caching
+     */
+    get saveLocally() {
+        return this._saveLocally;
+    }
+
+    /**
+     * @param {Number} turtleDelay - pause between each block as the program executes
+     */
+    set turtleDelay(turtleDelay) {
+        this._turtleDelay = turtleDelay;
+        this._noteDelay = 0;
+    }
+
+    /**
+     * @returns {Number} pause between each block as the program executes
+     */
+    get turtleDelay() {
+        return this._turtleDelay;
+    }
+
+    /**
+     * @param {number} noteDelay - pause between each note as the program executes
+     */
+    set noteDelay(noteDelay) {
+        this._noteDelay = noteDelay;
+        this._turtleDelay = 0;
+    }
+
+    /**
+     * @returns {Number} pause between each note as the program executes
+     */
+    get noteDelay() {
+        return this._noteDelay;
     }
 
     /**
@@ -1188,7 +1234,7 @@ class Logo {
 
         this._restoreConnections();         // restore any broken connections
 
-        this.saveLocally();                 // save the state before running
+        this._saveLocally();                // save the state before running
 
         for (let arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);
@@ -1199,7 +1245,7 @@ class Logo {
         this.blocks.unhighlightAll();
         this.blocks.bringToTop();           // draw under blocks
 
-        this.hideMsgs();
+        this._hideMsgs();
 
         // Run the Logo commands here
         this.time = new Date().getTime();

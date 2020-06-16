@@ -636,7 +636,7 @@ function setupExtrasBlocks() {
 
         flow(args, logo) {
             logo.showBlocks();
-            logo.setTurtleDelay(DEFAULTDELAY);
+            logo.turtleDelay = DEFAULTDELAY;
         }
     }
 
@@ -653,7 +653,7 @@ function setupExtrasBlocks() {
 
         flow(args, logo) {
             logo.hideBlocks();
-            logo.setTurtleDelay(0);
+            logo.turtleDelay = 0;
         }
     }
 
@@ -916,13 +916,13 @@ function setupExtrasBlocks() {
             let act = logo.blocks.activity ;
             logo.turtles.hideGrids() ;
             switch (args[0]){
-                case (_("Cartesian")) : 
+                case (_("Cartesian")) :
                     act._showCartesian();
                     break;
-                case (_("polar")) : 
+                case (_("polar")) :
                     act._showPolar();
                     break;
-                case (_("Cartesian+polar")) : 
+                case (_("Cartesian+polar")) :
                     act._showPolar();
                     act._showCartesian();
                     break;
@@ -938,13 +938,13 @@ function setupExtrasBlocks() {
                 case (_("alto")) :
                      act._showAlto();
                      break;
-                case (_("tenor")) : 
+                case (_("tenor")) :
                     act._showTenor();
                     break;
-                case (_("bass")) : 
+                case (_("bass")) :
                     act._showBass();
                     break;
-                case (_("none")) : 
+                case (_("none")) :
                     break;
             }
         }

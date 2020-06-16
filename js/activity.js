@@ -872,7 +872,7 @@ function Activity() {
 
         let currentDelay = logo.turtleDelay;
         let playingWidget = false;
-        logo.setTurtleDelay(0);
+        logo.turtleDelay = 0;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
 
@@ -932,7 +932,7 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        logo.setTurtleDelay(DEFAULTDELAY);
+        logo.turtleDelay = DEFAULTDELAY;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
         }
@@ -962,14 +962,14 @@ function Activity() {
         if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
             // Either we haven't set up a queue or we are
             // switching modes.
-            logo.setTurtleDelay(TURTLESTEP);
+            logo.turtleDelay = TURTLESTEP;
             // Queue and take first step.
             if (!turtles.running()) {
                 logo.runLogoCommands();
             }
             logo.step();
         } else {
-            logo.setTurtleDelay(TURTLESTEP);
+            logo.turtleDelay = TURTLESTEP;
             logo.step();
         }
     };
@@ -1350,7 +1350,7 @@ function Activity() {
 
     //     // Suppress music and turtle output when generating
     //     // compiled output.
-    //     logo.setTurtleDelay(0); // Compile at full speed.
+    //     logo.turtleDelay = 0;    // Compile at full speed.
     //     logo.playbackQueue = {};
     //     logo.playbackTime = 0;
     //     logo.compiling = true;
@@ -4884,23 +4884,23 @@ function Activity() {
         // initPalettes(palettes);
 
         logo = new Logo();
-        logo.setCanvas(canvas)
-            .setBlocks(blocks)
-            .setTurtles(turtles)
-            .setStage(turtleContainer)
-            .setRefreshCanvas(refreshCanvas)
-            .setTextMsg(textMsg)
-            .setErrorMsg(errorMsg)
-            .setHideMsgs(hideMsgs)
-            .setOnStopTurtle(that.onStopTurtle)
-            .setOnRunTurtle(that.onRunTurtle)
-            .setGetStageX(getStageX)
-            .setGetStageY(getStageY)
-            .setGetStageMouseDown(getStageMouseDown)
-            .setGetCurrentKeyCode(that.getCurrentKeyCode)
-            .setClearCurrentKeyCode(that.clearCurrentKeyCode)
-            // .setMeSpeak(meSpeak)
-            .setSetPlaybackStatus(setPlaybackStatus);
+        logo.canvas = canvas;
+        logo.blocks = blocks;
+        logo.turtles = turtles;
+        logo.stage = turtleContainer;
+        logo.refreshCanvas = refreshCanvas;
+        logo.textMsg = textMsg;
+        logo.errorMsg = errorMsg;
+        logo.hideMsgs = hideMsgs;
+        logo.onStopTurtle = that.onStopTurtle;
+        logo.onRunTurtle = that.onRunTurtle;
+        logo.getStageX = getStageX;
+        logo.getStageY = getStageY;
+        logo.getStageMouseDown = getStageMouseDown;
+        logo.getCurrentKeyCode = that.getCurrentKeyCode;
+        logo.clearCurrentKeyCode = that.clearCurrentKeyCode;
+        // logo.meSpeak = meSpeak;
+        logo.setPlaybackStatus = setPlaybackStatus;
 
         blocks.setLogo(logo);
 
@@ -5328,7 +5328,7 @@ function Activity() {
         }
 
         window.saveLocally = saveLocally;
-        logo.setSaveLocally(saveLocally);
+        logo.saveLocally = saveLocally;
 
         initPalettes(palettes);
 
