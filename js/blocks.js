@@ -6525,14 +6525,12 @@ function Blocks(activity) {
                     var postProcess = (args) => {
                         if (args[1].turtleID==null) {
                             setTimeout(() => {
-                                console.log(args[1] , last(turtles.turtleList));
                                 that.blockList[args[0]].turtleID = last(turtles.turtleList).id;
                             }
                             ,2000);
                         }
                         //wait for some time to let the beat turtle load . 
                         else {
-                            console.log(args[0],args[1]);
                             that.blockList[args[0]].turtleID = args[1]["turtleID"] ;
                         }
                     }
@@ -7089,10 +7087,14 @@ function Blocks(activity) {
             this.addDefaultBlock(parentBlock, thisBlock);
         }
 
+        // send associated beat Turtle to stash . 
         if (myBlock.name == "everybeatdonew"){
             let turtleID = myBlock.turtleID ;
             let tur;
-            for(tur of turtles.getTurtleList())if (turtleID == tur.id)break;
+            for(tur of turtles.turtleList) {
+                if (turtleID == tur.id) 
+                    break;
+            }
             this.sendStackToTrash(tur.startBlock);
         }
 

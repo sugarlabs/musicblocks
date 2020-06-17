@@ -606,22 +606,27 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
             let findTurtle=(id)=>{
-                for(let tur in turtles.getTurtleList()){
-                    if (id == turtles.getTurtleList()[tur].id) return tur;
+                for(let tur in turtles.turtleList){
+                    if (id == turtles.turtleList[tur].id) 
+                        return tur;
                 }
             };
             let org =turtle ;
             let turtleID =logo.blocks.blockList[blk].turtleID ;
             turtle = findTurtle(turtleID);
-            console.log(turtle,turtleID);
+            console.debug("beat Turtle : ",turtle,turtleID);
 
+            // 2 things need to be changed everytime we play this block in logo: note duration and deispatch event .
             let ans = null ;
             let done = {} ;
             let findBlock = (bk, blockName) => { // dfs 
                 if (!bk) return ;
                 if (bk in done) return ;
                 done[bk]= true ;
-                if (logo.blocks.blockList[bk].name == blockName){ans = bk; return ;}
+                if (logo.blocks.blockList[bk].name == blockName){
+                    ans = bk; 
+                    return ;
+                }
                 for ( let con of blocks.blockList[bk].connections ){
                     findBlock(con,blockName);
                 }
@@ -633,7 +638,6 @@ function setupMeterBlocks() {
             findBlock(logo.blocks.blockList.indexOf(turtles.turtleList[turtle].startBlock),"newnote");
             let divideBlock  = logo.blocks.blockList[ans].connections[1];
             let den = logo.blocks.blockList[divideBlock].connections[2];
-            console.log(dispatchTextBlock,divideBlock,den);
 
             logo.blocks.blockList[den].value = logo.noteValuePerBeat[org];
             if (!(args[0] in logo.actions)) {
@@ -675,7 +679,7 @@ function setupMeterBlocks() {
                 let eventName = "__everybeat_" + turtleID + "__";
                 logo.blocks.blockList[dispatchTextBlock].value = eventName ;
                 logo._setListener(turtle, eventName, __listener);
-                console.log("send " +this.turtleID);
+                console.debug("set listener",eventName);
             }
         }
     }
