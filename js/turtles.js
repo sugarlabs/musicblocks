@@ -17,7 +17,7 @@
  */
 
 // What is the scale factor when stage is shrunk?
-const SCALEFACTOR = 4;
+const CONTAINERSCALEFACTOR = 4;
 
 /**
  * Class for managing all the turtles.
@@ -69,9 +69,9 @@ class Turtles {
         this.add(startBlock, infoDict);
         if (this.isShrunk()) {
             let t = last(this.turtleList);
-            t.container.scaleX = SCALEFACTOR;
-            t.container.scaleY = SCALEFACTOR;
-            t.container.scale = SCALEFACTOR;
+            t.container.scaleX = CONTAINERSCALEFACTOR;
+            t.container.scaleY = CONTAINERSCALEFACTOR;
+            t.container.scale = CONTAINERSCALEFACTOR;
         }
     }
 
@@ -788,20 +788,20 @@ class Turtles {
                 this._isShrunk = true;
 
                 for (let i = 0; i < this.turtleList.length; i++) {
-                    this.turtleList[i].container.scaleX = SCALEFACTOR;
-                    this.turtleList[i].container.scaleY = SCALEFACTOR;
-                    this.turtleList[i].container.scale = SCALEFACTOR;
+                    this.turtleList[i].container.scaleX = CONTAINERSCALEFACTOR;
+                    this.turtleList[i].container.scaleY = CONTAINERSCALEFACTOR;
+                    this.turtleList[i].container.scale = CONTAINERSCALEFACTOR;
                 }
 
-                this._clearButton.scaleX = SCALEFACTOR;
-                this._clearButton.scaleY = SCALEFACTOR;
-                this._clearButton.scale = SCALEFACTOR;
+                this._clearButton.scaleX = CONTAINERSCALEFACTOR;
+                this._clearButton.scaleY = CONTAINERSCALEFACTOR;
+                this._clearButton.scale = CONTAINERSCALEFACTOR;
                 this._clearButton.x = this._w - 5 - 8 * 55;
 
                 if (this._gridButton !== null) {
-                    this._gridButton.scaleX = SCALEFACTOR;
-                    this._gridButton.scaleY = SCALEFACTOR;
-                    this._gridButton.scale = SCALEFACTOR;
+                    this._gridButton.scaleX = CONTAINERSCALEFACTOR;
+                    this._gridButton.scaleY = CONTAINERSCALEFACTOR;
+                    this._gridButton.scale = CONTAINERSCALEFACTOR;
                     this._gridButton.x = this._w - 10 - 12 * 55;
                     this._gridButton.visible = false;
                 }
@@ -1170,9 +1170,9 @@ class Turtles {
 
                     this._expandButton.x = this._w - 10 - 4 * 55;
                     this._expandButton.y = 70 + LEADING + 6;
-                    this._expandButton.scaleX = SCALEFACTOR;
-                    this._expandButton.scaleY = SCALEFACTOR;
-                    this._expandButton.scale = SCALEFACTOR;
+                    this._expandButton.scaleX = CONTAINERSCALEFACTOR;
+                    this._expandButton.scaleY = CONTAINERSCALEFACTOR;
+                    this._expandButton.scale = CONTAINERSCALEFACTOR;
                     this._expandButton.visible = false;
                     // borderContainer.addChild(this._expandButton);
                     turtlesStage.addChild(this._expandButton);
@@ -1220,7 +1220,7 @@ class Turtles {
 
                     this._expandButton.removeAllEventListeners("pressmove");
                     this._expandButton.on("pressmove", event => {
-                        let w = (this._w - 10 - SCALEFACTOR * 55) / SCALEFACTOR;
+                        let w = (this._w - 10 - CONTAINERSCALEFACTOR * 55) / CONTAINERSCALEFACTOR;
                         let x = event.stageX / this._scale - w;
                         let y = event.stageY / this._scale - 16;
                         turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
@@ -1351,8 +1351,8 @@ class Turtles {
                             encodeURIComponent(
                                 MBOUNDARY.replace("HEIGHT", this._h)
                                     .replace("WIDTH", this._w)
-                                    .replace("Y", 10 / SCALEFACTOR)
-                                    .replace("X", 10 / SCALEFACTOR)
+                                    .replace("Y", 10 / CONTAINERSCALEFACTOR)
+                                    .replace("X", 10 / CONTAINERSCALEFACTOR)
                                     .replace("DY", dy)
                                     .replace("DX", dx)
                                     .replace(
@@ -1360,7 +1360,7 @@ class Turtles {
                                         platformColor.ruleColor
                                     )
                                     .replace("fill_color", this._backgroundColor)
-                                    .replace("STROKE", 20 / SCALEFACTOR)
+                                    .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                             )
                         )
                     );
