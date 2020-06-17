@@ -1356,7 +1356,7 @@ class NoteController {
                         }
                     }
 
-                    if (!logo.suppressOutput[turtle] && logo.blinkState) {
+                    if (!logo.suppressOutput[turtle]) {
                         logo.turtles.turtleList[turtle].blink(
                             duration,
                             last(logo.masterVolume)
@@ -1842,7 +1842,7 @@ class NoteController {
                             }
                         }
 
-                        if (!logo.suppressOutput[turtle] && logo.blinkState) {
+                        if (!logo.suppressOutput[turtle]) {
                             logo.turtles.turtleList[turtle].blink(
                                 duration,
                                 last(logo.masterVolume)

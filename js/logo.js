@@ -160,9 +160,6 @@ class Logo {
         this.playbackQueue = {};
         this.playbackTime = 0;
 
-        // Optimize for runtime speed
-        this.optimize = beginnerMode;   // beginnerMode is a boolean value
-
         // Widget-related attributes
         this.showPitchDrumMatrix = false;
         this.inPitchDrumMatrix = false;
@@ -345,15 +342,6 @@ class Logo {
         this._saveOrientation = {};
         this._savePenState = {};
 
-        // Things we tweak to optimize performance
-        // this.blinkState = !this.optimize;
-        this.blinkState = true;
-        // if (this.optimize) {
-        //     createjs.Ticker.framerate = 10;
-        // } else {
-        //     createjs.Ticker.framerate = 30;
-        // }
-
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the default synthesizer
             this.synth = new Synth();
@@ -392,27 +380,11 @@ class Logo {
         this.pitchAnalyser = null;
     }
 
-    /**
-     * Switches optimize mode on if state, off otherwise.
-     *
-     * @privileged
-     * @param {boolean} state - An object representing a state
-     * @returns {void}
+    /*
+    =======================================================
+     Setters/Getters
+    =======================================================
      */
-    setOptimize(state) {
-        if (state) {
-            // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
-            // createjs.Ticker.framerate = 10;
-            this.optimize = true;
-        } else {
-            // this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            // createjs.Ticker.framerate = 10; // 30;
-            this.optimize = false;
-        }
-
-        // this.blinkState = !state;
-        this.blinkState = true;
-    }
 
     /**
      * @param {Function} setPlaybackStatus - setPlaybackStatus property
@@ -700,10 +672,15 @@ class Logo {
         return this._noteDelay;
     }
 
+    /*
+    =======================================================
+     Logo utility
+    =======================================================
+     */
+
     /**
      * Takes one step for each turtle in excuting Logo commands.
      *
-     * @privileged
      * @returns {void}
      */
     step() {
@@ -730,147 +707,9 @@ class Logo {
     }
 
     /**
-     * Steps through one note for each turtle in excuting Logo commands,
-     * but runs through other blocks at full speed.
-     *
-     * @privileged
-     * @returns {void}
-     */
-    stepNote() {
-        let tempStepQueue = {};
-        let notesFinish = {};
-        let thisNote = {};
-
-        let __stepNote = () => {
-            for (let turtle in this.stepQueue) {
-                // Have we already played a note for this turtle?
-                if (turtle in this.playedNote && this.playedNote[turtle]) {
-                    continue;
-                }
-
-                if (this.stepQueue[turtle].length > 0) {
-                    if (
-                        turtle in this.unhighlightStepQueue &&
-                        this.unhighlightStepQueue[turtle] != null
-                    ) {
-                        if (this.blocks.visible) {
-                            this.blocks.unhighlight(
-                                this.unhighlightStepQueue[turtle]
-                            );
-                        }
-                        this.unhighlightStepQueue[turtle] = null;
-                    }
-
-                    let blk = this.stepQueue[turtle].pop();
-                    if (blk != null && blk !== notesFinish[turtle]) {
-                        let block = this.blocks.blockList[blk];
-                        if (block.name === "newnote") {
-                            tempStepQueue[turtle] = blk;
-                            notesFinish[turtle] = last(block.connections);
-                            if (notesFinish[turtle] == null) {
-                                // end of flow
-                                notesFinish[turtle] =
-                                    last(
-                                        this.turtles.turtleList[turtle].queue
-                                    ) &&
-                                    last(this.turtles.turtleList[turtle].queue)
-                                        .blk;
-                                // catch case of null - end of project
-                            }
-
-                            // this.playedNote[turtle] = true;
-                            this.playedNoteTimes[turtle] =
-                                this.playedNoteTimes[turtle] || 0;
-                            thisNote[turtle] = Math.pow(
-                                this.parseArg(
-                                    this,
-                                    turtle,
-                                    block.connections[1],
-                                    blk,
-                                    this.receivedArg
-                                ),
-                                -1
-                            );
-
-                            // Keep track of how long the note played for,
-                            // so we can go back and play it again if needed
-                            this.playedNoteTimes[turtle] += thisNote[turtle];
-                        }
-
-                        this._runFromBlockNow(this, turtle, blk, 0, null);
-                    } else {
-                        this.playedNote[turtle] = true;
-                    }
-                }
-            }
-
-            // At this point, some turtles have played notes and others
-            // have not. We need to keep stepping until they all have.
-            let keepGoing = false;
-            for (let turtle in this.stepQueue) {
-                if (
-                    this.stepQueue[turtle].length > 0 &&
-                    !this.playedNote[turtle]
-                ) {
-                    keepGoing = true;
-                    break;
-                }
-            }
-
-            if (keepGoing) {
-                __stepNote();
-                // this.step();
-            } else {
-                let notesArray = [];
-                for (let turtle in this.playedNote) {
-                    this.playedNote[turtle] = false;
-                    notesArray.push(this.playedNoteTimes[turtle]);
-                }
-
-                // If some notes are supposed to play for longer, add
-                // them back to the queue
-                let shortestNote = Math.min.apply(null, notesArray);
-                let continueFrom;
-                for (let turtle in this.playedNoteTimes) {
-                    if (this.playedNoteTimes[turtle] > shortestNote) {
-                        continueFrom = tempStepQueue[turtle];
-                        // Subtract the time, as if we haven't played it yet
-                        this.playedNoteTimes[turtle] -= thisNote[turtle];
-                    } else {
-                        continueFrom = notesFinish[turtle];
-                    }
-                    this._runFromBlock(this, turtle, continueFrom, 0, null);
-                }
-
-                if (shortestNote === Math.max.apply(null, notesArray)) {
-                    this.playedNoteTimes = {};
-                }
-            }
-        };
-
-        __stepNote();
-    }
-
-    /**
-     * Returns whether to record.
-     *
-     * @privileged
-     * @returns {boolean}
-     */
-    recordingStatus() {
-        return (
-            this.recording ||
-            this.runningLilypond ||
-            this.runningAbc ||
-            this.runningMxml
-        );
-    }
-
-    /**
      * The stop button was pressed.
      * Stops the turtle and cleans up a few odds and ends.
      *
-     * @privileged
      * @returns {void}
      */
     doStopTurtle() {
@@ -923,7 +762,6 @@ class Logo {
     /**
      * Restores any broken connections made in duplicate notes clamps.
      *
-     * @privileged
      * @returns {void}
      */
     _restoreConnections() {
@@ -944,7 +782,6 @@ class Logo {
     /**
      * Clears all the blocks, updates the cache and refreshes the canvas.
      *
-     * @privileged
      * @returns {void}
      */
     _clearParameterBlocks() {
@@ -963,7 +800,6 @@ class Logo {
     /**
      * Updates the label on parameter blocks.
      *
-     * @privileged
      * @param {this} logo
      * @param turtle
      * @param blk
@@ -1015,7 +851,6 @@ class Logo {
     /**
      * Initialises the microphone.
      *
-     * @privileged
      * @returns {void}
      */
     initMediaDevices() {
@@ -1050,7 +885,6 @@ class Logo {
     /**
      * Initialises a turtle.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -1212,7 +1046,6 @@ class Logo {
     /**
      * Runs Logo commands.
      *
-     * @privileged
      * @param startHere - index of a block to start from
      * @param env
      * @returns {void}
@@ -1559,7 +1392,6 @@ class Logo {
     /**
      * Runs from a single block.
      *
-     * @privileged
      * @param {this} logo
      * @param turtle
      * @param blk
@@ -1632,7 +1464,6 @@ class Logo {
     /**
      * Changes a property according to a block name and a value.
      *
-     * @privileged
      * @param blk
      * @param value
      * @param turtle
@@ -1660,7 +1491,6 @@ class Logo {
     /**
      * Runs a stack of blocks, beginning with blk.
      *
-     * @privileged
      * @param {this} logo
      * @param turtle
      * @param blk
@@ -2347,7 +2177,6 @@ class Logo {
     /**
      * Sets the master volume to a value of at least 0 and at most 100.
      *
-     * @privileged
      * @param {number} volume
      * @returns {void}
      */
@@ -2376,7 +2205,6 @@ class Logo {
      * Sets the synth volume to a value of at least 0 and,
      * unless the synth is noise3, at most 100.
      *
-     * @privileged
      * @param turtle
      * @param synth
      * @param {number} volume
@@ -2405,9 +2233,22 @@ class Logo {
     }
 
     /**
+     * Returns whether to record.
+     *
+     * @returns {boolean}
+     */
+    recordingStatus() {
+        return (
+            this.recording ||
+            this.runningLilypond ||
+            this.runningAbc ||
+            this.runningMxml
+        );
+    }
+
+    /**
      * Pushes obj to playback queue, if possible.
      *
-     * @privileged
      * @param turtle
      * @param obj
      * @returns {void}
@@ -2416,8 +2257,7 @@ class Logo {
         // We only push for saveWAV, etc.
         if (!this.recordingStatus()) return;
 
-        // Don't record in optimize mode or Turtle Blocks
-        if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             this.playbackQueue[turtle].push(obj);
         }
     }
@@ -2425,7 +2265,6 @@ class Logo {
     /**
      * Plays back some amount of activity.
      *
-     * @privileged
      * @param {number} whichMouse
      * @param {boolean} [recording]
      * @returns {void}
@@ -2551,12 +2390,10 @@ class Logo {
 
                     case "notes":
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            if (this.blinkState) {
-                                this.turtles.turtleList[turtle].blink(
-                                    this.playbackQueue[turtle][idx][3],
-                                    50
-                                );
-                            }
+                            this.turtles.turtleList[turtle].blink(
+                                this.playbackQueue[turtle][idx][3],
+                                50
+                            );
 
                             this.lastNote[turtle] =
                                 this.playbackQueue[turtle][idx][3];
@@ -2838,7 +2675,6 @@ class Logo {
     /**
      * Dispatches turtle signals to update turtle graphics.
      *
-     * @privileged
      * @async
      * @param turtle
      * @param {number} beatValue
@@ -3637,7 +3473,6 @@ class Logo {
     /**
      * Sets a named listener after removing any existing listener in the same place.
      *
-     * @privileged
      * @param turtle
      * @param {string} listenerName
      * @param {Function} listener
@@ -3659,7 +3494,6 @@ class Logo {
     /**
      * Sets a single dispatch block.
      *
-     * @privileged
      * @param blk
      * @param turtle
      * @param {string} listenerName
@@ -3717,7 +3551,6 @@ class Logo {
     /**
      * Initialises and starts a default synth.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -3738,7 +3571,6 @@ class Logo {
      * Speaks all characters in the range of comma,
      * full stop, space, A to Z, a to z in the input text.
      *
-     * @privileged
      * @param {string} text
      * @returns {void}
      */
@@ -3757,7 +3589,6 @@ class Logo {
     /**
      * Shows information: with camera, in image form, at URL, as text.
      *
-     * @privileged
      * @param turtle
      * @param blk
      * @param arg0
@@ -3818,7 +3649,6 @@ class Logo {
      * If the input name is forever, repeat, while or until,
      * returns true (false otherwise).
      *
-     * @privileged
      * @param {string} name
      * @returns {boolean}
      */
@@ -3829,7 +3659,6 @@ class Logo {
     /**
      * Breaks a loop.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -3896,7 +3725,6 @@ class Logo {
     /**
      * Parses receivedArg.
      *
-     * @privileged
      * @param logo
      * @param turtle
      * @param blk
@@ -4033,7 +3861,6 @@ class Logo {
     /**
      * Counts notes, with saving of the box, heap and turtle states.
      *
-     * @privileged
      * @param turtle
      * @param cblk
      * @returns {number}
@@ -4137,7 +3964,6 @@ class Logo {
     /**
      * Makes the turtle wait.
      *
-     * @privileged
      * @param turtle
      * @param secs
      * @returns {void}
@@ -4149,7 +3975,6 @@ class Logo {
     /**
      * Returns a random integer in a range.
      *
-     * @privileged
      * @param a - preferably the minimum
      * @param b - preferably the maximum
      * @returns {number}
@@ -4172,7 +3997,6 @@ class Logo {
     /**
      * Randomly returns either a or b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {*}
@@ -4184,7 +4008,6 @@ class Logo {
     /**
      * Returns a modulo b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number}
@@ -4202,7 +4025,6 @@ class Logo {
     /**
      * Square-roots a number.
      *
-     * @privileged
      * @param a
      * @returns {number}
      */
@@ -4219,7 +4041,6 @@ class Logo {
     /**
      * Adds a and b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number|string}
@@ -4238,7 +4059,6 @@ class Logo {
     /**
      * Subtracts b from a.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number}
@@ -4256,7 +4076,6 @@ class Logo {
     /**
      * Multiplies a by b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number}
@@ -4275,7 +4094,6 @@ class Logo {
      * Calculates euclidean distance between (cursor x, cursor y)
      * and (mouse 'x' and mouse 'y').
      *
-     * @privileged
      * @param a
      * @param b
      * @param c
@@ -4304,7 +4122,6 @@ class Logo {
     /**
      * Returns a to the power of b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number}
@@ -4322,7 +4139,6 @@ class Logo {
     /**
      * Divides a by b.
      *
-     * @privileged
      * @param a
      * @param b
      * @returns {number}
@@ -4346,7 +4162,6 @@ class Logo {
     /**
      * Changes body background in DOM to current colour.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -4366,7 +4181,6 @@ class Logo {
     /**
      * Sets the cameraID property.
      *
-     * @privileged
      * @param id
      * @returns {void}
      */
@@ -4377,7 +4191,6 @@ class Logo {
     /**
      * Hides all the blocks.
      *
-     * @privileged
      * @returns {void}
      */
     hideBlocks(show) {
@@ -4390,7 +4203,6 @@ class Logo {
     /**
      * Shows all the blocks.
      *
-     * @privileged
      * @returns {void}
      */
     showBlocks() {
@@ -4403,7 +4215,6 @@ class Logo {
     /**
      * Calculates the change needed for musical inversion.
      *
-     * @privileged
      * @param turtle
      * @param note
      * @param octave
@@ -4472,7 +4283,6 @@ class Logo {
     /**
      * Shifts pitches by n steps relative to the provided scale.
      *
-     * @privileged
      * @param turtle
      * @param note
      * @param octave
@@ -4586,7 +4396,6 @@ class Logo {
     /**
      * Returns a distance for scalar transposition.
      *
-     * @privileged
      * @param turtle
      * @param {number} firstNote
      * @param {number} lastNote
@@ -4641,7 +4450,6 @@ class Logo {
     /**
      * Preps synths for each turtle.
      *
-     * @privileged
      * @returns {void}
      */
     _prepSynths() {
@@ -4704,7 +4512,6 @@ class Logo {
     /**
      * Clears note params.
      *
-     * @privileged
      * @param turtle
      * @param blk
      * @param drums
@@ -4726,7 +4533,6 @@ class Logo {
     /**
      * Updates the music notation used for Lilypond output.
      *
-     * @privileged
      * @param note
      * @param {number} duration
      * @param turtle
@@ -4743,8 +4549,6 @@ class Logo {
         drum,
         split
     ) {
-        if (this.optimize) return;
-
         // Note: At this point, the note of duration "duration" has
         // already been added to notesPlayed
 
@@ -4916,7 +4720,6 @@ class Logo {
     /**
      * Adds a voice if possible.
      *
-     * @privileged
      * @param turtle
      * @param {number} arg
      * @returns {void}
@@ -4946,7 +4749,6 @@ class Logo {
     /**
      * Sets the notation markup.
      *
-     * @privileged
      * @param turtle
      * @param markup
      * @param {boolean} below
@@ -4965,7 +4767,6 @@ class Logo {
     /**
      * Sets the key and mode in the notation.
      *
-     * @privileged
      * @param turtle
      * @param key
      * @param mode
@@ -4979,7 +4780,6 @@ class Logo {
     /**
      * Sets the meter.
      *
-     * @privileged
      * @param turtle
      * @param count
      * @param value
@@ -5010,7 +4810,6 @@ class Logo {
     /**
      * Adds swing.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5021,7 +4820,6 @@ class Logo {
     /**
      * Sets the tempo.
      *
-     * @privileged
      * @param turtle
      * @param {number} bpm - number of beats per minute
      * @param beatValue
@@ -5040,7 +4838,6 @@ class Logo {
     /**
      * Adds a pickup.
      *
-     * @privileged
      * @param turtle
      * @param {number} factor
      * @returns {void}
@@ -5082,7 +4879,6 @@ class Logo {
     /**
      * Sets tuning as harmonic.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5094,7 +4890,6 @@ class Logo {
     /**
      * Adds a line break.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5106,7 +4901,6 @@ class Logo {
     /**
      * Begins the articulation of an instrument.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5118,7 +4912,6 @@ class Logo {
     /**
      * Ends articulation.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5130,7 +4923,6 @@ class Logo {
     /**
      * Begins a crescendo or descrendo.
      *
-     * @privileged
      * @param turtle
      * @param {number} factor - If more than 0, we have a crescendo
      * (otherwise, a decrescendo)
@@ -5149,7 +4941,6 @@ class Logo {
     /**
      * Ends a crescendo or descrendo.
      *
-     * @privileged
      * @param turtle
      * @param {number} factor - If more than 0, we have a crescendo
      * (otherwise, a decrescendo)
@@ -5168,7 +4959,6 @@ class Logo {
     /**
      * Begins a slur.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5180,7 +4970,6 @@ class Logo {
     /**
      * Ends a slur.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5192,7 +4981,6 @@ class Logo {
     /**
      * Adds a tie.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5204,7 +4992,6 @@ class Logo {
     /**
      * Removes the last tie.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5216,7 +5003,6 @@ class Logo {
     /**
      * Begins harmonics.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -5228,7 +5014,6 @@ class Logo {
     /**
      * Ends harmonics.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */

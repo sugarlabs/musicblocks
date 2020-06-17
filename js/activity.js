@@ -1204,12 +1204,6 @@ function Activity() {
         myRadarChart = new Chart(ctx).Radar(data, options);
     };
 
-    // DEPRECATED
-    function doOptimize(state) {
-        blocks.activeBlock = null;
-        console.debug("Setting optimize to " + state);
-        logo.setOptimize(state);
-    }
     /*
      * Increases block size
      */
@@ -3373,11 +3367,6 @@ function Activity() {
     };
 
     errorMsg = function(msg, blk, text, timeout) {
-        /*
-        if (logo.optimize) {
-            return;
-        }
-        */
         if (errorMsgTimeoutID != null) {
             clearTimeout(errorMsgTimeoutID);
         }
