@@ -174,7 +174,7 @@ class NoteController {
 
         let __listener = function(event) {
             if (logo.multipleVoices[turtle]) {
-                logo.notationVoices(turtle, logo.inNoteBlock[turtle].length);
+                logo.notation.notationVoices(turtle, logo.inNoteBlock[turtle].length);
             }
 
             if (logo.inNoteBlock[turtle].length > 0) {
@@ -215,7 +215,7 @@ class NoteController {
                 logo.multipleVoices[turtle] &&
                 logo.inNoteBlock[turtle].length === 0
             ) {
-                logo.notationVoices(turtle, logo.inNoteBlock[turtle].length);
+                logo.notation.notationVoices(turtle, logo.inNoteBlock[turtle].length);
                 logo.multipleVoices[turtle] = false;
             }
 
@@ -255,7 +255,7 @@ class NoteController {
             }
 
             if (logo.suppressOutput[turtle]) {
-                logo.notationSwing(turtle);
+                logo.notation.notationSwing(turtle);
             } else {
                 logo.swing[turtle].push(1 / arg0);
                 logo.swingTarget[turtle].push(1 / arg1);
@@ -539,10 +539,7 @@ class NoteController {
                     ) &&
                 logo.justCounting[turtle].length === 0
             ) {
-                logo.notationBeginCrescendo(
-                    turtle,
-                    last(logo.crescendoDelta[turtle])
-                );
+                logo.notation.notationBeginCrescendo(turtle, last(logo.crescendoDelta[turtle]));
             }
 
             for (let synth in logo.synthVolume[turtle]) {
@@ -803,7 +800,7 @@ class NoteController {
                                 i < logo.notePitches[turtle][saveBlk].length;
                                 i++
                             ) {
-                                logo.notationRemoveTie(turtle);
+                                logo.notation.notationRemoveTie(turtle);
                             }
                         }
 
@@ -1035,11 +1032,11 @@ class NoteController {
                     1
                 ) {
                     if (
-                        turtle in logo.notationStaging &&
+                        turtle in logo.notation.notationStaging &&
                         logo.justCounting[turtle].length === 0
                     ) {
                         var insideChord =
-                            logo.notationStaging[turtle].length + 1;
+                            logo.notation.notationStaging[turtle].length + 1;
                     } else {
                         var insideChord = 1;
                     }
@@ -1186,7 +1183,7 @@ class NoteController {
                                     i === 0 &&
                                     logo.justCounting[turtle].length === 0
                                 ) {
-                                    logo.notationInsertTie(turtle);
+                                    logo.notation.notationInsertTie(turtle);
                                 }
 
                                 var originalDuration =

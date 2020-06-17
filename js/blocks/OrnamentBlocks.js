@@ -181,7 +181,7 @@ function setupOrnamentBlocks() {
             logo.glide[turtle].push(arg);
 
             if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginSlur(turtle);
+                logo.notation.notationBeginSlur(turtle);
             }
 
             logo.glideOverride[turtle] = logo._noteCounter(turtle, args[1]);
@@ -192,7 +192,7 @@ function setupOrnamentBlocks() {
 
             let __listener = function(event) {
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndSlur(turtle);
+                    logo.notation.notationEndSlur(turtle);
                 }
 
                 logo.glide[turtle].pop();
@@ -244,7 +244,7 @@ function setupOrnamentBlocks() {
             }
 
             if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginSlur(turtle);
+                logo.notation.notationBeginSlur(turtle);
             }
 
             let listenerName = "_staccato_" + turtle;
@@ -253,7 +253,7 @@ function setupOrnamentBlocks() {
             let __listener = function(event) {
                 logo.staccato[turtle].pop();
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndSlur(turtle);
+                    logo.notation.notationEndSlur(turtle);
                 }
             };
 
@@ -286,7 +286,7 @@ function setupOrnamentBlocks() {
                 // Nothing to do.
                 return;
             }
-          
+
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);

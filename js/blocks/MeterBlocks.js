@@ -698,7 +698,7 @@ function setupMeterBlocks() {
                     logo._masterBPM = bpm;
                 }
 
-                logo.notationTempo(turtle, args[0], args[1]);
+                logo.notation.notationTempo(turtle, args[0], args[1]);
                 logo.defaultBPMFactor = TONEBPM / logo._masterBPM;
             }
 
@@ -822,7 +822,7 @@ function setupMeterBlocks() {
                     bpm = bpm;
                 }
 
-                logo.notationTempo(turtle, args[0], args[1]);
+                logo.notation.notationTempo(turtle, args[0], args[1]);
                 logo.bpm[turtle].push(bpm);
             }
 
@@ -876,7 +876,7 @@ function setupMeterBlocks() {
                     bpm = 1000;
                 }
 
-                logo.notationTempo(turtle, args[0], args[1]);
+                logo.notation.notationTempo(turtle, args[0], args[1]);
                 logo.bpm[turtle].push(bpm);
 
                 let listenerName = "_bpm_" + turtle;
@@ -984,7 +984,7 @@ function setupMeterBlocks() {
                 logo.pickup[turtle] = arg0;
             }
 
-            logo.notationPickup(turtle, logo.pickup[turtle]);
+            logo.notation.notationPickup(turtle, logo.pickup[turtle]);
         }
     }
 
@@ -1061,7 +1061,7 @@ function setupMeterBlocks() {
                 logo.defaultStrongBeats[turtle] = true;
             }
 
-            logo.notationMeter(
+            logo.notation.notationMeter(
                 turtle,
                 logo.beatsPerMeasure[turtle],
                 logo.noteValuePerBeat[turtle]

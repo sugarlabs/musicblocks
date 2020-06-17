@@ -253,7 +253,6 @@ class Logo {
         this.crescendoInitialVolume = {};
         this.intervals = {};            // relative interval (based on scale degree)
         this.semitoneIntervals = {};    // absolute interval (based on semitones)
-        this.markup = {};
         this.staccato = {};
         this.glide = {};
         this.glideOverride = {};
@@ -307,13 +306,12 @@ class Logo {
         // pitch to drum mapping
         this.pitchDrumTable = {};
 
+        // object that deals with notations
+        this._notation = new Notation(this);
+
         // parameters used by notations
-        this.notationStaging = {};
-        this.notationDrumStaging = {};
         this.notationOutput = "";
         this.notationNotes = {};
-        this.pickupPOW2 = {};
-        this.pickupPoint = {};
         this.runningLilypond = false;
         this.runningAbc = false;
         this.runningMxml = false;
@@ -321,7 +319,6 @@ class Logo {
         this.compiling = false;
         this.recording = false;
         this.lastNote = {};
-        this.restartPlayback = true;
 
         // Variables for progress bar
         this.progressBar = docById("myBar");
@@ -382,7 +379,7 @@ class Logo {
 
     /*
     =======================================================
-     Setters/Getters
+     Setters, Getters
     =======================================================
      */
 
@@ -672,6 +669,13 @@ class Logo {
         return this._noteDelay;
     }
 
+    /**
+     * @returns {Object} object of Notation
+     */
+    get notation() {
+        return this._notation;
+    }
+
     /*
     =======================================================
      Logo utility
@@ -948,7 +952,6 @@ class Logo {
         };
         this.intervals[turtle] = [];
         this.semitoneIntervals[turtle] = [];
-        this.markup[turtle] = [];
         this.staccato[turtle] = [];
         this.glide[turtle] = [];
         this.glideOverride[turtle] = 0;
@@ -994,10 +997,10 @@ class Logo {
         this.currentMeasure[turtle] = 0;
         this.justCounting[turtle] = [];
         this.justMeasuring[turtle] = [];
-        this.notationStaging[turtle] = [];
-        this.notationDrumStaging[turtle] = [];
-        this.pickupPoint[turtle] = null;
-        this.pickupPOW2[turtle] = false;
+        this.notation.notationStaging[turtle] = [];
+        this.notation.notationDrumStaging[turtle] = [];
+        this.notation.pickupPoint[turtle] = null;
+        this.notation.pickupPOW2[turtle] = false;
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
         this.pitchNumberOffset[turtle] = 39;    // C4
@@ -1104,8 +1107,8 @@ class Logo {
             this._prepSynths();
         }
 
-        this.notationStaging = {};
-        this.notationDrumStaging = {};
+        this.notation.notationStaging = {};
+        this.notation.notationDrumStaging = {};
 
         // Each turtle needs to keep its own wait time and music states
         for (
@@ -4558,11 +4561,13 @@ class Logo {
         // Check to see if this note straddles a measure boundary
         let durationTime = 1 / duration;
         let beatsIntoMeasure =
-            ((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
-                this.pickup[turtle] -
-                durationTime) *
-                this.noteValuePerBeat[turtle]) %
-            this.beatsPerMeasure[turtle];
+            (
+                (
+                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
+                    this.pickup[turtle] -
+                    durationTime
+                ) * this.noteValuePerBeat[turtle]
+            ) % this.beatsPerMeasure[turtle];
         let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
         let timeLeftInMeasure =
             this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
@@ -4571,8 +4576,7 @@ class Logo {
         if (split && durationTime > timeLeftInMeasure) {
             let d = durationTime - timeLeftInMeasure;
             let d2 = timeLeftInMeasure;
-            let b =
-                this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.debug("splitting note across measure boundary.");
             let obj = rationalToFraction(d);
 
@@ -4585,19 +4589,12 @@ class Logo {
                 }
 
                 let obj2 = rationalToFraction(d2);
-                this.updateNotation(
-                    note,
-                    obj2[1] / obj2[0],
-                    turtle,
-                    insideChord,
-                    drum,
-                    false
-                );
+                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
                     if (note[0] !== "R") {
                         // Don't tie rests
-                        this.notationInsertTie(turtle);
-                        this.notationDrumStaging[turtle].push("tie");
+                        this.notation.notationInsertTie(turtle);
+                        this.notation.notationDrumStaging[turtle].push("tie");
                     }
                     obj2 = rationalToFraction(1 / b);
                 }
@@ -4605,421 +4602,24 @@ class Logo {
                 // Add any measures we straddled
                 while (i > 0) {
                     i -= 1;
-                    this.updateNotation(
-                        note,
-                        obj2[1] / obj2[0],
-                        turtle,
-                        insideChord,
-                        drum,
-                        false
-                    );
+                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
                         if (note[0] !== "R") {
                             // Don't tie rests
-                            this.notationInsertTie(turtle);
-                            this.notationDrumStaging[turtle].push("tie");
+                            this.notation.notationInsertTie(turtle);
+                            this.notation.notationDrumStaging[turtle].push("tie");
                         }
                     }
                 }
             }
 
             if (obj[0] > 0) {
-                this.updateNotation(
-                    note,
-                    obj[1] / obj[0],
-                    turtle,
-                    insideChord,
-                    drum,
-                    false
-                );
-            }
-
-            return;
-        }
-
-        // .. otherwise proceed as normal
-        let obj = durationToNoteValue(duration);
-
-        /** @deprecated */
-        if (this.turtles.turtleList[turtle].drum) {
-            note = "c2";
-        }
-
-        this.notationStaging[turtle].push([
-            note,
-            obj[0],
-            obj[1],
-            obj[2],
-            obj[3],
-            insideChord,
-            this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0
-        ]);
-
-        // If no drum is specified, add a rest to the drum line.
-        // Otherwise, add the drum.
-        if (drum.length === 0) {
-            this.notationDrumStaging[turtle].push([
-                ["R"],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
-            ]);
-        } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
-            let drumSymbol = getDrumSymbol(drum[0]);
-            this.notationDrumStaging[turtle].push([
-                [drumSymbol],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
-            ]);
-        }
-
-        this.pickupPoint[turtle] = null;
-
-        if (this.markup[turtle].length > 0) {
-            let markup = "";
-            for (let i = 0; i < this.markup[turtle].length; i++) {
-                markup += this.markup[turtle][i];
-                if (i < this.markup[turtle].length - 1) {
-                    markup += " ";
-                }
-            }
-
-            this.notationMarkup(turtle, markup, true);
-            this.markup[turtle] = [];
-        }
-
-        if (typeof note === "object") {
-            // If it is hertz, add a markup
-            let markup = "";
-            try {
-                for (let i = 0; i < note.length; i++) {
-                    if (typeof note[i] === "number") {
-                        if ((markup = "")) {
-                            markup = toFixed2(note[i]);
-                            break;
-                        }
-                    }
-                }
-
-                if (markup.length > 0) {
-                    this.notationMarkup(turtle, markup, false);
-                }
-            } catch (e) {
-                console.debug(e);
-            }
-        }
-    }
-
-    /**
-     * Adds a voice if possible.
-     *
-     * @param turtle
-     * @param {number} arg
-     * @returns {void}
-     */
-    notationVoices(turtle, arg) {
-        switch (arg) {
-            case 1:
-                this.notationStaging[turtle].push("voice one");
-                break;
-            case 2:
-                this.notationStaging[turtle].push("voice two");
-                break;
-            case 3:
-                this.notationStaging[turtle].push("voice three");
-                break;
-            case 4:
-                this.notationStaging[turtle].push("voice four");
-                break;
-            default:
-                this.notationStaging[turtle].push("one voice");
-                break;
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the notation markup.
-     *
-     * @param turtle
-     * @param markup
-     * @param {boolean} below
-     * @returns {void}
-     */
-    notationMarkup(turtle, markup, below) {
-        if (below) {
-            this.notationStaging[turtle].push("markdown", markup);
-        } else {
-            this.notationStaging[turtle].push("markup", markup);
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the key and mode in the notation.
-     *
-     * @param turtle
-     * @param key
-     * @param mode
-     * @returns {void}
-     */
-    notationKey(turtle, key, mode) {
-        this.notationStaging[turtle].push("key", key, mode);
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the meter.
-     *
-     * @param turtle
-     * @param count
-     * @param value
-     * @returns {void}
-     */
-    notationMeter(turtle, count, value) {
-        if (this.pickupPoint[turtle] != null) {
-            // Lilypond prefers meter to be before partials.
-            let d =
-                this.notationStaging[turtle].length - this.pickupPoint[turtle];
-            let pickup = [];
-
-            for (let i in d) {
-                pickup.push(this.notationStaging[turtle].pop());
-            }
-
-            this.notationStaging[turtle].push("meter", count, value);
-            for (let i in d) {
-                this.notationStaging[turtle].push(pickup.pop());
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
         } else {
-            this.notationStaging[turtle].push("meter", count, value);
+            // .. otherwise proceed as normal
+            this.notation.doUpdateNotation(... arguments);
         }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds swing.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationSwing(turtle) {
-        this.notationStaging[turtle].push("swing");
-    }
-
-    /**
-     * Sets the tempo.
-     *
-     * @param turtle
-     * @param {number} bpm - number of beats per minute
-     * @param beatValue
-     * @returns {void}
-     */
-    notationTempo(turtle, bpm, beatValue) {
-        let beat = convertFactor(beatValue);
-        if (beat !== null) {
-            this.notationStaging[turtle].push("tempo", bpm, beat);
-        } else {
-            let obj = rationalToFraction(beatValue);
-            // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
-        }
-    }
-
-    /**
-     * Adds a pickup.
-     *
-     * @param turtle
-     * @param {number} factor
-     * @returns {void}
-     */
-    notationPickup(turtle, factor) {
-        if (factor === 0) {
-            console.debug("ignoring pickup of 0");
-            return;
-        }
-
-        let pickupPoint = this.notationStaging[turtle].length;
-
-        // Lilypond partial must be a combination of powers of two.
-        let partial = 1 / factor;
-        let beat = convertFactor(factor);
-        if (beat !== null) {
-            this.notationStaging[turtle].push("pickup", beat);
-            this.pickupPOW2[turtle] = true;
-        } else {
-            if (this.runningLilypond) {
-                obj = rationalToFraction(factor);
-                this.errorMsg(
-                    _("Lilypond cannot process pickup of ") +
-                    obj[0] +
-                    "/" +
-                    obj[1]
-                );
-            }
-
-            obj = rationalToFraction(1 - factor);
-            for (let i = 0; i < obj[0]; i++) {
-                this.updateNotation(["R"], obj[1], turtle, false, "");
-            }
-        }
-
-        this.pickupPoint[turtle] = pickupPoint;
-    }
-
-    /**
-     * Sets tuning as harmonic.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationHarmonic(turtle) {
-        this.notationStaging.push("harmonic");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds a line break.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationLineBreak(turtle) {
-        // this.notationStaging[turtle].push('break');
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins the articulation of an instrument.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginArticulation(turtle) {
-        this.notationStaging[turtle].push("begin articulation");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends articulation.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndArticulation(turtle) {
-        this.notationStaging[turtle].push("end articulation");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins a crescendo or descrendo.
-     *
-     * @param turtle
-     * @param {number} factor - If more than 0, we have a crescendo
-     * (otherwise, a decrescendo)
-     * @returns {void}
-     */
-    notationBeginCrescendo(turtle, factor) {
-        if (factor > 0) {
-            this.notationStaging[turtle].push("begin crescendo");
-        } else {
-            this.notationStaging[turtle].push("begin decrescendo");
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends a crescendo or descrendo.
-     *
-     * @param turtle
-     * @param {number} factor - If more than 0, we have a crescendo
-     * (otherwise, a decrescendo)
-     * @returns {void}
-     */
-    notationEndCrescendo(turtle, factor) {
-        if (factor > 0) {
-            this.notationStaging[turtle].push("end crescendo");
-        } else {
-            this.notationStaging[turtle].push("end decrescendo");
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins a slur.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginSlur(turtle) {
-        this.notationStaging[turtle].push("begin slur");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends a slur.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndSlur(turtle) {
-        this.notationStaging[turtle].push("end slur");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds a tie.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationInsertTie(turtle) {
-        this.notationStaging[turtle].push("tie");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Removes the last tie.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationRemoveTie(turtle) {
-        this.notationStaging[turtle].pop();
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins harmonics.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginHarmonics(turtle) {
-        this.notationStaging[turtle].push("begin harmonics");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends harmonics.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndHarmonics(turtle) {
-        this.notationStaging[turtle].push("end harmonics");
-        this.pickupPoint[turtle] = null;
     }
 }
 

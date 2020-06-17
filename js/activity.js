@@ -194,6 +194,7 @@ function Activity() {
         "activity/blocks",
         "activity/block",
         "activity/turtledefs",
+        "activity/notation",
         "activity/logo",
         "activity/languagebox",
         "activity/basicblocks",
@@ -832,8 +833,8 @@ function Activity() {
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             logo.turtleHeaps[turtle] = [];
-            logo.notationStaging[turtle] = [];
-            logo.notationDrumStaging[turtle] = [];
+            logo.notation.notationStaging[turtle] = [];
+            logo.notation.notationDrumStaging[turtle] = [];
             if (noErase === undefined || !noErase) {
                 turtles.turtleList[turtle].doClear(true, true, true);
             }
@@ -1301,7 +1302,6 @@ function Activity() {
 
     // function doPausePlayback() {
     //     blocks.activeBlock = null;
-    //     logo.restartPlayback = false;
     //     logo.playback(-1);
     //     // playbackBox.playButton.visible = true;
     //     // playbackBox.pauseButton.visible = false;
@@ -1322,7 +1322,6 @@ function Activity() {
     // function doRestartPlayback() {
     //     blocks.activeBlock = null;
     //     logo.doStopTurtle();
-    //     logo.restartPlayback = true;
 
     //     /*
     //     setTimeout(function () {
@@ -1338,7 +1337,6 @@ function Activity() {
     // // Deprecated
     // function doCompile() {
     //     blocks.activeBlock = null;
-    //     logo.restartPlayback = true;
     //     document.body.style.cursor = 'wait';
     //     console.debug('Compiling music for playback');
 
@@ -3249,8 +3247,8 @@ function Activity() {
                         turtle++
                     ) {
                         logo.turtleHeaps[turtle] = [];
-                        logo.notationStaging[turtle] = [];
-                        logo.notationDrumStaging[turtle] = [];
+                        logo.notation.notationStaging[turtle] = [];
+                        logo.notation.notationDrumStaging[turtle] = [];
                         turtles.turtleList[turtle].doClear(true, true, false);
                     }
                     const imgUrl =

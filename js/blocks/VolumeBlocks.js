@@ -703,7 +703,7 @@ function setupVolumeBlocks() {
             }
 
             if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginArticulation(turtle);
+                logo.notation.notationBeginArticulation(turtle);
             }
 
             let listenerName = "_articulation_" + turtle;
@@ -726,7 +726,7 @@ function setupVolumeBlocks() {
                 }
 
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndArticulation(turtle);
+                    logo.notation.notationEndArticulation(turtle);
                 }
             };
 
@@ -795,7 +795,7 @@ function setupVolumeBlocks() {
 
                 let __listener = function(event) {
                     if (logo.justCounting[turtle].length === 0) {
-                        logo.notationEndCrescendo(
+                        logo.notation.notationEndCrescendo(
                             turtle,
                             last(logo.crescendoDelta[turtle])
                         );
