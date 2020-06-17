@@ -41,16 +41,21 @@ class Turtles {
         // Import members of model and view (no arguments for model or view)
         importMembers(this);
 
-        this.refreshCanvas = null;      // function to refresh canvas
+        this._refreshCanvas = null;     // function to refresh canvas
     }
 
     /**
-     * @param {Function} refreshCanvas
-     * @returns {this}
+     * @param {Function} refreshCanvas - function to refresh canvas after view update
      */
-    setRefreshCanvas(refreshCanvas) {
-        this.refreshCanvas = refreshCanvas;
-        return this;
+    set refreshCanvas(refreshCanvas) {
+        this._refreshCanvas = refreshCanvas;
+    }
+
+    /**
+     * @returns {Function} function to refresh canvas after view update
+     */
+    get refreshCanvas() {
+        return this._refreshCanvas;
     }
 
     /**
@@ -85,18 +90,12 @@ class Turtles {
                 console.debug("turtle #" + startBlock.value);
             }
         } else {
-            console.debug("adding a new turtle startBlock is null");
+            console.debug("adding a new turtle: startBlock is null");
         }
 
-        let blkInfoAvailable = false;
-
-        if (typeof infoDict === "object") {
-            if (Object.keys(infoDict).length > 0) {
-                blkInfoAvailable = true;
-            }
-        }
-
-        let i = this.turtleList.length % 10;
+        let blkInfoAvailable =
+            typeof infoDict === "object" && Object.keys(infoDict).length > 0 ?
+                true : false;
 
         // Unique ID of turtle is time of instantiation for the first time
         let id =
@@ -109,140 +108,120 @@ class Turtles {
             blkInfoAvailable && "name" in infoDict ?
                 infoDict["name"] : _("start");
 
-        let newTurtle = new Turtle(id, turtleName, this);
-        newTurtle.startBlock = startBlock;
+        // Instantiate a new Turtle object
+        let turtle = new Turtle(id, turtleName, this, startBlock);
 
-        if (blkInfoAvailable) {
-            if ("xcor" in infoDict) {
-                newTurtle.x = infoDict["xcor"];
-            }
-            if ("ycor" in infoDict) {
-                newTurtle.y = infoDict["ycor"];
-            }
-        }
-
-        this.turtleList.push(newTurtle);
+        // Add turtle model properties and store color index for turtle
+        this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
 
         let turtlesStage = this.getStage();
 
-        // Each turtle needs its own canvas
-        newTurtle.imageContainer = new createjs.Container();
-        turtlesStage.addChild(newTurtle.imageContainer);
-        newTurtle.penstrokes = new createjs.Bitmap();
-        turtlesStage.addChild(newTurtle.penstrokes);
+        this.reorderButtons(turtlesStage);
 
-        newTurtle.container = new createjs.Container();
-        turtlesStage.addChild(newTurtle.container);
-        newTurtle.container.x = this.turtleX2screenX(newTurtle.x);
-        newTurtle.container.y = this.turtleY2screenY(newTurtle.y);
+        let i = this.turtleList.length % 10;    // used for turtle (mouse) skin color
+        this.turtleList.push(turtle);           // add new turtle to turtle list
 
-        // Ensure that the buttons are on top
-        turtlesStage.removeChild(this._expandButton);
-        turtlesStage.addChild(this._expandButton);
-        turtlesStage.removeChild(this._collapseButton);
-        turtlesStage.addChild(this._collapseButton);
-        turtlesStage.removeChild(this._clearButton);
-        turtlesStage.addChild(this._clearButton);
-        if (this._gridButton !== null) {
-            turtlesStage.removeChild(this._gridButton);
-            turtlesStage.addChild(this._gridButton);
-        }
+        this.createArtwork(turtle, i);
 
-        let hitArea = new createjs.Shape();
-        hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
-        hitArea.x = 0;
-        hitArea.y = 0;
-        newTurtle.container.hitArea = hitArea;
+        this.createHitArea(turtle);
 
-        let artwork = TURTLESVG;
-
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-            artwork = artwork
-                .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                .replace(
-                    /stroke_color/g,
-                    sugarizerCompatibility.xoColor.stroke
-                );
-        } else {
-            artwork = artwork
-                .replace(/fill_color/g, FILLCOLORS[i])
-                .replace(/stroke_color/g, STROKECOLORS[i]);
-        }
-
-        newTurtle._makeTurtleBitmap(artwork, this.refreshCanvas);
-
+<<<<<<< turtle-painter-refactor
         newTurtle.color = i * 10;
         newTurtle.painter.canvasColor = getMunsellColor(
             newTurtle.color,
             DEFAULTVALUE,
             DEFAULTCHROMA
         );
+=======
+        /*
+        ===================================================
+         Add event handlers
+        ===================================================
+        */
+>>>>>>> Disect and distribute add method among MVC
 
-        newTurtle.container.on("mousedown", event => {
+        turtle.container.on("mousedown", event => {
             let scale = this.getScale();
             let offset = {
-                x: newTurtle.container.x - event.stageX / scale,
-                y: newTurtle.container.y - event.stageY / scale
+                x: turtle.container.x - event.stageX / scale,
+                y: turtle.container.y - event.stageY / scale
             };
 
-            turtlesStage.dispatchEvent("CursorDown" + newTurtle.id);
-            console.debug("--> [CursorDown " + newTurtle.name + "]");
+            turtlesStage.dispatchEvent("CursorDown" + turtle.id);
+            console.debug("--> [CursorDown " + turtle.name + "]");
 
-            newTurtle.container.removeAllEventListeners("pressmove");
-            newTurtle.container.on("pressmove", event => {
-                if (newTurtle.running) {
+            turtle.container.removeAllEventListeners("pressmove");
+            turtle.container.on("pressmove", event => {
+                if (turtle.running) {
                     return;
                 }
 
-                newTurtle.container.x = event.stageX / scale + offset.x;
-                newTurtle.container.y = event.stageY / scale + offset.y;
-                newTurtle.x = this.screenX2turtleX(newTurtle.container.x);
-                newTurtle.y = this.screenY2turtleY(newTurtle.container.y);
+                turtle.container.x = event.stageX / scale + offset.x;
+                turtle.container.y = event.stageY / scale + offset.y;
+                turtle.x = this.screenX2turtleX(turtle.container.x);
+                turtle.y = this.screenY2turtleY(turtle.container.y);
                 this.refreshCanvas();
             });
         });
 
-        newTurtle.container.on("pressup", event => {
-            console.debug("--> [CursorUp " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("CursorUp" + newTurtle.id);
+        turtle.container.on("pressup", event => {
+            console.debug("--> [CursorUp " + turtle.name + "]");
+            turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
-        newTurtle.container.on("click", event => {
+        turtle.container.on("click", event => {
             // If turtles listen for clicks then they can be used as buttons
-            console.debug("--> [click " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("click" + newTurtle.id);
+            console.debug("--> [click " + turtle.name + "]");
+            turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
+<<<<<<< turtle-painter-refactor
         newTurtle.container.on("mouseover", event => {
             console.debug("--> [mouseover " + newTurtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
 
             if (newTurtle.running) {
+=======
+        turtle.container.on("mouseover", event => {
+            console.debug("--> [mouseover " + turtle.name + "]");
+            turtlesStage.dispatchEvent("CursorOver" + turtle.id);
+
+            if (turtle.running) {
+>>>>>>> Disect and distribute add method among MVC
                 return;
             }
 
-            newTurtle.container.scaleX *= 1.2;
-            newTurtle.container.scaleY = newTurtle.container.scaleX;
-            newTurtle.container.scale = newTurtle.container.scaleX;
+            turtle.container.scaleX *= 1.2;
+            turtle.container.scaleY = turtle.container.scaleX;
+            turtle.container.scale = turtle.container.scaleX;
             this.refreshCanvas();
         });
 
+<<<<<<< turtle-painter-refactor
         newTurtle.container.on("mouseout", event => {
             console.debug("--> [mouseout " + newTurtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
 
             if (newTurtle.running) {
+=======
+        turtle.container.on("mouseout", event => {
+            console.debug("--> [mouseout " + turtle.name + "]");
+            turtlesStage.dispatchEvent("CursorOut" + turtle.id);
+
+            if (turtle.running) {
+>>>>>>> Disect and distribute add method among MVC
                 return;
             }
 
-            newTurtle.container.scaleX /= 1.2;
-            newTurtle.container.scaleY = newTurtle.container.scaleX;
-            newTurtle.container.scale = newTurtle.container.scaleX;
+            turtle.container.scaleX /= 1.2;
+            turtle.container.scaleY = turtle.container.scaleX;
+            turtle.container.scale = turtle.container.scaleX;
             this.refreshCanvas();
         });
 
         document.getElementById("loader").className = "";
 
+<<<<<<< turtle-painter-refactor
         setTimeout(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
@@ -270,6 +249,9 @@ class Turtles {
                 }
             }
         }, 6000);
+=======
+        this.addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict);
+>>>>>>> Disect and distribute add method among MVC
 
         this.refreshCanvas();
     }
@@ -427,6 +409,91 @@ class Turtles {
          */
         get turtleList() {
             return this._turtleList;
+        }
+
+        /**
+         * Adds createjs related properties of turtles and turtlesStage.
+         *
+         * @param {Object} turtle
+         * @param {Boolean} blkInfoAvailable
+         * @param {Object} infoDict
+         * @returns {void}
+         */
+        addTurtleStageProps(turtle, blkInfoAvailable, infoDict) {
+            // Add x- and y- coordinates
+            if (blkInfoAvailable) {
+                if ("xcor" in infoDict) {
+                    turtle.x = infoDict["xcor"];
+                }
+                if ("ycor" in infoDict) {
+                    turtle.y = infoDict["ycor"];
+                }
+            }
+
+            let turtlesStage = this._stage;
+
+            // Each turtle needs its own canvas
+            turtle.imageContainer = new createjs.Container();
+            turtlesStage.addChild(turtle.imageContainer);
+            turtle.penstrokes = new createjs.Bitmap();
+            turtlesStage.addChild(turtle.penstrokes);
+
+            turtle.container = new createjs.Container();
+            turtlesStage.addChild(turtle.container);
+            turtle.container.x = this.turtleX2screenX(turtle.x);
+            turtle.container.y = this.turtleY2screenY(turtle.y);
+        }
+
+        /**
+         * Creates sensor area for Turtle body.
+         *
+         * @param {*} turtle - Turtle object
+         * @returns {void}
+         */
+        createHitArea(turtle) {
+            let hitArea = new createjs.Shape();
+            hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
+            hitArea.x = 0;
+            hitArea.y = 0;
+            turtle.container.hitArea = hitArea;
+        }
+
+        /**
+         * Adds graphic specific properties of Turtle object.
+         *
+         * @param {Object} turtle
+         * @param {Boolean} blkInfoAvailable
+         * @param {Object} infoDict
+         * @returns {void}
+         */
+        addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict) {
+            setTimeout(() => {
+                if (blkInfoAvailable) {
+                    if ("heading" in infoDict) {
+                        turtle.doSetHeading(infoDict["heading"]);
+                    }
+
+                    if ("pensize" in infoDict) {
+                        turtle.doSetPensize(infoDict["pensize"]);
+                    }
+
+                    if ("grey" in infoDict) {
+                        turtle.doSetChroma(infoDict["grey"]);
+                    }
+
+                    if ("shade" in infoDict) {
+                        turtle.doSetValue(infoDict["shade"]);
+                    }
+
+                    if ("color" in infoDict) {
+                        turtle.doSetColor(infoDict["color"]);
+                    }
+
+                    if ("name" in infoDict) {
+                        turtle.rename(infoDict["name"]);
+                    }
+                }
+            }, 2000);
         }
 
         /**
@@ -613,7 +680,57 @@ class Turtles {
          */
         turtleY2screenY(y) {
             return this._invertY(y);
-        };
+        }
+
+        /**
+         * Brings stage control buttons to front.
+         *
+         * @param {Object} turtlesStage
+         * @returns {void}
+         */
+        reorderButtons(turtlesStage) {
+            // Ensure that the buttons are on top
+            turtlesStage.removeChild(this._expandButton);
+            turtlesStage.addChild(this._expandButton);
+            turtlesStage.removeChild(this._collapseButton);
+            turtlesStage.addChild(this._collapseButton);
+            turtlesStage.removeChild(this._clearButton);
+            turtlesStage.addChild(this._clearButton);
+            if (this._gridButton !== null) {
+                turtlesStage.removeChild(this._gridButton);
+                turtlesStage.addChild(this._gridButton);
+            }
+        }
+
+        /**
+         * Creates the artwork for the turtle (mouse) 's skin.
+         *
+         * @param {Object} turtle
+         * @param {Number} i
+         * @returns {void}
+         */
+        createArtwork(turtle, i) {
+            let artwork = TURTLESVG;
+            artwork = sugarizerCompatibility.isInsideSugarizer() ?
+                artwork
+                    .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                    .replace(
+                        /stroke_color/g,
+                        sugarizerCompatibility.xoColor.stroke
+                    ) :
+                artwork
+                    .replace(/fill_color/g, FILLCOLORS[i])
+                    .replace(/stroke_color/g, STROKECOLORS[i]);
+
+            turtle.makeTurtleBitmap(artwork, this.refreshCanvas);
+
+            turtle.color = i * 10;
+            turtle.canvasColor = getMunsellColor(
+                turtle.color,
+                DEFAULTVALUE,
+                DEFAULTCHROMA
+            );
+        }
 
         /**
          * Makes background for canvas: clears containers, renders buttons.

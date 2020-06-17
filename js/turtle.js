@@ -120,8 +120,6 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
     async blink(duration, volume) {
-        // this._sizeInUse = this.bitmap.scaleX;
-
         // suppress blinking when using cursorout and cursorover sensors to prevent multiple triggers.
         if ("CursorOver" + this.id in this.listeners || "CursorOut" + this.id in this.listeners)
             return;

@@ -4723,7 +4723,7 @@ function Activity() {
             .setStage(turtleContainer)
             .setHideGrids(hideGrids)
             .setDoGrid(_doCartesianPolar)
-            .setRefreshCanvas(refreshCanvas);
+        turtles.refreshCanvas = refreshCanvas;
 
         // Put the boundary in the blocks container so it scrolls
         // with the blocks.
