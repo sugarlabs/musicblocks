@@ -204,6 +204,7 @@ function Activity() {
         "activity/SaveInterface",
         "utils/musicutils",
         "utils/synthutils",
+        "utils/mathutils",
         // 'activity/playbackbox',
         "activity/pastebox",
         "prefixfree.min"
