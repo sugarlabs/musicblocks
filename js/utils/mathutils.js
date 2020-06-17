@@ -1,7 +1,35 @@
+/**
+ * @file This contains the encapsulation related to math operations.
+ * @author Walter Bender
+ *
+ * @copyright 2014-2020 Walter Bender
+ * @copyright 2020 Anindya Kundu
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of
+ * the The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
+
+/**
+ * Utility class for managing math operations.
+ *
+ * @class
+ * @classdesc This is the prototype that encapsulates the ten math operations: random, one-of,
+ * modulus, square root, add, subtract, multiply, divide, eucleidean distance, and exponent.
+ * The methods verify the input/s and return the operations' results or throws an exception if
+ * the arguments are invalid, which is then handled by their callers, i.e. `arg` methods in
+ * NumberBlocks.js
+ */
 class MathUtility {
     /**
      * Returns a random integer in a range.
      *
+     * @static
      * @param a - preferably the minimum
      * @param b - preferably the maximum
      * @returns {Number}
@@ -39,6 +67,7 @@ class MathUtility {
     /**
      * Randomly returns either a or b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {*}
@@ -50,6 +79,7 @@ class MathUtility {
     /**
      * Returns a modulo b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number}
@@ -66,6 +96,7 @@ class MathUtility {
     /**
      * Square-roots a number.
      *
+     * @static
      * @param a
      * @returns {Number}
      * @throws {String} No square root error, NAN error
@@ -85,6 +116,7 @@ class MathUtility {
     /**
      * Adds a and b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number|String}
@@ -103,6 +135,7 @@ class MathUtility {
     /**
      * Subtracts b from a.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number}
@@ -119,6 +152,7 @@ class MathUtility {
     /**
      * Multiplies a by b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number}
@@ -135,6 +169,7 @@ class MathUtility {
     /**
      * Divides a by b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number}
@@ -155,6 +190,7 @@ class MathUtility {
     /**
      * Calculates euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y').
      *
+     * @static
      * @param a
      * @param b
      * @param c
@@ -182,6 +218,7 @@ class MathUtility {
     /**
      * Returns a to the power of b.
      *
+     * @static
      * @param a
      * @param b
      * @returns {Number}
