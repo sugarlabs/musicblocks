@@ -4657,7 +4657,8 @@ function Block(protoblock, blocks, overrideName) {
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
         if (i === -1) {
-            i = 4;
+            if (custom) i = 0 ;
+            else i = 4 ;
         }
 
         prevPitch = i;
