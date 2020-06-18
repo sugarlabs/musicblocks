@@ -231,4 +231,22 @@ class MathUtility {
             throw "NanError";
         }
     }
+
+    /**
+     * Returns negative value (if number) or string in reverse (if string).
+     *
+     * @param {*} a
+     * @returns {Number|String}
+     * @throws {String} No Negation Error
+     */
+    static doNegate(a) {
+        if (typeof a === "number") {
+            return MathUtility.doMinus(0, a);
+        } else if (typeof a === "string") {
+            let obj = a.split("");
+            return obj.reverse().join("");
+        } else {
+            throw "NoNegError";
+        }
+    }
 }

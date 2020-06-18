@@ -490,20 +490,18 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
                 let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk !== null) {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return logo._doMinus(0, a);
-                    } else if (typeof a === "string") {
-                        let obj = a.split("");
-                        return obj.reverse().join("");
-                    } else {
+
+                    try {
+                        return MathUtility.doNegate(a);
+                    } catch {
                         return a;
                     }
                 } else {
