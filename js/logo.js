@@ -756,7 +756,7 @@ class Logo {
         document.body.style.cursor = "default";
         if (this.showBlocksAfterRun) {
             console.debug("SHOW BLOCKS");
-            this.showBlocks();
+            this.blocks.showBlocks();
             document.getElementById("stop").style.color = "white";
         }
 
@@ -780,75 +780,6 @@ class Logo {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Clears all the blocks, updates the cache and refreshes the canvas.
-     *
-     * @returns {void}
-     */
-    _clearParameterBlocks() {
-        for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
-            if (
-                this.blocks.blockList[blk].protoblock.parameter &&
-                this.blocks.blockList[blk].text !== null
-            ) {
-                this.blocks.blockList[blk].text.text = "";
-                this.blocks.blockList[blk].container.updateCache();
-            }
-        }
-        this.refreshCanvas();
-    }
-
-    /**
-     * Updates the label on parameter blocks.
-     *
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @returns {void}
-     */
-    _updateParameterBlock(logo, turtle, blk) {
-        let name = this.blocks.blockList[blk].name;
-
-        if (
-            this.blocks.blockList[blk].protoblock.parameter &&
-            this.blocks.blockList[blk].text !== null
-        ) {
-            let value = 0;
-
-            if (
-                typeof logo.blocks.blockList[blk].protoblock.updateParameter ===
-                "function"
-            ) {
-                value = logo.blocks.blockList[blk].protoblock.updateParameter(
-                    logo,
-                    turtle,
-                    blk
-                );
-            } else {
-                if (name in this.evalParameterDict) {
-                    eval(this.evalParameterDict[name]);
-                } else {
-                    return;
-                }
-            }
-
-            if (typeof value === "string") {
-                if (value.length > 6) {
-                    value = value.substr(0, 5) + "...";
-                }
-
-                this.blocks.blockList[blk].text.text = value;
-            } else if (name === "divide") {
-                this.blocks.blockList[blk].text.text = mixedNumber(value);
-            } else {
-                this.blocks.blockList[blk].text.text = value.toString();
-            }
-
-            this.blocks.blockList[blk].container.updateCache();
-            this.refreshCanvas();
         }
     }
 
@@ -1249,7 +1180,7 @@ class Logo {
 
         if (this.turtleDelay === 0) {
             // Don't update parameters when running full speed
-            this._clearParameterBlocks();
+            this.blocks.clearParameterBlocks();
         }
 
         this.onRunTurtle();
@@ -1435,59 +1366,22 @@ class Logo {
     }
 
     /**
-     * We may need to clear the timeout, e.g., after a successful input.
+     * Clears the delay timeout after a successfull input, and runs from next block.
      *
-     * @param turtle
+     * @param {Object} turtle
      * @returns {void}
      */
-    clearRunBlock(turtle) {
+    clearTurtleRun(turtle) {
         if (this.delayTimeout[turtle] !== null) {
             clearTimeout(this.delayTimeout[turtle]);
             this.delayTimeout[turtle] = null;
-            this.requeueRunBlock(turtle);
-        }
-    }
-
-    /**
-     * If we clear the delay timeout, we need to requeue the runBlock.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    requeueRunBlock(turtle) {
-        this._runFromBlockNow(
-            this,
-            turtle,
-            this.delayParameters[turtle]['blk'],
-            this.delayParameters[turtle]['flow'],
-            this.delayParameters[turtle]['arg']
-        );
-    }
-
-    /**
-     * Changes a property according to a block name and a value.
-     *
-     * @param blk
-     * @param value
-     * @param turtle
-     * @returns {void}
-     */
-    _blockSetter(blk, value, turtle) {
-        if (
-            typeof this.blocks.blockList[blk].protoblock.setter === "function"
-        ) {
-            this.blocks.blockList[blk].protoblock.setter(
+            this._runFromBlockNow(
                 this,
-                value,
                 turtle,
-                blk
+                this.delayParameters[turtle]['blk'],
+                this.delayParameters[turtle]['flow'],
+                this.delayParameters[turtle]['arg']
             );
-        } else {
-            if (this.blocks.blockList[blk].name in this.evalSetterDict) {
-                eval(this.evalSetterDict[this.blocks.blockList[blk].name]);
-            } else {
-                this.errorMsg(_("Block does not support incrementing."), blk);
-            }
         }
     }
 
@@ -1963,7 +1857,7 @@ class Logo {
             // We don't update parameter blocks when running full speed
             if (logo.turtleDelay !== 0) {
                 for (let pblk in logo.parameterQueue[turtle]) {
-                    logo._updateParameterBlock(
+                    logo.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         logo.parameterQueue[turtle][pblk]
@@ -2168,7 +2062,7 @@ class Logo {
                     ) {
                         console.debug("running status block");
                     } else {
-                        logo.showBlocks();
+                        logo.blocks.showBlocks();
                         logo.showBlocksAfterRun = false;
                     }
                 }
@@ -2180,23 +2074,15 @@ class Logo {
     /**
      * Sets the master volume to a value of at least 0 and at most 100.
      *
-     * @param {number} volume
+     * @param {Number} volume
      * @returns {void}
      */
-    _setMasterVolume(volume) {
-        if (volume > 100) {
-            volume = 100;
-        } else if (volume < 0) {
-            volume = 0;
-        }
+    setMasterVolume(volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setMasterVolume(volume);
-            for (
-                let turtle = 0;
-                turtle < this.turtles.turtleList.length;
-                turtle++
-            ) {
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (let synth in this.synthVolume[turtle]) {
                     this.synthVolume[turtle][synth].push(volume);
                 }
@@ -2205,20 +2091,15 @@ class Logo {
     }
 
     /**
-     * Sets the synth volume to a value of at least 0 and,
-     * unless the synth is noise3, at most 100.
+     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
      *
      * @param turtle
      * @param synth
-     * @param {number} volume
+     * @param {Number} volume
      * @returns {void}
      */
     setSynthVolume(turtle, synth, volume) {
-        if (volume > 100) {
-            volume = 100;
-        } else if (volume < 0) {
-            volume = 0;
-        }
+        volume = Math.min(Math.max(volume, 0), 100);
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             switch (synth) {
@@ -2230,7 +2111,6 @@ class Logo {
                     break;
                 default:
                     this.synth.setVolume(turtle, synth, volume);
-                    break;
             }
         }
     }
@@ -2238,15 +2118,10 @@ class Logo {
     /**
      * Returns whether to record.
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     recordingStatus() {
-        return (
-            this.recording ||
-            this.runningLilypond ||
-            this.runningAbc ||
-            this.runningMxml
-        );
+        return (this.recording || this.runningLilypond || this.runningAbc || this.runningMxml);
     }
 
     /**
@@ -2296,7 +2171,7 @@ class Logo {
 
             return;
         } else if (this.playbackTime === 0) {
-            this.hideBlocks();
+            this.blocks.hideBlocks();
             this.showBlocksAfterRun = true;
         }
 
@@ -2453,7 +2328,7 @@ class Logo {
                         break;
 
                     case "setvolume":
-                        this._setMasterVolume(
+                        this.setMasterVolume(
                             this.playbackQueue[turtle][idx][2]
                         );
                         break;
@@ -2600,12 +2475,12 @@ class Logo {
                         }
                     }
 
-                    this.showBlocks();
+                    this.blocks.showBlocks();
                     this.showBlocksAfterRun = false;
                 }
             } else {
                 this.turtles.turtleList[turtle].running = false;
-                this.showBlocks();
+                this.blocks.showBlocks();
                 this.showBlocksAfterRun = false;
             }
         };
@@ -3562,7 +3437,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this._setMasterVolume(DEFAULTVOLUME);
+        this.setMasterVolume(DEFAULTVOLUME);
         for (let synth in this.synthVolume[turtle]) {
             this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
         }
@@ -4005,30 +3880,6 @@ class Logo {
     }
 
     /**
-     * Hides all the blocks.
-     *
-     * @returns {void}
-     */
-    hideBlocks(show) {
-        this.blocks.palettes.hide();
-        this.blocks.hide();
-        this.refreshCanvas();
-        this.showBlocksAfterRun = show !== undefined && show;
-    }
-
-    /**
-     * Shows all the blocks.
-     *
-     * @returns {void}
-     */
-    showBlocks() {
-        this.blocks.palettes.show();
-        this.blocks.show();
-        this.blocks.bringToTop();
-        this.refreshCanvas();
-    }
-
-    /**
      * Calculates the change needed for musical inversion.
      *
      * @param turtle
@@ -4312,7 +4163,7 @@ class Logo {
         }
 
         if (!this.suppressOutput[turtle]) {
-            this._setMasterVolume(DEFAULTVOLUME);
+            this.setMasterVolume(DEFAULTVOLUME);
             for (
                 let turtle = 0;
                 turtle < this.turtles.turtleList.length;

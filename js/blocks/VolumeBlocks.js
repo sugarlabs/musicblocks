@@ -74,7 +74,7 @@ function setupVolumeBlocks() {
             let len = logo.masterVolume.length;
             logo.masterVolume[len - 1] = value;
             if (!logo.suppressOutput[turtle]) {
-                logo._setMasterVolume(value);
+                logo.setMasterVolume(value);
             }
 
             if (logo.justCounting[turtle].length === 0) {
@@ -537,7 +537,7 @@ function setupVolumeBlocks() {
 
                     logo.masterVolume.push(arg);
                     if (!logo.suppressOutput[turtle]) {
-                        logo._setMasterVolume(arg);
+                        logo.setMasterVolume(arg);
                     }
 
                     if (logo.justCounting[turtle].length === 0) {
@@ -601,7 +601,7 @@ function setupVolumeBlocks() {
 
             logo.masterVolume.push(arg);
             if (!logo.suppressOutput[turtle]) {
-                logo._setMasterVolume(arg);
+                logo.setMasterVolume(arg);
             }
 
             if (logo.justCounting[turtle].length === 0) {
@@ -622,7 +622,7 @@ function setupVolumeBlocks() {
                     logo.justCounting[turtle].length === 0 &&
                     logo.masterVolume.length > 0
                 ) {
-                    logo._setMasterVolume(last(logo.masterVolume));
+                    logo.setMasterVolume(last(logo.masterVolume));
                 }
             };
 

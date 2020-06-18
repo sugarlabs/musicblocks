@@ -358,7 +358,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            logo.showBlocks(); // Force blocks to be visible.
+            logo.blocks.showBlocks();   // Force blocks to be visible.
             let blockArgs = [null];
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
@@ -635,7 +635,7 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo) {
-            logo.showBlocks();
+            logo.blocks.showBlocks();
             logo.turtleDelay = DEFAULTDELAY;
         }
     }
@@ -652,7 +652,8 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo) {
-            logo.hideBlocks();
+            blocks.hideBlocks();
+            logo.showBlocksAfterRun = false;
             logo.turtleDelay = 0;
         }
     }

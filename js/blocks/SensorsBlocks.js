@@ -56,7 +56,7 @@ function setupSensorsBlocks() {
 
                     inputElem.blur();
                     inputElem.style.display = "none";
-                    logo.clearRunBlock(turtle);
+                    logo.clearTurtleRun(turtle);
                     docById("labelDiv").classList.remove("hasKeyboard");
                 }
             };

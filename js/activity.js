@@ -448,7 +448,7 @@ function Activity() {
         let toppos;
         blocks.activeBlock = null;
         hideDOMLabel();
-        logo.showBlocks();
+        blocks.showBlocks();
         blocksContainer.x = 0;
         blocksContainer.y = 0;
 
@@ -902,7 +902,8 @@ function Activity() {
         if (!turtles.running()) {
             console.debug("RUNNING");
             if (!turtles.isShrunk()) {
-                logo.hideBlocks(true);
+                blocks.hideBlocks();
+                logo.showBlocksAfterRun = true;
             }
 
             logo.runLogoCommands(null, env);
@@ -998,7 +999,7 @@ function Activity() {
         logo.doStopTurtle();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo._setMasterVolume(0);
+            logo.setMasterVolume(0);
 
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -1056,7 +1057,7 @@ function Activity() {
     };
 
     // function doMuteButton() {
-    //     logo._setMasterVolume(0);
+    //     logo.setMasterVolume(0);
     // };
 
     // function _hideBoxes() {
@@ -1140,7 +1141,7 @@ function Activity() {
         this.closeButton.on("click", function(event) {
             button.closeButton.visible = false;
             stage.removeChild(chartBitmap);
-            logo.showBlocks();
+            blocks.showBlocks();
             update = true;
             ctx.clearRect(0, 0, 600, 600);
         });
@@ -1193,7 +1194,8 @@ function Activity() {
                 chartBitmap.y = 200;
                 chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale =
                     600 / chartBitmap.image.width;
-                logo.hideBlocks();
+                blocks.hideBlocks();
+                logo.showBlocksAfterRun = false;
                 update = true;
                 document.body.style.cursor = "default";
                 loading = false;
@@ -2910,7 +2912,8 @@ function Activity() {
         hideDOMLabel();
 
         if (blocks.visible) {
-            logo.hideBlocks();
+            blocks.hideBlocks();
+            logo.showBlocksAfterRun = false;
             palettes.hide();
             hideBlocksContainer[1].visible = true;
             hideBlocksContainer[0].visible = false;
@@ -2921,7 +2924,7 @@ function Activity() {
             }
             hideBlocksContainer[1].visible = false;
             hideBlocksContainer[0].visible = true;
-            logo.showBlocks();
+            blocks.showBlocks();
             palettes.show();
             palettes.bringToTop();
         }

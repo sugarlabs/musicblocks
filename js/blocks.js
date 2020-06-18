@@ -7092,7 +7092,7 @@ function Blocks(activity) {
                 console.debug("putting turtle " + turtle + " in the trash");
                 this.turtles.turtleList[turtle].inTrash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
-            } 
+            }
             // else {
             //     this.errorMsg(
             //         _("You must always have at least one start block.")
@@ -7158,5 +7158,109 @@ function Blocks(activity) {
         }
     };
 
-    return this;
+    /**
+     * Clears all the blocks, updates the cache and refreshes the canvas.
+     *
+     * @returns {void}
+     */
+    this.clearParameterBlocks = function() {
+        for (let blk = 0; blk < this.blockList.length; blk++) {
+            if (
+                this.blockList[blk].protoblock.parameter &&
+                this.blockList[blk].text !== null
+            ) {
+                this.blockList[blk].text.text = "";
+                this.blockList[blk].container.updateCache();
+            }
+        }
+        this.refreshCanvas();
+    };
+
+    /**
+     * Updates the label on parameter blocks.
+     *
+     * @param logo
+     * @param turtle
+     * @param blk
+     * @returns {void}
+     */
+    this.updateParameterBlock = function(logo, turtle, blk) {
+        let name = this.blockList[blk].name;
+
+        if (
+            this.blockList[blk].protoblock.parameter &&
+            this.blockList[blk].text !== null
+        ) {
+            let value = 0;
+
+            if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
+                value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
+            } else {
+                if (name in this.evalParameterDict) {
+                    eval(this.evalParameterDict[name]);
+                } else {
+                    return;
+                }
+            }
+
+            if (typeof value === "string") {
+                if (value.length > 6) {
+                    value = value.substr(0, 5) + "...";
+                }
+
+                this.blockList[blk].text.text = value;
+            } else if (name === "divide") {
+                this.blockList[blk].text.text = mixedNumber(value);
+            } else {
+                this.blockList[blk].text.text = value.toString();
+            }
+
+            this.blockList[blk].container.updateCache();
+            this.refreshCanvas();
+        }
+    };
+
+    /**
+     * Changes a property according to a block name and a value.
+     *
+     * @param logo
+     * @param blk
+     * @param value
+     * @param turtle
+     * @returns {void}
+     */
+    this.blockSetter = function(logo, blk, value, turtle) {
+        if (typeof this.blockList[blk].protoblock.setter === "function") {
+            this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
+        } else {
+            if (this.blockList[blk].name in logo.evalSetterDict) {
+                eval(logo.evalSetterDict[this.blockList[blk].name]);
+            } else {
+                throw new Error();
+            }
+        }
+    };
+
+    /**
+     * Hides all the blocks.
+     *
+     * @returns {void}
+     */
+    this.hideBlocks = function() {
+        this.palettes.hide();
+        this.hide();
+        this.refreshCanvas();
+    }
+
+    /**
+     * Shows all the blocks.
+     *
+     * @returns {void}
+     */
+    this.showBlocks = function() {
+        this.palettes.show();
+        this.show();
+        this.bringToTop();
+        this.refreshCanvas();
+    }
 };
