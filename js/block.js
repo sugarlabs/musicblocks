@@ -55,7 +55,8 @@ const SPECIALINPUTS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 const WIDENAMES = [
     "intervalname",
@@ -87,7 +88,8 @@ const PIEMENUS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 
 // Define block instance objects and any methods that are intra-block.
@@ -1202,6 +1204,9 @@ function Block(protoblock, blocks, overrideName) {
                     case "grid":
                         this.value = "Cartesian";
                         break;
+                    case "outputtools":
+                        this.value = "letter class";
+                        break;
                 }
             }
 
@@ -1229,7 +1234,13 @@ function Block(protoblock, blocks, overrideName) {
                 if(attr !== "♮") {
                     label += attr;
                 }
+<<<<<<< HEAD
             } else if (this.name === "drumname") {
+=======
+            } else if(this.name === "outputtools") {
+                label = this.value;
+            } else if (this.name === "drumname") { 
+>>>>>>> block struct
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
@@ -3678,6 +3689,23 @@ function Block(protoblock, blocks, overrideName) {
             ];
             let Values = Labels ;
 
+            this._piemenuBasic(
+                Labels,
+                Values,
+                selectedvalue,
+                platformColor.piemenuBasic
+            );
+        } else if (this.name === "outputtools") {
+            selectedvalue = this.value;
+            let Labels = [
+                _("letter class"),
+                _("solfege syllable"),
+                _("pitch class"),
+                _("scalar class"),
+                _("scale degree"),
+                _("nth degree")
+            ];
+            let Values = Labels;
             this._piemenuBasic(
                 Labels,
                 Values,

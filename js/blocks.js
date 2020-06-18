@@ -2533,6 +2533,10 @@ function Blocks(activity) {
                     label += attr;
                 }
                 break;
+            case "outputtools":
+                if (myBlock.value === null) myBlock.value = "letter class";
+                label = myBlock.value;
+                break;
             case "customNote":
                 var label = _(myBlock.value);
                 break;
@@ -3283,6 +3287,8 @@ function Blocks(activity) {
             postProcessArg = [thisBlock, "sol"];
         } else if (name === "scaledegree2") {
             postProcessArg = [thisBlock, "5"];
+        } else if (name === "outputtools") {
+            postProcessArg = [thisBlock, "letter class"];
         } else if (name === "customNote") {
             var len = this.logo.synth.startingPitch.length;
             postProcessArg = [
@@ -6220,6 +6226,7 @@ function Blocks(activity) {
                 case "intervalname":
                 case "grid":
                 case "boolean":
+                case "outputtools":
                     var postProcess = function(args) {
                         var thisBlock = args[0];
                         var value = args[1];

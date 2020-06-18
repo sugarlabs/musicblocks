@@ -1029,6 +1029,9 @@ function PaletteModel(palette, palettes, name) {
                 case "namedarg":
                     label = "arg " + arg;
                     break;
+                case "outputtools":
+                    label = "output tools";
+                    break;
                 default:
                     if (blkname != modname) {
                         // Override label for do, storein, box, and namedarg

@@ -1398,6 +1398,53 @@ function setupPitchBlocks() {
         }
     }
 
+    class OutputToolsBlocks extends ValueBlock {
+        constructor() {
+            super("outputtools");
+            this.setPalette("pitch");
+            this.formBlock({
+                outType: "anyout"
+            })
+        }
+        arg(logo, turtle, blk) {
+            let blockName = logo.blocks.blockList[blk].postProcessArg[1];
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "outputtools"]);
+            } else {
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    switch (blockName) {
+                        case "letter class":
+                            let letterclass = logo.lastNotePlayed[turtle][0][0][0];
+                            return letterclass;
+                        case "solfege syllable":
+                            let note = logo.lastNotePlayed[turtle][0][0][0];
+                            if (logo.moveable[turtle] === false) {
+                                return SOLFEGECONVERSIONTABLE[note];
+                            } else {
+                                let scale = _buildScale(logo.keySignature[turtle])[0];
+                                let i = scale.indexOf(note);
+                                return SOLFEGENAMES[i];
+                            }
+                        case "pitch class":
+                            return 3;
+                        case "scalar class":
+                            return 4;
+                        case "scale degree":
+                            return 5;
+                        case "nth degree":
+                            return 6;
+                    }
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
@@ -3014,6 +3061,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new OutputToolsBlocks().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();

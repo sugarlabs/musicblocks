@@ -157,6 +157,11 @@ function StatusMatrix() {
                     }
                     console.debug(label);
                     break;
+                case "outputtools":
+                    var label = this._logo.blocks.blockList[
+                            this._logo.statusFields[i][0]
+                        ].postProcessArg[1];
+                    break;
                 default:
                     var label = this._logo.blocks.blockList[
                         this._logo.statusFields[i][0]
