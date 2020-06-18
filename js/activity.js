@@ -205,7 +205,6 @@ function Activity() {
         "utils/musicutils",
         "utils/synthutils",
         "utils/mathutils",
-        // 'activity/playbackbox',
         "activity/pastebox",
         "prefixfree.min"
     ];
@@ -2120,9 +2119,6 @@ function Activity() {
                     textMsg("Alt-E " + _("Erase"));
                     _allClear(false);
                     break;
-                case 80: // 'P'
-                    // logo.playback(-1);
-                    break;
                 case 82: // 'R'
                     textMsg("Alt-R " + _("Play"));
                     that._doFastButton();
@@ -2753,11 +2749,6 @@ function Activity() {
         }
     };
 
-    // function _doPlaybackBox() {
-    //     // _hideBoxes();
-    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
-    // };
-
     /*
      * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
      * @param {boolean} doNotSave     {if true discards any changes to project}
@@ -2816,7 +2807,6 @@ function Activity() {
 
         if (addStartBlock) {
             console.debug("ADDING START BLOCK");
-            logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
             _allClear(false);
         } else if (!doNotSave) {
@@ -3161,7 +3151,6 @@ function Activity() {
         // palettes.updatePalettes();
         justLoadStart = function() {
             console.debug("Loading start");
-            logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
         };
 
@@ -3208,8 +3197,6 @@ function Activity() {
 
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     keyboardEnableFlag = 1;
-
-                    // playbackOnLoad();
                 }, 1000);
             }
 
@@ -3243,7 +3230,6 @@ function Activity() {
                         blocks.palettes.dict[name].hideMenu(true);
                     }
 
-                    logo.playbackQueue = {};
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
             } catch (e) {
@@ -3610,9 +3596,6 @@ function Activity() {
     /*
      * We don't save blocks in the trash, so we need to
      * consolidate the block list and remap the connections.
-     *
-     * Next, save the playback queue, but don't save the
-     * playback queue if we are saving to Lilypond.
      */
     function prepareExport() {
         let blockMap = [];
@@ -3772,28 +3755,6 @@ function Activity() {
                     myBlock.container.y,
                     connections
                 ]);
-            }
-        }
-
-        // remap block connections
-
-        if (logo.runningLilypond) {
-            logo.playbackQueue = {};
-        }
-
-        let i = data.length;
-        if (i > 0) {
-            for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                if (turtle in logo.playbackQueue) {
-                    for (
-                        let j = 0;
-                        j < logo.playbackQueue[turtle].length;
-                        j++
-                    ) {
-                        data.push([i, turtle, logo.playbackQueue[turtle][j]]);
-                        i += 1;
-                    }
-                }
             }
         }
 
@@ -4845,22 +4806,6 @@ function Activity() {
             _showHelp();
         }
 
-        playbackOnLoad = function() {
-            /*
-            if (_THIS_IS_TURTLE_BLOCKS_) {
-                // Play playback queue if there is one.
-                for (turtle in logo.playbackQueue) {
-                    if (logo.playbackQueue[turtle].length > 0) {
-                        setTimeout(function () {
-                            logo.playback(-1);
-                        }, 3000);
-                        break;
-                    }
-                }
-            }
-            */
-        };
-
         function PlanetInterface(storage) {
             this.planet = null;
             this.iframe = null;
@@ -4957,7 +4902,6 @@ function Activity() {
                 }
 
                 let __afterLoad = function() {
-                    // playbackOnLoad();
                     document.removeEventListener(
                         "finishedLoading",
                         __afterLoad
@@ -4972,7 +4916,6 @@ function Activity() {
 
                 try {
                     let obj = JSON.parse(data);
-                    logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
                 } catch (e) {
                     console.debug(
@@ -5353,7 +5296,6 @@ function Activity() {
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
                                     let __listener = function(event) {
-                                        logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
                                         stage.removeAllEventListeners(
                                             "trashsignal"
@@ -5380,7 +5322,6 @@ function Activity() {
                                     }
                                 } else {
                                     merging = false;
-                                    logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
                                 }
 
@@ -5444,7 +5385,6 @@ function Activity() {
                             stage.removeAllEventListeners("trashsignal");
 
                             let __afterLoad = function() {
-                                // playbackOnLoad();
                                 document.removeEventListener(
                                     "finishedLoading",
                                     __afterLoad
@@ -5453,7 +5393,6 @@ function Activity() {
 
                             // Wait for the old blocks to be removed.
                             let __listener = function(event) {
-                                logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
                                 stage.removeAllEventListeners("trashsignal");
 

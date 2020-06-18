@@ -213,8 +213,6 @@ function SaveInterface(PlanetInterface) {
     this.saveWAV = function(filename) {
         document.body.style.cursor = "wait";
         this.filename = filename;
-        this.logo.playbackQueue = {};
-        this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
         console.debug("DURING SAVE WAV");

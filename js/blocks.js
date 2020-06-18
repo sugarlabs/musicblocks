@@ -5274,18 +5274,10 @@ function Blocks(activity) {
      * return {void}
      */
     this.loadNewBlocks = function(blockObjs) {
-        var playbackQueueStartsHere = null;
-
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
-
-            // Check for playbackQueue
-            if (typeof blkData[1] === "number") {
-                playbackQueueStartsHere = b;
-                break;
-            }
 
             for (var c in blkData[4]) {
                 if (blkData[4][c] === blkData[0]) {
@@ -5296,24 +5288,6 @@ function Blocks(activity) {
                     console.debug(blockObjs);
                     return;
                 }
-            }
-        }
-
-        // Load any playback code into the queue...
-        if (playbackQueueStartsHere != null) {
-            for (var b = playbackQueueStartsHere; b < blockObjs.length; b++) {
-                var turtle = blockObjs[b][1];
-                if (turtle in this.logo.playbackQueue) {
-                    this.logo.playbackQueue[turtle].push(blockObjs[b][2]);
-                } else {
-                    this.logo.playbackQueue[turtle] = [blockObjs[b][2]];
-                }
-            }
-
-            // and remove the entries from the end of blockObjs.
-            var n = blockObjs.length;
-            for (var b = playbackQueueStartsHere; b < n; b++) {
-                blockObjs.pop();
             }
         }
 
@@ -6680,47 +6654,6 @@ function Blocks(activity) {
                     }
                 }
             }
-        }
-
-        if (playbackQueueStartsHere != null) {
-            var that = this;
-            setTimeout(function() {
-                // Now that we know how many turtles we have, we can make
-                // sure that the playback queue does not reference turtles
-                // that are not known to us.
-
-                // Find the first turtle not in the trash.
-                for (
-                    var firstTurtle = 0;
-                    firstTurtle < that.turtles.turtleList.length;
-                    firstTurtle++
-                ) {
-                    if (!that.turtles.turtleList[firstTurtle].inTrash) {
-                        break;
-                    }
-                }
-
-                if (firstTurtle === that.turtles.turtleList.length) {
-                    console.debug("Cannot find a turtle");
-                    firstTurtle = 0;
-                }
-
-                // Is the first turtle in the playbackQueue?
-                if (!(firstTurtle in that.logo.playbackQueue)) {
-                    for (turtle in that.logo.playbackQueue) {
-                        console.debug(
-                            "playbackQueue: remapping from " +
-                                turtle +
-                                " to " +
-                                firstTurtle
-                        );
-                        that.logo.playbackQueue[firstTurtle] =
-                            that.logo.playbackQueue[turtle];
-                        delete that.logo.playbackQueue[turtle];
-                        firstTurtle += 1;
-                    }
-                }
-            }, 1500);
         }
     };
 
