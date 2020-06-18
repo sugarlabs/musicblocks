@@ -233,11 +233,28 @@ class MathUtility {
     }
 
     /**
+     * Returns absolute value.
+     *
+     * @static
+     * @param a
+     * @returns {Number}
+     * @throws {String} NAN error
+     */
+    static doAbs(a) {
+        if (typeof a === "number") {
+            return Math.abs(a);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
      * Returns negative value (if number) or string in reverse (if string).
      *
+     * @static
      * @param {*} a
      * @returns {Number|String}
-     * @throws {String} No Negation Error
+     * @throws {String} No Negation error
      */
     static doNegate(a) {
         if (typeof a === "number") {
@@ -247,6 +264,22 @@ class MathUtility {
             return obj.reverse().join("");
         } else {
             throw "NoNegError";
+        }
+    }
+
+    /**
+     * Returns integer value.
+     *
+     * @static
+     * @param {*} a
+     * @returns {Number}
+     * @throws {String} NAN error
+     */
+    static doInt(a) {
+        try {
+            return Math.floor(Number(a) + 0.5);
+        } catch (e) {
+            throw "NanError";
         }
     }
 }
