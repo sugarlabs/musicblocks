@@ -146,18 +146,6 @@ function Blocks(activity) {
     };
 
     /*
-     * Set the Set Playback status variable
-     * DEPRECATED
-     * @param - setPlaybackStatus - new variable
-     * @public
-     * @return this
-     */
-    this.setSetPlaybackStatus = function(setPlaybackStatus) {
-        this.setPlaybackStatus = setPlaybackStatus;
-        return this;
-    };
-
-    /*
      * We need access to the canvas.
      * @param - canvas
      * @public
@@ -6732,8 +6720,6 @@ function Blocks(activity) {
                         firstTurtle += 1;
                     }
                 }
-
-                that.setPlaybackStatus();
             }, 1500);
         }
     };

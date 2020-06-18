@@ -1293,65 +1293,6 @@ function Activity() {
         }
     };
 
-    // function getPlaybackQueueStatus() {
-    //     return Object.keys(logo.playbackQueue).length > 0;
-    // };
-
-    function setPlaybackStatus() {
-        // if (playbackBox != null) {
-        //     playbackBox.setPlaybackStatus();
-        // }
-    }
-
-    // function doPausePlayback() {
-    //     blocks.activeBlock = null;
-    //     logo.playback(-1);
-    //     // playbackBox.playButton.visible = true;
-    //     // playbackBox.pauseButton.visible = false;
-    // };
-
-    // function doPlayback() {
-    //     blocks.activeBlock = null;
-    //     progressBar.style.visibility = 'visible';
-    //     progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-    //     progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
-    //     logo.playback(-1);
-    //     // playbackBox.playButton.visible = false;
-    //     // playbackBox.pauseButton.visible = true;
-    //     // playbackBox.norewindButton.visible = false;
-    //     // playbackBox.rewindButton.visible = true;
-    // };
-
-    // function doRestartPlayback() {
-    //     blocks.activeBlock = null;
-    //     logo.doStopTurtle();
-
-    //     /*
-    //     setTimeout(function () {
-    //         // logo.playback(-1);
-    //         playbackBox.playButton.visible = true;
-    //         playbackBox.pauseButton.visible = false;
-    //         playbackBox.norewindButton.visible = true;
-    //         playbackBox.rewindButton.visible = false;
-    //     }, 500);
-    //     */
-    // };
-
-    // // Deprecated
-    // function doCompile() {
-    //     blocks.activeBlock = null;
-    //     document.body.style.cursor = 'wait';
-    //     console.debug('Compiling music for playback');
-
-    //     // Suppress music and turtle output when generating
-    //     // compiled output.
-    //     logo.turtleDelay = 0;    // Compile at full speed.
-    //     logo.playbackQueue = {};
-    //     logo.playbackTime = 0;
-    //     logo.compiling = true;
-    //     logo.runLogoCommands();
-    // };
-
     /*
      * Hides all grids (Cartesian/polar/treble/et al.)
      */
@@ -2877,7 +2818,6 @@ function Activity() {
             console.debug("ADDING START BLOCK");
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
-            setPlaybackStatus();
             _allClear(false);
         } else if (!doNotSave) {
             // Overwrite session data too.
@@ -2956,7 +2896,6 @@ function Activity() {
 
         if (stopTurtleContainer.visible) {
             _hideStopButton();
-            setPlaybackStatus();
         }
         */
     };
@@ -3224,7 +3163,6 @@ function Activity() {
             console.debug("Loading start");
             logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
-            setPlaybackStatus();
         };
 
         sessionData = null;
@@ -3307,7 +3245,6 @@ function Activity() {
 
                     logo.playbackQueue = {};
                     blocks.loadNewBlocks(JSON.parse(sessionData));
-                    setPlaybackStatus();
                 }
             } catch (e) {
                 console.debug(e);
@@ -4857,7 +4794,6 @@ function Activity() {
             .setUpdateStage(stage.update)
             .setGetStageScale(getStageScale)
             .setTurtles(turtles)
-            .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(errorMsg)
             .setHomeContainers(setHomeContainers, boundary);
 
@@ -4891,7 +4827,6 @@ function Activity() {
         logo.getCurrentKeyCode = that.getCurrentKeyCode;
         logo.clearCurrentKeyCode = that.clearCurrentKeyCode;
         // logo.meSpeak = meSpeak;
-        logo.setPlaybackStatus = setPlaybackStatus;
 
         blocks.setLogo(logo);
 
@@ -5039,7 +4974,6 @@ function Activity() {
                     let obj = JSON.parse(data);
                     logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
-                    setPlaybackStatus();
                 } catch (e) {
                     console.debug(
                         "loadRawProject: could not parse project data"
@@ -5421,7 +5355,6 @@ function Activity() {
                                     let __listener = function(event) {
                                         logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
-                                        setPlaybackStatus();
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
@@ -5449,7 +5382,6 @@ function Activity() {
                                     merging = false;
                                     logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
-                                    setPlaybackStatus();
                                 }
 
                                 loading = false;
@@ -5523,7 +5455,6 @@ function Activity() {
                             let __listener = function(event) {
                                 logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
-                                setPlaybackStatus();
                                 stage.removeAllEventListeners("trashsignal");
 
                                 if (document.addEventListener) {

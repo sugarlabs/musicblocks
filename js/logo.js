@@ -384,20 +384,6 @@ class Logo {
      */
 
     /**
-     * @param {Function} setPlaybackStatus - setPlaybackStatus property
-     */
-    set setPlaybackStatus(setPlaybackStatus) {
-        this._setPlaybackStatus = setPlaybackStatus;
-    }
-
-    /**
-     * @returns {Function} setPlaybackStatus property
-     */
-    get setPlaybackStatus() {
-        return this._setPlaybackStatus;
-    }
-
-    /**
      * @param {Object} canvas - createjs canvas
      */
     set canvas(canvas) {
@@ -1940,7 +1926,6 @@ class Logo {
                             logo.errorMsg(_("Playback is ready."));
                         }
 
-                        logo.setPlaybackStatus();
                         logo.compiling = false;
                         for (t in logo.turtles.turtleList) {
                             logo.turtles.turtleList[t].doPenUp();
