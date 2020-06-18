@@ -213,7 +213,7 @@ msgstr ""
 #: js/pitchtimematrix.js:733
 #.TRANS: tambor
 msgid "drum"
-msgstr ""
+msgstr "tinya"
 
 #: js/RhythmBlocks.js:615
 #.TRANS: 
@@ -519,7 +519,7 @@ msgstr "saywa"
 #.TRANS: set the current drum sound for playback
 #.TRANS: fijar tambor
 msgid "set drum"
-msgstr ""
+msgstr "tinyata takyachiy"
 
 #: js/DrumBlocks.js:322
 #.TRANS: efecto de sonido
@@ -745,7 +745,7 @@ msgstr "Kunka pachapi paqarichiq "
 #: plugins/rodi.rtp:328
 #.TRANS: estatus
 msgid "status"
-msgstr ""
+msgstr "imayna kasqan"
 
 #: js/ActionBlocks.js:7
 #.TRANS: El bloque Volver (Return) devolverá un valor de una acción.
@@ -850,7 +850,7 @@ msgstr "Sichus kanqa ruray, chayqa kuyukachay kanqa"
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
 #.TRANS: cuando
 msgid "on"
-msgstr ""
+msgstr "hayk’aq"
 
 #: js/ActionBlocks.js:626
 #: js/ActionBlocks.js:629
@@ -982,7 +982,7 @@ msgstr "kay kama"
 #: js/FlowBlocks.js:622
 #.TRANS: hacer
 msgid "do2"
-msgstr ""
+msgstr "ruray"
 
 #: js/FlowBlocks.js:613
 #.TRANS: El bloque Mientras se repetirá mientras la condición sea verdadera.
@@ -1468,13 +1468,13 @@ msgstr ""
 #.TRANS: set the loudness level
 #.TRANS: filar volumen maestro
 msgid "set master volume"
-msgstr ""
+msgstr "qispichiq p’ulinta takyachiy"
 
 #: js/VolumeBlocks.js:649
 #.TRANS: set an articulation (change in volume)
 #.TRANS: fijar volumen relativo
 msgid "set relative volume"
-msgstr ""
+msgstr "t’inkisqa p’ulinta takyachiy"
 
 #: js/VolumeBlocks.js:760
 #.TRANS: a gradual increase in loudness
@@ -3118,7 +3118,7 @@ msgstr "kunan kichaq"
 #.TRANS: set the key and mode, e.g. C Major
 #.TRANS: fijar clave
 msgid "set key"
-msgstr ""
+msgstr "kichananta takyachiy"
 
 #: js/IntervalsBlocks.js:941
 #: js/IntervalsBlocks.js:947
