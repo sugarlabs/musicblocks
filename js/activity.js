@@ -211,6 +211,7 @@ function Activity() {
         "utils/musicutils",
         "utils/synthutils",
         "utils/mathutils",
+        "utils/detective",
         "activity/pastebox",
         "prefixfree.min"
     ];
