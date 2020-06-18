@@ -177,13 +177,6 @@ function setupPenBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetChroma(value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setgrey",
-                    value
-                ]);
-            }
         }
 
         arg(logo, turtle, blk) {
@@ -218,13 +211,6 @@ function setupPenBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetValue(value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setshade",
-                    value
-                ]);
-            }
         }
 
         arg(logo, turtle, blk) {
@@ -260,13 +246,6 @@ function setupPenBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetColor(value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setcolor",
-                    value
-                ]);
-            }
         }
 
         arg(logo, turtle, blk) {
@@ -301,13 +280,6 @@ function setupPenBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetPensize(value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setpensize",
-                    value
-                ]);
-            }
         }
 
         arg(logo, turtle, blk) {
@@ -403,12 +375,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doStartHollowLine();
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "hollowline"
-                    ]);
-                }
             }
 
             let listenerName = "_hollowline_" + turtle;
@@ -421,12 +387,6 @@ function setupPenBlocks() {
                     ].push(blk);
                 } else {
                     logo.turtles.turtleList[turtle].doEndHollowLine();
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "hollowline"
-                        ]);
-                    }
                 }
             };
 
@@ -480,13 +440,6 @@ function setupPenBlocks() {
                 } else {
                     logo.turtles.turtleList[turtle].doStartFill();
                 }
-
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "fill"
-                    ]);
-                }
             }
 
             let listenerName = "_fill_" + turtle;
@@ -508,13 +461,6 @@ function setupPenBlocks() {
                         ].penState = savedPenState;
                     } else {
                         logo.turtles.turtleList[turtle].doEndFill();
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "fill"
-                        ]);
                     }
                 }
             };
@@ -546,12 +492,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doPenUp();
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "penup"
-                    ]);
-                }
             }
         }
     }
@@ -577,12 +517,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doPenDown();
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "pendown"
-                    ]);
-                }
             }
         }
     }
@@ -630,13 +564,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doSetPensize(args[0]);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setpensize",
-                        args[0]
-                    ]);
-                }
             }
         }
     }
@@ -684,13 +611,6 @@ function setupPenBlocks() {
                 let arg = args[0] % 101;
                 let alpha = 1.0 - arg / 100;
                 logo.turtles.turtleList[turtle].doSetPenAlpha(alpha);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "settranslucency",
-                        arg
-                    ]);
-                }
             }
         }
     }
@@ -735,13 +655,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doSetHue(args[0]);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "sethue",
-                        args[0]
-                    ]);
-                }
             }
         }
     }
@@ -790,13 +703,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doSetValue(args[0]);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setshade",
-                        args[0]
-                    ]);
-                }
             }
         }
     }
@@ -842,13 +748,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doSetChroma(args[0]);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setgrey",
-                        args[0]
-                    ]);
-                }
             }
         }
     }
@@ -895,13 +794,6 @@ function setupPenBlocks() {
                 ].push(blk);
             } else {
                 logo.turtles.turtleList[turtle].doSetColor(args[0]);
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setcolor",
-                        args[0]
-                    ]);
-                }
             }
         }
     }

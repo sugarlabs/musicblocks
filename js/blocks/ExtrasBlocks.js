@@ -858,14 +858,6 @@ function setupExtrasBlocks() {
                                 logo.textMsg(args[0].toString());
                             }
                         }
-
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [
-                                logo.previousTurtleTime[turtle],
-                                "print",
-                                args[0]
-                            ]);
-                        }
                     }
                 }
             }

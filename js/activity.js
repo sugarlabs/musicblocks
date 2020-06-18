@@ -991,7 +991,7 @@ function Activity() {
             onblur = false;
         }
 
-        if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
             console.debug("Ignoring hard stop due to blur");
             return;
         }

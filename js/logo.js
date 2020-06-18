@@ -2101,31 +2101,6 @@ class Logo {
     }
 
     /**
-     * Returns whether to record.
-     *
-     * @returns {Boolean}
-     */
-    recordingStatus() {
-        return (this.recording || this.runningLilypond || this.runningAbc || this.runningMxml);
-    }
-
-    /**
-     * Pushes obj to playback queue, if possible.
-     *
-     * @param turtle
-     * @param obj
-     * @returns {void}
-     */
-    _playbackPush(turtle, obj) {
-        // We only push for saveWAV, etc.
-        if (!this.recordingStatus()) return;
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.playbackQueue[turtle].push(obj);
-        }
-    }
-
-    /**
      * Plays back some amount of activity.
      *
      * @param {number} whichMouse

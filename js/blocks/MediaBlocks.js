@@ -253,14 +253,6 @@ function setupMediaBlocks() {
                         if (!logo.suppressOutput[turtle]) {
                             logo.processSpeak(args[0]);
                         }
-
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [
-                                logo.previousTurtleTime[turtle],
-                                "speak",
-                                args[0]
-                            ]);
-                        }
                     }
                 }
             }
@@ -572,15 +564,6 @@ function setupMediaBlocks() {
                 } else {
                     if (!logo.suppressOutput[turtle]) {
                         logo.processShow(turtle, blk, args[0], args[1]);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "show",
-                            args[0],
-                            args[1]
-                        ]);
                     }
                 }
             }

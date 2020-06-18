@@ -76,14 +76,6 @@ function setupVolumeBlocks() {
             if (!logo.suppressOutput[turtle]) {
                 logo.setMasterVolume(value);
             }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setvolume",
-                    value
-                ]);
-            }
         }
 
         updateParameter(logo, turtle, blk) {
@@ -315,15 +307,6 @@ function setupVolumeBlocks() {
                 logo.setSynthVolume(turtle, synth, arg1);
             }
 
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setsynthvolume",
-                    synth,
-                    arg1
-                ]);
-            }
-
             let listenerName = "_synthvolume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
@@ -339,12 +322,6 @@ function setupVolumeBlocks() {
                         synth,
                         last(logo.synthVolume[turtle][synth])
                     );
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
-                    ]);
                 }
             };
 
@@ -487,15 +464,6 @@ function setupVolumeBlocks() {
             if (!logo.suppressOutput[turtle]) {
                 logo.setSynthVolume(turtle, synth, args[1]);
             }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setsynthvolume",
-                    synth,
-                    arg1
-                ]);
-            }
         }
     }
 
@@ -538,14 +506,6 @@ function setupVolumeBlocks() {
                     logo.masterVolume.push(arg);
                     if (!logo.suppressOutput[turtle]) {
                         logo.setMasterVolume(arg);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "setvolume",
-                            arg
-                        ]);
                     }
                 }
             }
@@ -602,14 +562,6 @@ function setupVolumeBlocks() {
             logo.masterVolume.push(arg);
             if (!logo.suppressOutput[turtle]) {
                 logo.setMasterVolume(arg);
-            }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setvolume",
-                    arg
-                ]);
             }
 
             let listenerName = "_volume_" + turtle;
@@ -691,15 +643,6 @@ function setupVolumeBlocks() {
                 if (!logo.suppressOutput[turtle]) {
                     logo.setSynthVolume(turtle, synth, newVolume);
                 }
-
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        newVolume
-                    ]);
-                }
             }
 
             if (logo.justCounting[turtle].length === 0) {
@@ -717,12 +660,6 @@ function setupVolumeBlocks() {
                         synth,
                         last(logo.synthVolume[turtle][synth])
                     );
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
-                    ]);
                 }
 
                 if (logo.justCounting[turtle].length === 0) {
