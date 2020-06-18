@@ -617,6 +617,7 @@ function TemperamentWidget() {
     };
 
     this.edit = function() {
+        this.editMode = null ;
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
         var that = this;
@@ -684,6 +685,7 @@ function TemperamentWidget() {
     };
 
     this.equalEdit = function() {
+        this.editMode = "equal";
         docById("userEdit").innerHTML = "";
         var equalEdit = docById("userEdit");
         equalEdit.style.backgroundColor = "#c8C8C8";
@@ -845,6 +847,17 @@ function TemperamentWidget() {
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
                 docById("preview").style.marginLeft = "80px";
 
+                //make temperary
+                ratios = this.tempRatios.slice();
+                var frequency = this.frequencies[0];
+                this.eqTempHzs = [];
+                for (var i = 0; i <= pitchNumber; i++) {
+                    this.eqTempHzs[i] = ratios[i] * frequency;
+                    this.eqTempHzs[i] = this.eqTempHzs[i].toFixed(2);
+                }
+                this.eqTempPitchNumber = pitchNumber;
+                this.checkTemperament(compareRatios);
+
                 docById("done_").onclick = function() {
                     //Go to main Circle of Notes
                     that.ratios = that.tempRatios.slice();
@@ -856,18 +869,23 @@ function TemperamentWidget() {
                     }
 
                     that.pitchNumber = pitchNumber;
+                    that.eqTempPitchNumber = null ; 
+                    that.eqTempHzs = [] ; 
                     that.checkTemperament(compareRatios);
                     that._circleOfNotes();
                 };
 
                 docById("preview").onclick = function() {
                     that.equalEdit();
+                    that.eqTempPitchNumber = null ; 
+                    that.eqTempHzs = [] ; 
                 };
             }
         };
     };
 
     this.ratioEdit = function() {
+        this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
         var ratioEdit = docById("userEdit");
         ratioEdit.style.backgroundColor = "#c8C8C8";
@@ -995,7 +1013,24 @@ function TemperamentWidget() {
                 addButtons(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
                 docById("preview").style.marginLeft = "100px";
+                
+                //make temperary
+                var ratios = that.tempRatios.slice();
+                that.typeOfEdit = "nonequal";
+                that.NEqTempPitchNumber = ratios.length - 1;
+                var frequency1 = that.frequencies[0];
+                that.NEqTempHzs = [];
+                for (var i = 0; i <= that.NEqTempPitchNumber; i++) {
+                    that.NEqTempHzs[i] = ratios[i] * frequency1;
+                    that.NEqTempHzs[i] = that.NEqTempHzs[i].toFixed(2);
+                }
 
+                for (var i = 0; i < ratios.length; i++) {
+                    compareRatios[i] = ratios[i];
+                    compareRatios[i] = compareRatios[i].toFixed(2);
+                }
+                that.checkTemperament(compareRatios);
+                
                 docById("done_").onclick = function() {
                     //Go to main Circle of Notes
                     that.ratios = that.tempRatios.slice();
@@ -1014,16 +1049,21 @@ function TemperamentWidget() {
 
                     that.checkTemperament(compareRatios);
                     that._circleOfNotes();
+                    that.NEqTempPitchNumber = null ;
+                    that.NEqTempHzs = [] ;
                 };
 
                 docById("preview").onclick = function() {
                     that.ratioEdit();
+                    that.NEqTempPitchNumber = null ;
+                    that.NEqTempHzs = [] ;
                 };
             }
         };
     };
 
     this.arbitraryEdit = function() {
+        this.editMode = "arbitrary" ;        
         docById("userEdit").innerHTML = "";
         var arbitraryEdit = docById("userEdit");
         arbitraryEdit.innerHTML =
@@ -1345,6 +1385,7 @@ function TemperamentWidget() {
     };
 
     this.octaveSpaceEdit = function() {
+        this.editMode = "octave" ;        
         docById("userEdit").innerHTML = "";
         var len = this.ratios.length;
         var octaveRatio = this.ratios[len - 1];
@@ -1787,6 +1828,8 @@ function TemperamentWidget() {
 
         if (docById("wheelDiv4") == null) {
             var notes = this.frequencies[pitchNumber];
+            if (this.editMode=="equal" && this.eqTempHzs && this.eqTempHzs.length) notes = this.eqTempHzs[pitchNumber] ;
+            else if (this.editMode=="ratio" && this.NEqTempHzs && this.NEqTempHzs.length) notes = this.NEqTempHzs[pitchNumber] ;
         } else {
             var notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
         }
@@ -1851,6 +1894,8 @@ function TemperamentWidget() {
         );
         var that = this;
         var pitchNumber = this.pitchNumber;
+        if (this.editMode == "equal" && this.eqTempPitchNumber) pitchNumber = this.eqTempPitchNumber ;
+        else if  (this.editMode == "ratio" && this.NEqTempPitchNumber) pitchNumber = this.NEqTempPitchNumber ;
         if (docById("wheelDiv4") !== null) {
             pitchNumber = this.tempRatios1.length - 1;
         }
@@ -2226,6 +2271,7 @@ function TemperamentWidget() {
         this._circleOfNotes();
 
         noteCell.onclick = function(event) {
+            that.editMode = null ;            
             if (that.circleIsVisible) {
                 that._circleOfNotes();
             } else {
