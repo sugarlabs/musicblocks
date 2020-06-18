@@ -61,7 +61,7 @@ msgstr "Yupay waqaykuna"
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 #.TRANS: valor de la nota
 msgid "note value"
-msgstr ""
+msgstr "T’uyaq yupaynin"
 
 #: js/RhythmBlockPaletteBlocks.js:70
 #.TRANS: ritmo polifónico
@@ -213,12 +213,12 @@ msgstr ""
 #: js/pitchtimematrix.js:733
 #.TRANS: tambor
 msgid "drum"
-msgstr "tinya"
+msgstr "tankar"
 
 #: js/RhythmBlocks.js:615
 #.TRANS: 
 msgid "392 hertz"
-msgstr "329 kaparina"
+msgstr "392 kaparina"
 
 #: js/RhythmBlocks.js:778
 #: js/ExtrasBlocks.js:356
@@ -519,7 +519,7 @@ msgstr "saywa"
 #.TRANS: set the current drum sound for playback
 #.TRANS: fijar tambor
 msgid "set drum"
-msgstr "tinyata takyachiy"
+msgstr "tankar takyachiy"
 
 #: js/DrumBlocks.js:322
 #.TRANS: efecto de sonido
@@ -745,7 +745,7 @@ msgstr "Kunka pachapi paqarichiq "
 #: plugins/rodi.rtp:328
 #.TRANS: estatus
 msgid "status"
-msgstr "imayna kasqan"
+msgstr "kakusqan"
 
 #: js/ActionBlocks.js:7
 #.TRANS: El bloque Volver (Return) devolverá un valor de una acción.
