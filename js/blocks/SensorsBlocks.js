@@ -25,7 +25,7 @@ function setupSensorsBlocks() {
         flow(args, logo, turtle, blk) {
 
             // Pause the flow while we wait for input.
-            logo._doWait(turtle, 120);
+            logo.doWait(turtle, 120);
 
             // Display the input form.
             docById("labelDiv").innerHTML =

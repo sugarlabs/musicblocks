@@ -110,7 +110,7 @@ function setupRhythmBlockPaletteBlocks() {
                         0
                     ];
                 }
-                
+
                 let bpmFactor;
                 if (logo.bpm[turtle].length > 0) {
                     bpmFactor = TONEBPM / last(logo.bpm[turtle]);
@@ -153,7 +153,7 @@ function setupRhythmBlockPaletteBlocks() {
                     );
                 }
 
-                logo._doWait(turtle, (arg0 - 1) * beatValue);
+                logo.doWait(turtle, (arg0 - 1) * beatValue);
             }
         }
     }
@@ -431,7 +431,7 @@ function setupRhythmBlockPaletteBlocks() {
                 // nothing to do
                 return;
             }
-        
+
             let arg;
             if (
                 args[0] === null ||
@@ -542,7 +542,7 @@ function setupRhythmBlockPaletteBlocks() {
                         totalBeats += beatValue;
                     }
 
-                    logo._doWait(turtle, totalBeats - beatValue);
+                    logo.doWait(turtle, totalBeats - beatValue);
                 }
             };
 
@@ -733,7 +733,7 @@ function setupRhythmBlockPaletteBlocks() {
                     );
                 }
 
-                logo._doWait(turtle, (arg0 - 1) * beatValue);
+                logo.doWait(turtle, (arg0 - 1) * beatValue);
             }
         }
     }

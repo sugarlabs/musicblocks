@@ -184,7 +184,7 @@ function setupOrnamentBlocks() {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            logo.glideOverride[turtle] = logo._noteCounter(turtle, args[1]);
+            logo.glideOverride[turtle] = logo.noteCounter(turtle, args[1]);
             console.debug("length of glide " + logo.glideOverride[turtle]);
 
             let listenerName = "_glide_" + turtle;

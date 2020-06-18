@@ -437,7 +437,7 @@ function setupRhythmBlocks() {
                     }
 
                     // Wait until this note is played before continuing.
-                    logo._doWait(turtle, bpmFactor / noteValue);
+                    logo.doWait(turtle, bpmFactor / noteValue);
 
                     logo.inNoteBlock[turtle].pop();
 

@@ -816,7 +816,7 @@ class NoteController {
                         logo.inNoteBlock[turtle].pop();
 
                         if (!logo.suppressOutput[turtle]) {
-                            logo._doWait(
+                            logo.doWait(
                                 turtle,
                                 Math.max(
                                     bpmFactor / logo.tieCarryOver[turtle] +
@@ -957,7 +957,7 @@ class NoteController {
                     logo.turtleTime[turtle] +=
                         bpmFactor / duration + logo.noteDelay / 1000;
                     if (!logo.suppressOutput[turtle]) {
-                        logo._doWait(
+                        logo.doWait(
                             turtle,
                             Math.max(
                                 bpmFactor / duration +
@@ -1936,14 +1936,14 @@ class NoteController {
                 // the corresponding graphics.
                 if (logo.tie[turtle] && noteBeatValue === 0) {
                     if (tieDelay > 0) {
-                        logo._dispatchTurtleSignals(
+                        logo.dispatchTurtleSignals(
                             turtle,
                             bpmFactor / logo.tieCarryOver[turtle],
                             blk,
                             bpmFactor / tieDelay
                         );
                     } else {
-                        logo._dispatchTurtleSignals(
+                        logo.dispatchTurtleSignals(
                             turtle,
                             bpmFactor / logo.tieCarryOver[turtle],
                             blk,
@@ -1952,14 +1952,14 @@ class NoteController {
                     }
                 } else {
                     if (tieDelay > 0) {
-                        logo._dispatchTurtleSignals(
+                        logo.dispatchTurtleSignals(
                             turtle,
                             beatValue - bpmFactor / tieDelay,
                             blk,
                             bpmFactor / tieDelay
                         );
                     } else {
-                        logo._dispatchTurtleSignals(turtle, beatValue, blk, 0);
+                        logo.dispatchTurtleSignals(turtle, beatValue, blk, 0);
                     }
                 }
 

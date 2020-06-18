@@ -169,7 +169,7 @@ function _playPitch(args, logo, turtle, blk) {
                 octave = obj[1];
                 cents = obj[2];
             }
-        } 
+        }
         else if (
             Number(arg0[0]) &&
             logo.blocks.blockList[blk].name === "pitch"
@@ -249,10 +249,10 @@ function _playPitch(args, logo, turtle, blk) {
             let deltaOctave, deltaSemi;
             scaleDegree += 1;
 
-            // Choose a reference based on the key selected. This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8. 
+            // Choose a reference based on the key selected. This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8.
             // Subtract one to make it zero based.
             let ref = NOTESTEP[obj[0].substr(0,1)] -1;
-            
+
             //adjust reference if sharps/flats are present i.e increase by one for a sharp and decrease by one for a flat
             if(obj[0].substr(1) === FLAT) {
                 ref--;
@@ -263,9 +263,9 @@ function _playPitch(args, logo, turtle, blk) {
             /* Number of semitones is used to calculate changes in deltaSemi defined above.
             Semitones is initialised with reference value. e.g If selected key is G, semitone = ref = 7 (8 - 1)
             Now we assume our circle of fifths to start from our ref rather than default C note.
-            Whenever a note is played, we add the difference of it's semitones from ref; 
+            Whenever a note is played, we add the difference of it's semitones from ref;
             e.g. If the selected key is G major: ref = 7 and initially semitones = ref = 7.
-            G major scale: G A B C D E F# 
+            G major scale: G A B C D E F#
             When we play 1st note --> G: semitones = semitones + (position of G on circle of fifths - ref) => 7 + (7 - 7)
             When we play 2nd note -->> A: semitones = semitones + (position of A of circle of fifths - ref) => 7 + (9 - 7)
             And so on. In essence we add the relative difference.
@@ -273,24 +273,24 @@ function _playPitch(args, logo, turtle, blk) {
             1. If note number input is positive: Whenever the number of semitones will be less than ref, increment deltaSemi by one.
             2. If note number input is negative: Whenever the number of semitones will be greater than ref, increment deltaSemi by one.
             Note that these positions are zero based because we use an array to find indexes.
-            
+
             Notice that deltaSemi will attain values : {0, 1}, so if we play scales of greater length where octave may need to increment/decrement multiple times:
             That is done with the use of deltaOctave: It's value is incremented by one everytime we traverse the modelength of our selected key once. [ e.g 7 in case of any major scale]
             deltaOctave doesn't directly affect the octave that will play; instead it changes what we say is the reference octave i.e the value connected to the octave argument of this block.
 
-            You may see this as a cyclical process: 
+            You may see this as a cyclical process:
             e.g Repeat the scale degree block 14 times while in G major starting from note value --> 1 and octave arg --> 4
             Till we reach B --> Both deltaOctave and deltaSemi are {0,0}
             As we cross B and reach C --> no. of semitones < ref, deltaSemi = 1, deltaOctave = 0 and this causes note C to play in octave 5
             This behavious continues till E, as we reach F# (or Gb) --> deltaOctave becomes 1 and deltaSemi goes back to zero since we've traversed
-            our modeLength ( 7 ) once. 
+            our modeLength ( 7 ) once.
             Again on C deltaSemi will be 1, deltaOctave was already 1 and thus a total change of 2 octaves --> C6. Thus, deltaOctave brings a change
-            to the reference octave. 
+            to the reference octave.
             So this process can continue indefinitely producing our desired results.
             */
             let semitones = ref;
 
-            if (neg) {  
+            if (neg) {
                 // if (scaleDegree > 1) {
                 //     scaleDegree = modeLength - scaleDegree + 2;
                 // }
@@ -300,7 +300,7 @@ function _playPitch(args, logo, turtle, blk) {
                     scaleDegree
                 );
                 logo.currentNote = note;
-                
+
                 if(NOTESFLAT.indexOf(note) !== -1) {
                     semitones += (NOTESFLAT.indexOf(note) - ref);
                 } else {
@@ -332,7 +332,7 @@ function _playPitch(args, logo, turtle, blk) {
                     semitones += (NOTESSHARP.indexOf(note) - ref);
                 }
                 deltaSemi = semitones < ref? 1:0;
-                deltaOctave = Math.floor((arg0) / modeLength);  
+                deltaOctave = Math.floor((arg0) / modeLength);
                 octave =
                     Math.floor(
                         calcOctave(
@@ -391,7 +391,7 @@ function _playPitch(args, logo, turtle, blk) {
         }
     }
 
-    let noteObj = logo._addScalarTransposition(
+    let noteObj = logo.addScalarTransposition(
         turtle,
         note,
         octave,
@@ -418,7 +418,7 @@ function _playPitch(args, logo, turtle, blk) {
             logo.blocks.blockList[last(logo.inNeighbor[turtle])].name ===
             "neighbor2"
         ) {
-            noteObj2 = logo._addScalarTransposition(
+            noteObj2 = logo.addScalarTransposition(
                 turtle,
                 note,
                 octave,
@@ -494,7 +494,7 @@ function _playPitch(args, logo, turtle, blk) {
         }
 
         if (!(logo.invertList[turtle].length === 0)) {
-            delta += logo._calculateInvert(turtle, note, octave);
+            delta += logo.calculateInvert(turtle, note, octave);
         }
         let duplicateFactor;
         if (logo.duplicateFactor[turtle].length > 0) {
@@ -540,7 +540,7 @@ function _playPitch(args, logo, turtle, blk) {
         }
 
         if (!(logo.invertList[turtle].length === 0)) {
-            delta += logo._calculateInvert(turtle, note, octave);
+            delta += logo.calculateInvert(turtle, note, octave);
         }
 
         let duplicateFactor;
@@ -643,7 +643,7 @@ function _playPitch(args, logo, turtle, blk) {
         }
 
         if (!(logo.invertList[turtle].length === 0)) {
-            delta += logo._calculateInvert(turtle, note, octave);
+            delta += logo.calculateInvert(turtle, note, octave);
         }
 
         let transposition = 2 * delta;
@@ -713,7 +713,7 @@ function _playPitch(args, logo, turtle, blk) {
         if (turtle in logo.transposition) {
             transposition += logo.transposition[turtle];
         }
-        
+
         let noteObj1 = getNote(
             note,
             octave,
@@ -792,7 +792,7 @@ function _playPitch(args, logo, turtle, blk) {
         logo.pitchStaircase.stairPitchBlocks.push(blk);
     } else if (logo.inMusicKeyboard) {
         if (!(logo.invertList[turtle].length === 0)) {
-            delta += logo._calculateInvert(turtle, note, octave);
+            delta += logo.calculateInvert(turtle, note, octave);
         }
 
         // Apply transpositions
@@ -2434,7 +2434,7 @@ function setupPitchBlocks() {
                 logo.lastNotePlayed[turtle] = [note[0] + note[1], 4];
             } else if (logo.inNoteBlock[turtle].length > 0) {
                 if (!(logo.invertList[turtle].length === 0)) {
-                    delta += logo._calculateInvert(turtle, note, octave);
+                    delta += logo.calculateInvert(turtle, note, octave);
                 }
 
                 let noteObj1 = addPitch(note, octave, cents, arg);
@@ -2794,7 +2794,7 @@ function setupPitchBlocks() {
 
             let len = logo.lastNotePlayed[turtle][0].length;
 
-            let noteObj = logo._addScalarTransposition(
+            let noteObj = logo.addScalarTransposition(
                 turtle,
                 logo.lastNotePlayed[turtle][0].slice(0, len - 1),
                 parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)),
@@ -2803,7 +2803,7 @@ function setupPitchBlocks() {
 
             let delta = 0;
             if (!(logo.invertList[turtle].length === 0)) {
-                delta += logo._calculateInvert(turtle, noteObj[0], noteObj[1]);
+                delta += logo.calculateInvert(turtle, noteObj[0], noteObj[1]);
             }
 
             let transposition = 2 * delta;

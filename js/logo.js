@@ -2309,7 +2309,7 @@ class Logo {
                         break;
 
                     case "show":
-                        this._processShow(
+                        this.processShow(
                             turtle,
                             null,
                             this.playbackQueue[turtle][idx][2],
@@ -2318,7 +2318,7 @@ class Logo {
                         break;
 
                     case "speak":
-                        this._processSpeak(this.playbackQueue[turtle][idx][2]);
+                        this.processSpeak(this.playbackQueue[turtle][idx][2]);
                         break;
 
                     case "print":
@@ -2560,7 +2560,7 @@ class Logo {
      * @param {number} delay
      * @returns {void}
      */
-    async _dispatchTurtleSignals(
+    async dispatchTurtleSignals(
         turtle,
         beatValue,
         blk,
@@ -2714,7 +2714,7 @@ class Logo {
             if (suppressOutput) return;
 
             setTimeout(
-                () => this._processShow(turtle, null, arg1, arg2),
+                () => this.processShow(turtle, null, arg1, arg2),
                 timeout
             );
         }
@@ -2722,7 +2722,7 @@ class Logo {
         let __speak = (turtle, arg, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(() => this._processSpeak(arg), timeout);
+            setTimeout(() => this.processSpeak(arg), timeout);
         }
 
         let __print = (arg, timeout) => {
@@ -3452,7 +3452,7 @@ class Logo {
      * @param {string} text
      * @returns {void}
      */
-    _processSpeak(text) {
+    processSpeak(text) {
         let new_text = "";
         for (let i in text) {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
@@ -3473,7 +3473,7 @@ class Logo {
      * @param arg1
      * @returns {void}
      */
-    _processShow(turtle, blk, arg0, arg1) {
+    processShow(turtle, blk, arg0, arg1) {
         if (typeof arg1 === "string") {
             let len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
@@ -3540,7 +3540,7 @@ class Logo {
      * @param turtle
      * @returns {void}
      */
-    _doBreak(turtle) {
+    doBreak(turtle) {
         // Look for a parent loopBlock in queue and set its count to 1
         let parentLoopBlock = null;
         let loopBlkIdx = -1;
@@ -3743,7 +3743,7 @@ class Logo {
      * @param cblk
      * @returns {number}
      */
-    _noteCounter(turtle, cblk) {
+    noteCounter(turtle, cblk) {
         if (cblk != null) {
             let saveSuppressStatus = this.suppressOutput[turtle];
 
@@ -3846,7 +3846,7 @@ class Logo {
      * @param secs
      * @returns {void}
      */
-    _doWait(turtle, secs) {
+    doWait(turtle, secs) {
         this.waitTimes[turtle] = Number(secs) * 1000;
     }
 
@@ -3887,7 +3887,7 @@ class Logo {
      * @param octave
      * @returns {number}
      */
-    _calculateInvert(turtle, note, octave) {
+    calculateInvert(turtle, note, octave) {
         let delta = 0;
         let len = this.invertList[turtle].length;
         let note1 = getNote(
@@ -3925,8 +3925,8 @@ class Logo {
                 num1 += 2 * delta;
             } else {
                 // We need to calculate the scalar difference
-                let scalarSteps = this._scalarDistance(turtle, num2, num1);
-                let note3 = this._addScalarTransposition(
+                let scalarSteps = this.scalarDistance(turtle, num2, num1);
+                let note3 = this.addScalarTransposition(
                     turtle,
                     note2[0],
                     note2[1],
@@ -3956,7 +3956,7 @@ class Logo {
      * @param {number} n
      * @returns {object}
      */
-    _addScalarTransposition(turtle, note, octave, n) {
+    addScalarTransposition(turtle, note, octave, n) {
         let noteObj = null;
 
         if (n > 0) {
@@ -4068,7 +4068,7 @@ class Logo {
      * @param {number} lastNote
      * @returns {number}
      */
-    _scalarDistance(turtle, firstNote, lastNote) {
+    scalarDistance(turtle, firstNote, lastNote) {
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
         // to lastNote pitch

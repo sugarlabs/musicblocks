@@ -255,7 +255,7 @@ function setupMeterBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                return logo._noteCounter(turtle, cblk);
+                return logo.noteCounter(turtle, cblk);
             }
         }
     }

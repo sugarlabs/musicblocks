@@ -388,7 +388,7 @@ function setupExtrasBlocks() {
             );
 
             // We need to wait for the new block to load before continuing.
-            logo._doWait(turtle, 1);
+            logo.doWait(turtle, 1);
 
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
@@ -789,7 +789,7 @@ function setupExtrasBlocks() {
                 let noteBeatValue = bpmFactor / (1 / args[0]);
                 logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
                 logo.turtleTime[turtle] += noteBeatValue;
-                logo._doWait(turtle, args[0]);
+                logo.doWait(turtle, args[0]);
             }
         }
     }
