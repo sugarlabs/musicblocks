@@ -74,15 +74,7 @@ function setupVolumeBlocks() {
             let len = logo.masterVolume.length;
             logo.masterVolume[len - 1] = value;
             if (!logo.suppressOutput[turtle]) {
-                logo._setMasterVolume(value);
-            }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setvolume",
-                    value
-                ]);
+                logo.setMasterVolume(value);
             }
         }
 
@@ -315,15 +307,6 @@ function setupVolumeBlocks() {
                 logo.setSynthVolume(turtle, synth, arg1);
             }
 
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setsynthvolume",
-                    synth,
-                    arg1
-                ]);
-            }
-
             let listenerName = "_synthvolume_" + turtle;
             logo._setDispatchBlock(blk, turtle, listenerName);
 
@@ -339,12 +322,6 @@ function setupVolumeBlocks() {
                         synth,
                         last(logo.synthVolume[turtle][synth])
                     );
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
-                    ]);
                 }
             };
 
@@ -487,15 +464,6 @@ function setupVolumeBlocks() {
             if (!logo.suppressOutput[turtle]) {
                 logo.setSynthVolume(turtle, synth, args[1]);
             }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setsynthvolume",
-                    synth,
-                    arg1
-                ]);
-            }
         }
     }
 
@@ -537,15 +505,7 @@ function setupVolumeBlocks() {
 
                     logo.masterVolume.push(arg);
                     if (!logo.suppressOutput[turtle]) {
-                        logo._setMasterVolume(arg);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "setvolume",
-                            arg
-                        ]);
+                        logo.setMasterVolume(arg);
                     }
                 }
             }
@@ -601,15 +561,7 @@ function setupVolumeBlocks() {
 
             logo.masterVolume.push(arg);
             if (!logo.suppressOutput[turtle]) {
-                logo._setMasterVolume(arg);
-            }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setvolume",
-                    arg
-                ]);
+                logo.setMasterVolume(arg);
             }
 
             let listenerName = "_volume_" + turtle;
@@ -622,7 +574,7 @@ function setupVolumeBlocks() {
                     logo.justCounting[turtle].length === 0 &&
                     logo.masterVolume.length > 0
                 ) {
-                    logo._setMasterVolume(last(logo.masterVolume));
+                    logo.setMasterVolume(last(logo.masterVolume));
                 }
             };
 
@@ -691,19 +643,10 @@ function setupVolumeBlocks() {
                 if (!logo.suppressOutput[turtle]) {
                     logo.setSynthVolume(turtle, synth, newVolume);
                 }
-
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        newVolume
-                    ]);
-                }
             }
 
             if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginArticulation(turtle);
+                logo.notation.notationBeginArticulation(turtle);
             }
 
             let listenerName = "_articulation_" + turtle;
@@ -717,16 +660,10 @@ function setupVolumeBlocks() {
                         synth,
                         last(logo.synthVolume[turtle][synth])
                     );
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "setsynthvolume",
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
-                    ]);
                 }
 
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndArticulation(turtle);
+                    logo.notation.notationEndArticulation(turtle);
                 }
             };
 
@@ -795,7 +732,7 @@ function setupVolumeBlocks() {
 
                 let __listener = function(event) {
                     if (logo.justCounting[turtle].length === 0) {
-                        logo.notationEndCrescendo(
+                        logo.notation.notationEndCrescendo(
                             turtle,
                             last(logo.crescendoDelta[turtle])
                         );

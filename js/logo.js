@@ -55,23 +55,23 @@ class Logo {
      * @constructor
      */
     constructor() {
-        this.canvas = null;
-        this.blocks = null;
-        this.turtles = null;
-        this.stage = null;
-        this.refreshCanvas = null;
-        this.textMsg = null;
-        this.errorMsg = null;
-        this.hideMsgs = null;
-        this.onStopTurtle = null;
-        this.onRunTurtle = null;
-        this.getStageX = null;
-        this.getStageY = null;
-        this.getStageMouseDown = null;
-        this.getCurrentKeyCode = null;
-        this.clearCurrentKeyCode = null;
-        this.meSpeak = null;
-        this.saveLocally = null;
+        this._canvas = null;
+        this._blocks = null;
+        this._turtles = null;
+        this._stage = null;
+        this._refreshCanvas = null;
+        this._textMsg = null;
+        this._errorMsg = null;
+        this._hideMsgs = null;
+        this._onStopTurtle = null;
+        this._onRunTurtle = null;
+        this._getStageX = null;
+        this._getStageY = null;
+        this._getStageMouseDown = null;
+        this._getCurrentKeyCode = null;
+        this._clearCurrentKeyCode = null;
+        this._meSpeak = null;
+        this._saveLocally = null;
         this.showBlocksAfterRun = false;
 
         this.pitchTimeMatrix = null;
@@ -86,7 +86,6 @@ class Logo {
         this.modeWidget = null;
         this.meterWidget = null;
         this.statusMatrix = null;
-        this.playbackWidget = null;
 
         this.attack = {};
         this.decay = {};
@@ -139,7 +138,7 @@ class Logo {
         this.time = 0;
         this.firstNoteTime = null;
         this.waitTimes = {};
-        this.turtleDelay = 0;
+        this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
         this.stopTurtle = false;
@@ -152,16 +151,6 @@ class Logo {
 
         // Moveable solfege?
         this.moveable = {};
-
-        // When you run Music Blocks, you are "compiling" your code. The
-        // compiled code is stored in the playbackQueue, which can be used
-        // to playback the performance without the overhead of
-        // interpreting the code
-        this.playbackQueue = {};
-        this.playbackTime = 0;
-
-        // Optimize for runtime speed
-        this.optimize = beginnerMode;   // beginnerMode is a boolean value
 
         // Widget-related attributes
         this.showPitchDrumMatrix = false;
@@ -240,7 +229,7 @@ class Logo {
         this.bpm = {};
         this.previousTurtleTime = [];
         this.turtleTime = [];
-        this.noteDelay = 0;
+        this._noteDelay = 0;
         this.playedNote = {};
         this.playedNoteTimes = {};
         this.pushedNote = {};
@@ -256,7 +245,6 @@ class Logo {
         this.crescendoInitialVolume = {};
         this.intervals = {};            // relative interval (based on scale degree)
         this.semitoneIntervals = {};    // absolute interval (based on semitones)
-        this.markup = {};
         this.staccato = {};
         this.glide = {};
         this.glideOverride = {};
@@ -310,13 +298,12 @@ class Logo {
         // pitch to drum mapping
         this.pitchDrumTable = {};
 
+        // object that deals with notations
+        this._notation = new Notation(this);
+
         // parameters used by notations
-        this.notationStaging = {};
-        this.notationDrumStaging = {};
         this.notationOutput = "";
         this.notationNotes = {};
-        this.pickupPOW2 = {};
-        this.pickupPoint = {};
         this.runningLilypond = false;
         this.runningAbc = false;
         this.runningMxml = false;
@@ -324,7 +311,6 @@ class Logo {
         this.compiling = false;
         this.recording = false;
         this.lastNote = {};
-        this.restartPlayback = true;
 
         // Variables for progress bar
         this.progressBar = docById("myBar");
@@ -344,15 +330,6 @@ class Logo {
         this._saveCanvasAlpha = {};
         this._saveOrientation = {};
         this._savePenState = {};
-
-        // Things we tweak to optimize performance
-        // this.blinkState = !this.optimize;
-        this.blinkState = true;
-        // if (this.optimize) {
-        //     createjs.Ticker.framerate = 10;
-        // } else {
-        //     createjs.Ticker.framerate = 30;
-        // }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the default synthesizer
@@ -392,272 +369,300 @@ class Logo {
         this.pitchAnalyser = null;
     }
 
-    /**
-     * Switches optimize mode on if state, off otherwise.
-     *
-     * @privileged
-     * @param {boolean} state - An object representing a state
-     * @returns {void}
+    /*
+    =======================================================
+     Setters, Getters
+    =======================================================
      */
-    setOptimize(state) {
-        if (state) {
-            // this.errorMsg(_('Turning off mouse blink; setting FPS to 10.'));
-            // createjs.Ticker.framerate = 10;
-            this.optimize = true;
-        } else {
-            // this.errorMsg(_('Turning on mouse blink; setting FPS to 30.'));
-            // createjs.Ticker.framerate = 10; // 30;
-            this.optimize = false;
-        }
 
-        // this.blinkState = !state;
-        this.blinkState = true;
+    /**
+     * @param {Object} canvas - createjs canvas
+     */
+    set canvas(canvas) {
+        this._canvas = canvas;
     }
 
     /**
-     * Sets the setPlaybackStatus property.
-     *
-     * @privileged
-     * @param {Function} setPlaybackStatus
-     * @returns {this}
+     * @returns {Object} createjs canvas
      */
-    setSetPlaybackStatus(setPlaybackStatus) {
-        this.setPlaybackStatus = setPlaybackStatus;
-        return this;
+    get canvas() {
+        return this._canvas;
     }
 
     /**
-     * Sets the canvas property.
-     *
-     * @privileged
-     * @param canvas
-     * @returns {this}
+     * @param {Object} blocks - Blocks object
      */
-    setCanvas(canvas) {
-        this.canvas = canvas;
-        return this;
+    set blocks(blocks) {
+        this._blocks = blocks;
     }
 
     /**
-     * Sets all the blocks.
-     *
-     * @privileged
-     * @param blocks
-     * @returns {this}
+     * @returns {Object} Blocks object
      */
-    setBlocks(blocks) {
-        this.blocks = blocks;
-        return this;
+    get blocks() {
+        return this._blocks;
     }
 
     /**
-     * Sets all the turtles.
-     *
-     * @privileged
-     * @param turtles
-     * @returns {this}
+     * @param {Object} turtles - Turtles object
      */
-    setTurtles(turtles) {
-        this.turtles = turtles;
-        return this;
+    set turtles(turtles) {
+        this._turtles = turtles;
     }
 
     /**
-     * Sets the stage.
-     *
-     * @privileged
-     * @param stage
-     * @returns {this}
+     * @returns {Object} Turtles object
      */
-    setStage(stage) {
-        this.stage = stage;
-        return this;
+    get turtles() {
+        return this._turtles;
     }
 
     /**
-     * Sets the refreshCanvas property.
-     *
-     * @privileged
-     * @param {Function} refreshCanvas
-     * @returns {this}
+     * @param {Object} stage - createjs stage
      */
-    setRefreshCanvas(refreshCanvas) {
-        this.refreshCanvas = refreshCanvas;
-        return this;
+    set stage(stage) {
+        this._stage = stage;
     }
 
     /**
-     * Sets the textMsg property.
-     *
-     * @privileged
+     * @returns {Object} createjs stage
+     */
+    get stage() {
+        return this._stage;
+    }
+
+    /**
+     * @param {Function} refreshCanvas - function to update canvas changes
+     */
+    set refreshCanvas(refreshCanvas) {
+        this._refreshCanvas = refreshCanvas;
+    }
+
+    /**
+     * @returns {Function} function to update canvas changes
+     */
+    get refreshCanvas() {
+        return this._refreshCanvas;
+    }
+
+    /**
      * @param {Function} textMsg - function to produce a text message using exactly one string
-     * @returns {this}
      */
-    setTextMsg(textMsg) {
-        this.textMsg = textMsg;
-        return this;
+    set textMsg(textMsg) {
+        this._textMsg = textMsg;
     }
 
     /**
-     * Sets the hideMsgs property.
-     *
-     * @privileged
-     * @param {Function} hideMsgs
-     * @returns {this}
+     * @returns {Function} function to produce a text message using exactly one string
      */
-    setHideMsgs(hideMsgs) {
-        this.hideMsgs = hideMsgs;
-        return this;
-    };
+    get textMsg() {
+        return this._textMsg;
+    }
 
     /**
-     * Sets the errorMsg property.
-     *
-     * @privileged
      * @param {Function} errorMsg - function to produce an error message using at least a string
-     * @returns {this}
      */
-    setErrorMsg(errorMsg) {
-        this.errorMsg = errorMsg;
-        return this;
+    set errorMsg(errorMsg) {
+        this._errorMsg = errorMsg;
     }
 
     /**
-     * Sets the onStopTurtle property.
-     *
-     * @privileged
+     * @returns {Function} function to produce an error message using at least a string
+     */
+    get errorMsg() {
+        return this._errorMsg;
+    }
+
+    /**
+     * @param {Function} hideMsgs - function to hide messages
+     */
+    set hideMsgs(hideMsgs) {
+        this._hideMsgs = hideMsgs;
+    }
+
+    /**
+     * @returns {Function} function to hide messages
+     */
+    get hideMsgs() {
+        return this._hideMsgs;
+    }
+
+    /**
      * @param {Function} onStopTurtle
-     * @returns {this}
      */
-    setOnStopTurtle(onStopTurtle) {
-        this.onStopTurtle = onStopTurtle;
-        return this;
+    set onStopTurtle(onStopTurtle) {
+        this._onStopTurtle = onStopTurtle;
     }
 
     /**
-     * Sets the onRunTurtle property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get onStopTurtle() {
+        return this._onStopTurtle;
+    }
+
+    /**
      * @param {Function} onRunTurtle
-     * @returns {this}
      */
-    setOnRunTurtle(onRunTurtle) {
-        this.onRunTurtle = onRunTurtle;
-        return this;
+    set onRunTurtle(onRunTurtle) {
+        this._onRunTurtle = onRunTurtle;
     }
 
     /**
-     * Sets the getStageX property.
-     *
-     * @privileged
-     * @param {Function} getStageX
-     * @returns {this}
+     * @returns {Function}
      */
-    setGetStageX(getStageX) {
-        this.getStageX = getStageX;
-        return this;
+    get onRunTurtle() {
+        return this._onRunTurtle;
     }
 
     /**
-     * Sets the getStageY property.
-     *
-     * @privileged
-     * @param {Function} getStageY
-     * @returns {this}
+     * @param {Function} getStageX - function to get corresponding screen
+     * x - coordinate (from Turtle)
      */
-    setGetStageY(getStageY) {
-        this.getStageY = getStageY;
-        return this;
-    };
+    set getStageX(getStageX) {
+        this._getStageX = getStageX;
+    }
 
     /**
-     * Sets the getStageMouseDown property.
-     *
-     * @privileged
+     * @returns {Function} function to get corresponding screen x - coordinate
+     * (from Turtle)
+     */
+    get getStageX() {
+        return this._getStageX;
+    }
+
+    /**
+     * @param {Function} getStageY - function to get corresponding screen
+     * y - coordinate (from Turtle)
+     */
+    set getStageY(getStageY) {
+        this._getStageY = getStageY;
+    }
+
+    /**
+     * @returns {Function} function to get corresponding screen y - coordinate
+     * (from Turtle)
+     */
+    get getStageY() {
+        return this._getStageY;
+    }
+
+    /**
      * @param {Function} getStageMouseDown
-     * @returns {this}
      */
-    setGetStageMouseDown(getStageMouseDown) {
-        this.getStageMouseDown = getStageMouseDown;
-        return this;
+    set getStageMouseDown(getStageMouseDown) {
+        this._getStageMouseDown = getStageMouseDown;
     }
 
     /**
-     * Sets the getCurrentKeyCode property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get getStageMouseDown() {
+        return this._getStageMouseDown;
+    }
+
+    /**
      * @param {Function} getCurrentKeyCode
-     * @returns {this}
      */
-    setGetCurrentKeyCode(getCurrentKeyCode) {
-        this.getCurrentKeyCode = getCurrentKeyCode;
-        return this;
+    set getCurrentKeyCode(getCurrentKeyCode) {
+        this._getCurrentKeyCode = getCurrentKeyCode;
     }
 
     /**
-     * Sets the clearCurrentKeyCode property.
-     *
-     * @privileged
+     * @returns {Function}
+     */
+    get getCurrentKeyCode() {
+        return this._getCurrentKeyCode;
+    }
+
+    /**
      * @param {Function} clearCurrentKeyCode
-     * @returns {this}
      */
-    setClearCurrentKeyCode(clearCurrentKeyCode) {
-        this.clearCurrentKeyCode = clearCurrentKeyCode;
-        return this;
+    set clearCurrentKeyCode(clearCurrentKeyCode) {
+        this._clearCurrentKeyCode = clearCurrentKeyCode;
     }
 
     /**
-     * Sets the meSpeak property.
-     *
-     * @privileged
-     * @param meSpeak - an object with a speak method that takes a string
-     * @returns {this}
+     * @returns {Function}
      */
-    setMeSpeak(meSpeak) {
-        this.meSpeak = meSpeak;
-        return this;
+    get clearCurrentKeyCode() {
+        return this._clearCurrentKeyCode;
     }
 
     /**
-     * Sets the saveLocally property.
-     *
-     * @privileged
-     * @param {Function} saveLocally
-     * @returns {this}
+     * @param {Object} meSpeak - an object with a speak method that takes a string
      */
-    setSaveLocally(saveLocally) {
-        this.saveLocally = saveLocally;
-        return this;
+    set meSpeak(meSpeak) {
+        this._meSpeak = meSpeak;
     }
 
     /**
-     * Sets the pause between each block as the program executes.
-     *
-     * @privileged
-     * @param {number} turtleDelay
-     * @returns {void}
+     * @returns {Object} an object with a speak method that takes a string
      */
-    setTurtleDelay(turtleDelay) {
-        this.turtleDelay = turtleDelay;
-        this.noteDelay = 0;
+    get meSpeak() {
+        return this._meSpeak;
     }
 
     /**
-     * Sets the pause between each note as the program executes.
-     *
-     * @privileged
-     * @param {number} noteDelay
-     * @returns {void}
+     * @param {Function} saveLocally - function used for local caching
      */
-    setNoteDelay(noteDelay) {
-        this.noteDelay = noteDelay;
-        this.turtleDelay = 0;
+    set saveLocally(saveLocally) {
+        this._saveLocally = saveLocally;
     }
+
+    /**
+     * @returns {Function} function used for local caching
+     */
+    get saveLocally() {
+        return this._saveLocally;
+    }
+
+    /**
+     * @param {Number} turtleDelay - pause between each block as the program executes
+     */
+    set turtleDelay(turtleDelay) {
+        this._turtleDelay = turtleDelay;
+        this._noteDelay = 0;
+    }
+
+    /**
+     * @returns {Number} pause between each block as the program executes
+     */
+    get turtleDelay() {
+        return this._turtleDelay;
+    }
+
+    /**
+     * @param {number} noteDelay - pause between each note as the program executes
+     */
+    set noteDelay(noteDelay) {
+        this._noteDelay = noteDelay;
+        this._turtleDelay = 0;
+    }
+
+    /**
+     * @returns {Number} pause between each note as the program executes
+     */
+    get noteDelay() {
+        return this._noteDelay;
+    }
+
+    /**
+     * @returns {Object} object of Notation
+     */
+    get notation() {
+        return this._notation;
+    }
+
+    /*
+    =======================================================
+     Logo utility
+    =======================================================
+     */
 
     /**
      * Takes one step for each turtle in excuting Logo commands.
      *
-     * @privileged
      * @returns {void}
      */
     step() {
@@ -684,153 +689,14 @@ class Logo {
     }
 
     /**
-     * Steps through one note for each turtle in excuting Logo commands,
-     * but runs through other blocks at full speed.
-     *
-     * @privileged
-     * @returns {void}
-     */
-    stepNote() {
-        let tempStepQueue = {};
-        let notesFinish = {};
-        let thisNote = {};
-
-        let __stepNote = () => {
-            for (let turtle in this.stepQueue) {
-                // Have we already played a note for this turtle?
-                if (turtle in this.playedNote && this.playedNote[turtle]) {
-                    continue;
-                }
-
-                if (this.stepQueue[turtle].length > 0) {
-                    if (
-                        turtle in this.unhighlightStepQueue &&
-                        this.unhighlightStepQueue[turtle] != null
-                    ) {
-                        if (this.blocks.visible) {
-                            this.blocks.unhighlight(
-                                this.unhighlightStepQueue[turtle]
-                            );
-                        }
-                        this.unhighlightStepQueue[turtle] = null;
-                    }
-
-                    let blk = this.stepQueue[turtle].pop();
-                    if (blk != null && blk !== notesFinish[turtle]) {
-                        let block = this.blocks.blockList[blk];
-                        if (block.name === "newnote") {
-                            tempStepQueue[turtle] = blk;
-                            notesFinish[turtle] = last(block.connections);
-                            if (notesFinish[turtle] == null) {
-                                // end of flow
-                                notesFinish[turtle] =
-                                    last(
-                                        this.turtles.turtleList[turtle].queue
-                                    ) &&
-                                    last(this.turtles.turtleList[turtle].queue)
-                                        .blk;
-                                // catch case of null - end of project
-                            }
-
-                            // this.playedNote[turtle] = true;
-                            this.playedNoteTimes[turtle] =
-                                this.playedNoteTimes[turtle] || 0;
-                            thisNote[turtle] = Math.pow(
-                                this.parseArg(
-                                    this,
-                                    turtle,
-                                    block.connections[1],
-                                    blk,
-                                    this.receivedArg
-                                ),
-                                -1
-                            );
-
-                            // Keep track of how long the note played for,
-                            // so we can go back and play it again if needed
-                            this.playedNoteTimes[turtle] += thisNote[turtle];
-                        }
-
-                        this._runFromBlockNow(this, turtle, blk, 0, null);
-                    } else {
-                        this.playedNote[turtle] = true;
-                    }
-                }
-            }
-
-            // At this point, some turtles have played notes and others
-            // have not. We need to keep stepping until they all have.
-            let keepGoing = false;
-            for (let turtle in this.stepQueue) {
-                if (
-                    this.stepQueue[turtle].length > 0 &&
-                    !this.playedNote[turtle]
-                ) {
-                    keepGoing = true;
-                    break;
-                }
-            }
-
-            if (keepGoing) {
-                __stepNote();
-                // this.step();
-            } else {
-                let notesArray = [];
-                for (let turtle in this.playedNote) {
-                    this.playedNote[turtle] = false;
-                    notesArray.push(this.playedNoteTimes[turtle]);
-                }
-
-                // If some notes are supposed to play for longer, add
-                // them back to the queue
-                let shortestNote = Math.min.apply(null, notesArray);
-                let continueFrom;
-                for (let turtle in this.playedNoteTimes) {
-                    if (this.playedNoteTimes[turtle] > shortestNote) {
-                        continueFrom = tempStepQueue[turtle];
-                        // Subtract the time, as if we haven't played it yet
-                        this.playedNoteTimes[turtle] -= thisNote[turtle];
-                    } else {
-                        continueFrom = notesFinish[turtle];
-                    }
-                    this._runFromBlock(this, turtle, continueFrom, 0, null);
-                }
-
-                if (shortestNote === Math.max.apply(null, notesArray)) {
-                    this.playedNoteTimes = {};
-                }
-            }
-        };
-
-        __stepNote();
-    }
-
-    /**
-     * Returns whether to record.
-     *
-     * @privileged
-     * @returns {boolean}
-     */
-    recordingStatus() {
-        return (
-            this.recording ||
-            this.runningLilypond ||
-            this.runningAbc ||
-            this.runningMxml
-        );
-    }
-
-    /**
      * The stop button was pressed.
      * Stops the turtle and cleans up a few odds and ends.
      *
-     * @privileged
      * @returns {void}
      */
     doStopTurtle() {
         this.stopTurtle = true;
         this.turtles.markAsStopped();
-        this.playbackTime = 0;
 
         for (let sound in this.sounds) {
             this.sounds[sound].stop();
@@ -867,7 +733,7 @@ class Logo {
         document.body.style.cursor = "default";
         if (this.showBlocksAfterRun) {
             console.debug("SHOW BLOCKS");
-            this.showBlocks();
+            this.blocks.showBlocks();
             document.getElementById("stop").style.color = "white";
         }
 
@@ -877,7 +743,6 @@ class Logo {
     /**
      * Restores any broken connections made in duplicate notes clamps.
      *
-     * @privileged
      * @returns {void}
      */
     _restoreConnections() {
@@ -896,80 +761,8 @@ class Logo {
     }
 
     /**
-     * Clears all the blocks, updates the cache and refreshes the canvas.
-     *
-     * @privileged
-     * @returns {void}
-     */
-    _clearParameterBlocks() {
-        for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
-            if (
-                this.blocks.blockList[blk].protoblock.parameter &&
-                this.blocks.blockList[blk].text !== null
-            ) {
-                this.blocks.blockList[blk].text.text = "";
-                this.blocks.blockList[blk].container.updateCache();
-            }
-        }
-        this.refreshCanvas();
-    }
-
-    /**
-     * Updates the label on parameter blocks.
-     *
-     * @privileged
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @returns {void}
-     */
-    _updateParameterBlock(logo, turtle, blk) {
-        let name = this.blocks.blockList[blk].name;
-
-        if (
-            this.blocks.blockList[blk].protoblock.parameter &&
-            this.blocks.blockList[blk].text !== null
-        ) {
-            let value = 0;
-
-            if (
-                typeof logo.blocks.blockList[blk].protoblock.updateParameter ===
-                "function"
-            ) {
-                value = logo.blocks.blockList[blk].protoblock.updateParameter(
-                    logo,
-                    turtle,
-                    blk
-                );
-            } else {
-                if (name in this.evalParameterDict) {
-                    eval(this.evalParameterDict[name]);
-                } else {
-                    return;
-                }
-            }
-
-            if (typeof value === "string") {
-                if (value.length > 6) {
-                    value = value.substr(0, 5) + "...";
-                }
-
-                this.blocks.blockList[blk].text.text = value;
-            } else if (name === "divide") {
-                this.blocks.blockList[blk].text.text = mixedNumber(value);
-            } else {
-                this.blocks.blockList[blk].text.text = value.toString();
-            }
-
-            this.blocks.blockList[blk].container.updateCache();
-            this.refreshCanvas();
-        }
-    }
-
-    /**
      * Initialises the microphone.
      *
-     * @privileged
      * @returns {void}
      */
     initMediaDevices() {
@@ -1004,7 +797,6 @@ class Logo {
     /**
      * Initialises a turtle.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -1068,7 +860,6 @@ class Logo {
         };
         this.intervals[turtle] = [];
         this.semitoneIntervals[turtle] = [];
-        this.markup[turtle] = [];
         this.staccato[turtle] = [];
         this.glide[turtle] = [];
         this.glideOverride[turtle] = 0;
@@ -1114,10 +905,10 @@ class Logo {
         this.currentMeasure[turtle] = 0;
         this.justCounting[turtle] = [];
         this.justMeasuring[turtle] = [];
-        this.notationStaging[turtle] = [];
-        this.notationDrumStaging[turtle] = [];
-        this.pickupPoint[turtle] = null;
-        this.pickupPOW2[turtle] = false;
+        this.notation.notationStaging[turtle] = [];
+        this.notation.notationDrumStaging[turtle] = [];
+        this.notation.pickupPoint[turtle] = null;
+        this.notation.pickupPOW2[turtle] = false;
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
         this.pitchNumberOffset[turtle] = 39;    // C4
@@ -1134,15 +925,6 @@ class Logo {
         this.partials[turtle] = [];
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.playbackQueue[turtle] = [];
-        } else {
-            // Don't empty playback queue of precompiled content
-            if (!turtle in this.playbackQueue) {
-                this.playbackQueue[turtle] = [];
-            }
-        }
 
         if (this.compiling) {
             this._saveX[turtle] = this.turtles.turtleList[turtle].x;
@@ -1166,7 +948,6 @@ class Logo {
     /**
      * Runs Logo commands.
      *
-     * @privileged
      * @param startHere - index of a block to start from
      * @param env
      * @returns {void}
@@ -1188,7 +969,7 @@ class Logo {
 
         this._restoreConnections();         // restore any broken connections
 
-        this.saveLocally();                 // save the state before running
+        this._saveLocally();                // save the state before running
 
         for (let arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);
@@ -1199,7 +980,7 @@ class Logo {
         this.blocks.unhighlightAll();
         this.blocks.bringToTop();           // draw under blocks
 
-        this.hideMsgs();
+        this._hideMsgs();
 
         // Run the Logo commands here
         this.time = new Date().getTime();
@@ -1225,8 +1006,8 @@ class Logo {
             this._prepSynths();
         }
 
-        this.notationStaging = {};
-        this.notationDrumStaging = {};
+        this.notation.notationStaging = {};
+        this.notation.notationDrumStaging = {};
 
         // Each turtle needs to keep its own wait time and music states
         for (
@@ -1367,7 +1148,7 @@ class Logo {
 
         if (this.turtleDelay === 0) {
             // Don't update parameters when running full speed
-            this._clearParameterBlocks();
+            this.blocks.clearParameterBlocks();
         }
 
         this.onRunTurtle();
@@ -1513,7 +1294,6 @@ class Logo {
     /**
      * Runs from a single block.
      *
-     * @privileged
      * @param {this} logo
      * @param turtle
      * @param blk
@@ -1554,67 +1334,28 @@ class Logo {
     }
 
     /**
-     * We may need to clear the timeout, e.g., after a successful input.
+     * Clears the delay timeout after a successfull input, and runs from next block.
      *
-     * @param turtle
+     * @param {Object} turtle
      * @returns {void}
      */
-    clearRunBlock(turtle) {
+    clearTurtleRun(turtle) {
         if (this.delayTimeout[turtle] !== null) {
             clearTimeout(this.delayTimeout[turtle]);
             this.delayTimeout[turtle] = null;
-            this.requeueRunBlock(turtle);
-        }
-    }
-
-    /**
-     * If we clear the delay timeout, we need to requeue the runBlock.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    requeueRunBlock(turtle) {
-        this._runFromBlockNow(
-            this,
-            turtle,
-            this.delayParameters[turtle]['blk'],
-            this.delayParameters[turtle]['flow'],
-            this.delayParameters[turtle]['arg']
-        );
-    }
-
-    /**
-     * Changes a property according to a block name and a value.
-     *
-     * @privileged
-     * @param blk
-     * @param value
-     * @param turtle
-     * @returns {void}
-     */
-    _blockSetter(blk, value, turtle) {
-        if (
-            typeof this.blocks.blockList[blk].protoblock.setter === "function"
-        ) {
-            this.blocks.blockList[blk].protoblock.setter(
+            this._runFromBlockNow(
                 this,
-                value,
                 turtle,
-                blk
+                this.delayParameters[turtle]['blk'],
+                this.delayParameters[turtle]['flow'],
+                this.delayParameters[turtle]['arg']
             );
-        } else {
-            if (this.blocks.blockList[blk].name in this.evalSetterDict) {
-                eval(this.evalSetterDict[this.blocks.blockList[blk].name]);
-            } else {
-                this.errorMsg(_("Block does not support incrementing."), blk);
-            }
         }
     }
 
     /**
      * Runs a stack of blocks, beginning with blk.
      *
-     * @privileged
      * @param {this} logo
      * @param turtle
      * @param blk
@@ -2084,7 +1825,7 @@ class Logo {
             // We don't update parameter blocks when running full speed
             if (logo.turtleDelay !== 0) {
                 for (let pblk in logo.parameterQueue[turtle]) {
-                    logo._updateParameterBlock(
+                    logo.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         logo.parameterQueue[turtle][pblk]
@@ -2167,7 +1908,6 @@ class Logo {
                             logo.errorMsg(_("Playback is ready."));
                         }
 
-                        logo.setPlaybackStatus();
                         logo.compiling = false;
                         for (t in logo.turtles.turtleList) {
                             logo.turtles.turtleList[t].doPenUp();
@@ -2207,9 +1947,6 @@ class Logo {
                             logo.suppressOutput[turtle] = false;
                             logo.checkingCompletionState = false;
                             logo.saveLocally();
-                            console.debug("PLAYBACK FOR RECORD");
-                            logo.playback(-1, true);
-                            // logo.recording = false;
                         } else {
                             logo.suppressOutput[turtle] = false;
                             logo.checkingCompletionState = false;
@@ -2277,7 +2014,6 @@ class Logo {
             }
 
             if (!logo.turtles.running() && queueStart === 0) {
-                /** @todo Enable playback button here */
                 if (logo.showBlocksAfterRun) {
                     // If this is a status stack, not run showBlocks
                     if (
@@ -2289,7 +2025,7 @@ class Logo {
                     ) {
                         console.debug("running status block");
                     } else {
-                        logo.showBlocks();
+                        logo.blocks.showBlocks();
                         logo.showBlocksAfterRun = false;
                     }
                 }
@@ -2301,24 +2037,15 @@ class Logo {
     /**
      * Sets the master volume to a value of at least 0 and at most 100.
      *
-     * @privileged
-     * @param {number} volume
+     * @param {Number} volume
      * @returns {void}
      */
-    _setMasterVolume(volume) {
-        if (volume > 100) {
-            volume = 100;
-        } else if (volume < 0) {
-            volume = 0;
-        }
+    setMasterVolume(volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.setMasterVolume(volume);
-            for (
-                let turtle = 0;
-                turtle < this.turtles.turtleList.length;
-                turtle++
-            ) {
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (let synth in this.synthVolume[turtle]) {
                     this.synthVolume[turtle][synth].push(volume);
                 }
@@ -2327,21 +2054,15 @@ class Logo {
     }
 
     /**
-     * Sets the synth volume to a value of at least 0 and,
-     * unless the synth is noise3, at most 100.
+     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
      *
-     * @privileged
      * @param turtle
      * @param synth
-     * @param {number} volume
+     * @param {Number} volume
      * @returns {void}
      */
     setSynthVolume(turtle, synth, volume) {
-        if (volume > 100) {
-            volume = 100;
-        } else if (volume < 0) {
-            volume = 0;
-        }
+        volume = Math.min(Math.max(volume, 0), 100);
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             switch (synth) {
@@ -2353,446 +2074,13 @@ class Logo {
                     break;
                 default:
                     this.synth.setVolume(turtle, synth, volume);
-                    break;
             }
-        }
-    }
-
-    /**
-     * Pushes obj to playback queue, if possible.
-     *
-     * @privileged
-     * @param turtle
-     * @param obj
-     * @returns {void}
-     */
-    _playbackPush(turtle, obj) {
-        // We only push for saveWAV, etc.
-        if (!this.recordingStatus()) return;
-
-        // Don't record in optimize mode or Turtle Blocks
-        if (_THIS_IS_MUSIC_BLOCKS_ && !this.optimize) {
-            this.playbackQueue[turtle].push(obj);
-        }
-    }
-
-    /**
-     * Plays back some amount of activity.
-     *
-     * @privileged
-     * @param {number} whichMouse
-     * @param {boolean} [recording]
-     * @returns {void}
-     */
-    playback(whichMouse, recording) {
-        if (this.restartPlayback) {
-            this.progressBarWidth = 0;
-        }
-
-        if (recording === undefined)    recording = false;
-
-        this.recording = recording;
-
-        if (recording) {
-            this.playbackTime = 0;
-        }
-
-        let inFillClamp = false;
-        let inHollowLineClamp = false;
-
-        if (this.turtles.running()) {
-            console.debug(this.turtles.running() + " PUNTING");
-            if (this.playbackTime !== 0) {
-                this.stopTurtle = true;
-            }
-
-            return;
-        } else if (this.playbackTime === 0) {
-            this.hideBlocks();
-            this.showBlocksAfterRun = true;
-        }
-
-        // We need to sort the playback queue by time (as graphics
-        // embedded in embedded notes can be out of order)
-        if (this.turtles.turtleList.length > 0) {
-            for (t in this.turtles.turtleList) {
-                if (t in this.playbackQueue) {
-                    let playbackList = [];
-                    for (let i = 0; i < this.playbackQueue[t].length; i++) {
-                        playbackList.push([i, this.playbackQueue[t][i]]);
-                    }
-
-                    let sortedList = playbackList.sort((a, b) => {
-                        if (a[1][0] === b[1][0]) {
-                            // Preserve original order if the events
-                            // have the same time stamp.
-                            return a[0] - b[0];
-                        } else {
-                            return a[1][0] - b[1][0];
-                        }
-                    });
-                }
-            }
-        }
-
-        console.debug(playbackList.length);
-
-        this.firstNoteTime = new Date().getTime() - 1000 * this.playbackTime;
-
-        if (this.progressBarWidth >= 100) {
-            this.progressBarWidth = 0;
-        }
-
-        let l = 0;
-        for (let turtle in this.playbackQueue) {
-            // For multiple voices
-            l += this.playbackQueue[turtle].length;
-        }
-
-        this.progressBarDivision =
-            t in this.playbackQueue && l > 0 ?
-                100 / this.playbackQueue[t].length :
-                100;
-
-        let turtleCount = 0;
-        let inLoop = 0;
-
-        let __playbackLoop = (turtle, idx) => {
-            inLoop++;
-            this.playbackTime = this.playbackQueue[turtle][idx][0];
-
-            if (turtleCount === 0) {
-                // Not sure if it happens, but just in case
-                turtleCount = 1;
-            }
-
-            this.progressBarWidth += this.progressBarDivision / turtleCount;
-
-            if (inLoop === l || this.progressBarWidth > 100) {
-                this.progressBarWidth = 100;
-            }
-
-            if (this.progressBarWidth === NaN) {
-                // Not sure if it happens, but just in case
-                this.progressBar.style.visibility = "hidden";
-            }
-
-            this.progressBar.style.width = this.progressBarWidth + "%";
-            this.progressBar.innerHTML =
-                parseInt(this.progressBarWidth * 1) + "%";
-
-            if (!this.stopTurtle) {
-                switch (this.playbackQueue[turtle][idx][1]) {
-                    case "fill":
-                        if (inFillClamp) {
-                            this.turtles.turtleList[turtle].doEndFill();
-                            inFillClamp = false;
-                        } else {
-                            this.turtles.turtleList[turtle].doStartFill();
-                            inFillClamp = true;
-                        }
-                        break;
-
-                    case "hollowline":
-                        if (inHollowLineClamp) {
-                            this.turtles.turtleList[turtle].doEndHollowLine();
-                            inHollowLineClamp = false;
-                        } else {
-                            this.turtles.turtleList[turtle].doStartHollowLine();
-                            inHollowLineClamp = true;
-                        }
-                        break;
-
-                    case "notes":
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            if (this.blinkState) {
-                                this.turtles.turtleList[turtle].blink(
-                                    this.playbackQueue[turtle][idx][3],
-                                    50
-                                );
-                            }
-
-                            this.lastNote[turtle] =
-                                this.playbackQueue[turtle][idx][3];
-
-                            this.synth.trigger(
-                                turtle,
-                                this.playbackQueue[turtle][idx][2],
-                                this.playbackQueue[turtle][idx][3],
-                                this.playbackQueue[turtle][idx][4],
-                                this.playbackQueue[turtle][idx][5],
-                                this.playbackQueue[turtle][idx][6]
-                            );
-                        }
-                        break;
-
-                    case "controlpoint1":
-                        this.cp1x[turtle] = this.playbackQueue[turtle][idx][2];
-                        this.cp1y[turtle] = this.playbackQueue[turtle][idx][3];
-                        break;
-
-                    case "controlpoint2":
-                        this.cp2x[turtle] = this.playbackQueue[turtle][idx][2];
-                        this.cp2y[turtle] = this.playbackQueue[turtle][idx][3];
-                        break;
-
-                    case "bezier":
-                        this.turtles.turtleList[turtle].doBezier(
-                            this.cp1x[turtle],
-                            this.cp1y[turtle],
-                            this.cp2x[turtle],
-                            this.cp2y[turtle],
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "show":
-                        this._processShow(
-                            turtle,
-                            null,
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "speak":
-                        this._processSpeak(this.playbackQueue[turtle][idx][2]);
-                        break;
-
-                    case "print":
-                        this.textMsg(
-                            this.playbackQueue[turtle][idx][2].toString()
-                        );
-                        break;
-
-                    case "setvolume":
-                        this._setMasterVolume(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "setsynthvolume":
-                        this.setSynthVolume(
-                            turtle,
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "arc":
-                        this.turtles.turtleList[turtle].doArc(
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "setxy":
-                        this.turtles.turtleList[turtle].doSetXY(
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "scrollxy":
-                        this.turtles.turtleList[turtle].doSetXY(
-                            this.playbackQueue[turtle][idx][2],
-                            this.playbackQueue[turtle][idx][3]
-                        );
-                        break;
-
-                    case "forward":
-                        this.turtles.turtleList[turtle].doForward(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "right":
-                        this.turtles.turtleList[turtle].doRight(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "setheading":
-                        this.turtles.turtleList[turtle].doSetHeading(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "clear":
-                        this.svgBackground = true;
-                        this.turtles.turtleList[turtle].penState = false;
-                        this.turtles.turtleList[turtle].doSetHeading(0);
-                        this.turtles.turtleList[turtle].doSetXY(0, 0);
-                        this.turtles.turtleList[turtle].penState = true;
-                        // this.turtles.turtleList[turtle].doClear(true, true, true);
-                        break;
-
-                    case "setcolor":
-                        this.turtles.turtleList[turtle].doSetColor(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "sethue":
-                        this.turtles.turtleList[turtle].doSetHue(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "setshade":
-                        this.turtles.turtleList[turtle].doSetValue(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "settranslucency":
-                        this.turtles.turtleList[turtle].doSetPenAlpha(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "setgrey":
-                        this.turtles.turtleList[turtle].doSetChroma(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "setpensize":
-                        this.turtles.turtleList[turtle].doSetPensize(
-                            this.playbackQueue[turtle][idx][2]
-                        );
-                        break;
-
-                    case "penup":
-                        this.turtles.turtleList[turtle].doPenUp();
-                        break;
-
-                    case "pendown":
-                        this.turtles.turtleList[turtle].doPenDown();
-                        break;
-
-                    default:
-                        console.debug(this.playbackQueue[turtle][idx][1]);
-                        break;
-                }
-
-                ++idx;
-                let elapsedTime = new Date().getTime() - this.firstNoteTime;
-                if (this.playbackQueue[turtle].length > idx) {
-                    let timeout =
-                        this.playbackQueue[turtle][idx][0] * 1000 - elapsedTime;
-                    if (timeout < 0) {
-                        timeout = 0;
-                    }
-
-                    setTimeout(() => __playbackLoop(turtle, idx), timeout);
-                } else {
-                    if (turtle < this.turtles.turtleList.length) {
-                        this.turtles.turtleList[turtle].running = false;
-                    }
-
-                    if (!this.turtles.running()) {
-                        this.onStopTurtle();
-                        this.playbackTime = 0;
-                        if (recording) {
-                            let lastNote = 0;
-                            for (let turtle in this.playbackQueue) {
-                                if (this.lastNote[turtle] > lastNote) {
-                                    lastNote = this.lastNote[turtle];
-                                }
-                            }
-
-                            setTimeout(() => {
-                                console.debug("FINISHING RECORDING");
-                                this.synth.recorder.stop();
-                                this.synth.recorder.exportWAV(
-                                    save.afterSaveWAV.bind(save)
-                                );
-                                this.recording = false;
-                            }, Math.max(2000, lastNote * 1000));
-                        }
-                    }
-
-                    this.showBlocks();
-                    this.showBlocksAfterRun = false;
-                }
-            } else {
-                this.turtles.turtleList[turtle].running = false;
-                this.showBlocks();
-                this.showBlocksAfterRun = false;
-            }
-        };
-
-        let __playback = turtle => {
-            turtleCount++;
-            setTimeout(
-                () => __playbackLoop(turtle, 0),
-                this.playbackQueue[turtle][0][0] * 1000
-            );
-        };
-
-        let __resumePlayback = turtle => {
-            turtleCount++;
-            let idx = 0;
-            for (; idx < this.playbackQueue[turtle].length; idx++) {
-                if (this.playbackQueue[turtle][idx][0] >= this.playbackTime) {
-                    break;
-                }
-            }
-
-            console.debug("resume index: " + idx);
-
-            if (idx < this.playbackQueue[turtle].length) {
-                __playbackLoop(turtle, idx);
-            }
-        };
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this._prepSynths();
-        }
-
-        this.onRunTurtle();
-        this.stopTurtle = false;
-
-        if (recording) {
-            console.debug("RECORDING");
-            this.synth.recorder.clear();
-            this.synth.recorder.record();
-        }
-
-        console.debug(this.playbackQueue);
-
-        if (whichMouse < 0) {
-            for (let turtle in this.playbackQueue) {
-                this.lastNote[turtle] = 0;
-                if (this.playbackQueue[turtle].length > 0) {
-                    if (turtle < this.turtles.turtleList.length) {
-                        this.turtles.turtleList[turtle].running = true;
-                    }
-
-                    if (recording) {
-                        console.debug("recording");
-                        __playback(turtle);
-                    } else if (this.playbackTime > 0) {
-                        console.debug("resuming play at " + this.playbackTime);
-                        __resumePlayback(turtle);
-                    } else {
-                        console.debug("play");
-                        __playback(turtle);
-                    }
-                }
-            }
-        } else if (whichMouse < this.turtles.turtleList.length) {
-            this.turtles.turtleList[whichMouse].running = true;
-            __playback(whichMouse);
         }
     }
 
     /**
      * Dispatches turtle signals to update turtle graphics.
      *
-     * @privileged
      * @async
      * @param turtle
      * @param {number} beatValue
@@ -2800,7 +2088,7 @@ class Logo {
      * @param {number} delay
      * @returns {void}
      */
-    async _dispatchTurtleSignals(
+    async dispatchTurtleSignals(
         turtle,
         beatValue,
         blk,
@@ -2954,7 +2242,7 @@ class Logo {
             if (suppressOutput) return;
 
             setTimeout(
-                () => this._processShow(turtle, null, arg1, arg2),
+                () => this.processShow(turtle, null, arg1, arg2),
                 timeout
             );
         }
@@ -2962,7 +2250,7 @@ class Logo {
         let __speak = (turtle, arg, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(() => this._processSpeak(arg), timeout);
+            setTimeout(() => this.processSpeak(arg), timeout);
         }
 
         let __print = (arg, timeout) => {
@@ -3152,13 +2440,6 @@ class Logo {
                         this.receivedArg
                     );
                     __pen(turtle, name, arg, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        name,
-                        arg
-                    ]);
-
                     break;
 
                 case "penup":
@@ -3166,36 +2447,18 @@ class Logo {
                     if (!suppressOutput) {
                         __pen(turtle, name, null, waitTime);
                     }
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        name
-                    ]);
-
                     break;
 
                 case "clear":
                     __clear(turtle, waitTime);
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "clear"
-                    ]);
                     break;
 
                 case "fill":
                     __fill(turtle, waitTime);
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "fill"
-                    ]);
                     break;
 
                 case "hollowline":
                     __hollowline(turtle, waitTime);
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "hollowline"
-                    ]);
                     break;
 
                 case "controlpoint1":
@@ -3214,14 +2477,6 @@ class Logo {
                         this.receivedArg
                     );
                     __cp1(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "controlpoint1",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "controlpoint2":
@@ -3240,14 +2495,6 @@ class Logo {
                         this.receivedArg
                     );
                     __cp2(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "controlpoint2",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "bezier":
@@ -3270,14 +2517,6 @@ class Logo {
                         this.receivedArg
                     );
                     __bezier(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "bezier",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "setheading":
@@ -3289,13 +2528,6 @@ class Logo {
                         this.receivedArg
                     );
                     __setheading(turtle, arg, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "setheading",
-                        arg
-                    ]);
-
                     break;
 
                 case "right":
@@ -3318,12 +2550,6 @@ class Logo {
                         let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, deltaArg, deltaTime);
-
-                        this.playbackQueue[turtle].push([
-                            this.previousTurtleTime[turtle] + deltaTime / 1000,
-                            "right",
-                            deltaArg
-                        ]);
                     }
 
                     waitTime += NOTEDIV * stepTime;
@@ -3349,12 +2575,6 @@ class Logo {
                         let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __right(turtle, -deltaArg, deltaTime);
-
-                        this.playbackQueue[turtle].push([
-                            this.previousTurtleTime[turtle] + deltaTime / 1000,
-                            "right",
-                            -deltaArg
-                        ]);
                     }
 
                     waitTime += NOTEDIV * stepTime;
@@ -3380,12 +2600,6 @@ class Logo {
                         let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, deltaArg, deltaTime);
-
-                        this.playbackQueue[turtle].push([
-                            this.previousTurtleTime[turtle] + deltaTime / 1000,
-                            "forward",
-                            deltaArg
-                        ]);
                     }
 
                     waitTime += NOTEDIV * stepTime;
@@ -3411,12 +2625,6 @@ class Logo {
                         let deltaArg =
                             arg / (NOTEDIV / this.dispatchFactor[turtle]);
                         __forward(turtle, -deltaArg, deltaTime);
-
-                        this.playbackQueue[turtle].push([
-                            this.previousTurtleTime[turtle] + deltaTime / 1000,
-                            "forward",
-                            -deltaArg
-                        ]);
                     }
 
                     waitTime += NOTEDIV * stepTime;
@@ -3438,14 +2646,6 @@ class Logo {
                         this.receivedArg
                     );
                     __setxy(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "setxy",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "scrollxy":
@@ -3464,14 +2664,6 @@ class Logo {
                         this.receivedArg
                     );
                     __scrollxy(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "scrollxy",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "show":
@@ -3490,14 +2682,6 @@ class Logo {
                         this.receivedArg
                     );
                     __show(turtle, arg1, arg2, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "show",
-                        arg1,
-                        arg2
-                    ]);
-
                     break;
 
                 case "speak":
@@ -3509,13 +2693,6 @@ class Logo {
                         this.receivedArg
                     );
                     __speak(turtle, arg, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "speak",
-                        arg
-                    ]);
-
                     break;
 
                 case "print":
@@ -3527,13 +2704,6 @@ class Logo {
                         this.receivedArg
                     );
                     __print(arg, waitTime);
-
-                    this.playbackQueue[turtle].push([
-                        this.previousTurtleTime[turtle] + waitTime / 1000,
-                        "print",
-                        arg
-                    ]);
-
                     break;
 
                 case "arc":
@@ -3563,13 +2733,6 @@ class Logo {
                         let deltaArg =
                             arg1 / (NOTEDIV / this.dispatchFactor[turtle]);
                         __arc(turtle, deltaArg, arg2, deltaTime);
-
-                        this.playbackQueue[turtle].push([
-                            this.previousTurtleTime[turtle] + deltaTime / 1000,
-                            "arc",
-                            deltaArg,
-                            arg2
-                        ]);
                     }
 
                     waitTime += NOTEDIV * stepTime;
@@ -3591,7 +2754,6 @@ class Logo {
     /**
      * Sets a named listener after removing any existing listener in the same place.
      *
-     * @privileged
      * @param turtle
      * @param {string} listenerName
      * @param {Function} listener
@@ -3613,7 +2775,6 @@ class Logo {
     /**
      * Sets a single dispatch block.
      *
-     * @privileged
      * @param blk
      * @param turtle
      * @param {string} listenerName
@@ -3671,7 +2832,6 @@ class Logo {
     /**
      * Initialises and starts a default synth.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -3680,7 +2840,7 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this._setMasterVolume(DEFAULTVOLUME);
+        this.setMasterVolume(DEFAULTVOLUME);
         for (let synth in this.synthVolume[turtle]) {
             this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
         }
@@ -3692,11 +2852,10 @@ class Logo {
      * Speaks all characters in the range of comma,
      * full stop, space, A to Z, a to z in the input text.
      *
-     * @privileged
      * @param {string} text
      * @returns {void}
      */
-    _processSpeak(text) {
+    processSpeak(text) {
         let new_text = "";
         for (let i in text) {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
@@ -3711,14 +2870,13 @@ class Logo {
     /**
      * Shows information: with camera, in image form, at URL, as text.
      *
-     * @privileged
      * @param turtle
      * @param blk
      * @param arg0
      * @param arg1
      * @returns {void}
      */
-    _processShow(turtle, blk, arg0, arg1) {
+    processShow(turtle, blk, arg0, arg1) {
         if (typeof arg1 === "string") {
             let len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
@@ -3772,7 +2930,6 @@ class Logo {
      * If the input name is forever, repeat, while or until,
      * returns true (false otherwise).
      *
-     * @privileged
      * @param {string} name
      * @returns {boolean}
      */
@@ -3783,11 +2940,10 @@ class Logo {
     /**
      * Breaks a loop.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
-    _doBreak(turtle) {
+    doBreak(turtle) {
         // Look for a parent loopBlock in queue and set its count to 1
         let parentLoopBlock = null;
         let loopBlkIdx = -1;
@@ -3850,7 +3006,6 @@ class Logo {
     /**
      * Parses receivedArg.
      *
-     * @privileged
      * @param logo
      * @param turtle
      * @param blk
@@ -3987,12 +3142,11 @@ class Logo {
     /**
      * Counts notes, with saving of the box, heap and turtle states.
      *
-     * @privileged
      * @param turtle
      * @param cblk
      * @returns {number}
      */
-    _noteCounter(turtle, cblk) {
+    noteCounter(turtle, cblk) {
         if (cblk != null) {
             let saveSuppressStatus = this.suppressOutput[turtle];
 
@@ -4091,216 +3245,17 @@ class Logo {
     /**
      * Makes the turtle wait.
      *
-     * @privileged
      * @param turtle
      * @param secs
      * @returns {void}
      */
-    _doWait(turtle, secs) {
+    doWait(turtle, secs) {
         this.waitTimes[turtle] = Number(secs) * 1000;
-    }
-
-    /**
-     * Returns a random integer in a range.
-     *
-     * @privileged
-     * @param a - preferably the minimum
-     * @param b - preferably the maximum
-     * @returns {number}
-     */
-    _doRandom(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        // Check to see if min is > max
-        if (a > b) [a, b] = [b, a];
-
-        return Math.floor(
-            Math.random() * (Number(b) - Number(a) + 1) + Number(a)
-        );
-    }
-
-    /**
-     * Randomly returns either a or b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {*}
-     */
-    _doOneOf(a, b) {
-        return Math.random() < 0.5 ? a : b;
-    }
-
-    /**
-     * Returns a modulo b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number}
-     */
-    _doMod(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        return Number(a) % Number(b);
-    }
-
-    /**
-     * Square-roots a number.
-     *
-     * @privileged
-     * @param a
-     * @returns {number}
-     */
-    _doSqrt(a) {
-        if (typeof a === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        return Math.sqrt(Number(a));
-    }
-
-    /**
-     * Adds a and b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number|string}
-     */
-    _doPlus(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            let aString = typeof a === "string" ? a : a.toString();
-            let bString = typeof b === "string" ? b : b.toString();
-
-            return aString + bString;
-        } else {
-            return Number(a) + Number(b);
-        }
-    }
-
-    /**
-     * Subtracts b from a.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number}
-     */
-    _doMinus(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        return Number(a) - Number(b);
-    }
-
-    /**
-     * Multiplies a by b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number}
-     */
-    _doMultiply(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        return Number(a) * Number(b);
-    }
-
-    /**
-     * Calculates euclidean distance between (cursor x, cursor y)
-     * and (mouse 'x' and mouse 'y').
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @param c
-     * @param d
-     * @returns {number}
-     */
-    _docalculatedistance(x1, y1, x2, y2) {
-        if (
-            typeof x1 === "string" ||
-            typeof y1 === "string" ||
-            typeof x2 === "string" ||
-            typeof y2 === "string"
-        ) {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        if (x1 === x2 && y1 === y2) {
-            return 0;
-        }
-
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    }
-
-    /**
-     * Returns a to the power of b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number}
-     */
-    _doPower(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        return Math.pow(a, b);
-    }
-
-    /**
-     * Divides a by b.
-     *
-     * @privileged
-     * @param a
-     * @param b
-     * @returns {number}
-     */
-    _doDivide(a, b) {
-        if (typeof a === "string" || typeof b === "string") {
-            this.errorMsg(NANERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        }
-
-        if (Number(b) === 0) {
-            this.errorMsg(ZERODIVIDEERRORMSG);
-            this.stopTurtle = true;
-            return 0;
-        } else {
-            return Number(a) / Number(b);
-        }
     }
 
     /**
      * Changes body background in DOM to current colour.
      *
-     * @privileged
      * @param turtle
      * @returns {void}
      */
@@ -4320,7 +3275,6 @@ class Logo {
     /**
      * Sets the cameraID property.
      *
-     * @privileged
      * @param id
      * @returns {void}
      */
@@ -4329,41 +3283,14 @@ class Logo {
     }
 
     /**
-     * Hides all the blocks.
-     *
-     * @privileged
-     * @returns {void}
-     */
-    hideBlocks(show) {
-        this.blocks.palettes.hide();
-        this.blocks.hide();
-        this.refreshCanvas();
-        this.showBlocksAfterRun = show !== undefined && show;
-    }
-
-    /**
-     * Shows all the blocks.
-     *
-     * @privileged
-     * @returns {void}
-     */
-    showBlocks() {
-        this.blocks.palettes.show();
-        this.blocks.show();
-        this.blocks.bringToTop();
-        this.refreshCanvas();
-    }
-
-    /**
      * Calculates the change needed for musical inversion.
      *
-     * @privileged
      * @param turtle
      * @param note
      * @param octave
      * @returns {number}
      */
-    _calculateInvert(turtle, note, octave) {
+    calculateInvert(turtle, note, octave) {
         let delta = 0;
         let len = this.invertList[turtle].length;
         let note1 = getNote(
@@ -4401,8 +3328,8 @@ class Logo {
                 num1 += 2 * delta;
             } else {
                 // We need to calculate the scalar difference
-                let scalarSteps = this._scalarDistance(turtle, num2, num1);
-                let note3 = this._addScalarTransposition(
+                let scalarSteps = this.scalarDistance(turtle, num2, num1);
+                let note3 = this.addScalarTransposition(
                     turtle,
                     note2[0],
                     note2[1],
@@ -4426,14 +3353,13 @@ class Logo {
     /**
      * Shifts pitches by n steps relative to the provided scale.
      *
-     * @privileged
      * @param turtle
      * @param note
      * @param octave
      * @param {number} n
      * @returns {object}
      */
-    _addScalarTransposition(turtle, note, octave, n) {
+    addScalarTransposition(turtle, note, octave, n) {
         let noteObj = null;
 
         if (n > 0) {
@@ -4540,13 +3466,12 @@ class Logo {
     /**
      * Returns a distance for scalar transposition.
      *
-     * @privileged
      * @param turtle
      * @param {number} firstNote
      * @param {number} lastNote
      * @returns {number}
      */
-    _scalarDistance(turtle, firstNote, lastNote) {
+    scalarDistance(turtle, firstNote, lastNote) {
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote pitch
         // to lastNote pitch
@@ -4595,7 +3520,6 @@ class Logo {
     /**
      * Preps synths for each turtle.
      *
-     * @privileged
      * @returns {void}
      */
     _prepSynths() {
@@ -4642,7 +3566,7 @@ class Logo {
         }
 
         if (!this.suppressOutput[turtle]) {
-            this._setMasterVolume(DEFAULTVOLUME);
+            this.setMasterVolume(DEFAULTVOLUME);
             for (
                 let turtle = 0;
                 turtle < this.turtles.turtleList.length;
@@ -4658,7 +3582,6 @@ class Logo {
     /**
      * Clears note params.
      *
-     * @privileged
      * @param turtle
      * @param blk
      * @param drums
@@ -4680,7 +3603,6 @@ class Logo {
     /**
      * Updates the music notation used for Lilypond output.
      *
-     * @privileged
      * @param note
      * @param {number} duration
      * @param turtle
@@ -4697,8 +3619,6 @@ class Logo {
         drum,
         split
     ) {
-        if (this.optimize) return;
-
         // Note: At this point, the note of duration "duration" has
         // already been added to notesPlayed
 
@@ -4708,11 +3628,13 @@ class Logo {
         // Check to see if this note straddles a measure boundary
         let durationTime = 1 / duration;
         let beatsIntoMeasure =
-            ((this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
-                this.pickup[turtle] -
-                durationTime) *
-                this.noteValuePerBeat[turtle]) %
-            this.beatsPerMeasure[turtle];
+            (
+                (
+                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
+                    this.pickup[turtle] -
+                    durationTime
+                ) * this.noteValuePerBeat[turtle]
+            ) % this.beatsPerMeasure[turtle];
         let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
         let timeLeftInMeasure =
             this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
@@ -4721,8 +3643,7 @@ class Logo {
         if (split && durationTime > timeLeftInMeasure) {
             let d = durationTime - timeLeftInMeasure;
             let d2 = timeLeftInMeasure;
-            let b =
-                this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
             console.debug("splitting note across measure boundary.");
             let obj = rationalToFraction(d);
 
@@ -4735,19 +3656,12 @@ class Logo {
                 }
 
                 let obj2 = rationalToFraction(d2);
-                this.updateNotation(
-                    note,
-                    obj2[1] / obj2[0],
-                    turtle,
-                    insideChord,
-                    drum,
-                    false
-                );
+                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 if (i > 0 || obj[0] > 0) {
                     if (note[0] !== "R") {
                         // Don't tie rests
-                        this.notationInsertTie(turtle);
-                        this.notationDrumStaging[turtle].push("tie");
+                        this.notation.notationInsertTie(turtle);
+                        this.notation.notationDrumStaging[turtle].push("tie");
                     }
                     obj2 = rationalToFraction(1 / b);
                 }
@@ -4755,440 +3669,24 @@ class Logo {
                 // Add any measures we straddled
                 while (i > 0) {
                     i -= 1;
-                    this.updateNotation(
-                        note,
-                        obj2[1] / obj2[0],
-                        turtle,
-                        insideChord,
-                        drum,
-                        false
-                    );
+                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                     if (obj[0] > 0) {
                         if (note[0] !== "R") {
                             // Don't tie rests
-                            this.notationInsertTie(turtle);
-                            this.notationDrumStaging[turtle].push("tie");
+                            this.notation.notationInsertTie(turtle);
+                            this.notation.notationDrumStaging[turtle].push("tie");
                         }
                     }
                 }
             }
 
             if (obj[0] > 0) {
-                this.updateNotation(
-                    note,
-                    obj[1] / obj[0],
-                    turtle,
-                    insideChord,
-                    drum,
-                    false
-                );
-            }
-
-            return;
-        }
-
-        // .. otherwise proceed as normal
-        let obj = durationToNoteValue(duration);
-
-        /** @deprecated */
-        if (this.turtles.turtleList[turtle].drum) {
-            note = "c2";
-        }
-
-        this.notationStaging[turtle].push([
-            note,
-            obj[0],
-            obj[1],
-            obj[2],
-            obj[3],
-            insideChord,
-            this.staccato[turtle].length > 0 && last(this.staccato[turtle]) > 0
-        ]);
-
-        // If no drum is specified, add a rest to the drum line.
-        // Otherwise, add the drum.
-        if (drum.length === 0) {
-            this.notationDrumStaging[turtle].push([
-                ["R"],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
-            ]);
-        } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
-            let drumSymbol = getDrumSymbol(drum[0]);
-            this.notationDrumStaging[turtle].push([
-                [drumSymbol],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
-            ]);
-        }
-
-        this.pickupPoint[turtle] = null;
-
-        if (this.markup[turtle].length > 0) {
-            let markup = "";
-            for (let i = 0; i < this.markup[turtle].length; i++) {
-                markup += this.markup[turtle][i];
-                if (i < this.markup[turtle].length - 1) {
-                    markup += " ";
-                }
-            }
-
-            this.notationMarkup(turtle, markup, true);
-            this.markup[turtle] = [];
-        }
-
-        if (typeof note === "object") {
-            // If it is hertz, add a markup
-            let markup = "";
-            try {
-                for (let i = 0; i < note.length; i++) {
-                    if (typeof note[i] === "number") {
-                        if ((markup = "")) {
-                            markup = toFixed2(note[i]);
-                            break;
-                        }
-                    }
-                }
-
-                if (markup.length > 0) {
-                    this.notationMarkup(turtle, markup, false);
-                }
-            } catch (e) {
-                console.debug(e);
-            }
-        }
-    }
-
-    /**
-     * Adds a voice if possible.
-     *
-     * @privileged
-     * @param turtle
-     * @param {number} arg
-     * @returns {void}
-     */
-    notationVoices(turtle, arg) {
-        switch (arg) {
-            case 1:
-                this.notationStaging[turtle].push("voice one");
-                break;
-            case 2:
-                this.notationStaging[turtle].push("voice two");
-                break;
-            case 3:
-                this.notationStaging[turtle].push("voice three");
-                break;
-            case 4:
-                this.notationStaging[turtle].push("voice four");
-                break;
-            default:
-                this.notationStaging[turtle].push("one voice");
-                break;
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the notation markup.
-     *
-     * @privileged
-     * @param turtle
-     * @param markup
-     * @param {boolean} below
-     * @returns {void}
-     */
-    notationMarkup(turtle, markup, below) {
-        if (below) {
-            this.notationStaging[turtle].push("markdown", markup);
-        } else {
-            this.notationStaging[turtle].push("markup", markup);
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the key and mode in the notation.
-     *
-     * @privileged
-     * @param turtle
-     * @param key
-     * @param mode
-     * @returns {void}
-     */
-    notationKey(turtle, key, mode) {
-        this.notationStaging[turtle].push("key", key, mode);
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Sets the meter.
-     *
-     * @privileged
-     * @param turtle
-     * @param count
-     * @param value
-     * @returns {void}
-     */
-    notationMeter(turtle, count, value) {
-        if (this.pickupPoint[turtle] != null) {
-            // Lilypond prefers meter to be before partials.
-            let d =
-                this.notationStaging[turtle].length - this.pickupPoint[turtle];
-            let pickup = [];
-
-            for (let i in d) {
-                pickup.push(this.notationStaging[turtle].pop());
-            }
-
-            this.notationStaging[turtle].push("meter", count, value);
-            for (let i in d) {
-                this.notationStaging[turtle].push(pickup.pop());
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
         } else {
-            this.notationStaging[turtle].push("meter", count, value);
+            // .. otherwise proceed as normal
+            this.notation.doUpdateNotation(... arguments);
         }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds swing.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationSwing(turtle) {
-        this.notationStaging[turtle].push("swing");
-    }
-
-    /**
-     * Sets the tempo.
-     *
-     * @privileged
-     * @param turtle
-     * @param {number} bpm - number of beats per minute
-     * @param beatValue
-     * @returns {void}
-     */
-    notationTempo(turtle, bpm, beatValue) {
-        let beat = convertFactor(beatValue);
-        if (beat !== null) {
-            this.notationStaging[turtle].push("tempo", bpm, beat);
-        } else {
-            let obj = rationalToFraction(beatValue);
-            // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
-        }
-    }
-
-    /**
-     * Adds a pickup.
-     *
-     * @privileged
-     * @param turtle
-     * @param {number} factor
-     * @returns {void}
-     */
-    notationPickup(turtle, factor) {
-        if (factor === 0) {
-            console.debug("ignoring pickup of 0");
-            return;
-        }
-
-        let pickupPoint = this.notationStaging[turtle].length;
-
-        // Lilypond partial must be a combination of powers of two.
-        let partial = 1 / factor;
-        let beat = convertFactor(factor);
-        if (beat !== null) {
-            this.notationStaging[turtle].push("pickup", beat);
-            this.pickupPOW2[turtle] = true;
-        } else {
-            if (this.runningLilypond) {
-                obj = rationalToFraction(factor);
-                this.errorMsg(
-                    _("Lilypond cannot process pickup of ") +
-                    obj[0] +
-                    "/" +
-                    obj[1]
-                );
-            }
-
-            obj = rationalToFraction(1 - factor);
-            for (let i = 0; i < obj[0]; i++) {
-                this.updateNotation(["R"], obj[1], turtle, false, "");
-            }
-        }
-
-        this.pickupPoint[turtle] = pickupPoint;
-    }
-
-    /**
-     * Sets tuning as harmonic.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationHarmonic(turtle) {
-        this.notationStaging.push("harmonic");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds a line break.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationLineBreak(turtle) {
-        // this.notationStaging[turtle].push('break');
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins the articulation of an instrument.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginArticulation(turtle) {
-        this.notationStaging[turtle].push("begin articulation");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends articulation.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndArticulation(turtle) {
-        this.notationStaging[turtle].push("end articulation");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins a crescendo or descrendo.
-     *
-     * @privileged
-     * @param turtle
-     * @param {number} factor - If more than 0, we have a crescendo
-     * (otherwise, a decrescendo)
-     * @returns {void}
-     */
-    notationBeginCrescendo(turtle, factor) {
-        if (factor > 0) {
-            this.notationStaging[turtle].push("begin crescendo");
-        } else {
-            this.notationStaging[turtle].push("begin decrescendo");
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends a crescendo or descrendo.
-     *
-     * @privileged
-     * @param turtle
-     * @param {number} factor - If more than 0, we have a crescendo
-     * (otherwise, a decrescendo)
-     * @returns {void}
-     */
-    notationEndCrescendo(turtle, factor) {
-        if (factor > 0) {
-            this.notationStaging[turtle].push("end crescendo");
-        } else {
-            this.notationStaging[turtle].push("end decrescendo");
-        }
-
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins a slur.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginSlur(turtle) {
-        this.notationStaging[turtle].push("begin slur");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends a slur.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndSlur(turtle) {
-        this.notationStaging[turtle].push("end slur");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Adds a tie.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationInsertTie(turtle) {
-        this.notationStaging[turtle].push("tie");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Removes the last tie.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationRemoveTie(turtle) {
-        this.notationStaging[turtle].pop();
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Begins harmonics.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationBeginHarmonics(turtle) {
-        this.notationStaging[turtle].push("begin harmonics");
-        this.pickupPoint[turtle] = null;
-    }
-
-    /**
-     * Ends harmonics.
-     *
-     * @privileged
-     * @param turtle
-     * @returns {void}
-     */
-    notationEndHarmonics(turtle) {
-        this.notationStaging[turtle].push("end harmonics");
-        this.pickupPoint[turtle] = null;
     }
 }
 

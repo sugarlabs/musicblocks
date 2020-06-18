@@ -25,7 +25,7 @@ function setupSensorsBlocks() {
         flow(args, logo, turtle, blk) {
 
             // Pause the flow while we wait for input.
-            logo._doWait(turtle, 120);
+            logo.doWait(turtle, 120);
 
             // Display the input form.
             docById("labelDiv").innerHTML =
@@ -56,7 +56,7 @@ function setupSensorsBlocks() {
 
                     inputElem.blur();
                     inputElem.style.display = "none";
-                    logo.clearRunBlock(turtle);
+                    logo.clearTurtleRun(turtle);
                     docById("labelDiv").classList.remove("hasKeyboard");
                 }
             };
@@ -217,6 +217,7 @@ function setupSensorsBlocks() {
                 _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
                 "documentation",
                 null,
+                "cursoroverhelp"
             ]);
         }
 
@@ -236,6 +237,7 @@ function setupSensorsBlocks() {
                 _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                 "documentation",
                 null,
+                "cursorouthelp"
             ]);
         }
 
@@ -253,6 +255,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
                 "documentation",
                 null,
+                "cursordownhelp"
             ]);
         }
 
@@ -270,6 +273,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
                 "documentation",
                 null,
+                "cursoruphelp"
             ]);
         }
 

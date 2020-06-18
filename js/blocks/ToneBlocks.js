@@ -394,7 +394,7 @@ function setupToneBlocks() {
             }
 
             logo.partials[turtle][n].push(1);
-            logo.notationBeginHarmonics(turtle);
+            logo.notation.notationBeginHarmonics(turtle);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo._setDispatchBlock(blk, turtle, listenerName);
@@ -402,7 +402,7 @@ function setupToneBlocks() {
             let __listener = function(event) {
                 logo.inHarmonic[turtle].pop();
                 logo.partials[turtle].pop();
-                logo.notationEndHarmonics(turtle);
+                logo.notation.notationEndHarmonics(turtle);
             };
 
             logo._setListener(turtle, listenerName, __listener);

@@ -465,7 +465,7 @@ function setupFlowBlocks() {
         }
 
         flow(_, logo, turtle, blk) {
-            logo._doBreak(turtle);
+            logo.doBreak(turtle);
             // Since we pop the queue, we need to unhighlight our
             // parent.
             let parentBlk = logo.blocks.blockList[blk].connections[0];
@@ -507,7 +507,7 @@ function setupFlowBlocks() {
                 let queueBlock = new Queue(blk, 1, parentBlk);
                 logo.parentFlowQueue[turtle].push(parentBlk);
                 logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                logo._doWait(0.05);
+                logo.doWait(0.05);
             } else {
                 // Since a wait for block was requeued each
                 // time, we need to flush the queue of all but
@@ -835,8 +835,9 @@ function setupFlowBlocks() {
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                if (args[0] < 0)
+                    logo.errorMsg(POSNUMBER, blk);
+                return [null , 0];
             } else {
                 arg = args[0];
             }

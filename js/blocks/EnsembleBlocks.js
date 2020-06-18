@@ -144,8 +144,8 @@ function setupEnsembleBlocks() {
                 logo.unhighlightQueue[targetTurtle] = [];
                 logo.parameterQueue[targetTurtle] = [];
                 console.debug("stopping " + targetTurtle);
-		logo.turtles.turtleList[turtle].running = false;
-                logo._doBreak(targetTurtle);
+                logo.turtles.turtleList[turtle].running = false;
+                logo.doBreak(targetTurtle);
             }
         }
     }

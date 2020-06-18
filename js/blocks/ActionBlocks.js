@@ -221,7 +221,7 @@ function setupActionBlocks() {
 
             if (name in logo.actions) {
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 let childFlow;
@@ -380,7 +380,7 @@ function setupActionBlocks() {
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
                     if (logo.justCounting[turtle].length === 0) {
-                        logo.notationLineBreak(turtle);
+                        logo.notation.notationLineBreak(turtle);
                     }
                     return [logo.actions[args[0]], 1];
                 } else {
@@ -576,7 +576,7 @@ function setupActionBlocks() {
 
             if (args[0] in logo.actions) {
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
@@ -780,7 +780,7 @@ function setupActionBlocks() {
 
             if (args[0] in logo.actions) {
                 if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
@@ -812,7 +812,7 @@ function setupActionBlocks() {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
             }
             if (logo.justCounting[turtle].length === 0) {
-                logo.notationLineBreak(turtle);
+                logo.notation.notationLineBreak(turtle);
             }
 
             let childFlow;

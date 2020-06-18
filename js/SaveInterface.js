@@ -213,8 +213,6 @@ function SaveInterface(PlanetInterface) {
     this.saveWAV = function(filename) {
         document.body.style.cursor = "wait";
         this.filename = filename;
-        this.logo.playbackQueue = {};
-        this.logo.playbackTime = 0;
         this.logo.compiling = true;
         this.logo.recording = true;
         console.debug("DURING SAVE WAV");
@@ -241,8 +239,8 @@ function SaveInterface(PlanetInterface) {
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
+            this.logo.notation.notationStaging[turtle] = [];
+            this.logo.notation.notationDrumStaging[turtle] = [];
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
         this.logo.runLogoCommands();
@@ -389,8 +387,8 @@ function SaveInterface(PlanetInterface) {
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
+            this.logo.notation.notationStaging[turtle] = [];
+            this.logo.notation.notationDrumStaging[turtle] = [];
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
@@ -462,8 +460,8 @@ function SaveInterface(PlanetInterface) {
             turtle < this.turtles.turtleList.length;
             turtle++
         ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
+            this.logo.notation.notationStaging[turtle] = [];
+            this.logo.notation.notationDrumStaging[turtle] = [];
             this.turtles.turtleList[turtle].doClear(true, true, true);
         }
 

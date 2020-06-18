@@ -382,7 +382,7 @@ function setupRhythmBlocks() {
                                 ].length;
                                 i++
                             ) {
-                                logo.notationRemoveTie(turtle);
+                                logo.notation.notationRemoveTie(turtle);
                             }
                         }
                     }
@@ -437,7 +437,7 @@ function setupRhythmBlocks() {
                     }
 
                     // Wait until this note is played before continuing.
-                    logo._doWait(turtle, bpmFactor / noteValue);
+                    logo.doWait(turtle, bpmFactor / noteValue);
 
                     logo.inNoteBlock[turtle].pop();
 
@@ -452,7 +452,7 @@ function setupRhythmBlocks() {
                     delete logo.embeddedGraphics[turtle][saveBlk];
 
                     // Remove duplicate note
-                    logo.notationStaging[turtle].pop();
+                    logo.notation.notationStaging[turtle].pop();
                 }
 
                 logo.tieNotePitches[turtle] = [];

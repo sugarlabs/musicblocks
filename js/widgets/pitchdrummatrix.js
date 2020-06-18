@@ -121,7 +121,7 @@ function PitchDrumMatrix() {
             ICONSIZE,
             _("Play")
         ).onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
             that._playAll();
         };
 

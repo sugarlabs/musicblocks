@@ -16,13 +16,6 @@ function setupGraphicsBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetHeading(value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setheading",
-                    value
-                ]);
-            }
         }
 
         updateParameter(logo, turtle, blk) {
@@ -64,14 +57,6 @@ function setupGraphicsBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetXY(turtleObj.x, value);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setxy",
-                    turtleObj.x,
-                    value
-                ]);
-            }
         }
 
         updateParameter(logo, turtle, blk) {
@@ -115,14 +100,6 @@ function setupGraphicsBlocks() {
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
             turtleObj.doSetXY(value, turtleObj.y);
-            if (logo.justCounting[turtle].length === 0) {
-                logo._playbackPush(turtle, [
-                    logo.previousTurtleTime[turtle],
-                    "setxy",
-                    value,
-                    turtleObj.y
-                ]);
-            }
         }
 
         updateParameter(logo, turtle, blk) {
@@ -204,15 +181,6 @@ function setupGraphicsBlocks() {
                             args[1]
                         );
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "scrollxy",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -244,13 +212,6 @@ function setupGraphicsBlocks() {
                 } else {
                     logo.svgBackground = true;
                     logo.turtles.turtleList[turtle].doClear(true, true, true);
-                }
-
-                if (logo.justCounting[turtle].length === 0) {
-                    logo._playbackPush(turtle, [
-                        logo.previousTurtleTime[turtle],
-                        "clear"
-                    ]);
                 }
             }
         }
@@ -292,14 +253,6 @@ function setupGraphicsBlocks() {
                 } else {
                     logo.cp2x[turtle] = args[0];
                     logo.cp2y[turtle] = args[1];
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "controlpoint2",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -341,14 +294,6 @@ function setupGraphicsBlocks() {
                 } else {
                     logo.cp1x[turtle] = args[0];
                     logo.cp1y[turtle] = args[1];
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "controlpoint1",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -411,15 +356,6 @@ function setupGraphicsBlocks() {
                             args[1]
                         );
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "bezier",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -479,15 +415,6 @@ function setupGraphicsBlocks() {
                     } else {
                         logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "arc",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -529,13 +456,6 @@ function setupGraphicsBlocks() {
                     ].push(blk);
                 } else {
                     logo.turtles.turtleList[turtle].doSetHeading(args[0]);
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "setheading",
-                            args[0]
-                        ]);
-                    }
                 }
             }
         }
@@ -603,15 +523,6 @@ function setupGraphicsBlocks() {
                             args[1]
                         );
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "setxy",
-                            args[0],
-                            args[1]
-                        ]);
-                    }
                 }
             }
         }
@@ -666,14 +577,6 @@ function setupGraphicsBlocks() {
                         ].penState = savedPenState;
                     } else {
                         logo.turtles.turtleList[turtle].doRight(args[0]);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "right",
-                            args[0]
-                        ]);
                     }
                 }
             }
@@ -730,14 +633,6 @@ function setupGraphicsBlocks() {
                     } else {
                         logo.turtles.turtleList[turtle].doRight(-args[0]);
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "right",
-                            -args[0]
-                        ]);
-                    }
                 }
             }
         }
@@ -792,14 +687,6 @@ function setupGraphicsBlocks() {
                     } else {
                         logo.turtles.turtleList[turtle].doForward(-args[0]);
                     }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "forward",
-                            -args[0]
-                        ]);
-                    }
                 }
             }
         }
@@ -853,14 +740,6 @@ function setupGraphicsBlocks() {
                         ].penState = savedPenState;
                     } else {
                         logo.turtles.turtleList[turtle].doForward(args[0]);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "forward",
-                            args[0]
-                        ]);
                     }
                 }
             }

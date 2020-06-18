@@ -44,34 +44,34 @@ function setupBoxesBlocks() {
 
             if (args.length > 0) {
                 let cblk = logo.blocks.blockList[blk].connections[1];
-		// A special case for solfege stored in boxes.
-		if (logo.blocks.blockList[cblk].name === "namedbox") {
-		    let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
-		    if (j !== -1) {
-			j += i;
-			if (j >= SOLFEGENAMES.length) {
-			    j = 0;
-			} else if (j < 0) {
-			    j = SOLFEGENAMES.length - 1;
-			}
 
-			let settingBlk = logo.blocks.blockList[blk].connections[1];
-			logo._blockSetter(settingBlk, SOLFEGENAMES[j], turtle);
-			return;
-		    }
-		} else if (logo.blocks.blockList[cblk].name === "text") {
+                if (logo.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
-                    let name = this.blocks.blockList[cblk].value;
-                    if (name in this.boxes) {
-			console.log(this.boxes[name]);
-                        this.boxes[name] = this.boxes[name] + i;
+                    let name = logo.blocks.blockList[cblk].value;
+                    if (name in logo.boxes) {
+                        console.log(logo.boxes[name]);
+                        logo.boxes[name] = logo.boxes[name] + i;
                         return;
                     }
                 }
 
-                let settingBlk = logo.blocks.blockList[blk].connections[1];
-                logo._blockSetter(settingBlk, args[0] + i, turtle);
+                let value = args[0] + i;
+
+                // A special case for solfege stored in boxes.
+                if (logo.blocks.blockList[cblk].name === "namedbox") {
+                    let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
+                    if (j !== -1) {
+                        j = j >= SOLFEGENAMES.length ? 0 : SOLFEGENAMES.length - 1;
+                        value = SOLFEGENAMES[j] + i;
+                    }
+                }
+
+                try {
+                    logo.blocks.blockSetter(logo, cblk, value, turtle);
+                } catch (e) {
+                    logo.errorMsg(_("Block does not support incrementing."), cblk);
+                }
             }
         }
     }

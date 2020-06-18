@@ -1229,7 +1229,7 @@ function Block(protoblock, blocks, overrideName) {
                 if(attr !== "♮") {
                     label += attr;
                 }
-            } else if (this.name === "drumname") { 
+            } else if (this.name === "drumname") {
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
@@ -5749,7 +5749,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.protoblock.scale) /
             2 +
             "px";
-        console.log(this.label.style.width);
         // Navigate to a the current number value.
         let i = wheelValues.indexOf(selectedValue);
         if (i === -1) {

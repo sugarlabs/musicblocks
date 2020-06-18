@@ -87,7 +87,7 @@ function MeterWidget() {
                         ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     that._playing = true;
-                    that._logo.setTurtleDelay(0);
+                    that._logo.turtleDelay = 0;
                     that._logo.resetSynth(0);
                     that._playBeat();
                 }

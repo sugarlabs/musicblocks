@@ -251,15 +251,7 @@ function setupMediaBlocks() {
                         ].push(blk);
                     } else {
                         if (!logo.suppressOutput[turtle]) {
-                            logo._processSpeak(args[0]);
-                        }
-
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [
-                                logo.previousTurtleTime[turtle],
-                                "speak",
-                                args[0]
-                            ]);
+                            logo.processSpeak(args[0]);
                         }
                     }
                 }
@@ -571,16 +563,7 @@ function setupMediaBlocks() {
                     ].push(blk);
                 } else {
                     if (!logo.suppressOutput[turtle]) {
-                        logo._processShow(turtle, blk, args[0], args[1]);
-                    }
-
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "show",
-                            args[0],
-                            args[1]
-                        ]);
+                        logo.processShow(turtle, blk, args[0], args[1]);
                     }
                 }
             }

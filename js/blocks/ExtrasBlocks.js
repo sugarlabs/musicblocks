@@ -358,7 +358,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            logo.showBlocks(); // Force blocks to be visible.
+            logo.blocks.showBlocks();   // Force blocks to be visible.
             let blockArgs = [null];
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
@@ -388,7 +388,7 @@ function setupExtrasBlocks() {
             );
 
             // We need to wait for the new block to load before continuing.
-            logo._doWait(turtle, 1);
+            logo.doWait(turtle, 1);
 
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
@@ -635,8 +635,8 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo) {
-            logo.showBlocks();
-            logo.setTurtleDelay(DEFAULTDELAY);
+            logo.blocks.showBlocks();
+            logo.turtleDelay = DEFAULTDELAY;
         }
     }
 
@@ -652,8 +652,9 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo) {
-            logo.hideBlocks();
-            logo.setTurtleDelay(0);
+            blocks.hideBlocks();
+            logo.showBlocksAfterRun = false;
+            logo.turtleDelay = 0;
         }
     }
 
@@ -788,7 +789,7 @@ function setupExtrasBlocks() {
                 let noteBeatValue = bpmFactor / (1 / args[0]);
                 logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
                 logo.turtleTime[turtle] += noteBeatValue;
-                logo._doWait(turtle, args[0]);
+                logo.doWait(turtle, args[0]);
             }
         }
     }
@@ -857,14 +858,6 @@ function setupExtrasBlocks() {
                                 logo.textMsg(args[0].toString());
                             }
                         }
-
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [
-                                logo.previousTurtleTime[turtle],
-                                "print",
-                                args[0]
-                            ]);
-                        }
                     }
                 }
             }
@@ -916,13 +909,13 @@ function setupExtrasBlocks() {
             let act = logo.blocks.activity ;
             logo.turtles.hideGrids() ;
             switch (args[0]){
-                case (_("Cartesian")) : 
+                case (_("Cartesian")) :
                     act._showCartesian();
                     break;
-                case (_("polar")) : 
+                case (_("polar")) :
                     act._showPolar();
                     break;
-                case (_("Cartesian+polar")) : 
+                case (_("Cartesian+polar")) :
                     act._showPolar();
                     act._showCartesian();
                     break;
@@ -930,8 +923,7 @@ function setupExtrasBlocks() {
                      act._showTreble();
                      break;
                 case (_("grand staff")) :
-                    act._showTreble();
-                    act._showBass();
+                    act._showGrand();
                     break;
                 case (_("mezzo-soprano")):
                     act._showSoprano();
@@ -939,13 +931,13 @@ function setupExtrasBlocks() {
                 case (_("alto")) :
                      act._showAlto();
                      break;
-                case (_("tenor")) : 
+                case (_("tenor")) :
                     act._showTenor();
                     break;
-                case (_("bass")) : 
+                case (_("bass")) :
                     act._showBass();
                     break;
-                case (_("none")) : 
+                case (_("none")) :
                     break;
             }
         }

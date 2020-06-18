@@ -357,7 +357,7 @@ function setupIntervalsBlocks() {
                     logo.firstPitch[turtle].length > 0 &&
                     logo.lastPitch[turtle].length > 0
                 ) {
-                    return logo._scalarDistance(
+                    return logo.scalarDistance(
                         turtle,
                         last(logo.firstPitch[turtle]),
                         last(logo.lastPitch[turtle])
@@ -995,17 +995,17 @@ function setupIntervalsBlocks() {
                         logo.synth.inTemperament
                     );
                     logo.keySignature[turtle] = noteObj[0] + " " + modename;
-                    logo.notationKey(turtle, noteObj[0], modename);
+                    logo.notation.notationKey(turtle, noteObj[0], modename);
                 } else {
                     logo.keySignature[turtle] = args[0] + " " + modename;
-                    logo.notationKey(turtle, args[0], modename);
+                    logo.notation.notationKey(turtle, args[0], modename);
                 }
 
                 if (logo.insideModeWidget) {
                     // Ensure logo the mode for Turtle 0 is set, since it
                     // is used by the mode widget.
                     logo.keySignature[0] = args[0] + " " + modename;
-                    logo.notationKey(0, args[0], modename);
+                    logo.notation.notationKey(0, args[0], modename);
                 }
             }
         }

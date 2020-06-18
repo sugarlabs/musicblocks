@@ -146,18 +146,6 @@ function Blocks(activity) {
     };
 
     /*
-     * Set the Set Playback status variable
-     * DEPRECATED
-     * @param - setPlaybackStatus - new variable
-     * @public
-     * @return this
-     */
-    this.setSetPlaybackStatus = function(setPlaybackStatus) {
-        this.setPlaybackStatus = setPlaybackStatus;
-        return this;
-    };
-
-    /*
      * We need access to the canvas.
      * @param - canvas
      * @public
@@ -5286,18 +5274,10 @@ function Blocks(activity) {
      * return {void}
      */
     this.loadNewBlocks = function(blockObjs) {
-        var playbackQueueStartsHere = null;
-
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
-
-            // Check for playbackQueue
-            if (typeof blkData[1] === "number") {
-                playbackQueueStartsHere = b;
-                break;
-            }
 
             for (var c in blkData[4]) {
                 if (blkData[4][c] === blkData[0]) {
@@ -5308,24 +5288,6 @@ function Blocks(activity) {
                     console.debug(blockObjs);
                     return;
                 }
-            }
-        }
-
-        // Load any playback code into the queue...
-        if (playbackQueueStartsHere != null) {
-            for (var b = playbackQueueStartsHere; b < blockObjs.length; b++) {
-                var turtle = blockObjs[b][1];
-                if (turtle in this.logo.playbackQueue) {
-                    this.logo.playbackQueue[turtle].push(blockObjs[b][2]);
-                } else {
-                    this.logo.playbackQueue[turtle] = [blockObjs[b][2]];
-                }
-            }
-
-            // and remove the entries from the end of blockObjs.
-            var n = blockObjs.length;
-            for (var b = playbackQueueStartsHere; b < n; b++) {
-                blockObjs.pop();
             }
         }
 
@@ -6693,49 +6655,6 @@ function Blocks(activity) {
                 }
             }
         }
-
-        if (playbackQueueStartsHere != null) {
-            var that = this;
-            setTimeout(function() {
-                // Now that we know how many turtles we have, we can make
-                // sure that the playback queue does not reference turtles
-                // that are not known to us.
-
-                // Find the first turtle not in the trash.
-                for (
-                    var firstTurtle = 0;
-                    firstTurtle < that.turtles.turtleList.length;
-                    firstTurtle++
-                ) {
-                    if (!that.turtles.turtleList[firstTurtle].inTrash) {
-                        break;
-                    }
-                }
-
-                if (firstTurtle === that.turtles.turtleList.length) {
-                    console.debug("Cannot find a turtle");
-                    firstTurtle = 0;
-                }
-
-                // Is the first turtle in the playbackQueue?
-                if (!(firstTurtle in that.logo.playbackQueue)) {
-                    for (turtle in that.logo.playbackQueue) {
-                        console.debug(
-                            "playbackQueue: remapping from " +
-                                turtle +
-                                " to " +
-                                firstTurtle
-                        );
-                        that.logo.playbackQueue[firstTurtle] =
-                            that.logo.playbackQueue[turtle];
-                        delete that.logo.playbackQueue[turtle];
-                        firstTurtle += 1;
-                    }
-                }
-
-                that.setPlaybackStatus();
-            }, 1500);
-        }
     };
 
     /*
@@ -7092,14 +7011,13 @@ function Blocks(activity) {
                 console.debug("putting turtle " + turtle + " in the trash");
                 this.turtles.turtleList[turtle].inTrash = true;
                 this.turtles.turtleList[turtle].container.visible = false;
-            } 
-            // else {
-            //     this.errorMsg(
-            //         _("You must always have at least one start block.")
-            //     );
-            //     console.debug("null turtle");
-            //     return;
-            // }
+            } else {
+                this.errorMsg(
+                    _("You must always have at least one start block.")
+                );
+                console.debug("null turtle");
+                return;
+            }
         } else if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);
@@ -7158,5 +7076,109 @@ function Blocks(activity) {
         }
     };
 
-    return this;
+    /**
+     * Clears all the blocks, updates the cache and refreshes the canvas.
+     *
+     * @returns {void}
+     */
+    this.clearParameterBlocks = function() {
+        for (let blk = 0; blk < this.blockList.length; blk++) {
+            if (
+                this.blockList[blk].protoblock.parameter &&
+                this.blockList[blk].text !== null
+            ) {
+                this.blockList[blk].text.text = "";
+                this.blockList[blk].container.updateCache();
+            }
+        }
+        this.refreshCanvas();
+    };
+
+    /**
+     * Updates the label on parameter blocks.
+     *
+     * @param logo
+     * @param turtle
+     * @param blk
+     * @returns {void}
+     */
+    this.updateParameterBlock = function(logo, turtle, blk) {
+        let name = this.blockList[blk].name;
+
+        if (
+            this.blockList[blk].protoblock.parameter &&
+            this.blockList[blk].text !== null
+        ) {
+            let value = 0;
+
+            if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
+                value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
+            } else {
+                if (name in this.evalParameterDict) {
+                    eval(this.evalParameterDict[name]);
+                } else {
+                    return;
+                }
+            }
+
+            if (typeof value === "string") {
+                if (value.length > 6) {
+                    value = value.substr(0, 5) + "...";
+                }
+
+                this.blockList[blk].text.text = value;
+            } else if (name === "divide") {
+                this.blockList[blk].text.text = mixedNumber(value);
+            } else {
+                this.blockList[blk].text.text = value.toString();
+            }
+
+            this.blockList[blk].container.updateCache();
+            this.refreshCanvas();
+        }
+    };
+
+    /**
+     * Changes a property according to a block name and a value.
+     *
+     * @param logo
+     * @param blk
+     * @param value
+     * @param turtle
+     * @returns {void}
+     */
+    this.blockSetter = function(logo, blk, value, turtle) {
+        if (typeof this.blockList[blk].protoblock.setter === "function") {
+            this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
+        } else {
+            if (this.blockList[blk].name in logo.evalSetterDict) {
+                eval(logo.evalSetterDict[this.blockList[blk].name]);
+            } else {
+                throw new Error();
+            }
+        }
+    };
+
+    /**
+     * Hides all the blocks.
+     *
+     * @returns {void}
+     */
+    this.hideBlocks = function() {
+        this.palettes.hide();
+        this.hide();
+        this.refreshCanvas();
+    }
+
+    /**
+     * Shows all the blocks.
+     *
+     * @returns {void}
+     */
+    this.showBlocks = function() {
+        this.palettes.show();
+        this.show();
+        this.bringToTop();
+        this.refreshCanvas();
+    }
 };
