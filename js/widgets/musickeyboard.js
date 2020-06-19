@@ -453,17 +453,13 @@ function MusicKeyboard() {
             that._createAddRowPieSubmenu();
         };
 
-        let midiButton = widgetWindow.addButton(
+        this.midiButton = widgetWindow.addButton(
             null,
             ICONSIZE,
             _("MIDI")
         )
-        midiButton.onclick = function () {
-            if (navigator.requestMIDIAccess) {
-                that.doMIDI();
-            } else {
-                logo.textMsg(' MIDI is not supported in this browser.');
-            }
+        this.midiButton.onclick = function () {
+            that.doMIDI();
         };
 
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
@@ -2743,14 +2739,28 @@ function MusicKeyboard() {
         }
 
         let onMIDISuccess = ( midiAccess) => {
+            // re-init widget 
+            if (this.midiON){
+                this.midiButton.style.background = "#00FF00" ;
+                logo.textMsg("MIDI device present")
+                return ;
+            }
             midiAccess.inputs.forEach((input) => { input.onmidimessage = onMIDIMessage; });
+            if (midiAccess.inputs.size) {
+                this.midiButton.style.background = "#00FF00" ;
+                logo.textMsg("MIDI device present")
+                this.midiON =true ;
+            }
+            else logo.textMsg("MIDI device not present");
         }
 
-        if (this.midiON) return;
-        this.midiON = true;
+        let  onMIDIFailure= () => {
+            logo.errorMsg( "Failed to get MIDI access in browser");
+            this.midiON =false ;
+        }
 
         navigator.requestMIDIAccess()
-            .then(onMIDISuccess);
+            .then(onMIDISuccess,onMIDIFailure);
 
     }
 }
