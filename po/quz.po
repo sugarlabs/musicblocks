@@ -135,9 +135,10 @@ msgid "triplet"
 msgstr ""
 
 #: js/RhythmBlockPaletteBlocks.js:608
+#.TRANS: USING SPANISH
 #.TRANS: tuplet simple
 msgid "simple tuplet"
-msgstr ""
+msgstr "tuplet simple"
 
 #: js/RhythmBlocks.js:112
 #.TRANS: milisegundos
@@ -154,14 +155,16 @@ msgstr ""
 
 #: js/RhythmBlocks.js:208
 #.TRANS: the amount to shift to the offbeat note
+#.TRANS: USING SPANISH
 #.TRANS: valor de swing
 msgid "swing value"
-msgstr ""
+msgstr "valor de swing"
 
 #: js/RhythmBlocks.js:238
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Omitir notas hará que las notas se omitan.
 msgid "The Skip notes block will cause notes to be skipped."
-msgstr ""
+msgstr "El bloque Omitir notas hará que las notas se omitan."
 
 #: js/RhythmBlocks.js:246
 #.TRANS: substitute rests on notes being skipped
@@ -189,9 +192,10 @@ msgid "dot"
 msgstr "Ch’iku)"
 
 #: js/RhythmBlocks.js:496
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Punto extiende la duración de una nota en un 50%.
 msgid "The Dot block extends the duration of a note by 50%."
-msgstr ""
+msgstr "El bloque Punto extiende la duración de una nota en un 50%."
 
 #: js/RhythmBlocks.js:527
 #: js/ExtrasBlocks.js:439
@@ -203,9 +207,10 @@ msgstr "ch’in"
 
 #: js/RhythmBlocks.js:577
 #.TRANS: Japanese only: note value block for drum
+#.TRANS: USING SPANISH
 #.TRANS: Valor de nota tambor
 msgid "note value drum"
-msgstr ""
+msgstr "Valor de nota tambor"
 
 #: js/RhythmBlocks.js:578
 #: js/DrumBlocks.js:335
@@ -246,9 +251,10 @@ msgid "value"
 msgstr "tupu"
 
 #: js/RhythmBlocks.js:809
+#.TRANS: USING SPANISH
 #.TRANS: definir frecuencia
 msgid "define frequency"
-msgstr ""
+msgstr "definir frecuencia"
 
 #: js/RhythmBlocks.js:818
 #.TRANS: espacio de octava
@@ -325,9 +331,10 @@ msgid "grey"
 msgstr "uqi"
 
 #: js/PenBlocks.js:167
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque gris devuelve el valor gris actual de la pluma.
 msgid "The Grey block returns the current pen grey value."
-msgstr ""
+msgstr "El bloque gris devuelve el valor gris actual de la pluma."
 
 #: js/PenBlocks.js:204
 #.TRANS: sombra
@@ -335,9 +342,10 @@ msgid "shade"
 msgstr "llanthu"
 
 #: js/PenBlocks.js:208
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque sombra devuelve la sombra actual de la pluma.
 msgid "The Shade block returns the current pen shade value."
-msgstr ""
+msgstr "El bloque sombra devuelve la sombra actual de la pluma."
 
 #: js/PenBlocks.js:245
 #.TRANS: color
@@ -355,9 +363,10 @@ msgid "pen size"
 msgstr "Qillqanq sayayanin"
 
 #: js/PenBlocks.js:291
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque tamaño de la pluma devuelve el tamaño actual de la pluma.
 msgid "The Pen size block returns the current pen size value."
-msgstr ""
+msgstr "El bloque tamaño de la pluma devuelve el tamaño actual de la pluma."
 
 #: js/PenBlocks.js:328
 #.TRANS: fijar font
@@ -365,19 +374,22 @@ msgid "set font"
 msgstr "tahachiy font"
 
 #: js/PenBlocks.js:331
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque fijar font establece el font utilizada por el bloque mostrar.
 msgid "The Set font block sets the font used by the Show block."
-msgstr ""
+msgstr "El bloque fijar font establece el font utilizada por el bloque mostrar."
 
 #: js/PenBlocks.js:362
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque Fondo establece el color de fondo de la ventana.
 msgid "The Background block sets the window background color."
-msgstr ""
+msgstr "El bloque Fondo establece el color de fondo de la ventana."
 
 #: js/PenBlocks.js:378
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque de línea sin relleno crea una línea con un centro hueco.
 msgid "The Hollow line block creates a line with a hollow center."
-msgstr ""
+msgstr "El bloque de línea sin relleno crea una línea con un centro hueco."
 
 #: js/PenBlocks.js:385
 #.TRANS: draw a line logo has a hollow space down its center
@@ -386,9 +398,10 @@ msgid "hollow line"
 msgstr "Hunt’achina siq’i"
 
 #: js/PenBlocks.js:446
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque relleno rellena una forma con un color.
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "El bloque relleno rellena una forma con un color."
 
 #: js/PenBlocks.js:454
 #.TRANS: fill in as a solid color
@@ -414,9 +427,10 @@ msgid "pen down"
 msgstr "qillqanata urayachiy"
 
 #: js/PenBlocks.js:567
+#.TRANS: USING SPANISH
 #.TRANS: El bloque de Haciar pluma abajo baja la pluma para que dibuje.
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "El bloque Subir pluma levanta la pluma para que no dibuje."
 
 #: js/PenBlocks.js:593
 #.TRANS: set the width of the line drawn by the pen
@@ -433,38 +447,41 @@ msgstr "Sayaq, qillqanaq tahachinanmi kutichin qillqaqa rakhuyanata, ñañuyachi
 #.TRANS: set degree of translucence of the pen color
 #.TRANS: fijar translucidez
 msgid "set translucency"
-msgstr " K’anchayninta tahachiy "
+msgstr "K’anchayninta tahachiy "
 
 #: js/PenBlocks.js:650
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque fijar translucidez cambia la opacidad de la pluma.
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "El bloque fijar translucidez cambia la opacidad de la pluma."
 
 #: js/PenBlocks.js:700
 #.TRANS: fijar matiz
 msgid "set hue"
-msgstr " Llimp’inta tahachiy "
+msgstr "Llimp’inta tahachiy "
 
 #: js/PenBlocks.js:703
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque fijar matiz cambia la color de la pluma.
 msgid "The Set hue block changes the color of the pen."
-msgstr ""
+msgstr "El bloque fijar matiz cambia la color de la pluma."
 
 #: js/PenBlocks.js:751
 #.TRANS: fijar sombra
 msgid "set shade"
-msgstr " Llanthunta tahachiy "
+msgstr "Llanthunta tahachiy "
 
 #: js/PenBlocks.js:807
 #.TRANS: set the level of vividness of the pen color
 #.TRANS: fijar gris
 msgid "set grey"
-msgstr " Uqinta tahachiy "
+msgstr "Uqinta tahachiy "
 
 #: js/PenBlocks.js:810
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque fijar gris cambia la intensidad de la pluma."
 msgid "The Set grey block changes the vividness of the pen color."
-msgstr ""
+msgstr "El bloque fijar gris cambia la intensidad de la pluma."
 
 #: js/PenBlocks.js:858
 #.TRANS: fijar color
@@ -500,18 +517,20 @@ msgid "white noise"
 msgstr "Yuraq rakhaqaqaq"
 
 #: js/DrumBlocks.js:107
+#.TRANS: USING SPANISH
 #.TRANS: Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?
 msgid "Noise Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/DrumBlocks.js:190
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Reemplace cada instancia de un tono con un sonido de tambor.
 msgid "Replace every instance of a pitch with a drum sound."
-msgstr ""
+msgstr "Reemplace cada instancia de un tono con un sonido de tambor."
 
 #: js/DrumBlocks.js:197
 #.TRANS: map a pitch to a drum sound
-#.TRANS: 
+#.TRANS: mapa de tono al tambor
 msgid "map pitch to drum"
 msgstr "saywa"
 
@@ -532,21 +551,24 @@ msgid "You can use multiple Drum blocks within a Note block."
 msgstr "Sayaq uhpi atiwaqmi achka kunkakunaq takaykunanpi"
 
 #: js/DrumBlocks.js:438
+#.TRANS: USING SPANISH
 #.TRANS: Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?
 msgid "Drum Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?"
 
 #: js/WidgetBlocks.js:5
 #.TRANS: sound envelope (ADSR)
+#.TRANS: USING SPANISH
 #.TRANS: envolventes
 msgid "envelope"
-msgstr ""
+msgstr "envolventes"
 
 #: js/WidgetBlocks.js:13
 #.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
+#.TRANS: USING SPANISH
 #.TRANS: atacar
 msgid "attack"
-msgstr ""
+msgstr "atacar"
 
 #: js/WidgetBlocks.js:15
 #.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
@@ -564,12 +586,13 @@ msgstr "hap’ipay"
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 #.TRANS: liberar
 msgid "release"
-msgstr " waqmanta ñawinchay"
+msgstr "waqmanta ñawinchay"
 
 #: js/WidgetBlocks.js:28
+#.TRANS: USING SPANISH
 #.TRANS: El valor de atacar debe estar entre 0 y 100.
 msgid "Attack value should be from 0 to 100."
-msgstr ""
+msgstr "El valor de atacar debe estar entre 0 y 100."
 
 #: js/WidgetBlocks.js:31
 #.TRANS: El valor de decaer debe estar entre 0 y 100.
@@ -587,9 +610,10 @@ msgid "Release value should be from 0-100."
 msgstr "Kachariya tupun kanan 0 – 100 kama"
 
 #: js/WidgetBlocks.js:62
+#.TRANS: USING SPANISH
 #.TRANS: Está agregando varios bloques de envolvente.
 msgid "You are adding multiple envelope blocks."
-msgstr ""
+msgstr "Está agregando varios bloques de envolvente."
 
 #: js/WidgetBlocks.js:94
 #.TRANS: a filter removes some unwanted components from a signal
@@ -601,7 +625,6 @@ msgstr "suysuy"
 #: js/musicutils.js:566
 #: js/musicutils.js:911
 #.TRANS: highpass filter
-#.TRANS: 
 msgid "highpass"
 msgstr ""
 
@@ -611,14 +634,14 @@ msgstr ""
 #: js/timbre.js:1914
 #.TRANS: type of filter, e.g., lowpass, highpass, etc.
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
+#.TRANS: USING SPANISH
 #.TRANS: typo
 msgid "type"
-msgstr ""
+msgstr "typo"
 
 #: js/WidgetBlocks.js:104
 #: js/timbre.js:1924
 #.TRANS: rolloff is the steepness of a change in frequency.
-#.TRANS: 
 msgid "rolloff"
 msgstr ""
 
@@ -631,9 +654,10 @@ msgstr "Kutipayaq"
 
 #: js/WidgetBlocks.js:172
 #.TRANS: rolloff is the steepness of a change in frequency.
+#.TRANS: USING SPANISH
 #.TRANS: La Herramienta temperamento se utiliza para definir la afinación personalizada.
 msgid "The Temperament tool is used to define custom tuning."
-msgstr ""
+msgstr "La Herramienta temperamento se utiliza para definir la afinación personalizada."
 
 #: js/WidgetBlocks.js:179
 #: js/IntervalsBlocks.js:18
@@ -678,9 +702,10 @@ msgid "custom mode"
 msgstr "huk hinayuq runachasqa"
 
 #: js/WidgetBlocks.js:451
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Tempo abre un metrónomo para visualizar el ritmo.
 msgid "The Tempo block opens a metronome to visualize the beat."
-msgstr ""
+msgstr "El bloque Tempo abre un metrónomo para visualizar el ritmo."
 
 #: js/WidgetBlocks.js:458
 #.TRANS: the speed at music is should be played.
@@ -803,9 +828,10 @@ msgstr "ruway"
 #: js/ActionBlocks.js:556
 #: js/ActionBlocks.js:799
 #.TRANS: do is the do something or take an action.
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Hacer se utiliza para iniciar una acción.
 msgid "The Do block is used to initiate an action."
-msgstr ""
+msgstr "El bloque Hacer se utiliza para iniciar una acción."
 
 #: js/ActionBlocks.js:187
 #: js/ActionBlocks.js:343
@@ -861,9 +887,10 @@ msgid "event"
 msgstr "riqsichi"
 
 #: js/ActionBlocks.js:676
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Emitir se utiliza para desencadenar un evento.
 msgid "The Broadcast block is used to trigger an event."
-msgstr ""
+msgstr "El bloque Emitir se utiliza para desencadenar un evento."
 
 #: js/ActionBlocks.js:684
 #.TRANS: dispatch an event to trigger a listener
@@ -872,9 +899,10 @@ msgid "broadcast"
 msgstr "lluqsichiy"
 
 #: js/ActionBlocks.js:711
+#.TRANS: USING SPANISH
 #.TRANS: Cada bloque de inicio es una voz separada.
 msgid "Each Start block is a separate voice."
-msgstr ""
+msgstr "Cada bloque de inicio es una voz separada."
 
 #: js/ActionBlocks.js:720
 #: js/ExtrasBlocks.js:434
@@ -884,9 +912,10 @@ msgstr "qallari"
 
 #: js/ActionBlocks.js:733
 #: js/ExtrasBlocks.js:880
+#.TRANS: USING SPANISH
 #.TRANS: iniciar tambor
 msgid "start drum"
-msgstr ""
+msgstr "iniciar tambor"
 
 #: js/ActionBlocks.js:862
 #.TRANS: definir el temperamento
@@ -915,19 +944,22 @@ msgstr "Chhaynapaq rurasqa"
 
 #: js/FlowBlocks.js:288
 #: js/FlowBlocks.js:323
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Caso debe utilizarse dentro de un bloque de switch.
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr ""
+msgstr "El bloque Caso debe utilizarse dentro de un bloque de switch."
 
 #: js/FlowBlocks.js:313
+#.TRANS: USING SPANISH
 #.TRANS: caso
 msgid "case"
-msgstr ""
+msgstr "caso"
 
 #: js/FlowBlocks.js:339
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Switch ejecutará el código en el caso correspondiente.
 msgid "The Switch block will run the code in the matching Case."
-msgstr ""
+msgstr "El bloque Switch ejecutará el código en el caso correspondiente."
 
 #: js/FlowBlocks.js:346
 #.TRANS: 
@@ -935,14 +967,16 @@ msgid "switch"
 msgstr "tinkuchiy"
 
 #: js/FlowBlocks.js:446
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Parar detendrá un bucle.
 msgid "The Stop block will stop a loop"
-msgstr ""
+msgstr "El bloque Parar detendrá un bucle."
 
 #: js/FlowBlocks.js:448
+#.TRANS: USING SPANISH
 #.TRANS: Por siempre, Repetir, Mientras o Hasta.
 msgid "Forever, Repeat, While, or Until."
-msgstr ""
+msgstr "Por siempre, Repetir, Mientras o Hasta."
 
 #: js/FlowBlocks.js:452
 #: js/FlowBlocks.js:458
@@ -959,19 +993,22 @@ msgid "stop"
 msgstr "sayachiy"
 
 #: js/FlowBlocks.js:488
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Esperar esperará hasta que la condición sea verdadera.
 msgid "The Waitfor block will wait until the condition is true."
-msgstr ""
+msgstr "El bloque Esperar esperará hasta que la condición sea verdadera."
 
 #: js/FlowBlocks.js:495
+#.TRANS: USING SPANISH
 #.TRANS: esperar hasta
 msgid "wait for"
-msgstr ""
+msgstr "esperar hasta"
 
 #: js/FlowBlocks.js:550
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Hasta se repetirá hasta que la condición sea verdadera.
 msgid "The Until block will repeat until the condition is true."
-msgstr ""
+msgstr "El bloque Hasta se repetirá hasta que la condición sea verdadera."
 
 #: js/FlowBlocks.js:557
 #.TRANS: hasta
@@ -985,9 +1022,10 @@ msgid "do2"
 msgstr "ruray"
 
 #: js/FlowBlocks.js:613
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Mientras se repetirá mientras la condición sea verdadera.
 msgid "The While block will repeat while the condition is true."
-msgstr ""
+msgstr "El bloque Mientras se repetirá mientras la condición sea verdadera."
 
 #: js/FlowBlocks.js:620
 #.TRANS: mientras
@@ -1017,14 +1055,16 @@ msgid "forever"
 msgstr "wiñaypaq"
 
 #: js/FlowBlocks.js:813
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Repetir repetirá los bloques contenidos.
 msgid "The Repeat block will repeat the contained blocks."
-msgstr ""
+msgstr "El bloque Repetir repetirá los bloques contenidos."
 
 #: js/FlowBlocks.js:815
+#.TRANS: USING SPANISH
 #.TRANS: En este ejemplo la nota se tocará 4 veces.
 msgid "In this example the note will be played 4 times."
-msgstr ""
+msgstr "En este ejemplo la nota se tocará 4 veces."
 
 #: js/FlowBlocks.js:822
 #.TRANS: repetir
@@ -1033,9 +1073,10 @@ msgstr "huktawan"
 
 #: js/FlowBlocks.js:851
 #.TRANS: factor used in determining how many duplications to make
+#.TRANS: USING SPANISH
 #.TRANS: duplicar factor
 msgid "duplicate factor"
-msgstr ""
+msgstr "factor de duplicar"
 
 #: js/EnsembleBlocks.js:50
 #.TRANS: 
@@ -1058,9 +1099,10 @@ msgstr "Huk’ucha /qillqa purichina"
 #: js/EnsembleBlocks.js:753
 #: js/EnsembleBlocks.js:920
 #: js/EnsembleBlocks.js:979
+#.TRANS: USING SPANISH
 #.TRANS: Sr. Ratón
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "Sr. Ratón
 
 #: js/EnsembleBlocks.js:64
 #: js/EnsembleBlocks.js:822
@@ -1071,34 +1113,39 @@ msgstr "Sutichay huk’uchata"
 #: js/EnsembleBlocks.js:64
 #: js/HeapBlocks.js:396
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
+#.TRANS: USING SPANISH
 #.TRANS: posición en la pila
 msgid "index"
-msgstr ""
+msgstr "posición"
 
 #: js/EnsembleBlocks.js:91
 #: js/EnsembleBlocks.js:906
 #: js/HeapBlocks.js:355
 #: js/HeapBlocks.js:419
+#.TRANS: USING SPANISH
 #.TRANS: El índice debe ser > 0.
 msgid "Index must be > 0."
-msgstr ""
+msgstr "El índice debe ser > 0."
 
 #: js/EnsembleBlocks.js:96
 #: js/HeapBlocks.js:360
 #: js/HeapBlocks.js:424
+#.TRANS: USING SPANISH
 #.TRANS: El tamaño máximo de pilas es 1000.
 msgid "Maximum heap size is 1000."
-msgstr ""
+msgstr "El tamaño máximo de pilas es 1000."
 
 #: js/EnsembleBlocks.js:113
+#.TRANS: USING SPANISH
 #.TRANS: parar ratón
 msgid "stop mouse"
-msgstr ""
+msgstr "parar ratón"
 
 #: js/EnsembleBlocks.js:116
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque parar ratón parar el ratón especificado.
 msgid "The Stop mouse block stops the specified mouse."
-msgstr ""
+msgstr "El bloque parar ratón parar el ratón especificado."
 
 #: js/EnsembleBlocks.js:137
 #: js/EnsembleBlocks.js:180
@@ -1122,19 +1169,22 @@ msgstr "Manan huk’uchata tarikunchu"
 #: js/EnsembleBlocks.js:695
 #: js/EnsembleBlocks.js:901
 #: js/EnsembleBlocks.js:955
+#.TRANS: USING SPANISH
 #.TRANS: No se puede encontrar tortuga.
 msgid "Cannot find turtle"
-msgstr ""
+msgstr "No se puede encontrar tortuga."
 
 #: js/EnsembleBlocks.js:155
+#.TRANS: USING SPANISH
 #.TRANS: comenzar ratón
 msgid "start mouse"
-msgstr ""
+msgstr "comenzar ratón"
 
 #: js/EnsembleBlocks.js:158
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque comenzar ratón inicia el ratón especificado.
 msgid "The Start mouse block starts the specified mouse."
-msgstr ""
+msgstr "El bloque comenzar ratón inicia el ratón especificado."
 
 #: js/EnsembleBlocks.js:187
 #.TRANS: Ratón ya ha comenzado.
@@ -1142,9 +1192,10 @@ msgid "Mouse is already running."
 msgstr "Huk’ucha qallarinña"
 
 #: js/EnsembleBlocks.js:189
+#.TRANS: USING SPANISH
 #.TRANS: Tortuga ya ha comenzado.
 msgid "Turtle is already running."
-msgstr ""
+msgstr "Tortuga ya ha comenzado."
 
 #: js/EnsembleBlocks.js:222
 #.TRANS: No se puede encontrar el bloque de inicar.
@@ -1159,21 +1210,24 @@ msgstr "Llimp’iyniyuq huk’ucha"
 
 #: js/EnsembleBlocks.js:261
 #.TRANS: heading (compass direction) for this mouse
+#.TRANS: USING SPANISH
 #.TRANS: rumbo de ratón
 msgid "mouse heading"
-msgstr ""
+msgstr "rumbo de ratón"
 
 #: js/EnsembleBlocks.js:289
 #: js/EnsembleBlocks.js:345
 #.TRANS: set xy position for this mouse
+#.TRANS: USING SPANISH
 #.TRANS: fijar ratón
 msgid "set mouse"
-msgstr ""
+msgstr "fijar ratón"
 
 #: js/EnsembleBlocks.js:295
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Sr. Ratón
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "Sr. Ratón"
 
 #: js/EnsembleBlocks.js:298
 #: js/BoxesBlocks.js:300
@@ -1189,9 +1243,10 @@ msgstr "Suti"
 #: js/PitchBlocks.js:2909
 #: js/BoxesBlocks.js:301
 #: js/BoxesBlocks.js:301
+#.TRANS: USING SPANISH
 #.TRANS: nombre
 msgid "name"
-msgstr ""
+msgstr "nombre"
 
 #: js/EnsembleBlocks.js:299
 #: js/ExtrasBlocks.js:150
@@ -1231,31 +1286,36 @@ msgstr "puripaq X"
 
 #: js/EnsembleBlocks.js:438
 #.TRANS: notes played by this mouse
+#.TRANS: USING SPANISH
 #.TRANS: notas jugadas de ratón
 msgid "mouse notes played"
-msgstr ""
+msgstr "notas jugadas de ratón"
 
 #: js/EnsembleBlocks.js:468
 #.TRANS: convert current note for this turtle to piano key (1-88)
+#.TRANS: USING SPANISH
 #.TRANS: número de tono de ratón
 msgid "mouse pitch number"
-msgstr ""
+msgstr "número de tono de ratón"
 
 #: js/EnsembleBlocks.js:587
 #: js/EnsembleBlocks.js:656
+#.TRANS: USING SPANISH
 #.TRANS: valor de la nota del ratón
 msgid "mouse note value"
-msgstr ""
+msgstr "valor de la nota del ratón"
 
 #: js/EnsembleBlocks.js:669
+#.TRANS: USING SPANISH
 #.TRANS: sincronizar
 msgid "mouse sync"
-msgstr ""
+msgstr "sincronizar"
 
 #: js/EnsembleBlocks.js:672
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque sincronizar alinea el conteo de latidos entre ratones.
 msgid "The Mouse sync block aligns the beat count between mice."
-msgstr ""
+msgstr "El bloque sincronizar alinea el conteo de latidos entre ratones."
 
 #: js/EnsembleBlocks.js:717
 #.TRANS: encontré el raton
@@ -1268,9 +1328,10 @@ msgid "new mouse"
 msgstr "Musuq huk’ucha"
 
 #: js/EnsembleBlocks.js:745
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque nuevo ratón crea un nuevo ratón."
 msgid "The New mouse block will create a new mouse."
-msgstr ""
+msgstr "El bloque nuevo ratón crea un nuevo ratón."
 
 #: js/EnsembleBlocks.js:827
 #.TRANS: El bloque Nombre del ratón devuelve el nombre de un ratón.
@@ -1278,24 +1339,28 @@ msgid "The Mouse-name block returns the name of a mouse."
 msgstr "Huk’uha sayaq kutichin huk’ucha  sutiman"
 
 #: js/EnsembleBlocks.js:845
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: recuento de ratones
 msgid "mouse count"
-msgstr ""
+msgstr "recuento de ratones"
 
 #: js/EnsembleBlocks.js:850
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque recuento de ratones devuelve el número de ratones.
 msgid "The Mouse-count block returns the number of mice."
-msgstr ""
+msgstr "El bloque recuento de ratones devuelve el número de ratones."
 
 #: js/EnsembleBlocks.js:868
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: nombre de nth ratón
 msgid "nth mouse name"
-msgstr ""
+msgstr "nombre de nth ratón"
 
 #: js/EnsembleBlocks.js:873
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque nombre de nth ratón devuelve el nombre de nth ratón
 msgid "The Nth-Mouse name block returns the name of the nth mice."
-msgstr ""
+msgstr "El bloque nombre de nth ratón devuelve el nombre de nth ratón"
 
 #: js/EnsembleBlocks.js:914
 #: js/EnsembleBlocks.js:965
@@ -1318,21 +1383,24 @@ msgid "target"
 msgstr "chayana"
 
 #: js/EnsembleBlocks.js:970
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Fijar nombre se usa para nombrar un ratón.
 msgid "The Set-name block is used to name a mouse."
-msgstr ""
+msgstr "El bloque Fijar nombre se usa para nombrar un ratón."
 
 #: js/OrnamentBlocks.js:5
 #.TRANS: the duration of a note played as staccato
+#.TRANS: USING SPANISH
 #.TRANS: factor de staccato
 msgid "staccato factor"
-msgstr ""
+msgstr "factor de staccato"
 
 #: js/OrnamentBlocks.js:34
 #.TRANS: the degree of overlap of notes played as legato
+#.TRANS: USING SPANISH
 #.TRANS: factor de legato
 msgid "slur factor"
-msgstr ""
+msgstr "factor de legato"
 
 #: js/OrnamentBlocks.js:67
 #: js/OrnamentBlocks.js:124
@@ -1344,42 +1412,48 @@ msgstr "wasimasi"
 #: js/OrnamentBlocks.js:70
 #: js/IntervalsBlocks.js:480
 #.TRANS: calculate a relative step between notes based on semi-tones
+#.TRANS: USING SPANISH
 #.TRANS: intervalo semitono
 msgid "semi-tone interval"
-msgstr ""
+msgstr "intervalo semitono"
 
 #: js/OrnamentBlocks.js:127
 #: js/IntervalsBlocks.js:636
 #.TRANS: calculate a relative step between notes based on semi-tones
+#.TRANS: USING SPANISH
 #.TRANS: intervalo escalar
 msgid "scalar interval"
-msgstr ""
+msgstr "intervalo escalar"
 
 #: js/OrnamentBlocks.js:148
 #.TRANS: glide (glissando) is a blended overlap successive notes
+#.TRANS: USING SPANISH
 #.TRANS: deslizarse
 msgid "glide"
-msgstr ""
+msgstr "deslizarse"
 
 #: js/OrnamentBlocks.js:214
 #: js/OrnamentBlocks.js:332
 #.TRANS: slur or legato is an overlap successive notes
+#.TRANS: USING SPANISH
 #.TRANS: legato
 msgid "slur"
-msgstr ""
+msgstr "legato"
 
 #: js/OrnamentBlocks.js:272
 #: js/OrnamentBlocks.js:364
 #.TRANS: play each note sharply detached from the others
+#.TRANS: USING SPANISH
 #.TRANS: staccato
 msgid "staccato"
-msgstr ""
+msgstr "staccato"
 
 #: js/VolumeBlocks.js:5
 #.TRANS: the volume for this synth
+#.TRANS: USING SPANISH
 #.TRANS: volumen del sintetizador
 msgid "synth volume"
-msgstr ""
+msgstr "volumen del sintetizador"
 
 #: js/VolumeBlocks.js:19
 #: js/synthutils.js:25
@@ -1396,71 +1470,82 @@ msgid "master volume"
 msgstr "t’uqya kamay"
 
 #: js/VolumeBlocks.js:67
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque volumen maestro devuelve nivel de volumen maestro. 
 msgid "The Master volume block returns the master volume."
-msgstr ""
+msgstr "El bloque volumen maestro devuelve nivel de volumen maestro."
 
 #: js/VolumeBlocks.js:220
 #: js/VolumeBlocks.js:380
+#.TRANS: USING SPANISH
 #.TRANS: fijar volumen del sintetizador
 msgid "set synth volume"
-msgstr ""
+msgstr "fijar volumen del sintetizador"
 
 #: js/VolumeBlocks.js:227
 #: js/VolumeBlocks.js:402
+#.TRANS: USING SPANISH
 #.TRANS: sintetizador
 msgid "synth"
-msgstr ""
+msgstr "sintetizador"
 
 #: js/VolumeBlocks.js:227
 #: js/VolumeBlocks.js:368
 #: js/VolumeBlocks.js:402
+#.TRANS: USING SPANISH
 #.TRANS: volumen
 msgid "volume"
-msgstr ""
+msgstr "volumen"
 
 #: js/VolumeBlocks.js:260
 #: js/VolumeBlocks.js:433
 #: js/VolumeBlocks.js:535
 #: js/VolumeBlocks.js:598
+#.TRANS: USING SPANISH
 #.TRANS: Ajuste el volumen a 0
 msgid "Setting volume to 0."
-msgstr ""
+msgstr "Ajuste el volumen a 0"
 
 #: js/VolumeBlocks.js:266
 #: js/VolumeBlocks.js:439
 #: js/synthutils.js:70
 #: js/musicutils.js:607
 #.TRANS: polytone synthesizer
+#.TRANS: USING SPANISH
 #.TRANS: sintetizador electronico
 msgid "electronic synth"
-msgstr ""
+msgstr "sintetizador electronico"
 
 #: js/VolumeBlocks.js:297
+#.TRANS: USING SPANISH
 #.TRANS: No se encuentra el sintetizador.
 msgid "Synth not found"
-msgstr ""
+msgstr "No se encuentra el sintetizador."
 
 #: js/VolumeBlocks.js:360
 #.TRANS: set the loudness level
+#.TRANS: USING SPANISH
 #.TRANS: filar volumen del tambor
 msgid "set drum volume"
-msgstr ""
+msgstr "filar volumen del tambor"
 
 #: js/VolumeBlocks.js:389
+#.TRANS: USING SPANISH
 #.TRANS: por ejemplo, guitarra, violín, tambor
 msgid "eg guitar violin snare drum etc."
-msgstr ""
+msgstr "por ejemplo, guitarra, violín, tambor"
 
 #: js/VolumeBlocks.js:391
+#.TRANS: USING SPANISH
 #.TRANS: El volumen predeterminado es 50.
 msgid "The default volume is 50."
-msgstr ""
+msgstr "El volumen predeterminado es 50."
 
 #: js/VolumeBlocks.js:393
+#.TRANS: USING SPANISH
 #.TRANS: El rango es de 0 para el silencio a 100 para el volumen completo.
 msgid "The range is 0 for silence to 100 for full volume."
-msgstr ""
+msgstr "El rango es de 0 para el silencio a 100 para el volumen completo."
 
 #: js/VolumeBlocks.js:505
 #: js/VolumeBlocks.js:562
@@ -1494,14 +1579,16 @@ msgid "fraction"
 msgstr "phatmi"
 
 #: js/ExtrasBlocks.js:7
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: convertir un número racional en fracción"
 msgid "Convert a float to a fraction"
-msgstr ""
+msgstr "convertir un número racional en fracción""
 
 #: js/ExtrasBlocks.js:45
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque abrir la paleta abre una paleta"
 msgid "The Open palette block opens a palette."
-msgstr ""
+msgstr "El bloque abrir la paleta abre una paleta""
 
 #: js/ExtrasBlocks.js:51
 #.TRANS: abrir la paleta
@@ -1509,9 +1596,10 @@ msgid "open palette"
 msgstr "llimp’ipa taqinta kichay"
 
 #: js/ExtrasBlocks.js:83
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque eliminar bloque elimina un bloque
 msgid "The Delete block block removes a block."
-msgstr ""
+msgstr "El bloque eliminar bloque elimina un bloque"
 
 #: js/ExtrasBlocks.js:91
 #.TRANS: Move this block to the trash.
@@ -1520,9 +1608,10 @@ msgid "delete block"
 msgstr "kay chiqasta chanqapuy"
 
 #: js/ExtrasBlocks.js:141
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque mover bloque mueve un bloque.
 msgid "The Move block block moves a block."
-msgstr ""
+msgstr "El bloque mover bloque mueve un bloque."
 
 #: js/ExtrasBlocks.js:148
 #.TRANS: Move the position of a block on the screen.
@@ -1543,9 +1632,10 @@ msgid "run block"
 msgstr "kay chiqasta ruray"
 
 #: js/ExtrasBlocks.js:243
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque connectar conecta dos bloques
 msgid "The Dock block block connections two blocks."
-msgstr ""
+msgstr "El bloque connectar conecta dos bloques"
 
 #: js/ExtrasBlocks.js:250
 #.TRANS: We can connect a block to another block.
@@ -1564,9 +1654,10 @@ msgid "connection number"
 msgstr "hap’ichiypa yupaynin""
 
 #: js/ExtrasBlocks.js:339
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque crear bloque crea un bloque.
 msgid "The Make block block creates a new block."
-msgstr ""
+msgstr "El bloque crear bloque crea un bloque."
 
 #: js/ExtrasBlocks.js:347
 #.TRANS: Create a new block programmatically.
@@ -1612,19 +1703,21 @@ msgid "show blocks"
 msgstr " chiqaskunata qhawachiy"
 
 #: js/ExtrasBlocks.js:631
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque mostrar bloques muestra los bloques.
 msgid "The Show blocks block shows the blocks."
-msgstr ""
+msgstr "El bloque mostrar bloques muestra los bloques."
 
 #: js/ExtrasBlocks.js:645
 #.TRANS: ocultar bloques
 msgid "hide blocks"
-msgstr " chiqaskunata pakay"
+msgstr "chiqaskunata pakay"
 
 #: js/ExtrasBlocks.js:648
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque ocultar esconde los bloques.
 msgid "The Hide blocks block hides the blocks."
-msgstr ""
+msgstr "El bloque ocultar esconde los bloques."
 
 #: js/ExtrasBlocks.js:673
 #.TRANS: abierto proyecto
@@ -1931,9 +2024,10 @@ msgstr "chawa chaninchasqa"
 
 #: js/ToneBlocks.js:369
 #.TRANS: A harmonic is a overtone.
+#.TRANS: USING SPANISH
 #.TRANS: armónico
 msgid "harmonic"
-msgstr ""
+msgstr "armónico"
 
 #: js/ToneBlocks.js:383
 #.TRANS: partials components in a harmonic series
@@ -2097,9 +2191,10 @@ msgid "input"
 msgstr "haykuna"
 
 #: js/SensorsBlocks.js:19
+#.TRANS: USING SPANISH
 #.TRANS: ingrese un valor
 msgid "Input a value"
-msgstr ""
+msgstr "ingrese un valor"
 
 #: js/SensorsBlocks.js:70
 #.TRANS: valor de entrada
@@ -2189,9 +2284,10 @@ msgid "to ASCII"
 msgstr "ASCIIman"
 
 #: js/SensorsBlocks.js:445
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque a ASCII convierte números a letras.
 msgid "The To ASCII block converts numbers to letters."
-msgstr ""
+msgstr "El bloque a ASCII convierte números a letras."
 
 #: js/SensorsBlocks.js:486
 #.TRANS: teclado
@@ -2199,9 +2295,10 @@ msgid "keyboard"
 msgstr "ñup’una taqi"
 
 #: js/SensorsBlocks.js:490
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque teclado devuelve entrada de teclado.
 msgid "The Keyboard block returns computer keyboard input."
-msgstr ""
+msgstr "El bloque teclado devuelve entrada de teclado."
 
 #: js/MediaBlocks.js:5
 #.TRANS: right side of the screen
@@ -2273,9 +2370,10 @@ msgid "The Camera block connects a webcam to the Show block."
 msgstr "Cámarata webman hap’ichiy"
 
 #: js/MediaBlocks.js:290
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque video selecciona video para al bloque mostrar.
 msgid "The Video block selects video for use with the Show block."
-msgstr ""
+msgstr "El bloque video selecciona video para al bloque mostrar."
 
 #: js/MediaBlocks.js:323
 #.TRANS: detener medios
@@ -2283,9 +2381,10 @@ msgid "stop media"
 msgstr "ruranakunata sayachiy"
 
 #: js/MediaBlocks.js:326
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque detener medios detiene la reproducción de audio o video. 
 msgid "The Stop media block stops audio or video playback."
-msgstr ""
+msgstr "El bloque detener medios detiene la reproducción de audio o video."
 
 #: js/MediaBlocks.js:341
 #: js/PitchBlocks.js:2260
@@ -2444,9 +2543,10 @@ msgstr "kunkan t’ikrasqa"
 
 #: js/PitchBlocks.js:1217
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: cambio en tono escalar
 msgid "scalar change in pitch"
-msgstr ""
+msgstr "cambio en tono escalar"
 
 #: js/PitchBlocks.js:1224
 #: js/PitchBlocks.js:2504
@@ -2621,20 +2721,22 @@ msgstr "iskay pata"
 #: js/musicutils.js:487
 #.TRANS: unison means the note is the same as the current note
 #.TRANS: unison is a music term related to intervals
+#.TRANS: USING SPANISH
 #.TRANS: unísono
 msgid "unison"
-msgstr ""
+msgstr "unísono"
 
 #: js/PitchBlocks.js:2008
+#.TRANS: USING SPANISH
 #.TRANS: En el ejemplo que se muestra arriba, el sol se desplaza hacia arriba a la.
 msgid "In the example shown above, sol is shifted up to la."
-msgstr ""
+msgstr "En el ejemplo que se muestra arriba, el sol se desplaza hacia arriba a la."
 
 #: js/PitchBlocks.js:2015
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 #.TRANS: transposición escalar
 msgid "scalar transpose"
-msgstr "  sayayninta  tupachiy haywapuynin"
+msgstr "sayayninta  tupachiy haywapuynin"
 
 #: js/PitchBlocks.js:2075
 #.TRANS: El bloque Accidental se utiliza para crear objetos punzantes y pisos.
@@ -2682,9 +2784,10 @@ msgstr "Hertz chiqas: ¿yaqapas huch’uy willakuy chiqaspi llamk’ayta munawaq
 #: js/PitchBlocks.js:2562
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: nth tono modal
 msgid "nth modal pitch"
-msgstr ""
+msgstr "nth tono modal"
 
 #: js/PitchBlocks.js:2548
 #: js/PitchBlocks.js:2578
@@ -2705,9 +2808,10 @@ msgid "heading"
 msgstr "mayman"
 
 #: js/GraphicsBlocks.js:10
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque rumbo devuelve la orientación del ratón.
 msgid "The Heading block returns the orientation of the mouse."
-msgstr ""
+msgstr "El bloque rumbo devuelve la orientación del ratón."
 
 #: js/GraphicsBlocks.js:53
 #.TRANS: y coordinate
@@ -2788,9 +2892,10 @@ msgid "control point 1"
 msgstr "arariwaq 1"
 
 #: js/GraphicsBlocks.js:362
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque bezier dibuja una curva bezier.
 msgid "The Bezier block draws a Bezier curve."
-msgstr ""
+msgstr "El bloque bezier dibuja una curva bezier."
 
 #: js/GraphicsBlocks.js:369
 #.TRANS: Bézier curves employ at least three points to define a curve
@@ -2799,9 +2904,10 @@ msgid "bezier"
 msgstr ""
 
 #: js/GraphicsBlocks.js:435
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Arco mueve el ratón en un arco.
 msgid "The Arc block moves the mouse in a arc."
-msgstr ""
+msgstr "El bloque Arco mueve el ratón en un arco."
 
 #: js/GraphicsBlocks.js:443
 #.TRANS: draws a part of the circumference of a circle
@@ -2826,9 +2932,10 @@ msgid "set heading"
 msgstr "mayman rinantam churay"
 
 #: js/GraphicsBlocks.js:502
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque fijar rumbo establece el rumbo del mouse.
 msgid "The Set heading block sets the heading of the mouse."
-msgstr ""
+msgstr "El bloque fijar rumbo establece el rumbo del mouse."
 
 #: js/GraphicsBlocks.js:560
 #.TRANS: set xy (Cartesian) position
@@ -2837,9 +2944,10 @@ msgid "set xy"
 msgstr "xy nisqata churay" "xy k’askachiy"
 
 #: js/GraphicsBlocks.js:627
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Derecha gira el ratón hacia la derecha.
 msgid "The Right block turns the mouse to the right."
-msgstr ""
+msgstr "El bloque Derecha gira el ratón hacia la derecha."
 
 #: js/GraphicsBlocks.js:635
 #.TRANS: right1 and right are when turning right (clockwise)
@@ -2929,9 +3037,10 @@ msgid "add 1 to"
 msgstr "1 yapay" "hukta yapay"
 
 #: js/BoxesBlocks.js:112
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque restar-1-de resta uno al valor almacenado en un cuadro.
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
-msgstr ""
+msgstr "El bloque restar-1-de resta uno al valor almacenado en un cuadro."
 
 #: js/BoxesBlocks.js:118
 #.TRANS: restar 1 de
@@ -2940,9 +3049,10 @@ msgstr "1 qichuy" "hukta qichuy"
 
 #: js/BoxesBlocks.js:137
 #: js/BoxesBlocks.js:204
-#.TRANS: El bloque Caja devuelve el valor almacenado en una caja .
+#.TRANS: USING SPANISH
+#.TRANS: El bloque Caja devuelve el valor almacenado en una caja.
 msgid "The Box block returns the value stored in a box."
-msgstr ""
+msgstr "El bloque Caja devuelve el valor almacenado en una caja."
 
 #: js/BoxesBlocks.js:145
 #: js/BoxesBlocks.js:148
@@ -2955,9 +3065,10 @@ msgstr "tawa k'uchu"
 
 #: js/BoxesBlocks.js:260
 #: js/BoxesBlocks.js:286
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Guardar en caja se utiliza para almacenar un valor en una caja.
 msgid "The Store in block will store a value in a box."
-msgstr ""
+msgstr "El bloque Guardar en caja se utiliza para almacenar un valor en una caja."
 
 #: js/BoxesBlocks.js:266
 #.TRANS: guardar en caja
@@ -3036,9 +3147,10 @@ msgid "perfect"
 msgstr "allinpuni"
 
 #: js/IntervalsBlocks.js:474
+#.TRANS: USING SPANISH
 #.TRANS: En la figura, agregamos sol# a sol.
 msgid "In the figure, we add sol# to sol."
-msgstr ""
+msgstr "En la figura, agregamos sol# a sol."
 
 #: js/IntervalsBlocks.js:590
 #.TRANS: acorde V
@@ -3063,32 +3175,35 @@ msgid "chord1"
 msgstr "1 tinkuq kunka"
 
 #: js/IntervalsBlocks.js:629
-#.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
-#.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
+#.TRANS: USING SPANISH
 #.TRANS: En la figura, sumamos la a sol.
 msgid "In the figure, we add la to sol."
-msgstr ""
+msgstr "En la figura, sumamos la a sol."
 
 #: js/IntervalsBlocks.js:691
 #.TRANS: define a custom mode
+#.TRANS: USING SPANISH
 #.TRANS: definir el modo
 msgid "define mode"
-msgstr ""
+msgstr "definir el modo"
 
 #: js/IntervalsBlocks.js:740
+#.TRANS: USING SPANISH
 #.TRANS: Agregar el número de tono que falta 0.
 msgid "Adding missing pitch number 0."
-msgstr ""
+msgstr "Agregar el número de tono que falta 0."
 
 #: js/IntervalsBlocks.js:758
+#.TRANS: USING SPANISH
 #.TRANS: Ignorando números de tono duplicados.
 msgid "Ignoring duplicate pitch numbers."
-msgstr ""
+msgstr "Ignorando números de tono duplicados."
 
 #: js/IntervalsBlocks.js:787
+#.TRANS: USING SPANISH
 #.TRANS: movible Do
 msgid "moveable Do"
-msgstr ""
+msgstr "movible Do"
 
 #: js/IntervalsBlocks.js:823
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -3097,9 +3212,10 @@ msgid "mode length"
 msgstr "Hina kay sunin"
 
 #: js/IntervalsBlocks.js:832
+#.TRANS: USING SPANISH
 #.TRANS: La mayoría de las escalas occidentales tienen 7 notas.
 msgid "Most Western scales have 7 notes."
-msgstr ""
+msgstr "La mayoría de las escalas occidentales tienen 7 notas."
 
 #: js/IntervalsBlocks.js:858
 #.TRANS: the mode in music is 'major', 'minor', etc.
@@ -3122,9 +3238,10 @@ msgstr "kichananta takyachiy"
 
 #: js/IntervalsBlocks.js:941
 #: js/IntervalsBlocks.js:947
-#.TRANS: El bloque Fijar tecla se usa para configurar la tecla y el modo,
+#.TRANS: USING SPANISH
+#.TRANS: El bloque Fijar tecla se usa para configurar la tecla y el modo.
 msgid "The Set key block is used to set the key and mode,"
-msgstr ""
+msgstr "El bloque Fijar tecla se usa para configurar la tecla y el modo."
 
 #: js/IntervalsBlocks.js:949
 #.TRANS: por ejemplo, C Mayor
@@ -3144,9 +3261,10 @@ msgid "mode"
 msgstr "Tupasqa kunkakuna"
 
 #: js/NumberBlocks.js:7
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Int devuelve un entero.
 msgid "The Int block returns an integer."
-msgstr ""
+msgstr "El bloque Int devuelve un entero."
 
 #: js/NumberBlocks.js:13
 #.TRANS: 
@@ -3154,9 +3272,10 @@ msgid "int"
 msgstr ""
 
 #: js/NumberBlocks.js:55
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Mod devuelve el resto de una división.
 msgid "The Mod block returns the remainder from a division."
-msgstr ""
+msgstr "El bloque Mod devuelve el resto de una división."
 
 #: js/NumberBlocks.js:61
 #.TRANS: módulo
@@ -3164,14 +3283,16 @@ msgid "mod"
 msgstr "kunka tupachiy"
 
 #: js/NumberBlocks.js:115
+#.TRANS: USING SPANISH
 #.TRANS: El bloque de potencia calcula una función de potencia.
 msgid "The Power block calculates a power function."
-msgstr ""
+msgstr "El bloque de potencia calcula una función de potencia."
 
 #: js/NumberBlocks.js:187
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Sqrt devuelve la raíz cuadrada.
 msgid "The Sqrt block returns the square root."
-msgstr ""
+msgstr "El bloque Sqrt devuelve la raíz cuadrada."
 
 #: js/NumberBlocks.js:193
 #.TRANS: raíz
@@ -3179,9 +3300,10 @@ msgid "sqrt"
 msgstr "saphi"
 
 #: js/NumberBlocks.js:238
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Abs devuelve el valor absoluto.
 msgid "The Abs block returns the absolute value."
-msgstr ""
+msgstr "El bloque Abs devuelve el valor absoluto."
 
 #: js/NumberBlocks.js:244
 #.TRANS: 
@@ -3215,9 +3337,10 @@ msgid "The Plus block is used to add."
 msgstr "Plus t’aqaqa yapanapaq apaykachakun"
 
 #: js/NumberBlocks.js:911
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Uno de estos devuelve una de dos opciones.
 msgid "The One-of block returns one of two choices."
-msgstr ""
+msgstr "El bloque Uno de estos devuelve una de dos opciones."
 
 #: js/NumberBlocks.js:918
 #.TRANS: uno de estos
@@ -3235,9 +3358,10 @@ msgid "that"
 msgstr "chay"
 
 #: js/NumberBlocks.js:983
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Aleatorio devuelve un número aleatorio.
 msgid "The Random block returns a random number."
-msgstr ""
+msgstr "El bloque Aleatorio devuelve un número aleatorio."
 
 #: js/NumberBlocks.js:990
 #.TRANS: aleatorio
@@ -3261,14 +3385,16 @@ msgstr "Yupay t’aqaqa huk yupayniyuq"
 
 #: js/HeapBlocks.js:16
 #.TRANS: load the heap contents from a URL
+#.TRANS: USING SPANISH
 #.TRANS: cargar pila desde aplicación
 msgid "load heap from App"
-msgstr ""
+msgstr "cargar pila desde aplicación"
 
 #: js/HeapBlocks.js:42
+#.TRANS: USING SPANISH
 #.TRANS: Error de análisis de datos JSON.
 msgid "Error parsing JSON data:"
-msgstr ""
+msgstr "Error de análisis de datos JSON."
 
 #: js/HeapBlocks.js:46
 #.TRANS: 404: Página no encontrada.
@@ -3276,9 +3402,10 @@ msgid "404: Page not found"
 msgstr "mana tarisqa p’anqa"
 
 #: js/HeapBlocks.js:66
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Guardar-pila-en-app guarda la pila en una página web.
 msgid "The Save-heap-to-app block saves the heap to a web page."
-msgstr ""
+msgstr "El bloque Guardar-pila-en-app guarda la pila en una página web."
 
 #: js/HeapBlocks.js:73
 #.TRANS: save the heap contents to a URL
@@ -3301,7 +3428,7 @@ msgstr "qutu rikuchiy"
 #: js/HeapBlocks.js:138
 #.TRANS: El bloque Longitud de la pila devuelve la longitud de la pila.
 msgid "The Heap-length block returns the length of the heap."
-msgstr ""
+msgstr "El bloque Longitud de la pila devuelve la longitud de la pila."
 
 #: js/HeapBlocks.js:145
 #.TRANS: How many entries are in the heap?
@@ -3312,7 +3439,7 @@ msgstr "qutuq sunin"
 #: js/HeapBlocks.js:165
 #.TRANS: El bloque Pila-vacío? devuelve verdadero si la pila está vacío.
 msgid "The Heap-empty? block returns true if the heap is empty."
-msgstr ""
+msgstr "El bloque Pila-vacío? devuelve verdadero si la pila está vacío."
 
 #: js/HeapBlocks.js:172
 #: plugins/heap.rtp:134
@@ -3324,7 +3451,7 @@ msgstr "Llapan qutupi mana kanchu?"
 #: js/HeapBlocks.js:191
 #.TRANS: El bloque Vacío pila vacía la pila.
 msgid "The Empty-heap block empties the heap."
-msgstr ""
+msgstr "El bloque Vacío pila vacía la pila."
 
 #: js/HeapBlocks.js:198
 #: js/HeapBlocks.js:462
@@ -3338,7 +3465,7 @@ msgstr "ch’usaq qutu"
 #: js/HeapBlocks.js:212
 #.TRANS: El bloque Guardar pila guarda la pila en un archivo.
 msgid "The Save-heap block saves the heap to a file."
-msgstr ""
+msgstr "El bloque Guardar pila guarda la pila en un archivo."
 
 #: js/HeapBlocks.js:219
 #: plugins/heap.rtp:150
@@ -3348,9 +3475,10 @@ msgid "save heap"
 msgstr "Qutupi waqaychay"
 
 #: js/HeapBlocks.js:243
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Cargar pila carga la pila de un archivo.
 msgid "The Load-heap block loads the heap from a file."
-msgstr ""
+msgstr "El bloque Cargar pila carga la pila de un archivo."
 
 #: js/HeapBlocks.js:250
 #: plugins/heap.rtp:160
@@ -3366,14 +3494,16 @@ msgstr "Huk waqaychasqata ch’ikuy"
 
 #: js/HeapBlocks.js:288
 #: plugins/heap.rtp:102
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Pila de carga necesita un bloque de archivo de carga.
 msgid "The loadHeap block needs a loadFile block."
-msgstr ""
+msgstr "El bloque Pila de carga necesita un bloque de archivo de carga."
 
 #: js/HeapBlocks.js:300
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Pila inversa invierte el orden de la pila.
 msgid "The Reverse-heap block reverses the order of the heap."
-msgstr ""
+msgstr "El bloque Pila inversa invierte el orden de la pila."
 
 #: js/HeapBlocks.js:307
 #.TRANS: reverse the order of the heap
@@ -3383,9 +3513,10 @@ msgstr "Qutu tikray"
 
 #: js/HeapBlocks.js:332
 #.TRANS: retrieve a value from the heap at index position in the heap
+#.TRANS: USING SPANISH
 #.TRANS: valor en la pila
 msgid "index heap"
-msgstr ""
+msgstr "valor en la pila"
 
 #: js/HeapBlocks.js:390
 #.TRANS: modificar valor en pila
@@ -3393,9 +3524,10 @@ msgid "set heap"
 msgstr "Qutu kutichiy"
 
 #: js/HeapBlocks.js:444
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Pop elimina el valor en la parte superior del pila.
 msgid "The Pop block removes the value at the top of the heap."
-msgstr ""
+msgstr "El bloque Pop elimina el valor en la parte superior del pila."
 
 #: js/HeapBlocks.js:451
 #: plugins/heap.rtp:118
@@ -3405,9 +3537,10 @@ msgid "pop"
 msgstr "hurquy"
 
 #: js/HeapBlocks.js:474
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Push agrega un valor a la parte superior del pila.
 msgid "The Push block adds a value to the top of the heap."
-msgstr ""
+msgstr "El bloque Push agrega un valor a la parte superior del pila."
 
 #: js/HeapBlocks.js:481
 #: plugins/heap.rtp:109
@@ -3417,9 +3550,10 @@ msgid "push"
 msgstr "tawqay"
 
 #: js/BooleanBlocks.js:7
+#.TRANS: USING SPANISH
 #.TRANS: El bloque No es el operador lógico no.
 msgid "The Not block is the logical not operator."
-msgstr ""
+msgstr "El bloque No es el operador lógico no."
 
 #: js/BooleanBlocks.js:13
 #.TRANS: no
@@ -3427,9 +3561,10 @@ msgid "not"
 msgstr "mana"
 
 #: js/BooleanBlocks.js:49
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Y es el lógico y el operador.
 msgid "The And block is the logical and operator."
-msgstr ""
+msgstr "El bloque Y es el lógico y el operador."
 
 #: js/BooleanBlocks.js:55
 #.TRANS: y
@@ -3437,9 +3572,10 @@ msgid "and"
 msgstr "hinallataq"
 
 #: js/BooleanBlocks.js:88
+#.TRANS: USING SPANISH
 #.TRANS: El bloque O es el lógico o el operador.
 msgid "The Or block is the logical or operator."
-msgstr ""
+msgstr "El bloque O es el lógico o el operador."
 
 #: js/BooleanBlocks.js:94
 #.TRANS: o
@@ -3447,9 +3583,10 @@ msgid "or"
 msgstr "utaq"
 
 #: js/BooleanBlocks.js:127
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: El bloque XOR es el lógico XOR el operador.
 msgid "The XOR block is the logical XOR operator."
-msgstr ""
+msgstr "El bloque XOR es el lógico XOR el operador."
 
 #: js/BooleanBlocks.js:133
 #.TRANS: 
@@ -3457,14 +3594,16 @@ msgid "xor"
 msgstr ""
 
 #: js/BooleanBlocks.js:267
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Igual devuelve verdadero si los dos números son iguales.
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr ""
+msgstr "El bloque Igual devuelve verdadero si los dos números son iguales."
 
 #: js/BooleanBlocks.js:312
+#.TRANS: USING SPANISH
 #.TRANS: El bloque Booleano se utiliza para especificar verdadero o falso.
 msgid "The Boolean block is used to specify true or false."
-msgstr ""
+msgstr "El bloque Booleano se utiliza para especificar verdadero o falso."
 
 #: js/help.js:62
 #.TRANS: 
@@ -3493,9 +3632,10 @@ msgstr "qayllampi"
 
 #: js/help.js:279
 #: js/help.js:308
+#.TRANS: USING SPANISH
 #.TRANS: Felicitaciones.
 msgid "Congratulations."
-msgstr ""
+msgstr "Felicitaciones."
 
 #: js/musickeyboard.js:419
 #: js/musickeyboard.js:583
@@ -3554,9 +3694,10 @@ msgstr "pichay"
 
 #: js/musickeyboard.js:451
 #: js/pitchtimematrix.js:296
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Agrega una nota
 msgid "Add note"
-msgstr ""
+msgstr "Agrega una nota"
 
 #: js/musickeyboard.js:456
 #: js/temperament.js:2132
@@ -3606,9 +3747,10 @@ msgstr "iskay t’aqlla"
 #: js/temperament.js:1762
 #: js/modewidget.js:920
 #: js/pitchstaircase.js:520
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Nuevo bloque de acción creado!
 msgid "New action block generated!"
-msgstr ""
+msgstr "Nuevo bloque de acción creado!"
 
 #: js/pitchdrummatrix.js:152
 #: js/timbre.js:1033
@@ -3625,9 +3767,10 @@ msgid "rest"
 msgstr "samay"
 
 #: js/pitchdrummatrix.js:315
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en la cuadrícula para asignar notas a sonidos de tambors
 msgid "Click in the grid to map notes to drums."
-msgstr ""
+msgstr "Haga clic en la cuadrícula para asignar notas a sonidos de tambors"
 
 #: js/pitchslider.js:330
 #.TRANS: Ascender
@@ -3640,9 +3783,10 @@ msgid "Move down"
 msgstr "uraqay"
 
 #: js/pitchslider.js:349
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Haga clic en el control deslizante para crear un bloque de notas.
 msgid "Click on the slider to create a note block."
-msgstr ""
+msgstr "Haga clic en el control deslizante para crear un bloque de notas."
 
 #: js/pitchtimematrix.js:282
 #.TRANS: Exportar
@@ -3655,9 +3799,10 @@ msgid "Sort"
 msgstr "ñiq’ichay"
 
 #: js/pitchtimematrix.js:676
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en la tabla para agregar notas.
 msgid "Click on the table to add notes."
-msgstr ""
+msgstr "Haga clic en la tabla para agregar notas."
 
 #: js/pitchtimematrix.js:734
 #.TRANS: gráficos
@@ -3671,9 +3816,10 @@ msgstr "qillqana"
 
 #: js/pitchtimematrix.js:2544
 #: js/pitchtimematrix.js:2678
+#.TRANS: USING SPANISH
 #.TRANS: valor del tuplet
 msgid "tuplet value"
-msgstr ""
+msgstr "valor del tuplet"
 
 #: js/meterwidget.js:68
 #: js/meterwidget.js:70
@@ -3704,9 +3850,10 @@ msgid "Stop"
 msgstr "Sayachiy"
 
 #: js/meterwidget.js:137
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: Haga clic en el círculo para seleccionar ritmos fuertes para el medidor.
 msgid "Click in the circle to select strong beats for the meter."
-msgstr ""
+msgstr "Haga clic en el círculo para seleccionar ritmos fuertes para el medidor."
 
 #: js/timbre.js:819
 #.TRANS: Sintetizador
@@ -3749,9 +3896,10 @@ msgid "Undo"
 msgstr "paskay"
 
 #: js/timbre.js:1044
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en los botones para abrir las herramientas de diseño de timbre.
 msgid "Click on buttons to open the timbre design tools."
-msgstr ""
+msgstr "Haga clic en los botones para abrir las herramientas de diseño de timbre."
 
 #: js/timbre.js:1311
 #.TRANS: armonía
@@ -3770,9 +3918,10 @@ msgid "vibrato amount"
 msgstr "kunkachasqa"
 
 #: js/timbre.js:2037
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: filtro ya presente
 msgid "Filter already present."
-msgstr ""
+msgstr "filtro ya presente"
 
 #: js/timbre.js:2472
 #.TRANS: retraso (MS)
@@ -3780,15 +3929,17 @@ msgid "delay (MS)"
 msgstr "qhipariy"
 
 #: js/timbre.js:2674
+#.TRANS: USING SPANISH
 #.TRANS: cantidad de distorsión
 msgid "distortion amount"
-msgstr ""
+msgstr "cantidad de distorsión"
 
 #: js/tempo.js:83
 #: js/tempo.js:88
+#.TRANS: USING SPANISH
 #.TRANS: Los latidos por minuto deben estar entre 30 y 1000.
 msgid "The beats per minute must be between 30 and 1000."
-msgstr ""
+msgstr "Los latidos por minuto deben estar entre 30 y 1000."
 
 #: js/tempo.js:283
 #: js/tempo.js:289
@@ -3817,9 +3968,10 @@ msgid "slow down"
 msgstr "qhipariy"
 
 #: js/tempo.js:412
+#.TRANS: USING SPANISH
 #.TRANS: Ajusta el tempo con los botones.
 msgid "Adjust the tempo with the buttons."
-msgstr ""
+msgstr "Ajusta el tempo con los botones."
 
 #: js/pitchtracker.js:181
 #: js/pitchtracker.js:200
@@ -3837,9 +3989,10 @@ msgid "Stop Recording"
 msgstr ""
 
 #: js/pitchtracker.js:312
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: guardar ritmos
 msgid "save rhythms"
-msgstr ""
+msgstr "guardar ritmos"
 
 #: js/pitchtracker.js:452
 #.TRANS: cerrar
@@ -3847,9 +4000,10 @@ msgid "close"
 msgstr "wisq’ay"
 
 #: js/pitchtracker.js:475
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: arrastrar
 msgid "drag"
-msgstr ""
+msgstr "arrastrar"
 
 #: js/rhythmruler.js:143
 #: js/rhythmruler.js:145
@@ -3857,14 +4011,15 @@ msgstr ""
 #: js/rhythmruler.js:344
 #: js/rhythmruler.js:956
 #: js/rhythmruler.js:958
+#.TRANS: USING SPANISH
 #.TRANS: tocar un ritmo
 msgid "tap a rhythm"
-msgstr ""
+msgstr "tocar un ritmo"
 
 #: js/rhythmruler.js:640
 #.TRANS: Se ha superado el valor máximo de 256.
 msgid "Maximum value of 256 has been exceeded."
-msgstr ""
+msgstr "Se ha superado el valor máximo de 256."
 
 #: js/rhythmruler.js:1211
 #: js/rhythmruler.js:1621
@@ -3895,14 +4050,16 @@ msgstr "tawa k’uchu t’impumusqakuna waqaychana"
 
 #: js/rhythmruler.js:2487
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
+#.TRANS: USING SPANISH
 #.TRANS: Toca un ritmo
 msgid "Tap a rhythm"
-msgstr ""
+msgstr "Toca un ritmo"
 
 #: js/rhythmruler.js:2742
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en la regla para dividirla.
 msgid "Click on the ruler to divide it."
-msgstr ""
+msgstr "Haga clic en la regla para dividirla."
 
 #: js/temperament.js:2239
 #.TRANS: añadir tonos
@@ -3910,9 +4067,10 @@ msgid "Add pitches"
 msgstr "kunkakuna yapay"
 
 #: js/modewidget.js:106
+#.TRANS: USING SPANISH
 #.TRANS: Girar en sentido antihorario
 msgid "Rotate counter clockwise"
-msgstr ""
+msgstr "Girar en sentido antihorario"
 
 #: js/modewidget.js:114
 #.TRANS: Girar en sentido horario
@@ -3926,24 +4084,28 @@ msgstr "Tikray"
 
 #: js/modewidget.js:167
 #.TRANS: A circle of notes represents the musical mode.
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en el círculo para seleccionar notas para el modo.
 msgid "Click in the circle to select notes for the mode."
-msgstr ""
+msgstr "Haga clic en el círculo para seleccionar notas para el modo."
 
 #: js/pitchstaircase.js:554
+#.TRANS: USING SPANISH
 #.TRANS: Tocar un acorde
 msgid "Play chord"
-msgstr ""
+msgstr "Tocar un acorde"
 
 #: js/pitchstaircase.js:562
+#.TRANS: USING SPANISH
 #.TRANS: Tocar una escala
 msgid "Play scale"
-msgstr ""
+msgstr "Tocar una escala"
 
 #: js/pitchstaircase.js:624
+#.TRANS: USING SPANISH
 #.TRANS: Haga clic en una nota para crear un nuevo paso.
 msgid "Click on a note to create a new step."
-msgstr ""
+msgstr "Haga clic en una nota para crear un nuevo paso."
 
 #: js/synthutils.js:18
 #: js/musicutils.js:613
@@ -4210,16 +4372,18 @@ msgstr "kastañuylas"
 #: js/synthutils.js:137
 #: js/musicutils.js:626
 #.TRANS: musical instrument
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: campana japonesa
 msgid "japanese bell"
-msgstr ""
+msgstr "campana japonesa"
 
 #: js/synthutils.js:139
 #: js/musicutils.js:629
 #.TRANS: a musically tuned set of bells
+#.TRANS: USING SPANISH
 #.TRANS: campaneo
 msgid "chime"
-msgstr " "
+msgstr "campaneo"
 
 #: js/synthutils.js:141
 #: js/musicutils.js:630
@@ -4233,7 +4397,7 @@ msgstr ""                        "
 #.TRANS: sound effect
 #.TRANS: estruendo
 msgid "clang"
-msgstr "raqhaqaqay""
+msgstr "raqhaqaqay"
 
 #: js/synthutils.js:145
 #: js/musicutils.js:632
@@ -4436,9 +4600,10 @@ msgstr ""
 
 #: js/musicutils.js:527
 #.TRANS: minor jazz scale for music
+#.TRANS: USING SPANISH
 #.TRANS: jazz menor
 msgid "jazz minor"
-msgstr ""
+msgstr "jazz menor"
 
 #: js/musicutils.js:529
 #.TRANS: bebop scale for music
@@ -4447,14 +4612,16 @@ msgid "bebop"
 msgstr ""
 
 #: js/musicutils.js:530
+#.TRANS: USING SPANISH
 #.TRANS: arábica
 msgid "arabic"
-msgstr ""
+msgstr "arábica"
 
 #: js/musicutils.js:531
+#.TRANS: USING SPANISH
 #.TRANS: bizantino
 msgid "byzantine"
-msgstr ""
+msgstr "bizantino"
 
 #: js/musicutils.js:533
 #.TRANS: musical scale for music by Verdi
@@ -4463,9 +4630,10 @@ msgid "enigmatic"
 msgstr "mana riqsichikuq"
 
 #: js/musicutils.js:534
+#.TRANS: USING SPANISH
 #.TRANS: etíope
 msgid "ethiopian"
-msgstr ""
+msgstr "etíope"
 
 #: js/musicutils.js:536
 #.TRANS: Ethiopic scale for music
@@ -4474,14 +4642,16 @@ msgid "geez"
 msgstr ""
 
 #: js/musicutils.js:537
+#.TRANS: USING SPANISH
 #.TRANS: hindú
 msgid "hindu"
-msgstr ""
+msgstr "hindú"
 
 #: js/musicutils.js:538
+#.TRANS: USING SPANISH
 #.TRANS: húngaro
 msgid "hungarian"
-msgstr ""
+msgstr "húngaro"
 
 #: js/musicutils.js:540
 #.TRANS: minor Romanian scale for music
@@ -4513,31 +4683,36 @@ msgid "major blues"
 msgstr "kuraq anqas"
 
 #: js/musicutils.js:548
+#.TRANS: USING SPANISH
 #.TRANS: tono completo
 msgid "whole tone"
-msgstr ""
+msgstr "tono completo"
 
 #: js/musicutils.js:550
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+#.TRANS: USING SPANISH
 #.TRANS: pentatonic minor
 msgid "minor pentatonic"
-msgstr ""
+msgstr "pentatonic minor"
 
 #: js/musicutils.js:552
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
+#.TRANS: USING SPANISH
 #.TRANS: pentatonic mayor
 msgid "major pentatonic"
-msgstr ""
+msgstr "pentatonic mayor"
 
 #: js/musicutils.js:553
+#.TRANS: USING SPANISH
 #.TRANS: chino
 msgid "chinese"
-msgstr ""
+msgstr "chino"
 
 #: js/musicutils.js:554
+#.TRANS: USING SPANISH
 #.TRANS: egipcio
 msgid "egyptian"
-msgstr ""
+msgstr "egipcio"
 
 #: js/musicutils.js:556
 #.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
@@ -4546,9 +4721,10 @@ msgid "hirajoshi"
 msgstr ""
 
 #: js/musicutils.js:557
+#.TRANS: USING SPANISH
 #.TRANS: Japón
 msgid "Japan"
-msgstr ""
+msgstr "Japón"
 
 #: js/musicutils.js:559
 #.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
@@ -4633,16 +4809,18 @@ msgid "simple 4"
 msgstr ""
 
 #: js/musicutils.js:625
-#.TRANS: 
+#.TRANS: USING SPANISH
+#.TRANS: tambor japonés
 msgid "japanese drum"
-msgstr ""
+msgstr "tambor japonés"
 
 #: js/musicutils.js:650
 #: js/musicutils.js:929
 #.TRANS: musical temperament
+#.TRANS: USING SPANISH
 #.TRANS: igual
 msgid "equal"
-msgstr ""
+msgstr "igual"
 
 #: js/musicutils.js:652
 #: js/musicutils.js:931
@@ -4654,9 +4832,10 @@ msgstr ""
 #: js/musicutils.js:654
 #: js/musicutils.js:930
 #.TRANS: musical temperament
+#.TRANS: USING SPANISH
 #.TRANS: solo entonación
 msgid "just intonation"
-msgstr ""
+msgstr "solo entonación"
 
 #: js/musicutils.js:656
 #: js/musicutils.js:932
@@ -4669,47 +4848,55 @@ msgstr ""
 #: js/musicutils.js:2495
 #: js/musicutils.js:2976
 #.TRANS: the note names must be separated by single spaces
+#.TRANS: USING SPANISH
 #.TRANS: si la sol fa mi re do
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "si la sol fa mi re do"
 
 #: js/musicutils.js:2651
 #: js/musicutils.js:2685
+#.TRANS: USING SPANISH
 #.TRANS: actuales
 msgid "current"
-msgstr ""
+msgstr "actuales"
 
 #: js/musicutils.js:2654
 #: js/musicutils.js:2676
+#.TRANS: USING SPANISH
 #.TRANS: próximo
 msgid "next"
-msgstr ""
+msgstr "próximo"
 
 #: js/musicutils.js:2657
 #: js/musicutils.js:2681
+#.TRANS: USING SPANISH
 #.TRANS: anterior
 msgid "previous"
-msgstr ""
+msgstr "anterior"
 
 #: js/StringHelper.js:16
+#.TRANS: USING SPANISH
 #.TRANS: Planeta
 msgid "Planet"
-msgstr ""
+msgstr "Planeta"
 
 #: js/StringHelper.js:17
+#.TRANS: USING SPANISH
 #.TRANS: Cerrar Planeta
 msgid "Close Planet"
-msgstr ""
+msgstr "Cerrar Planeta"
 
 #: js/StringHelper.js:18
+#.TRANS: USING SPANISH
 #.TRANS: Abrir proyecto desde archivo
 msgid "Open project from file"
-msgstr ""
+msgstr "Abrir proyecto desde archivo"
 
 #: js/StringHelper.js:19
+#.TRANS: USING SPANISH
 #.TRANS: Nuevo proyecto
 msgid "New project"
-msgstr ""
+msgstr "Nuevo proyecto"
 
 #: js/StringHelper.js:20
 #.TRANS: 
@@ -4722,86 +4909,101 @@ msgid "Global"
 msgstr ""
 
 #: js/StringHelper.js:22
+#.TRANS: USING SPANISH
 #.TRANS: Buscar un proyecto
 msgid "Search for a project"
-msgstr ""
+msgstr "Buscar un proyecto"
 
 #: js/StringHelper.js:23
 #: js/GlobalTag.js:17
 #.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: USING SPANISH
 #.TRANS: Mis proyectos
 msgid "My Projects"
-msgstr ""
+msgstr "Mis proyectos"
 
 #: js/StringHelper.js:24
 #: js/Publisher.js:127
+#.TRANS: USING SPANISH
 #.TRANS: Publicar el proyecto
 msgid "Publish Project"
-msgstr ""
+msgstr "Publicar el proyecto"
 
 #: js/StringHelper.js:25
+#.TRANS: USING SPANISH
 #.TRANS: Título del proyecto
 msgid "Project title"
-msgstr ""
+msgstr "Título del proyecto"
 
 #: js/StringHelper.js:26
+#.TRANS: USING SPANISH
 #.TRANS: Etiquetas (max 5)
 msgid "Tags (max 5)"
-msgstr ""
+msgstr "Etiquetas (max 5)"
 
 #: js/StringHelper.js:27
 #: js/StringHelper.js:47
+#.TRANS: USING SPANISH
 #.TRANS: Descripción
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: js/StringHelper.js:28
 #: js/StringHelper.js:53
+#.TRANS: USING SPANISH
 #.TRANS: Presentar
 msgid "Submit"
-msgstr ""
+msgstr "Presentar"
 
 #: js/StringHelper.js:29
 #: js/StringHelper.js:33
+#.TRANS: USING SPANISH
 #.TRANS: Cancelar
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: js/StringHelper.js:30
+#.TRANS: USING SPANISH
 #.TRANS: Borrar \\"<span id=\\"deleter-title\\"></span>\\"?
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
+msgstr "Borrar \\"<span id=\\"deleter-title\\"></span>\\"?"
 
 #: js/StringHelper.js:31
+#.TRANS: USING SPANISH
 #.TRANS: Eliminar permanentemente el proyecto \\"<span id=\\"deleter-name\\"></span>\\"?
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
+msgstr "Eliminar permanentemente el proyecto \\"<span id=\\"deleter-name\\"></span>\\"?"
 
 #: js/StringHelper.js:32
+#.TRANS: USING SPANISH
 #.TRANS: Borrar
 msgid "Delete"
-msgstr ""
+msgstr "Borrar"
 
 #: js/StringHelper.js:34
+#.TRANS: USING SPANISH
 #.TRANS: Explorar proyectos
 msgid "Explore Projects"
-msgstr ""
+msgstr "Explorar proyectos"
 
 #: js/StringHelper.js:35
 #: js/helper.js:141
+#.TRANS: USING SPANISH
 #.TRANS: Mostrar más etiquetas
 msgid "Show more tags"
-msgstr ""
+msgstr "Mostrar más etiquetas"
 
 #: js/StringHelper.js:36
+#.TRANS: USING SPANISH
 #.TRANS: Más reciente
 msgid "Most recent"
-msgstr ""
+msgstr "Más reciente"
 
 #: js/StringHelper.js:37
+#.TRANS: USING SPANISH
 #.TRANS: Más gustado
 msgid "Most liked"
-msgstr ""
+msgstr "Más gustado"
 
 #: js/StringHelper.js:38
 #.TRANS: Más descargados
@@ -4982,9 +5184,10 @@ msgstr "llapam llamk’aq"
 
 #: js/GlobalTag.js:29
 #.TRANS: On the Planet, we use labels to tag projects.
+#.TRANS: USING SPANISH
 #.TRANS: diseño
 msgid "Design"
-msgstr ""
+msgstr "diseño"
 
 #: js/GlobalTag.js:31
 #.TRANS: On the Planet, we use labels to tag projects.
@@ -5088,120 +5291,142 @@ msgid "Copy"
 msgstr "Kikinchay"
 
 #: js/LocalCard.js:21
+#.TRANS: USING SPANISH
 #.TRANS: Ver proyecto publicado
 msgid "View published project"
-msgstr ""
+msgstr "Ver proyecto publicado"
 
 #: js/LocalCard.js:24
+#.TRANS: USING SPANISH
 #.TRANS: Publicar proyecto
 msgid "Publish project"
-msgstr ""
+msgstr "Publicar proyecto"
 
 #: js/LocalCard.js:31
+#.TRANS: USING SPANISH
 #.TRANS: Editar proyecto
 msgid "Edit project"
-msgstr ""
+msgstr "Editar proyecto"
 
 #: js/LocalCard.js:32
+#.TRANS: USING SPANISH
 #.TRANS: Borrar proyecto
 msgid "Delete project"
-msgstr ""
+msgstr "Borrar proyecto"
 
 #: js/LocalCard.js:51
+#.TRANS: USING SPANISH
 #.TRANS: Descargar proyecto
 msgid "Download project"
-msgstr ""
+msgstr "Descargar proyecto"
 
 #: js/LocalCard.js:52
+#.TRANS: USING SPANISH
 #.TRANS: Unir con el proyecto actual
 msgid "Merge with current project"
-msgstr ""
+msgstr "Unir con el proyecto actual"
 
 #: js/LocalCard.js:53
+#.TRANS: USING SPANISH
 #.TRANS: Duplucar proyecto
 msgid "Duplicate project"
-msgstr ""
+msgstr "Duplucar proyecto"
 
 #: js/GlobalPlanet.js:15
+#.TRANS: USING SPANISH
 #.TRANS: No se han encontrado resultados.
 msgid "No results found."
-msgstr ""
+msgstr "No se han encontrado resultados."
 
 #: js/GlobalPlanet.js:31
+#.TRANS: USING SPANISH
 #.TRANS: Remix de
 msgid "Remix of"
-msgstr ""
+msgstr "Remix de"
 
 #: js/GlobalPlanet.js:383
+#.TRANS: USING SPANISH
 #.TRANS: No es posible conectar con el servidor.
 msgid "Cannot connect to server"
-msgstr ""
+msgstr "No es posible conectar con el servidor."
 
 #: plugins/finance.rtp:28
+#.TRANS: USING SPANISH
 #.TRANS: moneda
 msgid "currency"
-msgstr ""
+msgstr "moneda"
 
 #: plugins/finance.rtp:28
 #: plugins/bitcoin.rtp:27
+#.TRANS: USING SPANISH
 #.TRANS: desde
 msgid "from"
-msgstr ""
+msgstr "desde"
 
 #: plugins/finance.rtp:69
+#.TRANS: USING SPANISH
 #.TRANS: valor de acción
 msgid "stock price"
-msgstr ""
+msgstr "valor de acción"
 
 #: plugins/translate.rtp:73
+#.TRANS: USING SPANISH
 #.TRANS: traducir
 msgid "translate"
-msgstr ""
+msgstr "traducir"
 
 #: plugins/translate.rtp:78
 #: plugins/translate.rtp:89
+#.TRANS: USING SPANISH
 #.TRANS: hola
 msgid "hello"
-msgstr ""
+msgstr "hola"
 
 #: plugins/translate.rtp:84
+#.TRANS: USING SPANISH
 #.TRANS: detectar idioma
 msgid "detect lang"
-msgstr ""
+msgstr "detectar idioma"
 
 #: plugins/translate.rtp:95
+#.TRANS: USING SPANISH
 #.TRANS: cambiar idioma
 msgid "set lang"
-msgstr ""
+msgstr "cambiar idioma"
 
 #: plugins/gmap.rtp:30
+#.TRANS: USING SPANISH
 #.TRANS: latitud de la ciudad
 msgid "city latitude"
-msgstr ""
+msgstr "latitud de la ciudad"
 
 #: plugins/gmap.rtp:40
+#.TRANS: USING SPANISH
 #.TRANS: longitud de la ciudad
 msgid "city longitude"
-msgstr ""
+msgstr "longitud de la ciudad"
 
 #: plugins/gmap.rtp:71
 #: plugins/gmap.rtp:74
 #: plugins/gmap.rtp:104
 #: plugins/gmap.rtp:107
+#.TRANS: USING SPANISH
 #.TRANS: Coordinar datos no disponibles.
 msgid "Coordinate data not available."
-msgstr ""
+msgstr "Coordinar datos no disponibles."
 
 #: plugins/gmap.rtp:116
+#.TRANS: USING SPANISH
 #.TRANS: Mapa de Google
 msgid "Google map"
-msgstr ""
+msgstr "Mapa de Google"
 
 #: plugins/gmap.rtp:116
 #: plugins/gmap.rtp:160
+#.TRANS: USING SPANISH
 #.TRANS: coordenadas
 msgid "coordinates"
-msgstr ""
+msgstr "coordenadas"
 
 #: plugins/gmap.rtp:116
 #.TRANS: factor de zoom
@@ -5214,19 +5439,22 @@ msgid "zoom"
 msgstr ""
 
 #: plugins/gmap.rtp:160
+#.TRANS: USING SPANISH
 #.TRANS: latitud
 msgid "latitude"
-msgstr ""
+msgstr "latitud"
 
 #: plugins/gmap.rtp:160
+#.TRANS: USING SPANISH
 #.TRANS: longitud
 msgid "longitude"
-msgstr ""
+msgstr "longitud"
 
 #: plugins/maths.rtp:47
+#.TRANS: USING SPANISH
 #.TRANS: poder
 msgid "power"
-msgstr ""
+msgstr "poder"
 
 #: plugins/maths.rtp:47
 #.TRANS: base
@@ -5239,124 +5467,148 @@ msgid "exp"
 msgstr ""
 
 #: plugins/maths.rtp:69
+#.TRANS: USING SPANISH
 #.TRANS: piso
 msgid "floor"
-msgstr ""
+msgstr "piso"
 
 #: plugins/maths.rtp:71
+#.TRANS: USING SPANISH
 #.TRANS: techo
 msgid "ceiling"
-msgstr ""
+msgstr "techo"
 
 #: plugins/maths.rtp:74
+#.TRANS: USING SPANISH
 #.TRANS: grados
 msgid "degrees"
-msgstr ""
+msgstr "grados"
 
 #: plugins/maths.rtp:74
+#.TRANS: USING SPANISH
 #.TRANS: a grados
 msgid "to degrees"
-msgstr ""
+msgstr "a grados"
 
 #: plugins/maths.rtp:76
+#.TRANS: USING SPANISH
 #.TRANS: radianes
 msgid "radians"
-msgstr ""
+msgstr "radianes"
 
 #: plugins/maths.rtp:76
+#.TRANS: USING SPANISH
 #.TRANS: a radianes
 msgid "to radians"
-msgstr ""
+msgstr "a radianes"
 
 #: plugins/accelerometer.rtp:48
+#.TRANS: USING SPANISH
 #.TRANS: x del acelerómetro
 msgid "motion x"
-msgstr ""
+msgstr "x del acelerómetro"
 
 #: plugins/accelerometer.rtp:56
+#.TRANS: USING SPANISH
 #.TRANS: y del acelerómetro
 msgid "motion y"
-msgstr ""
+msgstr "y del acelerómetro"
 
 #: plugins/accelerometer.rtp:64
+#.TRANS: USING SPANISH
 #.TRANS: z del acelerómetro
 msgid "motion z"
-msgstr ""
+msgstr "z del acelerómetro"
 
 #: plugins/dictionary.rtp:25
+#.TRANS: USING SPANISH
 #.TRANS: definir
 msgid "define"
-msgstr ""
+msgstr "definir"
 
 #: plugins/nutrition.rtp:104
+#.TRANS: USING SPANISH
 #.TRANS: obtener calorías
 msgid "get calories"
-msgstr ""
+msgstr "obtener calorías"
 
 #: plugins/nutrition.rtp:107
+#.TRANS: USING SPANISH
 #.TRANS: obtener proteínas
 msgid "get protein"
-msgstr ""
+msgstr "obtener proteínas"
 
 #: plugins/nutrition.rtp:110
+#.TRANS: USING SPANISH
 #.TRANS: obtener carbohidratos
 msgid "get carbs"
-msgstr ""
+msgstr "obtener carbohidratos"
 
 #: plugins/nutrition.rtp:113
+#.TRANS: USING SPANISH
 #.TRANS: obtener fibra
 msgid "get fiber"
-msgstr ""
+msgstr "obtener fibra"
 
 #: plugins/nutrition.rtp:116
+#.TRANS: USING SPANISH
 #.TRANS: obtener grasas
 msgid "get fat"
-msgstr ""
+msgstr "obtener grasas"
 
 #: plugins/nutrition.rtp:119
+#.TRANS: USING SPANISH
 #.TRANS: obtener nombre
 msgid "get name"
-msgstr ""
+msgstr "obtener nombre"
 
 #: plugins/nutrition.rtp:122
+#.TRANS: USING SPANISH
 #.TRANS: calorías
 msgid "calories"
-msgstr ""
+msgstr "calorías"
 
 #: plugins/nutrition.rtp:128
+#.TRANS: USING SPANISH
 #.TRANS: proteína
 msgid "protein"
-msgstr ""
+msgstr "proteína"
 
 #: plugins/nutrition.rtp:134
+#.TRANS: USING SPANISH
 #.TRANS: carbohidratos
 msgid "carbs"
-msgstr ""
+msgstr "carbohidratos"
 
 #: plugins/nutrition.rtp:140
+#.TRANS: USING SPANISH
 #.TRANS: fibra
 msgid "fiber"
-msgstr ""
+msgstr "fibra"
 
 #: plugins/nutrition.rtp:146
+#.TRANS: USING SPANISH
 #.TRANS: grasa
 msgid "fat"
-msgstr ""
+msgstr "grasa"
 
 #: plugins/nutrition.rtp:152
+#.TRANS: USING SPANISH
 #.TRANS: comer
 msgid "eat"
-msgstr ""
+msgstr "comer"
 
 #: plugins/nutrition.rtp:155
+#.TRANS: USING SPANISH
 #.TRANS: digerir
 msgid "digest meal"
-msgstr ""
+msgstr "digerir"
 
 #: plugins/nutrition.rtp:158
+#.TRANS: USING SPANISH
 #.TRANS: manzana
 msgid "apple"
-msgstr ""
+msgstr "manzana"
 
 #: plugins/nutrition.rtp:161
 #.TRANS: banana
@@ -5364,79 +5616,94 @@ msgid "banana"
 msgstr ""
 
 #: plugins/nutrition.rtp:167
+#.TRANS: USING SPANISH
 #.TRANS: pan
 msgid "wheat bread"
-msgstr ""
+msgstr "pan"
 
 #: plugins/nutrition.rtp:170
+#.TRANS: USING SPANISH
 #.TRANS: maíz
 msgid "corn"
-msgstr ""
+msgstr "maíz"
 
 #: plugins/nutrition.rtp:173
+#.TRANS: USING SPANISH
 #.TRANS: papa
 msgid "potato"
-msgstr ""
+msgstr "papa"
 
 #: plugins/nutrition.rtp:176
+#.TRANS: USING SPANISH
 #.TRANS: boñato
 msgid "sweet potato"
-msgstr ""
+msgstr "boñato"
 
 #: plugins/nutrition.rtp:179
+#.TRANS: USING SPANISH
 #.TRANS: tomate
 msgid "tomato"
-msgstr ""
+msgstr "tomate"
 
 #: plugins/nutrition.rtp:182
+#.TRANS: USING SPANISH
 #.TRANS: brócoli
 msgid "broccoli"
-msgstr ""
+msgstr "brócoli"
 
 #: plugins/nutrition.rtp:185
+#.TRANS: USING SPANISH
 #.TRANS: arroz y frijoles
 msgid "rice and beans"
-msgstr ""
+msgstr "arroz y frijoles"
 
 #: plugins/nutrition.rtp:188
+#.TRANS: USING SPANISH
 #.TRANS: tamal
 msgid "tamale"
-msgstr ""
+msgstr "tamal"
 
 #: plugins/nutrition.rtp:191
+#.TRANS: USING SPANISH
 #.TRANS: queso
 msgid "cheese"
-msgstr ""
+msgstr "queso"
 
 #: plugins/nutrition.rtp:194
+#.TRANS: USING SPANISH
 #.TRANS: pollo
 msgid "chicken"
-msgstr ""
+msgstr "pollo"
 
 #: plugins/nutrition.rtp:197
+#.TRANS: USING SPANISH
 #.TRANS: pescado
 msgid "fish"
-msgstr ""
+msgstr "pescado"
 
 #: plugins/nutrition.rtp:200
+#.TRANS: USING SPANISH
 #.TRANS: carne de res
 msgid "beef"
-msgstr ""
+msgstr "carne de res"
 
 #: plugins/nutrition.rtp:203
+#.TRANS: USING SPANISH
 #.TRANS: pastel
 msgid "cake"
-msgstr ""
+msgstr "pastel"
 
 #: plugins/nutrition.rtp:206
+#.TRANS: USING SPANISH
 #.TRANS: galleta
 msgid "cookie"
-msgstr ""
+msgstr "galleta"
 
 #: plugins/nutrition.rtp:209
+#.TRANS: USING SPANISH
 #.TRANS: agua
 msgid "water"
-msgstr ""
+msgstr "agua"
 
 #: plugins/bitcoin.rtp:27
 #.TRANS: bitcoin
@@ -5444,79 +5711,93 @@ msgid "bitcoin"
 msgstr ""
 
 #: plugins/facebook.rtp:27
+#.TRANS: USING SPANISH
 #.TRANS: publicar
 msgid "publish"
-msgstr ""
+msgstr "publicar"
 
 #: plugins/turtle.rtp:42
+#.TRANS: USING SPANISH
 #.TRANS: tortuga x
 msgid "turtle x"
-msgstr ""
+msgstr "tortuga x"
 
 #: plugins/turtle.rtp:52
+#.TRANS: USING SPANISH
 #.TRANS: tortuga y
 msgid "turtle y"
-msgstr ""
+msgstr "tortuga y"
 
 #: plugins/turtle.rtp:62
+#.TRANS: USING SPANISH
 #.TRANS: iniciar tortuga
 msgid "start turtle"
-msgstr ""
+msgstr "iniciar tortuga"
 
 #: plugins/turtle.rtp:72
+#.TRANS: USING SPANISH
 #.TRANS: detener tortuga
 msgid "stop turtle"
-msgstr ""
+msgstr "detener tortuga"
 
 #: plugins/turtle.rtp:82
+#.TRANS: USING SPANISH
 #.TRANS: renombrar tortuga
 msgid "turtle name"
-msgstr ""
+msgstr "renombrar tortuga"
 
 #: plugins/weather.rtp:62
 #: plugins/weather.rtp:86
+#.TRANS: USING SPANISH
 #.TRANS: Los días siguientes deben estar en el rango de -1 a 5.
 msgid "Days ahead must be in the range of -1 to 5."
-msgstr ""
+msgstr "Los días siguientes deben estar en el rango de -1 a 5."
 
 #: plugins/weather.rtp:107
+#.TRANS: USING SPANISH
 #.TRANS: pronóstico
 msgid "forecast"
-msgstr ""
+msgstr "pronóstico"
 
 #: plugins/weather.rtp:108
 #: plugins/weather.rtp:122
 #: plugins/weather.rtp:135
+#.TRANS: USING SPANISH
 #.TRANS: ciudad
 msgid "city"
-msgstr ""
+msgstr "ciudad"
 
 #: plugins/weather.rtp:109
 #: plugins/weather.rtp:123
 #: plugins/weather.rtp:136
+#.TRANS: USING SPANISH
 #.TRANS: día
 msgid "day"
-msgstr ""
+msgstr "día"
 
 #: plugins/weather.rtp:121
+#.TRANS: USING SPANISH
 #.TRANS: alta
 msgid "high"
-msgstr ""
+msgstr "alta"
 
 #: plugins/weather.rtp:134
+#.TRANS: USING SPANISH
 #.TRANS: baja
 msgid "low"
-msgstr ""
+msgstr "baja"
 
 #: plugins/rodi.rtp:176
+#.TRANS: USING SPANISH
 #.TRANS: parpadear
 msgid "blink"
-msgstr ""
+msgstr "parpadear"
 
 #: plugins/rodi.rtp:195
+#.TRANS: USING SPANISH
 #.TRANS: tocar
 msgid "play"
-msgstr ""
+msgstr "tocar"
 
 #: plugins/rodi.rtp:250
 #.TRANS: 
@@ -5524,32 +5805,38 @@ msgid "led"
 msgstr ""
 
 #: plugins/rodi.rtp:269
+#.TRANS: USING SPANISH
 #.TRANS: intensidad de luz
 msgid "light intensity"
-msgstr ""
+msgstr "intensidad de luz"
 
 #: plugins/rodi.rtp:286
+#.TRANS: USING SPANISH
 #.TRANS: luz infrarroja (izquierda)
 msgid "infrared light (left)"
-msgstr ""
+msgstr "luz infrarroja (izquierda)"
 
 #: plugins/rodi.rtp:300
+#.TRANS: USING SPANISH
 #.TRANS: luz infrarroja (derecha)
 msgid "infrared light (right)"
-msgstr ""
+msgstr "luz infrarroja (derecha)"
 
 #: plugins/rodi.rtp:342
+#.TRANS: USING SPANISH
 #.TRANS: mover
 msgid "move"
-msgstr ""
+msgstr "mover"
 
 #: plugins/heap.rtp:81
 #: plugins/heap.rtp:85
+#.TRANS: USING SPANISH
 #.TRANS: Debe seleccionar un archivo.
 msgid "You need to select a file."
-msgstr ""
+msgstr "Debe seleccionar un archivo."
 
 #: plugins/heap.rtp:96
+#.TRANS: USING SPANISH
 #.TRANS: El archivo seleccionado no contiene un pila válida.
 msgid "The file you selected does not contain a valid heap."
-msgstr ""
+msgstr "El archivo seleccionado no contiene un pila válida."
