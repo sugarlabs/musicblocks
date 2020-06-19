@@ -160,7 +160,7 @@ function StatusMatrix() {
                 case "outputtools":
                     var label = this._logo.blocks.blockList[
                             this._logo.statusFields[i][0]
-                        ].postProcessArg[1];
+                        ].value;
                     break;
                 default:
                     var label = this._logo.blocks.blockList[
@@ -312,6 +312,45 @@ function StatusMatrix() {
                                     value += freq.toFixed(2);
                                 }
                             }
+                        }
+                        break;
+                    case "outputtools":
+                        var value = "";
+                        let blockName = this._logo.blocks.blockList[
+                            this._logo.statusFields[i][0]
+                        ].value;
+                        if (logo.noteStatus[turtle] !== null) {
+                            let lc = logo.noteStatus[turtle][0][0][0];
+                            switch (blockName) {
+                                case "letter class": 
+                                    value = lc;
+                                    break;
+                                case "solfege syllable":
+                                    if (this._logo.moveable[turtle] === false) {
+                                        value = SOLFEGECONVERSIONTABLE[lc];
+                                    }
+                                    break;
+                                case "pitch class":
+                                    let note = this._logo.lastPitchPlayed[0][0];
+                                    let num = pitchToNumber(
+                                        note.substr(0, note.length - 1 ),
+                                        note[note.length - 1],
+                                        this._logo.keySignature[turtle]
+                                    );
+                                    value = (num - 3) % 12;
+                                    break;
+                                case "scalar class":
+                                    value = 4;
+                                    break;
+                                case "scale degree":
+                                    value = 5;
+                                    break;
+                                case "nth degree":
+                                    value = 6;
+                                    break;
+                            }
+                        } else {
+                            value = "";
                         }
                         break;
                     default:

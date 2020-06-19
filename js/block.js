@@ -1234,13 +1234,7 @@ function Block(protoblock, blocks, overrideName) {
                 if(attr !== "♮") {
                     label += attr;
                 }
-<<<<<<< HEAD
-            } else if (this.name === "drumname") {
-=======
-            } else if(this.name === "outputtools") {
-                label = this.value;
             } else if (this.name === "drumname") { 
->>>>>>> block struct
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
