@@ -829,6 +829,7 @@ function Activity() {
         logo.boxes = {};
         logo.time = 0;
         hideMsgs();
+	hideGrids();
         logo.setBackgroundColor(-1);
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
