@@ -859,7 +859,7 @@ function setupExtrasBlocks() {
                             }
                         } else if (logo.runningLilypond) {
 			    if (logo.inNoteBlock[turtle].length > 0) {
-				logo.notation._markup[turtle] = args[0].toString();
+				logo.notation.notationMarkup(turtle, args[0].toString());
 			    }
 			}
                     }
