@@ -574,7 +574,7 @@ function PitchTimeMatrix() {
             } else {
                 if (
                     noteIsSolfege(this.rowLabels[i]) &&
-                    this._logo.synth.inTemperament !== "custom"
+                    !isCustom(this._logo.synth.inTemperament)
                 ) {
                     cell.innerHTML =
                         i18nSolfege(this.rowLabels[i]) +
@@ -1980,7 +1980,7 @@ function PitchTimeMatrix() {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (
                 noteIsSolfege(that.rowLabels[i]) &&
-                that._logo.synth.inTemperament !== "custom"
+                !isCustom(that._logo.synth.inTemperament)
             ) {
                 cell.innerHTML =
                     i18nSolfege(that.rowLabels[index]) +
@@ -5052,7 +5052,7 @@ function PitchTimeMatrix() {
                         }
 
                         if (note[0][j][1] === "♯") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",
@@ -5142,7 +5142,7 @@ function PitchTimeMatrix() {
                                 thisBlock += 3;
                             }
                         } else if (note[0][j][1] === "♭") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",

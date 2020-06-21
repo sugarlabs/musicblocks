@@ -935,7 +935,27 @@ var TEMPERAMENTS = [
     [_("custom"), "custom", "custom"]
 ];
 
-const TEMPERAMENT = {
+let updateTEMPERAMENTS = () => {
+    let listOfAll ={} ;
+    for (let i of TEMPERAMENTS){
+        listOfAll[i[1]] =true ;
+    }
+    for (let i in TEMPERAMENT){
+        if (!(i in PreDefinedTemperaments) && !(i in listOfAll)){
+            TEMPERAMENTS.push([_(i),i,i]);
+        }
+    }
+}
+
+var PreDefinedTemperaments = {
+    equal:true ,
+    "just intonation":true ,
+    Pythagorean:true ,
+    "1/3 comma meantone":true ,
+    "1/4 comma meantone":true 
+}
+
+var TEMPERAMENT = {
     equal: {
         "perfect 1": Math.pow(2, 0 / 12),
         "minor 2": Math.pow(2, 1 / 12),
@@ -1647,7 +1667,7 @@ function _getStepSize(
     if (temperament === undefined) {
         temperament = "equal";
     }
-    if (temperament === "custom") {
+    if (isCustom(temperament)) {
         //Scalar = Semitone for custom Temperament.
         return transposition;
     }
@@ -2523,27 +2543,27 @@ function numberToPitch(i, temperament, startPitch, offset) {
             var pitchNumber = Math.floor(i - offset);
         }
     }
-    if (temperament === "custom") {
+    if (isCustom(temperament)) {
         pitchNumber = pitchNumber + "";
-        if (TEMPERAMENT["custom"][pitchNumber][1] === undefined) {
+        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
             //If custom temperament is not defined, then it will store equal temperament notes.
             for (var i = 0; i < 12; i++) {
                 var number = "" + i;
                 var interval = TEMPERAMENT["equal"]["interval"][i];
-                TEMPERAMENT["custom"][number] = [
+                TEMPERAMENT[temperament][number] = [
                     Math.pow(2, i / 12),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
             }
             return [
-                TEMPERAMENT["custom"][pitchNumber][1],
-                TEMPERAMENT["custom"][pitchNumber][2]
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
             ];
         } else {
             return [
-                TEMPERAMENT["custom"][pitchNumber][1],
-                TEMPERAMENT["custom"][pitchNumber][2]
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
             ];
         }
     } else {
@@ -2977,6 +2997,10 @@ function getCustomNote(notes) {
     }
     return notes;
 }
+
+var isCustom = (temperament) => {
+    return !(temperament in PreDefinedTemperaments) ;
+};
 
 function getNote(
     noteArg,
@@ -3450,11 +3474,11 @@ function getNote(
                 note = EQUIVALENTFLATS[note];
             }
         }
-    } else if (temperament === "custom") {
+    } else if (isCustom(temperament)) {
         var note = getCustomNote(noteArg);
-        for (var number in TEMPERAMENT["custom"]) {
+        for (var number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
-                if (note === TEMPERAMENT["custom"][number][1]) {
+                if (note === TEMPERAMENT[temperament][number][1]) {
                     var pitchNumber = Number(number);
                     break;
                 }
@@ -3472,7 +3496,7 @@ function getNote(
             );
         }
         var inOctave = octave;
-        var octaveLength = TEMPERAMENT["custom"]["pitchNumber"];
+        var octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         if (transposition !== 0) {
             if (transposition < 0) {
                 var deltaOctave = -Math.floor(-transposition / octaveLength);
@@ -3492,7 +3516,7 @@ function getNote(
             inOctave = inOctave + 1;
         }
         pitchNumber = pitchNumber + "";
-        note = TEMPERAMENT["custom"][pitchNumber][1];
+        note = TEMPERAMENT[temperament][pitchNumber][1];
         octave = inOctave;
     } else {
         //Return E# as E#, Fb as Fb etc. for different temperament systems.

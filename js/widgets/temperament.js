@@ -450,7 +450,7 @@ function TemperamentWidget() {
         var headerNotes = notesGraph.createTHead();
         var rowNotes = headerNotes.insertRow(0);
         var menuLabels = [];
-        if (this.inTemperament == "custom") {
+        if (isCustom(this.inTemperament)) {
             menuLabels = ["Play", "Pitch Number", "Ratio", "Frequency"];
         } else {
             menuLabels = [
@@ -479,7 +479,7 @@ function TemperamentWidget() {
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
             menuItems[i].style.fontWeight = "bold";
-            if (this.inTemperament == "custom") {
+            if (isCustom(this.inTemperament)) {
                 menuItems[0].style.width = 40 + "px";
                 menuItems[1].style.width = 120 + "px";
                 menuItems[2].style.width = 120 + "px";
@@ -563,7 +563,7 @@ function TemperamentWidget() {
                 platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
-            if (this.inTemperament !== "custom") {
+            if (!isCustom(this.inTemperament)) {
                 //Interval
                 notesCell[(i, 3)] = notesRow[i].insertCell(-1);
                 notesCell[(i, 3)].innerHTML = this.intervals[i];
@@ -604,7 +604,7 @@ function TemperamentWidget() {
                 platformColor.selectorBackground;
             notesCell[(i, 6)].style.textAlign = "center";
 
-            if (this.inTemperament == "custom") {
+            if (isCustom(this.inTemperament)) {
                 notesCell[(i, 1)].style.width = 130 + "px";
                 notesCell[(i, 6)].style.width = 130 + "px";
                 notesCell[(i, 2)].style.width = 130 + "px";
@@ -1454,7 +1454,7 @@ function TemperamentWidget() {
         var selectedTemperament;
 
         for (var temperament in TEMPERAMENT) {
-            if (temperament !== "custom") {
+            if (!isCustom(temperament)) {
                 var t = TEMPERAMENT[temperament];
                 var temperamentRatios = [];
                 for (var j = 0; j < t.interval.length; j++) {
@@ -1488,7 +1488,7 @@ function TemperamentWidget() {
         var index = [];
         this.notes = [];
 
-        if (this.inTemperament == "custom") {
+        if (isCustom(this.inTemperament)) {
             for (var i = 0; i < this.ratios.length; i++) {
                 for (var j = 0; j < this.ratiosNotesPair.length; j++) {
                     notesMatch = false;
@@ -1537,6 +1537,7 @@ function TemperamentWidget() {
         var value = this._logo.blocks.findUniqueTemperamentName(
             this.inTemperament
         );
+        this.inTemperament = value ; // change from temporary "custom" to "custom1" or "custom2" .. 
         var newStack = [
             [0, "temperament1", 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: value }], 0, 0, [0]],
@@ -1635,7 +1636,7 @@ function TemperamentWidget() {
                     0,
                     [idx + 8, idx + 10, idx + 11, null]
                 ]);
-                if (this.inTemperament !== "custom") {
+                if (!isCustom(this.inTemperament)) {
                     newStack.push([
                         idx + 10,
                         ["notename", { value: this.ratiosNotesPair[i][1][0] }],
@@ -1739,7 +1740,7 @@ function TemperamentWidget() {
                     [idx + 6, idx + 8, idx + 9, null]
                 ]);
 
-                if (this.inTemperament !== "custom") {
+                if (!isCustom(this.inTemperament)) {
                     newStack.push([
                         idx + 8,
                         ["notename", { value: this.ratiosNotesPair[i][1][0] }],
@@ -1802,12 +1803,13 @@ function TemperamentWidget() {
         this._logo.blocks.loadNewBlocks(newStack1);
         this._logo.textMsg(_("New action block generated!"));
 
-        if (this.inTemperament === "custom") {
-            TEMPERAMENT["custom"] = [];
-            TEMPERAMENT["custom"]["pitchNumber"] = this.pitchNumber;
+        if (isCustom(this.inTemperament)) {   
+            TEMPERAMENT[this.inTemperament] = [];
+            TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
+            updateTEMPERAMENTS();
             for (var i = 0; i < this.pitchNumber; i++) {
                 var number = "" + i;
-                TEMPERAMENT["custom"][number] = [
+                TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),
                     this.notes[i].slice(-1)
@@ -1815,7 +1817,7 @@ function TemperamentWidget() {
             }
         }
 
-        if (this.inTemperament == "custom") {
+        if (isCustom(this.inTemperament)) {
             this._logo.customTemperamentDefined = true;
             this._logo.blocks.protoBlockDict["custompitch"].hidden = false;
             this._logo.blocks.palettes.updatePalettes("pitch");
@@ -2195,34 +2197,32 @@ function TemperamentWidget() {
 
         for (var i = 0; i <= this.pitchNumber; i++) {
             if (
-                this.inTemperament == "custom" &&
-                TEMPERAMENT["custom"]["0"][1] !== undefined
+                isCustom(this.inTemperament) &&
+                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
             ) {
                 //If temperament selected is custom and it is defined by user.
                 var pitchNumber = i + "";
                 if (i === this.pitchNumber) {
                     this.notes[i] = [
-                        TEMPERAMENT["custom"]["0"][1],
-                        Number(TEMPERAMENT["custom"]["0"][2]) + 1
+                        TEMPERAMENT[this.inTemperament]["0"][1],
+                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
                     ];
                     this.ratios[i] = this.powerBase;
                 } else {
                     this.notes[i] = [
-                        TEMPERAMENT["custom"][pitchNumber][1],
-                        TEMPERAMENT["custom"][pitchNumber][2]
+                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
+                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
                     ];
-                    this.ratios[i] = TEMPERAMENT["custom"][pitchNumber][0];
+                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
                 }
                 this.frequencies[i] = this._logo.synth
-                    .getCustomFrequency(
-                        this.notes[i][0] + this.notes[i][1] + ""
-                    )
+                    .getCustomFrequency((this.notes[i][0] + this.notes[i][1] + "") ,this.inTemperament  )
                     .toFixed(2);
                 this.cents[i] =
                     1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             } else {
-                if (this.inTemperament == "custom") {
+                if (isCustom(this.inTemperament)) {
                     // If temperament selected is custom and it is not defined by user
                     // then custom temperament behaves like equal temperament.
                     t = TEMPERAMENT["equal"];

@@ -3311,27 +3311,30 @@ function Block(protoblock, blocks, overrideName) {
                     );
                 }
             } else {
+                let noteLabels = TEMPERAMENT ;
+                
+                let customLabels =  [];
+                for (let lab in noteLabels)
+                    if (!(lab in PreDefinedTemperaments))customLabels.push(lab);
+                
+                let selectedCustom ;
+                if (this.customID != null) {
+                    selectedCustom = this.customID ;
+                } else {
+                    selectedCustom = customLabels[0];
+                }
+
+                let selectedNote ;                
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = TEMPERAMENT["custom"]["0"][1];
+                    selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
                 }
-
-                let noteLabels = [];
-                let noteValues = [];
-                for (let pitchNumber in TEMPERAMENT["custom"]) {
-                    if (pitchNumber !== "pitchNumber") {
-                        noteLabels.push(TEMPERAMENT["custom"][pitchNumber][1]);
-                        noteValues.push(TEMPERAMENT["custom"][pitchNumber][1]);
-                    }
-                }
-                this._piemenuPitches(
+                this._piemenuPitchesCustom(
                     noteLabels,
-                    noteValues,
-                    "",
-                    selectednote,
-                    "",
-                    true
+                    customLabels,
+                    selectedNote,
+                    selectedCustom
                 );
             }
         } else if (this.name === "eastindiansolfege") {
@@ -4909,6 +4912,376 @@ function Block(protoblock, blocks, overrideName) {
             if (!custom) {
                 that._accidentalsWheel.removeWheel();
             }
+            that._exitWheel.removeWheel();
+            if (hasOctaveWheel) {
+                that._octavesWheel.removeWheel();
+            }
+        };
+    };
+    this._piemenuPitchesCustom = function(
+        noteLabels,
+        customLabels,
+        selectedNote,
+        selectedCustom
+    ) {
+        let prevPitch = null;
+
+        // wheelNav pie menu for pitch selection
+        if (this.blocks.stageClick) {
+            return;
+        }
+
+        // Some blocks have both pitch and octave, so we can modify
+        // both at once.
+        let hasOctaveWheel =
+            this.connections[0] !== null &&
+            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+                this.blocks.blockList[this.connections[0]].name
+            ) !== -1;
+
+        // If we are attached to a set key block, we want to order
+        // pitch by fifths.
+        if (
+            this.connections[0] !== null &&
+            ["setkey", "setkey2"].indexOf(
+                this.blocks.blockList[this.connections[0]].name
+            ) !== -1
+        ) {
+            noteLabels = ["C", "G", "D", "A", "E", "B", "F"];
+            noteValues = ["C", "G", "D", "A", "E", "B", "F"];
+        }
+
+        docById("wheelDiv").style.display = "";
+
+        // the pitch selector
+        this._pitchWheel = new wheelnav("wheelDiv", null, 1200, 1200);
+        this._customWheel = new wheelnav(
+            "_customWheel",
+            this._pitchWheel.raphael
+        );
+        
+        // the octave selector
+        if (hasOctaveWheel) {
+            this._octavesWheel = new wheelnav(
+                "_octavesWheel",
+                this._pitchWheel.raphael
+            );
+        }
+
+        // exit button
+        this._exitWheel = new wheelnav("_exitWheel", this._pitchWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+
+
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        let LABELS = [];
+        for (let k in noteLabels[selectedCustom] ) if (k !== "pitchNumber") LABELS.push(noteLabels[selectedCustom][k][1]);
+        this._pitchWheel.createWheel(LABELS);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(["×", " "]);
+
+        this._customWheel.colors =
+            platformColor.accidentalsWheelcolors;
+        this._customWheel.slicePathFunction = slicePath().DonutSlice;
+        this._customWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._customWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._customWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        this._customWheel.sliceSelectedPathCustom = this._customWheel.slicePathCustom;
+        this._customWheel.sliceInitPathCustom = this._customWheel.slicePathCustom;
+
+        this._customWheel.animatetime = 0; // 300;
+        this._customWheel.createWheel(customLabels);
+    
+        if (hasOctaveWheel) {
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            let octaveLabels = [
+                "8",
+                "7",
+                "6",
+                "5",
+                "4",
+                "3",
+                "2",
+                "1",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ];
+            this._octavesWheel.animatetime = 0; // 300;
+            this._octavesWheel.createWheel(octaveLabels);
+        }
+
+        // Position the widget over the note block.
+        let x = this.container.x;
+        let y = this.container.y;
+
+        let canvasLeft =
+            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        let canvasTop =
+            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById("wheelDiv").style.position = "absolute";
+        docById("wheelDiv").style.height = "300px";
+        docById("wheelDiv").style.width = "300px";
+        docById("wheelDiv").style.left =
+            Math.min(
+                this.blocks.turtles._canvas.width - 300,
+                Math.max(
+                    0,
+                    Math.round(
+                        (x + this.blocks.stage.x) *
+                        this.blocks.getStageScale() +
+                        canvasLeft
+                    ) - 200
+                )
+            ) + "px";
+        docById("wheelDiv").style.top =
+            Math.min(
+                this.blocks.turtles._canvas.height - 350,
+                Math.max(
+                    0,
+                    Math.round(
+                        (y + this.blocks.stage.y) *
+                        this.blocks.getStageScale() +
+                        canvasTop
+                    ) - 200
+                )
+            ) + "px";
+
+        // Navigate to a the current note value.
+
+        let i = LABELS.indexOf(selectedNote);
+        if (i === -1) {
+            i = 0 ;
+        }
+
+        prevPitch = i;
+
+        this._pitchWheel.navigateWheel(i);
+        // Navigate to a the current accidental value.
+        this._customWheel.navigateWheel(customLabels.indexOf(selectedCustom));
+        
+        if (hasOctaveWheel) {
+            // Use the octave associated with this block, if available.
+            let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+            
+            // Navigate to current octave
+            this._octavesWheel.navigateWheel(8 - pitchOctave);
+            prevOctave = 8 - pitchOctave;
+        }
+
+        // Set up event handlers
+        let that = this;
+
+        let __selectionChanged = function() {
+            let label =
+                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
+                    .title;
+            let i = LABELS.indexOf(label);
+            that.value = label;
+            that.text.text = label;
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+            
+            let attr =that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
+            if (attr!=that.customID){
+                that.customID=attr ;
+                that._exitWheel.navItems[0].navigateFunction();
+                that._piemenuPitchesCustom(noteLabels,customLabels,label,that.customID);
+           }        
+            // Make sure text is on top.
+
+            if (hasOctaveWheel) {
+                // Set the octave of the pitch block if available
+                let octave = Number(
+                    that._octavesWheel.navItems[
+                        that._octavesWheel.selectedNavItemIndex
+                        ].title
+                );
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
+            if (
+                that.connections[0] !== null &&
+                ["setkey", "setkey2"].indexOf(
+                    that.blocks.blockList[that.connections[0]].name
+                ) !== -1
+            ) {
+                // We may need to update the mode widget.
+                that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
+            }
+        };
+
+        /*
+         * Preview the selected pitch using the synth
+         * @return{void}
+         * @private
+         */
+        let __pitchPreview = function() {
+            let label =
+                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
+                    .title;
+            let i = LABELS.indexOf(label);
+
+            // Are we wrapping across C? We need to compare with the
+            // previous pitch.
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+            let deltaPitch = i - prevPitch;
+            let delta;
+            if (deltaPitch > 3) {
+                delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                delta = deltaPitch + 7;
+            } else {
+                delta = deltaPitch;
+            }
+
+            // If we wrapped across C, we need to adjust the octave.
+            let deltaOctave = 0;
+            if (prevPitch + delta > 6) {
+                deltaOctave = -1;
+            } else if (prevPitch + delta < 0) {
+                deltaOctave = 1;
+            }
+
+            prevPitch = i;
+            let note = label;
+
+            let octave;
+            if (hasOctaveWheel) {
+                octave = Number(
+                    that._octavesWheel.navItems[
+                        that._octavesWheel.selectedNavItemIndex
+                        ].title
+                );
+            } else {
+                octave = 4;
+            }
+
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
+
+            if (hasOctaveWheel && deltaOctave !== 0) {
+               // that._octavesWheel.navigateWheel(8 - octave);
+               // that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
+
+            if (Number(note.substr(0,1)) == note.substr(0,1)) {
+                let obj1 = splitScaleDegree(note);
+                note = SOLFEGENAMES[obj1[0] - 1];
+                if(obj1[1] != NATURAL) {
+                    note += obj1[1]
+                }
+            }
+            // FIX ME: get key signature if available
+            // FIX ME: get moveable if availableconsole.log(note);
+            let obj = getNote(
+                note,
+                octave,
+                0,
+                "C major",
+                false,
+                null,
+                that.blocks.errorMsg,
+                that.customID
+            );
+
+            if (
+                that.blocks.logo.instrumentNames[0] === undefined ||
+                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+            ) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            if (!that._triggerLock) {
+                //preview :
+                that._triggerLock = true;
+                let no = [obj[0]+obj[1]];
+                let notes1 = no ;
+                no = that.blocks.logo.synth.getCustomFrequency(no,that.customID);
+                if (no === undefined) {
+                    no = notes1;
+                }
+                console.debug(no);
+                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1/8);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, 1 / 8);
+
+            __selectionChanged();
+        };
+
+        // Set up handlers for pitch preview.
+        for (let i = 0; i < noteLabels[selectedCustom].length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (let i = 0; i < customLabels.length; i++) {
+            this._customWheel.navItems[i].navigateFunction = __selectionChanged;
+        }
+
+        if (hasOctaveWheel) {
+            for (let i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[
+                    i
+                    ].navigateFunction = __pitchPreview;
+            }
+        }
+
+        // Hide the widget when the exit button is clicked.
+        this._exitWheel.navItems[0].navigateFunction = function() {
+            that._piemenuExitTime = new Date().getTime();
+            docById("wheelDiv").style.display = "none";
+            that._pitchWheel.removeWheel();
+            that._customWheel.removeWheel();
             that._exitWheel.removeWheel();
             if (hasOctaveWheel) {
                 that._octavesWheel.removeWheel();

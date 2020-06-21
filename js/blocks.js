@@ -5930,14 +5930,21 @@ function Blocks(activity) {
                         var thisBlock = args[0];
                         var value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
-                            TEMPERAMENT["custom"] =
-                                value.customTemperamentNotes;
-                            TEMPERAMENT["custom"]["pitchNumber"] =
-                                value.customTemperamentNotes.length;
+                            TEMPERAMENT = {...TEMPERAMENT,...value.customTemperamentNotes}
+                            for (let temp in value.customTemperamentNotes){
+                                if(!(temp in PreDefinedTemperaments)){
+                                    TEMPERAMENT[temp]["pitchNumber"] = value.customTemperamentNotes[temp].length;
+                                }
+                                console.debug(value.customTemperamentNotes[temp]);
+                            }
+                            updateTEMPERAMENTS();
                             that.logo.synth.startingPitch = value.startingPitch;
                             OCTAVERATIO = value.octaveSpace;
-                            console.debug(TEMPERAMENT["custom"]);
                             that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
+                            
+                            // if temperament is defined "customPitch" should be available
+                            that.logo.blocks.protoBlockDict["custompitch"].hidden = false;
+                            that.logo.blocks.palettes.updatePalettes("pitch");
                         }
                     };
                     this._makeNewBlockWithConnections(

@@ -1266,7 +1266,7 @@ class NoteController {
                             }
                         }
                     }
-                    if (logo.synth.inTemperament === "custom") {
+                    if (isCustom(logo.synth.inTemperament))  {
                         var notesFrequency = logo.synth.getCustomFrequency(
                             notes
                         );
