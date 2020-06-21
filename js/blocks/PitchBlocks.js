@@ -2497,6 +2497,9 @@ function setupPitchBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(logo.beatFactor[turtle]);
                 logo.pushedNote[turtle] = true;
+                if (logo.runningLilypond) {
+                    logo.notation.notationMarkup(turtle, pitchToFrequency(noteObj1[0], noteObj1[1], cents, logo.keySignature[turtle]));
+                }
             } else if (logo.inPitchStaircase) {
                 let frequency = arg;
                 let note = frequencyToPitch(arg);
