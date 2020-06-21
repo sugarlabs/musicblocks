@@ -2840,6 +2840,28 @@ function setupPitchBlocks() {
         }
     }
 
+    class OnScaleDegreeDoBlock extends FlowBlock {
+        constructor() {
+            super("scaledegreedo", _("on scale degree do"));
+            this.setPalette("pitch");
+            
+            this.formBlock({
+                args: 2,
+                argTypes: ["scaledegreein", "textin"],
+                defaults: ["1", _("action")],
+                argLabels: ["scale degree", this.lang === "ja" ? _("do1") : _("do")]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "scaledegreedo", x, y, [null, 1, 2, null]],
+                [1, ["scaledegree2", { value: "1" }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {}
+    }
+
     class StepPitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
@@ -3211,6 +3233,7 @@ function setupPitchBlocks() {
     new ThirdBlock().setup();
     new SecondBlock().setup();
     new UnisonBlock().setup();
+    new OnScaleDegreeDoBlock().setup();
     new SetScalarTranspositionBlock().setup();
     new AccidentalBlock().setup();
     new FlatBlock().setup();
