@@ -184,29 +184,15 @@ class Notation {
         this._pickupPoint[turtle] = null;
 
         if (typeof note === "object") {
-            // If it is hertz, add a markup
             let markup = "";
-            try {
-                for (let i = 0; i < note.length; i++) {
-                    if (typeof note[i] === "number") {
-                        if ((markup = "")) {
-                            markup = toFixed2(note[i]);
-                            break;
-                        }
-                    }
-                }
-
-                if (markup.length > 0) {
-                    this._notationMarkup(turtle, markup, false);
-                }
-            } catch (e) {
-                console.debug(e);
-            }
-	    
-	    markup = this._markup[turtle];
-	    if (markup.length > 0) {
-                this._notationMarkup(turtle, markup, true);
-		this._markup[turtle] = "";
+	    if (turtle in this._markup) {
+		markup = this._markup[turtle];
+                if (typeof markup === "number") { // Hertz block
+                    this._notationMarkup(turtle, toFixed2(markup), false);
+		} else if (markup.length > 0) { // Print block
+                    this._notationMarkup(turtle, markup, true);
+		    this._markup[turtle] = "";
+		}
             }
         }
     }
