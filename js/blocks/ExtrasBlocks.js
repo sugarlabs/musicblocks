@@ -857,7 +857,12 @@ function setupExtrasBlocks() {
                             } else {
                                 logo.textMsg(args[0].toString());
                             }
-                        }
+                        } else if (logo.runningLilypond) {
+			    if (logo.inNoteBlock[turtle].length > 0) {
+				console.log('LYRIC: ' + args[0]);
+				logo.notation._markup[turtle] = args[0].toString();
+			    }
+			}
                     }
                 }
             }

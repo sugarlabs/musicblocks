@@ -31,8 +31,12 @@ class Notation {
     constructor(logo) {
         this._logo = logo;
 
+	// _notationStaging is used to aggregate all of the notes played in a performance.
         this._notationStaging = {};
         this._notationDrumStaging = {};
+	// _markup is used to aggregate markup for individual notes.
+	this._markup = {};
+	// _pickup is used to manage the specification of a pickup.
         this._pickupPOW2 = {};
         this._pickupPoint = {};
     }
@@ -69,6 +73,20 @@ class Notation {
      */
     get notationDrumStaging() {
         return this._notationDrumStaging;
+    }
+
+    /**
+     * @param {Object.<String[]>} notationMarkup
+     */
+    set notationMarkup(notationMarkup) {
+        this._notationMarkup = notationMarkup;
+    }
+
+    /**
+     * @returns {Object.<String[]>}
+     */
+    get notationMarkup() {
+        return this._notationMarkup;
     }
 
     /**
@@ -183,6 +201,12 @@ class Notation {
                 }
             } catch (e) {
                 console.debug(e);
+            }
+	    
+	    markup = this._markup[turtle];
+	    if (markup.length > 0) {
+                this._notationMarkup(turtle, markup, true);
+		this._markup[turtle] = "";
             }
         }
     }
