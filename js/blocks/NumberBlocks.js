@@ -20,27 +20,24 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
                 let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return Math.floor(a + 0.5);
-                    } else {
-                        try {
-                            return Math.floor(Number(a) + 0.5);
-                        } catch (e) {
-                            console.debug(e);
-                            logo.errorMsg(NANERRORMSG, blk);
-                            return 0;
-                        }
+
+                    try {
+                        return MathUtility.doInt(a);
+                    } catch (e) {
+                        this.stopTurtle = true;
+                        logo.errorMsg(NANERRORMSG, blk);
+                        return 0;
                     }
                 }
             }
@@ -227,20 +224,22 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else {
                 let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return Math.abs(a);
-                    } else {
+
+                    try {
+                        return MathUtility.doAbs(a);
+                    } catch (e) {
+                        this.stopTurtle = true;
                         logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
@@ -490,20 +489,18 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
                 let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk !== null) {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return logo._doMinus(0, a);
-                    } else if (typeof a === "string") {
-                        let obj = a.split("");
-                        return obj.reverse().join("");
-                    } else {
+
+                    try {
+                        return MathUtility.doNegate(a);
+                    } catch {
                         return a;
                     }
                 } else {

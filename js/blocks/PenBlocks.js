@@ -473,7 +473,7 @@ function setupPenBlocks() {
 
     class PenUpBlock extends FlowBlock {
         constructor() {
-            //.TRANS: riase up the pen so logo it does not draw when it is moved
+            //.TRANS: raise up the pen so logo it does not draw when it is moved
             super("penup", _("pen up"));
             this.setPalette("pen");
             this.beginnerBlock(true);

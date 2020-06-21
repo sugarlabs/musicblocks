@@ -214,7 +214,7 @@ msgstr "El bloque relleno rellena una forma con un color."
 msgid "fill"
 msgstr "relleno"
 
-#.TRANS: riase up the pen so logo it does not draw when it is moved
+#.TRANS: raise up the pen so logo it does not draw when it is moved
 msgid "pen up"
 msgstr "subir pluma"
 
@@ -2061,7 +2061,7 @@ msgid "vibrato amount"
 msgstr "cantidad de vibrato"
 
 msgid "Filter already present."
-msgstr ""
+msgstr "filtro ya presente"
 
 msgid "delay (MS)"
 msgstr "retraso (MS)"
@@ -2094,13 +2094,13 @@ msgid "Stop Recording"
 msgstr ""
 
 msgid "save rhythms"
-msgstr ""
+msgstr "guardar ritmos"
 
 msgid "close"
 msgstr "cerrar"
 
 msgid "drag"
-msgstr ""
+msgstr "arrastrar"
 
 msgid "tap a rhythm"
 msgstr "tocar un ritmo"
@@ -4152,3 +4152,5 @@ msgstr "El archivo seleccionado no contiene un pila válida."
 #~msgid "collapse"
 #~msgstr "colapso"
 
+msgid "nth modal pitch"
+msgstr "nth tono modal"
