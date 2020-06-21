@@ -31,12 +31,12 @@ class Notation {
     constructor(logo) {
         this._logo = logo;
 
-	// _notationStaging is used to aggregate all of the notes played in a performance.
+        // _notationStaging is used to aggregate all of the notes played in a performance.
         this._notationStaging = {};
         this._notationDrumStaging = {};
-	// _markup is used to aggregate markup for individual notes.
-	this._markup = {};
-	// _pickup is used to manage the specification of a pickup.
+        // _markup is used to aggregate markup for individual notes.
+        this._markup = {};
+        // _pickup is used to manage the specification of a pickup.
         this._pickupPOW2 = {};
         this._pickupPoint = {};
     }
@@ -184,16 +184,16 @@ class Notation {
         this._pickupPoint[turtle] = null;
 
         if (typeof note === "object") {
-	    if (turtle in this._markup) {
-		for (let i = 0; i < this._markup[turtle].length; i++) {
-		    let markup = this._markup[turtle][i];
+            if (turtle in this._markup) {
+                for (let i = 0; i < this._markup[turtle].length; i++) {
+                    let markup = this._markup[turtle][i];
                     if (typeof markup === "number") { // Hertz block
-			this._notationMarkup(turtle, toFixed2(markup), false);
-		    } else if (markup.length > 0) { // Print block
-			this._notationMarkup(turtle, markup, true);
-		    }
-		}
-		this._markup[turtle] = [];
+                        this._notationMarkup(turtle, toFixed2(markup), false);
+                    } else if (markup.length > 0) { // Print block
+                        this._notationMarkup(turtle, markup, true);
+                    }
+                }
+                this._markup[turtle] = [];
             }
         }
     }
@@ -206,11 +206,11 @@ class Notation {
      * @returns {void}
      */
     notationMarkup(turtle, arg) {
-	if (turtle in this._markup) {
-	    this._markup[turtle].push(arg);
-	} else {
-	    this._markup[turtle] = [arg];
-	}
+        if (turtle in this._markup) {
+            this._markup[turtle].push(arg);
+        } else {
+            this._markup[turtle] = [arg];
+        }
     }
 
     /**
