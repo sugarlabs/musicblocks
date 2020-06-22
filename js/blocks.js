@@ -585,7 +585,7 @@ function Blocks(activity) {
 
         var myBlock = this.blockList[blk];
 
-        if (myBlock.isArgFlowClampBlock()) {
+        if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
             // Make sure myBlock is a clamp block.
         } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
@@ -606,7 +606,7 @@ function Blocks(activity) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-            if (myBlock.isArgFlowClampBlock()) {
+            if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
                 var c = 1; // 0: outie; and 1: child flow
             } else if (clamp === 0) {
                 var c = myBlock.connections.length - 2;
@@ -4480,7 +4480,7 @@ function Blocks(activity) {
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isExpandableBlock()) {
                 // If it is the last connection, keep searching.
-                if (this.blockList[cblk].isArgFlowClampBlock()) {
+                if (this.blockList[cblk].isArgFlowClampBlock() || this.blockList[cblk].isLeftClampBlock()) {
                     return cblk;
                 } else if (blk === last(this.blockList[cblk].connections)) {
                     return this.insideExpandableBlock(cblk);
@@ -6499,7 +6499,7 @@ function Blocks(activity) {
                 default:
                     // Check that name is in the proto list
                     if (
-                        !name in this.protoBlockDict ||
+                        !(name in this.protoBlockDict) ||
                         this.protoBlockDict[name] == null
                     ) {
                         var postProcessUnknownBlock = function(args) {
