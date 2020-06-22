@@ -198,6 +198,21 @@ function MusicKeyboard() {
                     null,
                     null
                 );
+
+                if(!that.keyboardAgainstTime) return ;
+                let dur =(startTime[id] - that.endTime)/ 1000 ;
+                if (dur === 0) {
+                    dur = 0.125;
+                } else if (dur < 0) {
+                    dur = -dur;
+                }
+                if (that.endTime === 0)dur =0 ;
+                that._notesPlayed.push({
+                    startTime: that.endTime,
+                    noteOctave: "R",
+                    objId: null,
+                    duration: parseFloat(dur)
+                });
                 prevKey = event.keyCode;
             }
         };
@@ -218,6 +233,7 @@ function MusicKeyboard() {
             var ele = docById(id);
             newDate = new Date();
             newTime = newDate.getTime();
+            that.endTime = newTime;
             duration = (newTime - startTime[id]) / 1000.0;
 
             if (ele !== null && ele !== undefined) {
@@ -275,6 +291,7 @@ function MusicKeyboard() {
         document.onkeyup = __keyboardup;
     };
 
+    this.endTime =0 ;
     this.loadHandler = function(element, i, blockNumber) {
         var temp1 = this.layout[i].noteName;
         if (temp1 === "hertz") {
@@ -292,7 +309,7 @@ function MusicKeyboard() {
         this.blockNumberMapper[element.id] = blockNumber;
         this.instrumentMapper[element.id] = this.layout[i].voice;
         this.noteMapper[element.id] = temp2;
-
+        
         var that = this;
         var duration = 0;
         var startDate = new Date();
@@ -310,6 +327,20 @@ function MusicKeyboard() {
                 null,
                 null
             );
+            if(!that.keyboardAgainstTime) return ;
+            let dur =(startTime - that.endTime)/ 1000 ;
+            if (dur === 0) {
+                dur = 0.125;
+            } else if (dur < 0) {
+                dur = -dur;
+            }
+            if (that.endTime === 0)dur =0 ;
+            that._notesPlayed.push({
+                startTime: that.endTime,
+                noteOctave: "R",
+                objId: null,
+                duration: parseFloat(dur)
+            });
         };
 
         element.onmousedown = function() {
@@ -325,7 +356,8 @@ function MusicKeyboard() {
             }
 
             var now = new Date();
-            duration = now.getTime() - startTime;
+            that.endTime = now.getTime();
+            duration = that.endTime - startTime;
             duration /= 1000;
             that._logo.synth.stopSound(
                 0,
@@ -424,6 +456,15 @@ function MusicKeyboard() {
             that.processSelected();
             that.playAll();
         };
+        this.keyboardAgainstTime =false;
+        this.timeButton = widgetWindow.addButton(
+            "",
+            ICONSIZE,
+            _("Time")
+        );
+        this.timeButton.onclick = () => {
+            this.keyboardAgainstTime = true ;
+        };
 
         widgetWindow.addButton(
             "export-chunk.svg",
@@ -440,6 +481,7 @@ function MusicKeyboard() {
         ).onclick = function() {
             that._notesPlayed = [];
             selectedNotes = [];
+            that.endTime =0;
             // if (!that.keyboardShown) {
             that._createTable();
             // }
