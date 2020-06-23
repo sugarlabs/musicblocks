@@ -1881,6 +1881,12 @@ class Logo {
                 logo.turtles.turtleList[turtle].running = false;
             }
 
+            let comp = logo.turtles.turtleList[turtle].companionTurtle;
+            if (comp){
+                logo.turtles.turtleList[comp].running = false ;
+                let interval = logo.turtles.turtleList[comp].interval;
+                if (interval) clearInterval(interval);
+            }
             // Because flow can come from calc blocks, we are not
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
