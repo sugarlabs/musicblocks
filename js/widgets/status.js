@@ -340,13 +340,41 @@ function StatusMatrix() {
                                     value = (num - 3) % 12;
                                     break;
                                 case "scalar class":
-                                    value = 4;
+                                    let note2 = this._logo.lastPitchPlayed[0][0];
+                                    note2 = note2.substr(0, note2.length - 1);
+                                    note2 = note2
+                                                .replace("#", SHARP)
+                                                .replace("b", FLAT);
+                                    let scalarClass = scaleDegreeToPitchMapping(
+                                        this._logo.keySignature[turtle],
+                                        null,
+                                        this._logo.moveable[turtle],
+                                        note2
+                                    );
+                                    value = scalarClass[0];
                                     break;
                                 case "scale degree":
-                                    value = 5;
+                                    let note3 = this._logo.lastPitchPlayed[0][0];
+                                    note3 = note3.substr(0, note3.length - 1);
+                                    note3 = note3
+                                                .replace("#", SHARP)
+                                                .replace("b", FLAT);
+                                    let scalarClass1 = scaleDegreeToPitchMapping(
+                                        this._logo.keySignature[turtle],
+                                        null,
+                                        this._logo.moveable[turtle],
+                                        note3
+                                    );
+                                    value = scalarClass1[0] + scalarClass1[1];
                                     break;
                                 case "nth degree":
-                                    value = 6;
+                                    let note4 = this._logo.noteStatus[0][0][0];
+                                    note4 = note4.substr(0, note4.length - 1);
+                                    note4 = note4
+                                                .replace("#", SHARP)
+                                                .replace("b", FLAT);
+                                    let scale = _buildScale(this._logo.keySignature[turtle])[0];
+                                    value = scale.indexOf(note4);
                                     break;
                             }
                         } else {
