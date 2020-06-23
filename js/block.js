@@ -67,7 +67,8 @@ const WIDENAMES = [
     "modename",
     "temperamentname",
     "modename",
-    "noisename"
+    "noisename",
+    "outputtools"
 ];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = [
@@ -7502,6 +7503,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (this.name === "modename") {
             var label = this.value + " " + getModeNumbers(this.value);
+            console.log(label)
         } else {
             var label = this.value.toString();
         }
