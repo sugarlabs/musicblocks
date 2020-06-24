@@ -2074,10 +2074,6 @@ function Activity() {
         const KEYCODE_L = 76; // la
         const KEYCODE_T = 84; // ti
 
-        // Check for RETURN in search widget ahead of other events.
-        if (event.keyCode === RETURN && docById("search").value.length > 0) {
-            doSearch();
-        }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             disableKeys =
@@ -2358,26 +2354,20 @@ function Activity() {
                         }
                         break;
                     case RETURN:
-                        if (docById("search").value.length > 0) {
-                            doSearch();
-                        } else {
-                            textMsg("Return " + _("Play"));
-                            if (inTempoWidget) {
-                                if (logo.tempo.isMoving) {
-                                    logo.tempo.pause();
-                                }
-
-                                logo.tempo.resume();
+                        textMsg("Return " + _("Play"));
+                        if (inTempoWidget) {
+                            if (logo.tempo.isMoving) {
+                                logo.tempo.pause();
                             }
-
-                            if (
-                                blocks.activeBlock == null ||
-                                SPECIALINPUTS.indexOf(
-                                    blocks.blockList[blocks.activeBlock].name
-                                ) === -1
-                            ) {
-                                logo.runLogoCommands();
-                            }
+                            logo.tempo.resume();
+                        }
+                        if (
+                            blocks.activeBlock == null ||
+                            SPECIALINPUTS.indexOf(
+                                blocks.blockList[blocks.activeBlock].name
+                            ) === -1
+                        ) {
+                            logo.runLogoCommands();
                         }
                         break;
                     case KEYCODE_D:
