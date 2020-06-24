@@ -2859,7 +2859,54 @@ function setupPitchBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk) {}
+        flow(args, logo, turtle, blk) {
+            if (args.length === 2) {
+                if (!(args[1] in logo.actions)) {
+                    logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                } else {
+                    let __listener = function(event) {
+                        console.log(logo.turtles.turtleList);
+                        if (logo.turtles.turtleList[turtle].running) {
+                            let queueBlock = new Queue(
+                                logo.actions[args[1]],
+                                1,
+                                blk
+                            );
+                            logo.parentFlowQueue[turtle].push(blk);
+                            logo.turtles.turtleList[turtle].queue.push(
+                                queueBlock
+                            );
+                        } else {
+                            // Since the turtle has stopped
+                            // running, we need to run the stack
+                            // from here.
+                            if (isflow) {
+                                logo._runFromBlockNow(
+                                    logo,
+                                    turtle,
+                                    logo.actions[args[1]],
+                                    isflow,
+                                    receivedArg
+                                );
+                            } else {
+                                logo._runFromBlock(
+                                    logo,
+                                    turtle,
+                                    logo.actions[args[1]],
+                                    isflow,
+                                    receivedArg
+                                );
+                            }
+                        }
+                    };
+                    let turtleID = logo.turtles.turtleList[turtle].id;
+                    let eventName = "__scaledegree_" + args[0] + "_" + turtleID + "__";
+                    logo._setListener(turtle, eventName, __listener);
+
+                    logo.beatList.push(args[0]);
+                }
+            }
+        }
     }
 
     class StepPitchBlock extends FlowBlock {
