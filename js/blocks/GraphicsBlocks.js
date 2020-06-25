@@ -689,9 +689,9 @@ function setupGraphicsBlocks() {
     new XBlock().setup();
     new ScrollXYBlock().setup();
     new ClearBlock().setup();
-    new ControlPoint1Block().setup();
-    new ControlPoint2Block().setup();
     new BezierBlock().setup();
+    new ControlPoint2Block().setup();
+    new ControlPoint1Block().setup();
     new ArcBlock().setup();
     new SetHeadingBlock().setup();
     new SetXYBlock().setup();

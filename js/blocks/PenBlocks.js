@@ -811,8 +811,8 @@ function setupPenBlocks() {
     new BackgroundBlock().setup();
     new HollowLineBlock().setup();
     new FillBlock().setup();
-    new PenUpBlock().setup();
     new PenDownBlock().setup();
+    new PenUpBlock().setup();
     new SetPenSizeBlock().setup();
     new SetTranslucencyBlock().setup();
     new SetHueBlock().setup();
