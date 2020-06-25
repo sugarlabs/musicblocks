@@ -865,8 +865,6 @@ function setupExtrasBlocks() {
                         }
                     }
                 }
-            } else if(logo.blocks.blockList[cblk].name === "outputtools") {
-                logo.statusFields.push([cblk, "outputtools"]);
             }
         }
     }

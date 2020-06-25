@@ -1412,7 +1412,77 @@ function setupPitchBlocks() {
             ]);
         }
         arg(logo, turtle, blk) {
-            return 5;
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "outputtools"]);
+            } else {
+                if (logo.lastNotePlayed[turtle] !== null) {
+                    let name = logo.blocks.blockList[blk].privateData;
+                    switch (name) {
+                        case "letter class":
+                            let lc = logo.noteStatus[turtle][0][0][0];
+                            return lc;
+                        case "solfege syllable":
+                            let lc2 = logo.noteStatus[turtle][0][0][0];
+                            if (logo.moveable[turtle] === false) {
+                                return SOLFEGECONVERSIONTABLE[lc];
+                            } else {
+                                let scale = _buildScale(logo.keySignature[turtle])[0];
+                                let i = scale.indexOf(lc2);
+                                return SOLFEGENAMES[i];
+                            }
+                        case "pitch class":
+                            let note = logo.lastPitchPlayed[0][0];
+                            let num = pitchToNumber(
+                                note.substr(0, note.length - 1 ),
+                                note[note.length - 1],
+                                logo.keySignature[turtle]
+                            );
+                            return (num - 3) % 12;
+                        case "scalar class":
+                            let note2 = logo.lastPitchPlayed[0][0];
+                            note2 = note2.substr(0, note2.length - 1);
+                            note2 = note2
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scalarClass = scaleDegreeToPitchMapping(
+                                logo.keySignature[turtle],
+                                null,
+                                logo.moveable[turtle],
+                                note2
+                            );
+                            return scalarClass[0];
+                        case "scale degree":
+                            let note3 = logo.lastPitchPlayed[0][0];
+                            note3 = note3.substr(0, note3.length - 1);
+                            note3 = note3
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scalarClass1 = scaleDegreeToPitchMapping(
+                                logo.keySignature[turtle],
+                                null,
+                                logo.moveable[turtle],
+                                note3
+                            );
+                            return scalarClass1[0] + scalarClass1[1];
+                        case "nth degree":
+                            let note4 = logo.noteStatus[0][0][0];
+                            note4 = note4.substr(0, note4.length - 1);
+                            note4 = note4
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scale = _buildScale(logo.keySignature[turtle])[0];
+                            return scale.indexOf(note4);
+                        default:
+                            return "__INVALID_INPUT__";
+                    }
+                } else {
+                    return "";
+                }
+            }
         }
 
     }
