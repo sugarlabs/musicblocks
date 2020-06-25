@@ -2548,6 +2548,16 @@ function Palette(palettes, name) {
                 }
                 var newBlk = protoblk.name;
                 break;
+            case "outputtools":
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "outputtools";
+                    var arg = "letter class";
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
             default:
                 if (blkname === "nameddo") {
                     var arg = _("action");

@@ -1047,7 +1047,7 @@ function Block(protoblock, blocks, overrideName) {
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
-        if (this.overrideName) {
+        if (this.overrideName && this.name !== "outputtools") {
             if (
                 [
                     "namedbox",
@@ -1205,9 +1205,6 @@ function Block(protoblock, blocks, overrideName) {
                     case "grid":
                         this.value = "Cartesian";
                         break;
-                    case "outputtools":
-                        this.value = "letter class";
-                        break;
                 }
             }
 
@@ -1239,6 +1236,8 @@ function Block(protoblock, blocks, overrideName) {
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
+            } else if (this.name === "outputtools") {
+                label = this.overrideName;
             } else {
                 if (this.value !== null) {
                     label = this.value.toString();
@@ -3691,7 +3690,7 @@ function Block(protoblock, blocks, overrideName) {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "outputtools") {
-            selectedvalue = this.value;
+            selectedvalue = this.privateData;
             let Labels = [
                 _("letter class"),
                 _("solfege syllable"),
@@ -6194,9 +6193,14 @@ function Block(protoblock, blocks, overrideName) {
                 that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex]
                     .title;
             let i = labels.indexOf(label);
-            that.value = menuValues[i];
-            that.text.text = menuLabels[i];
-
+            if (that.name === "outputtools") {
+                  that.overrideName = menuValues[i]; 
+                  that.privateData = menuValues[i];
+                  that.text.text = menuLabels[i];
+            } else {
+                that.value = menuValues[i];
+                that.text.text = menuLabels[i];
+            }
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
@@ -7503,7 +7507,6 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (this.name === "modename") {
             var label = this.value + " " + getModeNumbers(this.value);
-            console.log(label)
         } else {
             var label = this.value.toString();
         }

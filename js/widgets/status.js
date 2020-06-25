@@ -160,7 +160,7 @@ function StatusMatrix() {
                 case "outputtools":
                     var label = this._logo.blocks.blockList[
                             this._logo.statusFields[i][0]
-                        ].value;
+                        ].privateData;
                     break;
                 default:
                     var label = this._logo.blocks.blockList[
@@ -318,7 +318,7 @@ function StatusMatrix() {
                         var value = "";
                         let blockName = this._logo.blocks.blockList[
                             this._logo.statusFields[i][0]
-                        ].value;
+                        ].privateData;
                         if (logo.noteStatus[turtle] !== null) {
                             let lc = logo.noteStatus[turtle][0][0][0];
                             switch (blockName) {

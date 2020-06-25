@@ -1406,10 +1406,15 @@ function setupPitchBlocks() {
             this.formBlock({
                 outType: "anyout"
             });
+            this.makeMacro((x, y) => [
+                [0, "print", x, y, [null, 1, null]],
+                [1, ["outputtools", { value: "letter class" }], 0, 0, [0]],
+            ]);
         }
         arg(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return 5;
         }
+
     }
 
     class MIDIBlock extends FlowBlock {
