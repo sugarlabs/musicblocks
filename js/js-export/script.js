@@ -2,19 +2,6 @@ async function runScript() {
     console.clear();
     let mb = new MusicBlocks();
 
-    // await mb.doForward(100);
-    // await mb.doRight(90);
-    // console.log("1st");
-    // await mb.doForward(100);
-    // await mb.doRight(90);
-    // console.log("2nd");
-    // await mb.doForward(100);
-    // await mb.doRight(90);
-    // console.log("3rd");
-    // await mb.doForward(100);
-    // await mb.doRight(90);
-    // console.log("4th");
-
     await mb.goForward(100);
     await mb.goBackward(200);
     await mb.turnLeft(90);
