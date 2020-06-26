@@ -1419,7 +1419,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
-                if (logo.lastNotePlayed[turtle] !== null) {
+                if (logo.noteStatus[turtle] !== null) {
                     let name = logo.blocks.blockList[blk].privateData;
                     switch (name) {
                         case "letter class":
@@ -1428,7 +1428,7 @@ function setupPitchBlocks() {
                         case "solfege syllable":
                             let lc2 = logo.noteStatus[turtle][0][0][0];
                             if (logo.moveable[turtle] === false) {
-                                return SOLFEGECONVERSIONTABLE[lc];
+                                return SOLFEGECONVERSIONTABLE[lc2];
                             } else {
                                 let scale = _buildScale(logo.keySignature[turtle])[0];
                                 let i = scale.indexOf(lc2);
@@ -1480,7 +1480,7 @@ function setupPitchBlocks() {
                             return "__INVALID_INPUT__";
                     }
                 } else {
-                    return "";
+                    return "Waiting for a note to finish playing.";
                 }
             }
         }
