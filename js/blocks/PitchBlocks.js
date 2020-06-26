@@ -1469,7 +1469,7 @@ function setupPitchBlocks() {
                             );
                             return scalarClass1[0] + scalarClass1[1];
                         case "nth degree":
-                            let note4 = logo.noteStatus[0][0][0];
+                            let note4 = logo.noteStatus[turtle][0][0];
                             note4 = note4.substr(0, note4.length - 1);
                             note4 = note4
                                         .replace("#", SHARP)
@@ -1480,7 +1480,7 @@ function setupPitchBlocks() {
                             return "__INVALID_INPUT__";
                     }
                 } else {
-                    return "Waiting for a note to finish playing.";
+                    return "";
                 }
             }
         }
