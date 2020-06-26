@@ -8,8 +8,8 @@ async function runScript() {
     await mb.turnRight(90);
     await mb.setHeading(45);
     await mb.drawArc(45, 100);
-    mb.setBezierControlPoint1(0, 0);
-    mb.setBezierControlPoint2(100, 100);
+    await mb.setBezierControlPoint1(0, 0);
+    await mb.setBezierControlPoint2(100, 100);
     await mb.drawBezier(200, 200);
     await mb.scrollXY(100, 100);
     await mb.setXY(100, 100);
@@ -26,4 +26,22 @@ async function runScript() {
             await mb.turnLeft(60);
         }
     }
+    await mb.clear();
+
+    await mb.fillShape(async () => {
+        for (let i = 0; i < 6; i++) {
+            await mb.goForward(100);
+            await mb.turnRight(60);
+        }
+        return mb.ENDFLOW;
+    });
+    await mb.clear();
+
+    await mb.hollowLine(async () => {
+        for (let i = 0; i < 4; i++) {
+            await mb.goForward(100);
+            await mb.turnRight(90);
+        }
+        return mb.ENDFLOW;
+    });
 }

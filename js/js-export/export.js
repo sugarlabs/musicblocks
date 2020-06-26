@@ -6,9 +6,21 @@ class MusicBlocks {
 
     runCommand(command, args) {
         return new Promise(resolve => {
-            this.turtle[command](...args);
+            if (command === "_anonymous") {
+                if (args !== undefined) args();
+            } else {
+                if (args === undefined || args === []) {
+                    this.turtle[command]();
+                } else {
+                    this.turtle[command](...args);
+                }
+            }
             setTimeout(resolve, 250);
         });
+    }
+
+    get ENDFLOW() {
+        return new Promise(resolve => resolve());
     }
 
     goForward(steps) {
@@ -50,11 +62,17 @@ class MusicBlocks {
     }
 
     setBezierControlPoint1(x, y) {
-        [logo.cp1x[this.turtle], logo.cp1y[this.turtle]] = [x, y];
+        return this.runCommand(
+            "_anonymous",
+            () => [logo.cp1x[this.turtle], logo.cp1y[this.turtle]] = [x, y]
+        );
     }
 
     setBezierControlPoint2(x, y) {
-        [logo.cp2x[this.turtle], logo.cp2y[this.turtle]] = [x, y];
+        return this.runCommand(
+            "_anonymous",
+            () => [logo.cp2x[this.turtle], logo.cp2y[this.turtle]] = [x, y]
+        );
     }
 
     clear() {
@@ -75,6 +93,87 @@ class MusicBlocks {
 
     get HEADING() {
         return this.turtle.orientation;
+    }
+
+    setColor(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetColor", [value]);
+    }
+
+    setGrey(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetChroma", [value]);
+    }
+
+    setShade(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetValue", [value]);
+    }
+
+    setHue(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetHue", [value]);
+    }
+
+    setTranslucency(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        value = 1.0 - arg / 100;
+        return this.runCommand("doSetPenAlpha", [value]);
+    }
+
+    setPensize(value) {
+        value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetPensize", [value]);
+    }
+
+    penUp() {
+        return this.runCommand("doPenUp");
+    }
+
+    penDown() {
+        return this.runCommand("doPenDown");
+    }
+
+    async fillShape(flow) {
+        await this.runCommand("doStartFill");
+        await flow();
+        await this.runCommand("doEndFill");
+        turtles.refreshCanvas();
+
+        return this.ENDFLOW;
+    }
+
+    async hollowLine(flow) {
+        await this.runCommand("doStartHollowLine");
+        await flow();
+        await this.runCommand("doEndHollowLine");
+        turtles.refreshCanvas();
+
+        return this.ENDFLOW;
+    }
+
+    fillBackground() {
+        return this.runCommand("_anonymous", () => logo.setBackgroundColor(turtle));
+    }
+
+    setFont(fontname) {
+        return this.runCommand("doSetFont", [fontname]);
+    }
+
+    get PENSIZE() {
+        return this.turtle.stroke;
+    }
+
+    get COLOR() {
+        return this.turtle.color;
+    }
+
+    get SHADE() {
+        return this.turtle.value;
+    }
+
+    get GREY() {
+        return this.turtle.chroma;
     }
 
     // play(delay) {
