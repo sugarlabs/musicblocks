@@ -5186,6 +5186,7 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
+                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
