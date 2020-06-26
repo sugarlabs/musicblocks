@@ -926,6 +926,14 @@ var OSCTYPES = [
     [_("sawtooth"), "sawtooth"]
 ];
 
+const initialTEMPERAMENTS = [ 
+    [_("equal"), "equal", "equal"],
+    [_("just intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
+    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+];
+
 var TEMPERAMENTS = [
     [_("equal"), "equal", "equal"],
     [_("just intonation"), "just intonation", "just intonation"],
@@ -936,12 +944,9 @@ var TEMPERAMENTS = [
 ];
 
 let updateTEMPERAMENTS = () => {
-    let listOfAll ={} ;
-    for (let i of TEMPERAMENTS){
-        listOfAll[i[1]] =true ;
-    }
+    TEMPERAMENTS = [...initialTEMPERAMENTS] ;
     for (let i in TEMPERAMENT){
-        if (!(i in PreDefinedTemperaments) && !(i in listOfAll)){
+        if (!(i in PreDefinedTemperaments)){
             TEMPERAMENTS.push([_(i),i,i]);
         }
     }
@@ -1187,8 +1192,8 @@ var TEMPERAMENT = {
         "9": Math.pow(2, 9 / 12),
         "10": Math.pow(2, 10 / 12),
         "11": Math.pow(2, 11 / 12),
-        pitchNumber: 12
-        //'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
+        pitchNumber: 12,
+        "interval": ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     }
 };
 

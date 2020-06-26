@@ -2191,6 +2191,7 @@ function TemperamentWidget() {
         var note = [];
         this.notes = [];
         this.frequencies = [];
+        this.cents = [];
         this.intervals = [];
         this.ratios = [];
         this.ratiosNotesPair = [];
