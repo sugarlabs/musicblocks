@@ -1423,10 +1423,14 @@ function setupPitchBlocks() {
                     let name = logo.blocks.blockList[blk].privateData;
                     switch (name) {
                         case "letter class":
-                            let lc = logo.noteStatus[turtle][0][0][0];
+                            let lc = logo.lastNotePlayed[turtle][0][0];
                             return lc;
                         case "solfege syllable":
-                            let lc2 = logo.noteStatus[turtle][0][0][0];
+                            let lc2 = logo.lastNotePlayed[turtle][0];
+                            lc2 = lc2.substr(0, lc2.length - 1);
+                            lc2 = lc2
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
                             if (logo.moveable[turtle] === false) {
                                 return SOLFEGECONVERSIONTABLE[lc2];
                             } else {
@@ -1435,7 +1439,7 @@ function setupPitchBlocks() {
                                 return SOLFEGENAMES[i];
                             }
                         case "pitch class":
-                            let note = logo.lastPitchPlayed[0][0];
+                            let note = logo.lastNotePlayed[turtle][0];
                             let num = pitchToNumber(
                                 note.substr(0, note.length - 1 ),
                                 note[note.length - 1],
@@ -1443,7 +1447,7 @@ function setupPitchBlocks() {
                             );
                             return (num - 3) % 12;
                         case "scalar class":
-                            let note2 = logo.lastPitchPlayed[0][0];
+                            let note2 = logo.lastNotePlayed[turtle][0];
                             note2 = note2.substr(0, note2.length - 1);
                             note2 = note2
                                         .replace("#", SHARP)
@@ -1456,7 +1460,7 @@ function setupPitchBlocks() {
                             );
                             return scalarClass[0];
                         case "scale degree":
-                            let note3 = logo.lastPitchPlayed[0][0];
+                            let note3 = logo.lastNotePlayed[turtle][0];
                             note3 = note3.substr(0, note3.length - 1);
                             note3 = note3
                                         .replace("#", SHARP)
@@ -1469,7 +1473,7 @@ function setupPitchBlocks() {
                             );
                             return scalarClass1[0] + scalarClass1[1];
                         case "nth degree":
-                            let note4 = logo.noteStatus[turtle][0][0];
+                            let note4 = logo.lastNotePlayed[turtle][0];
                             note4 = note4.substr(0, note4.length - 1);
                             note4 = note4
                                         .replace("#", SHARP)
