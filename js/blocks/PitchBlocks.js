@@ -2902,8 +2902,7 @@ function setupPitchBlocks() {
                     let turtleID = logo.turtles.turtleList[turtle].id;
                     let eventName = "__scaledegree_" + args[0] + "_" + turtleID + "__";
                     logo._setListener(turtle, eventName, __listener);
-
-                    logo.beatList.push(args[0]);
+                    logo.factorList[turtle].push("SD" + args[0]);
                 }
             }
         }

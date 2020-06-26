@@ -131,6 +131,30 @@ class NoteController {
                         "__";
                     logo.stage.dispatchEvent(eventName);
                 }
+                if (typeof(logo.factorList[turtle][f]) === "string") {
+                    if (logo.factorList[turtle][f].substr(0,2) == "SD") {
+                        let arg = logo.factorList[turtle][f].substr(2);
+                        let scaleDegree = scaleDegreeToPitch(logo.keySignature[turtle], arg, logo.moveable[turtle]);
+                        console.log(scaleDegree);
+                        let queueBlock = new Queue(
+                            childFlow,
+                            childFlowCount,
+                            blk,
+                            receivedArg
+                        );
+                        logo.parentFlowQueue[turtle].push(blk);
+                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                        childFlow = null;
+
+                        let eventName = 
+                            "__scaledegree_" +
+                            arg +
+                            "_" +
+                            turtleID +
+                            "__";
+                        logo.stage.dispatchEvent(eventName);
+                    }
+                }
             }
         }
 
