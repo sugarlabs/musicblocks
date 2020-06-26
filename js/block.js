@@ -1796,6 +1796,15 @@ function Block(protoblock, blocks, overrideName) {
         return this.protoblock.style === "argflowclamp";
     };
 
+    this.isLeftClampBlock = function() {
+        return (
+            this.isClampBlock() && 
+            this.protoblock._style.flows.left == true &&
+            this.protoblock._style.args === 0 &&
+            this.protoblock._style.flows.type == "flow" 
+        );
+    };
+    
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === "doubleclamp";
     };
