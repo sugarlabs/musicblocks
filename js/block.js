@@ -3205,9 +3205,7 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.turtles.turtleList[turtle].startBlock
                             === this
                     ) {
-                        this.blocks.turtles.turtleList[
-                            turtle
-                            ].getDecorationBitmap().x =
+                        this.blocks.turtles.turtleList[turtle].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }

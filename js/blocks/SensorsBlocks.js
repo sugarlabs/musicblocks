@@ -301,7 +301,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[2] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");
@@ -328,7 +328,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[1] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");
@@ -355,7 +355,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[0] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");
