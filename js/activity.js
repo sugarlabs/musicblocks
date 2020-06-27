@@ -830,7 +830,7 @@ function Activity() {
         logo.boxes = {};
         logo.time = 0;
         hideMsgs();
-	hideGrids();
+        hideGrids();
         logo.setBackgroundColor(-1);
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -4715,14 +4715,13 @@ function Activity() {
         // Put the boundary in the turtles container so it scrolls
         // with the blocks.
         turtles = new Turtles();
-        turtles
-            .setCanvas(canvas)
-            .setClear(_allClear)
-            .setHideMenu(hideAuxMenu)
-            .setMasterStage(stage)
-            .setStage(turtleContainer)
-            .setHideGrids(hideGrids)
-            .setDoGrid(_doCartesianPolar)
+        turtles.masterStage = stage;
+        turtles.stage = turtleContainer;
+        turtles.canvas = canvas;
+        turtles.hideMenu = hideAuxMenu;
+        turtles.doClear = _allClear;
+        turtles.hideGrids = hideGrids;
+        turtles.doGrid = _doCartesianPolar;
         turtles.refreshCanvas = refreshCanvas;
 
         // Put the boundary in the blocks container so it scrolls

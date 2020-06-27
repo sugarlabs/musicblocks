@@ -650,7 +650,7 @@ Turtle.TurtleView = class {
             );
             text.textAlign = "left";
             text.textBaseline = "alphabetic";
-            this.turtles.getStage().addChild(text);
+            this.turtles.stage.addChild(text);
             this._media.push(text);
             text.x = this.container.x;
             text.y = this.container.y + i * size;

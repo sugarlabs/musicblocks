@@ -216,7 +216,7 @@ class Painter {
      */
     _move(ox, oy, x, y, invert) {
         let turtles = this.turtles;
-        let turtlesScale = turtles.getScale();
+        let turtlesScale = turtles.scale;
 
         let nx, ny;
         if (invert) {
@@ -400,7 +400,7 @@ class Painter {
         let nx, ny, sa, ea;
 
         let turtles = this.turtles;
-        let turtlesScale = turtles.getScale();
+        let turtlesScale = turtles.scale;
 
         if (invert) {
             cx = turtles.turtleX2screenX(cx);
@@ -890,7 +890,7 @@ class Painter {
         let dxi, dyi, dxf, dyf;
 
         let turtles = this.turtles;
-        let turtlesScale = turtles.getScale();
+        let turtlesScale = turtles.scale;
 
         if (this._penDown && this._hollowState) {
             // Convert from turtle coordinates to screen coordinates
@@ -1178,7 +1178,7 @@ class Painter {
         for (let i = 0; i < this.turtle.media.length; i++) {
             // Could be in the image Container or the Stage
             this.turtle.imageContainer.removeChild(this.turtle.media[i]);
-            turtles.getStage().removeChild(this.turtle.media[i]);
+            turtles.stage.removeChild(this.turtle.media[i]);
             delete this.turtle.media[i];
         }
 

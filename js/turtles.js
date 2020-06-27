@@ -113,7 +113,7 @@ class Turtles {
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
 
-        let turtlesStage = this.getStage();
+        let turtlesStage = this.stage;
 
         this.reorderButtons(turtlesStage);
 
@@ -131,7 +131,7 @@ class Turtles {
         */
 
         turtle.container.on("mousedown", event => {
-            let scale = this.getScale();
+            let scale = this.scale;
             let offset = {
                 x: turtle.container.x - event.stageX / scale,
                 y: turtle.container.y - event.stageY / scale
@@ -212,6 +212,132 @@ class Turtles {
 
         this.refreshCanvas();
     }
+
+    // ================================ MODEL =================================
+    // ========================================================================
+
+    /**
+     * @param {Object} stage
+     */
+    set masterStage(stage) {
+        this._masterStage = stage;
+    }
+
+    /**
+     * @returns {Object} - master stage object
+     */
+    get masterStage() {
+        return this._masterStage;
+    }
+
+    /**
+     * @param {Object} stage
+     */
+    set stage(stage) {
+        this._stage = stage;
+        this._stage.addChild(this._borderContainer);
+    }
+
+    /**
+     * @returns {Object} - stage object
+     */
+    get stage() {
+        return this._stage;
+    }
+
+    /**
+     * @param {Object} canvas
+     */
+    set canvas(canvas) {
+        this._canvas = canvas;
+    }
+
+    /**
+     * @return {Object} canvas object
+     */
+    get canvas() {
+        return this._canvas;
+    }
+
+    /**
+     * @returns {Object} border container object
+     */
+    get borderContainer() {
+        return this._borderContainer;
+    }
+
+    /**
+     * @param {Function} hideMenu - hide auxiliary menu
+     */
+    set hideMenu(hideMenu) {
+        this._hideMenu = hideMenu;
+    }
+
+    /**
+     * @returns {Function} hide auxiliary menu
+     */
+    get hideMenu() {
+        return this._hideMenu;
+    }
+
+    /**
+     * @param {Function} doClear - reset canvas and turtles
+     */
+    set doClear(doClear) {
+        this._doClear = doClear;
+    }
+
+    /**
+     * @returns {Function} reset canvas and turtles
+     */
+    get doClear() {
+        return this._doClear;
+    }
+
+    /**
+     * @param {Function} hideGrids - hide canvas gridwork
+     */
+    set hideGrids(hideGrids) {
+        this._hideGrids = hideGrids;
+    }
+
+    /**
+     * @returns {Function} hide canvas gridwork
+     */
+    get hideGrids() {
+        return this._hideGrids;
+    }
+
+    /**
+     * @param {Function} doGrid - show canvas gridwork
+     */
+    set doGrid(doGrid) {
+        this._doGrid = doGrid;
+    }
+
+    /**
+     * @returns {Function} show canvas gridwork
+     */
+    get doGrid() {
+        return this._doGrid;
+    }
+
+    /**
+     * @returns {Object[]} list of Turtle objects
+     */
+    get turtleList() {
+        return this._turtleList;
+    }
+
+    // ================================ VIEW ==================================
+    // ========================================================================
+
+    /**
+     * @returns {Number} scale factor
+     */
+    get scale() {
+        return this._scale;
+    }
 }
 
 /**
@@ -233,10 +359,10 @@ Turtles.TurtlesModel = class {
         this._canvas = null;            // DOM canvas element
 
         // These functions are directly called by TurtlesView
-        this.hideMenu = null;           // function to hide aux menu
-        this.doClear = null;            // function to clear the canvas
-        this.hideGrids = null;          // function to hide all grids
-        this.doGrid = null;             // function that renders Cartesian/Polar
+        this._hideMenu = null;          // function to hide aux menu
+        this._doClear = null;           // function to clear the canvas
+        this._hideGrids = null;         // function to hide all grids
+        this._doGrid = null;            // function that renders Cartesian/Polar
                                         //  grids and changes button labels
 
         // createjs border container
@@ -250,107 +376,6 @@ Turtles.TurtlesModel = class {
          * required turtle rather than having to "get" the turtleList itself,
          * and return the length of the turtleList (number of Turtles).
          */
-    }
-
-    /**
-     * @param {Object} stage
-     * @returns {this}
-     */
-    setMasterStage(stage) {
-        this._masterStage = stage;
-        return this;
-    }
-
-    /**
-     * @returns {Object} - master stage object
-     */
-    getMasterStage() {
-        return this._masterStage;
-    }
-
-    /**
-     * @param {Object} stage
-     * @returns {this}
-     */
-    setStage(stage) {
-        this._stage = stage;
-        this._stage.addChild(this._borderContainer);
-        return this;
-    }
-
-    /**
-     * @returns {Object} - stage object
-     */
-    getStage() {
-        return this._stage;
-    }
-
-    /**
-     * @param {Object} canvas
-     * @returns {this}
-     */
-    setCanvas(canvas) {
-        this._canvas = canvas;
-        return this;
-    }
-
-    /**
-     * Getter for canvas object.
-     *
-     * @return {Object} canvas object
-     */
-    getCanvas() {
-        return this._canvas;
-    }
-
-    /**
-     * @param {Function} hideGrids
-     * @returns {this}
-     */
-    setHideGrids(hideGrids) {
-        this.hideGrids = hideGrids;
-        return this;
-    }
-
-    /**
-     * @param {Function} doGrid
-     * @returns {this}
-     */
-    setDoGrid(doGrid) {
-        this.doGrid = doGrid;
-        return this;
-    }
-
-    /**
-     * @param {Function} hideMenu
-     * @returns {this}
-     */
-    setHideMenu(hideMenu) {
-        this.hideMenu = hideMenu;
-        return this;
-    }
-
-    /**
-     * @param {Function} doClear
-     * @returns {this}
-     */
-    setClear(doClear) {
-        this.doClear = doClear;
-        return this;
-    }
-
-    /**
-     * @returns {Object} border container object
-     */
-    getBorderContainer() {
-        return this._borderContainer;
-    }
-
-    /**
-     * @returns {Object[]} list of Turtle objects
-     */
-    get turtleList() {
-        return this._turtleList;
     }
 
     /**
@@ -506,8 +531,8 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     setStageScale(scale) {
-        this.getStage().scaleX = scale;
-        this.getStage().scaleY = scale;
+        this.stage.scaleX = scale;
+        this.stage.scaleY = scale;
         this.refreshCanvas();
     }
 
@@ -529,13 +554,6 @@ Turtles.TurtlesView = class {
         }
 
         this.makeBackground();
-    }
-
-    /**
-     * @returns {Number} scale factor
-     */
-    getScale() {
-        return this._scale;
     }
 
     /**
@@ -569,7 +587,7 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     deltaY(dy) {
-        this.getStage().y += dy;
+        this.stage.y += dy;
     }
 
     /**
@@ -580,7 +598,7 @@ Turtles.TurtlesView = class {
      * @returns {Number} inverted y coordinate
      */
     _invertY(y) {
-        return this.getCanvas().height / (2.0 * this._scale) - y;
+        return this.canvas.height / (2.0 * this._scale) - y;
     }
 
     /**
@@ -590,7 +608,7 @@ Turtles.TurtlesView = class {
      * @returns {Number} turtle x coordinate
      */
     screenX2turtleX(x) {
-        return x - this.getCanvas().width / (2.0 * this._scale);
+        return x - this.canvas.width / (2.0 * this._scale);
     }
 
     /**
@@ -610,7 +628,7 @@ Turtles.TurtlesView = class {
      * @returns {Number} screen x coordinate
      */
     turtleX2screenX(x) {
-        return this.getCanvas().width / (2.0 * this._scale) + x;
+        return this.canvas.width / (2.0 * this._scale) + x;
     }
 
     /**
@@ -681,7 +699,7 @@ Turtles.TurtlesView = class {
     makeBackground(setCollapsed) {
         let doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
-        let borderContainer = this.getBorderContainer();
+        let borderContainer = this.borderContainer;
 
         // Remove any old background containers
         for (let i = 0; i < borderContainer.children.length; i++) {
@@ -691,7 +709,7 @@ Turtles.TurtlesView = class {
             );
         }
 
-        let turtlesStage = this.getStage();
+        let turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
         if (this._expandButton !== null) {
             turtlesStage.removeChild(this._expandButton);
@@ -748,8 +766,8 @@ Turtles.TurtlesView = class {
             }
 
             // remove the stage and add it back at the top
-            this.getMasterStage().removeChild(turtlesStage);
-            this.getMasterStage().addChild(turtlesStage);
+            this.masterStage.removeChild(turtlesStage);
+            this.masterStage.addChild(turtlesStage);
 
             this.refreshCanvas();
         }
@@ -1209,8 +1227,8 @@ Turtles.TurtlesView = class {
                     }
 
                     // remove the stage and add it back in position 0
-                    this.getMasterStage().removeChild(turtlesStage);
-                    this.getMasterStage().addChildAt(turtlesStage, 0);
+                    this.masterStage.removeChild(turtlesStage);
+                    this.masterStage.addChildAt(turtlesStage, 0);
                 });
 
                 __makeCollapseButton();
