@@ -10,9 +10,9 @@ class MusicBlocks {
                 if (args !== undefined) args();
             } else {
                 if (args === undefined || args === []) {
-                    this.turtle[command]();
+                    this.turtle.painter[command]();
                 } else {
-                    this.turtle[command](...args);
+                    this.turtle.painter[command](...args);
                 }
             }
             setTimeout(resolve, 250);
