@@ -929,19 +929,13 @@ class Logo {
         if (this.compiling) {
             this._saveX[turtle] = this.turtles.turtleList[turtle].x;
             this._saveY[turtle] = this.turtles.turtleList[turtle].y;
-            this._saveColor[turtle] = this.turtles.turtleList[turtle].color;
-            this._saveValue[turtle] = this.turtles.turtleList[turtle].value;
-            this._saveChroma[turtle] = this.turtles.turtleList[turtle].chroma;
-            this._saveStroke[turtle] = this.turtles.turtleList[turtle].stroke;
-            this._saveCanvasAlpha[turtle] = this.turtles.turtleList[
-                turtle
-            ].canvasAlpha;
-            this._saveOrientation[turtle] = this.turtles.turtleList[
-                turtle
-            ].orientation;
-            this._savePenState[turtle] = this.turtles.turtleList[
-                turtle
-            ].penState;
+            this._saveColor[turtle] = this.turtles.turtleList[turtle].painter.color;
+            this._saveValue[turtle] = this.turtles.turtleList[turtle].painter.value;
+            this._saveChroma[turtle] = this.turtles.turtleList[turtle].painter.chroma;
+            this._saveStroke[turtle] = this.turtles.turtleList[turtle].painter.stroke;
+            this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].painter.canvasAlpha;
+            this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
+            this._savePenState[turtle] = this.turtles.turtleList[turtle].painter.penState;
         }
     }
 
@@ -1497,12 +1491,12 @@ class Logo {
         switch (logo.blocks.blockList[blk].name) {
             /** @deprecated */
             case "beginhollowline":
-                logo.turtles.turtleList[turtle].doStartHollowLine();
+                logo.turtles.turtleList[turtle].painter.doStartHollowLine();
                 break;
 
             /** @deprecated */
             case "endhollowline":
-                logo.turtles.turtleList[turtle].doEndHollowLine();
+                logo.turtles.turtleList[turtle].painter.doEndHollowLine();
                 break;
 
             /** @deprecated */
@@ -1870,7 +1864,7 @@ class Logo {
                 }
 
                 // Make sure SVG path is closed
-                logo.turtles.turtleList[turtle].closeSVG();
+                logo.turtles.turtleList[turtle].painter.closeSVG();
 
                 // Mark the turtle as not running
                 logo.turtles.turtleList[turtle].running = false;
@@ -1910,25 +1904,25 @@ class Logo {
 
                         logo.compiling = false;
                         for (t in logo.turtles.turtleList) {
-                            logo.turtles.turtleList[t].doPenUp();
-                            logo.turtles.turtleList[t].doSetXY(
+                            logo.turtles.turtleList[t].painter.doPenUp();
+                            logo.turtles.turtleList[t].painter.doSetXY(
                                 logo._saveX[t],
                                 logo._saveY[t]
                             );
-                            logo.turtles.turtleList[t].color =
+                            logo.turtles.turtleList[t].painter.color =
                                 logo._saveColor[t];
-                            logo.turtles.turtleList[t].value =
+                            logo.turtles.turtleList[t].painter.value =
                                 logo._saveValue[t];
-                            logo.turtles.turtleList[t].chroma =
+                            logo.turtles.turtleList[t].painter.chroma =
                                 logo._saveChroma[t];
-                            logo.turtles.turtleList[t].stroke =
+                            logo.turtles.turtleList[t].painter.stroke =
                                 logo._saveStroke[t];
-                            logo.turtles.turtleList[t].canvasAlpha =
+                            logo.turtles.turtleList[t].painter.canvasAlpha =
                                 logo._saveCanvasAlpha[t];
-                            logo.turtles.turtleList[t].doSetHeading(
+                            logo.turtles.turtleList[t].painter.doSetHeading(
                                 logo._saveOrientation[t]
                             );
-                            logo.turtles.turtleList[t].penState =
+                            logo.turtles.turtleList[t].painter.penState =
                                 logo._savePenState[t];
                         }
                     }
@@ -2124,28 +2118,28 @@ class Logo {
             let _penSwitch = name => {
                 switch (name) {
                     case "penup":
-                        this.turtles.turtleList[turtle].doPenUp();
+                        this.turtles.turtleList[turtle].painter.doPenUp();
                         break;
                     case "pendown":
-                        this.turtles.turtleList[turtle].doPenDown();
+                        this.turtles.turtleList[turtle].painter.doPenDown();
                         break;
                     case "setcolor":
-                        this.turtles.turtleList[turtle].doSetColor(arg);
+                        this.turtles.turtleList[turtle].painter.doSetColor(arg);
                         break;
                     case "sethue":
-                        this.turtles.turtleList[turtle].doSetHue(arg);
+                        this.turtles.turtleList[turtle].painter.doSetHue(arg);
                         break;
                     case "setshade":
-                        this.turtles.turtleList[turtle].doSetValue(arg);
+                        this.turtles.turtleList[turtle].painter.doSetValue(arg);
                         break;
                     case "settranslucency":
-                        this.turtles.turtleList[turtle].doSetPenAlpha(arg);
+                        this.turtles.turtleList[turtle].painter.doSetPenAlpha(arg);
                         break;
                     case "setgrey":
-                        this.turtles.turtleList[turtle].doSetChroma(arg);
+                        this.turtles.turtleList[turtle].painter.doSetChroma(arg);
                         break;
                     case "setpensize":
-                        this.turtles.turtleList[turtle].doSetPensize(arg);
+                        this.turtles.turtleList[turtle].painter.doSetPensize(arg);
                         break;
                 }
             };
@@ -2159,30 +2153,30 @@ class Logo {
 
         let __clear = (turtle, timeout) => {
             if (this.suppressOutput[turtle]) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doSetXY(0, 0);
-                this.turtles.turtleList[turtle].doSetHeading(0);
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
                 this.svgBackground = true;
             } else {
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doSetHeading(0);
-                this.turtles.turtleList[turtle].doSetXY(0, 0);
-                this.turtles.turtleList[turtle].penState = true;
-                // this.turtles.turtleList[turtle].doClear(true, true, true);
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.penState = true;
+                // this.turtles.turtleList[turtle].painter.doClear(true, true, true);
             }
         };
 
         let __right = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doRight(arg);
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doRight(arg);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doRight(arg),
+                    () => this.turtles.turtleList[turtle].painter.doRight(arg),
                     timeout
                 );
             }
@@ -2190,10 +2184,10 @@ class Logo {
 
         let __setheading = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                this.turtles.turtleList[turtle].doSetHeading(arg);
+                this.turtles.turtleList[turtle].painter.doSetHeading(arg);
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doSetHeading(arg),
+                    () => this.turtles.turtleList[turtle].painter.doSetHeading(arg),
                     timeout
                 );
             }
@@ -2201,13 +2195,13 @@ class Logo {
 
         let __forward = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doForward(arg);
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doForward(arg);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doForward(arg),
+                    () => this.turtles.turtleList[turtle].painter.doForward(arg),
                     timeout
                 );
             }
@@ -2215,10 +2209,10 @@ class Logo {
 
         let __scrollxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                this.turtles.turtleList[turtle].doScrollXY(arg1, arg2);
+                this.turtles.turtleList[turtle].painter.doScrollXY(arg1, arg2);
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doScrollXY(arg1, arg2),
+                    () => this.turtles.turtleList[turtle].painter.doScrollXY(arg1, arg2),
                     timeout
                 );
             }
@@ -2226,13 +2220,13 @@ class Logo {
 
         let __setxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doSetXY(arg1, arg2);
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(arg1, arg2);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doSetXY(arg1, arg2),
+                    () => this.turtles.turtleList[turtle].painter.doSetXY(arg1, arg2),
                     timeout
                 );
             }
@@ -2261,13 +2255,13 @@ class Logo {
 
         let __arc = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doArc(arg1, arg2);
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doArc(arg1, arg2);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(
-                    () => this.turtles.turtleList[turtle].doArc(arg1, arg2),
+                    () => this.turtles.turtleList[turtle].painter.doArc(arg1, arg2),
                     timeout
                 );
             }
@@ -2299,9 +2293,9 @@ class Logo {
 
         let __bezier = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
-                this.turtles.turtleList[turtle].doBezier(
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doBezier(
                     this.cp1x[turtle],
                     this.cp1y[turtle],
                     this.cp2x[turtle],
@@ -2309,10 +2303,10 @@ class Logo {
                     arg1,
                     arg2
                 );
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(() => {
-                    this.turtles.turtleList[turtle].doBezier(
+                    this.turtles.turtleList[turtle].painter.doBezier(
                         this.cp1x[turtle],
                         this.cp1y[turtle],
                         this.cp2x[turtle],
@@ -2327,24 +2321,24 @@ class Logo {
         let inFillClamp = false;
         let __fill = (turtle, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].penState;
-                this.turtles.turtleList[turtle].penState = false;
+                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
                 if (inFillClamp) {
-                    this.turtles.turtleList[turtle].doEndFill();
+                    this.turtles.turtleList[turtle].painter.doEndFill();
                     inFillClamp = false;
                 } else {
-                    this.turtles.turtleList[turtle].doStartFill();
+                    this.turtles.turtleList[turtle].painter.doStartFill();
                     inFillClamp = true;
                 }
 
-                this.turtles.turtleList[turtle].penState = savedPenState;
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
             } else {
                 setTimeout(() => {
                     if (inFillClamp) {
-                        this.turtles.turtleList[turtle].doEndFill();
+                        this.turtles.turtleList[turtle].painter.doEndFill();
                         inFillClamp = false;
                     } else {
-                        this.turtles.turtleList[turtle].doStartFill();
+                        this.turtles.turtleList[turtle].painter.doStartFill();
                         inFillClamp = true;
                     }
                 }, timeout);
@@ -2355,19 +2349,19 @@ class Logo {
         let __hollowline = (turtle, timeout) => {
             if (suppressOutput) {
                 if (inHollowLineClamp) {
-                    this.turtles.turtleList[turtle].doEndHollowLine();
+                    this.turtles.turtleList[turtle].painter.doEndHollowLine();
                     inHollowLineClamp = false;
                 } else {
-                    this.turtles.turtleList[turtle].doStartHollowLine();
+                    this.turtles.turtleList[turtle].painter.doStartHollowLine();
                     inHollowLineClamp = true;
                 }
             } else {
                 setTimeout(() => {
                     if (inHollowLineClamp) {
-                        this.turtles.turtleList[turtle].doEndHollowLine();
+                        this.turtles.turtleList[turtle].painter.doEndHollowLine();
                         inHollowLineClamp = false;
                     } else {
-                        this.turtles.turtleList[turtle].doStartHollowLine();
+                        this.turtles.turtleList[turtle].painter.doStartHollowLine();
                         inHollowLineClamp = true;
                     }
                 }, timeout);
@@ -3105,7 +3099,7 @@ class Logo {
                         logo.statusFields.push([blk, "color"]);
                     } else {
                         logo.blocks.blockList[blk].value =
-                            logo.turtles.turtleList[turtle].color;
+                            logo.turtles.turtleList[turtle].painter.color;
                     }
                     break;
 
@@ -3158,13 +3152,13 @@ class Logo {
             // .. and the turtle state
             let saveX = this.turtles.turtleList[turtle].x;
             let saveY = this.turtles.turtleList[turtle].y;
-            let saveColor = this.turtles.turtleList[turtle].color;
-            let saveValue = this.turtles.turtleList[turtle].value;
-            let saveChroma = this.turtles.turtleList[turtle].chroma;
-            let saveStroke = this.turtles.turtleList[turtle].stroke;
-            let saveCanvasAlpha = this.turtles.turtleList[turtle].canvasAlpha;
+            let saveColor = this.turtles.turtleList[turtle].painter.color;
+            let saveValue = this.turtles.turtleList[turtle].painter.value;
+            let saveChroma = this.turtles.turtleList[turtle].painter.chroma;
+            let saveStroke = this.turtles.turtleList[turtle].painter.stroke;
+            let saveCanvasAlpha = this.turtles.turtleList[turtle].painter.canvasAlpha;
             let saveOrientation = this.turtles.turtleList[turtle].orientation;
-            let savePenState = this.turtles.turtleList[turtle].penState;
+            let savePenState = this.turtles.turtleList[turtle].painter.penState;
 
             let saveWhichNoteToCount = this.whichNoteToCount[turtle];
 
@@ -3216,15 +3210,15 @@ class Logo {
             console.debug(saveTurtleHeaps);
             this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-            this.turtles.turtleList[turtle].doPenUp();
-            this.turtles.turtleList[turtle].doSetXY(saveX, saveY);
-            this.turtles.turtleList[turtle].color = saveColor;
-            this.turtles.turtleList[turtle].value = saveValue;
-            this.turtles.turtleList[turtle].chroma = saveChroma;
-            this.turtles.turtleList[turtle].stroke = saveStroke;
-            this.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
-            this.turtles.turtleList[turtle].doSetHeading(saveOrientation);
-            this.turtles.turtleList[turtle].penState = savePenState;
+            this.turtles.turtleList[turtle].painter.doPenUp();
+            this.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+            this.turtles.turtleList[turtle].painter.color = saveColor;
+            this.turtles.turtleList[turtle].painter.value = saveValue;
+            this.turtles.turtleList[turtle].painter.chroma = saveChroma;
+            this.turtles.turtleList[turtle].painter.stroke = saveStroke;
+            this.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+            this.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+            this.turtles.turtleList[turtle].painter.penState = savePenState;
 
             this.previousTurtleTime[turtle] = savePrevTurtleTime;
             this.turtleTime[turtle] = saveTurtleTime;
@@ -3263,7 +3257,7 @@ class Logo {
         let c =
             turtle === -1 ?
                 platformColor.background :
-                this.turtles.turtleList[turtle].canvasColor;
+                this.turtles.turtleList[turtle].painter.canvasColor;
 
         // docById('myCanvas').style.background = c;
         this.turtles.setBackgroundColor(c);

@@ -199,15 +199,14 @@ function setupIntervalsBlocks() {
                 // And the turtle state
                 let saveX = logo.turtles.turtleList[turtle].x;
                 let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].color;
-                let saveValue = logo.turtles.turtleList[turtle].value;
-                let saveChroma = logo.turtles.turtleList[turtle].chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].stroke;
-                let saveCanvasAlpha =
-                    logo.turtles.turtleList[turtle].canvasAlpha;
+                let saveColor = logo.turtles.turtleList[turtle].painter.color;
+                let saveValue = logo.turtles.turtleList[turtle].painter.value;
+                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
+                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
+                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
                 let saveOrientation =
                     logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].penState;
+                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -261,15 +260,15 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].doPenUp();
-                logo.turtles.turtleList[turtle].doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].color = saveColor;
-                logo.turtles.turtleList[turtle].value = saveValue;
-                logo.turtles.turtleList[turtle].chroma = saveChroma;
-                logo.turtles.turtleList[turtle].stroke = saveStroke;
-                logo.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].penState = savePenState;
+                logo.turtles.turtleList[turtle].painter.doPenUp();
+                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+                logo.turtles.turtleList[turtle].painter.color = saveColor;
+                logo.turtles.turtleList[turtle].painter.value = saveValue;
+                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
+                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
+                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+                logo.turtles.turtleList[turtle].painter.penState = savePenState;
 
                 logo.justCounting[turtle].pop();
                 logo.justMeasuring[turtle].pop();
@@ -315,15 +314,14 @@ function setupIntervalsBlocks() {
                 // And the turtle state
                 let saveX = logo.turtles.turtleList[turtle].x;
                 let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].color;
-                let saveValue = logo.turtles.turtleList[turtle].value;
-                let saveChroma = logo.turtles.turtleList[turtle].chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].stroke;
-                let saveCanvasAlpha =
-                    logo.turtles.turtleList[turtle].canvasAlpha;
+                let saveColor = logo.turtles.turtleList[turtle].painter.color;
+                let saveValue = logo.turtles.turtleList[turtle].painter.value;
+                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
+                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
+                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
                 let saveOrientation =
                     logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].penState;
+                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -380,15 +378,15 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].doPenUp();
-                logo.turtles.turtleList[turtle].doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].color = saveColor;
-                logo.turtles.turtleList[turtle].value = saveValue;
-                logo.turtles.turtleList[turtle].chroma = saveChroma;
-                logo.turtles.turtleList[turtle].stroke = saveStroke;
-                logo.turtles.turtleList[turtle].canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].penState = savePenState;
+                logo.turtles.turtleList[turtle].painter.doPenUp();
+                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+                logo.turtles.turtleList[turtle].painter.color = saveColor;
+                logo.turtles.turtleList[turtle].painter.value = saveValue;
+                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
+                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
+                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+                logo.turtles.turtleList[turtle].painter.penState = savePenState;
 
                 logo.justCounting[turtle].pop();
                 logo.justMeasuring[turtle].pop();

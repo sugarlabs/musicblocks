@@ -4538,44 +4538,44 @@ function PitchTimeMatrix() {
     this._processGraphics = function(obj) {
         switch (obj[0]) {
             case "forward":
-                this._logo.turtles.turtleList[0].doForward(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doForward(obj[1]);
                 break;
             case "back":
-                this._logo.turtles.turtleList[0].doForward(-obj[1]);
+                this._logo.turtles.turtleList[0].painter.doForward(-obj[1]);
                 break;
             case "right":
-                this._logo.turtles.turtleList[0].doRight(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doRight(obj[1]);
                 break;
             case "left":
-                this._logo.turtles.turtleList[0].doRight(-obj[1]);
+                this._logo.turtles.turtleList[0].painter.doRight(-obj[1]);
                 break;
             case "setcolor":
-                this._logo.turtles.turtleList[0].doSetColor(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetColor(obj[1]);
                 break;
             case "sethue":
-                this._logo.turtles.turtleList[0].doSetHue(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetHue(obj[1]);
                 break;
             case "setshade":
-                this._logo.turtles.turtleList[0].doSetValue(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetValue(obj[1]);
                 break;
             case "setgrey":
-                this._logo.turtles.turtleList[0].doSetChroma(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetChroma(obj[1]);
                 break;
             case "settranslucency":
                 var alpha = 1.0 - obj[1] / 100;
-                this._logo.turtles.turtleList[0].doSetPenAlpha(alpha);
+                this._logo.turtles.turtleList[0].painter.doSetPenAlpha(alpha);
                 break;
             case "setpensize":
-                this._logo.turtles.turtleList[0].doSetPensize(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetPensize(obj[1]);
                 break;
             case "setheading":
-                this._logo.turtles.turtleList[0].doSetHeading(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetHeading(obj[1]);
                 break;
             case "arc":
-                this._logo.turtles.turtleList[0].doArc(obj[1], obj[2]);
+                this._logo.turtles.turtleList[0].painter.doArc(obj[1], obj[2]);
                 break;
             case "setxy":
-                this._logo.turtles.turtleList[0].doSetXY(obj[1], obj[2]);
+                this._logo.turtles.turtleList[0].painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
                 console.debug("unknown graphics command " + obj[0]);

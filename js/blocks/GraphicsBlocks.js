@@ -15,7 +15,7 @@ function setupGraphicsBlocks() {
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetHeading(value);
+            turtleObj.painter.doSetHeading(value);
         }
 
         updateParameter(logo, turtle, blk) {
@@ -56,7 +56,7 @@ function setupGraphicsBlocks() {
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetXY(turtleObj.x, value);
+            turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
         updateParameter(logo, turtle, blk) {
@@ -99,7 +99,7 @@ function setupGraphicsBlocks() {
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetXY(value, turtleObj.y);
+            turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
         updateParameter(logo, turtle, blk) {
@@ -166,17 +166,15 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doScrollXY(
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doScrollXY(
+                        logo.turtles.turtleList[turtle].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
@@ -204,14 +202,14 @@ function setupGraphicsBlocks() {
             } else {
                 if (logo.suppressOutput[turtle]) {
                     let savedPenState =
-                        logo.turtles.turtleList[turtle].penState;
-                    logo.turtles.turtleList[turtle].penState = false;
-                    logo.turtles.turtleList[turtle].doSetXY(0, 0);
-                    logo.turtles.turtleList[turtle].doSetHeading(0);
-                    logo.turtles.turtleList[turtle].penState = savedPenState;
+                        logo.turtles.turtleList[turtle].painter.penState;
+                    logo.turtles.turtleList[turtle].painter.penState = false;
+                    logo.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                    logo.turtles.turtleList[turtle].painter.doSetHeading(0);
+                    logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                 } else {
                     logo.svgBackground = true;
-                    logo.turtles.turtleList[turtle].doClear(true, true, true);
+                    logo.turtles.turtleList[turtle].painter.doClear(true, true, true);
                 }
             }
         }
@@ -333,9 +331,9 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doBezier(
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doBezier(
                             logo.cp1x[turtle],
                             logo.cp1y[turtle],
                             logo.cp2x[turtle],
@@ -343,11 +341,9 @@ function setupGraphicsBlocks() {
                             args[0],
                             args[1]
                         );
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doBezier(
+                        logo.turtles.turtleList[turtle].painter.doBezier(
                             logo.cp1x[turtle],
                             logo.cp1y[turtle],
                             logo.cp2x[turtle],
@@ -406,14 +402,12 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doArc(args[0], args[1]);
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doArc(args[0], args[1]);
+                        logo.turtles.turtleList[turtle].painter.doArc(args[0], args[1]);
                     }
                 }
             }
@@ -455,7 +449,7 @@ function setupGraphicsBlocks() {
                         last(logo.inNoteBlock[turtle])
                     ].push(blk);
                 } else {
-                    logo.turtles.turtleList[turtle].doSetHeading(args[0]);
+                    logo.turtles.turtleList[turtle].painter.doSetHeading(args[0]);
                 }
             }
         }
@@ -508,17 +502,15 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doSetXY(
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doSetXY(
                             args[0],
                             args[1]
                         );
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doSetXY(
+                        logo.turtles.turtleList[turtle].painter.doSetXY(
                             args[0],
                             args[1]
                         );
@@ -569,14 +561,12 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doRight(args[0]);
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doRight(args[0]);
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doRight(args[0]);
+                        logo.turtles.turtleList[turtle].painter.doRight(args[0]);
                     }
                 }
             }
@@ -624,14 +614,12 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doRight(-args[0]);
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doRight(-args[0]);
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doRight(-args[0]);
+                        logo.turtles.turtleList[turtle].painter.doRight(-args[0]);
                     }
                 }
             }
@@ -678,14 +666,12 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doForward(-args[0]);
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doForward(-args[0]);
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doForward(-args[0]);
+                        logo.turtles.turtleList[turtle].painter.doForward(-args[0]);
                     }
                 }
             }
@@ -732,14 +718,12 @@ function setupGraphicsBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doForward(args[0]);
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doForward(args[0]);
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doForward(args[0]);
+                        logo.turtles.turtleList[turtle].painter.doForward(args[0]);
                     }
                 }
             }

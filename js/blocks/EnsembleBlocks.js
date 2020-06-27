@@ -250,8 +250,8 @@ function setupEnsembleBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
-            if (thisTurtle) return thisTurtle.color;
-            return logo.turtles.turtleList[turtle].color;
+            if (thisTurtle) return thisTurtle.painter.color;
+            return logo.turtles.turtleList[turtle].painter.color;
         }
     }
 
@@ -320,7 +320,7 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    logo.turtles.turtleList[targetTurtle].doSetXY(
+                    logo.turtles.turtleList[targetTurtle].painter.doSetXY(
                         args[1],
                         args[2]
                     );

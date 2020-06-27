@@ -112,7 +112,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.turtles.turtleList[turtle].doStartFill();
+            logo.turtles.turtleList[turtle].painter.doStartFill();
         }
     }
 
@@ -125,7 +125,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.turtles.turtleList[turtle].doEndFill();
+            logo.turtles.turtleList[turtle].painter.doEndFill();
         }
     }
 
@@ -144,16 +144,16 @@ function setupPenBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 3) {
-                let hue = logo.turtles.turtleList[turtle].color;
-                let value = logo.turtles.turtleList[turtle].value;
-                let chroma = logo.turtles.turtleList[turtle].chroma;
-                logo.turtles.turtleList[turtle].doSetHue(args[0]);
-                logo.turtles.turtleList[turtle].doSetValue(args[1]);
-                logo.turtles.turtleList[turtle].doSetChroma(args[2]);
+                let hue = logo.turtles.turtleList[turtle].painter.color;
+                let value = logo.turtles.turtleList[turtle].painter.value;
+                let chroma = logo.turtles.turtleList[turtle].painter.chroma;
+                logo.turtles.turtleList[turtle].painter.doSetHue(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetValue(args[1]);
+                logo.turtles.turtleList[turtle].painter.doSetChroma(args[2]);
                 logo.setBackgroundColor(turtle);
-                logo.turtles.turtleList[turtle].doSetHue(hue);
-                logo.turtles.turtleList[turtle].doSetValue(value);
-                logo.turtles.turtleList[turtle].doSetChroma(chroma);
+                logo.turtles.turtleList[turtle].painter.doSetHue(hue);
+                logo.turtles.turtleList[turtle].painter.doSetValue(value);
+                logo.turtles.turtleList[turtle].painter.doSetChroma(chroma);
             }
         }
     }
@@ -171,12 +171,12 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].chroma);
+            return toFixed2(logo.turtles.turtleList[turtle].painter.chroma);
         }
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetChroma(value);
+            turtleObj.painter.doSetChroma(value);
         }
 
         arg(logo, turtle, blk) {
@@ -187,7 +187,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "grey"]);
             } else {
-                return logo.turtles.turtleList[turtle].chroma;
+                return logo.turtles.turtleList[turtle].painter.chroma;
             }
         }
     }
@@ -205,12 +205,12 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].value);
+            return toFixed2(logo.turtles.turtleList[turtle].painter.value);
         }
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetValue(value);
+            turtleObj.painter.doSetValue(value);
         }
 
         arg(logo, turtle, blk) {
@@ -221,7 +221,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "shade"]);
             } else {
-                return logo.turtles.turtleList[turtle].value;
+                return logo.turtles.turtleList[turtle].painter.value;
             }
         }
     }
@@ -240,12 +240,12 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].color);
+            return toFixed2(logo.turtles.turtleList[turtle].painter.color);
         }
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetColor(value);
+            turtleObj.painter.doSetColor(value);
         }
 
         arg(logo, turtle, blk) {
@@ -256,7 +256,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "color"]);
             } else {
-                return logo.turtles.turtleList[turtle].color;
+                return logo.turtles.turtleList[turtle].painter.color;
             }
         }
     }
@@ -274,12 +274,12 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].stroke);
+            return toFixed2(logo.turtles.turtleList[turtle].painter.stroke);
         }
 
         setter(logo, value, turtle, blk) {
             let turtleObj = logo.turtles.turtleList[turtle];
-            turtleObj.doSetPensize(value);
+            turtleObj.painter.doSetPensize(value);
         }
 
         arg(logo, turtle, blk) {
@@ -290,7 +290,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "pensize"]);
             } else {
-                return logo.turtles.turtleList[turtle].stroke;
+                return logo.turtles.turtleList[turtle].painter.stroke;
             }
         }
     }
@@ -319,7 +319,7 @@ function setupPenBlocks() {
             }
 
             if (typeof args[0] === "string") {
-                logo.turtles.turtleList[turtle].doSetFont(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetFont(args[0]);
             }
         }
     }
@@ -374,7 +374,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doStartHollowLine();
+                logo.turtles.turtleList[turtle].painter.doStartHollowLine();
             }
 
             let listenerName = "_hollowline_" + turtle;
@@ -386,7 +386,7 @@ function setupPenBlocks() {
                         last(logo.inNoteBlock[turtle])
                     ].push(blk);
                 } else {
-                    logo.turtles.turtleList[turtle].doEndHollowLine();
+                    logo.turtles.turtleList[turtle].painter.doEndHollowLine();
                 }
             };
 
@@ -433,12 +433,12 @@ function setupPenBlocks() {
             } else {
                 if (logo.suppressOutput[turtle]) {
                     let savedPenState =
-                        logo.turtles.turtleList[turtle].penState;
-                    logo.turtles.turtleList[turtle].penState = false;
-                    logo.turtles.turtleList[turtle].doStartFill();
-                    logo.turtles.turtleList[turtle].penState = savedPenState;
+                        logo.turtles.turtleList[turtle].painter.penState;
+                    logo.turtles.turtleList[turtle].painter.penState = false;
+                    logo.turtles.turtleList[turtle].painter.doStartFill();
+                    logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                 } else {
-                    logo.turtles.turtleList[turtle].doStartFill();
+                    logo.turtles.turtleList[turtle].painter.doStartFill();
                 }
             }
 
@@ -453,14 +453,12 @@ function setupPenBlocks() {
                 } else {
                     if (logo.suppressOutput[turtle]) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].penState;
-                        logo.turtles.turtleList[turtle].penState = false;
-                        logo.turtles.turtleList[turtle].doEndFill();
-                        logo.turtles.turtleList[
-                            turtle
-                        ].penState = savedPenState;
+                            logo.turtles.turtleList[turtle].painter.penState;
+                        logo.turtles.turtleList[turtle].painter.penState = false;
+                        logo.turtles.turtleList[turtle].painter.doEndFill();
+                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].doEndFill();
+                        logo.turtles.turtleList[turtle].painter.doEndFill();
                     }
                 }
             };
@@ -491,7 +489,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doPenUp();
+                logo.turtles.turtleList[turtle].painter.doPenUp();
             }
         }
     }
@@ -516,7 +514,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doPenDown();
+                logo.turtles.turtleList[turtle].painter.doPenDown();
             }
         }
     }
@@ -563,7 +561,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doSetPensize(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetPensize(args[0]);
             }
         }
     }
@@ -610,7 +608,7 @@ function setupPenBlocks() {
             } else {
                 let arg = args[0] % 101;
                 let alpha = 1.0 - arg / 100;
-                logo.turtles.turtleList[turtle].doSetPenAlpha(alpha);
+                logo.turtles.turtleList[turtle].painter.doSetPenAlpha(alpha);
             }
         }
     }
@@ -654,7 +652,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doSetHue(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetHue(args[0]);
             }
         }
     }
@@ -702,7 +700,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doSetValue(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetValue(args[0]);
             }
         }
     }
@@ -747,7 +745,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doSetChroma(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetChroma(args[0]);
             }
         }
     }
@@ -793,7 +791,7 @@ function setupPenBlocks() {
                     last(logo.inNoteBlock[turtle])
                 ].push(blk);
             } else {
-                logo.turtles.turtleList[turtle].doSetColor(args[0]);
+                logo.turtles.turtleList[turtle].painter.doSetColor(args[0]);
             }
         }
     }

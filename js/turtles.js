@@ -172,7 +172,7 @@ class Turtles {
         newTurtle._makeTurtleBitmap(artwork, this.refreshCanvas);
 
         newTurtle.color = i * 10;
-        newTurtle.canvasColor = getMunsellColor(
+        newTurtle.painter.canvasColor = getMunsellColor(
             newTurtle.color,
             DEFAULTVALUE,
             DEFAULTCHROMA
@@ -216,7 +216,7 @@ class Turtles {
         newTurtle.container.on("mouseover", event => {
             console.debug("--> [mouseover " + newTurtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
-            
+
             if (newTurtle.running) {
                 return;
             }
@@ -230,7 +230,7 @@ class Turtles {
         newTurtle.container.on("mouseout", event => {
             console.debug("--> [mouseout " + newTurtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
-            
+
             if (newTurtle.running) {
                 return;
             }
@@ -246,23 +246,23 @@ class Turtles {
         setTimeout(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
-                    newTurtle.doSetHeading(infoDict["heading"]);
+                    newTurtle.painter.doSetHeading(infoDict["heading"]);
                 }
 
                 if ("pensize" in infoDict) {
-                    newTurtle.doSetPensize(infoDict["pensize"]);
+                    newTurtle.painter.doSetPensize(infoDict["pensize"]);
                 }
 
                 if ("grey" in infoDict) {
-                    newTurtle.doSetChroma(infoDict["grey"]);
+                    newTurtle.painter.doSetChroma(infoDict["grey"]);
                 }
 
                 if ("shade" in infoDict) {
-                    newTurtle.doSetValue(infoDict["shade"]);
+                    newTurtle.painter.doSetValue(infoDict["shade"]);
                 }
 
                 if ("color" in infoDict) {
-                    newTurtle.doSetColor(infoDict["color"]);
+                    newTurtle.painter.doSetColor(infoDict["color"]);
                 }
 
                 if ("name" in infoDict) {
