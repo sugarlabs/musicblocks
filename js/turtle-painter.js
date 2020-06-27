@@ -57,7 +57,7 @@ class Painter {
         this._canvasAlpha = 1.0;
         this._fillState = false;
         this._hollowState = false;
-        this._penState = true;
+        this._penDown = true;
     }
 
     /*
@@ -175,14 +175,14 @@ class Painter {
      * @param {Boolean} penState - whether pen is down
      */
     set penState(penState) {
-        this._penState = penState;
+        this._penDown = penState;
     }
 
     /**
      * @returns {Boolean} whether pen is down
      */
     get penState() {
-        return this._penState;
+        return this._penDown;
     }
 
     /*
@@ -230,7 +230,7 @@ class Painter {
         }
 
         // Draw a line if the pen is down
-        if (this._penState && this._hollowState) {
+        if (this._penDown && this._hollowState) {
             // Close the current SVG path
             this.closeSVG();
             this._svgPath = true;
@@ -323,7 +323,7 @@ class Painter {
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(nx, ny);
-        } else if (this._penState) {
+        } else if (this._penDown) {
             this.turtle.ctx.lineTo(nx, ny);
             if (!this._svgPath) {
                 this._svgPath = true;
@@ -423,7 +423,7 @@ class Painter {
         }
 
         // Draw an arc if the pen is down
-        if (this._penState && this._hollowState) {
+        if (this._penDown && this._hollowState) {
             // Close the current SVG path
             this.closeSVG();
             this._svgPath = true;
@@ -515,7 +515,7 @@ class Painter {
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(nx, ny);
-        } else if (this._penState) {
+        } else if (this._penDown) {
             this.turtle.ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
             if (!this._svgPath) {
                 this._svgPath = true;
@@ -892,7 +892,7 @@ class Painter {
         let turtles = this.turtles;
         let turtlesScale = turtles.getScale();
 
-        if (this._penState && this._hollowState) {
+        if (this._penDown && this._hollowState) {
             // Convert from turtle coordinates to screen coordinates
             fx = turtles.turtleX2screenX(x2);
             fy = turtles.turtleY2screenY(y2);
@@ -1015,7 +1015,7 @@ class Painter {
             this._svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.turtle.x = x2;
             this.turtle.y = y2;
-        } else if (this._penState) {
+        } else if (this._penDown) {
             this._processColor();
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
@@ -1185,7 +1185,7 @@ class Painter {
         this.turtle.media = [];
 
         // Clear all graphics
-        this._penState = true;
+        this._penDown = true;
         this._fillState = false;
         this._hollowState = false;
 
@@ -1370,14 +1370,14 @@ class Painter {
      */
     doPenUp() {
         this.closeSVG();
-        this._penState = false;
+        this._penDown = false;
     }
 
     /**
      * Toggles penState: puts pen 'down'.
      */
     doPenDown() {
-        this._penState = true;
+        this._penDown = true;
     }
 
     /**

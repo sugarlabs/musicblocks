@@ -696,7 +696,7 @@ class Logo {
      */
     doStopTurtle() {
         this.stopTurtle = true;
-        this.turtles.markAsStopped();
+        this.turtles.markAllAsStopped();
 
         for (let sound in this.sounds) {
             this.sounds[sound].stop();

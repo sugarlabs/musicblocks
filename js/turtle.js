@@ -685,7 +685,7 @@ Turtle.TurtleView = class {
      * @param {Function} refreshCanvas - callback to refresh canvas
      * @returns {void}
      */
-    _makeTurtleBitmap(data, refreshCanvas) {
+    makeTurtleBitmap(data, refreshCanvas) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         let img = new Image();
 
