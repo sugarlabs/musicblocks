@@ -125,20 +125,11 @@ class Turtles {
 
         this.createHitArea(turtle);
 
-<<<<<<< turtle-painter-refactor
-        newTurtle.color = i * 10;
-        newTurtle.painter.canvasColor = getMunsellColor(
-            newTurtle.color,
-            DEFAULTVALUE,
-            DEFAULTCHROMA
-        );
-=======
         /*
         ===================================================
          Add event handlers
         ===================================================
         */
->>>>>>> Disect and distribute add method among MVC
 
         turtle.container.on("mousedown", event => {
             let scale = this.getScale();
@@ -175,19 +166,11 @@ class Turtles {
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
-<<<<<<< turtle-painter-refactor
-        newTurtle.container.on("mouseover", event => {
-            console.debug("--> [mouseover " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("CursorOver" + newTurtle.id);
-
-            if (newTurtle.running) {
-=======
         turtle.container.on("mouseover", event => {
             console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
             if (turtle.running) {
->>>>>>> Disect and distribute add method among MVC
                 return;
             }
 
@@ -197,19 +180,11 @@ class Turtles {
             this.refreshCanvas();
         });
 
-<<<<<<< turtle-painter-refactor
-        newTurtle.container.on("mouseout", event => {
-            console.debug("--> [mouseout " + newTurtle.name + "]");
-            turtlesStage.dispatchEvent("CursorOut" + newTurtle.id);
-
-            if (newTurtle.running) {
-=======
         turtle.container.on("mouseout", event => {
             console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
             if (turtle.running) {
->>>>>>> Disect and distribute add method among MVC
                 return;
             }
 
@@ -221,37 +196,7 @@ class Turtles {
 
         document.getElementById("loader").className = "";
 
-<<<<<<< turtle-painter-refactor
-        setTimeout(() => {
-            if (blkInfoAvailable) {
-                if ("heading" in infoDict) {
-                    newTurtle.painter.doSetHeading(infoDict["heading"]);
-                }
-
-                if ("pensize" in infoDict) {
-                    newTurtle.painter.doSetPensize(infoDict["pensize"]);
-                }
-
-                if ("grey" in infoDict) {
-                    newTurtle.painter.doSetChroma(infoDict["grey"]);
-                }
-
-                if ("shade" in infoDict) {
-                    newTurtle.painter.doSetValue(infoDict["shade"]);
-                }
-
-                if ("color" in infoDict) {
-                    newTurtle.painter.doSetColor(infoDict["color"]);
-                }
-
-                if ("name" in infoDict) {
-                    newTurtle.rename(infoDict["name"]);
-                }
-            }
-        }, 6000);
-=======
         this.addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict);
->>>>>>> Disect and distribute add method among MVC
 
         this.refreshCanvas();
     }
