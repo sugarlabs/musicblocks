@@ -5274,23 +5274,23 @@ function Blocks(activity) {
      * return {void}
      */
     this.loadNewBlocks = function(blockObjs) {
-	// Playback Queue has been deprecated, but some old projects
-	// may still have playback blocks appended, which we will
-	// remove.
-	let playbackQueueStartsHere = null;
+        // Playback Queue has been deprecated, but some old projects
+        // may still have playback blocks appended, which we will
+        // remove.
+        let playbackQueueStartsHere = null;
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
-	    // Check for deprecated playbackQueue
+            // Check for deprecated playbackQueue
             if (typeof(blkData[1]) === 'number') {
                 playbackQueueStartsHere = b;
-		break;
+                break;
             }
-	}
+        }
 
-	if (playbackQueueStartsHere !== null) {
-	    console.debug("Removing deprecated playback queue from project");
-	    blockObjs.splice(playbackQueueStartsHere, blockObjs.length - playbackQueueStartsHere);
-	}
+        if (playbackQueueStartsHere !== null) {
+            console.debug("Removing deprecated playback queue from project");
+            blockObjs.splice(playbackQueueStartsHere, blockObjs.length - playbackQueueStartsHere);
+        }
 
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
