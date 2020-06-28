@@ -1797,12 +1797,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.isLeftClampBlock = function() {
-        return (
-            this.isClampBlock() && 
-            this.protoblock._style.flows.left == true &&
-            this.protoblock._style.args === 0 &&
-            this.protoblock._style.flows.type == "flow" 
-        );
+        return this.protoblock.isLeftClamp;
     };
     
     this.isDoubleClampBlock = function() {
