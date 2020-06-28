@@ -643,12 +643,18 @@ function setupMeterBlocks() {
                 logo.parameterQueue[turtle] = [];
                 logo.initTurtle(turtle);
                 logo._setListener(turtle, eventName, __listener);
+                let duration ;
+                if (logo.bpm[orgTurtle].length > 0) {
+                    duration = 60 / last(logo.bpm[orgTurtle]);
+                } else {
+                    duration = 60 / logo._masterBPM;
+                }        
                 if (logo.turtles.turtleList[turtle].interval !== undefined)clearInterval(this.interval);
                 logo.turtles.turtleList[turtle].interval = setInterval(
                     () => {
                         logo.stage.dispatchEvent(eventName);
                     }
-                ,666);
+                ,duration*1000);
                 console.debug("set listener",eventName);
             }
         }
