@@ -3380,7 +3380,7 @@ class Logo {
                 this.synth.inTemperament
             );
 
-            if (this.synth.inTemperament == "custom") {
+            if (isCustom(this.synth.inTemperament)) {
                 let value = getStepSizeUp(
                     this.keySignature[turtle],
                     noteObj[0],
@@ -3427,7 +3427,7 @@ class Logo {
                 this.synth.inTemperament
             );
 
-            if (this.synth.inTemperament == "custom") {
+            if (isCustom(this.synth.inTemperament)) {
                 let value = getStepSizeDown(
                     this.keySignature[turtle],
                     noteObj[0],

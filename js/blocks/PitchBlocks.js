@@ -83,7 +83,7 @@ function _playPitch(args, logo, turtle, blk) {
             );
 
             if (
-                logo.synth.inTemperament === "custom" &&
+                isCustom(logo.synth.inTemperament) &&
                 logo.scalarTransposition[turtle] +
                     logo.transposition[turtle] !==
                     0

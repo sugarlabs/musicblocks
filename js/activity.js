@@ -3666,8 +3666,10 @@ function Activity() {
                     case "temperament1":
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
+                            custom ={};
+                            for (let temp in TEMPERAMENT)if(!(temp in PreDefinedTemperaments)) custom[temp] = TEMPERAMENT[temp]; 
                             args = {
-                                customTemperamentNotes: TEMPERAMENT["custom"],
+                                customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
                                 octaveSpace: OCTAVERATIO
                             };
