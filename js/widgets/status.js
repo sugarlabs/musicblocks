@@ -157,6 +157,11 @@ function StatusMatrix() {
                     }
                     console.debug(label);
                     break;
+                case "outputtools":
+                    var label = this._logo.blocks.blockList[
+                            this._logo.statusFields[i][0]
+                        ].privateData;
+                    break;
                 default:
                     var label = this._logo.blocks.blockList[
                         this._logo.statusFields[i][0]
@@ -307,6 +312,8 @@ function StatusMatrix() {
                                     value += freq.toFixed(2);
                                 }
                             }
+                        } else {
+                            value = "";
                         }
                         break;
                     default:

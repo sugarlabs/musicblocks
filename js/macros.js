@@ -89,6 +89,7 @@ function blockIsMacro(blkname) {
         "oneOf",
         "oneofhelp",
         "osctimehelp",
+        "outputtools",
         "phaserhelp",
         "pitchnumberhelp",
         "randomhelp",
@@ -1172,6 +1173,31 @@ function getMacroExpansion(blkname, x, y) {
         [23, ["number", { value: 4 }], 0, 0, [21]],
         [24, "hidden", 0, 0, [16, null]]
     ];
+
+    const OUTPUTTOOLSHELP = [
+        [0,["status",{"collapsed":false}],468,153,[null,1,4]],
+        [1,"hidden",482,194,[0,19]],
+        [2,"print",482,418,[11,6,13]],
+        [3,"print",482,290,[17,5,7]],
+        [4,"hiddennoflow",483,507,[0,null]],
+        [5,["outputtools",{"value":"pitch number"}],556,290,[3]],
+        [6,["outputtools",{"value":"nth degree"}],556,418,[2]],
+        [7,"print",482,322,[3,8,9]],
+        [8,["outputtools",{"value":"pitch in hertz"}],556,322,[7]],
+        [9,"print",482,354,[7,10,11]],
+        [10,["outputtools",{"value":"scalar class"}],556,354,[9]],
+        [11,"print",482,386,[9,12,2]],
+        [12,["outputtools",{"value":"scale degree"}],556,386,[11]],
+        [13,"print",482,450,[2,14,null]],
+        [14,["outputtools",{"value":"staff y"}],556,450,[13]],
+        [15,"print",482,226,[19,16,17]],
+        [16,["outputtools",{"value":"solfege syllable"}],556,226,[15]],
+        [17,"print",482,258,[15,18,3]],
+        [18,["outputtools",{"value":"pitch class"}],556,258,[17]],
+        [19,"print",482,194,[1,20,15]],
+        [20,["outputtools",{"value":"letter class"}],556,194,[19]]
+    ];
+
     const PHASERHELP = [
         [0, "phaser", x, y, [null, 1, 2, 3, 4, null]],
         [1, ["number", { value: 0.5 }], 0, 0, [0]],
@@ -1229,7 +1255,7 @@ function getMacroExpansion(blkname, x, y) {
         [3, ["number", { value: 4 }], 0, 0, [1]],
         [4, "vspace", 0, 0, [0, 5]],
         [5, "pitch", 0, 0, [4, 6, 7, null]],
-        [6, ["solfege", { value: "sol" }], 0, 0, [5]],
+        [6, ["solfege", { value: "la" }], 0, 0, [5]],
         [7, ["number", { value: 4 }], 0, 0, [5]],
         [8, "hidden", 0, 0, [0, null]],
         [9, "repeat", x, y, [null, 10, 0, null]],
@@ -1645,6 +1671,7 @@ function getMacroExpansion(blkname, x, y) {
         notecounterhelp: NOTECOUNTERHELP,
         oneofhelp: ONEOFHELP,
         osctimehelp: OSCTIMEHELP,
+        outputtoolshelp: OUTPUTTOOLSHELP,
         phaserhelp: PHASERHELP,
         pitchnumberhelp: PITCHNUMBERHELP,
         randomhelp: RANDOMHELP,

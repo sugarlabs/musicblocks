@@ -1275,6 +1275,7 @@ function setupPitchBlocks() {
             this.setPalette("pitch");
             this.beginnerBlock(true);
             this.parameter = true;
+            this.hidden = true;
             this.setHelpString([
                 _(
                     "The Pitch number block is the value of the pitch of the note currently being played."
@@ -1366,6 +1367,7 @@ function setupPitchBlocks() {
             super("pitchinhertz", _("pitch in hertz"));
             this.setPalette("pitch");
             this.parameter = true;
+            this.hidden = true;
             this.setHelpString([
                 _(
                     "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
@@ -1396,6 +1398,175 @@ function setupPitchBlocks() {
                 }
             }
         }
+    }
+
+    class OutputToolsBlocks extends ValueBlock {
+        constructor() {
+            super("outputtools");
+            this.setPalette("pitch");
+            this.beginnerBlock(true);
+            this.extraWidth = 40;
+            this.setHelpString([
+                        _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
+                        "documentation",
+                        null,
+                        "outputtoolshelp"
+                    ]);
+            this.formBlock({
+                outType: "anyout"
+            });
+            this.makeMacro((x, y) => [
+                [0, "print", x, y, [null, 1, null]],
+                [1, ["outputtools", { value: "pitch number" }], 0, 0, [0]],
+            ]);
+        }
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "print"
+            ) {
+                logo.statusFields.push([blk, "outputtools"]);
+            } else {
+                if (logo.noteStatus[turtle] !== null) {
+                    let name = logo.blocks.blockList[blk].privateData;
+                    switch (name) {
+                        case "letter class":
+                            let lc = logo.lastNotePlayed[turtle][0][0];
+                            return lc;
+                        case "solfege syllable":
+                            let lc2 = logo.lastNotePlayed[turtle][0];
+                            lc2 = lc2.substr(0, lc2.length - 1);
+                            lc2 = lc2
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            if (logo.moveable[turtle] === false) {
+                                return SOLFEGECONVERSIONTABLE[lc2];
+                            } else {
+                                let scale = _buildScale(logo.keySignature[turtle])[0];
+                                let i = scale.indexOf(lc2);
+                                return SOLFEGENAMES[i];
+                            }
+                        case "pitch class":
+                            let note = logo.lastNotePlayed[turtle][0];
+                            let num = pitchToNumber(
+                                note.substr(0, note.length - 1 ),
+                                note[note.length - 1],
+                                logo.keySignature[turtle]
+                            );
+                            return (num - 3) % 12;
+                        case "scalar class":
+                            let note2 = logo.lastNotePlayed[turtle][0];
+                            note2 = note2.substr(0, note2.length - 1);
+                            note2 = note2
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scalarClass = scaleDegreeToPitchMapping(
+                                logo.keySignature[turtle],
+                                null,
+                                logo.moveable[turtle],
+                                note2
+                            );
+                            return scalarClass[0];
+                        case "scale degree":
+                            let note3 = logo.lastNotePlayed[turtle][0];
+                            note3 = note3.substr(0, note3.length - 1);
+                            note3 = note3
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scalarClass1 = scaleDegreeToPitchMapping(
+                                logo.keySignature[turtle],
+                                null,
+                                logo.moveable[turtle],
+                                note3
+                            );
+                            return scalarClass1[0] + scalarClass1[1];
+                        case "nth degree":
+                            let note4 = logo.lastNotePlayed[turtle][0];
+                            note4 = note4.substr(0, note4.length - 1);
+                            note4 = note4
+                                        .replace("#", SHARP)
+                                        .replace("b", FLAT);
+                            let scale = _buildScale(logo.keySignature[turtle])[0];
+                            return scale.indexOf(note4);
+                        case "staff y":
+                            if (logo.lastNotePlayed[turtle].length === 0) {
+                                return 0;
+                            }
+                            let lc1 = logo.lastNotePlayed[turtle][0][0];
+                            let o1 = 4;
+                            if (logo.lastNotePlayed[turtle][0].length === 2) {
+                                o1 = logo.lastNotePlayed[turtle][0][1];
+                            } else {
+                                o1 = logo.lastNotePlayed[turtle][0][2];
+                            }
+                            // these numbers are subject to staff artwork
+                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;    
+                        case "pitch number":
+                            let value = null;
+                            let obj;
+                            if (logo.lastNotePlayed[turtle] !== null) {
+                                if (typeof logo.lastNotePlayed[turtle][0] === "string") {
+                                    let len = logo.lastNotePlayed[turtle][0].length;
+                                    let pitch = logo.lastNotePlayed[turtle][0].slice(
+                                        0,
+                                        len - 1
+                                    );
+                                    let octave = parseInt(
+                                        logo.lastNotePlayed[turtle][0].slice(len - 1)
+                                    );
+                                    obj = [pitch, octave];
+                                } else {
+                                    // Hertz?
+                                    obj = frequencyToPitch(
+                                        logo.lastNotePlayed[turtle][0]
+                                    );
+                                }
+                            } else if (
+                                logo.inNoteBlock[turtle] in logo.notePitches[turtle] &&
+                                logo.notePitches[turtle][last(logo.inNoteBlock[turtle])]
+                                    .length > 0
+                            ) {
+                                obj = getNote(
+                                    logo.notePitches[turtle][
+                                        last(logo.inNoteBlock[turtle])
+                                    ][0],
+                                    logo.noteOctaves[turtle][
+                                        last(logo.inNoteBlock[turtle])
+                                    ][0],
+                                    0,
+                                    logo.keySignature[turtle],
+                                    logo.moveable[turtle],
+                                    null,
+                                    logo.errorMsg
+                                );
+                            } else {
+                                if (logo.lastNotePlayed[turtle] !== null) {
+                                    console.debug("Cannot find a note ");
+                                    logo.errorMsg(INVALIDPITCH, blk);
+                                }
+            
+                                obj = ["G", 4];
+                            }
+            
+                            value =
+                                pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
+                                logo.pitchNumberOffset[turtle];
+                            return value;
+                        case "pitch in hertz":
+                            return logo.synth._getFrequency(
+                                logo.lastNotePlayed[turtle][0],
+                                logo.synth.changeInTemperament
+                            );
+                        default:
+                            return "__INVALID_INPUT__";
+                    }
+                } else {
+                    return "";
+                }
+            }
+        }
+
     }
 
     class MIDIBlock extends FlowBlock {
@@ -3014,6 +3185,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new OutputToolsBlocks().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
