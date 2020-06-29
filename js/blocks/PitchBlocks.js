@@ -1407,7 +1407,6 @@ function setupPitchBlocks() {
             this.beginnerBlock(true);
             this.extraWidth = 40;
             this.setHelpString([
-                // TRANS: hover
                         _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
                         "documentation",
                         null,
