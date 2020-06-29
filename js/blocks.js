@@ -7027,8 +7027,18 @@ function Blocks(activity) {
 
             if (turtle != null && turtleNotInTrash > 1) {
                 console.debug("putting turtle " + turtle + " in the trash");
-                this.turtles.turtleList[turtle].inTrash = true;
-                this.turtles.turtleList[turtle].container.visible = false;
+                let comp = this.turtles.turtleList[turtle].companionTurtle;
+                if (comp){
+                    if (turtleNotInTrash > 2){
+                        this.turtles.turtleList[comp].inTrash = true;
+                        this.turtles.turtleList[comp].container.visible = false;
+                        this.turtles.turtleList[turtle].inTrash = true;
+                        this.turtles.turtleList[turtle].container.visible = false;
+                    }
+                } else {
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
+                }
             } else {
                 this.errorMsg(
                     _("You must always have at least one start block.")

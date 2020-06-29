@@ -554,7 +554,111 @@ function setupMeterBlocks() {
             }
         }
     }
+    class EveryBeatDoBlockNew extends FlowBlock {
+        constructor() {
+            // .TRANS: on every note played, do some action
+            super("everybeatdonew", _("on every beat do"));
+            this.setPalette("meter");
+            this.beginnerBlock(true);
 
+            this.setHelpString([
+                _(
+                    "The On-every-beat block let you specify actions to take on every beat."
+                ),
+                "documentation",
+                null,
+                "everybeathelp"
+            ]);
+
+
+            this.formBlock({
+                args: 1,
+                argTypes: ["textin"],
+                defaults: [_("action")]
+            });
+
+            this.makeMacro((x, y) => {
+                return [
+                    [0, ["everybeatdonew",{}], x, y, [null, 1, null]],
+                    [1, ["text", { "value": "action" }], 0, 0, [0]]
+                ]
+            });
+        }
+
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            // Set up a listener for every beat for this turtle.
+            let orgTurtle =turtle ;
+            console.debug("used from :",orgTurtle)
+            if (!turtles.turtleList[orgTurtle].companionTurtle){
+                turtle = logo.turtles.turtleList.length;
+                turtles.turtleList[orgTurtle].companionTurtle = turtle ;
+                logo.turtles.addTurtle(
+                    logo.blocks.blockList[blk],
+                    []
+                );
+                console.debug("beat Turtle : ",turtle);
+            }
+            turtle = turtles.turtleList[orgTurtle].companionTurtle;
+
+            if (!(args[0] in logo.actions)) {
+                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+            } else {
+                let __listener = function(event) {
+                    if (logo.turtles.turtleList[turtle].running) {
+                        let queueBlock = new Queue(
+                            logo.actions[args[0]],
+                            1,
+                            blk
+                        );
+                        logo.parentFlowQueue[turtle].push(blk);
+                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                    } else {
+                        // Since the turtle has stopped
+                        // running, we need to run the stack
+                        // from here.
+                        if (isflow) {
+                            logo._runFromBlockNow(
+                                logo,
+                                turtle,
+                                logo.actions[args[0]],
+                                isflow,
+                                receivedArg
+                            );
+                        } else {
+                            logo._runFromBlock(
+                                logo,
+                                turtle,
+                                logo.actions[args[0]],
+                                isflow,
+                                receivedArg
+                            );
+                        }
+                    }
+                };
+
+                let eventName = "__everybeat_" + turtle + "__";
+                logo.turtles.turtleList[turtle].queue = [];
+                logo.parentFlowQueue[turtle] = [];
+                logo.unhighlightQueue[turtle] = [];
+                logo.parameterQueue[turtle] = [];
+                logo.initTurtle(turtle);
+                logo._setListener(turtle, eventName, __listener);
+                let duration ;
+                if (logo.bpm[orgTurtle].length > 0) {
+                    duration = 60 / last(logo.bpm[orgTurtle]);
+                } else {
+                    duration = 60 / logo._masterBPM;
+                }        
+                if (logo.turtles.turtleList[turtle].interval !== undefined)clearInterval(this.interval);
+                logo.turtles.turtleList[turtle].interval = setInterval(
+                    () => {
+                        logo.stage.dispatchEvent(eventName);
+                    }
+                ,duration*1000);
+                console.debug("set listener",eventName);
+            }
+        }
+    }
     class EveryBeatDoBlock extends FlowBlock {
         constructor() {
             // .TRANS: on every note played, do some action
@@ -1080,6 +1184,7 @@ function setupMeterBlocks() {
     new DriftBlock().setup();
     new OffBeatDoBlock().setup();
     new OnBeatDoBlock().setup();
+    new EveryBeatDoBlockNew().setup();
     new EveryBeatDoBlock().setup();
     new SetMasterBPM2Block().setup();
     new SetMasterBPMBlock().setup();
