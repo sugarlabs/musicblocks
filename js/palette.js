@@ -1030,7 +1030,7 @@ function PaletteModel(palette, palettes, name) {
                     label = "arg " + arg;
                     break;
                 case "outputtools":
-                    label = "output tools";
+                    label = "current pitch  ";
                     break;
                 default:
                     if (blkname != modname) {

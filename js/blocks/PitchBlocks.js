@@ -1410,7 +1410,7 @@ function setupPitchBlocks() {
             });
             this.makeMacro((x, y) => [
                 [0, "print", x, y, [null, 1, null]],
-                [1, ["outputtools", { value: "letter class" }], 0, 0, [0]],
+                [1, ["outputtools", { value: "pitch number" }], 0, 0, [0]],
             ]);
         }
         arg(logo, turtle, blk) {
