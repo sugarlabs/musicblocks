@@ -714,8 +714,8 @@ class Logo {
                     this.synth.stopSound(turtle, instrumentName);
                 }
                 let comp = this.turtles.turtleList[turtle].companionTurtle;
-                if (comp){
-                    this.turtles.turtleList[comp].running = false ;
+                if (comp) {
+                    this.turtles.turtleList[comp].running = false;
                     let interval = logo.turtles.turtleList[comp].interval;
                     if (interval) clearInterval(interval);
                 }

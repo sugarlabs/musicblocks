@@ -390,9 +390,9 @@ function setupMeterBlocks() {
             logo._setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-		if (logo.drift[turtle] > 0) {
+                if (logo.drift[turtle] > 0) {
                     logo.drift[turtle] -= 1;
-		}
+                }
             };
 
             logo._setListener(turtle, listenerName, __listener);
@@ -556,7 +556,7 @@ function setupMeterBlocks() {
     }
     class EveryBeatDoBlockNew extends FlowBlock {
         constructor() {
-            // .TRANS: on every note played, do some action
+            // .TRANS: on every beat, do some action
             super("everybeatdonew", _("on every beat do"));
             this.setPalette("meter");
             this.beginnerBlock(true);
@@ -569,7 +569,6 @@ function setupMeterBlocks() {
                 null,
                 "everybeathelp"
             ]);
-
 
             this.formBlock({
                 args: 1,
@@ -648,17 +647,17 @@ function setupMeterBlocks() {
                     duration = 60 / last(logo.bpm[orgTurtle]);
                 } else {
                     duration = 60 / logo._masterBPM;
-                }        
-                if (logo.turtles.turtleList[turtle].interval !== undefined)clearInterval(this.interval);
-                logo.turtles.turtleList[turtle].interval = setInterval(
+                }
+                if (logo.turtles.turtleList[turtle].interval !== undefined) clearInterval(this.interval);
+                logo.turtles.turtleList[turtle].interval = setInterval (
                     () => {
                         logo.stage.dispatchEvent(eventName);
-                    }
-                ,duration*1000);
-                console.debug("set listener",eventName);
+                    }, duration * 1000);
+                console.debug("set listener", eventName);
             }
         }
     }
+
     class EveryBeatDoBlock extends FlowBlock {
         constructor() {
             // .TRANS: on every note played, do some action
