@@ -1480,6 +1480,18 @@ function setupPitchBlocks() {
                                         .replace("b", FLAT);
                             let scale = _buildScale(logo.keySignature[turtle])[0];
                             return scale.indexOf(note4);
+                        case "staff y":
+                            if (logo.lastNotePlayed[turtle].length === 0) {
+                                return 0;
+                            }
+                            let lc1 = logo.lastNotePlayed[turtle][0][0];
+                            let o1 = 4;
+                            if (logo.lastNotePlayed[turtle][0].length === 2) {
+                                o1 = logo.lastNotePlayed[turtle][0][1];
+                            } else {
+                                o1 = logo.lastNotePlayed[turtle][0][2];
+                            }
+                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;    
                         default:
                             return "__INVALID_INPUT__";
                     }

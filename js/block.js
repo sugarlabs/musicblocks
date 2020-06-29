@@ -3697,7 +3697,8 @@ function Block(protoblock, blocks, overrideName) {
                 _("pitch class"),
                 _("scalar class"),
                 _("scale degree"),
-                _("nth degree")
+                _("nth degree"),
+                _("staff y")
             ];
             let Values = Labels;
             this._piemenuBasic(
