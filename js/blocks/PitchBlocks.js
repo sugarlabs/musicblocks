@@ -1275,6 +1275,7 @@ function setupPitchBlocks() {
             this.setPalette("pitch");
             this.beginnerBlock(true);
             this.parameter = true;
+            this.hidden = true;
             this.setHelpString([
                 _(
                     "The Pitch number block is the value of the pitch of the note currently being played."
@@ -1366,6 +1367,7 @@ function setupPitchBlocks() {
             super("pitchinhertz", _("pitch in hertz"));
             this.setPalette("pitch");
             this.parameter = true;
+            this.hidden = true;
             this.setHelpString([
                 _(
                     "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
@@ -1492,6 +1494,62 @@ function setupPitchBlocks() {
                                 o1 = logo.lastNotePlayed[turtle][0][2];
                             }
                             return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;    
+                        case "pitch number":
+                            let value = null;
+                            let obj;
+                            if (logo.lastNotePlayed[turtle] !== null) {
+                                if (typeof logo.lastNotePlayed[turtle][0] === "string") {
+                                    let len = logo.lastNotePlayed[turtle][0].length;
+                                    let pitch = logo.lastNotePlayed[turtle][0].slice(
+                                        0,
+                                        len - 1
+                                    );
+                                    let octave = parseInt(
+                                        logo.lastNotePlayed[turtle][0].slice(len - 1)
+                                    );
+                                    obj = [pitch, octave];
+                                } else {
+                                    // Hertz?
+                                    obj = frequencyToPitch(
+                                        logo.lastNotePlayed[turtle][0]
+                                    );
+                                }
+                            } else if (
+                                logo.inNoteBlock[turtle] in logo.notePitches[turtle] &&
+                                logo.notePitches[turtle][last(logo.inNoteBlock[turtle])]
+                                    .length > 0
+                            ) {
+                                obj = getNote(
+                                    logo.notePitches[turtle][
+                                        last(logo.inNoteBlock[turtle])
+                                    ][0],
+                                    logo.noteOctaves[turtle][
+                                        last(logo.inNoteBlock[turtle])
+                                    ][0],
+                                    0,
+                                    logo.keySignature[turtle],
+                                    logo.moveable[turtle],
+                                    null,
+                                    logo.errorMsg
+                                );
+                            } else {
+                                if (logo.lastNotePlayed[turtle] !== null) {
+                                    console.debug("Cannot find a note ");
+                                    logo.errorMsg(INVALIDPITCH, blk);
+                                }
+            
+                                obj = ["G", 4];
+                            }
+            
+                            value =
+                                pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
+                                logo.pitchNumberOffset[turtle];
+                            return value;
+                        case "pitch in hertz":
+                            return logo.synth._getFrequency(
+                                logo.lastNotePlayed[turtle][0],
+                                logo.synth.changeInTemperament
+                            );
                         default:
                             return "__INVALID_INPUT__";
                     }

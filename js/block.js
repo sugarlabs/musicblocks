@@ -3695,6 +3695,8 @@ function Block(protoblock, blocks, overrideName) {
                 _("letter class"),
                 _("solfege syllable"),
                 _("pitch class"),
+                _("pitch number"),
+                _("pitch in hertz"),
                 _("scalar class"),
                 _("scale degree"),
                 _("nth degree"),
@@ -6164,8 +6166,15 @@ function Block(protoblock, blocks, overrideName) {
 
         docById("wheelDiv").style.display = "";
 
+        // reference to diameter of the basic wheel
+        let size = 800;
+        if (this.name === "outputtools" || this.name === "grid") {
+            // slightly larger menu 
+            size = 1000;
+        }
+
         // the selectedValueh selector
-        this._basicWheel = new wheelnav("wheelDiv", null, 800, 800);
+        this._basicWheel = new wheelnav("wheelDiv", null, size, size);
 
         let labels = [];
         for (let i = 0; i < menuLabels.length; i++) {
