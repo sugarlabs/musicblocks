@@ -1029,6 +1029,9 @@ function PaletteModel(palette, palettes, name) {
                 case "namedarg":
                     label = "arg " + arg;
                     break;
+                case "outputtools":
+                    label = "current pitch  ";
+                    break;
                 default:
                     if (blkname != modname) {
                         // Override label for do, storein, box, and namedarg
@@ -2539,6 +2542,16 @@ function Palette(palettes, name) {
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "namedcalcArg";
                     var arg = _("action");
+                } else {
+                    blkname = protoblk.defaults[0];
+                    var arg = protoblk.defaults[0];
+                }
+                var newBlk = protoblk.name;
+                break;
+            case "outputtools":
+                if (protoblk.defaults[0] === undefined) {
+                    blkname = "outputtools";
+                    var arg = "letter class";
                 } else {
                     blkname = protoblk.defaults[0];
                     var arg = protoblk.defaults[0];

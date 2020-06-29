@@ -1830,9 +1830,13 @@ function _buildScale(keySignature) {
     return [scale, halfSteps];
 }
 
-function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
+// A two-way function to get pitch according to scale degree and vice versa for a chosen mode
+
+function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
+    if (pitch === null ) {
+        scaleDegree -= 1;
+    }
     // Subtract one to make it zero-based as we're working with arrays
-    scaleDegree -= 1
 
     // Info variables according to chosen mode
     let chosenMode = keySignatureToMode(keySignature);
@@ -1849,18 +1853,63 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
 
     // Final 7 note scale combining chosen mode and arbitration
     let finalScale = [];
+    let sd = [];
 
     // if moveable do is present just return the major/perfect tones
     if (moveable) {
         finalScale = _buildScale(chosenMode[0] + " major")[0];
-        return finalScale[scaleDegree];
 
+        if (pitch === null) {
+            return finalScale[scaleDegree];
+        }
+        if (scaleDegree == null) {
+            for(let i in finalScale) {
+                if(finalScale[i][0] == pitch[0]) {
+                    sd.push(String(Number(i) + 1));
+                    if (finalScale[i] == pitch) {
+                        sd.push(NATURAL);
+                    } else {
+                        if (finalScale[i].includes(SHARP)) {
+                            sd.push(FLAT);
+                        } else if (finalScale[i].includes(FLAT)) {
+                            sd.push(FLAT);
+                        } else if (pitch.includes(SHARP)) {
+                            sd.push(SHARP);
+                        } else if (pitch.includes(FLAT)) {
+                            sd.push(FLAT);
+                        }
+                    }
+                }
+            }
+            return sd;
+        }
     } else {
-
         // For 7 note systems scale degrees have a one-one relation
         if (chosenModePattern.length == 7) {
-            return chosenModeScale[scaleDegree];
-    
+            if (pitch === null) {
+                return chosenModeScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in chosenModeScale) {
+                    if(chosenModeScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (chosenModeScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (chosenModeScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (chosenModeScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
             let majorScale = _buildScale(chosenMode[0] + " major")[0];
@@ -1919,8 +1968,31 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
                     finalScale.push(majorScale[i]);
                 }
             }
-
-            return finalScale[scaleDegree];
+            
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in finalScale) {
+                    if(finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
     
         } else {
             // For scales with greater than 7 notes 
@@ -2012,7 +2084,30 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
                 }
             }
 
-            return finalScale[scaleDegree];
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in finalScale) {
+                    if(finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
         }
     }
 }

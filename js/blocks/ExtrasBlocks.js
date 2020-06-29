@@ -846,6 +846,7 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {

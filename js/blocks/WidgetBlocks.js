@@ -1100,7 +1100,7 @@ function setupWidgetBlocks() {
                 [8, "print", 0, 0, [6, 9, null]],
                 [9, "bpmfactor", 0, 0, [8]],
                 [10, "print", 0, 0, [1, 11, 2]],
-                [11, "pitchinhertz", 0, 0, [10]],
+                [11, ["outputtools", { value: "pitch in hertz"}], 0, 0, [10]],
                 [12, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }

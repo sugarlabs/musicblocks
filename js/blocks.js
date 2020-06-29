@@ -3161,7 +3161,8 @@ function Blocks(activity) {
                 "nameddo",
                 "namedcalc",
                 "nameddoArg",
-                "namedcalcArg"
+                "namedcalcArg",
+                "outputtools"
             ].indexOf(name) !== -1
         ) {
             this.blockList.push(
@@ -3274,7 +3275,15 @@ function Blocks(activity) {
             };
 
             postProcessArg = thisBlock;
-        } else if (name === "text") {
+        } 
+        else if (name === "outputtools") {
+            var postProcess = function(args) {
+                that.blockList[thisBlock].value = null;
+                that.blockList[thisBlock].privateData = args[1];
+            }
+            postProcessArg = [thisBlock, arg];
+        } 
+        else if (name === "text") {
             postProcessArg = [thisBlock, _("text")];
         } else if (name === "boolean") {
             console.debug("boolean" + " " + true);
@@ -3486,6 +3495,12 @@ function Blocks(activity) {
                     that.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
+                } else if (name === "outputtools") {
+                    if (that.protoBlockDict[proto].defaults[0] === undefined) {
+                        that.makeNewBlock(proto, postProcess, postProcessArg);
+                        protoFound = true;
+                        break;
+                    }
                 }
             }
         }
@@ -5171,6 +5186,7 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
+                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
@@ -6210,6 +6226,21 @@ function Blocks(activity) {
                         blkData[4],
                         postProcess,
                         [thisBlock, value]
+                    );
+                    break;
+                case "outputtools":
+                    var postProcess = function(args) {
+                        var thisBlock = args[0];
+                        var value = args[1];
+                        that.blockList[thisBlock].privateData = value;
+                        that.blockList[thisBlock].overrideName = value;
+                    }
+                    this._makeNewBlockWithConnections(
+                        "outputtools",
+                        blockOffset,
+                        blkData[4],
+                        postProcess,
+                        [thisBlock, blockObjs[b][1][1].value]
                     );
                     break;
                 case "text":

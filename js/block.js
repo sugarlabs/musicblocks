@@ -55,7 +55,8 @@ const SPECIALINPUTS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 const WIDENAMES = [
     "intervalname",
@@ -66,7 +67,8 @@ const WIDENAMES = [
     "modename",
     "temperamentname",
     "modename",
-    "noisename"
+    "noisename",
+    "outputtools"
 ];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = [
@@ -87,7 +89,8 @@ const PIEMENUS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 
 // Define block instance objects and any methods that are intra-block.
@@ -1044,7 +1047,7 @@ function Block(protoblock, blocks, overrideName) {
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
-        if (this.overrideName) {
+        if (this.overrideName && this.name !== "outputtools") {
             if (
                 [
                     "namedbox",
@@ -1229,10 +1232,12 @@ function Block(protoblock, blocks, overrideName) {
                 if(attr !== "♮") {
                     label += attr;
                 }
-            } else if (this.name === "drumname") {
+            } else if (this.name === "drumname") { 
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
+            } else if (this.name === "outputtools") {
+                label = this.overrideName;
             } else {
                 if (this.value !== null) {
                     label = this.value.toString();
@@ -3681,6 +3686,37 @@ function Block(protoblock, blocks, overrideName) {
             ];
             let Values = Labels ;
 
+            this._piemenuBasic(
+                Labels,
+                Values,
+                selectedvalue,
+                platformColor.piemenuBasic
+            );
+        } else if (this.name === "outputtools") {
+            selectedvalue = this.privateData;
+            let Labels;
+            if (beginnerMode) {
+                Labels = [
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("letter class"),
+                    _("staff y")
+                ];
+            } else {
+                Labels = [
+                    _("letter class"),
+                    _("solfege syllable"),
+                    _("pitch class"),
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("scalar class"),
+                    _("scale degree"),
+                    _("nth degree"),
+                    _("staff y")
+                ];
+            }
+            
+            let Values = Labels;
             this._piemenuBasic(
                 Labels,
                 Values,
@@ -6477,8 +6513,15 @@ function Block(protoblock, blocks, overrideName) {
 
         docById("wheelDiv").style.display = "";
 
+        // reference to diameter of the basic wheel
+        let size = 800;
+        if (this.name === "outputtools" || this.name === "grid") {
+            // slightly larger menu 
+            size = 1000;
+        }
+
         // the selectedValueh selector
-        this._basicWheel = new wheelnav("wheelDiv", null, 800, 800);
+        this._basicWheel = new wheelnav("wheelDiv", null, size, size);
 
         let labels = [];
         for (let i = 0; i < menuLabels.length; i++) {
@@ -6507,9 +6550,14 @@ function Block(protoblock, blocks, overrideName) {
                 that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex]
                     .title;
             let i = labels.indexOf(label);
-            that.value = menuValues[i];
-            that.text.text = menuLabels[i];
-
+            if (that.name === "outputtools") {
+                  that.overrideName = menuValues[i]; 
+                  that.privateData = menuValues[i];
+                  that.text.text = menuLabels[i];
+            } else {
+                that.value = menuValues[i];
+                that.text.text = menuLabels[i];
+            }
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
