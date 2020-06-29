@@ -1519,14 +1519,14 @@ function TemperamentWidget() {
                         this.notes[i] =
                             this.ratiosNotesPair[index][1][0] +
                             "(-" +
-                            centsDiff1[index].toFixed(2) +
+                            centsDiff1[index].toFixed(0) +
                             ")" +
                             this.ratiosNotesPair[index][1][1];
                     } else {
                         this.notes[i] =
                             this.ratiosNotesPair[index][1][0] +
                             "(+" +
-                            centsDiff1[index].toFixed(2) +
+                            centsDiff1[index].toFixed(0) +
                             ")" +
                             this.ratiosNotesPair[index][1][1];
                     }
