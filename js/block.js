@@ -3691,17 +3691,28 @@ function Block(protoblock, blocks, overrideName) {
             );
         } else if (this.name === "outputtools") {
             selectedvalue = this.privateData;
-            let Labels = [
-                _("letter class"),
-                _("solfege syllable"),
-                _("pitch class"),
-                _("pitch number"),
-                _("pitch in hertz"),
-                _("scalar class"),
-                _("scale degree"),
-                _("nth degree"),
-                _("staff y")
-            ];
+            let Labels;
+            if (beginnerMode) {
+                Labels = [
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("letter class"),
+                    _("staff y")
+                ];
+            } else {
+                Labels = [
+                    _("letter class"),
+                    _("solfege syllable"),
+                    _("pitch class"),
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("scalar class"),
+                    _("scale degree"),
+                    _("nth degree"),
+                    _("staff y")
+                ];
+            }
+            
             let Values = Labels;
             this._piemenuBasic(
                 Labels,

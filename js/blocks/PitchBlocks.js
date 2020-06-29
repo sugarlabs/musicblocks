@@ -1404,7 +1404,15 @@ function setupPitchBlocks() {
         constructor() {
             super("outputtools");
             this.setPalette("pitch");
+            this.beginnerBlock(true);
             this.extraWidth = 40;
+            this.setHelpString([
+                // TRANS: hover
+                        _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
+                        "documentation",
+                        null,
+                        "outputtoolshelp"
+                    ]);
             this.formBlock({
                 outType: "anyout"
             });
@@ -1493,6 +1501,7 @@ function setupPitchBlocks() {
                             } else {
                                 o1 = logo.lastNotePlayed[turtle][0][2];
                             }
+                            // these numbers are subject to staff artwork
                             return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;    
                         case "pitch number":
                             let value = null;
