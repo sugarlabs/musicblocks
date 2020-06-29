@@ -253,8 +253,8 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
 
     let turtleSVG = "";
     for (let turtle in turtles.turtleList) {
-        turtles.turtleList[turtle].closeSVG();
-        turtleSVG += turtles.turtleList[turtle].svgOutput;
+        turtles.turtleList[turtle].painter.closeSVG();
+        turtleSVG += turtles.turtleList[turtle].painter.svgOutput;
     }
 
     let svg =
@@ -279,8 +279,8 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
 
 function isSVGEmpty(turtles) {
     for (let turtle in turtles.turtleList) {
-        turtles.turtleList[turtle].closeSVG();
-        if (turtles.turtleList[turtle].svgOutput !== "") {
+        turtles.turtleList[turtle].painter.closeSVG();
+        if (turtles.turtleList[turtle].painter.svgOutput !== "") {
             return false;
         }
     }

@@ -585,7 +585,7 @@ function Blocks(activity) {
 
         var myBlock = this.blockList[blk];
 
-        if (myBlock.isArgFlowClampBlock()) {
+        if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
             // Make sure myBlock is a clamp block.
         } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
@@ -606,7 +606,7 @@ function Blocks(activity) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-            if (myBlock.isArgFlowClampBlock()) {
+            if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
                 var c = 1; // 0: outie; and 1: child flow
             } else if (clamp === 0) {
                 var c = myBlock.connections.length - 2;
@@ -4480,7 +4480,7 @@ function Blocks(activity) {
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isExpandableBlock()) {
                 // If it is the last connection, keep searching.
-                if (this.blockList[cblk].isArgFlowClampBlock()) {
+                if (this.blockList[cblk].isArgFlowClampBlock() || this.blockList[cblk].isLeftClampBlock()) {
                     return cblk;
                 } else if (blk === last(this.blockList[cblk].connections)) {
                     return this.insideExpandableBlock(cblk);
@@ -5274,6 +5274,24 @@ function Blocks(activity) {
      * return {void}
      */
     this.loadNewBlocks = function(blockObjs) {
+        // Playback Queue has been deprecated, but some old projects
+        // may still have playback blocks appended, which we will
+        // remove.
+        let playbackQueueStartsHere = null;
+        for (var b = 0; b < blockObjs.length; b++) {
+            var blkData = blockObjs[b];
+            // Check for deprecated playbackQueue
+            if (typeof(blkData[1]) === 'number') {
+                playbackQueueStartsHere = b;
+                break;
+            }
+        }
+
+        if (playbackQueueStartsHere !== null) {
+            console.debug("Removing deprecated playback queue from project");
+            blockObjs.splice(playbackQueueStartsHere, blockObjs.length - playbackQueueStartsHere);
+        }
+
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
@@ -6499,7 +6517,7 @@ function Blocks(activity) {
                 default:
                     // Check that name is in the proto list
                     if (
-                        !name in this.protoBlockDict ||
+                        !(name in this.protoBlockDict) ||
                         this.protoBlockDict[name] == null
                     ) {
                         var postProcessUnknownBlock = function(args) {
@@ -7009,8 +7027,18 @@ function Blocks(activity) {
 
             if (turtle != null && turtleNotInTrash > 1) {
                 console.debug("putting turtle " + turtle + " in the trash");
-                this.turtles.turtleList[turtle].inTrash = true;
-                this.turtles.turtleList[turtle].container.visible = false;
+                let comp = this.turtles.turtleList[turtle].companionTurtle;
+                if (comp){
+                    if (turtleNotInTrash > 2){
+                        this.turtles.turtleList[comp].inTrash = true;
+                        this.turtles.turtleList[comp].container.visible = false;
+                        this.turtles.turtleList[turtle].inTrash = true;
+                        this.turtles.turtleList[turtle].container.visible = false;
+                    }
+                } else {
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
+                }
             } else {
                 this.errorMsg(
                     _("You must always have at least one start block.")

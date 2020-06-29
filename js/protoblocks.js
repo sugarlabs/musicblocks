@@ -1680,11 +1680,21 @@ class BaseBlock extends ProtoBlock {
                 svg.docks[1][1] = svg.docks[0][1];
             }
             let clickHeight;
+            this.isLeftClamp = this.style === "clamp" &&
+                this._style.flows.left == true &&
+                this._style.args === 0 &&
+                this._style.flows.type == "flow" ;
+
             if (this._style.flows.top || this._style.flows.bottom)
                 clickHeight =
                     svg.docks[
                         svg.docks.length - this._style.flows.labels.length - 1
                     ][1];
+            else if (this.isLeftClamp) 
+                clickHeight =               // special Case with no .top and .bottom .
+                    svg.docks[
+                        svg.docks.length - this._style.flows.labels.length 
+                    ][1];  
             else clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
 

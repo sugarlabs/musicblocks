@@ -1796,6 +1796,10 @@ function Block(protoblock, blocks, overrideName) {
         return this.protoblock.style === "argflowclamp";
     };
 
+    this.isLeftClampBlock = function() {
+        return this.protoblock.isLeftClamp;
+    };
+    
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === "doubleclamp";
     };
@@ -3196,9 +3200,7 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.turtles.turtleList[turtle].startBlock
                             === this
                     ) {
-                        this.blocks.turtles.turtleList[
-                            turtle
-                            ].getDecorationBitmap().x =
+                        this.blocks.turtles.turtleList[turtle].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }
