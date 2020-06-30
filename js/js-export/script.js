@@ -35,6 +35,11 @@
         return mouse.ENDFLOW;
     });
 
+    RUN ALL MICE:
+    -------------
+    MusicBlocks.run();
+
+
     FLOW BLOCK FUNCTIONS:
     ----------------------
     forward                     : goForward(steps)
@@ -76,7 +81,7 @@
     draw hollow lines           : hollowLine(async () => {...})
  */
 
- 
+
 function runScript() {
     let rightSqr = async mouse => {
         await mouse.hollowLine(async () => {
