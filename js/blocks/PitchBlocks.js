@@ -2865,7 +2865,6 @@ function setupPitchBlocks() {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
                     let __listener = function(event) {
-                        console.log(logo.turtles.turtleList);
                         if (logo.turtles.turtleList[turtle].running) {
                             let queueBlock = new Queue(
                                 logo.actions[args[1]],

@@ -131,28 +131,46 @@ class NoteController {
                         "__";
                     logo.stage.dispatchEvent(eventName);
                 }
+
                 if (typeof(logo.factorList[turtle][f]) === "string") {
                     if (logo.factorList[turtle][f].substr(0,2) == "SD") {
                         let arg = logo.factorList[turtle][f].substr(2);
-                        let scaleDegree = scaleDegreeToPitch(logo.keySignature[turtle], arg, logo.moveable[turtle]);
-                        console.log(scaleDegree);
-                        let queueBlock = new Queue(
-                            childFlow,
-                            childFlowCount,
-                            blk,
-                            receivedArg
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                        childFlow = null;
-
-                        let eventName = 
-                            "__scaledegree_" +
-                            arg +
-                            "_" +
-                            turtleID +
-                            "__";
-                        logo.stage.dispatchEvent(eventName);
+                        let argCopy = arg;
+                        let attr = "";
+                        if (arg.includes(SHARP)) {
+                            attr = "#";
+                            arg = arg.replace(SHARP, "");
+                        } else if (arg.includes(FLAT)) {
+                            attr = "b";
+                            arg = arg.replace(FLAT, "");
+                        }
+                        let pitch = scaleDegreeToPitchMapping(logo.keySignature[turtle], arg, logo.moveable[turtle], null);
+                        pitch += attr;
+                        
+                        if (logo.lastNotePlayed[turtle] !== null) {
+                            let notePlayed = logo.lastNotePlayed[turtle][0];
+                            notePlayed = notePlayed.substr(0, notePlayed.length - 1);
+                            console.log(notePlayed, pitch);
+                            if (notePlayed == pitch) {
+                                let queueBlock = new Queue(
+                                    childFlow,
+                                    childFlowCount,
+                                    blk,
+                                    receivedArg
+                                );
+                                logo.parentFlowQueue[turtle].push(blk);
+                                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                                childFlow = null;
+        
+                                let eventName = 
+                                    "__scaledegree_" +
+                                    argCopy +
+                                    "_" +
+                                    turtleID +
+                                    "__";
+                                logo.stage.dispatchEvent(eventName);    
+                            }
+                        }
                     }
                 }
             }
