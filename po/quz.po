@@ -5840,3 +5840,53 @@ msgstr "Debe seleccionar un archivo."
 #.TRANS: El archivo seleccionado no contiene un pila válida.
 msgid "The file you selected does not contain a valid heap."
 msgstr "El archivo seleccionado no contiene un pila válida."
+
+msgid "display grid"
+msgstr "mostrar cuadrícula"
+
+msgid "The Display Grid Block changes the grid type"
+msgstr "Mostrar el bloque de cuadrícula cambia el tipo de cuadrícula"
+
+msgid "on every beat do"
+msgstr "en cada latodo hacer"
+
+msgid "on every note do"
+msgstr "en cada nota hacer"
+
+msgid "The Click block triggers an event if a mouse has been clicked."
+msgstr "El bloque Click activa un evento si se ha hecho clic en un mouse."
+
+msgid "cursor over"
+msgstr "cursor sobre"
+
+msgid "The Cursor over block triggers an event when the cursor is moved over a mouse."
+msgstr "El cursor sobre el bloque activa un evento cuando el cursor se mueve sobre un ratón."
+
+msgid "cursor out"
+msgstr "cursor fuera"
+
+msgid "The Cursor out block triggers an event when the cursor is moved off of a mouse."
+msgstr "El bloque de salida del cursor desencadena un evento cuando el cursor se mueve fuera de un ratón."
+ 
+msgid "cursor button down"
+msgstr "el botón presionado"  
+
+msgid "The Cursor button down block triggers an event when the curson button is press on a mouse."
+msgstr "El bloque hacia abajo del botón del cursor activa un evento cuando se presiona el botón del cursor en un ratón."
+
+msgid "cursor button up"
+msgstr "el botón arriba"
+
+msgid "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
+msgstr "El bloque del botón del cursor hacia arriba desencadena un evento cuando se suelta el botón del cursor sobre un ratón."
+
+msgid "This block converts the pitch value of the last note played into differe
+nt formats such as hertz, letter name, pitch number, et al."
+msgstr "Este bloque convierte el valor de tono de la última nota tocada en dife
+rentes formatos como hertz, nombre de letra, número de tono, etc."
+
+msgid "The Box2 block returns the value stored in Box2."
+msgstr "El bloque Caja 2 devuelve el valor almacenado en caja 2."
+ 
+msgid "The Box1 block returns the value stored in Box1."
+msgstr "El bloque Caja 1 devuelve el valor almacenado en caja 1."
