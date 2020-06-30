@@ -1,51 +1,82 @@
-// async function runScript() {
-//     console.clear();
-//     let mb = new MusicBlocks();
+/*
+ ============================================================
+        API
+ ============================================================
+    CREATE NEW MOUSE:
+    -----------------
+    new Mouse(async mouse => {
+        await mouse.func(...);
 
-//     await mb.goForward(100);
-//     await mb.goBackward(200);
-//     await mb.turnLeft(90);
-//     await mb.turnRight(90);
-//     await mb.setHeading(45);
-//     await mb.drawArc(45, 100);
-//     await mb.setBezierControlPoint1(0, 0);
-//     await mb.setBezierControlPoint2(100, 100);
-//     await mb.drawBezier(200, 200);
-//     await mb.scrollXY(100, 100);
-//     await mb.setXY(100, 100);
-//     console.log("X = " + mb.X);
-//     console.log("Y = " + mb.Y);
-//     console.log("HEADING = " + mb.HEADING);
-//     await mb.clear();
+        // also can be inside conditionals and loops
+        // e.g.
+        if (cond ..) {
+            await mouse.func(...);
+            ...
+        } else {
+            await mouse.func(...);
+            ...
+        }
+    });
 
-//     for (let i = 0; i < 12; i++) {
-//         await mb.goForward(100);
-//         if (i < 6) {
-//             await mb.turnRight(60);
-//         } else {
-//             await mb.turnLeft(60);
-//         }
-//     }
-//     await mb.clear();
+    CREATE NEW ACTION:
+    ------------------
+    let action_name = async mouse => {
+        await mouse.func(...);
+        ...
+        return mouse.ENDFLOW;
+    };
 
-//     await mb.fillShape(async () => {
-//         for (let i = 0; i < 6; i++) {
-//             await mb.goForward(100);
-//             await mb.turnRight(60);
-//         }
-//         return mb.ENDFLOW;
-//     });
-//     await mb.clear();
+    CALL A CLAMP BLOCK FUNCTION:
+    ----------------------------
+    ...
+    await mouse.func(async () => {
+        await mouse.func(...);  // non clamp block function
+        ...
+        return mouse.ENDFLOW;
+    });
 
-//     await mb.hollowLine(async () => {
-//         for (let i = 0; i < 4; i++) {
-//             await mb.goForward(100);
-//             await mb.turnRight(90);
-//         }
-//         return mb.ENDFLOW;
-//     });
-// }
+    FLOW BLOCK FUNCTIONS:
+    ----------------------
+    forward                     : goForward(steps)
+    backward                    : goBackward(steps)
+    right                       : turnRight(degrees)
+    left                        : turnLeft(degrees)
+    set x, y coordinates        : setXY(x_coord, y_coord)
+    set mouse head angle        : setHeading(degrees)
+    draw pivoted arc            : drawArc(degrees, radius)
+    draw bezier curve           : drawBezier(dest_x, dest_y)
+    set bezier control point 1  : setBezierControlPoint1(x_coord, y_coord)
+    set bezier control point 2  : setBezierControlPoint2(x_coord, y_coord)
+    clear screen                : clear()
+    scroll canvas to x, y       : scrollXY(x_coord, y_coord)
+    set pen color               : setColor(hue_value_in_0_to_100)
+    set pen saturation          : setGrey(value_in_0_to_100)
+    set pen lightness           : setShade(value_in_0_to_100)
+    set pen hue                 : setHue(value_in_0_to_100)
+    set pen opacity             : setTranslucency(value_in_0_to_100)
+    set pen thickness           : setPensize(value_in_0_to_100)
+    pen up                      : penUp()
+    pen down                    : penDown()
+    fill background             : fillBackground()
+    set font name               : setFont(fontname)
 
+    VALUE BLOCK GETTERS:
+    --------------------
+    mouse X coordinate          : X
+    mouse Y coordinate          : Y
+    mouse head angle            : HEADING
+    pen size                    : PENSIZE
+    pen color                   : COLOR
+    pen lightness               : SHADE
+    pen saturation              : GREY
+
+    CLAMP BLOCK FUNCTIONS:
+    ----------------------
+    draw filled polygon         : fillShape(async () => {...})
+    draw hollow lines           : hollowLine(async () => {...})
+ */
+
+ 
 function runScript() {
     let rightSqr = async mouse => {
         await mouse.hollowLine(async () => {
