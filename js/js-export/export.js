@@ -1,7 +1,39 @@
+class Mouse {
+    constructor(flow) {
+        if (Mouse.MouseCount < turtles.turtleList.length) {
+            this.turtle = turtles.turtleList[Mouse.MouseCount];
+        } else {
+            turtles.addTurtle();
+            this.turtle = last(turtles.turtleList);
+        }
+
+        this.flow = flow;
+        this.MB = new MusicBlocks(this.turtle);
+
+        Mouse.MouseCount++;
+        Mouse.MouseList.push(this);
+    }
+
+    run() {
+        this.flow(this.MB);
+    }
+}
+
+Mouse.MouseCount = 0;
+Mouse.MouseList = [];
+
 class MusicBlocks {
-    constructor() {
-        this.turtle = turtles.turtleList[0];
+    constructor(turtle) {
+        this.turtle = turtle;
         // this.flowList = [];
+    }
+
+    static run() {
+        for (let mouse of Mouse.MouseList) {
+            mouse.run();
+        }
+        Mouse.MouseCount = 0;
+        Mouse.MouseList = [];
     }
 
     runCommand(command, args) {
