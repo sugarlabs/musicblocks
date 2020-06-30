@@ -11,6 +11,8 @@
 
 #: js/RhythmBlockPaletteBlocks.js:14
 #: js/RhythmBlockPaletteBlocks.js:177
+#: js/RhythmBlockPaletteBlocks.js:14
+#: js/RhythmBlockPaletteBlocks.js:177
 #.TRANS: rhythm block
 #.TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
@@ -1858,7 +1860,7 @@ msgstr "El bloque de salida del cursor desencadena un evento cuando el cursor se
 
 #: js/SensorsBlocks.js:251
 msgid "cursor button down"
-msgstr "el botón presionado"  
+msgstr "el botón presionado" "
 
 #: js/SensorsBlocks.js:255
 msgid "The Cursor button down block triggers an event when the curson button is press on a mouse."
@@ -5767,3 +5769,4 @@ msgstr "El archivo seleccionado no contiene un pila válida."
 
 #~msgid "collapse"
 #~msgstr "colapso"
+
