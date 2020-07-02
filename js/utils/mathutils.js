@@ -35,7 +35,7 @@ class MathUtility {
      * @returns {Number}
      * @throws {String} NAN error
      */
-    static doRandom(a, b) {
+    static doRandom(a, b, octave) {
         /**
          * @param {Number} n1
          * @param {Number} n2
@@ -46,6 +46,30 @@ class MathUtility {
             [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
             return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
         };
+
+        let GetRandomSolfege = (n1, n2, octave) => {
+            let lowerOctave = 0;
+            // [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
+            lowerOctave = n1 > n2 ? -1 : 0;
+
+            let res;
+            if (n1 > n2) {
+                let choice = Math.random();
+                if (choice >= 0.5) {
+                    res = Math.floor(Math.random() * (Number(6) - Number(n1) + 1) + Number(n1));
+                } else {
+                    res = Math.floor(Math.random() * (Number(0) - Number(n2) + 1) + Number(n2));
+                }
+            } else {
+                res = Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
+            }
+            
+            if (n1 <= res && res <= 6) {
+                octave += lowerOctave;
+            }
+
+            return [SOLFEGENAMES[res], octave];
+        }
 
         if (typeof a === "number" && typeof b === "number") {
             return GetRandom(a, b);
@@ -58,7 +82,7 @@ class MathUtility {
             a = SOLFEGENAMES.indexOf(a);
             b = SOLFEGENAMES.indexOf(b);
 
-            return SOLFEGENAMES[GetRandom(a, b)];
+            return GetRandomSolfege(a, b, octave);
         } else {
             throw "NanError";
         }

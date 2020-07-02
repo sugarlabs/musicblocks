@@ -789,9 +789,10 @@ function setupNumberBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
+            let cblk0 = logo.blocks.blockList[blk].connections[0];
             let cblk1 = logo.blocks.blockList[blk].connections[1];
             let cblk2 = logo.blocks.blockList[blk].connections[2];
-
+            
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -799,9 +800,16 @@ function setupNumberBlocks() {
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            let octave = null;
+
+            // check if connected to pitch block and read octave values
+            if (logo.blocks.blockList[cblk0].name === "pitch") {
+                let numBlock = logo.blocks.blockList[cblk0].connections[2];
+                octave = logo.blocks.blockList[numBlock].value;
+            }
 
             try {
-                return MathUtility.doRandom(a, b);
+                return MathUtility.doRandom(a, b, octave);
             } catch (e) {
                 logo.stopTurtle = true;
                 logo.errorMsg(NANERRORMSG, blk);
