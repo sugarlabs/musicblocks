@@ -48,17 +48,18 @@ class MathUtility {
         };
 
         let GetRandomSolfege = (n1, n2, octave) => {
-            let lowerOctave = 0;
             // [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
-            lowerOctave = n1 > n2 ? -1 : 0;
+            let lowerOctave = n1 > n2 ? -1 : 0;
 
             let res;
             if (n1 > n2) {
                 let choice = Math.random();
                 if (choice >= 0.5) {
                     res = Math.floor(Math.random() * (Number(6) - Number(n1) + 1) + Number(n1));
+                    console.log(res);
                 } else {
-                    res = Math.floor(Math.random() * (Number(0) - Number(n2) + 1) + Number(n2));
+                    res = Math.floor(Math.random() * (Number(n2) + 1));
+                    console.log(n2, res);   
                 }
             } else {
                 res = Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
