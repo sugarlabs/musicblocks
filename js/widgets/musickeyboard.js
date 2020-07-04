@@ -454,7 +454,7 @@ function MusicKeyboard() {
         };
 
         this.midiButton = widgetWindow.addButton(
-            null,
+            "midi.svg",
             ICONSIZE,
             _("MIDI")
         )
