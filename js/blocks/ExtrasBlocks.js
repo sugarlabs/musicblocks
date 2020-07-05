@@ -228,7 +228,7 @@ function setupExtrasBlocks() {
                 logo.unhighlightQueue[thisTurtle] = [];
                 logo.parameterQueue[thisTurtle] = [];
                 logo.turtles.turtleList[thisTurtle].running = true;
-                logo._runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
+                logo.runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
             } else {
                 return [args[0], 1];
             }

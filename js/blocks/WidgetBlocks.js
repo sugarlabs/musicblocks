@@ -221,13 +221,13 @@ function setupWidgetBlocks() {
             }
 
             let listenerName = "_temperament_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.temperament.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 
@@ -337,13 +337,13 @@ function setupWidgetBlocks() {
             logo.timbre.notesToPlay = [];
 
             let listenerName = "_timbre_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.timbre.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -382,14 +382,14 @@ function setupWidgetBlocks() {
             logo.insideMeterWidget = true;
 
             let listenerName = "_meterwidget_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.meterWidget.init(logo, logo._meterBlock);
                 logo.insideMeterWidget = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -428,14 +428,14 @@ function setupWidgetBlocks() {
             logo.insideModeWidget = true;
 
             let listenerName = "_modewidget_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.modeWidget.init(logo, logo._modeBlock);
                 logo.insideModeWidget = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -478,13 +478,13 @@ function setupWidgetBlocks() {
             logo.tempo.BPMs = [];
 
             let listenerName = "_tempo_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.tempo.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -536,7 +536,7 @@ function setupWidgetBlocks() {
             logo.pitchDrumMatrix.clearBlocks();
 
             let listenerName = "_pitchdrummatrix_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (
@@ -556,7 +556,7 @@ function setupWidgetBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -594,14 +594,14 @@ function setupWidgetBlocks() {
             logo.inPitchSlider = true;
 
             let listenerName = "_pitchslider_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -735,13 +735,13 @@ function setupWidgetBlocks() {
             logo.musicKeyboard._rowBlocks = [];
 
             let listenerName = "_musickeyboard_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.musicKeyboard.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -784,14 +784,14 @@ function setupWidgetBlocks() {
             logo.inPitchStaircase = true;
 
             let listenerName = "_pitchstaircase_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -870,13 +870,13 @@ function setupWidgetBlocks() {
             logo.inRhythmRuler = true;
 
             let listenerName = "_rhythmruler_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.rhythmRuler.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -1012,7 +1012,7 @@ function setupWidgetBlocks() {
             logo.addingNotesToTuplet = false;
 
             let listenerName = "_matrix_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (
@@ -1066,7 +1066,7 @@ function setupWidgetBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -1116,14 +1116,14 @@ function setupWidgetBlocks() {
             logo.inStatusMatrix = true;
 
             let listenerName = "_status_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }

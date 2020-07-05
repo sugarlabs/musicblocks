@@ -170,7 +170,7 @@ class NoteController {
             1 / (noteBeatValue * logo.beatFactor[turtle]);
 
         let listenerName = "_playnote_" + turtle;
-        logo._setDispatchBlock(blk, turtle, listenerName);
+        logo.setDispatchBlock(blk, turtle, listenerName);
 
         let __listener = function(event) {
             if (logo.multipleVoices[turtle]) {
@@ -224,7 +224,7 @@ class NoteController {
             logo.drumBlocks = [];
         };
 
-        logo._setListener(turtle, listenerName, __listener);
+        logo.setTurtleListener(turtle, listenerName, __listener);
 
         return [childFlow, childFlowCount];
     }
@@ -275,7 +275,7 @@ class NoteController {
         logo.swingCarryOver[turtle] = 0;
 
         let listenerName = "_swing_" + turtle;
-        logo._setDispatchBlock(blk, turtle, listenerName);
+        logo.setDispatchBlock(blk, turtle, listenerName);
 
         let __listener = function(event) {
             if (!logo.suppressOutput[turtle]) {
@@ -286,7 +286,7 @@ class NoteController {
             logo.swingCarryOver[turtle] = 0;
         };
 
-        logo._setListener(turtle, listenerName, __listener);
+        logo.setTurtleListener(turtle, listenerName, __listener);
 
         return [childFlow, 1];
     }
@@ -325,7 +325,7 @@ class NoteController {
         logo.beatFactor[turtle] /= newDotFactor;
 
         let listenerName = "_dot_" + turtle;
-        logo._setDispatchBlock(blk, turtle, listenerName);
+        logo.setDispatchBlock(blk, turtle, listenerName);
 
         let __listener = function(event) {
             let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
@@ -340,7 +340,7 @@ class NoteController {
             logo.beatFactor[turtle] /= newDotFactor;
         };
 
-        logo._setListener(turtle, listenerName, __listener);
+        logo.setTurtleListener(turtle, listenerName, __listener);
 
         if (logo.blocks.blockList[blk].name === "rhythmicdot") {
             return [args[0], 1];

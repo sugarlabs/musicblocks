@@ -210,7 +210,7 @@ function setupEnsembleBlocks() {
                 }
                 if (foundStartBlock) {
                     console.debug("STARTING " + targetTurtle + " " + startBlk);
-                    logo._runFromBlock(
+                    logo.runFromBlock(
                         logo,
                         targetTurtle,
                         startBlk,
@@ -352,7 +352,7 @@ function setupEnsembleBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             let targetTurtle = _getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle !== null) {
-                logo._runFromBlock(
+                logo.runFromBlock(
                     logo,
                     targetTurtle,
                     args[1],
@@ -787,7 +787,7 @@ function setupEnsembleBlocks() {
                     logo.unhighlightQueue[thisTurtle] = [];
                     logo.parameterQueue[thisTurtle] = [];
                     logo.turtles.turtleList[thisTurtle].running = true;
-                    logo._runFromBlock(
+                    logo.runFromBlock(
                         logo,
                         thisTurtle,
                         blockNumber,

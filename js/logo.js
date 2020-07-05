@@ -369,11 +369,9 @@ class Logo {
         this.pitchAnalyser = null;
     }
 
-    /*
-    =======================================================
-     Setters, Getters
-    =======================================================
-     */
+    // ============================================================================================
+    //  Setters, Getters
+    // ============================================================================================
 
     /**
      * @param {Object} canvas - createjs canvas
@@ -654,97 +652,9 @@ class Logo {
         return this._notation;
     }
 
-    /*
-    =======================================================
-     Logo utility
-    =======================================================
-     */
-
-    /**
-     * Takes one step for each turtle in excuting Logo commands.
-     *
-     * @returns {void}
-     */
-    step() {
-        for (let turtle in this.stepQueue) {
-            if (this.stepQueue[turtle].length > 0) {
-                if (
-                    turtle in this.unhighlightStepQueue &&
-                    this.unhighlightStepQueue[turtle] != null
-                ) {
-                    if (this.blocks.visible) {
-                        this.blocks.unhighlight(
-                            this.unhighlightStepQueue[turtle]
-                        );
-                    }
-                    this.unhighlightStepQueue[turtle] = null;
-                }
-
-                let blk = this.stepQueue[turtle].pop();
-                if (blk != null) {
-                    this._runFromBlockNow(this, turtle, blk, 0, null);
-                }
-            }
-        }
-    }
-
-    /**
-     * The stop button was pressed.
-     * Stops the turtle and cleans up a few odds and ends.
-     *
-     * @returns {void}
-     */
-    doStopTurtle() {
-        this.stopTurtle = true;
-        this.turtles.markAllAsStopped();
-
-        for (let sound in this.sounds) {
-            this.sounds[sound].stop();
-        }
-
-        this.sounds = [];
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            for (
-                let turtle = 0;
-                turtle < this.turtles.turtleList.length;
-                turtle++
-            ) {
-                for (let instrumentName in instruments[turtle]) {
-                    this.synth.stopSound(turtle, instrumentName);
-                }
-                let comp = this.turtles.turtleList[turtle].companionTurtle;
-                if (comp) {
-                    this.turtles.turtleList[comp].running = false;
-                    let interval = logo.turtles.turtleList[comp].interval;
-                    if (interval) clearInterval(interval);
-                }
-            }
-
-            this.synth.stop();
-        }
-
-        if (this.cameraID != null) {
-            doStopVideoCam(this.cameraID, this.setCameraID);
-        }
-
-        this.onStopTurtle();
-        this.blocks.bringToTop();
-
-        this.stepQueue = {};
-        this.unhighlightQueue = {};
-
-        this._restoreConnections();
-
-        document.body.style.cursor = "default";
-        if (this.showBlocksAfterRun) {
-            console.debug("SHOW BLOCKS");
-            this.blocks.showBlocks();
-            document.getElementById("stop").style.color = "white";
-        }
-
-        this.showBlocksAfterRun = false;
-    }
+    // ============================================================================================
+    //  Utility methods
+    // ============================================================================================
 
     /**
      * Restores any broken connections made in duplicate notes clamps.
@@ -764,6 +674,87 @@ class Logo {
                 }
             }
         }
+    }
+
+    /**
+     * Preps synths for each turtle.
+     *
+     * @returns {void}
+     */
+    _prepSynths() {
+        this.synth.newTone();
+
+        let turtle = 0;
+        for ( ; turtle < this.turtles.turtleList.length; turtle++) {
+            if (!(turtle in instruments)) {
+                instruments[turtle] = {};
+                instrumentsFilters[turtle] = {};
+                instrumentsEffects[turtle] = {};
+            }
+
+            // Make sure there is a default synth for each turtle
+            if (!("electronic synth" in instruments[turtle])) {
+                this.synth.createDefaultSynth(turtle);
+            }
+
+            // Copy any preloaded synths from the default turtle
+            for (let instrumentName in instruments[0]) {
+                if (!(instrumentName in instruments[turtle])) {
+                    this.synth.loadSynth(turtle, instrumentName);
+
+                    // Copy any filters
+                    if (instrumentName in instrumentsFilters[0]) {
+                        instrumentsFilters[turtle][instrumentName] =
+                            instrumentsFilters[0][instrumentName];
+                    }
+
+                    // .. and any effects
+                    if (instrumentName in instrumentsEffects[0]) {
+                        instrumentsEffects[turtle][instrumentName] =
+                            instrumentsEffects[0][instrumentName];
+                    }
+                }
+            }
+
+            this.synthVolume[turtle] = {
+                "electronic synth": [DEFAULTVOLUME],
+                noise1: [DEFAULTVOLUME],
+                noise2: [DEFAULTVOLUME],
+                noise3: [DEFAULTVOLUME]
+            };
+        }
+
+        if (!this.suppressOutput[turtle]) {
+            this.setMasterVolume(DEFAULTVOLUME);
+            for (
+                let turtle = 0;
+                turtle < this.turtles.turtleList.length;
+                turtle++
+            ) {
+                for (let synth in this.synthVolume[turtle]) {
+                    this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
+                }
+            }
+        }
+    }
+
+    /**
+     * Initialises and starts a default synth.
+     *
+     * @param turtle
+     * @returns {void}
+     */
+    resetSynth(turtle) {
+        if (!("electronic synth" in instruments[turtle])) {
+            this.synth.createDefaultSynth(turtle);
+        }
+
+        this.setMasterVolume(DEFAULTVOLUME);
+        for (let synth in this.synthVolume[turtle]) {
+            this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
+        }
+
+        this.synth.start();
     }
 
     /**
@@ -799,6 +790,881 @@ class Logo {
             }
         }
     }
+
+    /**
+     * Clears note params.
+     *
+     * @param turtle
+     * @param blk
+     * @param drums
+     * @returns {void}
+     */
+    clearNoteParams(turtle, blk, drums) {
+        this.oscList[turtle][blk] = [];
+        this.noteBeat[turtle][blk] = [];
+        this.noteBeatValues[turtle][blk] = [];
+        this.noteValue[turtle][blk] = null;
+        this.notePitches[turtle][blk] = [];
+        this.noteOctaves[turtle][blk] = [];
+        this.noteCents[turtle][blk] = [];
+        this.noteHertz[turtle][blk] = [];
+        this.embeddedGraphics[turtle][blk] = [];
+        this.noteDrums[turtle][blk] = drums !== null ? drums : [];
+    }
+
+    /**
+     * Speaks all characters in the range of comma, full stop, space, A to Z, a to z in the input text.
+     *
+     * @param {string} text
+     * @returns {void}
+     */
+    processSpeak(text) {
+        let new_text = "";
+        for (let i in text) {
+            if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
+                new_text += text[i];
+        }
+
+        if (this.meSpeak !== null) {
+            this.meSpeak.speak(new_text);
+        }
+    }
+
+    /**
+     * Shows information: with camera, in image form, at URL, as text.
+     *
+     * @param turtle
+     * @param blk
+     * @param arg0
+     * @param arg1
+     * @returns {void}
+     */
+    processShow(turtle, blk, arg0, arg1) {
+        if (typeof arg1 === "string") {
+            let len = arg1.length;
+            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
+                doUseCamera(
+                    [arg0],
+                    this.turtles,
+                    turtle,
+                    false,
+                    this.cameraID,
+                    this.setCameraID,
+                    this.errorMsg
+                );
+            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
+                doUseCamera(
+                    [arg0],
+                    this.turtles,
+                    turtle,
+                    true,
+                    this.cameraID,
+                    this.setCameraID,
+                    this.errorMsg
+                );
+            } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
+                this.turtles.turtleList[turtle].doShowImage(arg0, arg1);
+            } else if (len > 8 && arg1.substr(0, 8) === "https://") {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else if (len > 7 && arg1.substr(0, 7) === "http://") {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else if (len > 7 && arg1.substr(0, 7) === "file://") {
+                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+            } else {
+                this.turtles.turtleList[turtle].doShowText(arg0, arg1);
+            }
+        } else if (
+            typeof arg1 === "object" &&
+            blk !== null &&
+            this.blocks.blockList[this.blocks.blockList[blk].connections[2]]
+                .name === "loadFile"
+        ) {
+            if (arg1) {
+                this.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
+            } else {
+                this.errorMsg(_("You must select a file."));
+            }
+        } else {
+            this.turtles.turtleList[turtle].doShowText(arg0, arg1);
+        }
+    }
+
+    // ========================================================================
+
+    /**
+     * Counts notes, with saving of the box, heap and turtle states.
+     *
+     * @param turtle
+     * @param cblk
+     * @returns {number}
+     */
+    noteCounter(turtle, cblk) {
+        if (cblk != null) {
+            let saveSuppressStatus = this.suppressOutput[turtle];
+
+            // We need to save the state of the boxes and heap
+            // although there is a potential of a boxes collision with
+            // other turtles
+            let saveBoxes = JSON.stringify(this.boxes);
+            let saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
+            // .. and the turtle state
+            let saveX = this.turtles.turtleList[turtle].x;
+            let saveY = this.turtles.turtleList[turtle].y;
+            let saveColor = this.turtles.turtleList[turtle].painter.color;
+            let saveValue = this.turtles.turtleList[turtle].painter.value;
+            let saveChroma = this.turtles.turtleList[turtle].painter.chroma;
+            let saveStroke = this.turtles.turtleList[turtle].painter.stroke;
+            let saveCanvasAlpha = this.turtles.turtleList[turtle].painter.canvasAlpha;
+            let saveOrientation = this.turtles.turtleList[turtle].orientation;
+            let savePenState = this.turtles.turtleList[turtle].painter.penState;
+
+            let saveWhichNoteToCount = this.whichNoteToCount[turtle];
+
+            let savePrevTurtleTime = this.previousTurtleTime[turtle];
+            let saveTurtleTime = this.turtleTime[turtle];
+
+            this.suppressOutput[turtle] = true;
+            this.justCounting[turtle].push(true);
+
+            for (let b in this.endOfClampSignals[turtle]) {
+                this.butNotThese[turtle][b] = [];
+                for (
+                    let i = 0;
+                    i < this.endOfClampSignals[turtle][b].length;
+                    i++
+                ) {
+                    this.butNotThese[turtle][b].push(i);
+                }
+            }
+
+            let actionArgs = [];
+            let saveNoteCount = this.notesPlayed[turtle];
+            this.turtles.turtleList[turtle].running = true;
+
+            if (this.inNoteBlock[turtle]) {
+                this.whichNoteToCount[turtle] += this.inNoteBlock[
+                    turtle
+                ].length;
+            }
+
+            this.runFromBlockNow(
+                this,
+                turtle,
+                cblk,
+                true,
+                actionArgs,
+                this.turtles.turtleList[turtle].queue.length
+            );
+
+            let returnValue = rationalSum(this.notesPlayed[turtle], [
+                -saveNoteCount[0],
+                saveNoteCount[1]
+            ]);
+            this.notesPlayed[turtle] = saveNoteCount;
+
+            // Restore previous state
+            console.debug(saveBoxes);
+            this.boxes = JSON.parse(saveBoxes);
+            console.debug(saveTurtleHeaps);
+            this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+            this.turtles.turtleList[turtle].painter.doPenUp();
+            this.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+            this.turtles.turtleList[turtle].painter.color = saveColor;
+            this.turtles.turtleList[turtle].painter.value = saveValue;
+            this.turtles.turtleList[turtle].painter.chroma = saveChroma;
+            this.turtles.turtleList[turtle].painter.stroke = saveStroke;
+            this.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+            this.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+            this.turtles.turtleList[turtle].painter.penState = savePenState;
+
+            this.previousTurtleTime[turtle] = savePrevTurtleTime;
+            this.turtleTime[turtle] = saveTurtleTime;
+
+            this.whichNoteToCount[turtle] = saveWhichNoteToCount;
+
+            this.justCounting[turtle].pop();
+            this.suppressOutput[turtle] = saveSuppressStatus;
+
+            this.butNotThese[turtle] = {};
+
+            return returnValue[0] / returnValue[1];
+        }
+
+        return 0;
+    }
+
+    /**
+     * Calculates the change needed for musical inversion.
+     *
+     * @param turtle
+     * @param note
+     * @param octave
+     * @returns {number}
+     */
+    calculateInvert(turtle, note, octave) {
+        let delta = 0;
+        let len = this.invertList[turtle].length;
+        let note1 = getNote(
+            note,
+            octave,
+            0,
+            this.keySignature[turtle],
+            this.moveable[turtle],
+            null,
+            this.errorMsg
+        );
+        let num1 =
+            pitchToNumber(note1[0], note1[1], this.keySignature[turtle]) -
+            this.pitchNumberOffset[turtle];
+
+        for (let i = len - 1; i > -1; i--) {
+            let note2 = getNote(
+                this.invertList[turtle][i][0],
+                this.invertList[turtle][i][1],
+                0,
+                this.keySignature[turtle],
+                this.moveable[turtle],
+                null,
+                this.errorMsg
+            );
+            let num2 =
+                pitchToNumber(note2[0], note2[1], this.keySignature[turtle]) -
+                this.pitchNumberOffset[turtle];
+
+            if (this.invertList[turtle][i][2] === "even") {
+                delta += num2 - num1;
+                num1 += 2 * delta;
+            } else if (this.invertList[turtle][i][2] === "odd") {
+                delta += num2 - num1 + 0.5;
+                num1 += 2 * delta;
+            } else {
+                // We need to calculate the scalar difference
+                let scalarSteps = this.scalarDistance(turtle, num2, num1);
+                let note3 = this.addScalarTransposition(
+                    turtle,
+                    note2[0],
+                    note2[1],
+                    -scalarSteps
+                );
+                let num3 =
+                    pitchToNumber(
+                        note3[0],
+                        note3[1],
+                        this.keySignature[turtle]
+                    ) - this.pitchNumberOffset[turtle];
+
+                delta += (num3 - num1) / 2;
+                num1 = num3;
+            }
+        }
+
+        return delta;
+    }
+
+    /**
+     * Shifts pitches by n steps relative to the provided scale.
+     *
+     * @param turtle
+     * @param note
+     * @param octave
+     * @param {number} n
+     * @returns {object}
+     */
+    addScalarTransposition(turtle, note, octave, n) {
+        let noteObj = null;
+
+        if (n > 0) {
+            noteObj = getNote(
+                note,
+                octave,
+                0,
+                this.keySignature[turtle],
+                this.moveable[turtle],
+                null,
+                this.errorMsg,
+                this.synth.inTemperament
+            );
+
+            if (isCustom(this.synth.inTemperament)) {
+                let value = getStepSizeUp(
+                    this.keySignature[turtle],
+                    noteObj[0],
+                    n,
+                    this.synth.inTemperament
+                );
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    value,
+                    this.keySignature[turtle],
+                    this.moveable[turtle],
+                    null,
+                    this.errorMsg,
+                    this.synth.inTemperament
+                );
+            } else {
+                for (let i = 0; i < n; i++) {
+                    let value = getStepSizeUp(
+                        this.keySignature[turtle],
+                        noteObj[0]
+                    );
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        value,
+                        this.keySignature[turtle],
+                        this.moveable[turtle],
+                        null,
+                        this.errorMsg,
+                        this.synth.inTemperament
+                    );
+                }
+            }
+        } else if (n < 0) {
+            noteObj = getNote(
+                note,
+                octave,
+                0,
+                this.keySignature[turtle],
+                this.moveable[turtle],
+                null,
+                this.errorMsg,
+                this.synth.inTemperament
+            );
+
+            if (isCustom(this.synth.inTemperament)) {
+                let value = getStepSizeDown(
+                    this.keySignature[turtle],
+                    noteObj[0],
+                    n,
+                    this.synth.inTemperament
+                );
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    value,
+                    this.keySignature[turtle],
+                    this.moveable[turtle],
+                    null,
+                    this.errorMsg,
+                    this.synth.inTemperament
+                );
+            } else {
+                for (let i = 0; i < -n; i++) {
+                    let value = getStepSizeDown(
+                        this.keySignature[turtle],
+                        noteObj[0]
+                    );
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        value,
+                        this.keySignature[turtle],
+                        this.moveable[turtle],
+                        null,
+                        this.errorMsg,
+                        this.synth.inTemperament
+                    );
+                }
+            }
+        } else {
+            noteObj = [note, octave];
+        }
+
+        return noteObj;
+    }
+
+    /**
+     * Returns a distance for scalar transposition.
+     *
+     * @param turtle
+     * @param {number} firstNote
+     * @param {number} lastNote
+     * @returns {number}
+     */
+    scalarDistance(turtle, firstNote, lastNote) {
+        // Rather than just counting the semitones, we need to count
+        // the steps in the current key needed to get from firstNote pitch
+        // to lastNote pitch
+
+        if (lastNote === firstNote) {
+            return 0;
+        } else if (lastNote > firstNote) {
+            let noteObj = numberToPitch(
+                firstNote + this.pitchNumberOffset[turtle]
+            );
+            let n = firstNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
+            while (i < 100) {
+                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
+                ++i;
+                if (n >= lastNote + this.pitchNumberOffset[turtle]) {
+                    break;
+                }
+
+                noteObj = numberToPitch(n);
+            }
+
+            return i;
+        } else {
+            let noteObj = numberToPitch(
+                lastNote + this.pitchNumberOffset[turtle]
+            );
+            let n = lastNote + this.pitchNumberOffset[turtle];
+
+            let i = 0;
+            while (i < 100) {
+                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
+                ++i;
+                if (n >= firstNote + this.pitchNumberOffset[turtle]) {
+                    break;
+                }
+
+                noteObj = numberToPitch(n);
+            }
+
+            return -i;
+        }
+    }
+
+    /**
+     * Updates the music notation used for Lilypond output.
+     *
+     * @param note
+     * @param {number} duration
+     * @param turtle
+     * @param insideChord
+     * @param drum
+     * @param {boolean} [split]
+     * @returns {void}
+     */
+    updateNotation(note, duration, turtle, insideChord, drum, split) {
+        // Note: At this point, the note of duration "duration" has
+        // already been added to notesPlayed
+
+        // Don't split the note if we are already splitting the note
+        if (split == undefined) split = true;
+
+        // Check to see if this note straddles a measure boundary
+        let durationTime = 1 / duration;
+        let beatsIntoMeasure =
+            (
+                (
+                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
+                    this.pickup[turtle] -
+                    durationTime
+                ) * this.noteValuePerBeat[turtle]
+            ) % this.beatsPerMeasure[turtle];
+        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+        let timeLeftInMeasure =
+            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
+            timeIntoMeasure;
+
+        if (split && durationTime > timeLeftInMeasure) {
+            let d = durationTime - timeLeftInMeasure;
+            let d2 = timeLeftInMeasure;
+            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            console.debug("splitting note across measure boundary.");
+            let obj = rationalToFraction(d);
+
+            if (d2 > 0) {
+                // Check to see if the note straddles multiple measures
+                let i = 0;
+                while (d2 > b) {
+                    ++i;
+                    d2 -= b;
+                }
+
+                let obj2 = rationalToFraction(d2);
+                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                if (i > 0 || obj[0] > 0) {
+                    if (note[0] !== "R") {
+                        // Don't tie rests
+                        this.notation.notationInsertTie(turtle);
+                        this.notation.notationDrumStaging[turtle].push("tie");
+                    }
+                    obj2 = rationalToFraction(1 / b);
+                }
+
+                // Add any measures we straddled
+                while (i > 0) {
+                    i -= 1;
+                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                    if (obj[0] > 0) {
+                        if (note[0] !== "R") {
+                            // Don't tie rests
+                            this.notation.notationInsertTie(turtle);
+                            this.notation.notationDrumStaging[turtle].push("tie");
+                        }
+                    }
+                }
+            }
+
+            if (obj[0] > 0) {
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
+            }
+        } else {
+            // .. otherwise proceed as normal
+            this.notation.doUpdateNotation(... arguments);
+        }
+    }
+
+    // ========================================================================
+
+    /**
+     * Sets the cameraID property.
+     *
+     * @param id
+     * @returns {void}
+     */
+    setCameraID(id) {
+        this.cameraID = id;
+    }
+
+    // ============================================================================================
+    //  Action methods
+    // ============================================================================================
+
+    /**
+     * Sets a named listener after removing any existing listener in the same place.
+     *
+     * @param {Number} turtle - Turtle index in turtleList
+     * @param {String} listenerName
+     * @param {Function} listener
+     * @returns {void}
+     */
+    setTurtleListener(turtle, listenerName, listener) {
+        if (listenerName in this.turtles.turtleList[turtle].listeners) {
+            this.stage.removeEventListener(
+                listenerName,
+                this.turtles.turtleList[turtle].listeners[listenerName],
+                false
+            );
+        }
+
+        this.turtles.turtleList[turtle].listeners[listenerName] = listener;
+        this.stage.addEventListener(listenerName, listener, false);
+    }
+
+    /**
+     * Sets a single dispatch block.
+     *
+     * @param blk
+     * @param turtle
+     * @param {string} listenerName
+     * @returns {void}
+     */
+    setDispatchBlock(blk, turtle, listenerName) {
+        if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
+            let c =
+                this.blocks.blockList[last(this.backward[turtle])].name ===
+                    "backward" ?
+                    1 : 2;
+            if (
+                this.blocks.sameGeneration(
+                    this.blocks.blockList[last(this.backward[turtle])]
+                        .connections[c],
+                    blk
+                )
+            ) {
+                let nextBlock = this.blocks.blockList[blk].connections[0];
+                if (nextBlock in this.endOfClampSignals[turtle]) {
+                    this.endOfClampSignals[turtle][nextBlock].push(
+                        listenerName
+                    );
+                } else {
+                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
+            } else {
+                let nextBlock = last(this.blocks.blockList[blk].connections);
+                if (nextBlock != null) {
+                    if (nextBlock in this.endOfClampSignals[turtle]) {
+                        this.endOfClampSignals[turtle][nextBlock].push(
+                            listenerName
+                        );
+                    } else {
+                        this.endOfClampSignals[turtle][nextBlock] = [
+                            listenerName
+                        ];
+                    }
+                }
+            }
+        } else {
+            let nextBlock = last(this.blocks.blockList[blk].connections);
+            if (nextBlock != null) {
+                if (nextBlock in this.endOfClampSignals[turtle]) {
+                    this.endOfClampSignals[turtle][nextBlock].push(
+                        listenerName
+                    );
+                } else {
+                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                }
+            }
+        }
+    }
+
+    /**
+     * Parses receivedArg.
+     *
+     * @param logo
+     * @param turtle
+     * @param blk
+     * @param parentBlk
+     * @param receivedArg
+     * @returns {*}
+     */
+    parseArg(logo, turtle, blk, parentBlk, receivedArg) {
+        // Retrieve the value of a block
+        if (blk == null) {
+            logo.errorMsg(NOINPUTERRORMSG, parentBlk);
+            // logo.stopTurtle = true;
+            return null;
+        }
+
+        if (logo.blocks.blockList[blk].protoblock.parameter) {
+            if (turtle in logo.parameterQueue) {
+                if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
+                    logo.parameterQueue[turtle].push(blk);
+                }
+            } else {
+                // console.debug('turtle ' + turtle + ' has no parameterQueue');
+            }
+        }
+
+        if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
+            return (logo.blocks.blockList[blk].value = logo.blocks.blockList[
+                blk
+            ].protoblock.arg(logo, turtle, blk, receivedArg));
+        }
+
+        if (logo.blocks.blockList[blk].name === "intervalname") {
+            if (typeof logo.blocks.blockList[blk].value === "string") {
+                logo.noteDirection[turtle] = getIntervalDirection(
+                    logo.blocks.blockList[blk].value
+                );
+                return getIntervalNumber(logo.blocks.blockList[blk].value);
+            } else return 0;
+        } else if (logo.blocks.blockList[blk].isValueBlock()) {
+            if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
+                eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
+            }
+
+            return logo.blocks.blockList[blk].value;
+        } else if (
+            ["anyout", "numberout", "textout", "booleanout"].indexOf(
+                logo.blocks.blockList[blk].protoblock.dockTypes[0]
+            ) !== -1
+        ) {
+            switch (logo.blocks.blockList[blk].name) {
+                case "dectofrac":
+                    if (
+                        logo.inStatusMatrix &&
+                        logo.blocks.blockList[
+                            logo.blocks.blockList[blk].connections[0]
+                        ].name === "print"
+                    ) {
+                        logo.statusFields.push([blk, "dectofrac"]);
+                    } else {
+                        let cblk = logo.blocks.blockList[blk].connections[1];
+                        if (cblk === null) {
+                            logo.errorMsg(NOINPUTERRORMSG, blk);
+                            logo.blocks.blockList[blk].value = 0;
+                        } else {
+                            let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                            if (typeof a === "number") {
+                                logo.blocks.blockList[blk].value =
+                                    a < 0 ? "-" + mixedNumber(-a) : mixedNumber(a);
+                            } else {
+                                logo.errorMsg(NANERRORMSG, blk);
+                                logo.blocks.blockList[blk].value = 0;
+                            }
+                        }
+                    }
+                    break;
+
+                case "hue":
+                    if (
+                        logo.inStatusMatrix &&
+                        logo.blocks.blockList[
+                            logo.blocks.blockList[blk].connections[0]
+                        ].name === "print"
+                    ) {
+                        logo.statusFields.push([blk, "color"]);
+                    } else {
+                        logo.blocks.blockList[blk].value =
+                            logo.turtles.turtleList[turtle].painter.color;
+                    }
+                    break;
+
+                /** @deprecated */
+                case "returnValue":
+                    if (logo.returns[turtle].length > 0) {
+                        logo.blocks.blockList[blk].value = logo.returns[turtle].pop();
+                    } else {
+                        console.debug("WARNING: No return value.");
+                        logo.blocks.blockList[blk].value = 0;
+                    }
+                    break;
+
+                default:
+                    if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
+                        eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
+                    } else {
+                        console.error("I do not know how to " + logo.blocks.blockList[blk].name);
+                    }
+                    break;
+            }
+
+            return logo.blocks.blockList[blk].value;
+        } else {
+            return blk;
+        }
+    }
+
+    // ========================================================================
+
+    /**
+     * Sets wait duration of turtle.
+     *
+     * @param turtle
+     * @param secs
+     * @returns {void}
+     */
+    doWait(turtle, secs) {
+        this.waitTimes[turtle] = Number(secs) * 1000;
+    }
+
+    /**
+     * Clears the delay timeout after a successful input, and runs from next block.
+     *
+     * @param {Object} turtle
+     * @returns {void}
+     */
+    clearTurtleRun(turtle) {
+        if (this.delayTimeout[turtle] !== null) {
+            clearTimeout(this.delayTimeout[turtle]);
+            this.delayTimeout[turtle] = null;
+            this.runFromBlockNow(
+                this,
+                turtle,
+                this.delayParameters[turtle]['blk'],
+                this.delayParameters[turtle]['flow'],
+                this.delayParameters[turtle]['arg']
+            );
+        }
+    }
+
+    /**
+     * Breaks a loop.
+     *
+     * @param turtle
+     * @returns {void}
+     */
+    doBreak(turtle) {
+        // Look for a parent loopBlock in queue and set its count to 1
+        let parentLoopBlock = null;
+        let loopBlkIdx = -1;
+
+        let queueLength = this.turtles.turtleList[turtle].queue.length;
+        for (let i = queueLength - 1; i > -1; i--) {
+            if (
+                ["forever", "repeat", "while", "until"].indexOf(
+                    this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].blk].name
+                ) !== -1
+            ) {
+                // while or until
+                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
+                parentLoopBlock = this.blocks.blockList[loopBlkIdx];
+                // Flush the parent from the queue
+                this.turtles.turtleList[turtle].queue.pop();
+                break;
+            } else if (
+                ["forever", "repeat", "while", "until"].indexOf(
+                    this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].parentBlk].name
+                ) !== -1
+            ) {
+                // repeat or forever
+                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
+                parentLoopBlock = this.blocks.blockList[loopBlkIdx];
+                // Flush the parent from the queue
+                this.turtles.turtleList[turtle].queue.pop();
+                break;
+            }
+        }
+
+        if (parentLoopBlock == null) {
+            // Flush the child flow
+            this.turtles.turtleList[turtle].queue.pop();
+            return;
+        }
+
+        // For while and until, we need to add any childflow from the
+        // parent to the queue
+        if (
+            parentLoopBlock.name === "while" ||
+            parentLoopBlock.name === "until"
+        ) {
+            let childFlow = last(parentLoopBlock.connections);
+            if (childFlow != null) {
+                let queueBlock = new Queue(childFlow, 1, loopBlkIdx);
+                // We need to keep track of the parent block to the
+                // child flow so we can unlightlight the parent block
+                // after the child flow completes
+                this.parentFlowQueue[turtle].push(loopBlkIdx);
+                this.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+        }
+    }
+
+    /**
+     * Sets the master volume to a value of at least 0 and at most 100.
+     *
+     * @param {Number} volume
+     * @returns {void}
+     */
+    setMasterVolume(volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.synth.setMasterVolume(volume);
+            for (let turtle in this.turtles.turtleList) {
+                for (let synth in this.synthVolume[turtle]) {
+                    this.synthVolume[turtle][synth].push(volume);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
+     *
+     * @param turtle
+     * @param synth
+     * @param {Number} volume
+     * @returns {void}
+     */
+    setSynthVolume(turtle, synth, volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            switch (synth) {
+                case "noise1":
+                case "noise2":
+                case "noise3":
+                    // Noise is very very loud
+                    this.synth.setVolume(turtle, synth, volume / 25);
+                    break;
+                default:
+                    this.synth.setVolume(turtle, synth, volume);
+            }
+        }
+    }
+
+    // ============================================================================================
+    //  Behavior methods
+    // ============================================================================================
 
     /**
      * Initialises a turtle.
@@ -861,9 +1727,7 @@ class Logo {
         this.instrumentNames[turtle] = ["electronic synth"];
         this.inCrescendo[turtle] = [];
         this.crescendoDelta[turtle] = [];
-        this.crescendoInitialVolume[turtle] = {
-            "electronic synth": [DEFAULTVOLUME]
-        };
+        this.crescendoInitialVolume[turtle] = {"electronic synth": [DEFAULTVOLUME]};
         this.intervals[turtle] = [];
         this.semitoneIntervals[turtle] = [];
         this.staccato[turtle] = [];
@@ -919,10 +1783,7 @@ class Logo {
         this.lastPitch[turtle] = [];
         this.pitchNumberOffset[turtle] = 39;    // C4
         this.suppressOutput[turtle] =
-            this.runningLilypond ||
-            this.runningAbc ||
-            this.runningMxml ||
-            this.compiling;
+            this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.moveable[turtle] = false;
         this.inNeighbor[turtle] = [];
         this.neighborStepPitch[turtle] = [];
@@ -942,6 +1803,88 @@ class Logo {
             this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].painter.canvasAlpha;
             this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
             this._savePenState[turtle] = this.turtles.turtleList[turtle].painter.penState;
+        }
+    }
+
+    /**
+     * Stops the turtles and cleans up a few odds and ends.
+     * The stop button was pressed.
+     *
+     * @returns {void}
+     */
+    doStopTurtles() {
+        this.stopTurtle = true;
+        this.turtles.markAllAsStopped();
+
+        for (let sound in this.sounds) {
+            this.sounds[sound].stop();
+        }
+
+        this.sounds = [];
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            for (let turtle in this.turtles.turtleList) {
+                for (let instrumentName in instruments[turtle]) {
+                    this.synth.stopSound(turtle, instrumentName);
+                }
+                let comp = this.turtles.turtleList[turtle].companionTurtle;
+                if (comp) {
+                    this.turtles.turtleList[comp].running = false;
+                    let interval = logo.turtles.turtleList[comp].interval;
+                    if (interval) clearInterval(interval);
+                }
+            }
+
+            this.synth.stop();
+        }
+
+        if (this.cameraID != null) {
+            doStopVideoCam(this.cameraID, this.setCameraID);
+        }
+
+        this.onStopTurtle();
+        this.blocks.bringToTop();
+
+        this.stepQueue = {};
+        this.unhighlightQueue = {};
+
+        this._restoreConnections();
+
+        document.body.style.cursor = "default";
+        if (this.showBlocksAfterRun) {
+            console.debug("SHOW BLOCKS");
+            this.blocks.showBlocks();
+            document.getElementById("stop").style.color = "white";
+        }
+
+        this.showBlocksAfterRun = false;
+    }
+
+    /**
+     * Takes one step for each turtle in executing Logo commands.
+     *
+     * @returns {void}
+     */
+    step() {
+        for (let turtle in this.stepQueue) {
+            if (this.stepQueue[turtle].length > 0) {
+                if (
+                    turtle in this.unhighlightStepQueue &&
+                    this.unhighlightStepQueue[turtle] != null
+                ) {
+                    if (this.blocks.visible) {
+                        this.blocks.unhighlight(
+                            this.unhighlightStepQueue[turtle]
+                        );
+                    }
+                    this.unhighlightStepQueue[turtle] = null;
+                }
+
+                let blk = this.stepQueue[turtle].pop();
+                if (blk != null) {
+                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                }
+            }
         }
     }
 
@@ -1206,7 +2149,7 @@ class Logo {
             }
 
             this.turtles.turtleList[turtle].running = true;
-            this._runFromBlock(this, turtle, startHere, 0, env);
+            this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
             // Look for a status block
@@ -1227,7 +2170,7 @@ class Logo {
 
                     this.turtles.turtleList[turtle].running = true;
                     delayStart = 250;
-                    this._runFromBlock(this, turtle, startBlocks[b], 0, env);
+                    this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
             }
 
@@ -1256,7 +2199,7 @@ class Logo {
                             }
 
                             this.turtles.turtleList[turtle].running = true;
-                            this._runFromBlock(
+                            this.runFromBlock(
                                 this,
                                 turtle,
                                 startBlocks[b],
@@ -1301,7 +2244,7 @@ class Logo {
      * @param receivedArg
      * @returns {void}
      */
-    _runFromBlock(logo, turtle, blk, isflow, receivedArg) {
+    runFromBlock(logo, turtle, blk, isflow, receivedArg) {
         this.runningBlock = blk;
         if (blk == null) return;
 
@@ -1321,7 +2264,7 @@ class Logo {
                 logo.delayParameters[turtle] =
                     { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
                 logo.delayTimeout[turtle] = setTimeout(() => {
-                    logo._runFromBlockNow(
+                    logo.runFromBlockNow(
                         logo,
                         turtle,
                         blk,
@@ -1330,26 +2273,6 @@ class Logo {
                     );
                 }, delay);
             }
-        }
-    }
-
-    /**
-     * Clears the delay timeout after a successfull input, and runs from next block.
-     *
-     * @param {Object} turtle
-     * @returns {void}
-     */
-    clearTurtleRun(turtle) {
-        if (this.delayTimeout[turtle] !== null) {
-            clearTimeout(this.delayTimeout[turtle]);
-            this.delayTimeout[turtle] = null;
-            this._runFromBlockNow(
-                this,
-                turtle,
-                this.delayParameters[turtle]['blk'],
-                this.delayParameters[turtle]['flow'],
-                this.delayParameters[turtle]['arg']
-            );
         }
     }
 
@@ -1364,14 +2287,7 @@ class Logo {
      * @param {number} [queueStart]
      * @returns {void}
      */
-    _runFromBlockNow(
-        logo,
-        turtle,
-        blk,
-        isflow,
-        receivedArg,
-        queueStart
-    ) {
+    runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
         this.alreadyRunning = true;
 
         this.receivedArg = receivedArg;
@@ -1565,10 +2481,10 @@ class Logo {
                 childFlowCount = 1;
 
                 let listenerName = "_drum_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = event => logo.drumStyle[turtle].pop();
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 break;
 
@@ -1599,13 +2515,13 @@ class Logo {
             /** @deprecated */
             case "playfwd":
                 logo.pitchTimeMatrix.playDirection = 1;
-                logo._runFromBlock(logo, turtle, args[0]);
+                logo.runFromBlock(logo, turtle, args[0]);
                 break;
 
             /** @deprecated */
             case "playbwd":
                 logo.pitchTimeMatrix.playDirection = -1;
-                logo._runFromBlock(logo, turtle, args[0]);
+                logo.runFromBlock(logo, turtle, args[0]);
                 break;
 
             default:
@@ -1834,7 +2750,7 @@ class Logo {
             }
 
             if (isflow) {
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     nextBlock,
@@ -1843,7 +2759,7 @@ class Logo {
                     queueStart
                 );
             } else {
-                logo._runFromBlock(logo, turtle, nextBlock, isflow, passArg);
+                logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
             logo.alreadyRunning = false;
@@ -2041,50 +2957,6 @@ class Logo {
     }
 
     /**
-     * Sets the master volume to a value of at least 0 and at most 100.
-     *
-     * @param {Number} volume
-     * @returns {void}
-     */
-    setMasterVolume(volume) {
-        volume = Math.min(Math.max(volume, 0), 100);
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.setMasterVolume(volume);
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                for (let synth in this.synthVolume[turtle]) {
-                    this.synthVolume[turtle][synth].push(volume);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
-     *
-     * @param turtle
-     * @param synth
-     * @param {Number} volume
-     * @returns {void}
-     */
-    setSynthVolume(turtle, synth, volume) {
-        volume = Math.min(Math.max(volume, 0), 100);
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            switch (synth) {
-                case "noise1":
-                case "noise2":
-                case "noise3":
-                    // Noise is very very loud
-                    this.synth.setVolume(turtle, synth, volume / 25);
-                    break;
-                default:
-                    this.synth.setVolume(turtle, synth, volume);
-            }
-        }
-    }
-
-    /**
      * Dispatches turtle signals to update turtle graphics.
      *
      * @async
@@ -2094,12 +2966,7 @@ class Logo {
      * @param {number} delay
      * @returns {void}
      */
-    async dispatchTurtleSignals(
-        turtle,
-        beatValue,
-        blk,
-        delay
-    ) {
+    async dispatchTurtleSignals(turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration
         if (!turtle in this.embeddedGraphics) {
@@ -2755,944 +3622,6 @@ class Logo {
         // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
         this.embeddedGraphicsFinished[turtle] = true;
-    }
-
-    /**
-     * Sets a named listener after removing any existing listener in the same place.
-     *
-     * @param turtle
-     * @param {string} listenerName
-     * @param {Function} listener
-     * @returns {void}
-     */
-    _setListener(turtle, listenerName, listener) {
-        if (listenerName in this.turtles.turtleList[turtle].listeners) {
-            this.stage.removeEventListener(
-                listenerName,
-                this.turtles.turtleList[turtle].listeners[listenerName],
-                false
-            );
-        }
-
-        this.turtles.turtleList[turtle].listeners[listenerName] = listener;
-        this.stage.addEventListener(listenerName, listener, false);
-    }
-
-    /**
-     * Sets a single dispatch block.
-     *
-     * @param blk
-     * @param turtle
-     * @param {string} listenerName
-     * @returns {void}
-     */
-    _setDispatchBlock(blk, turtle, listenerName) {
-        if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
-            let c =
-                this.blocks.blockList[last(this.backward[turtle])].name ===
-                    "backward" ?
-                    1 : 2;
-            if (
-                this.blocks.sameGeneration(
-                    this.blocks.blockList[last(this.backward[turtle])]
-                        .connections[c],
-                    blk
-                )
-            ) {
-                let nextBlock = this.blocks.blockList[blk].connections[0];
-                if (nextBlock in this.endOfClampSignals[turtle]) {
-                    this.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
-                } else {
-                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
-                }
-            } else {
-                let nextBlock = last(this.blocks.blockList[blk].connections);
-                if (nextBlock != null) {
-                    if (nextBlock in this.endOfClampSignals[turtle]) {
-                        this.endOfClampSignals[turtle][nextBlock].push(
-                            listenerName
-                        );
-                    } else {
-                        this.endOfClampSignals[turtle][nextBlock] = [
-                            listenerName
-                        ];
-                    }
-                }
-            }
-        } else {
-            let nextBlock = last(this.blocks.blockList[blk].connections);
-            if (nextBlock != null) {
-                if (nextBlock in this.endOfClampSignals[turtle]) {
-                    this.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
-                } else {
-                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
-                }
-            }
-        }
-    }
-
-    /**
-     * Initialises and starts a default synth.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    resetSynth(turtle) {
-        if (!("electronic synth" in instruments[turtle])) {
-            this.synth.createDefaultSynth(turtle);
-        }
-
-        this.setMasterVolume(DEFAULTVOLUME);
-        for (let synth in this.synthVolume[turtle]) {
-            this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
-        }
-
-        this.synth.start();
-    }
-
-    /**
-     * Speaks all characters in the range of comma,
-     * full stop, space, A to Z, a to z in the input text.
-     *
-     * @param {string} text
-     * @returns {void}
-     */
-    processSpeak(text) {
-        let new_text = "";
-        for (let i in text) {
-            if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
-                new_text += text[i];
-        }
-
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
-        }
-    }
-
-    /**
-     * Shows information: with camera, in image form, at URL, as text.
-     *
-     * @param turtle
-     * @param blk
-     * @param arg0
-     * @param arg1
-     * @returns {void}
-     */
-    processShow(turtle, blk, arg0, arg1) {
-        if (typeof arg1 === "string") {
-            let len = arg1.length;
-            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    false,
-                    this.cameraID,
-                    this.setCameraID,
-                    this.errorMsg
-                );
-            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    true,
-                    this.cameraID,
-                    this.setCameraID,
-                    this.errorMsg
-                );
-            } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
-                this.turtles.turtleList[turtle].doShowImage(arg0, arg1);
-            } else if (len > 8 && arg1.substr(0, 8) === "https://") {
-                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "http://") {
-                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "file://") {
-                this.turtles.turtleList[turtle].doShowURL(arg0, arg1);
-            } else {
-                this.turtles.turtleList[turtle].doShowText(arg0, arg1);
-            }
-        } else if (
-            typeof arg1 === "object" &&
-            blk !== null &&
-            this.blocks.blockList[this.blocks.blockList[blk].connections[2]]
-                .name === "loadFile"
-        ) {
-            if (arg1) {
-                this.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
-            } else {
-                this.errorMsg(_("You must select a file."));
-            }
-        } else {
-            this.turtles.turtleList[turtle].doShowText(arg0, arg1);
-        }
-    }
-
-    /**
-     * If the input name is forever, repeat, while or until,
-     * returns true (false otherwise).
-     *
-     * @param {string} name
-     * @returns {boolean}
-     */
-    _loopBlock(name) {
-        return ["forever", "repeat", "while", "until"].indexOf(name) !== -1;
-    }
-
-    /**
-     * Breaks a loop.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    doBreak(turtle) {
-        // Look for a parent loopBlock in queue and set its count to 1
-        let parentLoopBlock = null;
-        let loopBlkIdx = -1;
-
-        let queueLength = this.turtles.turtleList[turtle].queue.length;
-        for (let i = queueLength - 1; i > -1; i--) {
-            if (
-                this._loopBlock(
-                    this.blocks.blockList[
-                        this.turtles.turtleList[turtle].queue[i].blk
-                    ].name
-                )
-            ) {
-                // while or until
-                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
-                parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue
-                this.turtles.turtleList[turtle].queue.pop();
-                break;
-            } else if (
-                this._loopBlock(
-                    this.blocks.blockList[
-                        this.turtles.turtleList[turtle].queue[i].parentBlk
-                    ].name
-                )
-            ) {
-                // repeat or forever
-                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
-                parentLoopBlock = this.blocks.blockList[loopBlkIdx];
-                // Flush the parent from the queue
-                this.turtles.turtleList[turtle].queue.pop();
-                break;
-            }
-        }
-
-        if (parentLoopBlock == null) {
-            // Flush the child flow
-            this.turtles.turtleList[turtle].queue.pop();
-            return;
-        }
-
-        // For while and until, we need to add any childflow from the
-        // parent to the queue
-        if (
-            parentLoopBlock.name === "while" ||
-            parentLoopBlock.name === "until"
-        ) {
-            let childFlow = last(parentLoopBlock.connections);
-            if (childFlow != null) {
-                let queueBlock = new Queue(childFlow, 1, loopBlkIdx);
-                // We need to keep track of the parent block to the
-                // child flow so we can unlightlight the parent block
-                // after the child flow completes
-                this.parentFlowQueue[turtle].push(loopBlkIdx);
-                this.turtles.turtleList[turtle].queue.push(queueBlock);
-            }
-        }
-    }
-
-    /**
-     * Parses receivedArg.
-     *
-     * @param logo
-     * @param turtle
-     * @param blk
-     * @param parentBlk
-     * @param receivedArg
-     * @returns {mixed}
-     */
-    parseArg(logo, turtle, blk, parentBlk, receivedArg) {
-        // Retrieve the value of a block
-        if (blk == null) {
-            logo.errorMsg(NOINPUTERRORMSG, parentBlk);
-            // logo.stopTurtle = true;
-            return null;
-        }
-
-        if (logo.blocks.blockList[blk].protoblock.parameter) {
-            if (turtle in logo.parameterQueue) {
-                if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
-                    logo.parameterQueue[turtle].push(blk);
-                }
-            } else {
-                // console.debug('turtle ' + turtle + ' has no parameterQueue');
-            }
-        }
-
-        if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
-            return (logo.blocks.blockList[blk].value = logo.blocks.blockList[
-                blk
-            ].protoblock.arg(logo, turtle, blk, receivedArg));
-        }
-
-        if (logo.blocks.blockList[blk].name === "intervalname") {
-            if (typeof logo.blocks.blockList[blk].value === "string") {
-                logo.noteDirection[turtle] = getIntervalDirection(
-                    logo.blocks.blockList[blk].value
-                );
-                return getIntervalNumber(logo.blocks.blockList[blk].value);
-            } else return 0;
-        } else if (logo.blocks.blockList[blk].isValueBlock()) {
-            if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
-                eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
-            }
-
-            return logo.blocks.blockList[blk].value;
-        } else if (
-            ["anyout", "numberout", "textout", "booleanout"].indexOf(
-                logo.blocks.blockList[blk].protoblock.dockTypes[0]
-            ) !== -1
-        ) {
-            switch (logo.blocks.blockList[blk].name) {
-                case "dectofrac":
-                    if (
-                        logo.inStatusMatrix &&
-                        logo.blocks.blockList[
-                            logo.blocks.blockList[blk].connections[0]
-                        ].name === "print"
-                    ) {
-                        logo.statusFields.push([blk, "dectofrac"]);
-                    } else {
-                        let cblk = logo.blocks.blockList[blk].connections[1];
-                        if (cblk === null) {
-                            logo.errorMsg(NOINPUTERRORMSG, blk);
-                            logo.blocks.blockList[blk].value = 0;
-                        } else {
-                            let a = logo.parseArg(
-                                logo,
-                                turtle,
-                                cblk,
-                                blk,
-                                receivedArg
-                            );
-                            if (typeof a === "number") {
-                                if (a < 0) {
-                                    a = a * -1;
-                                    logo.blocks.blockList[blk].value =
-                                        "-" + mixedNumber(a);
-                                } else {
-                                    logo.blocks.blockList[
-                                        blk
-                                    ].value = mixedNumber(a);
-                                }
-                            } else {
-                                logo.errorMsg(NANERRORMSG, blk);
-                                logo.blocks.blockList[blk].value = 0;
-                            }
-                        }
-                    }
-                    break;
-
-                case "hue":
-                    if (
-                        logo.inStatusMatrix &&
-                        logo.blocks.blockList[
-                            logo.blocks.blockList[blk].connections[0]
-                        ].name === "print"
-                    ) {
-                        logo.statusFields.push([blk, "color"]);
-                    } else {
-                        logo.blocks.blockList[blk].value =
-                            logo.turtles.turtleList[turtle].painter.color;
-                    }
-                    break;
-
-                /** @deprecated */
-                case "returnValue":
-                    if (logo.returns[turtle].length > 0) {
-                        logo.blocks.blockList[blk].value = logo.returns[
-                            turtle
-                        ].pop();
-                    } else {
-                        console.debug("WARNING: No return value.");
-                        logo.blocks.blockList[blk].value = 0;
-                    }
-                    break;
-
-                default:
-                    if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
-                        eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
-                    } else {
-                        console.error(
-                            "I do not know how to " +
-                            logo.blocks.blockList[blk].name
-                        );
-                    }
-                    break;
-            }
-
-            return logo.blocks.blockList[blk].value;
-        } else {
-            return blk;
-        }
-    }
-
-    /**
-     * Counts notes, with saving of the box, heap and turtle states.
-     *
-     * @param turtle
-     * @param cblk
-     * @returns {number}
-     */
-    noteCounter(turtle, cblk) {
-        if (cblk != null) {
-            let saveSuppressStatus = this.suppressOutput[turtle];
-
-            // We need to save the state of the boxes and heap
-            // although there is a potential of a boxes collision with
-            // other turtles
-            let saveBoxes = JSON.stringify(this.boxes);
-            let saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
-            // .. and the turtle state
-            let saveX = this.turtles.turtleList[turtle].x;
-            let saveY = this.turtles.turtleList[turtle].y;
-            let saveColor = this.turtles.turtleList[turtle].painter.color;
-            let saveValue = this.turtles.turtleList[turtle].painter.value;
-            let saveChroma = this.turtles.turtleList[turtle].painter.chroma;
-            let saveStroke = this.turtles.turtleList[turtle].painter.stroke;
-            let saveCanvasAlpha = this.turtles.turtleList[turtle].painter.canvasAlpha;
-            let saveOrientation = this.turtles.turtleList[turtle].orientation;
-            let savePenState = this.turtles.turtleList[turtle].painter.penState;
-
-            let saveWhichNoteToCount = this.whichNoteToCount[turtle];
-
-            let savePrevTurtleTime = this.previousTurtleTime[turtle];
-            let saveTurtleTime = this.turtleTime[turtle];
-
-            this.suppressOutput[turtle] = true;
-            this.justCounting[turtle].push(true);
-
-            for (let b in this.endOfClampSignals[turtle]) {
-                this.butNotThese[turtle][b] = [];
-                for (
-                    let i = 0;
-                    i < this.endOfClampSignals[turtle][b].length;
-                    i++
-                ) {
-                    this.butNotThese[turtle][b].push(i);
-                }
-            }
-
-            let actionArgs = [];
-            let saveNoteCount = this.notesPlayed[turtle];
-            this.turtles.turtleList[turtle].running = true;
-
-            if (this.inNoteBlock[turtle]) {
-                this.whichNoteToCount[turtle] += this.inNoteBlock[
-                    turtle
-                ].length;
-            }
-
-            this._runFromBlockNow(
-                this,
-                turtle,
-                cblk,
-                true,
-                actionArgs,
-                this.turtles.turtleList[turtle].queue.length
-            );
-
-            let returnValue = rationalSum(this.notesPlayed[turtle], [
-                -saveNoteCount[0],
-                saveNoteCount[1]
-            ]);
-            this.notesPlayed[turtle] = saveNoteCount;
-
-            // Restore previous state
-            console.debug(saveBoxes);
-            this.boxes = JSON.parse(saveBoxes);
-            console.debug(saveTurtleHeaps);
-            this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-
-            this.turtles.turtleList[turtle].painter.doPenUp();
-            this.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-            this.turtles.turtleList[turtle].painter.color = saveColor;
-            this.turtles.turtleList[turtle].painter.value = saveValue;
-            this.turtles.turtleList[turtle].painter.chroma = saveChroma;
-            this.turtles.turtleList[turtle].painter.stroke = saveStroke;
-            this.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-            this.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-            this.turtles.turtleList[turtle].painter.penState = savePenState;
-
-            this.previousTurtleTime[turtle] = savePrevTurtleTime;
-            this.turtleTime[turtle] = saveTurtleTime;
-
-            this.whichNoteToCount[turtle] = saveWhichNoteToCount;
-
-            this.justCounting[turtle].pop();
-            this.suppressOutput[turtle] = saveSuppressStatus;
-
-            this.butNotThese[turtle] = {};
-
-            return returnValue[0] / returnValue[1];
-        }
-
-        return 0;
-    }
-
-    /**
-     * Makes the turtle wait.
-     *
-     * @param turtle
-     * @param secs
-     * @returns {void}
-     */
-    doWait(turtle, secs) {
-        this.waitTimes[turtle] = Number(secs) * 1000;
-    }
-
-    /**
-     * Changes body background in DOM to current colour.
-     *
-     * @param turtle
-     * @returns {void}
-     */
-    setBackgroundColor(turtle) {
-        let c =
-            turtle === -1 ?
-                platformColor.background :
-                this.turtles.turtleList[turtle].painter.canvasColor;
-
-        // docById('myCanvas').style.background = c;
-        this.turtles.setBackgroundColor(c);
-        this.turtles.makeBackground(this.turtles.isShrunk());
-
-        this.svgOutput = "";
-    }
-
-    /**
-     * Sets the cameraID property.
-     *
-     * @param id
-     * @returns {void}
-     */
-    setCameraID(id) {
-        this.cameraID = id;
-    }
-
-    /**
-     * Calculates the change needed for musical inversion.
-     *
-     * @param turtle
-     * @param note
-     * @param octave
-     * @returns {number}
-     */
-    calculateInvert(turtle, note, octave) {
-        let delta = 0;
-        let len = this.invertList[turtle].length;
-        let note1 = getNote(
-            note,
-            octave,
-            0,
-            this.keySignature[turtle],
-            this.moveable[turtle],
-            null,
-            this.errorMsg
-        );
-        let num1 =
-            pitchToNumber(note1[0], note1[1], this.keySignature[turtle]) -
-            this.pitchNumberOffset[turtle];
-
-        for (let i = len - 1; i > -1; i--) {
-            let note2 = getNote(
-                this.invertList[turtle][i][0],
-                this.invertList[turtle][i][1],
-                0,
-                this.keySignature[turtle],
-                this.moveable[turtle],
-                null,
-                this.errorMsg
-            );
-            let num2 =
-                pitchToNumber(note2[0], note2[1], this.keySignature[turtle]) -
-                this.pitchNumberOffset[turtle];
-
-            if (this.invertList[turtle][i][2] === "even") {
-                delta += num2 - num1;
-                num1 += 2 * delta;
-            } else if (this.invertList[turtle][i][2] === "odd") {
-                delta += num2 - num1 + 0.5;
-                num1 += 2 * delta;
-            } else {
-                // We need to calculate the scalar difference
-                let scalarSteps = this.scalarDistance(turtle, num2, num1);
-                let note3 = this.addScalarTransposition(
-                    turtle,
-                    note2[0],
-                    note2[1],
-                    -scalarSteps
-                );
-                let num3 =
-                    pitchToNumber(
-                        note3[0],
-                        note3[1],
-                        this.keySignature[turtle]
-                    ) - this.pitchNumberOffset[turtle];
-
-                delta += (num3 - num1) / 2;
-                num1 = num3;
-            }
-        }
-
-        return delta;
-    }
-
-    /**
-     * Shifts pitches by n steps relative to the provided scale.
-     *
-     * @param turtle
-     * @param note
-     * @param octave
-     * @param {number} n
-     * @returns {object}
-     */
-    addScalarTransposition(turtle, note, octave, n) {
-        let noteObj = null;
-
-        if (n > 0) {
-            noteObj = getNote(
-                note,
-                octave,
-                0,
-                this.keySignature[turtle],
-                this.moveable[turtle],
-                null,
-                this.errorMsg,
-                this.synth.inTemperament
-            );
-
-            if (isCustom(this.synth.inTemperament)) {
-                let value = getStepSizeUp(
-                    this.keySignature[turtle],
-                    noteObj[0],
-                    n,
-                    this.synth.inTemperament
-                );
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    value,
-                    this.keySignature[turtle],
-                    this.moveable[turtle],
-                    null,
-                    this.errorMsg,
-                    this.synth.inTemperament
-                );
-            } else {
-                for (let i = 0; i < n; i++) {
-                    let value = getStepSizeUp(
-                        this.keySignature[turtle],
-                        noteObj[0]
-                    );
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        value,
-                        this.keySignature[turtle],
-                        this.moveable[turtle],
-                        null,
-                        this.errorMsg,
-                        this.synth.inTemperament
-                    );
-                }
-            }
-        } else if (n < 0) {
-            noteObj = getNote(
-                note,
-                octave,
-                0,
-                this.keySignature[turtle],
-                this.moveable[turtle],
-                null,
-                this.errorMsg,
-                this.synth.inTemperament
-            );
-
-            if (isCustom(this.synth.inTemperament)) {
-                let value = getStepSizeDown(
-                    this.keySignature[turtle],
-                    noteObj[0],
-                    n,
-                    this.synth.inTemperament
-                );
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    value,
-                    this.keySignature[turtle],
-                    this.moveable[turtle],
-                    null,
-                    this.errorMsg,
-                    this.synth.inTemperament
-                );
-            } else {
-                for (let i = 0; i < -n; i++) {
-                    let value = getStepSizeDown(
-                        this.keySignature[turtle],
-                        noteObj[0]
-                    );
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        value,
-                        this.keySignature[turtle],
-                        this.moveable[turtle],
-                        null,
-                        this.errorMsg,
-                        this.synth.inTemperament
-                    );
-                }
-            }
-        } else {
-            noteObj = [note, octave];
-        }
-
-        return noteObj;
-    }
-
-    /**
-     * Returns a distance for scalar transposition.
-     *
-     * @param turtle
-     * @param {number} firstNote
-     * @param {number} lastNote
-     * @returns {number}
-     */
-    scalarDistance(turtle, firstNote, lastNote) {
-        // Rather than just counting the semitones, we need to count
-        // the steps in the current key needed to get from firstNote pitch
-        // to lastNote pitch
-
-        if (lastNote === firstNote) {
-            return 0;
-        } else if (lastNote > firstNote) {
-            let noteObj = numberToPitch(
-                firstNote + this.pitchNumberOffset[turtle]
-            );
-            let n = firstNote + this.pitchNumberOffset[turtle];
-
-            let i = 0;
-            while (i < 100) {
-                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                ++i;
-                if (n >= lastNote + this.pitchNumberOffset[turtle]) {
-                    break;
-                }
-
-                noteObj = numberToPitch(n);
-            }
-
-            return i;
-        } else {
-            let noteObj = numberToPitch(
-                lastNote + this.pitchNumberOffset[turtle]
-            );
-            let n = lastNote + this.pitchNumberOffset[turtle];
-
-            let i = 0;
-            while (i < 100) {
-                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                ++i;
-                if (n >= firstNote + this.pitchNumberOffset[turtle]) {
-                    break;
-                }
-
-                noteObj = numberToPitch(n);
-            }
-
-            return -i;
-        }
-    }
-
-    /**
-     * Preps synths for each turtle.
-     *
-     * @returns {void}
-     */
-    _prepSynths() {
-        this.synth.newTone();
-
-        let turtle = 0;
-        for ( ; turtle < this.turtles.turtleList.length; turtle++) {
-            if (!(turtle in instruments)) {
-                instruments[turtle] = {};
-                instrumentsFilters[turtle] = {};
-                instrumentsEffects[turtle] = {};
-            }
-
-            // Make sure there is a default synth for each turtle
-            if (!("electronic synth" in instruments[turtle])) {
-                this.synth.createDefaultSynth(turtle);
-            }
-
-            // Copy any preloaded synths from the default turtle
-            for (let instrumentName in instruments[0]) {
-                if (!(instrumentName in instruments[turtle])) {
-                    this.synth.loadSynth(turtle, instrumentName);
-
-                    // Copy any filters
-                    if (instrumentName in instrumentsFilters[0]) {
-                        instrumentsFilters[turtle][instrumentName] =
-                            instrumentsFilters[0][instrumentName];
-                    }
-
-                    // .. and any effects
-                    if (instrumentName in instrumentsEffects[0]) {
-                        instrumentsEffects[turtle][instrumentName] =
-                            instrumentsEffects[0][instrumentName];
-                    }
-                }
-            }
-
-            this.synthVolume[turtle] = {
-                "electronic synth": [DEFAULTVOLUME],
-                noise1: [DEFAULTVOLUME],
-                noise2: [DEFAULTVOLUME],
-                noise3: [DEFAULTVOLUME]
-            };
-        }
-
-        if (!this.suppressOutput[turtle]) {
-            this.setMasterVolume(DEFAULTVOLUME);
-            for (
-                let turtle = 0;
-                turtle < this.turtles.turtleList.length;
-                turtle++
-            ) {
-                for (let synth in this.synthVolume[turtle]) {
-                    this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
-                }
-            }
-        }
-    }
-
-    /**
-     * Clears note params.
-     *
-     * @param turtle
-     * @param blk
-     * @param drums
-     * @returns {void}
-     */
-    clearNoteParams(turtle, blk, drums) {
-        this.oscList[turtle][blk] = [];
-        this.noteBeat[turtle][blk] = [];
-        this.noteBeatValues[turtle][blk] = [];
-        this.noteValue[turtle][blk] = null;
-        this.notePitches[turtle][blk] = [];
-        this.noteOctaves[turtle][blk] = [];
-        this.noteCents[turtle][blk] = [];
-        this.noteHertz[turtle][blk] = [];
-        this.embeddedGraphics[turtle][blk] = [];
-        this.noteDrums[turtle][blk] = drums !== null ? drums : [];
-    }
-
-    /**
-     * Updates the music notation used for Lilypond output.
-     *
-     * @param note
-     * @param {number} duration
-     * @param turtle
-     * @param insideChord
-     * @param drum
-     * @param {boolean} [split]
-     * @returns {void}
-     */
-    updateNotation(
-        note,
-        duration,
-        turtle,
-        insideChord,
-        drum,
-        split
-    ) {
-        // Note: At this point, the note of duration "duration" has
-        // already been added to notesPlayed
-
-        // Don't split the note if we are already splitting the note
-        if (split == undefined) split = true;
-
-        // Check to see if this note straddles a measure boundary
-        let durationTime = 1 / duration;
-        let beatsIntoMeasure =
-            (
-                (
-                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
-                    this.pickup[turtle] -
-                    durationTime
-                ) * this.noteValuePerBeat[turtle]
-            ) % this.beatsPerMeasure[turtle];
-        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
-        let timeLeftInMeasure =
-            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
-            timeIntoMeasure;
-
-        if (split && durationTime > timeLeftInMeasure) {
-            let d = durationTime - timeLeftInMeasure;
-            let d2 = timeLeftInMeasure;
-            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
-            console.debug("splitting note across measure boundary.");
-            let obj = rationalToFraction(d);
-
-            if (d2 > 0) {
-                // Check to see if the note straddles multiple measures
-                let i = 0;
-                while (d2 > b) {
-                    ++i;
-                    d2 -= b;
-                }
-
-                let obj2 = rationalToFraction(d2);
-                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                if (i > 0 || obj[0] > 0) {
-                    if (note[0] !== "R") {
-                        // Don't tie rests
-                        this.notation.notationInsertTie(turtle);
-                        this.notation.notationDrumStaging[turtle].push("tie");
-                    }
-                    obj2 = rationalToFraction(1 / b);
-                }
-
-                // Add any measures we straddled
-                while (i > 0) {
-                    i -= 1;
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                    if (obj[0] > 0) {
-                        if (note[0] !== "R") {
-                            // Don't tie rests
-                            this.notation.notationInsertTie(turtle);
-                            this.notation.notationDrumStaging[turtle].push("tie");
-                        }
-                    }
-                }
-            }
-
-            if (obj[0] > 0) {
-                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-            }
-        } else {
-            // .. otherwise proceed as normal
-            this.notation.doUpdateNotation(... arguments);
-        }
     }
 }
 

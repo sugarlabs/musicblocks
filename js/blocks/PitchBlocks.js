@@ -1501,7 +1501,7 @@ function setupPitchBlocks() {
                                 o1 = logo.lastNotePlayed[turtle][0][2];
                             }
                             // these numbers are subject to staff artwork
-                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;    
+                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;
                         case "pitch number":
                             let value = null;
                             let obj;
@@ -1545,10 +1545,10 @@ function setupPitchBlocks() {
                                     console.debug("Cannot find a note ");
                                     logo.errorMsg(INVALIDPITCH, blk);
                                 }
-            
+
                                 obj = ["G", 4];
                             }
-            
+
                             value =
                                 pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
                                 logo.pitchNumberOffset[turtle];
@@ -1848,13 +1848,13 @@ function setupPitchBlocks() {
             }
 
             let listenerName = "_invert_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.invertList[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[3], 1];
         }
@@ -1881,13 +1881,13 @@ function setupPitchBlocks() {
                 logo.invertList[turtle].push([args[0], args[1], "odd"]);
             }
             let listenerName = "_invert_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.invertList[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
         }
@@ -1988,7 +1988,7 @@ function setupPitchBlocks() {
                 logo.transpositionValues[turtle].push(transValue);
 
                 let listenerName = "_transposition_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     transValue = logo.transpositionValues[turtle].pop();
@@ -1999,7 +1999,7 @@ function setupPitchBlocks() {
                     }
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 return [args[1], 1];
             }
@@ -2271,7 +2271,7 @@ function setupPitchBlocks() {
             logo.scalarTranspositionValues[turtle].push(transValue);
 
             let listenerName = "_scalar_transposition_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 transValue = logo.scalarTranspositionValues[turtle].pop();
@@ -2282,7 +2282,7 @@ function setupPitchBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -2357,7 +2357,7 @@ function setupPitchBlocks() {
             }
 
             let listenerName = "_accidental_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -2367,7 +2367,7 @@ function setupPitchBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -2408,7 +2408,7 @@ function setupPitchBlocks() {
             }
 
             let listenerName = "_flat_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -2418,7 +2418,7 @@ function setupPitchBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -2459,7 +2459,7 @@ function setupPitchBlocks() {
             }
 
             let listenerName = "_sharp_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (!(logo.invertList[turtle].length === 0)) {
@@ -2469,7 +2469,7 @@ function setupPitchBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }

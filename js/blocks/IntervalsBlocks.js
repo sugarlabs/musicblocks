@@ -227,7 +227,7 @@ function setupIntervalsBlocks() {
                 let actionArgs = [];
                 let saveNoteCount = logo.notesPlayed[turtle];
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     cblk,
@@ -342,7 +342,7 @@ function setupIntervalsBlocks() {
                 let actionArgs = [];
                 let saveNoteCount = logo.notesPlayed[turtle];
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     cblk,
@@ -518,13 +518,13 @@ function setupIntervalsBlocks() {
                 logo.noteDirection[turtle] = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function() {
                     logo.semitoneIntervals[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
             }
 
             return [args[1], 1];
@@ -666,13 +666,13 @@ function setupIntervalsBlocks() {
             logo.intervals[turtle].push(i);
 
             let listenerName = "_interval_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.intervals[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -735,7 +735,7 @@ function setupIntervalsBlocks() {
             }
 
             let listenerName = "_definemode_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 MUSICALMODES[modeName] = [];
@@ -780,7 +780,7 @@ function setupIntervalsBlocks() {
                 logo.inDefineMode[turtle] = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }

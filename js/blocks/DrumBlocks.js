@@ -221,13 +221,13 @@ function setupDrumBlocks() {
             logo.drumStyle[turtle].push(drumname);
 
             let listenerName = "_mapdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.drumStyle[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
                 logo._currentDrumBlock = blk;
                 logo.rhythmRuler.Drums.push(blk);
@@ -299,14 +299,14 @@ function setupDrumBlocks() {
             logo.drumStyle[turtle].push(drumname);
 
             let listenerName = "_setdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 let drumname = logo.drumStyle[turtle].pop();
                 logo.pitchDrumTable[turtle] = {};
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
                 logo._currentDrumBlock = blk;
                 logo.rhythmRuler.Drums.push(blk);

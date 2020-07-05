@@ -92,7 +92,7 @@ function setupOrnamentBlocks() {
             logo.neighborNoteValue[turtle].push(args[1]);
 
             let listenerName = "_neighbor_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.inNeighbor[turtle].pop();
@@ -100,7 +100,7 @@ function setupOrnamentBlocks() {
                 logo.neighborNoteValue[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
         }
@@ -188,7 +188,7 @@ function setupOrnamentBlocks() {
             console.debug("length of glide " + logo.glideOverride[turtle]);
 
             let listenerName = "_glide_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (logo.justCounting[turtle].length === 0) {
@@ -198,7 +198,7 @@ function setupOrnamentBlocks() {
                 logo.glide[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -248,7 +248,7 @@ function setupOrnamentBlocks() {
             }
 
             let listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.staccato[turtle].pop();
@@ -257,7 +257,7 @@ function setupOrnamentBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -302,13 +302,13 @@ function setupOrnamentBlocks() {
             }
 
             let listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.staccato[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
