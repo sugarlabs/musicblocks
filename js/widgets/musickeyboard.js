@@ -300,7 +300,7 @@ function MusicKeyboard() {
 
         var __startNote = function(element) {
             startDate = new Date();
-            startTime = startDate.getTime(); // Milliseconds();
+            startTime = startDate.getTime();  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
             that._logo.synth.trigger(
                 0,
@@ -2093,7 +2093,7 @@ function MusicKeyboard() {
                 this.noteNames.push(PITCHES3[i]);
                 this.octaves.push(4);
                 if (i === 4) {
-                    this.noteNames.push(null); // missing black key
+                    this.noteNames.push(null);  // missing black key
                     this.octaves.push(4);
                 }
             }
@@ -2652,7 +2652,7 @@ function MusicKeyboard() {
 
         let __startNote = (event, element) => { 
             if (!element) return;
-            startTime = event.timeStamp ; // Milliseconds();
+            startTime = event.timeStamp;  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
             this._logo.synth.trigger(
                 0,
@@ -2727,40 +2727,39 @@ function MusicKeyboard() {
             let pitch1 = pitchOctave[0];
             let pitch2 = pitchOctave[1];
             let octave = pitchOctave[2];
-            let key = this.getElement[pitch1 +""+ octave] || this.getElement[pitch2 +"" + octave];
+            let key = this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 +"" + octave];
             console.debug(pitch1, octave);
             if (event.data[0] == 144 && event.data[2] != 0) {
                 __startNote(event, docById(key));
 
-            }
-            else {
-                __endNote(event, docById(key));
+            } else {
+		__endNote(event, docById(key));
             }
         }
 
-        let onMIDISuccess = ( midiAccess) => {
+        let onMIDISuccess = (midiAccess) => {
             // re-init widget 
             if (this.midiON){
-                this.midiButton.style.background = "#00FF00" ;
-                logo.textMsg("MIDI device present")
-                return ;
+                this.midiButton.style.background = "#00FF00";
+                // logo.textMsg(_("MIDI device present."));
+                return;
             }
             midiAccess.inputs.forEach((input) => { input.onmidimessage = onMIDIMessage; });
             if (midiAccess.inputs.size) {
-                this.midiButton.style.background = "#00FF00" ;
-                logo.textMsg("MIDI device present")
-                this.midiON =true ;
-            }
-            else logo.textMsg("MIDI device not present");
+                this.midiButton.style.background = "#00FF00";
+                // logo.textMsg(_("MIDI device present."));
+                this.midiON = true;
+            } else {
+                logo.textMsg(_("No MIDI device found."));
+	    }
         }
 
         let  onMIDIFailure= () => {
-            logo.errorMsg( "Failed to get MIDI access in browser");
-            this.midiON =false ;
+            logo.errorMsg(_("Failed to get MIDI access in browser."));
+            this.midiON = false;
         }
 
         navigator.requestMIDIAccess()
-            .then(onMIDISuccess,onMIDIFailure);
-
+            .then(onMIDISuccess, onMIDIFailure);
     }
 }
