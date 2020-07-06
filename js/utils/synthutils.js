@@ -264,7 +264,7 @@ const SAMPLECENTERNO = {
     piano: ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     violin: ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
     cello: ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    bass: ["C2", 15], // pitchToNumber('C', 2, 'C Major')],
+    bass: ["C3", 27], // pitchToNumber('C', 2, 'C Major')],
     guitar: ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "acoustic guitar": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     flute: ["F#5", 57], // pitchToNumber('F#', 57, 'C Major')],
