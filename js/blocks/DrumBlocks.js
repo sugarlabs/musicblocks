@@ -133,19 +133,12 @@ function setupDrumBlocks() {
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
                     [
-                        1,
-                        [
+                        1, [
                             isDrum ? "drumname" : "effectsname",
                             {
-                                value:
-                                    drumName || isDrum
-                                        ? displayName || name
-                                        : name
+                                value: drumName || isDrum ? displayName || name : name
                             }
-                        ],
-                        0,
-                        0,
-                        [0]
+                        ], 0, 0, [0]
                     ]
                 ]);
             }
@@ -171,12 +164,7 @@ function setupDrumBlocks() {
         new PlayDrumMacroBlock("hihat", "hi hat", true).setup();
         new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup();
         new PlayDrumMacroBlock("cup", "cup drum", true).setup();
-        new PlayDrumMacroBlock(
-            "floortom",
-            "floor tom",
-            true,
-            "floor tom tom"
-        ).setup();
+        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup();
         new PlayDrumMacroBlock("tom", "tom tom", true).setup();
         new PlayDrumMacroBlock("kick", "kick drum", true).setup();
         new PlayDrumMacroBlock("snare", "snare drum", true).setup();

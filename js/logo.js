@@ -1447,10 +1447,6 @@ class Logo {
                 return getIntervalNumber(logo.blocks.blockList[blk].value);
             } else return 0;
         } else if (logo.blocks.blockList[blk].isValueBlock()) {
-            if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
-                eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
-            }
-
             return logo.blocks.blockList[blk].value;
         } else if (
             ["anyout", "numberout", "textout", "booleanout"].indexOf(
@@ -1509,11 +1505,7 @@ class Logo {
                     break;
 
                 default:
-                    if (logo.blocks.blockList[blk].name in logo.evalArgDict) {
-                        eval(logo.evalArgDict[logo.blocks.blockList[blk].name]);
-                    } else {
-                        console.error("I do not know how to " + logo.blocks.blockList[blk].name);
-                    }
+                    console.error("I do not know how to " + logo.blocks.blockList[blk].name);
                     break;
             }
 
@@ -2332,170 +2324,37 @@ class Logo {
             }
         }
 
-        switch (logo.blocks.blockList[blk].name) {
-            /** @deprecated */
-            case "beginhollowline":
-                logo.turtles.turtleList[turtle].painter.doStartHollowLine();
-                break;
+        if (typeof logo.blocks.blockList[blk].protoblock.flow === "function") {
+            let res = logo.blocks.blockList[blk].protoblock.flow(
+                args, logo, turtle, blk, receivedArg, actionArgs, isflow
+            );
 
-            /** @deprecated */
-            case "endhollowline":
-                logo.turtles.turtleList[turtle].painter.doEndHollowLine();
-                break;
+            if (res) {
+                let [cf, cfc, ret] = res;
+                if (cf !== undefined) childFlow = cf;
+                if (cfc !== undefined) childFlowCount = cfc;
+                if (ret) return ret;
+            }
+        } else {
+            // Could be an arg block, so we need to print its value
+            if (
+                logo.blocks.blockList[blk].isArgBlock() ||
+                ["anyout", "numberout", "textout", "booleanout"].indexOf(
+                    logo.blocks.blockList[blk].protoblock.dockTypes[0]
+                ) !== -1
+            ) {
+                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
 
-            /** @deprecated */
-            case "wholeNote":
-                NoteController._processNote(logo, 1, blk, turtle);
-                break;
-
-            case "halfNote":
-                NoteController._processNote(logo, 2, blk, turtle);
-                break;
-
-            case "quarterNote":
-                NoteController._processNote(logo, 4, blk, turtle);
-                break;
-
-            case "eighthNote":
-                NoteController._processNote(logo, 8, blk, turtle);
-                break;
-
-            case "sixteenthNote":
-                NoteController._processNote(logo, 16, blk, turtle);
-                break;
-
-            case "thirtysecondNote":
-                NoteController._processNote(logo, 32, blk, turtle);
-                break;
-
-            case "sixtyfourthNote":
-                NoteController._processNote(logo, 64, blk, turtle);
-                break;
-
-            /** @deprecated */
-            case "darbuka":
-            case "clang":
-            case "bottle":
-            case "duck":
-            case "snare":
-            case "hihat":
-            case "tom":
-            case "kick":
-            case "pluck":
-            case "triangle1":
-            case "slap":
-            case "frogs":
-            case "fingercymbals":
-            case "cup":
-            case "cowbell":
-            case "splash":
-            case "ridebell":
-            case "floortom":
-            case "crash":
-            case "chine":
-            case "dog":
-            case "cat":
-            case "clap":
-            case "bubbles":
-            case "cricket":
-                logo.drumStyle[turtle].push(logo.blocks.blockList[blk].name);
-                childFlow = args[0];
-                childFlowCount = 1;
-
-                let listenerName = "_drum_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = event => logo.drumStyle[turtle].pop();
-                logo.setTurtleListener(turtle, listenerName, __listener);
-
-                break;
-
-            /** @deprecated - P5 tone generator replaced by macro */
-            case "tone2":
-                if (_THIS_IS_TURTLE_BLOCKS_) {
-                    if (typeof logo.turtleOscs[turtle] === "undefined") {
-                        logo.turtleOscs[turtle] = new p5.TriOsc();
-                    }
-
-                    osc = logo.turtleOscs[turtle];
-                    osc.stop();
-                    osc.start();
-                    osc.amp(0);
-
-                    osc.freq(args[0]);
-                    osc.fade(0.5, 0.2);
-
-                    setTimeout(
-                        osc => osc.fade(0, 0.2),
-                        args[1],
-                        osc
-                    );
-                }
-
-                break;
-
-            /** @deprecated */
-            case "playfwd":
-                logo.pitchTimeMatrix.playDirection = 1;
-                logo.runFromBlock(logo, turtle, args[0]);
-                break;
-
-            /** @deprecated */
-            case "playbwd":
-                logo.pitchTimeMatrix.playDirection = -1;
-                logo.runFromBlock(logo, turtle, args[0]);
-                break;
-
-            default:
-                if (typeof logo.blocks.blockList[blk].protoblock.flow === "function") {
-                    let res = logo.blocks.blockList[blk].protoblock.flow(
-                        args, logo, turtle, blk, receivedArg, actionArgs, isflow
-                    );
-
-                    if (res) {
-                        let [cf, cfc, ret] = res;
-                        if (cf !== undefined) childFlow = cf;
-                        if (cfc !== undefined) childFlowCount = cfc;
-                        if (ret) return ret;
-                    }
-                } else if (
-                    logo.blocks.blockList[blk].name in logo.evalFlowDict
-                ) {
-                    eval(logo.evalFlowDict[logo.blocks.blockList[blk].name]);
+                if (logo.blocks.blockList[blk].value == null) {
+                    logo.textMsg("null block value");
                 } else {
-                    // Could be an arg block, so we need to print its value
-                    if (
-                        logo.blocks.blockList[blk].isArgBlock() ||
-                        [
-                            "anyout",
-                            "numberout",
-                            "textout",
-                            "booleanout"
-                        ].indexOf(
-                            logo.blocks.blockList[blk].protoblock.dockTypes[0]
-                        ) !== -1
-                    ) {
-                        args.push(
-                            logo.parseArg(logo, turtle, blk, logo.receievedArg)
-                        );
-
-                        if (logo.blocks.blockList[blk].value == null) {
-                            logo.textMsg("null block value");
-                        } else {
-                            logo.textMsg(
-                                logo.blocks.blockList[blk].value.toString()
-                            );
-                        }
-                    } else {
-                        logo.errorMsg(
-                            "I do not know how to " + logo.blocks.blockList[blk].name + ".",
-                            blk
-                        );
-                    }
-
-                    logo.stopTurtle = true;
+                    logo.textMsg(logo.blocks.blockList[blk].value.toString());
                 }
-                break;
+            } else {
+                logo.errorMsg("I do not know how to " + logo.blocks.blockList[blk].name + ".", blk);
+            }
+
+            logo.stopTurtle = true;
         }
 
         /*
