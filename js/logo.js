@@ -787,7 +787,7 @@ class Logo {
             }
 
             this.mic = mic;
-            this.limit = 1024;
+            this.limit = 16384;
         } else {
             try {
                 this.mic = new p5.AudioIn();
