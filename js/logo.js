@@ -1873,9 +1873,7 @@ class Logo {
                     this.unhighlightStepQueue[turtle] != null
                 ) {
                     if (this.blocks.visible) {
-                        this.blocks.unhighlight(
-                            this.unhighlightStepQueue[turtle]
-                        );
+                        this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
                     }
                     this.unhighlightStepQueue[turtle] = null;
                 }
@@ -1953,11 +1951,7 @@ class Logo {
         this.notation.notationDrumStaging = {};
 
         // Each turtle needs to keep its own wait time and music states
-        for (
-            let turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        for (let turtle in this.turtles.turtleList) {
             this.initTurtle(turtle);
         }
 
@@ -1979,11 +1973,7 @@ class Logo {
         this._meterBlock = null;
 
         // Remove any listeners that might be still active
-        for (
-            let turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        for (let turtle in this.turtles.turtleList) {
             for (let listener in this.turtles.turtleList[turtle].listeners) {
                 this.stage.removeEventListener(
                     listener,
@@ -1996,19 +1986,11 @@ class Logo {
         }
 
         // Init the graphic state
-        for (
-            let turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
-            this.turtles.turtleList[
-                turtle
-            ].container.x = this.turtles.turtleX2screenX(
+        for (let turtle in this.turtles.turtleList) {
+            this.turtles.turtleList[turtle].container.x = this.turtles.turtleX2screenX(
                 this.turtles.turtleList[turtle].x
             );
-            this.turtles.turtleList[
-                turtle
-            ].container.y = this.turtles.turtleY2screenY(
+            this.turtles.turtleList[turtle].container.y = this.turtles.turtleY2screenY(
                 this.turtles.turtleList[turtle].y
             );
         }
@@ -2044,21 +2026,14 @@ class Logo {
                 if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                     startBlocks.push(this.blocks.stackList[blk]);
                 }
-            } else if (
-                this.blocks.blockList[this.blocks.stackList[blk]].name ===
-                "action"
-            ) {
+            } else if (this.blocks.blockList[this.blocks.stackList[blk]].name === "action") {
                 // Does the action stack have a name?
-                let c = this.blocks.blockList[this.blocks.stackList[blk]]
-                    .connections[1];
+                let c = this.blocks.blockList[this.blocks.stackList[blk]].connections[1];
                 // Is there a block in the action clamp?
-                let b = this.blocks.blockList[this.blocks.stackList[blk]]
-                    .connections[2];
+                let b = this.blocks.blockList[this.blocks.stackList[blk]].connections[2];
                 if (c != null && b != null) {
                     // Don't use an action block in the trash
-                    if (
-                        !this.blocks.blockList[this.blocks.stackList[blk]].trash
-                    ) {
+                    if (!this.blocks.blockList[this.blocks.stackList[blk]].trash) {
                         // We need to calculate the value of block c.
                         // this.actions[this.blocks.blockList[c].value] = b;
                         let name = this.parseArg(this, 0, c, null);
@@ -2071,11 +2046,7 @@ class Logo {
         this.svgOutput = "";
         this.svgBackground = true;
 
-        for (
-            let turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        for (let turtle in this.turtles.turtleList) {
             if (turtle in this.parentFlowQueue) {
                 this.parentFlowQueue[turtle] = [];
             }
@@ -2103,11 +2074,7 @@ class Logo {
         }
 
         // Mark all turtles as not running
-        for (
-            let turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
+        for (let turtle in this.turtles.turtleList) {
             if (this.turtles.turtleList[turtle].running) {
                 console.debug("already running...");
             }
@@ -2131,11 +2098,7 @@ class Logo {
                 ++turtle;
             }
 
-            if (
-                ["start", "drum"].indexOf(
-                    this.blocks.blockList[startHere].name
-                ) !== -1
-            ) {
+            if (["start", "drum"].indexOf(this.blocks.blockList[startHere].name) !== -1) {
                 turtle = this.blocks.blockList[startHere].value;
             }
 
@@ -2183,11 +2146,8 @@ class Logo {
 
                 // If there are start blocks, run them all
                 for (let b = 0; b < startBlocks.length; b++) {
-                    if (
-                        this.blocks.blockList[startBlocks[b]].name !== "status"
-                    ) {
-                        let turtle =
-                            this.blocks.blockList[startBlocks[b]].value;
+                    if (this.blocks.blockList[startBlocks[b]].name !== "status") {
+                        let turtle = this.blocks.blockList[startBlocks[b]].value;
                         this.turtles.turtleList[turtle].queue = [];
                         this.parentFlowQueue[turtle] = [];
                         this.unhighlightQueue[turtle] = [];
@@ -2199,29 +2159,15 @@ class Logo {
                             }
 
                             this.turtles.turtleList[turtle].running = true;
-                            this.runFromBlock(
-                                this,
-                                turtle,
-                                startBlocks[b],
-                                0,
-                                env
-                            );
+                            this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                         }
                     }
                 }
             }, delayStart);
         } else {
-            console.debug(
-                "Empty start block: " +
-                turtle +
-                " " +
-                this.suppressOutput[turtle]
-            );
+            console.debug("Empty start block: " + turtle + " " + this.suppressOutput[turtle]);
 
-            if (
-                this.suppressOutput[turtle] ||
-                this.suppressOutput[turtle] == undefined
-            ) {
+            if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
                 this.checkingCompletionState = false;
@@ -2264,13 +2210,7 @@ class Logo {
                 logo.delayParameters[turtle] =
                     { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
                 logo.delayTimeout[turtle] = setTimeout(() => {
-                    logo.runFromBlockNow(
-                        logo,
-                        turtle,
-                        blk,
-                        isflow,
-                        receivedArg
-                    );
+                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                 }, delay);
             }
         }
@@ -2302,14 +2242,8 @@ class Logo {
         */
         let args = [];
         if (logo.blocks.blockList[blk].protoblock.args > 0) {
-            for (
-                let i = 1;
-                i < logo.blocks.blockList[blk].protoblock.args + 1;
-                i++
-            ) {
-                if (
-                    logo.blocks.blockList[blk].protoblock.dockTypes[i] === "in"
-                ) {
+            for (let i = 1; i <= logo.blocks.blockList[blk].protoblock.args; i++) {
+                if (logo.blocks.blockList[blk].protoblock.dockTypes[i] === "in") {
                     if (logo.blocks.blockList[blk].connections[i] == null) {
                         console.debug("skipping inflow args");
                     } else {
@@ -2343,15 +2277,11 @@ class Logo {
             if (logo.backward[turtle].length > 0) {
                 // We only run backwards in the "first generation" children
                 let c =
-                    (
-                        logo.blocks.blockList[last(logo.backward[turtle])].name
-                        === "backward"
-                    ) ? 1 : 2;
+                    logo.blocks.blockList[last(logo.backward[turtle])].name === "backward" ? 1 : 2;
 
                 if (
                     !logo.blocks.sameGeneration(
-                        logo.blocks.blockList[last(logo.backward[turtle])]
-                            .connections[c],
+                        logo.blocks.blockList[last(logo.backward[turtle])].connections[c],
                         blk
                     )
                 ) {
@@ -2366,18 +2296,13 @@ class Logo {
                     } else {
                         if (
                             !logo.blocks.sameGeneration(
-                                logo.blocks.blockList[
-                                    last(logo.backward[turtle])
-                                ].connections[c],
+                                logo.blocks.blockList[last(logo.backward[turtle])].connections[c],
                                 nextFlow
                             )
                         ) {
-                            nextFlow = last(
-                                logo.blocks.blockList[blk].connections
-                            );
+                            nextFlow = last(logo.blocks.blockList[blk].connections);
                         } else {
-                            nextFlow =
-                                logo.blocks.blockList[blk].connections[0];
+                            nextFlow = logo.blocks.blockList[blk].connections[0];
                         }
                     }
                 }
@@ -2402,10 +2327,7 @@ class Logo {
         let actionArgs = [];
 
         if (logo.blocks.visible) {
-            if (
-                !logo.suppressOutput[turtle] &&
-                logo.justCounting[turtle].length === 0
-            ) {
+            if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
                 logo.blocks.highlight(blk, false);
             }
         }
@@ -2525,18 +2447,9 @@ class Logo {
                 break;
 
             default:
-                if (
-                    typeof logo.blocks.blockList[blk].protoblock.flow ===
-                    "function"
-                ) {
+                if (typeof logo.blocks.blockList[blk].protoblock.flow === "function") {
                     let res = logo.blocks.blockList[blk].protoblock.flow(
-                        args,
-                        logo,
-                        turtle,
-                        blk,
-                        receivedArg,
-                        actionArgs,
-                        isflow
+                        args, logo, turtle, blk, receivedArg, actionArgs, isflow
                     );
 
                     if (res) {
@@ -2575,9 +2488,7 @@ class Logo {
                         }
                     } else {
                         logo.errorMsg(
-                            "I do not know how to " +
-                            logo.blocks.blockList[blk].name +
-                            ".",
+                            "I do not know how to " + logo.blocks.blockList[blk].name + ".",
                             blk
                         );
                     }
@@ -2607,11 +2518,7 @@ class Logo {
             console.debug("Ignoring block on overlapped start.");
         }
 
-        if (
-            logo.statusMatrix &&
-            logo.statusMatrix.isOpen &&
-            !logo.inStatusMatrix
-        ) {
+        if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
             logo.statusMatrix.updateAll();
         }
 
@@ -2622,19 +2529,9 @@ class Logo {
                 logo.blocks.blockList[blk].name === "doArg" ||
                 logo.blocks.blockList[blk].name === "nameddoArg"
             ) {
-                queueBlock = new Queue(
-                    childFlow,
-                    childFlowCount,
-                    blk,
-                    actionArgs
-                );
+                queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
-                queueBlock = new Queue(
-                    childFlow,
-                    childFlowCount,
-                    blk,
-                    receivedArg
-                );
+                queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
             }
 
             // We need to keep track of the parent block to the child
@@ -2689,15 +2586,16 @@ class Logo {
             }
 
             if (
-                (logo.backward[turtle].length > 0 &&
-                    logo.blocks.blockList[blk].connections[0] == null) ||
-                (logo.backward[turtle].length === 0 &&
-                    last(logo.blocks.blockList[blk].connections) == null)
+                (
+                    logo.backward[turtle].length > 0 &&
+                    logo.blocks.blockList[blk].connections[0] == null
+                ) ||
+                (
+                    logo.backward[turtle].length === 0 &&
+                    last(logo.blocks.blockList[blk].connections) == null
+                )
             ) {
-                if (
-                    !logo.suppressOutput[turtle] &&
-                    logo.justCounting[turtle].length === 0
-                ) {
+                if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
                     // If we are at the end of the child flow, queue the
                     // unhighlighting of the parent block to the flow
                     if (logo.unhighlightQueue[turtle] === undefined) {
@@ -2707,29 +2605,22 @@ class Logo {
                     } else if (
                         logo.parentFlowQueue[turtle].length > 0 &&
                         logo.turtles.turtleList[turtle].queue.length > 0 &&
-                        last(logo.turtles.turtleList[turtle].queue)
-                            .parentBlk !== last(logo.parentFlowQueue[turtle])
-                    ) {
-                        logo.unhighlightQueue[turtle].push(
+                        last(logo.turtles.turtleList[turtle].queue).parentBlk !==
                             last(logo.parentFlowQueue[turtle])
-                        );
-                        // logo.unhighlightQueue[turtle].push(logo.parentFlowQueue[turtle].pop());
+                    ) {
+                        logo.unhighlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
                     } else if (logo.unhighlightQueue[turtle].length > 0) {
                         // The child flow is finally complete, so unhighlight
                         setTimeout(() => {
                             if (!turtle in logo.unhighlightQueue) {
                                 console.debug(
-                                    "turtle " +
-                                    turtle +
-                                    " not found in unhighlightQueue"
+                                    "turtle " + turtle + " not found in unhighlightQueue"
                                 );
                                 return;
                             }
 
                             if (logo.blocks.visible) {
-                                logo.blocks.unhighlight(
-                                    logo.unhighlightQueue[turtle].pop()
-                                );
+                                logo.blocks.unhighlight(logo.unhighlightQueue[turtle].pop());
                             } else {
                                 logo.unhighlightQueue[turtle].pop();
                             }
@@ -2750,14 +2641,7 @@ class Logo {
             }
 
             if (isflow) {
-                logo.runFromBlockNow(
-                    logo,
-                    turtle,
-                    nextBlock,
-                    isflow,
-                    passArg,
-                    queueStart
-                );
+                logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
@@ -2767,19 +2651,13 @@ class Logo {
             if (!logo.prematureRestart) {
                 // console.debug('Make sure any unissued signals are dispatched.');
                 for (let b in logo.endOfClampSignals[turtle]) {
-                    for (
-                        let i = 0;
-                        i < logo.endOfClampSignals[turtle][b].length;
-                        i++
-                    ) {
+                    for (let i = 0; i < logo.endOfClampSignals[turtle][b].length; i++) {
                         if (logo.endOfClampSignals[turtle][b][i] != null) {
                             if (
                                 logo.butNotThese[turtle][b] == null ||
                                 logo.butNotThese[turtle][b].indexOf(i) === -1
                             ) {
-                                logo.stage.dispatchEvent(
-                                    logo.endOfClampSignals[turtle][b][i]
-                                );
+                                logo.stage.dispatchEvent(logo.endOfClampSignals[turtle][b][i]);
                             }
                         }
                     }
@@ -2837,21 +2715,16 @@ class Logo {
                                 logo._saveX[t],
                                 logo._saveY[t]
                             );
-                            logo.turtles.turtleList[t].painter.color =
-                                logo._saveColor[t];
-                            logo.turtles.turtleList[t].painter.value =
-                                logo._saveValue[t];
-                            logo.turtles.turtleList[t].painter.chroma =
-                                logo._saveChroma[t];
-                            logo.turtles.turtleList[t].painter.stroke =
-                                logo._saveStroke[t];
+                            logo.turtles.turtleList[t].painter.color = logo._saveColor[t];
+                            logo.turtles.turtleList[t].painter.value = logo._saveValue[t];
+                            logo.turtles.turtleList[t].painter.chroma = logo._saveChroma[t];
+                            logo.turtles.turtleList[t].painter.stroke = logo._saveStroke[t];
                             logo.turtles.turtleList[t].painter.canvasAlpha =
                                 logo._saveCanvasAlpha[t];
                             logo.turtles.turtleList[t].painter.doSetHeading(
                                 logo._saveOrientation[t]
                             );
-                            logo.turtles.turtleList[t].painter.penState =
-                                logo._savePenState[t];
+                            logo.turtles.turtleList[t].painter.penState = logo._savePenState[t];
                         }
                     }
 
@@ -2896,15 +2769,11 @@ class Logo {
                 }
             }
 
-            if (
-                !logo.suppressOutput[turtle] &&
-                logo.justCounting[turtle].length === 0
-            ) {
+            if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
                 // Nothing else to do. Clean up.
                 if (
                     logo.turtles.turtleList[turtle].queue.length === 0 ||
-                    blk !==
-                    last(logo.turtles.turtleList[turtle].queue).parentBlk
+                    blk !== last(logo.turtles.turtleList[turtle].queue).parentBlk
                 ) {
                     setTimeout(() => {
                         if (logo.blocks.visible) {
@@ -2916,18 +2785,13 @@ class Logo {
                 // Unhighlight any parent blocks still highlighted
                 for (let b in logo.parentFlowQueue[turtle]) {
                     if (logo.blocks.visible) {
-                        logo.blocks.unhighlight(
-                            logo.parentFlowQueue[turtle][b]
-                        );
+                        logo.blocks.unhighlight(logo.parentFlowQueue[turtle][b]);
                     }
                 }
 
                 // Make sure the turtles are on top
                 let i = logo.stage.children.length - 1;
-                logo.stage.setChildIndex(
-                    logo.turtles.turtleList[turtle].container,
-                    i
-                );
+                logo.stage.setChildIndex(logo.turtles.turtleList[turtle].container, i);
                 logo.refreshCanvas();
             }
 
@@ -2970,9 +2834,7 @@ class Logo {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration
         if (!turtle in this.embeddedGraphics) {
-            console.debug(
-                "Could not find turtle " + turtle + "in embeddedGraphics."
-            );
+            console.debug("Could not find turtle " + turtle + "in embeddedGraphics.");
             return;
         }
 
