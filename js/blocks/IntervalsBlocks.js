@@ -430,20 +430,24 @@ function setupIntervalsBlocks() {
                 ]);
             }
         }
-        for (let i = 2; i <= 8; i++)
-            new SemitoneIntervalMacroBlock("diminished", i).setup();
-        for (let i = 1; i <= 8; i++)
-            new SemitoneIntervalMacroBlock("augmented", i).setup();
-        for (let i in [8, 5, 4])
-            new SemitoneIntervalMacroBlock("perfect", i).setup();
-        new SemitoneIntervalMacroBlock("minor", 6, true).setup();
-        new SemitoneIntervalMacroBlock("minor", 3, true).setup();
-        for (let i in [7, 6, 3, 2])
-            new SemitoneIntervalMacroBlock("minor", i).setup();
-        new SemitoneIntervalMacroBlock("major", 6, true).setup();
-        new SemitoneIntervalMacroBlock("major", 3, true).setup();
-        for (let i in [7, 6, 3, 2])
-            new SemitoneIntervalMacroBlock("major", i).setup();
+        // DEPRECATED: no verbose macros required, only major 3rd for reference
+
+        // for (let i = 2; i <= 8; i++)
+        //     new SemitoneIntervalMacroBlock("diminished", i).setup();
+        // for (let i = 1; i <= 8; i++)
+        //     new SemitoneIntervalMacroBlock("augmented", i).setup();
+        // for (let i in [8, 5, 4])
+        //     new SemitoneIntervalMacroBlock("perfect", i).setup();
+        // new SemitoneIntervalMacroBlock("minor", 6, true).setup();
+        // new SemitoneIntervalMacroBlock("minor", 3, true).setup();
+        // for (let i in [7, 6, 3, 2])
+        //     new SemitoneIntervalMacroBlock("minor", i).setup();
+        // new SemitoneIntervalMacroBlock("major", 6, true).setup();
+
+        new SemitoneIntervalMacroBlock("major", 3, false).setup();
+        
+        // for (let i in [7, 6, 3, 2])
+        //     new SemitoneIntervalMacroBlock("major", i).setup();
     }
 
     class PerfectBlock extends FlowClampBlock {
@@ -526,94 +530,96 @@ function setupIntervalsBlocks() {
             return [args[1], 1];
         }
     }
+    
+    // DEPRECATED: verbose macros, no longer needed
 
-    function makeIntervalMacroBlocks() {
-        class ChordIntervalMacroBlock extends FlowBlock {
-            constructor(name, display, value1, value2) {
-                super(name, _(display));
-                this.setPalette("intervals");
-                this.beginnerBlock(true);
-                this.setHelpString();
-                this.makeMacro((x, y) => [
-                    [0, "interval", x, y, [null, 1, 3, 2]],
-                    [1, ["number", { value: value1 }], 0, 0, [0]],
-                    [2, "hidden", 0, 0, [0, null]],
-                    [3, "interval", 0, 0, [0, 4, 6, 5]],
-                    [4, ["number", { value: value2 }], 0, 0, [3]],
-                    [5, "hidden", 0, 0, [3, null]],
-                    [
-                        6,
-                        ["newnote", { collapsed: false }],
-                        0,
-                        0,
-                        [3, 7, 10, 14]
-                    ],
-                    [7, "divide", 0, 0, [6, 8, 9]],
-                    [8, ["number", { value: 1 }], 0, 0, [7]],
-                    [9, ["number", { value: 1 }], 0, 0, [7]],
-                    [10, "vspace", 0, 0, [6, 11]],
-                    [11, "pitch", 0, 0, [10, 12, 13, null]],
-                    [12, ["solfege", { value: "do" }], 0, 0, [11]],
-                    [13, ["number", { value: 4 }], 0, 0, [11]],
-                    [14, "hidden", 0, 0, [6, null]]
-                ]);
-            }
-        }
-        class IntervalMacroBlock extends FlowBlock {
-            constructor(name, value, down) {
-                super(
-                    (down ? "down" : "") + name + "interval",
-                    _((down ? "down " : "") + name)
-                );
-                this.setPalette("intervals");
-                this.beginnerBlock(value === 2 || value === 5);
-                this.setHelpString();
-                this.makeMacro((x, y) => [
-                    [0, "interval", x, y, [null, 1, 6, 8]],
-                    [1, down ? "minus" : "plus", 0, 0, [0, 2, 3]],
-                    [2, ["number", { value: value }], 0, 0, [1]],
-                    [3, "multiply", 0, 0, [1, 4, 5]],
-                    [4, ["number", { value: 0 }], 0, 0, [3]],
-                    [5, "modelength", 0, 0, [3]],
-                    [6, "vspace", 0, 0, [0, 7]],
-                    [7, "vspace", 0, 0, [6, null]],
-                    [8, "hidden", 0, 0, [0, null]]
-                ]);
-            }
-        }
-        let lang = localStorage.languagePreference || navigator.language;
+    // function makeIntervalMacroBlocks() {
+    //     class ChordIntervalMacroBlock extends FlowBlock {
+    //         constructor(name, display, value1, value2) {
+    //             super(name, _(display));
+    //             this.setPalette("intervals");
+    //             this.beginnerBlock(true);
+    //             this.setHelpString();
+    //             this.makeMacro((x, y) => [
+    //                 [0, "interval", x, y, [null, 1, 3, 2]],
+    //                 [1, ["number", { value: value1 }], 0, 0, [0]],
+    //                 [2, "hidden", 0, 0, [0, null]],
+    //                 [3, "interval", 0, 0, [0, 4, 6, 5]],
+    //                 [4, ["number", { value: value2 }], 0, 0, [3]],
+    //                 [5, "hidden", 0, 0, [3, null]],
+    //                 [
+    //                     6,
+    //                     ["newnote", { collapsed: false }],
+    //                     0,
+    //                     0,
+    //                     [3, 7, 10, 14]
+    //                 ],
+    //                 [7, "divide", 0, 0, [6, 8, 9]],
+    //                 [8, ["number", { value: 1 }], 0, 0, [7]],
+    //                 [9, ["number", { value: 1 }], 0, 0, [7]],
+    //                 [10, "vspace", 0, 0, [6, 11]],
+    //                 [11, "pitch", 0, 0, [10, 12, 13, null]],
+    //                 [12, ["solfege", { value: "do" }], 0, 0, [11]],
+    //                 [13, ["number", { value: 4 }], 0, 0, [11]],
+    //                 [14, "hidden", 0, 0, [6, null]]
+    //             ]);
+    //         }
+    //     }
+    //     class IntervalMacroBlock extends FlowBlock {
+    //         constructor(name, value, down) {
+    //             super(
+    //                 (down ? "down" : "") + name + "interval",
+    //                 _((down ? "down " : "") + name)
+    //             );
+    //             this.setPalette("intervals");
+    //             this.beginnerBlock(value === 2 || value === 5);
+    //             this.setHelpString();
+    //             this.makeMacro((x, y) => [
+    //                 [0, "interval", x, y, [null, 1, 6, 8]],
+    //                 [1, down ? "minus" : "plus", 0, 0, [0, 2, 3]],
+    //                 [2, ["number", { value: value }], 0, 0, [1]],
+    //                 [3, "multiply", 0, 0, [1, 4, 5]],
+    //                 [4, ["number", { value: 0 }], 0, 0, [3]],
+    //                 [5, "modelength", 0, 0, [3]],
+    //                 [6, "vspace", 0, 0, [0, 7]],
+    //                 [7, "vspace", 0, 0, [6, null]],
+    //                 [8, "hidden", 0, 0, [0, null]]
+    //             ]);
+    //         }
+    //     }
+    //     let lang = localStorage.languagePreference || navigator.language;
 
-        new ChordIntervalMacroBlock(
-            "chordV",
-            lang === "ja" ? _("chord5") : _("chord") + " V",
-            3,
-            2
-        ).setup();
-        new ChordIntervalMacroBlock(
-            "chordIV",
-            lang === "ja" ? _("chord4") : _("chord") + " IV",
-            5,
-            2
-        ).setup();
-        new ChordIntervalMacroBlock(
-            "chordI",
-            lang === "ja" ? _("chord1") : _("chord") + " I",
-            4,
-            2
-        ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordV",
+    //         lang === "ja" ? _("chord5") : _("chord") + " V",
+    //         3,
+    //         2
+    //     ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordIV",
+    //         lang === "ja" ? _("chord4") : _("chord") + " IV",
+    //         5,
+    //         2
+    //     ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordI",
+    //         lang === "ja" ? _("chord1") : _("chord") + " I",
+    //         4,
+    //         2
+    //     ).setup();
 
-        //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
-        //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
-        new IntervalMacroBlock("sixth", -5, true).setup();
-        new IntervalMacroBlock("third", -2, true).setup();
-        new IntervalMacroBlock("seventh", 6, true).setup();
-        new IntervalMacroBlock("sixth", 5, true).setup();
-        new IntervalMacroBlock("fifth", 4, true).setup();
-        new IntervalMacroBlock("fourth", 3, true).setup();
-        new IntervalMacroBlock("third", 2, true).setup();
-        new IntervalMacroBlock("second", 1, true).setup();
-        new IntervalMacroBlock("unison", 0, true).setup();
-    }
+    //     //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
+    //     //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
+    //     new IntervalMacroBlock("sixth", -5, true).setup();
+    //     new IntervalMacroBlock("third", -2, true).setup();
+    //     new IntervalMacroBlock("seventh", 6, true).setup();
+    //     new IntervalMacroBlock("sixth", 5, true).setup();
+    //     new IntervalMacroBlock("fifth", 4, true).setup();
+    //     new IntervalMacroBlock("fourth", 3, true).setup();
+    //     new IntervalMacroBlock("third", 2, true).setup();
+    //     new IntervalMacroBlock("second", 1, true).setup();
+    //     new IntervalMacroBlock("unison", 0, true).setup();
+    // }
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -1019,7 +1025,7 @@ function setupIntervalsBlocks() {
     makeSemitoneIntervalMacroBlocks();
     new PerfectBlock().setup();
     new SemitoneIntervalBlock().setup();
-    makeIntervalMacroBlocks();
+    // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup();
     new DefineModeBlock().setup();
     new MoveableBlock().setup();
