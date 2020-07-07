@@ -2542,7 +2542,7 @@ function Activity() {
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
 
-        palettes.setScale(turtleBlocksScale);
+        //palettes.setScale(turtleBlocksScale);
 
         trashcan.resizeEvent(turtleBlocksScale);
 

@@ -1435,3 +1435,6 @@ input.timbreName {
     height: 28px;
     filter: invert(100%);
   }
+  ::-webkit-scrollbar {
+    display: none;
+  }
