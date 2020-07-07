@@ -1365,6 +1365,21 @@ input.timbreName {
     height: 100%;
 }
 
+#chooseKeyDiv {
+    height: 350px;
+    width: 350px;
+    left: 550px;
+    margin: auto;
+    z-index: 100;
+    position: fixed;
+    transition: ease 1s;
+}
+
+#chooseKeyDiv > svg {
+    width: 100%;
+    height: 100%;
+}
+
 @media (max-width: 880px) {
     .wheelNav {
         height: 330px;

@@ -1050,8 +1050,22 @@ function Activity() {
     };
 
     chooseKeyMenu = () => {
-        var wheel = new wheelnav("chooseKeyMenu");
-        wheel.createWheel(["Thank you", "for", "download"]);
+        var wheel1 = new wheelnav("chooseKeyDiv", null, 800, 800);
+        var wheel2 = new wheelnav("wheel2", wheel1.raphael);
+        let labels = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+        
+        wheel1.slicePathFunction = slicePath().DonutSlice;
+        wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
+        wheel1.slicePathCustom.minRadiusPercent = 0.5;
+        wheel1.slicePathCustom.maxRadiusPercent = 0.8;
+        wheel1.sliceSelectedPathCustom = wheel1.slicePathCustom;
+        wheel1.sliceInitPathCustom = wheel1.slicePathCustom;
+        wheel1.titleRotateAngle = 0;
+        wheel1.clickModeRotate = false;
+        wheel1.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
+        wheel1.animatetime = 0;            
+        
+        wheel1.createWheel(labels);
     }
 
     // DEPRECATED
