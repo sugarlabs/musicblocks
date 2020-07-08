@@ -47,29 +47,31 @@ class MathUtility {
             return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
         };
 
-        let GetRandomSolfege = (n1, n2, octave) => {
-            // [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
-            let lowerOctave = n1 > n2 ? -1 : 0;
-
-            let res;
-            if (n1 > n2) {
-                let choice = Math.random();
-                if (choice >= 0.5) {
-                    res = Math.floor(Math.random() * (Number(6) - Number(n1) + 1) + Number(n1));
-                    console.log(res);
-                } else {
-                    res = Math.floor(Math.random() * (Number(n2) + 1));
-                    console.log(n2, res);   
-                }
-            } else {
-                res = Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
+        let GetRandomSolfege = (a1, a2, octave) => {
+            if (octave === undefined) {
+                octave = 4;
             }
             
-            if (n1 <= res && res <= 6) {
-                octave += lowerOctave;
+            let broadScale = [];
+            for(let i = octave; i <= octave+1; i++) {
+                for(let j = 0; j < SOLFEGENAMES.length; j++) {
+                    broadScale.push(SOLFEGENAMES[j] + " " + i);
+                } 
             }
 
-            return [SOLFEGENAMES[res], octave];
+            let n1 = SOLFEGENAMES.indexOf(a1);
+            let n2 = SOLFEGENAMES.indexOf(a2);
+            let o1 = octave;
+            let o2 = n1 > n2 ? octave + 1 : octave;
+
+            let n11, n22;
+            for(let i=0; i<broadScale.length; i++) {
+                n11 = broadScale.indexOf(a1 + " " + o1);
+                n22 = broadScale.indexOf(a2 + " " + o2);
+            }
+
+            let note = broadScale[Math.floor(Math.random() * (Number(n22) - Number(n11) + 1) + Number(n11))].split(" ");
+            return note;
         }
 
         if (typeof a === "number" && typeof b === "number") {
@@ -80,9 +82,6 @@ class MathUtility {
             SOLFEGENAMES.indexOf(a) != -1 &&
             SOLFEGENAMES.indexOf(b) != -1
         ) {
-            a = SOLFEGENAMES.indexOf(a);
-            b = SOLFEGENAMES.indexOf(b);
-
             return GetRandomSolfege(a, b, octave);
         } else {
             throw "NanError";
