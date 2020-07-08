@@ -209,7 +209,6 @@ class Logo {
         this.pitchNumberOffset = [];        // 39, C4
         this.currentOctave = {};
         this.currentCalculatedOctave = {};  // for a stand-alone pitch block
-        this.currentNote = {};
         this.inHarmonic = {};
         this.partials = {};
         this.inNeighbor = [];
@@ -258,7 +257,6 @@ class Logo {
         this.tieFirstDrums = {};
         this.masterVolume = [];
         this.synthVolume = {};
-        this.validNote = true;
         this.drift = {};
         this.drumStyle = {};
         this.voices = {};
