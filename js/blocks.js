@@ -2320,6 +2320,11 @@ function Blocks(activity) {
         ) {
             return true;
         }
+        if(
+            type1 === "scaledegreeout" && type2 === "scaledegreein"
+        ) {
+            return true;
+        }
         if (
             type2 === "notein" &&
             ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type1) !== -1

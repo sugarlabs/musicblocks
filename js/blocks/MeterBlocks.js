@@ -496,7 +496,9 @@ function setupMeterBlocks() {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
                     let __listener = function(event) {
+                        console.log(logo.turtles.turtleList);
                         if (logo.turtles.turtleList[turtle].running) {
+                            console.log("here");
                             let queueBlock = new Queue(
                                 logo.actions[args[1]],
                                 1,
@@ -532,6 +534,7 @@ function setupMeterBlocks() {
 
                     let turtleID = logo.turtles.turtleList[turtle].id;
                     let eventName = "__beat_" + args[0] + "_" + turtleID + "__";
+                    console.log("listener");
                     logo._setListener(turtle, eventName, __listener);
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
@@ -544,7 +547,7 @@ function setupMeterBlocks() {
                         }
                         logo.defaultStrongBeats[turtle] = false;
                     }
-
+                    console.log(typeof args[0]);
                     if (args[0] > logo.beatsPerMeasure[turtle]) {
                         logo.factorList[turtle].push(args[0]);
                     } else {

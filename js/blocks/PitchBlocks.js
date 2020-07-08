@@ -2840,6 +2840,73 @@ function setupPitchBlocks() {
         }
     }
 
+    class OnScaleDegreeDoBlock extends FlowBlock {
+        constructor() {
+            super("scaledegreedo", _("on scale degree do"));
+            this.setPalette("pitch");
+            
+            this.formBlock({
+                args: 2,
+                argTypes: ["scaledegreein", "textin"],
+                defaults: ["1", _("action")],
+                argLabels: ["scale degree", this.lang === "ja" ? _("do1") : _("do")]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "scaledegreedo", x, y, [null, 1, 2, null]],
+                [1, ["scaledegree2", { value: "1" }], 0, 0, [0]],
+                [2, ["text", { value: "action" }], 0, 0, [0]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args.length === 2) {
+                if (!(args[1] in logo.actions)) {
+                    logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                } else {
+                    let __listener = function(event) {
+                        if (logo.turtles.turtleList[turtle].running) {
+                            let queueBlock = new Queue(
+                                logo.actions[args[1]],
+                                1,
+                                blk
+                            );
+                            logo.parentFlowQueue[turtle].push(blk);
+                            logo.turtles.turtleList[turtle].queue.push(
+                                queueBlock
+                            );
+                        } else {
+                            // Since the turtle has stopped
+                            // running, we need to run the stack
+                            // from here.
+                            if (isflow) {
+                                logo._runFromBlockNow(
+                                    logo,
+                                    turtle,
+                                    logo.actions[args[1]],
+                                    isflow,
+                                    receivedArg
+                                );
+                            } else {
+                                logo._runFromBlock(
+                                    logo,
+                                    turtle,
+                                    logo.actions[args[1]],
+                                    isflow,
+                                    receivedArg
+                                );
+                            }
+                        }
+                    };
+                    let turtleID = logo.turtles.turtleList[turtle].id;
+                    let eventName = "__scaledegree_" + args[0] + "_" + turtleID + "__";
+                    logo._setListener(turtle, eventName, __listener);
+                    logo.factorList[turtle].push("SD" + args[0]);
+                }
+            }
+        }
+    }
+
     class StepPitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
@@ -3211,6 +3278,7 @@ function setupPitchBlocks() {
     new ThirdBlock().setup();
     new SecondBlock().setup();
     new UnisonBlock().setup();
+    new OnScaleDegreeDoBlock().setup();
     new SetScalarTranspositionBlock().setup();
     new AccidentalBlock().setup();
     new FlatBlock().setup();
