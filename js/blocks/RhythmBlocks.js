@@ -130,7 +130,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            return Singer.playNote(args, logo, turtle, blk, receivedArg);
         }
     }
 
@@ -154,7 +154,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            return Singer.playSwing(args, logo, turtle, blk);
         }
     }
 
@@ -182,7 +182,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            return Singer.playSwing(args, logo, turtle, blk);
         }
     }
 
@@ -226,7 +226,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            return Singer.playSwing(args, logo, turtle, blk);
         }
     }
 
@@ -428,7 +428,7 @@ function setupRhythmBlocks() {
                     // Graphics will have already been rendered.
                     logo.embeddedGraphics[turtle][saveBlk] = [];
 
-                    NoteController._processNote(logo, noteValue, saveBlk, turtle);
+                    Singer.processNote(logo, noteValue, saveBlk, turtle);
                     let bpmFactor;
                     if (logo.bpm[turtle].length > 0) {
                         bpmFactor = TONEBPM / last(logo.bpm[turtle]);
@@ -484,7 +484,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playDotted(args, logo, turtle, blk);
+            return Singer.playDotted(args, logo, turtle, blk);
         }
     }
 
@@ -518,7 +518,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playDotted(args, logo, turtle, blk);
+            return Singer.playDotted(args, logo, turtle, blk);
         }
     }
 
@@ -772,7 +772,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            return Singer.playNote(args, logo, turtle, blk, receivedArg);
         }
     }
 
@@ -815,7 +815,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            return Singer.playNote(args, logo, turtle, blk, receivedArg);
         }
     }
 

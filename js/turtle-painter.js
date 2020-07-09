@@ -31,6 +31,12 @@ const DEFAULTFONT = "sans-serif";       // also used in PenBlocks.js
  * with methods of Turtle and Turtles objects. An action may require updating the state of the
  * Turtle or the Turtles object.
  *
+ * @todo move visual artwork related states from logo.js to here eventually.
+ * As of now, some state variables are present in logo.js. To ensure modularity and independence of
+ * components, Logo should contain members only related to execution of blocks while the logic of
+ * execution of blocks should be present in respective files in blocks/ directory, which should
+ * eventually use members of this file and turtle-singer.js to proceed.
+ *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
@@ -38,6 +44,7 @@ const DEFAULTFONT = "sans-serif";       // also used in PenBlocks.js
 class Painter {
     /**
      * @constructor
+     * @param {Object} turtle - Turtle object
      */
     constructor(turtle) {
         this.turtle = turtle;

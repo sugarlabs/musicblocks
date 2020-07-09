@@ -420,7 +420,7 @@ function setupDrumBlocks() {
                     logo.inNoteBlock[turtle].splice(j, 1);
                 };
 
-                NoteController._processNote(logo, noteBeatValue, blk, turtle, __callback);
+                Singer.processNote(logo, noteBeatValue, blk, turtle, __callback);
             } else {
                 // logo.errorMsg(
                 //     _("Drum Block: Did you mean to use a Note block?"),
