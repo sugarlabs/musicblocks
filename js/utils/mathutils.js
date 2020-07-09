@@ -35,7 +35,7 @@ class MathUtility {
      * @returns {Number}
      * @throws {String} NAN error
      */
-    static doRandom(a, b) {
+    static doRandom(a, b, octave) {
         /**
          * @param {Number} n1
          * @param {Number} n2
@@ -47,6 +47,33 @@ class MathUtility {
             return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
         };
 
+        let GetRandomSolfege = (a1, a2, octave) => {
+            if (octave === undefined) {
+                octave = 4;
+            }
+            
+            let broadScale = [];
+            for(let i = octave; i <= octave+1; i++) {
+                for(let j = 0; j < SOLFEGENAMES.length; j++) {
+                    broadScale.push(SOLFEGENAMES[j] + " " + i);
+                } 
+            }
+
+            let n1 = SOLFEGENAMES.indexOf(a1);
+            let n2 = SOLFEGENAMES.indexOf(a2);
+            let o1 = octave;
+            let o2 = n1 > n2 ? octave + 1 : octave;
+
+            let n11, n22;
+            for(let i=0; i<broadScale.length; i++) {
+                n11 = broadScale.indexOf(a1 + " " + o1);
+                n22 = broadScale.indexOf(a2 + " " + o2);
+            }
+
+            let note = broadScale[Math.floor(Math.random() * (Number(n22) - Number(n11) + 1) + Number(n11))].split(" ");
+            return note;
+        }
+
         if (typeof a === "number" && typeof b === "number") {
             return GetRandom(a, b);
         } else if (
@@ -55,10 +82,7 @@ class MathUtility {
             SOLFEGENAMES.indexOf(a) != -1 &&
             SOLFEGENAMES.indexOf(b) != -1
         ) {
-            a = SOLFEGENAMES.indexOf(a);
-            b = SOLFEGENAMES.indexOf(b);
-
-            return SOLFEGENAMES[GetRandom(a, b)];
+            return GetRandomSolfege(a, b, octave);
         } else {
             throw "NanError";
         }

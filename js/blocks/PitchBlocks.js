@@ -348,6 +348,13 @@ function _playPitch(args, logo, turtle, blk) {
         } else {
             cents = 0;
             note = arg0;
+
+            // Checking if a random block is used to generate solfege
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            if (logo.blocks.blockList[cblk1].name === "random") {
+                note = arg0[0];
+            }
+            
             octave;
             if (
                 SOLFEGENAMES1.indexOf(arg0) !== -1
@@ -387,6 +394,9 @@ function _playPitch(args, logo, turtle, blk) {
                         logo.currentNote
                     )
                 );
+            }
+            if (logo.blocks.blockList[cblk1].name === "random") {
+                octave = arg0[1];
             }
         }
     }
