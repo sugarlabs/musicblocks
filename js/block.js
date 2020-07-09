@@ -1232,7 +1232,7 @@ function Block(protoblock, blocks, overrideName) {
                 if(attr !== "♮") {
                     label += attr;
                 }
-            } else if (this.name === "drumname") { 
+            } else if (this.name === "drumname") {
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
@@ -1804,7 +1804,7 @@ function Block(protoblock, blocks, overrideName) {
     this.isLeftClampBlock = function() {
         return this.protoblock.isLeftClamp;
     };
-    
+
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === "doubleclamp";
     };
@@ -2672,7 +2672,7 @@ function Block(protoblock, blocks, overrideName) {
                     event.nativeEvent.shiftKey
                 ) {
                     if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtle();
+                        that.blocks.logo.doStopTurtles();
 
                         setTimeout(function() {
                             that.blocks.logo.runLogoCommands(topBlock);
@@ -2742,7 +2742,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
 
                         if (that.blocks.turtles.running()) {
-                            that.blocks.logo.doStopTurtle();
+                            that.blocks.logo.doStopTurtles();
 
                             setTimeout(function() {
                                 that.blocks.logo.runLogoCommands(topBlock);
@@ -2766,7 +2766,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtle();
+                        that.blocks.logo.doStopTurtles();
 
                         setTimeout(function() {
                             that.blocks.logo.runLogoCommands(topBlock);
@@ -3319,11 +3319,11 @@ function Block(protoblock, blocks, overrideName) {
                 }
             } else {
                 let noteLabels = TEMPERAMENT ;
-                
+
                 let customLabels =  [];
                 for (let lab in noteLabels)
                     if (!(lab in PreDefinedTemperaments))customLabels.push(lab);
-                
+
                 let selectedCustom ;
                 if (this.customID != null) {
                     selectedCustom = this.customID ;
@@ -3331,7 +3331,7 @@ function Block(protoblock, blocks, overrideName) {
                     selectedCustom = customLabels[0];
                 }
 
-                let selectedNote ;                
+                let selectedNote ;
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
@@ -3715,7 +3715,7 @@ function Block(protoblock, blocks, overrideName) {
                     _("staff y")
                 ];
             }
-            
+
             let Values = Labels;
             this._piemenuBasic(
                 Labels,
@@ -4980,7 +4980,7 @@ function Block(protoblock, blocks, overrideName) {
 
         // Use advanced constructor for more wheelnav on same div
         this._customWheel = new wheelnav("wheelDiv", null, 800, 800);
-        
+
 
         this._cusNoteWheel = new wheelnav(
             "_cusNoteWheel",
@@ -4999,7 +4999,7 @@ function Block(protoblock, blocks, overrideName) {
                 this._customWheel.raphael
             );
         }
-        
+
 
         wheelnav.cssMode = true;
 
@@ -5055,7 +5055,7 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
-        
+
         //Disable rotation, set navAngle and create the menus
         this._cusNoteWheel.clickModeRotate = false;
         this._cusNoteWheel.animatetime = 0; // 300;
@@ -5077,7 +5077,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             thisCustom = 0 ;
         }
-        
+
         this._cusNoteWheel.navAngle =
             -(180 / customLabels.length) + 180 / labels.length;
         this._cusNoteWheel.createWheel(labels);
@@ -5131,11 +5131,11 @@ function Block(protoblock, blocks, overrideName) {
                 )
             ) + "px";
 
-                
+
         if (hasOctaveWheel) {
             // Use the octave associated with this block, if available.
             let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
-            
+
             // Navigate to current octave
             this._octavesWheel.navigateWheel(8 - pitchOctave);
         }
@@ -5144,10 +5144,10 @@ function Block(protoblock, blocks, overrideName) {
         // FIXME: Add all tabs to each interval
         let __setupAction = function(i) {
             that._customWheel.navItems[i].navigateFunction = function() {
-                that.customID = 
+                that.customID =
                     that._customWheel.navItems[
                         that._customWheel.selectedNavItemIndex
-                        ].title;                
+                        ].title;
                 for (let l = 0; l < customLabels.length; l++) {
                     for (let j = 0; j < max; j++) {
                         if (l !== i) {
@@ -5189,11 +5189,11 @@ function Block(protoblock, blocks, overrideName) {
         let j = selectedNote ;
         for (let x in noteLabels[selectedCustom]){
             if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
-                j = +x ; break ; 
+                j = +x ; break ;
             }
         }
 
-        if (typeof j  == "number") 
+        if (typeof j  == "number")
             this._cusNoteWheel.navigateWheel(max * customLabels.indexOf (selectedCustom) + j);
 
         let __exitMenu = function() {
@@ -5214,7 +5214,7 @@ function Block(protoblock, blocks, overrideName) {
             that.value = note;
             that.text.text =note;
             let octave = 4 ;
-            
+
             if (hasOctaveWheel) {
                 // Set the octave of the pitch block if available
                 octave = Number(
@@ -5224,7 +5224,7 @@ function Block(protoblock, blocks, overrideName) {
                 );
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
-            
+
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
@@ -5285,10 +5285,10 @@ function Block(protoblock, blocks, overrideName) {
                 i
             ].navigateFunction = __selectionChanged;
         }
-        
+
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
-    };        
-    
+    };
+
     this._piemenuNthModalPitch = function(noteValues, note) {
         // wheelNav pie menu for scale degree pitch selection
 
@@ -6516,7 +6516,7 @@ function Block(protoblock, blocks, overrideName) {
         // reference to diameter of the basic wheel
         let size = 800;
         if (this.name === "outputtools" || this.name === "grid") {
-            // slightly larger menu 
+            // slightly larger menu
             size = 1000;
         }
 
@@ -6551,7 +6551,7 @@ function Block(protoblock, blocks, overrideName) {
                     .title;
             let i = labels.indexOf(label);
             if (that.name === "outputtools") {
-                  that.overrideName = menuValues[i]; 
+                  that.overrideName = menuValues[i];
                   that.privateData = menuValues[i];
                   that.text.text = menuLabels[i];
             } else {

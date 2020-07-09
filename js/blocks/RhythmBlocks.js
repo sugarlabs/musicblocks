@@ -307,13 +307,13 @@ function setupRhythmBlocks() {
             logo.beatFactor[turtle] /= factor;
 
             let listenerName = "_multiplybeat_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.beatFactor[turtle] *= factor;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -359,7 +359,7 @@ function setupRhythmBlocks() {
             logo.tieFirstDrums[turtle] = [];
 
             let listenerName = "_tie_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.tie[turtle] = false;
@@ -459,7 +459,7 @@ function setupRhythmBlocks() {
                 logo.tieNoteExtras[turtle] = [];
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }

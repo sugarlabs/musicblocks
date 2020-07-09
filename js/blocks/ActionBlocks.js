@@ -113,7 +113,7 @@ function setupActionBlocks() {
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo._runFromBlockNow(
+                    logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
@@ -156,7 +156,7 @@ function setupActionBlocks() {
             // logo.getBlockAtStartOfArg(blk);
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
@@ -233,7 +233,7 @@ function setupActionBlocks() {
                     logo.backward[turtle].push(actionBlk);
 
                     let listenerName = "_backward_action_" + turtle + "_" + blk;
-                    logo._setDispatchBlock(blk, turtle, listenerName);
+                    logo.setDispatchBlock(blk, turtle, listenerName);
 
                     let nextBlock =
                         logo.blocks.blockList[actionBlk].connections[2];
@@ -255,7 +255,7 @@ function setupActionBlocks() {
                         logo.backward[turtle].pop();
                     };
 
-                    logo._setListener(turtle, listenerName, __listener);
+                    logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
                     childFlow = logo.actions[name];
                 }
@@ -313,7 +313,7 @@ function setupActionBlocks() {
             if (name in logo.actions) {
                 // Just run the stack.
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
@@ -443,7 +443,7 @@ function setupActionBlocks() {
                 let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo._runFromBlockNow(
+                    logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
@@ -649,7 +649,7 @@ function setupActionBlocks() {
                         // Since the turtle has stopped
                         // running, we must run the stack
                         // from here.
-                        logo._runFromBlockNow(
+                        logo.runFromBlockNow(
                             logo,
                             turtle,
                             logo.actions[args[1]],
@@ -661,7 +661,7 @@ function setupActionBlocks() {
 
                 // If there is already a listener, remove it
                 // before adding the new one.
-                logo._setListener(turtle, args[0], __listener);
+                logo.setTurtleListener(turtle, args[0], __listener);
             }
         }
     }
@@ -822,7 +822,7 @@ function setupActionBlocks() {
                 logo.backward[turtle].push(actionBlk);
 
                 let listenerName = "_backward_action_" + turtle + "_" + blk;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
                 if (nextBlock === null) {
@@ -843,7 +843,7 @@ function setupActionBlocks() {
                     logo.backward[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
             } else {
                 childFlow = logo.actions[name];
             }

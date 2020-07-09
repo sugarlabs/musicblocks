@@ -339,7 +339,7 @@ function setupRhythmBlockPaletteBlocks() {
             }
 
             let listenerName = "_tuplet_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (logo.inMatrix) {
@@ -348,7 +348,7 @@ function setupRhythmBlockPaletteBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
         }
@@ -454,7 +454,7 @@ function setupRhythmBlockPaletteBlocks() {
             logo.tupletParams.push([1, (1 / arg) * logo.beatFactor[turtle]]);
 
             let listenerName = "_tuplet_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.tuplet = false;
@@ -546,7 +546,7 @@ function setupRhythmBlockPaletteBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }

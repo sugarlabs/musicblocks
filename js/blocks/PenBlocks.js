@@ -150,10 +150,11 @@ function setupPenBlocks() {
                 logo.turtles.turtleList[turtle].painter.doSetHue(args[0]);
                 logo.turtles.turtleList[turtle].painter.doSetValue(args[1]);
                 logo.turtles.turtleList[turtle].painter.doSetChroma(args[2]);
-                logo.setBackgroundColor(turtle);
+                logo.turtles.setBackgroundColor(turtle);
                 logo.turtles.turtleList[turtle].painter.doSetHue(hue);
                 logo.turtles.turtleList[turtle].painter.doSetValue(value);
                 logo.turtles.turtleList[turtle].painter.doSetChroma(chroma);
+                logo.svgOutput = "";
             }
         }
     }
@@ -338,7 +339,8 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.setBackgroundColor(turtle);
+            logo.turtles.setBackgroundColor(turtle);
+            logo.svgOutput = "";
         }
     }
 
@@ -378,7 +380,7 @@ function setupPenBlocks() {
             }
 
             let listenerName = "_hollowline_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function() {
                 if (logo.inNoteBlock[turtle].length > 0) {
@@ -390,7 +392,7 @@ function setupPenBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -443,7 +445,7 @@ function setupPenBlocks() {
             }
 
             let listenerName = "_fill_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function() {
                 if (logo.inNoteBlock[turtle].length > 0) {
@@ -463,7 +465,7 @@ function setupPenBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }

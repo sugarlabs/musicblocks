@@ -387,7 +387,7 @@ function setupMeterBlocks() {
             logo.drift[turtle] += 1;
 
             let listenerName = "_drift_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (logo.drift[turtle] > 0) {
@@ -395,7 +395,7 @@ function setupMeterBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -440,7 +440,7 @@ function setupMeterBlocks() {
                         // running, we need to run the stack
                         // from here.
                         if (isflow) {
-                            logo._runFromBlockNow(
+                            logo.runFromBlockNow(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -448,7 +448,7 @@ function setupMeterBlocks() {
                                 receivedArg
                             );
                         } else {
-                            logo._runFromBlock(
+                            logo.runFromBlock(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -461,7 +461,7 @@ function setupMeterBlocks() {
 
                 let turtleID = logo.turtles.turtleList[turtle].id;
                 let eventName = "__offbeat_" + turtleID + "__";
-                logo._setListener(turtle, eventName, __listener);
+                logo.setTurtleListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("offbeat");
             }
@@ -511,7 +511,7 @@ function setupMeterBlocks() {
                             // running, we need to run the stack
                             // from here.
                             if (isflow) {
-                                logo._runFromBlockNow(
+                                logo.runFromBlockNow(
                                     logo,
                                     turtle,
                                     logo.actions[args[1]],
@@ -519,7 +519,7 @@ function setupMeterBlocks() {
                                     receivedArg
                                 );
                             } else {
-                                logo._runFromBlock(
+                                logo.runFromBlock(
                                     logo,
                                     turtle,
                                     logo.actions[args[1]],
@@ -532,7 +532,7 @@ function setupMeterBlocks() {
 
                     let turtleID = logo.turtles.turtleList[turtle].id;
                     let eventName = "__beat_" + args[0] + "_" + turtleID + "__";
-                    logo._setListener(turtle, eventName, __listener);
+                    logo.setTurtleListener(turtle, eventName, __listener);
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
                     if (logo.defaultStrongBeats[turtle]) {
@@ -616,7 +616,7 @@ function setupMeterBlocks() {
                         // running, we need to run the stack
                         // from here.
                         if (isflow) {
-                            logo._runFromBlockNow(
+                            logo.runFromBlockNow(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -624,7 +624,7 @@ function setupMeterBlocks() {
                                 receivedArg
                             );
                         } else {
-                            logo._runFromBlock(
+                            logo.runFromBlock(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -641,7 +641,7 @@ function setupMeterBlocks() {
                 logo.unhighlightQueue[turtle] = [];
                 logo.parameterQueue[turtle] = [];
                 logo.initTurtle(turtle);
-                logo._setListener(turtle, eventName, __listener);
+                logo.setTurtleListener(turtle, eventName, __listener);
                 let duration ;
                 if (logo.bpm[orgTurtle].length > 0) {
                     duration = 60 / last(logo.bpm[orgTurtle]);
@@ -700,7 +700,7 @@ function setupMeterBlocks() {
                         // running, we need to run the stack
                         // from here.
                         if (isflow) {
-                            logo._runFromBlockNow(
+                            logo.runFromBlockNow(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -708,7 +708,7 @@ function setupMeterBlocks() {
                                 receivedArg
                             );
                         } else {
-                            logo._runFromBlock(
+                            logo.runFromBlock(
                                 logo,
                                 turtle,
                                 logo.actions[args[0]],
@@ -721,7 +721,7 @@ function setupMeterBlocks() {
 
                 let turtleID = logo.turtles.turtleList[turtle].id;
                 let eventName = "__everybeat_" + turtleID + "__";
-                logo._setListener(turtle, eventName, __listener);
+                logo.setTurtleListener(turtle, eventName, __listener);
 
                 logo.beatList[turtle].push("everybeat");
             }
@@ -983,13 +983,13 @@ function setupMeterBlocks() {
                 logo.bpm[turtle].push(bpm);
 
                 let listenerName = "_bpm_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     logo.bpm[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 return [args[2], 1];
             }
@@ -1032,13 +1032,13 @@ function setupMeterBlocks() {
                 logo.bpm[turtle].push(bpm);
 
                 let listenerName = "_bpm_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     logo.bpm[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 return [args[1], 1];
             }

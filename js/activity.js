@@ -831,7 +831,8 @@ function Activity() {
         logo.time = 0;
         hideMsgs();
         hideGrids();
-        logo.setBackgroundColor(-1);
+        turtles.setBackgroundColor(-1);
+        logo.svgOutput = "";
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             logo.turtleHeaps[turtle] = [];
@@ -917,7 +918,7 @@ function Activity() {
                 // stop and restart
                 console.debug("STOPPING...");
                 document.getElementById("stop").style.color = "white";
-                logo.doStopTurtle();
+                logo.doStopTurtles();
 
                 setTimeout(function() {
                     console.debug("AND RUNNING");
@@ -997,7 +998,7 @@ function Activity() {
             return;
         }
 
-        logo.doStopTurtle();
+        logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.setMasterVolume(0);
@@ -1054,7 +1055,7 @@ function Activity() {
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
-        logo.doStopTurtle();
+        logo.doStopTurtles();
     };
 
     // function doMuteButton() {
@@ -2123,7 +2124,7 @@ function Activity() {
                     break;
                 case 83: // 'S'
                     textMsg("Alt-S " + _("Stop"));
-                    logo.doStopTurtle();
+                    logo.doStopTurtles();
                     break;
                 case 86: // 'V'
                     textMsg("Alt-V " + _("Paste"));
@@ -3668,7 +3669,7 @@ function Activity() {
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
                             custom ={};
-                            for (let temp in TEMPERAMENT)if(!(temp in PreDefinedTemperaments)) custom[temp] = TEMPERAMENT[temp]; 
+                            for (let temp in TEMPERAMENT)if(!(temp in PreDefinedTemperaments)) custom[temp] = TEMPERAMENT[temp];
                             args = {
                                 customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
@@ -4802,7 +4803,7 @@ function Activity() {
                 hideSearchWidget();
                 widgetWindows.hideAllWindows();
 
-                logo.doStopTurtle();
+                logo.doStopTurtles();
                 docById("helpElem").style.visibility = "hidden";
                 document.querySelector(".canvasHolder").classList.add("hide");
                 document.querySelector("#canvas").style.display = "none";

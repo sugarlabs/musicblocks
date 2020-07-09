@@ -308,7 +308,7 @@ function setupVolumeBlocks() {
             }
 
             let listenerName = "_synthvolume_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.synthVolume[turtle][synth].pop();
@@ -325,7 +325,7 @@ function setupVolumeBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
         }
@@ -565,7 +565,7 @@ function setupVolumeBlocks() {
             }
 
             let listenerName = "_volume_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.masterVolume.pop();
@@ -578,7 +578,7 @@ function setupVolumeBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -650,7 +650,7 @@ function setupVolumeBlocks() {
             }
 
             let listenerName = "_articulation_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 for (let synth in logo.synthVolume[turtle]) {
@@ -667,7 +667,7 @@ function setupVolumeBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -728,7 +728,7 @@ function setupVolumeBlocks() {
                 logo.inCrescendo[turtle].push(true);
 
                 let listenerName = "_crescendo_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     if (logo.justCounting[turtle].length === 0) {
@@ -748,7 +748,7 @@ function setupVolumeBlocks() {
                     }
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 return [args[1], 1];
             }
