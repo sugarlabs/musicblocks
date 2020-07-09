@@ -606,64 +606,6 @@ class Singer {
     }
 
     /**
-     * Grabs a bit from the next note to give to the current note.
-     *
-     * @static
-     * @param {*[]} args - arguments (parameters)
-     * @param {Object} logo - Logo object
-     * @param {Object} turtle - Turtle object
-     * @param {Object} blk - corresponding Block object index in blocks.blockList
-     */
-    static playSwing(args, logo, turtle, blk) {
-        if (logo.blocks.blockList[blk].name === "newswing2") {
-            // Should never happen, but if it does, nothing to do
-            if (args[2] === undefined)
-                return;
-
-            if (
-                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
-                args[1] === null || typeof args[1] !== "number" || args[1] <= 0
-            )   logo.errorMsg(NOINPUTERRORMSG, blk);
-            let arg0 =
-                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
-            let arg1 =
-                args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
-
-            if (logo.suppressOutput[turtle]) {
-                logo.notation.notationSwing(turtle);
-            } else {
-                logo.swing[turtle].push(1 / arg0);
-                logo.swingTarget[turtle].push(1 / arg1);
-            }
-        } else if (logo.blocks.blockList[blk].name === "newswing") {
-            /** @deprecated */
-            logo.swing[turtle].push(1 / args[0]);
-            logo.swingTarget[turtle].push(null);
-        } else {
-            /** @deprecated */
-            logo.swing[turtle].push(args[0]);
-            logo.swingTarget[turtle].push(null);
-        }
-        logo.swingCarryOver[turtle] = 0;
-
-        let listenerName = "_swing_" + turtle;
-        logo.setDispatchBlock(blk, turtle, listenerName);
-
-        let __listener = event => {
-            if (!logo.suppressOutput[turtle]) {
-                logo.swingTarget[turtle].pop();
-                logo.swing[turtle].pop();
-            }
-
-            logo.swingCarryOver[turtle] = 0;
-        };
-
-        logo.setTurtleListener(turtle, listenerName, __listener);
-
-        return [logo.blocks.blockList[blk].name === "newswing2" ? args[2] : args[1], 1];
-    }
-
-    /**
      * Increase note's play time by a(2 - 1/2^n).
      *
      * @static
