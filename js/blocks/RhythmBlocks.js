@@ -130,7 +130,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return Singer.playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -772,7 +789,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return Singer.playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -815,7 +849,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return Singer.playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 

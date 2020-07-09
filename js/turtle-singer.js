@@ -472,13 +472,15 @@ class Singer {
     }
 
     /**
+     * Processes and plays a note clamp.
+     *
      * @static
-     * @param {*[]} args - arguments (parameters)
+     * @param {Number} value - note value
      * @param {Object} logo - Logo object
      * @param {Object} turtle - Turtle object
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
-    static playNote(args, logo, turtle, blk, receivedArg) {
+    static playNote(value, logo, turtle, blk, _enqueue) {
         /**
          * We queue up the child flow of the note clamp and once all of the children are run, we
          * trigger a _playnote_ event, then wait for the note to play. The note can be specified
@@ -487,10 +489,6 @@ class Singer {
          *
          * @todo We should consider the use of the global timer in Tone.js for more accuracy.
          */
-
-        // Should never happen, but if it does, nothing to do
-        if (args[1] === undefined)
-            return;
 
         // Use the outer most note when nesting to determine the beat and triggering
         if (logo.inNoteBlock[turtle].length === 0) {
@@ -516,22 +514,16 @@ class Singer {
             */
             let turtleID = logo.turtles.turtleList[turtle].id;
 
-            let Enqueue = () => {
-                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            };
-
             if (logo.beatList[turtle].indexOf("everybeat") !== -1) {
-                Enqueue();
+                _enqueue();
                 logo.stage.dispatchEvent("__everybeat_" + turtleID + "__");
             }
 
             if (logo.beatList[turtle].indexOf(beatValue) !== -1) {
-                Enqueue();
+                _enqueue();
                 logo.stage.dispatchEvent("__beat_" + beatValue + "_" + turtleID + "__");
             } else if (beatValue > 1 && logo.beatList[turtle].indexOf("offbeat") !== -1) {
-                Enqueue();
+                _enqueue();
                 logo.stage.dispatchEvent("__offbeat_" + turtleID + "__");
             }
 
@@ -539,7 +531,7 @@ class Singer {
                 beatValue + logo.beatsPerMeasure[turtle] * (logo.currentMeasure[turtle] - 1);
             for (let f = 0; f < logo.factorList[turtle].length; f++) {
                 if (thisBeat % logo.factorList[turtle][f] === 0) {
-                    Enqueue();
+                    _enqueue();
                     let eventName = "__beat_" + logo.factorList[turtle][f] + "_" + turtleID + "__";
                     logo.stage.dispatchEvent(eventName);
                 }
@@ -550,13 +542,7 @@ class Singer {
         // arrays, which are used when we play the note
         logo.clearNoteParams(turtle, blk, []);
 
-        let arg = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : args[0];
-        if (args[0] === null || typeof args[0] !== "number")
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-
-        // Ensure logo note duration is positive.
-        let noteBeatValue = Math.abs(logo.blocks.blockList[blk].name === "newnote" ? 1 / arg : arg);
-        if (arg <= 0)   logo.errorMsg(_("Note value must be greater than 0."), blk);
+        let noteBeatValue = logo.blocks.blockList[blk].name === "newnote" ? 1 / value : value;
 
         logo.inNoteBlock[turtle].push(blk);
         logo.multipleVoices[turtle] = logo.inNoteBlock[turtle].length > 1 ? true : false;
@@ -617,8 +603,6 @@ class Singer {
         };
 
         logo.setTurtleListener(turtle, listenerName, __listener);
-
-        return [args[1], 1];
     }
 
     /**
