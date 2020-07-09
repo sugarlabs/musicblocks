@@ -800,7 +800,7 @@ function setupNumberBlocks() {
 
             let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            let octave = null;
+            let octave = undefined;
 
             // check if connected to pitch block and read octave values
             if (logo.blocks.blockList[cblk0].name === "pitch") {
