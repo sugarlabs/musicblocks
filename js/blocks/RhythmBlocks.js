@@ -570,12 +570,41 @@ function setupRhythmBlocks() {
                 [0, "rhythmicdot", x, y, [null, null, 1]],
                 [1, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return Singer.playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = 1;
+
+            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] *= currentDotFactor;
+            if (arg >= 0) {
+                logo.dotCount[turtle] += arg;
+            } else if (arg === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                arg = 0;
+            } else {
+                logo.dotCount[turtle] += 1 / arg;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] *= currentDotFactor;
+                logo.dotCount[turtle] -= arg >= 0 ? arg : 1 / arg;
+                let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[0], 1];
         }
     }
 
@@ -609,7 +638,37 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return Singer.playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = args[0] === null ? 0 : args[0];
+
+            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] *= currentDotFactor;
+            if (arg >= 0) {
+                logo.dotCount[turtle] += arg;
+            } else if (arg === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                arg = 0;
+            } else {
+                logo.dotCount[turtle] += 1 / arg;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] *= currentDotFactor;
+                logo.dotCount[turtle] -= arg >= 0 ? arg : 1 / arg;
+                let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 

@@ -606,50 +606,6 @@ class Singer {
     }
 
     /**
-     * Increase note's play time by a(2 - 1/2^n).
-     *
-     * @static
-     * @param {*[]} args - arguments (parameters)
-     * @param {Object} logo - Logo object
-     * @param {Object} turtle - Turtle object
-     * @param {Object} blk - corresponding Block object index in blocks.blockList
-     */
-    static playDotted(args, logo, turtle, blk) {
-        if (args[0] === null)   logo.errorMsg(NOINPUTERRORMSG, blk);
-        let arg =
-            logo.blocks.blockList[blk].name === "rhythmicdot" ? 1 : args[0] === null ? 0 : args[0];
-
-        let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-        logo.beatFactor[turtle] *= currentDotFactor;
-        if (arg >= 0) {
-            logo.dotCount[turtle] += arg;
-        } else if (arg === -1) {
-            logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
-            arg = 0;
-        } else {
-            logo.dotCount[turtle] += 1 / arg;
-        }
-
-        let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-        logo.beatFactor[turtle] /= newDotFactor;
-
-        let listenerName = "_dot_" + turtle;
-        logo.setDispatchBlock(blk, turtle, listenerName);
-
-        let __listener = event => {
-            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-            logo.beatFactor[turtle] *= currentDotFactor;
-            logo.dotCount[turtle] -= arg >= 0 ? arg : 1 / arg;
-            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-            logo.beatFactor[turtle] /= newDotFactor;
-        };
-
-        logo.setTurtleListener(turtle, listenerName, __listener);
-
-        return [logo.blocks.blockList[blk].name === "rhythmicdot" ? args[0] : args[1], 1];
-    }
-
-    /**
      * Processes a single note.
      *
      * @static
