@@ -1933,11 +1933,11 @@ function setupPitchBlocks() {
                 1. If note number input is positive: Whenever the number of semitones will be less than ref, increment deltaSemi by one.
                 2. If note number input is negative: Whenever the number of semitones will be greater than ref, increment deltaSemi by one.
                 Note that these positions are zero based because we use an array to find indexes.
-    
+
                 Notice that deltaSemi will attain values : {0, 1}, so if we play scales of greater length where octave may need to increment/decrement multiple times:
                 That is done with the use of deltaOctave: It's value is incremented by one everytime we traverse the modelength of our selected key once. [ e.g 7 in case of any major scale]
                 deltaOctave doesn't directly affect the octave that will play; instead it changes what we say is the reference octave i.e the value connected to the octave argument of this block.
-    
+
                 You may see this as a cyclical process:
                 e.g Repeat the scale degree block 14 times while in G major starting from note value --> 1 and octave arg --> 4
                 Till we reach B --> Both deltaOctave and deltaSemi are {0,0}
@@ -2052,11 +2052,11 @@ function setupPitchBlocks() {
                 1. If note number input is positive: Whenever the number of semitones will be less than ref, increment deltaSemi by one.
                 2. If note number input is negative: Whenever the number of semitones will be greater than ref, increment deltaSemi by one.
                 Note that these positions are zero based because we use an array to find indexes.
-    
+
                 Notice that deltaSemi will attain values : {0, 1}, so if we play scales of greater length where octave may need to increment/decrement multiple times:
                 That is done with the use of deltaOctave: It's value is incremented by one everytime we traverse the modelength of our selected key once. [ e.g 7 in case of any major scale]
                 deltaOctave doesn't directly affect the octave that will play; instead it changes what we say is the reference octave i.e the value connected to the octave argument of this block.
-    
+
                 You may see this as a cyclical process:
                 e.g Repeat the scale degree block 14 times while in G major starting from note value --> 1 and octave arg --> 4
                 Till we reach B --> Both deltaOctave and deltaSemi are {0,0}
@@ -2498,6 +2498,12 @@ function setupPitchBlocks() {
                     [note, octave, cents] = frequencyToPitch(arg0);
                 }
             } else {
+                // If 1st arg is a random block with solfeges, arg0 is an array as [note, octave]
+                if (typeof arg0 === "object") {
+                    arg1 = arg0[1];
+                    arg0 = arg0[0];
+                }
+
                 // Check if string ends with accidental
                 if (
                     SOLFEGENAMES1.indexOf(arg0.toLowerCase()) !== -1 ||
