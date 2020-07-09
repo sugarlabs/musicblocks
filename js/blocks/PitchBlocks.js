@@ -191,7 +191,7 @@ function _playPitch(args, logo, turtle, blk) {
 
             // separate the accidental from the scaledegree
             scaledegree = Number(arg0.replace(attr, ""));
-            note = scaleDegreeToPitch(logo.keySignature[turtle], scaledegree, logo.moveable[turtle]);
+            note = scaleDegreeToPitchMapping(logo.keySignature[turtle], scaledegree, logo.moveable[turtle], null);
 
             if(attr != NATURAL) {
                 note += attr;

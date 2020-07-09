@@ -641,7 +641,6 @@ function setupNumberBlocks() {
             } else {
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
                 let cblk2 = logo.blocks.blockList[blk].connections[2];
-
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
@@ -664,9 +663,26 @@ function setupNumberBlocks() {
                         cblk0 !== null &&
                         logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        // check if plus block is used to create scale degree representation
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                        if (logo.blocks.blockList[cblk2].name === "accidentalname") {
+                            let scaledegree;
+                            if (logo.blocks.blockList[cblk1].name === "namedbox") {
+                                scaledegree = logo.boxes[logo.blocks.blockList[cblk1].overrideName];
+                            } else {
+                                scaledegree = logo.blocks.blockList[cblk1].value;
+                            }
+
+                            let attr = logo.blocks.blockList[cblk2].value.split(" ");
+                            attr = attr[attr.length - 1];
+                            scaledegree += attr;
+                            
+                            return scaledegree;
+                        }
+                        else {
+                            let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+
+                            a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
                                     logo.currentOctave[turtle],
                                     logo.blocks.blockList[cblk1].value,
@@ -675,7 +691,7 @@ function setupNumberBlocks() {
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                            b = typeof logo.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
                                     logo.currentOctave[turtle],
                                     logo.blocks.blockList[cblk2].value,
@@ -683,6 +699,8 @@ function setupNumberBlocks() {
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+                        }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
