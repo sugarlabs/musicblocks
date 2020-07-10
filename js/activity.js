@@ -1050,22 +1050,103 @@ function Activity() {
     };
 
     chooseKeyMenu = () => {
-        var wheel1 = new wheelnav("chooseKeyDiv", null, 800, 800);
-        var wheel2 = new wheelnav("wheel2", wheel1.raphael);
-        let labels = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+        docById("chooseKeyDiv").style.display = "";
+
+        var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+        var addedOptionsWheel = new wheelnav("addedOptionsWheel", keyNameWheel.raphael); 
+        let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
         
-        wheel1.slicePathFunction = slicePath().DonutSlice;
-        wheel1.slicePathCustom = slicePath().DonutSliceCustomization();
-        wheel1.slicePathCustom.minRadiusPercent = 0.5;
-        wheel1.slicePathCustom.maxRadiusPercent = 0.8;
-        wheel1.sliceSelectedPathCustom = wheel1.slicePathCustom;
-        wheel1.sliceInitPathCustom = wheel1.slicePathCustom;
-        wheel1.titleRotateAngle = 0;
-        wheel1.clickModeRotate = false;
-        wheel1.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
-        wheel1.animatetime = 0;            
+        wheelnav.cssMode = true;
+
+        keyNameWheel.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
+        keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.titleRotateAngle = 0;
+        keyNameWheel.clickModeRotate = false;
+        keyNameWheel.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
+        // keyNameWheel.animatetime = 0;
         
-        wheel1.createWheel(labels);
+        keyNameWheel.createWheel(keys);
+
+        addedOptionsWheel.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
+        addedOptionsWheel.slicePathFunction = slicePath().DonutSlice;
+        addedOptionsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        addedOptionsWheel.slicePathCustom.minRadiusPercent = 0.8;
+        addedOptionsWheel.slicePathCustom.maxRadiusPercent = 1;
+        addedOptionsWheel.sliceSelectedPathCustom = addedOptionsWheel.slicePathCustom;
+        addedOptionsWheel.sliceInitPathCustom = addedOptionsWheel.slicePathCustom;
+        let labels = [];
+
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].length > 2) {
+                let obj = keys[i].split("/");
+                labels.push(obj[0]);
+                labels.push(obj[1]);
+            } else {
+                labels.push("");
+                labels.push("");
+            }
+        }
+
+        addedOptionsWheel.navAngle = -7.45;
+        addedOptionsWheel.clickModeRotate = false;
+        addedOptionsWheel.createWheel(labels);
+
+        var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
+        labels3 = ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"];
+        modenameWheel.slicePathFunction = slicePath().DonutSlice;
+        modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.titleRotateAngle = 0;
+        modenameWheel.clickModeRotate = false;
+        modenameWheel.colors = ["#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#c0c0c0", "#c0c0c0"];
+        modenameWheel.animatetime = 0;
+        
+        modenameWheel.createWheel(labels3);
+
+        var exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
+        exitWheel.slicePathFunction = slicePath().DonutSlice;
+        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+        exitWheel.titleRotateAngle = 0;
+        exitWheel.clickModeRotate = false;
+        exitWheel.colors = platformColor.exitWheelcolors;
+        exitWheel.animatetime = 0;
+        exitWheel.createWheel(["×", " "]);
+
+        let __exitMenu = () => {
+            keyNameWheel.removeWheel();
+            addedOptionsWheel.removeWheel();
+            modenameWheel.removeWheel();
+        };
+        
+        exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+        let __setupAction = function(i, activeTabs) {
+            keyNameWheel.navItems[i].navigateFunction = function() {
+                for (let j = 0; j < labels.length; j++) {
+                    if ( Math.floor(j/2) != i) {
+                        addedOptionsWheel.navItems[j].navItem.hide();
+                    } else {
+                        addedOptionsWheel.navItems[j].navItem.show();
+                    }
+                }
+            }
+        }
+
+        for (let i = 0; i < keys.length; i++) {
+            __setupAction(i);
+        }
+    
     }
 
     // DEPRECATED

@@ -1368,16 +1368,17 @@ input.timbreName {
 #chooseKeyDiv {
     height: 350px;
     width: 350px;
-    left: 550px;
+    left: 700px;
+    top: 200px;
     margin: auto;
     z-index: 100;
     position: fixed;
-    transition: ease 1s;
 }
 
 #chooseKeyDiv > svg {
     width: 100%;
     height: 100%;
+    transition: width 2s linear 1s;
 }
 
 @media (max-width: 880px) {
