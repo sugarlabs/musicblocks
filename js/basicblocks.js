@@ -77,6 +77,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupMediaBlocks();
     setupSensorsBlocks();
     setupEnsembleBlocks();
+    setupDictionaryBlocks();
 
     // Push protoblocks onto their palettes.
     for (let protoblock in blocks.protoBlockDict) {

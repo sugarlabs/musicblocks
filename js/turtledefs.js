@@ -57,6 +57,7 @@ const BUILTINPALETTES = [
     "media",
     "sensors",
     "heap",
+    "dictionary",
     "ensemble",
     "extras",
     "myblocks"
@@ -83,6 +84,7 @@ const BUILTINPALETTESFORL23N = [
     _("media"),
     _("sensors"),
     _("heap"),
+    _("dictionary"),
     _("ensemble"),
     _("extras"),
     _("my blocks")
@@ -108,6 +110,7 @@ const MULTIPALETTES = [
         "number",
         "boolean",
         "heap",
+        "dictionary",
         "extras",
         "myblocks"
     ],
