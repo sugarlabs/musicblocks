@@ -802,10 +802,15 @@ function setupNumberBlocks() {
             let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             let octave = undefined;
 
-            // check if connected to pitch block and read octave values
-            if (logo.blocks.blockList[cblk0].name === "pitch") {
-                let numBlock = logo.blocks.blockList[cblk0].connections[2];
-                octave = logo.blocks.blockList[numBlock].value;
+            // Check if connected to pitch block and read octave values
+            if (cblk0 !== null) {
+                let par = logo.blocks.blockList[cblk0];
+                while (par.name === "hspace") {
+                    par = logo.blocks.blockList[par.connections[0]];
+                }
+                if (par.name === "pitch") {
+                    octave = logo.blocks.blockList[par.connections[2]].value;
+                }
             }
 
             try {

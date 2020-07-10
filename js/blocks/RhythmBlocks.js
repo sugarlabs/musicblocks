@@ -130,7 +130,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -150,11 +167,30 @@ function setupRhythmBlocks() {
                 [1, ["number", { value: 32 }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            logo.swing[turtle].push(args[0]);
+            logo.swingTarget[turtle].push(null);
+
+            logo.swingCarryOver[turtle] = 0;
+
+            let listenerName = "_swing_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!logo.suppressOutput[turtle]) {
+                    logo.swingTarget[turtle].pop();
+                    logo.swing[turtle].pop();
+                }
+
+                logo.swingCarryOver[turtle] = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -178,11 +214,30 @@ function setupRhythmBlocks() {
                 [4, "vspace", 0, 0, [0, null]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            logo.swing[turtle].push(1 / args[0]);
+            logo.swingTarget[turtle].push(null);
+
+            logo.swingCarryOver[turtle] = 0;
+
+            let listenerName = "_swing_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!logo.suppressOutput[turtle]) {
+                    logo.swingTarget[turtle].pop();
+                    logo.swing[turtle].pop();
+                }
+
+                logo.swingCarryOver[turtle] = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -226,7 +281,43 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playSwing(args, logo, turtle, blk);
+            // Should never happen, but if it does, nothing to do
+            if (args[2] === undefined)
+                return;
+
+            if (
+                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
+                args[1] === null || typeof args[1] !== "number" || args[1] <= 0
+            )   logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg0 =
+                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
+            let arg1 =
+                args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
+
+            if (logo.suppressOutput[turtle]) {
+                logo.notation.notationSwing(turtle);
+            } else {
+                logo.swing[turtle].push(1 / arg0);
+                logo.swingTarget[turtle].push(1 / arg1);
+            }
+
+            logo.swingCarryOver[turtle] = 0;
+
+            let listenerName = "_swing_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!logo.suppressOutput[turtle]) {
+                    logo.swingTarget[turtle].pop();
+                    logo.swing[turtle].pop();
+                }
+
+                logo.swingCarryOver[turtle] = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[2], 1];
         }
     }
 
@@ -428,7 +519,7 @@ function setupRhythmBlocks() {
                     // Graphics will have already been rendered.
                     logo.embeddedGraphics[turtle][saveBlk] = [];
 
-                    NoteController._processNote(logo, noteValue, saveBlk, turtle);
+                    Singer.processNote(logo, noteValue, saveBlk, turtle);
                     let bpmFactor;
                     if (logo.bpm[turtle].length > 0) {
                         bpmFactor = TONEBPM / last(logo.bpm[turtle]);
@@ -479,12 +570,41 @@ function setupRhythmBlocks() {
                 [0, "rhythmicdot", x, y, [null, null, 1]],
                 [1, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = 1;
+
+            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] *= currentDotFactor;
+            if (arg >= 0) {
+                logo.dotCount[turtle] += arg;
+            } else if (arg === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                arg = 0;
+            } else {
+                logo.dotCount[turtle] += 1 / arg;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] *= currentDotFactor;
+                logo.dotCount[turtle] -= arg >= 0 ? arg : 1 / arg;
+                let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[0], 1];
         }
     }
 
@@ -518,7 +638,37 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return NoteController._playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = args[0] === null ? 0 : args[0];
+
+            let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] *= currentDotFactor;
+            if (arg >= 0) {
+                logo.dotCount[turtle] += arg;
+            } else if (arg === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                arg = 0;
+            } else {
+                logo.dotCount[turtle] += 1 / arg;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+            logo.beatFactor[turtle] /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] *= currentDotFactor;
+                logo.dotCount[turtle] -= arg >= 0 ? arg : 1 / arg;
+                let newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
+                logo.beatFactor[turtle] /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -772,7 +922,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -815,7 +982,24 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return NoteController._playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                logo.parentFlowQueue[turtle].push(blk);
+                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            }
+            Singer.playNote(value, logo, turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 

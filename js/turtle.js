@@ -46,9 +46,10 @@ class Turtle {
         // Import members of model and view (arguments only for model)
         importMembers(this, [id, name, turtles]);
 
-        this.painter = new Painter(this);
+        this.singer = new Singer(this);     // for music logic
+        this.painter = new Painter(this);   // for drawing logic
 
-        this._blinkFinished = true;     // whether not blinking or blinking
+        this._blinkFinished = true;         // whether not blinking or blinking
     }
 
     /**

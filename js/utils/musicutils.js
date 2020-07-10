@@ -175,6 +175,36 @@ const SOLFEGENAMES1 = [
     "ti" + FLAT,
     "ti"
 ];
+const NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+const NOTENAMES1 = [
+    "C",
+    "C" + SHARP,
+    "C" + DOUBLESHARP,
+    "D" + DOUBLEFLAT,
+    "D" + FLAT,
+    "D",
+    "D" + SHARP,
+    "D" + DOUBLESHARP,
+    "E" + DOUBLEFLAT,
+    "E" + FLAT,
+    "E",
+    "F",
+    "F" + SHARP,
+    "F" + DOUBLESHARP,
+    "G" + DOUBLEFLAT,
+    "G" + FLAT,
+    "G",
+    "G" + SHARP,
+    "G" + DOUBLESHARP,
+    "A",
+    "A" + DOUBLEFLAT,
+    "A" + FLAT,
+    "A" + SHARP,
+    "A" + DOUBLESHARP,
+    "B" + DOUBLEFLAT,
+    "B" + FLAT,
+    "B"
+];
 const SOLFEGECONVERSIONTABLE = {
     C: "do",
     "C♯": "do" + SHARP,

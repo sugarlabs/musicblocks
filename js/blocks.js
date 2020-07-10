@@ -3190,11 +3190,6 @@ function Blocks(activity) {
         var myBlock = last(this.blockList);
         myBlock.copySize();
 
-        // Create a new NoteController instance for each note block
-        if (myBlock.name === "newnote") {
-            myBlock.controller = new NoteController();
-        }
-
         // We may need to do some postProcessing to the block
         myBlock.postProcess = postProcess;
         myBlock.postProcessArg = postProcessArg;
