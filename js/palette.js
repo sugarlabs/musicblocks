@@ -275,6 +275,11 @@ function Palettes() {
         return this;
     };
 
+    this.setBlocksContainer= function(bloc) {
+        this.blocksContainer = bloc ;
+        return this;
+    };
+    
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function(obj) {
         this.macroDict = obj;
@@ -1163,17 +1168,21 @@ function PaletteNew1(palettes, name) {
                 let img = makePaletteIcons(
                     b.artwork
                 );
+
                 img.onmouseover = (evt) => {
                     document.body.style.cursor = "pointer";
                 }
+
                 img.onmouseleave = (evt) => {
                     document.body.style.cursor = "default";
                 }
-        
+
+                //image Drag initiates a browser defined drag . which needs to be stoped.
                 img.ondragstart = function() {
                     return false;
                 };
-                img.onmousedown = function(event){
+
+                let down = function(event){
                     // (1) prepare to moving: make absolute and on top by z-index
                     let posit = img.style.position ; 
                     let zInd = img.style.zIndex ; 
@@ -1189,39 +1198,57 @@ function PaletteNew1(palettes, name) {
                       img.style.left = pageX - img.offsetWidth / 2 + 'px';
                       img.style.top = pageY - img.offsetHeight / 2 + 'px';
                     }
-                  
-                    // move our absolutely positioned img under the pointer
-                    moveAt(event.pageX, event.pageY);
-                  
-                    let onMouseMove = (event) => {
-                      moveAt(event.pageX, event.pageY);
+                    
+                    let onMouseMove = (e) => {
+                        let x,y;
+                        if (e.type === "touchmove"){
+                            x = e.touches[0].clientX;
+                            y = e.touches[0].clientY;
+                        }   
+                        else{
+                            x = e.pageX;
+                            y = e.pageY;
+                        }
+                        moveAt(x,y);
                     }
-                  
-                    // (2) move the img on mousemove
+                    onMouseMove(event)
+                    
+                    document.addEventListener('touchmove', onMouseMove);
                     document.addEventListener('mousemove', onMouseMove);
-                  
-                    // (3) drop the img, remove unneeded handlers
-                    img.onmouseup = function (event) {
+                    
+                    let up = function (event) {
                         document.body.style.cursor = "default";
                         docById("palette").removeChild(docById("palette").children[1]);
                         document.removeEventListener('mousemove', onMouseMove);
                         img.onmouseup = null;
-                        console.log(that.protoList[blk],blk);
+
+                        let x,y;
+                        x = parseInt (img.style.left);
+                        y = parseInt (img.style.top);
+                        
+                        img.style.position = posit;
+                        img.style.zIndex = zInd;
+                        document.body.removeChild(img);
+                        itemCell.appendChild(img)
+                        
+                        if (!x || !y) return ;
                         that._makeBlockFromProtoblock(
                             that.protoList[blk],
                             true,
                             b.modname,
                             event,
-                            event.pageX - img.offsetWidth / 2,
-                            event.pageY - img.offsetHeight/ 2,
+                            x - that.palettes.blocksContainer.x,
+                            y - that.palettes.blocksContainer.y
                         );
-                        img.style.position = posit;
-                        img.style.zIndex = zInd;
-                        document.body.removeChild(img);
-                        itemCell.appendChild(img)
                     };
-                  
+
+                    img.ontouchend = up ;                  
+                    img.onmouseup = up ;
                 };
+
+                img.ontouchstart = down ;
+                img.onmousedown = down ;
+                 
                 itemCell.setAttribute("style","width: "+img.width+"px ");
                 itemCell.appendChild(
                     img

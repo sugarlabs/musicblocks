@@ -4752,6 +4752,7 @@ function Activity() {
             .setCanvas(canvas)
             .setStage(palettesContainer)
             .setRefreshCanvas(refreshCanvas)
+            .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
             .setTrashcan(trashcan)
             .setSearch(showSearchWidget, hideSearchWidget)
