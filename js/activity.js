@@ -74,7 +74,6 @@ function Activity() {
     _loadButtonDragHandler = this._loadButtonDragHandler;
 
     scrollBlockContainer = false;
-    scrollPaletteContainer = false;
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
@@ -314,7 +313,6 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
-        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -1074,7 +1072,6 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
         let enableHorizScrollIcon = docById("enableHorizScrollIcon");
         let disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
@@ -1387,80 +1384,6 @@ function Activity() {
             delta: 0
         };
 
-        let __paletteWheelHandler = function(event) {
-            // vertical scroll
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                }
-            }
-
-            // horizontal scroll
-            if (scrollPaletteContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    }
-                }
-            } else {
-                event.preventDefault();
-            }
-
-            refreshCanvas();
-        };
-
-        let myCanvas = docById("myCanvas");
-
-        let __heightBasedScroll = function(event) {
-            actualReszieHandler(); // check size during init
-            window.addEventListener("resize", resizeThrottler, false);
-            let resizeTimeout;
-
-            function resizeThrottler() {
-                // Ignore resize events as long as an actualResizeHandler
-                // execution is in queue.
-                if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
-                        resizeTimeout = null;
-                        actualReszieHandler();
-                        // The actualResizeHandler will execute at the
-                        // rate of 15 FPS.
-                    }, 66);
-                }
-            }
-        };
-
-        function actualReszieHandler() {
-            // Handle the resize event
-            let h = window.innerHeight;
-
-            if (h < 500) {
-                //activate on mobile
-                myCanvas.addEventListener(
-                    "wheel",
-                    __paletteWheelHandler,
-                    false
-                );
-            } else {
-                // Cleanup event listeners
-                myCanvas.removeEventListener("wheel", __paletteWheelHandler);
-            }
-        }
-
-        __heightBasedScroll();
-
         let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
@@ -1471,35 +1394,17 @@ function Activity() {
         let __wheelHandler = function(event) {
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                }
+                blocksContainer.y -= event.deltaY;
             }
-
             // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    }
+                    blocksContainer.x -= event.deltaX;
                 }
             } else {
                 event.preventDefault();
             }
-
             refreshCanvas();
         };
 
@@ -1804,7 +1709,7 @@ function Activity() {
      */
     showSearchWidget = function() {
         //bring to top;
-        
+        searchWidget.style.zIndex = 1 ;
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
@@ -2243,9 +2148,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     STANDARDBLOCKHEIGHT,
@@ -2270,9 +2172,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(-1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     -STANDARDBLOCKHEIGHT,
@@ -2543,8 +2442,6 @@ function Activity() {
 
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
-
-        //palettes.setScale(turtleBlocksScale);
 
         trashcan.resizeEvent(turtleBlocksScale);
 
@@ -3219,11 +3116,7 @@ function Activity() {
                             50
                         )}...`
                     );
-                    // First, hide the palettes as they will need updating.
-                    for (let name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
-
+                    
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
             } catch (e) {
@@ -4701,12 +4594,11 @@ function Activity() {
          *   turtles
          *   logo (drawing)
          */
-        palettesContainer = new createjs.Container();
         blocksContainer = new createjs.Container();
         trashContainer = new createjs.Container();
         turtleContainer = new createjs.Container();
         stage.addChild(turtleContainer);
-        stage.addChild(trashContainer, blocksContainer, palettesContainer);
+        stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
         trashcan = new Trashcan();
@@ -4750,7 +4642,6 @@ function Activity() {
         palettes = new Palettes();
         palettes
             .setCanvas(canvas)
-            .setStage(palettesContainer)
             .setRefreshCanvas(refreshCanvas)
             .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
@@ -4887,10 +4778,8 @@ function Activity() {
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
-                for (let name in blocks.palettes.dict) {
-                    blocks.palettes.dict[name].hideMenu(true);
-                }
-
+                blocks.palettes._hideMenus(true);
+                
                 let __afterLoad = function() {
                     document.removeEventListener(
                         "finishedLoading",

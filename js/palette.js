@@ -111,6 +111,8 @@ function Palettes() {
     };
 
     this.deltaY = function(dy) {
+        let curr = parseInt(document.getElementById("palette").style.top);
+        document.getElementById("palette").style.top = curr + dy +"px"
     };
 
     this._makeSelectorButton = function(i) {
@@ -254,22 +256,6 @@ function Palettes() {
         this.mobile = mobile;
         if (mobile) {
             this._hideMenus();
-        }
-
-        return this;
-    };
-
-    this.setScale = function(scale) {
-        this.scale = scale;
-
-        this._updateButtonMasks();
-
-        for (var i in this.dict) {
-            this.dict[i]._resizeEvent();
-        }
-
-        if (this.downIndicator != null) {
-            this.downIndicator.y = windowHeight() / scale - 27;
         }
 
         return this;
@@ -438,7 +424,7 @@ function Palettes() {
 
             console.debug("searching");
             this.dict[name].visible = true;
-            //this.showSearchWidget(true);
+            this.showSearchWidget(true);
             return;
         }
 
@@ -479,18 +465,11 @@ function Palettes() {
     this._hideMenus = function() {
         // Hide the menu buttons and the palettes themselves.
 
-        for (var name in this.dict) {
-            this.dict[name].hideMenu();
-        }
-
         this.hideSearchWidget(true);
 
-        for (var i = 0; i < this.selectorButtonsOff.length; i++) {
-            this.selectorButtonsOn[i].visible = false;
-            this.selectorButtonsOff[i].visible = false;
-        }
-
-        this.refreshCanvas();
+        if (docById("PaletteBody")) 
+            docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
+            
     };
 
     this.getInfo = function() {
@@ -503,33 +482,16 @@ function Palettes() {
         if (showPalette != null) {
             this.makePalettes(false);
             var myPalettes = this;
-            setTimeout(function() {
-                myPalettes.dict[showPalette]._resetLayout();
-                // Show the action palette after adding/deleting new
-                // nameddo blocks.
-                // myPalettes.dict[showPalette].showMenu();
-                // myPalettes.dict[showPalette]._showMenuItems();
-                myPalettes.dict[showPalette].hideMenu();
-                myPalettes.dict[showPalette]._hideMenuItems();
-                myPalettes.refreshCanvas();
-            }, 100);
-        } else {
-            this.makePalettes(true);
-            this.refreshCanvas();
+            myPalettes.dict[showPalette]._resetLayout();
+            // Show the action palette after adding/deleting new
+            // nameddo blocks.
+            // myPalettes.dict[showPalette].showMenu();
+            // myPalettes.dict[showPalette]._showMenuItems();
+            myPalettes.dict[showPalette].hideMenu();
+            myPalettes.dict[showPalette]._hideMenuItems();
         }
-
         if (this.mobile) {
-            var that = this;
-            setTimeout(function() {
-                that.hide();
-
-                for (var i in that.dict) {
-                    if (that.dict[i].visible) {
-                        that.dict[i].hideMenu();
-                        that.dict[i]._hideMenuItems();
-                    }
-                }
-            }, 500);
+            this.hide();
         }
     };
 
@@ -545,7 +507,7 @@ function Palettes() {
     };
 
     this.add = function(name) {
-        this.dict[name] = new PaletteNew1(this, name);
+        this.dict[name] = new Palette(this, name);
         return this;
     };
 
@@ -970,7 +932,7 @@ function PaletteModel(palette, palettes, name) {
 }
 
 // Define objects for individual palettes.
-function PaletteNew1(palettes, name) {
+function Palette(palettes, name) {
     this.palettes = palettes;
     this.name = name;
     this.model = new PaletteModel(this, palettes, name);
@@ -994,12 +956,6 @@ function PaletteNew1(palettes, name) {
 
     };
 
-    this._resizeEvent = function() {
-        this.hide();
-        this._updateBackground();
-        this._updateBlockMasks();
-    };
-
     this._updateBlockMasks = function() {
     };
 
@@ -1014,49 +970,6 @@ function PaletteNew1(palettes, name) {
         }
 
         return maxWidth > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0;
-    };
-
-    this._updateBackground = function() {
-        if (this.menuContainer === null) {
-            return;
-        }
-
-        if (this.background !== null) {
-            this.background.removeAllChildren();
-        } else {
-            this.background = new createjs.Container();
-            this.background.snapToPixelEnabled = true;
-            this.background.visible = false;
-            this.palettes.stage.addChild(this.background);
-            this._setupBackgroundEvents();
-        }
-
-        // Since we don't always add items at the end, the dependency
-        // on this.y is unrelable. Easy workaround is just to always
-        // extend the palette to the bottom.
-
-        // var h = Math.min(maxPaletteHeight(this.palettes.cellSize, this.palettes.scale), this.y);
-        var h = maxPaletteHeight(this.palettes.cellSize, this.palettes.scale);
-
-        var shape = new createjs.Shape();
-        shape.graphics
-            .f(platformColor.ruleColor)
-            .r(0, 0, MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth(), h)
-            .ef()
-            .f(platformColor.paletteBackground)
-            .r(
-                2,
-                2,
-                MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth() - 4,
-                h - 4
-            )
-            .ef();
-        shape.width = MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
-        shape.height = h;
-        this.background.addChild(shape);
-
-        this.background.x = this.menuContainer.x;
-        this.background.y = this.menuContainer.y + STANDARDBLOCKHEIGHT / 2;
     };
 
     this._resetLayout = function() {
@@ -1089,20 +1002,16 @@ function PaletteNew1(palettes, name) {
     };
 
     this.hideMenu = function() {
-        if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
-            this.palettes.hideSearchWidget(true);
-        }
-
         this._hideMenuItems();
     };
 
     this.showMenu = function(createHeader) {
         
         let palDiv = docById("palette");
-        if (palDiv.children.length > 1) 
-            palDiv.removeChild(palDiv.children[1]);
+        if (docById("PaletteBody")) 
+            palDiv.removeChild(docById("PaletteBody"));
         let x = document.createElement("table");
-        x.setAttribute("border","0px");
+        x.setAttribute("id","PaletteBody")
         x.setAttribute("bgcolor","white");
         x.setAttribute("style","float: left");
         x.innerHTML= '<thead></thead><tbody style = "display: block; height: 400px; overflow: auto;" id ="PaletteBody_items" class="PalScrol"></tbody>'
@@ -1115,7 +1024,7 @@ function PaletteNew1(palettes, name) {
                 
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.innerHTML='<td style ="width: 10px"></td><td></td><td></td>';
+            header.innerHTML='<td style ="width: 10px"></td><td></td>';
             let closeImg = makePaletteIcons(
                 CLOSEICON.replace("fill_color", platformColor.selectorSelected),
                 this.palettes.cellSize,
@@ -1129,9 +1038,17 @@ function PaletteNew1(palettes, name) {
                 this.palettes.cellSize,
                 this.palettes.cellSize,
             );
+            closeImg.onmouseover = (evt) => {
+                document.body.style.cursor = "pointer";
+            }
+            closeImg.onmouseleave = (evt) => {
+                document.body.style.cursor = "default";
+            }
             header.children[0].appendChild(labelImg);
-            header.children[1].textContent = toTitleCase(_(this.name));
-            header.children[2].appendChild(closeImg);
+            let label = document.createElement("span");
+            label.textContent = toTitleCase(_(this.name));
+            header.children[0].appendChild(label);
+            header.children[1].appendChild(closeImg);
         }
         this._showMenuItems();
     };
@@ -1140,12 +1057,8 @@ function PaletteNew1(palettes, name) {
         if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
             this.palettes.hideSearchWidget(true);
         }
-
-        for (var i in this.protoContainers) {
-            this.protoContainers[i].visible = false;
-        }
-
-        //docById("palette").removeChild(docById("palette").children[1]);        
+        if (docById("PaletteBody"))
+            docById("palette").removeChild(docById("PaletteBody"));        
     };
 
     this._showMenuItems = function() {
@@ -1164,96 +1077,94 @@ function PaletteNew1(palettes, name) {
             let itemRow = paletteList.insertRow();
             let itemCell = itemRow.insertCell();
             var that = this ;
-            if (!this.protoContainers[b.modname]){
-                let img = makePaletteIcons(
-                    b.artwork
-                );
+            let img = makePaletteIcons(
+                b.artwork
+            );
 
-                img.onmouseover = (evt) => {
-                    document.body.style.cursor = "pointer";
-                }
-
-                img.onmouseleave = (evt) => {
-                    document.body.style.cursor = "default";
-                }
-
-                //image Drag initiates a browser defined drag . which needs to be stoped.
-                img.ondragstart = function() {
-                    return false;
-                };
-
-                let down = function(event){
-                    // (1) prepare to moving: make absolute and on top by z-index
-                    let posit = img.style.position ; 
-                    let zInd = img.style.zIndex ; 
-                    img.style.position = 'absolute';
-                    img.style.zIndex = 1000;
-
-                    // move it out of any current parents directly into body
-                    // to make it positioned relative to the body
-                    document.body.appendChild(img);
-                  
-                    // centers the img at (pageX, pageY) coordinates
-                    moveAt = (pageX, pageY) => {
-                      img.style.left = pageX - img.offsetWidth / 2 + 'px';
-                      img.style.top = pageY - img.offsetHeight / 2 + 'px';
-                    }
-                    
-                    let onMouseMove = (e) => {
-                        let x,y;
-                        if (e.type === "touchmove"){
-                            x = e.touches[0].clientX;
-                            y = e.touches[0].clientY;
-                        }   
-                        else{
-                            x = e.pageX;
-                            y = e.pageY;
-                        }
-                        moveAt(x,y);
-                    }
-                    onMouseMove(event)
-                    
-                    document.addEventListener('touchmove', onMouseMove);
-                    document.addEventListener('mousemove', onMouseMove);
-                    
-                    let up = function (event) {
-                        document.body.style.cursor = "default";
-                        docById("palette").removeChild(docById("palette").children[1]);
-                        document.removeEventListener('mousemove', onMouseMove);
-                        img.onmouseup = null;
-
-                        let x,y;
-                        x = parseInt (img.style.left);
-                        y = parseInt (img.style.top);
-                        
-                        img.style.position = posit;
-                        img.style.zIndex = zInd;
-                        document.body.removeChild(img);
-                        itemCell.appendChild(img)
-                        
-                        if (!x || !y) return ;
-                        that._makeBlockFromProtoblock(
-                            that.protoList[blk],
-                            true,
-                            b.modname,
-                            event,
-                            x - that.palettes.blocksContainer.x,
-                            y - that.palettes.blocksContainer.y
-                        );
-                    };
-
-                    img.ontouchend = up ;                  
-                    img.onmouseup = up ;
-                };
-
-                img.ontouchstart = down ;
-                img.onmousedown = down ;
-                 
-                itemCell.setAttribute("style","width: "+img.width+"px ");
-                itemCell.appendChild(
-                    img
-                )
+            img.onmouseover = (evt) => {
+                document.body.style.cursor = "pointer";
             }
+
+            img.onmouseleave = (evt) => {
+                document.body.style.cursor = "default";
+            }
+
+            //image Drag initiates a browser defined drag . which needs to be stoped.
+            img.ondragstart = function() {
+                return false;
+            };
+
+            let down = function(event){
+                // (1) prepare to moving: make absolute and on top by z-index
+                let posit = img.style.position ; 
+                let zInd = img.style.zIndex ; 
+                img.style.position = 'absolute';
+                img.style.zIndex = 1000;
+
+                // move it out of any current parents directly into body
+                // to make it positioned relative to the body
+                document.body.appendChild(img);
+                
+                // centers the img at (pageX, pageY) coordinates
+                moveAt = (pageX, pageY) => {
+                    img.style.left = pageX - img.offsetWidth / 2 + 'px';
+                    img.style.top = pageY - img.offsetHeight / 2 + 'px';
+                }
+                
+                let onMouseMove = (e) => {
+                    let x,y;
+                    if (e.type === "touchmove"){
+                        x = e.touches[0].clientX;
+                        y = e.touches[0].clientY;
+                    }   
+                    else{
+                        x = e.pageX;
+                        y = e.pageY;
+                    }
+                    moveAt(x,y);
+                }
+                onMouseMove(event)
+                
+                document.addEventListener('touchmove', onMouseMove);
+                document.addEventListener('mousemove', onMouseMove);
+                
+                let up = function (event) {
+                    document.body.style.cursor = "default";
+                    that.palettes._hideMenus()
+                    document.removeEventListener('mousemove', onMouseMove);
+                    img.onmouseup = null;
+
+                    let x,y;
+                    x = parseInt (img.style.left);
+                    y = parseInt (img.style.top);
+                    
+                    img.style.position = posit;
+                    img.style.zIndex = zInd;
+                    document.body.removeChild(img);
+                    itemCell.appendChild(img)
+                    
+                    if (!x || !y) return ;
+                    that._makeBlockFromProtoblock(
+                        that.protoList[blk],
+                        true,
+                        b.modname,
+                        event,
+                        x - that.palettes.blocksContainer.x,
+                        y - that.palettes.blocksContainer.y
+                    );
+                };
+
+                img.ontouchend = up ;                  
+                img.onmouseup = up ;
+            };
+
+            img.ontouchstart = down ;
+            img.onmousedown = down ;
+                
+            itemCell.setAttribute("style","width: "+img.width+"px ");
+            itemCell.appendChild(
+                img
+            )
         }
 
         if (this.palettes.mobile) {
@@ -1312,226 +1223,6 @@ function PaletteNew1(palettes, name) {
             }
         }
         return this;
-    };
-
-    this._setupBackgroundEvents = function() {
-        var that = this;
-        var scrolling = false;
-
-        // Ensure we don't end up with duplicate event handlers.
-        this.background.removeAllEventListeners("mouseover");
-        this.background.removeAllEventListeners("mouseout");
-        this.background.removeAllEventListeners("mousedown");
-
-        this.background.on("mouseover", function(event) {
-            that.palettes.activePalette = that;
-        });
-
-        this.background.on("mouseout", function(event) {
-            that.palettes.activePalette = null;
-        });
-
-        this.background.on("mousedown", function(event) {
-            scrolling = true;
-            var lastY = event.stageY;
-
-            that.background.removeAllEventListeners("pressmove");
-            that.background.on("pressmove", function(event) {
-                if (!scrolling) {
-                    return;
-                }
-
-                var diff = event.stageY - lastY;
-                that.scrollEvent(diff, 10);
-                lastY = event.stageY;
-            });
-
-            that.background.removeAllEventListeners("pressup");
-            that.background.on(
-                "pressup",
-                function(event) {
-                    that.palettes.activePalette = null;
-                    scrolling = false;
-                },
-                null,
-                true
-            ); // once = true
-        });
-    };
-
-    // Palette Menu event handlers
-    this._loadPaletteMenuHandler = function() {
-        // The palette menu is the container for the protoblocks. One
-        // palette per palette button.
-
-        var that = this;
-        var locked = false;
-        var trashcan = this.palettes.trashcan;
-        var paletteWidth =
-            MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
-
-        this.menuContainer.on("click", function(event) {
-            if (
-                Math.round(event.stageX / that.palettes.scale) >
-                that.menuContainer.x + paletteWidth - STANDARDBLOCKHEIGHT
-            ) {
-                that.hide();
-                that.palettes.refreshCanvas();
-                return;
-            }
-
-            if (locked) {
-                return;
-            }
-
-            locked = true;
-            setTimeout(function() {
-                locked = false;
-            }, 500);
-
-            for (var p in that.palettes.dict) {
-                if (that.name != p) {
-                    if (that.palettes.dict[p].visible) {
-                        that.palettes.dict[p]._hideMenuItems();
-                    }
-                }
-            }
-
-            if (that.visible) {
-                that._hideMenuItems();
-            } else {
-                that._showMenuItems();
-            }
-            that.palettes.refreshCanvas();
-        });
-
-        this.menuContainer.on("mouseover", function(event) {
-            document.body.style.cursor = "pointer";
-        });
-
-        this.menuContainer.on("mouseout", function(event) {
-            document.body.style.cursor = "default";
-        });
-    };
-
-    // Menu Item event handlers
-    this._loadPaletteMenuItemHandler = function(protoblk, blkname) {
-        // A menu item is a protoblock that is used to create a new block.
-        var that = this;
-        var pressupLock = false;
-        var pressed = false;
-        var moved = false;
-        var saveX = this.protoContainers[blkname].x;
-        var saveY = this.protoContainers[blkname].y;
-        var bgScrolling = false;
-
-        this.protoContainers[blkname].on("mouseover", function(event) {
-            document.body.style.cursor = "pointer";
-            that.palettes.activePalette = that;
-        });
-
-        this.protoContainers[blkname].on("mousedown", function(event) {
-            var stage = that.palettes.stage;
-            stage.setChildIndex(
-                that.protoContainers[blkname],
-                stage.children.length - 1
-            );
-
-            var h = Math.min(
-                maxPaletteHeight(that.palettes.cellSize, that.palettes.scale),
-                that.palettes.y
-            );
-            var clickY = event.stageY / that.palettes.scale;
-            var paletteEndY = that.menuContainer.y + h + STANDARDBLOCKHEIGHT;
-
-            // if(clickY < paletteEndY)
-            that.protoContainers[blkname].mask = null;
-
-            moved = false;
-            pressed = true;
-            saveX = that.protoContainers[blkname].x;
-            saveY = that.protoContainers[blkname].y - that.scrollDiff;
-            var startX = event.stageX;
-            var startY = event.stageY;
-            var lastY = event.stageY;
-
-            if (that.draggingProtoBlock) {
-                return;
-            }
-
-            var mode = window.hasMouse ? MODEDRAG : MODEUNSURE;
-
-            that.protoContainers[blkname].removeAllEventListeners("pressmove");
-            that.protoContainers[blkname].on("pressmove", function(event) {
-                if (mode === MODEDRAG) {
-                    // if(clickY < paletteEndY)
-                    moved = true;
-                    that.draggingProtoBlock = true;
-                    that.protoContainers[blkname].x =
-                        Math.round(event.stageX / that.palettes.scale) -
-                        PALETTELEFTMARGIN;
-                    that.protoContainers[blkname].y = Math.round(
-                        event.stageY / that.palettes.scale
-                    );
-                    that.palettes.refreshCanvas();
-                    return;
-                }
-
-                if (mode === MODESCROLL) {
-                    var diff = event.stageY - lastY;
-                    that.scrollEvent(diff, 10);
-                    lastY = event.stageY;
-                    return;
-                }
-
-                var xd = Math.abs(event.stageX - startX);
-                var yd = Math.abs(event.stageY - startY);
-                var diff = Math.sqrt(xd * xd + yd * yd);
-                if (mode === MODEUNSURE && diff > DECIDEDISTANCE) {
-                    mode = yd > xd ? MODESCROLL : MODEDRAG;
-                }
-            });
-        });
-
-        this.protoContainers[blkname].on("mouseout", function(event) {
-            // Catch case when pressup event is missed.
-            // Put the protoblock back on the palette...
-            document.body.style.cursor = "default";
-            that.palettes.activePalette = null;
-
-            if (pressed && moved) {
-                that._restoreProtoblock(
-                    blkname,
-                    saveX,
-                    saveY + that.scrollDiff
-                );
-                pressed = false;
-                moved = false;
-            }
-        });
-
-        this.protoContainers[blkname].on("pressup", function(event) {
-            document.body.style.cursor = "default";
-            that.palettes.activePalette = null;
-
-            if (pressupLock) {
-                return;
-            } else {
-                pressupLock = true;
-                setTimeout(function() {
-                    pressupLock = false;
-                }, 1000);
-            }
-
-            that._makeBlockFromProtoblock(
-                protoblk,
-                moved,
-                blkname,
-                event,
-                saveX,
-                saveY
-            );
-        });
     };
 
     this._restoreProtoblock = function(name, x, y) {
@@ -1684,8 +1375,8 @@ function PaletteNew1(palettes, name) {
             blockIsMacro(blkname)
         ) {
             var moved = true;
-            var saveX = this.protoContainers[blkname].x;
-            var saveY = this.protoContainers[blkname].y;
+            var saveX = 100;
+            var saveY = 100;
             this._makeBlockFromProtoblock(
                 protoblk,
                 moved,
@@ -1706,8 +1397,8 @@ function PaletteNew1(palettes, name) {
             blkname in this.palettes.pluginMacros
         ) {
             var moved = true;
-            var saveX = this.protoContainers[blkname].x;
-            var saveY = this.protoContainers[blkname].y;
+            var saveX = 100;
+            var saveY = 100;
             this._makeBlockFromProtoblock(
                 protoblk,
                 moved,
@@ -1883,9 +1574,9 @@ async function initPalettes(palettes) {
         palettes.add(BUILTINPALETTES[i]);
     }
 
+    await delayExecution(4000);
     palettes.init_selectors();
     palettes.makePalettesNew(0);
-    await delayExecution(3000);
     console.debug("Time to show the palettes.");
     palettes.show();
     palettes.showSelection(0);
