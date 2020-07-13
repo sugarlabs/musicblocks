@@ -121,7 +121,7 @@ function Palettes() {
         if (!document.getElementById("palette")){
             let element = document.createElement("div");
             element.setAttribute("id","palette");
-            element.setAttribute("style",'position: fixed; left :0px; top:'+this.top+'px');
+            element.setAttribute("style",'position: fixed; display: none ; left :0px; top:'+this.top+'px');
             element.innerHTML ='<table style="float: left" bgcolor="white"><thead><tr></tr></thead><tbody></tbody></table>'
             document.body.appendChild(element);
         }
@@ -480,9 +480,7 @@ function Palettes() {
 
     this.updatePalettes = function(showPalette) {
         if (showPalette != null) {
-            this.makePalettes(false);
             var myPalettes = this;
-            myPalettes.dict[showPalette]._resetLayout();
             // Show the action palette after adding/deleting new
             // nameddo blocks.
             // myPalettes.dict[showPalette].showMenu();
@@ -1230,7 +1228,6 @@ function Palette(palettes, name) {
         this.protoContainers[name].x = x;
         this.protoContainers[name].y = y;
         // console.debug('restore ' + name);
-        this._resetLayout();
     };
 
     this.makeBlockFromSearch = function(protoblk, blkname, callback) {
@@ -1419,7 +1416,6 @@ function Palette(palettes, name) {
     };
 
     this.cleanup = function() {
-        this._resetLayout();
         this._updateBlockMasks();
     };
 
@@ -1567,21 +1563,18 @@ function Palette(palettes, name) {
 }
 
 async function initPalettes(palettes) {
-    // function initPalettes (palettes) {
     // Instantiate the palettes object on first load.
 
     for (var i = 0; i < BUILTINPALETTES.length; i++) {
         palettes.add(BUILTINPALETTES[i]);
     }
 
-    await delayExecution(4000);
     palettes.init_selectors();
     palettes.makePalettesNew(0);
     console.debug("Time to show the palettes.");
     palettes.show();
     palettes.showSelection(0);
 
-    // }, 3000);
 }
 
 const MODEUNSURE = 0;

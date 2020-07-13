@@ -2831,6 +2831,8 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function() {
+        if (docById("palette").style.display != "none") 
+            docById("palette").style.display = "none";
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
     };
@@ -3019,6 +3021,7 @@ function Activity() {
      */
     this.showContents = function() {
         docById("loading-image-container").style.display = "none";
+        docById("palette").style.display = "block";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
 
@@ -4710,6 +4713,7 @@ function Activity() {
 
             this.showMusicBlocks = function() {
                 document.getElementById("toolbars").style.display = "block";
+                document.getElementById("palette").style.display = "block";
 
                 widgetWindows.showWindows();
 
