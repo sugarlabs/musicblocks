@@ -196,6 +196,63 @@ class Singer {
         return positive ? i : -i;
     }
 
+    /**
+     * Calculates the change needed for musical inversion.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {String} note
+     * @param {Number} octave
+     * @returns {Number} inverted value
+     */
+    static calculateInvert(logo, turtle, note, octave) {
+        let delta = 0;
+        let note1 = getNote(
+            note, octave, 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg
+        );
+        let num1 =
+            pitchToNumber(note1[0], note1[1], logo.keySignature[turtle]) -
+            logo.pitchNumberOffset[turtle];
+
+        for (let i = logo.invertList[turtle].length - 1; i >= 0; i--) {
+            let note2 = getNote(
+                logo.invertList[turtle][i][0],
+                logo.invertList[turtle][i][1],
+                0,
+                logo.keySignature[turtle],
+                logo.moveable[turtle],
+                null,
+                logo.errorMsg
+            );
+            let num2 =
+                pitchToNumber(note2[0], note2[1], logo.keySignature[turtle]) -
+                logo.pitchNumberOffset[turtle];
+
+            if (logo.invertList[turtle][i][2] === "even") {
+                delta += num2 - num1;
+                num1 += 2 * delta;
+            } else if (logo.invertList[turtle][i][2] === "odd") {
+                delta += num2 - num1 + 0.5;
+                num1 += 2 * delta;
+            } else {
+                // We need to calculate the scalar difference
+                let scalarSteps = Singer.scalarDistance(logo, turtle, num2, num1);
+                let note3 = Singer.addScalarTransposition(
+                    logo, turtle, note2[0], note2[1], -scalarSteps
+                );
+                let num3 =
+                    pitchToNumber(note3[0], note3[1], logo.keySignature[turtle]) -
+                    logo.pitchNumberOffset[turtle];
+
+                delta += (num3 - num1) / 2;
+                num1 = num3;
+            }
+        }
+
+        return delta;
+    }
+
     // ========================================================================
 
     /**
@@ -260,7 +317,8 @@ class Singer {
         }
 
         let delta =
-            logo.invertList[turtle].length > 0 ? logo.calculateInvert(turtle, note, octave) : 0;
+            logo.invertList[turtle].length > 0 ?
+                Singer.calculateInvert(logo, turtle, note, octave) : 0;
 
         if (logo.justMeasuring[turtle].length > 0) {
             let transposition = turtle in logo.transposition ? logo.transposition[turtle] : 0;

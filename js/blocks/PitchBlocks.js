@@ -1677,7 +1677,7 @@ function setupPitchBlocks() {
                 logo.lastNotePlayed[turtle] = [note[0] + note[1], 4];
             } else if (logo.inNoteBlock[turtle].length > 0) {
                 if (!(logo.invertList[turtle].length === 0)) {
-                    delta += logo.calculateInvert(turtle, note, octave);
+                    delta += Singer.calculateInvert(logo, turtle, note, octave);
                 }
 
                 let noteObj1 = addPitch(note, octave, cents, arg);
@@ -2267,7 +2267,7 @@ function setupPitchBlocks() {
 
             let delta = 0;
             if (!(logo.invertList[turtle].length === 0)) {
-                delta += logo.calculateInvert(turtle, noteObj[0], noteObj[1]);
+                delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
             }
 
             let transposition = 2 * delta;
