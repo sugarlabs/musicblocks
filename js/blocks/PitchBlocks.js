@@ -129,7 +129,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "transposition"]);
             } else {
-                return logo.transposition[turtle];
+                return logo.turtles.ithTurtle(turtle).singer.transposition;
             }
         }
     }
@@ -1051,24 +1051,18 @@ function setupPitchBlocks() {
 
             if (args[0] !== null && typeof args[0] === "number") {
                 let transValue = args[0];
-                if (!(logo.invertList[turtle].length === 0)) {
-                    logo.transposition[turtle] -= transValue;
-                } else {
-                    logo.transposition[turtle] += transValue;
-                }
-
-                logo.transpositionValues[turtle].push(transValue);
+                let tur = logo.turtles.ithTurtle(turtle);
+                tur.singer.transposition +=
+                    logo.invertList[turtle].length > 0 ? -transValue : transValue;
+                tur.singer.transpositionValues.push(transValue);
 
                 let listenerName = "_transposition_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
-                    transValue = logo.transpositionValues[turtle].pop();
-                    if (!(logo.invertList[turtle].length === 0)) {
-                        logo.transposition[turtle] += transValue;
-                    } else {
-                        logo.transposition[turtle] -= transValue;
-                    }
+                    transValue = tur.singer.transpositionValues.pop();
+                    tur.singer.transposition +=
+                        logo.invertList[turtle].length > 0 ? transValue : -transValue;
                 };
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1334,24 +1328,18 @@ function setupPitchBlocks() {
                 transValue = args[0];
             }
 
-            if (!(logo.invertList[turtle].length === 0)) {
-                logo.scalarTransposition[turtle] -= transValue;
-            } else {
-                logo.scalarTransposition[turtle] += transValue;
-            }
-
-            logo.scalarTranspositionValues[turtle].push(transValue);
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.singer.scalarTransposition +=
+                logo.invertList[turtle].length > 0 ? transValue : -transValue;
+            tur.singer.scalarTranspositionValues.push(transValue);
 
             let listenerName = "_scalar_transposition_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                transValue = logo.scalarTranspositionValues[turtle].pop();
-                if (!(logo.invertList[turtle].length === 0)) {
-                    logo.scalarTransposition[turtle] += transValue;
-                } else {
-                    logo.scalarTransposition[turtle] -= transValue;
-                }
+            let __listener = event => {
+                transValue = tur.singer.scalarTranspositionValues.pop();
+                tur.singer.scalarTransposition +=
+                    logo.invertList[turtle].length > 0 ? transValue : -transValue;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1422,21 +1410,14 @@ function setupPitchBlocks() {
                 value = ACCIDENTALVALUES[i];
             }
 
-            if (!(logo.invertList[turtle].length === 0)) {
-                logo.transposition[turtle] -= value;
-            } else {
-                logo.transposition[turtle] += value;
-            }
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.singer.transposition += logo.invertList[turtle].length > 0 ? -value : value;
 
             let listenerName = "_accidental_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                if (!(logo.invertList[turtle].length === 0)) {
-                    logo.transposition[turtle] += value;
-                } else {
-                    logo.transposition[turtle] -= value;
-                }
+            let __listener = event => {
+                tur.singer.transposition += logo.invertList[turtle].length > 0 ? value : -value;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1473,21 +1454,15 @@ function setupPitchBlocks() {
                 return;
             }
 
-            if (!(logo.invertList[turtle].length === 0)) {
-                logo.transposition[turtle] += 1;
-            } else {
-                logo.transposition[turtle] -= 1;
-            }
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.singer.transposition += logo.invertList[turtle].length > 0 ? 1 : -1;
 
             let listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                if (!(logo.invertList[turtle].length === 0)) {
-                    logo.transposition[turtle] -= 1;
-                } else {
-                    logo.transposition[turtle] += 1;
-                }
+            let __listener = event => {
+                let tur = logo.turtles.ithTurtle(turtle);
+                tur.singer.transposition += logo.invertList[turtle].length > 0 ? -1 : 1;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1524,21 +1499,15 @@ function setupPitchBlocks() {
                 return;
             }
 
-            if (!(logo.invertList[turtle].length === 0)) {
-                logo.transposition[turtle] -= 1;
-            } else {
-                logo.transposition[turtle] += 1;
-            }
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.singer.transposition += logo.invertList[turtle].length > 0 ? -1 : 1;
 
             let listenerName = "_sharp_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                if (!(logo.invertList[turtle].length === 0)) {
-                    logo.transposition[turtle] += 1;
-                } else {
-                    logo.transposition[turtle] -= 1;
-                }
+            let __listener = event => {
+                let tur = logo.turtles.ithTurtle(turtle);
+                tur.singer.transposition += logo.invertList[turtle].length > 0 ? 1 : -1;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1620,10 +1589,7 @@ function setupPitchBlocks() {
                 return noteObj;
             }
 
-            let transposition = 2 * delta;
-            if (turtle in logo.transposition) {
-                transposition += logo.transposition[turtle];
-            }
+            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
 
             if (note === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
@@ -1833,9 +1799,10 @@ function setupPitchBlocks() {
                 logo.defineMode[turtle].push(arg0);
                 return;
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
                 if (
                     isCustom(logo.synth.inTemperament) &&
-                    logo.scalarTransposition[turtle] + logo.transposition[turtle] !== 0
+                    tur.singer.scalarTransposition + tur.singer.transposition !== 0
                 ) {
                     logo.errorMsg(
                         _(
@@ -2270,10 +2237,7 @@ function setupPitchBlocks() {
                 delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
             }
 
-            let transposition = 2 * delta;
-            if (turtle in logo.transposition) {
-                transposition += logo.transposition[turtle];
-            }
+            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
 
             let noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
             // Only apply the transposition to the base note of an interval

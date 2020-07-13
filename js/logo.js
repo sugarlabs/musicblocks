@@ -74,6 +74,7 @@ class Logo {
         this._saveLocally = null;
         this.showBlocksAfterRun = false;
 
+        // Widgets
         this.pitchTimeMatrix = null;
         this.pitchDrumMatrix = null;
         this.rhythmRuler = null;
@@ -122,7 +123,7 @@ class Logo {
 
         // When we leave a clamp block, we need to dispatch a signal
         this.endOfClampSignals = {};
-        // Don't dispatch these signals (when exiting note counter or interval measure
+        // Don't dispatch these signals (when exiting note counter or interval measure)
         this.butNotThese = {};
 
         this.lastNoteTimeout = null;
@@ -179,10 +180,10 @@ class Logo {
         this.multipleVoices = [];
 
         // Parameters used by pitch
-        this.scalarTransposition = {};
-        this.scalarTranspositionValues = {};
-        this.transposition = {};
-        this.transpositionValues = {};
+        /** @deprecated */  // this.scalarTransposition = {};
+        /** @deprecated */  // this.scalarTranspositionValues = {};
+        /** @deprecated */  // this.transposition = {};
+        /** @deprecated */  // this.transpositionValues = {};
 
         // Parameters used by notes
         this._masterBPM = TARGETBPM;
@@ -1275,6 +1276,12 @@ class Logo {
      * @returns {void}
      */
     initTurtle(turtle) {
+        let tur = this.turtles.ithTurtle(Number(turtle));
+        tur.singer.scalarTransposition = 0;
+        tur.singer.scalarTranspositionValues = [];
+        tur.singer.transposition = 0;
+        tur.singer.transpositionValues = [];
+
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
         this.waitTimes[turtle] = 0;
@@ -1286,10 +1293,10 @@ class Logo {
         this.cp2y[turtle] = 100;
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
-        this.scalarTransposition[turtle] = 0;
-        this.scalarTranspositionValues[turtle] = [];
-        this.transposition[turtle] = 0;
-        this.transpositionValues[turtle] = [];
+        /** @deprecated */  // this.scalarTransposition[turtle] = 0;
+        /** @deprecated */  // this.scalarTranspositionValues[turtle] = [];
+        /** @deprecated */  // this.transposition[turtle] = 0;
+        /** @deprecated */  // this.transpositionValues[turtle] = [];
         this.noteBeat[turtle] = {};
         this.noteValue[turtle] = {};
         this.noteCents[turtle] = {};

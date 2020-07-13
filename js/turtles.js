@@ -476,6 +476,14 @@ Turtles.TurtlesModel = class {
         }
         return false;
     }
+
+    /**
+     * @param {Number} i - index number
+     * @returns {Object} ith Turtle object
+     */
+    ithTurtle(i) {
+        return this._turtleList[Number(i)];
+    }
 };
 
 /**

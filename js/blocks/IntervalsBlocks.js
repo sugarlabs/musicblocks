@@ -984,12 +984,13 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                // Check to see if there are any transpositions on the key.
-                if (turtle in logo.transposition) {
+                let tur = logo.turtles.ithTurtle(turtle);
+                // Check to see if there are any transpositions on the key
+                if (tur.singer.transposition !== 0) {
                     let noteObj = getNote(
                         args[0],
                         4,
-                        logo.transposition[turtle],
+                        tur.singer.transposition,
                         logo.keySignature[turtle],
                         false,
                         null,

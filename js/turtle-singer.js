@@ -41,6 +41,12 @@ class Singer {
     constructor(turtle) {
         this.turtle = turtle;
         this.turtles = turtle.turtles;
+
+        // Parameters used by pitch
+        this.scalarTransposition = 0;
+        this.scalarTranspositionValues = [];
+        this.transposition = 0;
+        this.transpositionValues = [];
     }
 
     //  Deprecated
@@ -405,8 +411,9 @@ class Singer {
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
     static processPitch(note, octave, cents, logo, turtle, blk) {
+        let tur = logo.turtles.ithTurtle(turtle);
         let noteObj = Singer.addScalarTransposition(
-            logo, turtle, note, octave, logo.scalarTransposition[turtle]
+            logo, turtle, note, octave, tur.singer.scalarTransposition
         );
         [note, octave] = noteObj;
 
@@ -414,7 +421,7 @@ class Singer {
             noteObj = getNote(
                 note,
                 octave,
-                logo.transposition[turtle],
+                tur.singer.transposition,
                 logo.keySignature[turtle],
                 logo.moveable[turtle],
                 null,
@@ -428,11 +435,11 @@ class Singer {
                 noteObj2 = Singer.addScalarTransposition(
                    logo, turtle, note, octave, parseInt(logo.neighborStepPitch[turtle])
                 );
-                if (logo.transposition[turtle] !== 0) {
+                if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
                         noteObj2[0],
                         noteObj2[1],
-                        logo.transposition[turtle],
+                        tur.singer.transposition,
                         logo.keySignature[turtle],
                         logo.moveable[turtle],
                         null,
@@ -444,7 +451,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    logo.transposition[turtle] + parseInt(logo.neighborStepPitch[turtle]),
+                    tur.singer.transposition + parseInt(logo.neighborStepPitch[turtle]),
                     logo.keySignature[turtle],
                     logo.moveable[turtle],
                     null,
@@ -461,7 +468,7 @@ class Singer {
                 Singer.calculateInvert(logo, turtle, note, octave) : 0;
 
         if (logo.justMeasuring[turtle].length > 0) {
-            let transposition = turtle in logo.transposition ? logo.transposition[turtle] : 0;
+            let transposition = tur.singer.transposition;
 
             noteObj = getNote(
                 note,
@@ -496,10 +503,7 @@ class Singer {
 
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
-                let transposition = 2 * delta;
-                if (turtle in logo.transposition) {
-                    transposition += logo.transposition[turtle];
-                }
+                let transposition = 2 * delta + tur.singer.transposition;
 
                 let nnote = getNote(
                     note,
@@ -533,10 +537,7 @@ class Singer {
 
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
-                let transposition = 2 * delta;
-                if (turtle in logo.transposition) {
-                    transposition += logo.transposition[turtle];
-                }
+                let transposition = 2 * delta + tur.singer.transposition;
 
                 let noteObj = getNote(
                     note,
@@ -615,10 +616,7 @@ class Singer {
             }
 
             // Apply transpositions
-            let transposition = 2 * delta;
-            if (turtle in logo.transposition) {
-                transposition += logo.transposition[turtle];
-            }
+            let transposition = 2 * delta + tur.singer.transposition;
 
             let noteObj1 = addPitch(note, octave, cents);
 
@@ -669,7 +667,7 @@ class Singer {
             logo.pushedNote[turtle] = true;
         } else if (logo.drumStyle[turtle].length > 0) {
             let drumname = last(logo.drumStyle[turtle]);
-            let transposition = turtle in logo.transposition ? logo.transposition[turtle] : 0;
+            let transposition = tur.singer.transposition;
 
             let noteObj1 = getNote(
                 note,
@@ -716,10 +714,7 @@ class Singer {
             logo.pitchStaircase.stairPitchBlocks.push(blk);
         } else if (logo.inMusicKeyboard) {
             // Apply transpositions
-            let transposition = 2 * delta;
-            if (turtle in logo.transposition) {
-                transposition += logo.transposition[turtle];
-            }
+            let transposition = 2 * delta + tur.singer.transposition;
 
             let nnote = getNote(
                 note,
