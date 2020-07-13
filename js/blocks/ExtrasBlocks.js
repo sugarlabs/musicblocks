@@ -779,12 +779,9 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                let bpmFactor;
-                if (logo.bpm[turtle].length > 0) {
-                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    bpmFactor = TONEBPM / logo._masterBPM;
-                }
+                let bpmFactor =
+                    TONEBPM /
+                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
                 logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];

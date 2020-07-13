@@ -186,8 +186,8 @@ class Logo {
         /** @deprecated */  // this.transpositionValues = {};
 
         // Parameters used by notes
-        this._masterBPM = TARGETBPM;
-        this.defaultBPMFactor = TONEBPM / this._masterBPM;
+        /** @deprecated */  // this._masterBPM = TARGETBPM;
+        /** @deprecated */  // this.defaultBPMFactor = TONEBPM / TARGETBPM;
 
         this.register = {};
         this.beatFactor = {};
@@ -1541,8 +1541,8 @@ class Logo {
             this.turtles.add(null);
         }
 
-        this._masterBPM = TARGETBPM;
-        this.defaultBPMFactor = TONEBPM / this._masterBPM;
+        Singer.masterBPM = TARGETBPM;
+        Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
         this.masterVolume = [DEFAULTVOLUME];
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.changeInTemperament = false;

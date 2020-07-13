@@ -405,14 +405,6 @@ function setupDrumBlocks() {
                     drumname
                 );
 
-                // let bpmFactor;
-                // if (logo.bpm[turtle].length > 0) {
-                //     bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                // } else {
-                //     bpmFactor = TONEBPM / logo._masterBPM;
-                // }
-                // let beatValue = bpmFactor / noteBeatValue;
-
                 let noteBeatValue = 4;
 
                 __callback = function() {

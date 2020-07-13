@@ -172,12 +172,7 @@ function RhythmRuler() {
                 for (var i = 0; i < 4; i++) {
                     setTimeout(function() {
                         that._logo.synth.trigger(
-                            0,
-                            "C4",
-                            that._logo.defaultBPMFactor / 16,
-                            drum,
-                            null,
-                            null
+                            0, "C4", Singer.defaultBPMFactor / 16, drum, null, null
                         );
                     }, (interval * i) / 4);
                 }
@@ -1145,25 +1140,13 @@ function RhythmRuler() {
         if (that._playing) {
             // Play the current note.
             if (noteValue > 0) {
-                // console.debug(0 + ' C4 ' + that._logo.defaultBPMFactor / noteValue + ' ' + drum);
                 if (foundVoice) {
                     that._logo.synth.trigger(
-                        0,
-                        "C4",
-                        that._logo.defaultBPMFactor / noteValue,
-                        drum,
-                        null,
-                        null,
-                        false
+                        0, "C4", Singer.defaultBPMFactor / noteValue, drum, null, null, false
                     );
                 } else if (foundDrum) {
                     that._logo.synth.trigger(
-                        0,
-                        ["C4"],
-                        that._logo.defaultBPMFactor / noteValue,
-                        drum,
-                        null,
-                        null
+                        0, ["C4"], Singer.defaultBPMFactor / noteValue, drum, null, null
                     );
                 }
             }
@@ -1186,11 +1169,9 @@ function RhythmRuler() {
             if (that._playing) {
                 that.__loop(noteTime, rulerNo, colIndex);
             }
-        }, this._logo.defaultBPMFactor * 1000 * noteTime -
-            this._offsets[rulerNo]);
+        }, Singer.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
 
-        this._elapsedTimes[rulerNo] +=
-            this._logo.defaultBPMFactor * 1000 * noteTime;
+        this._elapsedTimes[rulerNo] += Singer.defaultBPMFactor * 1000 * noteTime;
     };
 
     this._save = function(selectedRuler) {
@@ -2315,7 +2296,7 @@ function RhythmRuler() {
         console.debug("init RhythmRuler");
         this._logo = logo;
 
-        this._bpmFactor = (1000 * TONEBPM) / this._logo._masterBPM;
+        this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
 
         this._playing = false;
         this._playingOne = false;

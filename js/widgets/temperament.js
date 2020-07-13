@@ -406,12 +406,7 @@ function TemperamentWidget() {
             that.temporaryRatios[i] = ratio;
             that._logo.resetSynth(0);
             that._logo.synth.trigger(
-                0,
-                frequency,
-                that._logo.defaultBPMFactor * 0.01,
-                "electronic synth",
-                null,
-                null
+                0, frequency, Singer.defaultBPMFactor * 0.01, "electronic synth", null, null
             );
             that.createMainWheel(that.temporaryRatios);
         };
@@ -1374,12 +1369,7 @@ function TemperamentWidget() {
         var pitchNumber = this.tempRatios.length - 1;
         this._logo.resetSynth(0);
         this._logo.synth.trigger(
-            0,
-            frequency,
-            this._logo.defaultBPMFactor * 0.01,
-            "electronic synth",
-            null,
-            null
+            0, frequency, Singer.defaultBPMFactor * 0.01, "electronic synth", null, null
         );
         this._createInnerWheel(this.tempRatios, pitchNumber);
     };
@@ -1837,12 +1827,7 @@ function TemperamentWidget() {
         }
 
         this._logo.synth.trigger(
-            0,
-            notes,
-            this._logo.defaultBPMFactor * duration,
-            "electronic synth",
-            null,
-            null
+            0, notes, Singer.defaultBPMFactor * duration, "electronic synth", null, null
         );
     };
 
@@ -1913,7 +1898,7 @@ function TemperamentWidget() {
                 that._logo.synth.trigger(
                     0,
                     startPitch,
-                    that._logo.defaultBPMFactor * duration,
+                    Singer.defaultBPMFactor * duration,
                     "electronic synth",
                     null,
                     null
@@ -2041,7 +2026,7 @@ function TemperamentWidget() {
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
                 setTimeout(function() {
                     __playLoop(i);
-                }, that._logo.defaultBPMFactor * 1000 * duration);
+                }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
@@ -2090,7 +2075,7 @@ function TemperamentWidget() {
                                 "#e0e0e0";
                             that.wheel1.refreshWheel();
                         }
-                    }, that._logo.defaultBPMFactor * 1000 * duration);
+                    }, Singer.defaultBPMFactor * 1000 * duration);
                 }
                 that._playing = false;
             }

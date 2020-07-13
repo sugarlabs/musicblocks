@@ -388,7 +388,7 @@ function TimbreWidget() {
             this._logo.synth.trigger(
                 0,
                 note,
-                this._logo.defaultBPMFactor * duration,
+                Singer.defaultBPMFactor * duration,
                 this.instrumentName,
                 paramsEffects,
                 instrumentsFilters[0][this.instrumentName]
@@ -402,7 +402,7 @@ function TimbreWidget() {
             this._logo.synth.trigger(
                 0,
                 note,
-                this._logo.defaultBPMFactor * duration,
+                Singer.defaultBPMFactor * duration,
                 this.instrumentName,
                 paramsEffects,
                 null
@@ -465,9 +465,7 @@ function TimbreWidget() {
             if (i < that.notesToPlay.length && that._playing) {
                 setTimeout(function() {
                     __playLoop(i);
-                }, that._logo.defaultBPMFactor *
-                    1000 *
-                    that.notesToPlay[i - 1][1]);
+                }, Singer.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
             } else {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +

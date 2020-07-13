@@ -49,8 +49,7 @@ class Singer {
         this.transpositionValues = [];
     }
 
-    //  Deprecated
-    // ========================================================================
+    // ========= Deprecated ===================================================
 
     /**
      * @deprecated
@@ -99,8 +98,7 @@ class Singer {
         }
     }
 
-    //  Utilities
-    // ========================================================================
+    // ========= Utilities ====================================================
 
     /**
      * Shifts pitches by n steps relative to the provided scale.
@@ -398,8 +396,7 @@ class Singer {
         }
     }
 
-    //  Action
-    // ========================================================================
+    // ========= Action =======================================================
 
     /**
      * @static
@@ -912,12 +909,8 @@ class Singer {
      * @param {Function} callback
      */
     static processNote(logo, noteValue, blk, turtle, callback) {
-        let bpmFactor;
-        if (logo.bpm[turtle].length > 0) {
-            bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-        } else {
-            bpmFactor = TONEBPM / logo._masterBPM;
-        }
+        let bpmFactor =
+            TONEBPM / (logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM);
 
         let noteBeatValue;
         if (logo.blocks.blockList[blk].name === "osctime") {
@@ -2378,3 +2371,8 @@ class Singer {
         stage.update(event);
     }
 }
+
+// ========= Static variables =============================================
+// Parameters used by notes
+Singer.masterBPM = TARGETBPM;
+Singer.defaultBPMFactor = TONEBPM / TARGETBPM;

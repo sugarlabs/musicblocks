@@ -111,12 +111,9 @@ function setupRhythmBlockPaletteBlocks() {
                     ];
                 }
 
-                let bpmFactor;
-                if (logo.bpm[turtle].length > 0) {
-                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    bpmFactor = TONEBPM / logo._masterBPM;
-                }
+                let bpmFactor =
+                    TONEBPM /
+                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                 let beatValue = bpmFactor / noteBeatValue;
 
@@ -494,12 +491,9 @@ function setupRhythmBlockPaletteBlocks() {
 
                     logo.inNoteBlock[turtle].push(blk);
 
-                    let bpmFactor;
-                    if (logo.bpm[turtle].length > 0) {
-                        bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                    } else {
-                        bpmFactor = TONEBPM / logo._masterBPM;
-                    }
+                    let bpmFactor =
+                        TONEBPM /
+                        logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                     let totalBeats = 0;
 
@@ -692,12 +686,9 @@ function setupRhythmBlockPaletteBlocks() {
 
                 logo.inNoteBlock[turtle].push(blk);
 
-                let bpmFactor;
-                if (logo.bpm[turtle].length > 0) {
-                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    bpmFactor = TONEBPM / logo._masterBPM;
-                }
+                let bpmFactor =
+                    TONEBPM /
+                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                 let beatValue = bpmFactor / noteBeatValue / arg0;
 

@@ -520,12 +520,9 @@ function setupRhythmBlocks() {
                     logo.embeddedGraphics[turtle][saveBlk] = [];
 
                     Singer.processNote(logo, noteValue, saveBlk, turtle);
-                    let bpmFactor;
-                    if (logo.bpm[turtle].length > 0) {
-                        bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                    } else {
-                        bpmFactor = TONEBPM / logo._masterBPM;
-                    }
+                    let bpmFactor =
+                        TONEBPM /
+                        logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                     // Wait until this note is played before continuing.
                     logo.doWait(turtle, bpmFactor / noteValue);

@@ -104,7 +104,7 @@ function setupMeterBlocks() {
             } else if (logo.bpm[turtle].length > 0) {
                 return last(logo.bpm[turtle]);
             } else {
-                return logo._masterBPM;
+                return Singer.masterBPM;
             }
         }
     }
@@ -642,12 +642,9 @@ function setupMeterBlocks() {
                 logo.parameterQueue[turtle] = [];
                 logo.initTurtle(turtle);
                 logo.setTurtleListener(turtle, eventName, __listener);
-                let duration ;
-                if (logo.bpm[orgTurtle].length > 0) {
-                    duration = 60 / last(logo.bpm[orgTurtle]);
-                } else {
-                    duration = 60 / logo._masterBPM;
-                }
+                let duration =
+                    60 /
+                    logo.bpm[orgTurtle].length > 0 ? last(logo.bpm[orgTurtle]) : Singer.masterBPM;
                 if (logo.turtles.turtleList[turtle].interval !== undefined) clearInterval(this.interval);
                 logo.turtles.turtleList[turtle].interval = setInterval (
                     () => {
@@ -780,7 +777,7 @@ function setupMeterBlocks() {
                             target,
                         blk
                     );
-                    logo._masterBPM = 30;
+                    Singer.masterBPM = 30;
                 } else if (bpm > 1000) {
                     obj = rationalToFraction(args[1]);
                     target = (1000 * 0.25) / args[1];
@@ -796,13 +793,13 @@ function setupMeterBlocks() {
                             target,
                         blk
                     );
-                    logo._masterBPM = 1000;
+                    Singer.masterBPM = 1000;
                 } else {
-                    logo._masterBPM = bpm;
+                    Singer.masterBPM = bpm;
                 }
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.defaultBPMFactor = TONEBPM / logo._masterBPM;
+                Singer.defaultBPMFactor = TONEBPM / Singer.masterBPM;
             }
 
             if (logo.inTempo) {
@@ -831,15 +828,15 @@ function setupMeterBlocks() {
             if (args.length === 1 && typeof args[0] === "number") {
                 if (args[0] < 30) {
                     logo.errorMsg(_("Beats per minute must be > 30."), blk);
-                    logo._masterBPM = 30;
+                    Singer.masterBPM = 30;
                 } else if (args[0] > 1000) {
                     logo.errorMsg(_("Maximum beats per minute is 1000."), blk);
-                    logo._masterBPM = 1000;
+                    Singer.masterBPM = 1000;
                 } else {
-                    logo._masterBPM = args[0];
+                    Singer.masterBPM = args[0];
                 }
 
-                logo.defaultBPMFactor = TONEBPM / logo._masterBPM;
+                Singer.defaultBPMFactor = TONEBPM / Singer.masterBPM;
             }
 
             if (logo.inTempo) {
