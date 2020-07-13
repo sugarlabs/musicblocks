@@ -2042,7 +2042,7 @@ function PitchTimeMatrix() {
                 );
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
-                that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+                Singer.setSynthVolume(that._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(
                     0,
                     [obj[0] + obj[1]],
@@ -2074,7 +2074,7 @@ function PitchTimeMatrix() {
 
                 setTimeout(function() {
                     that._logo.synth.setMasterVolume(DEFAULTVOLUME);
-                    that._logo.setSynthVolume(0, label, DEFAULTVOLUME);
+                    Singer.setSynthVolume(that._logo, 0, label, DEFAULTVOLUME);
                     that._logo.synth.trigger(
                         0,
                         "G4",

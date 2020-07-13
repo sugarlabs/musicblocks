@@ -74,7 +74,7 @@ function setupVolumeBlocks() {
             let len = logo.masterVolume.length;
             logo.masterVolume[len - 1] = value;
             if (!logo.suppressOutput[turtle]) {
-                logo.setMasterVolume(value);
+                Singer.setMasterVolume(logo, value);
             }
         }
 
@@ -304,7 +304,7 @@ function setupVolumeBlocks() {
 
             logo.synthVolume[turtle][synth].push(arg1);
             if (!logo.suppressOutput[turtle]) {
-                logo.setSynthVolume(turtle, synth, arg1);
+                Singer.setSynthVolume(logo, turtle, synth, arg1);
             }
 
             let listenerName = "_synthvolume_" + turtle;
@@ -317,10 +317,8 @@ function setupVolumeBlocks() {
                     logo.justCounting[turtle].length === 0 &&
                     logo.synthVolume[turtle][synth].length > 0
                 ) {
-                    logo.setSynthVolume(
-                        turtle,
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
+                    Singer.setSynthVolume(
+                        logo, turtle, synth, last(logo.synthVolume[turtle][synth])
                     );
                 }
             };
@@ -462,7 +460,7 @@ function setupVolumeBlocks() {
 
             logo.synthVolume[turtle][synth].push(args[1]);
             if (!logo.suppressOutput[turtle]) {
-                logo.setSynthVolume(turtle, synth, args[1]);
+                Singer.setSynthVolume(logo, turtle, synth, args[1]);
             }
         }
     }
@@ -505,7 +503,7 @@ function setupVolumeBlocks() {
 
                     logo.masterVolume.push(arg);
                     if (!logo.suppressOutput[turtle]) {
-                        logo.setMasterVolume(arg);
+                        Singer.setMasterVolume(logo, arg);
                     }
                 }
             }
@@ -561,7 +559,7 @@ function setupVolumeBlocks() {
 
             logo.masterVolume.push(arg);
             if (!logo.suppressOutput[turtle]) {
-                logo.setMasterVolume(arg);
+                Singer.setMasterVolume(logo, arg);
             }
 
             let listenerName = "_volume_" + turtle;
@@ -574,7 +572,7 @@ function setupVolumeBlocks() {
                     logo.justCounting[turtle].length === 0 &&
                     logo.masterVolume.length > 0
                 ) {
-                    logo.setMasterVolume(last(logo.masterVolume));
+                    Singer.setMasterVolume(logo, last(logo.masterVolume));
                 }
             };
 
@@ -641,7 +639,7 @@ function setupVolumeBlocks() {
                 }
 
                 if (!logo.suppressOutput[turtle]) {
-                    logo.setSynthVolume(turtle, synth, newVolume);
+                    Singer.setSynthVolume(logo, turtle, synth, newVolume);
                 }
             }
 
@@ -655,10 +653,8 @@ function setupVolumeBlocks() {
             let __listener = function(event) {
                 for (let synth in logo.synthVolume[turtle]) {
                     logo.synthVolume[turtle][synth].pop();
-                    logo.setSynthVolume(
-                        turtle,
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
+                    Singer.setSynthVolume(
+                        logo, turtle, synth, last(logo.synthVolume[turtle][synth])
                     );
                 }
 

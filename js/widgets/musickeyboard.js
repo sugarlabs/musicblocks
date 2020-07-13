@@ -2025,7 +2025,7 @@ function MusicKeyboard() {
                 that._logo.synth.inTemperament
             );
             that._logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
             that._logo.synth.trigger(
                 0,
                 [obj[0] + obj[1]],

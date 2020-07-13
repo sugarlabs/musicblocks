@@ -93,6 +93,306 @@ class Singer {
         }
     }
 
+    //  Utilities
+    // ========================================================================
+
+    /**
+     * Shifts pitches by n steps relative to the provided scale.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {String} note
+     * @param {Number} octave
+     * @param {Number} steps
+     * @returns {[String, Number]} transposed [note, octave]
+     */
+    static addScalarTransposition(logo, turtle, note, octave, steps) {
+        if (steps === 0)
+            return [note, octave];
+
+        let noteObj = getNote(
+            note,
+            octave,
+            0,
+            logo.keySignature[turtle],
+            logo.moveable[turtle],
+            null,
+            logo.errorMsg,
+            logo.synth.inTemperament
+        );
+
+        if (isCustom(logo.synth.inTemperament)) {
+            noteObj = getNote(
+                noteObj[0],
+                noteObj[1],
+                steps > 0 ?
+                    getStepSizeUp(
+                        logo.keySignature[turtle], noteObj[0], steps, logo.synth.inTemperament
+                    ) :
+                    getStepSizeDown(
+                        logo.keySignature[turtle], noteObj[0], steps, logo.synth.inTemperament
+                    ),
+                logo.keySignature[turtle],
+                logo.moveable[turtle],
+                null,
+                logo.errorMsg,
+                logo.synth.inTemperament
+            );
+        } else {
+            for (let i = 0; i < Math.abs(steps); i++) {
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    steps > 0 ?
+                        getStepSizeUp(logo.keySignature[turtle], noteObj[0]) :
+                        getStepSizeDown(logo.keySignature[turtle], noteObj[0]),
+                    logo.keySignature[turtle],
+                    logo.moveable[turtle],
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+            }
+        }
+
+        return noteObj;
+    }
+
+    /**
+     * Returns a distance for scalar transposition.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} firstNote
+     * @param {Number} lastNote
+     * @returns {Number} scalar distance
+     */
+    static scalarDistance(logo, turtle, firstNote, lastNote) {
+        if (lastNote === firstNote)
+            return 0;
+
+        // Rather than just counting the semitones, we need to count the steps in the current key
+        // needed to get from firstNote pitch to lastNote pitch
+
+        let positive = false;
+        if (lastNote > firstNote) {
+            [firstNote, lastNote] = [lastNote, firstNote];
+            positive = true;
+        }
+
+        let noteObj = numberToPitch(lastNote + logo.pitchNumberOffset[turtle]);
+        let n = firstNote + logo.pitchNumberOffset[turtle];
+
+        let i = 0;
+        while (i++ < 100) {
+            n += getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
+            if (n >= firstNote + logo.pitchNumberOffset[turtle])
+                break;
+
+            noteObj = numberToPitch(n);
+        }
+
+        return positive ? i : -i;
+    }
+
+    /**
+     * Calculates the change needed for musical inversion.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {String} note
+     * @param {Number} octave
+     * @returns {Number} inverted value
+     */
+    static calculateInvert(logo, turtle, note, octave) {
+        let delta = 0;
+        let note1 = getNote(
+            note, octave, 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg
+        );
+        let num1 =
+            pitchToNumber(note1[0], note1[1], logo.keySignature[turtle]) -
+            logo.pitchNumberOffset[turtle];
+
+        for (let i = logo.invertList[turtle].length - 1; i >= 0; i--) {
+            let note2 = getNote(
+                logo.invertList[turtle][i][0],
+                logo.invertList[turtle][i][1],
+                0,
+                logo.keySignature[turtle],
+                logo.moveable[turtle],
+                null,
+                logo.errorMsg
+            );
+            let num2 =
+                pitchToNumber(note2[0], note2[1], logo.keySignature[turtle]) -
+                logo.pitchNumberOffset[turtle];
+
+            if (logo.invertList[turtle][i][2] === "even") {
+                delta += num2 - num1;
+                num1 += 2 * delta;
+            } else if (logo.invertList[turtle][i][2] === "odd") {
+                delta += num2 - num1 + 0.5;
+                num1 += 2 * delta;
+            } else {
+                // We need to calculate the scalar difference
+                let scalarSteps = Singer.scalarDistance(logo, turtle, num2, num1);
+                let note3 = Singer.addScalarTransposition(
+                    logo, turtle, note2[0], note2[1], -scalarSteps
+                );
+                let num3 =
+                    pitchToNumber(note3[0], note3[1], logo.keySignature[turtle]) -
+                    logo.pitchNumberOffset[turtle];
+
+                delta += (num3 - num1) / 2;
+                num1 = num3;
+            }
+        }
+
+        return delta;
+    }
+
+    /**
+     * Counts notes, with saving of the box, heap and turtle states.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} cblk - block number
+     * @returns {Number} note count
+     */
+    static noteCounter(logo, turtle, cblk) {
+        if (cblk === null)
+            return 0;
+
+        let saveSuppressStatus = logo.suppressOutput[turtle];
+
+        // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
+        let saveBoxes = JSON.stringify(logo.boxes);
+        let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+        // .. and the turtle state
+        let saveX = logo.turtles.turtleList[turtle].x;
+        let saveY = logo.turtles.turtleList[turtle].y;
+        let saveColor = logo.turtles.turtleList[turtle].painter.color;
+        let saveValue = logo.turtles.turtleList[turtle].painter.value;
+        let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
+        let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
+        let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
+        let saveOrientation = logo.turtles.turtleList[turtle].orientation;
+        let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+
+        let saveWhichNoteToCount = logo.whichNoteToCount[turtle];
+
+        let savePrevTurtleTime = logo.previousTurtleTime[turtle];
+        let saveTurtleTime = logo.turtleTime[turtle];
+
+        logo.suppressOutput[turtle] = true;
+        logo.justCounting[turtle].push(true);
+
+        for (let b in logo.endOfClampSignals[turtle]) {
+            logo.butNotThese[turtle][b] = [];
+            for (let i in logo.endOfClampSignals[turtle][b]) {
+                logo.butNotThese[turtle][b].push(i);
+            }
+        }
+
+        let actionArgs = [];
+        let saveNoteCount = logo.notesPlayed[turtle];
+        logo.turtles.turtleList[turtle].running = true;
+
+        if (logo.inNoteBlock[turtle]) {
+            logo.whichNoteToCount[turtle] += logo.inNoteBlock[turtle].length;
+        }
+
+        logo.runFromBlockNow(
+            logo, turtle, cblk, true, actionArgs, logo.turtles.turtleList[turtle].queue.length
+        );
+
+        let returnValue = rationalSum(
+            logo.notesPlayed[turtle], [-saveNoteCount[0], saveNoteCount[1]]
+        );
+        logo.notesPlayed[turtle] = saveNoteCount;
+
+        // Restore previous state
+        console.debug(saveBoxes);
+        logo.boxes = JSON.parse(saveBoxes);
+        console.debug(saveTurtleHeaps);
+        logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+        logo.turtles.turtleList[turtle].painter.doPenUp();
+        logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+        logo.turtles.turtleList[turtle].painter.color = saveColor;
+        logo.turtles.turtleList[turtle].painter.value = saveValue;
+        logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
+        logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
+        logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+        logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+        logo.turtles.turtleList[turtle].painter.penState = savePenState;
+
+        logo.previousTurtleTime[turtle] = savePrevTurtleTime;
+        logo.turtleTime[turtle] = saveTurtleTime;
+
+        logo.whichNoteToCount[turtle] = saveWhichNoteToCount;
+
+        logo.justCounting[turtle].pop();
+        logo.suppressOutput[turtle] = saveSuppressStatus;
+
+        logo.butNotThese[turtle] = {};
+
+        return returnValue[0] / returnValue[1];
+    }
+
+    /**
+     * Sets the master volume to a value of at least 0 and at most 100.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Number} volume
+     * @returns {void}
+     */
+    static setMasterVolume(logo, volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            logo.synth.setMasterVolume(volume);
+            for (let turtle in logo.turtles.turtleList) {
+                for (let synth in logo.synthVolume[turtle]) {
+                    logo.synthVolume[turtle][synth].push(volume);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} synth
+     * @param {Number} volume
+     * @returns {void}
+     */
+    static setSynthVolume(logo, turtle, synth, volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            switch (synth) {
+                case "noise1":
+                case "noise2":
+                case "noise3":
+                    // Noise is very very loud
+                    logo.synth.setVolume(turtle, synth, volume / 25);
+                    break;
+                default:
+                    logo.synth.setVolume(turtle, synth, volume);
+            }
+        }
+    }
+
+    //  Action
     // ========================================================================
 
     /**
@@ -105,8 +405,8 @@ class Singer {
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
     static processPitch(note, octave, cents, logo, turtle, blk) {
-        let noteObj = logo.addScalarTransposition(
-            turtle, note, octave, logo.scalarTransposition[turtle]
+        let noteObj = Singer.addScalarTransposition(
+            logo, turtle, note, octave, logo.scalarTransposition[turtle]
         );
         [note, octave] = noteObj;
 
@@ -125,8 +425,8 @@ class Singer {
 
             let noteObj2;
             if (logo.blocks.blockList[last(logo.inNeighbor[turtle])].name === "neighbor2") {
-                noteObj2 = logo.addScalarTransposition(
-                    turtle, note, octave, parseInt(logo.neighborStepPitch[turtle])
+                noteObj2 = Singer.addScalarTransposition(
+                   logo, turtle, note, octave, parseInt(logo.neighborStepPitch[turtle])
                 );
                 if (logo.transposition[turtle] !== 0) {
                     noteObj2 = getNote(
@@ -157,7 +457,8 @@ class Singer {
         }
 
         let delta =
-            logo.invertList[turtle].length > 0 ? logo.calculateInvert(turtle, note, octave) : 0;
+            logo.invertList[turtle].length > 0 ?
+                Singer.calculateInvert(logo, turtle, note, octave) : 0;
 
         if (logo.justMeasuring[turtle].length > 0) {
             let transposition = turtle in logo.transposition ? logo.transposition[turtle] : 0;
@@ -775,10 +1076,8 @@ class Singer {
         ) {
             logo.inCrescendo[turtle].pop();
             for (let synth in logo.synthVolume[turtle]) {
-                logo.setSynthVolume(
-                    turtle,
-                    "electronic synth",
-                    last(logo.synthVolume[turtle][synth])
+                Singer.setSynthVolume(
+                    logo, turtle, "electronic synth", last(logo.synthVolume[turtle][synth])
                 );
             }
         } else if (logo.crescendoDelta[turtle].length > 0) {
@@ -801,10 +1100,8 @@ class Singer {
                     synth + "= " + logo.synthVolume[turtle][synth][len - 1]
                 );
                 if (!logo.suppressOutput[turtle]) {
-                    logo.setSynthVolume(
-                        turtle,
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
+                    Singer.setSynthVolume(
+                        logo, turtle, synth, last(logo.synthVolume[turtle][synth])
                     );
                 }
             }

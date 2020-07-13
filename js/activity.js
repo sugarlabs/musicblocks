@@ -1001,7 +1001,7 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.setMasterVolume(0);
+            Singer.setMasterVolume(logo, 0);
 
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -1059,7 +1059,7 @@ function Activity() {
     };
 
     // function doMuteButton() {
-    //     logo.setMasterVolume(0);
+    //     Singer.setMasterVolume(logo, 0);
     // };
 
     // function _hideBoxes() {
