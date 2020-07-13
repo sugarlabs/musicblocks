@@ -33,9 +33,9 @@ function MeterWidget() {
 
         this._logo.synth.setMasterVolume(PREVIEWVOLUME);
         this._logo.synth.loadSynth(0, "kick drum");
-        this._logo.setSynthVolume(0, "kick drum", PREVIEWVOLUME);
+        Singer.setSynthVolume(this._logo, 0, "kick drum", PREVIEWVOLUME);
         this._logo.synth.loadSynth(0, "snare drum");
-        this._logo.setSynthVolume(0, "snare drum", PREVIEWVOLUME);
+        Singer.setSynthVolume(this._logo, 0, "snare drum", PREVIEWVOLUME);
 
         // For the button callbacks
         let that = this;

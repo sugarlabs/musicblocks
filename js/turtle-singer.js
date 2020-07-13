@@ -344,6 +344,55 @@ class Singer {
         return returnValue[0] / returnValue[1];
     }
 
+    /**
+     * Sets the master volume to a value of at least 0 and at most 100.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Number} volume
+     * @returns {void}
+     */
+    static setMasterVolume(logo, volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            logo.synth.setMasterVolume(volume);
+            for (let turtle in logo.turtles.turtleList) {
+                for (let synth in logo.synthVolume[turtle]) {
+                    logo.synthVolume[turtle][synth].push(volume);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} synth
+     * @param {Number} volume
+     * @returns {void}
+     */
+    static setSynthVolume(logo, turtle, synth, volume) {
+        volume = Math.min(Math.max(volume, 0), 100);
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            switch (synth) {
+                case "noise1":
+                case "noise2":
+                case "noise3":
+                    // Noise is very very loud
+                    logo.synth.setVolume(turtle, synth, volume / 25);
+                    break;
+                default:
+                    logo.synth.setVolume(turtle, synth, volume);
+            }
+        }
+    }
+
+    //  Action
     // ========================================================================
 
     /**
@@ -1027,10 +1076,8 @@ class Singer {
         ) {
             logo.inCrescendo[turtle].pop();
             for (let synth in logo.synthVolume[turtle]) {
-                logo.setSynthVolume(
-                    turtle,
-                    "electronic synth",
-                    last(logo.synthVolume[turtle][synth])
+                Singer.setSynthVolume(
+                    logo, turtle, "electronic synth", last(logo.synthVolume[turtle][synth])
                 );
             }
         } else if (logo.crescendoDelta[turtle].length > 0) {
@@ -1053,10 +1100,8 @@ class Singer {
                     synth + "= " + logo.synthVolume[turtle][synth][len - 1]
                 );
                 if (!logo.suppressOutput[turtle]) {
-                    logo.setSynthVolume(
-                        turtle,
-                        synth,
-                        last(logo.synthVolume[turtle][synth])
+                    Singer.setSynthVolume(
+                        logo, turtle, synth, last(logo.synthVolume[turtle][synth])
                     );
                 }
             }

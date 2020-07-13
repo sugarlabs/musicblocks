@@ -723,14 +723,10 @@ class Logo {
         }
 
         if (!this.suppressOutput[turtle]) {
-            this.setMasterVolume(DEFAULTVOLUME);
-            for (
-                let turtle = 0;
-                turtle < this.turtles.turtleList.length;
-                turtle++
-            ) {
+            Singer.setMasterVolume(this, DEFAULTVOLUME);
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 for (let synth in this.synthVolume[turtle]) {
-                    this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
+                    Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
                 }
             }
         }
@@ -747,9 +743,9 @@ class Logo {
             this.synth.createDefaultSynth(turtle);
         }
 
-        this.setMasterVolume(DEFAULTVOLUME);
+        Singer.setMasterVolume(logo, DEFAULTVOLUME);
         for (let synth in this.synthVolume[turtle]) {
-            this.setSynthVolume(turtle, synth, DEFAULTVOLUME);
+            Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
         }
 
         this.synth.start();
@@ -1264,50 +1260,6 @@ class Logo {
                 // after the child flow completes
                 this.parentFlowQueue[turtle].push(loopBlkIdx);
                 this.turtles.turtleList[turtle].queue.push(queueBlock);
-            }
-        }
-    }
-
-    /**
-     * Sets the master volume to a value of at least 0 and at most 100.
-     *
-     * @param {Number} volume
-     * @returns {void}
-     */
-    setMasterVolume(volume) {
-        volume = Math.min(Math.max(volume, 0), 100);
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.setMasterVolume(volume);
-            for (let turtle in this.turtles.turtleList) {
-                for (let synth in this.synthVolume[turtle]) {
-                    this.synthVolume[turtle][synth].push(volume);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
-     *
-     * @param turtle
-     * @param synth
-     * @param {Number} volume
-     * @returns {void}
-     */
-    setSynthVolume(turtle, synth, volume) {
-        volume = Math.min(Math.max(volume, 0), 100);
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            switch (synth) {
-                case "noise1":
-                case "noise2":
-                case "noise3":
-                    // Noise is very very loud
-                    this.synth.setVolume(turtle, synth, volume / 25);
-                    break;
-                default:
-                    this.synth.setVolume(turtle, synth, volume);
             }
         }
     }
