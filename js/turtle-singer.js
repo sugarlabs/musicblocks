@@ -96,6 +96,70 @@ class Singer {
     // ========================================================================
 
     /**
+     * Shifts pitches by n steps relative to the provided scale.
+     *
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {String} note
+     * @param {Number} octave
+     * @param {Number} steps
+     * @returns {*[]} transposed [note, octave]
+     */
+    static addScalarTransposition(logo, turtle, note, octave, steps) {
+        if (steps === 0)
+            return [note, octave];
+
+        let noteObj = getNote(
+            note,
+            octave,
+            0,
+            logo.keySignature[turtle],
+            logo.moveable[turtle],
+            null,
+            logo.errorMsg,
+            logo.synth.inTemperament
+        );
+
+        if (isCustom(logo.synth.inTemperament)) {
+            noteObj = getNote(
+                noteObj[0],
+                noteObj[1],
+                steps > 0 ?
+                    getStepSizeUp(
+                        logo.keySignature[turtle], noteObj[0], steps, logo.synth.inTemperament
+                    ) :
+                    getStepSizeDown(
+                        logo.keySignature[turtle], noteObj[0], steps, logo.synth.inTemperament
+                    ),
+                logo.keySignature[turtle],
+                logo.moveable[turtle],
+                null,
+                logo.errorMsg,
+                logo.synth.inTemperament
+            );
+        } else {
+            for (let i = 0; i < Math.abs(steps); i++) {
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    steps > 0 ?
+                        getStepSizeUp(logo.keySignature[turtle], noteObj[0]) :
+                        getStepSizeDown(logo.keySignature[turtle], noteObj[0]),
+                    logo.keySignature[turtle],
+                    logo.moveable[turtle],
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+            }
+        }
+
+        return noteObj;
+    }
+
+    // ========================================================================
+
+    /**
      * @static
      * @param {String} note - note value or solfege
      * @param {Number} octave - scale octave
@@ -105,8 +169,8 @@ class Singer {
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
     static processPitch(note, octave, cents, logo, turtle, blk) {
-        let noteObj = logo.addScalarTransposition(
-            turtle, note, octave, logo.scalarTransposition[turtle]
+        let noteObj = Singer.addScalarTransposition(
+            logo, turtle, note, octave, logo.scalarTransposition[turtle]
         );
         [note, octave] = noteObj;
 
@@ -125,8 +189,8 @@ class Singer {
 
             let noteObj2;
             if (logo.blocks.blockList[last(logo.inNeighbor[turtle])].name === "neighbor2") {
-                noteObj2 = logo.addScalarTransposition(
-                    turtle, note, octave, parseInt(logo.neighborStepPitch[turtle])
+                noteObj2 = Singer.addScalarTransposition(
+                   logo, turtle, note, octave, parseInt(logo.neighborStepPitch[turtle])
                 );
                 if (logo.transposition[turtle] !== 0) {
                     noteObj2 = getNote(

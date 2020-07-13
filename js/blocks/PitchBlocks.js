@@ -2257,7 +2257,8 @@ function setupPitchBlocks() {
 
             let len = logo.lastNotePlayed[turtle][0].length;
 
-            let noteObj = logo.addScalarTransposition(
+            let noteObj = Singer.addScalarTransposition(
+                logo,
                 turtle,
                 logo.lastNotePlayed[turtle][0].slice(0, len - 1),
                 parseInt(logo.lastNotePlayed[turtle][0].slice(len - 1)),

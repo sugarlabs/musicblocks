@@ -92,12 +92,13 @@ class Logo {
         this.sustain = {};
         this.release = {};
 
-        this.evalFlowDict = {};
-        this.evalArgDict = {};
-        this.evalParameterDict = {};
-        this.evalSetterDict = {};
-        this.evalOnStartList = {};
-        this.evalOnStopList = {};
+        /** @deprecated */  this.evalFlowDict = {};
+        /** @deprecated */  this.evalArgDict = {};
+        /** @deprecated */  this.evalParameterDict = {};
+        /** @deprecated */  this.evalSetterDict = {};
+        /** @deprecated */  this.evalOnStartList = {};
+        /** @deprecated */  this.evalOnStopList = {};
+
         this.eventList = {};
         this.receivedArg = null;
 
@@ -121,8 +122,7 @@ class Logo {
 
         // When we leave a clamp block, we need to dispatch a signal
         this.endOfClampSignals = {};
-        // Don't dispatch these signals (when exiting note counter or
-        // interval measure
+        // Don't dispatch these signals (when exiting note counter or interval measure
         this.butNotThese = {};
 
         this.lastNoteTimeout = null;
@@ -1039,11 +1039,8 @@ class Logo {
             } else {
                 // We need to calculate the scalar difference
                 let scalarSteps = this.scalarDistance(turtle, num2, num1);
-                let note3 = this.addScalarTransposition(
-                    turtle,
-                    note2[0],
-                    note2[1],
-                    -scalarSteps
+                let note3 = Singer.addScalarTransposition(
+                    this, turtle, note2[0], note2[1],-scalarSteps
                 );
                 let num3 =
                     pitchToNumber(
@@ -1058,119 +1055,6 @@ class Logo {
         }
 
         return delta;
-    }
-
-    /**
-     * Shifts pitches by n steps relative to the provided scale.
-     *
-     * @param turtle
-     * @param note
-     * @param octave
-     * @param {number} n
-     * @returns {object}
-     */
-    addScalarTransposition(turtle, note, octave, n) {
-        let noteObj = null;
-
-        if (n > 0) {
-            noteObj = getNote(
-                note,
-                octave,
-                0,
-                this.keySignature[turtle],
-                this.moveable[turtle],
-                null,
-                this.errorMsg,
-                this.synth.inTemperament
-            );
-
-            if (isCustom(this.synth.inTemperament)) {
-                let value = getStepSizeUp(
-                    this.keySignature[turtle],
-                    noteObj[0],
-                    n,
-                    this.synth.inTemperament
-                );
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    value,
-                    this.keySignature[turtle],
-                    this.moveable[turtle],
-                    null,
-                    this.errorMsg,
-                    this.synth.inTemperament
-                );
-            } else {
-                for (let i = 0; i < n; i++) {
-                    let value = getStepSizeUp(
-                        this.keySignature[turtle],
-                        noteObj[0]
-                    );
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        value,
-                        this.keySignature[turtle],
-                        this.moveable[turtle],
-                        null,
-                        this.errorMsg,
-                        this.synth.inTemperament
-                    );
-                }
-            }
-        } else if (n < 0) {
-            noteObj = getNote(
-                note,
-                octave,
-                0,
-                this.keySignature[turtle],
-                this.moveable[turtle],
-                null,
-                this.errorMsg,
-                this.synth.inTemperament
-            );
-
-            if (isCustom(this.synth.inTemperament)) {
-                let value = getStepSizeDown(
-                    this.keySignature[turtle],
-                    noteObj[0],
-                    n,
-                    this.synth.inTemperament
-                );
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    value,
-                    this.keySignature[turtle],
-                    this.moveable[turtle],
-                    null,
-                    this.errorMsg,
-                    this.synth.inTemperament
-                );
-            } else {
-                for (let i = 0; i < -n; i++) {
-                    let value = getStepSizeDown(
-                        this.keySignature[turtle],
-                        noteObj[0]
-                    );
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        value,
-                        this.keySignature[turtle],
-                        this.moveable[turtle],
-                        null,
-                        this.errorMsg,
-                        this.synth.inTemperament
-                    );
-                }
-            }
-        } else {
-            noteObj = [note, octave];
-        }
-
-        return noteObj;
     }
 
     /**
