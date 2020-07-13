@@ -890,193 +890,6 @@ class Logo {
     // ========================================================================
 
     /**
-     * Counts notes, with saving of the box, heap and turtle states.
-     *
-     * @param turtle
-     * @param cblk
-     * @returns {number}
-     */
-    noteCounter(turtle, cblk) {
-        if (cblk != null) {
-            let saveSuppressStatus = this.suppressOutput[turtle];
-
-            // We need to save the state of the boxes and heap
-            // although there is a potential of a boxes collision with
-            // other turtles
-            let saveBoxes = JSON.stringify(this.boxes);
-            let saveTurtleHeaps = JSON.stringify(this.turtleHeaps[turtle]);
-            // .. and the turtle state
-            let saveX = this.turtles.turtleList[turtle].x;
-            let saveY = this.turtles.turtleList[turtle].y;
-            let saveColor = this.turtles.turtleList[turtle].painter.color;
-            let saveValue = this.turtles.turtleList[turtle].painter.value;
-            let saveChroma = this.turtles.turtleList[turtle].painter.chroma;
-            let saveStroke = this.turtles.turtleList[turtle].painter.stroke;
-            let saveCanvasAlpha = this.turtles.turtleList[turtle].painter.canvasAlpha;
-            let saveOrientation = this.turtles.turtleList[turtle].orientation;
-            let savePenState = this.turtles.turtleList[turtle].painter.penState;
-
-            let saveWhichNoteToCount = this.whichNoteToCount[turtle];
-
-            let savePrevTurtleTime = this.previousTurtleTime[turtle];
-            let saveTurtleTime = this.turtleTime[turtle];
-
-            this.suppressOutput[turtle] = true;
-            this.justCounting[turtle].push(true);
-
-            for (let b in this.endOfClampSignals[turtle]) {
-                this.butNotThese[turtle][b] = [];
-                for (
-                    let i = 0;
-                    i < this.endOfClampSignals[turtle][b].length;
-                    i++
-                ) {
-                    this.butNotThese[turtle][b].push(i);
-                }
-            }
-
-            let actionArgs = [];
-            let saveNoteCount = this.notesPlayed[turtle];
-            this.turtles.turtleList[turtle].running = true;
-
-            if (this.inNoteBlock[turtle]) {
-                this.whichNoteToCount[turtle] += this.inNoteBlock[
-                    turtle
-                ].length;
-            }
-
-            this.runFromBlockNow(
-                this,
-                turtle,
-                cblk,
-                true,
-                actionArgs,
-                this.turtles.turtleList[turtle].queue.length
-            );
-
-            let returnValue = rationalSum(this.notesPlayed[turtle], [
-                -saveNoteCount[0],
-                saveNoteCount[1]
-            ]);
-            this.notesPlayed[turtle] = saveNoteCount;
-
-            // Restore previous state
-            console.debug(saveBoxes);
-            this.boxes = JSON.parse(saveBoxes);
-            console.debug(saveTurtleHeaps);
-            this.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-
-            this.turtles.turtleList[turtle].painter.doPenUp();
-            this.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-            this.turtles.turtleList[turtle].painter.color = saveColor;
-            this.turtles.turtleList[turtle].painter.value = saveValue;
-            this.turtles.turtleList[turtle].painter.chroma = saveChroma;
-            this.turtles.turtleList[turtle].painter.stroke = saveStroke;
-            this.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-            this.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-            this.turtles.turtleList[turtle].painter.penState = savePenState;
-
-            this.previousTurtleTime[turtle] = savePrevTurtleTime;
-            this.turtleTime[turtle] = saveTurtleTime;
-
-            this.whichNoteToCount[turtle] = saveWhichNoteToCount;
-
-            this.justCounting[turtle].pop();
-            this.suppressOutput[turtle] = saveSuppressStatus;
-
-            this.butNotThese[turtle] = {};
-
-            return returnValue[0] / returnValue[1];
-        }
-
-        return 0;
-    }
-
-    /**
-     * Updates the music notation used for Lilypond output.
-     *
-     * @param note
-     * @param {number} duration
-     * @param turtle
-     * @param insideChord
-     * @param drum
-     * @param {boolean} [split]
-     * @returns {void}
-     */
-    updateNotation(note, duration, turtle, insideChord, drum, split) {
-        // Note: At this point, the note of duration "duration" has
-        // already been added to notesPlayed
-
-        // Don't split the note if we are already splitting the note
-        if (split == undefined) split = true;
-
-        // Check to see if this note straddles a measure boundary
-        let durationTime = 1 / duration;
-        let beatsIntoMeasure =
-            (
-                (
-                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
-                    this.pickup[turtle] -
-                    durationTime
-                ) * this.noteValuePerBeat[turtle]
-            ) % this.beatsPerMeasure[turtle];
-        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
-        let timeLeftInMeasure =
-            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
-            timeIntoMeasure;
-
-        if (split && durationTime > timeLeftInMeasure) {
-            let d = durationTime - timeLeftInMeasure;
-            let d2 = timeLeftInMeasure;
-            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
-            console.debug("splitting note across measure boundary.");
-            let obj = rationalToFraction(d);
-
-            if (d2 > 0) {
-                // Check to see if the note straddles multiple measures
-                let i = 0;
-                while (d2 > b) {
-                    ++i;
-                    d2 -= b;
-                }
-
-                let obj2 = rationalToFraction(d2);
-                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                if (i > 0 || obj[0] > 0) {
-                    if (note[0] !== "R") {
-                        // Don't tie rests
-                        this.notation.notationInsertTie(turtle);
-                        this.notation.notationDrumStaging[turtle].push("tie");
-                    }
-                    obj2 = rationalToFraction(1 / b);
-                }
-
-                // Add any measures we straddled
-                while (i > 0) {
-                    i -= 1;
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
-                    if (obj[0] > 0) {
-                        if (note[0] !== "R") {
-                            // Don't tie rests
-                            this.notation.notationInsertTie(turtle);
-                            this.notation.notationDrumStaging[turtle].push("tie");
-                        }
-                    }
-                }
-            }
-
-            if (obj[0] > 0) {
-                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-            }
-        } else {
-            // .. otherwise proceed as normal
-            this.notation.doUpdateNotation(... arguments);
-        }
-    }
-
-    // ========================================================================
-
-    /**
      * Sets the cameraID property.
      *
      * @param id
@@ -1275,6 +1088,88 @@ class Logo {
             return logo.blocks.blockList[blk].value;
         } else {
             return blk;
+        }
+    }
+
+    /**
+     * Updates the music notation used for Lilypond output.
+     *
+     * @param note
+     * @param {number} duration
+     * @param turtle
+     * @param insideChord
+     * @param drum
+     * @param {boolean} [split]
+     * @returns {void}
+     */
+    updateNotation(note, duration, turtle, insideChord, drum, split) {
+        // Note: At this point, the note of duration "duration" has
+        // already been added to notesPlayed
+
+        // Don't split the note if we are already splitting the note
+        if (split == undefined) split = true;
+
+        // Check to see if this note straddles a measure boundary
+        let durationTime = 1 / duration;
+        let beatsIntoMeasure =
+            (
+                (
+                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
+                    this.pickup[turtle] -
+                    durationTime
+                ) * this.noteValuePerBeat[turtle]
+            ) % this.beatsPerMeasure[turtle];
+        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+        let timeLeftInMeasure =
+            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
+            timeIntoMeasure;
+
+        if (split && durationTime > timeLeftInMeasure) {
+            let d = durationTime - timeLeftInMeasure;
+            let d2 = timeLeftInMeasure;
+            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            console.debug("splitting note across measure boundary.");
+            let obj = rationalToFraction(d);
+
+            if (d2 > 0) {
+                // Check to see if the note straddles multiple measures
+                let i = 0;
+                while (d2 > b) {
+                    ++i;
+                    d2 -= b;
+                }
+
+                let obj2 = rationalToFraction(d2);
+                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                if (i > 0 || obj[0] > 0) {
+                    if (note[0] !== "R") {
+                        // Don't tie rests
+                        this.notation.notationInsertTie(turtle);
+                        this.notation.notationDrumStaging[turtle].push("tie");
+                    }
+                    obj2 = rationalToFraction(1 / b);
+                }
+
+                // Add any measures we straddled
+                while (i > 0) {
+                    i -= 1;
+                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                    if (obj[0] > 0) {
+                        if (note[0] !== "R") {
+                            // Don't tie rests
+                            this.notation.notationInsertTie(turtle);
+                            this.notation.notationDrumStaging[turtle].push("tie");
+                        }
+                    }
+                }
+            }
+
+            if (obj[0] > 0) {
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
+            }
+        } else {
+            // .. otherwise proceed as normal
+            this.notation.doUpdateNotation(...arguments);
         }
     }
 

@@ -93,6 +93,7 @@ class Singer {
         }
     }
 
+    //  Utilities
     // ========================================================================
 
     /**
@@ -251,6 +252,96 @@ class Singer {
         }
 
         return delta;
+    }
+
+    /**
+     * Counts notes, with saving of the box, heap and turtle states.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} cblk - block number
+     * @returns {Number} note count
+     */
+    static noteCounter(logo, turtle, cblk) {
+        if (cblk === null)
+            return 0;
+
+        let saveSuppressStatus = logo.suppressOutput[turtle];
+
+        // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
+        let saveBoxes = JSON.stringify(logo.boxes);
+        let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+        // .. and the turtle state
+        let saveX = logo.turtles.turtleList[turtle].x;
+        let saveY = logo.turtles.turtleList[turtle].y;
+        let saveColor = logo.turtles.turtleList[turtle].painter.color;
+        let saveValue = logo.turtles.turtleList[turtle].painter.value;
+        let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
+        let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
+        let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
+        let saveOrientation = logo.turtles.turtleList[turtle].orientation;
+        let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+
+        let saveWhichNoteToCount = logo.whichNoteToCount[turtle];
+
+        let savePrevTurtleTime = logo.previousTurtleTime[turtle];
+        let saveTurtleTime = logo.turtleTime[turtle];
+
+        logo.suppressOutput[turtle] = true;
+        logo.justCounting[turtle].push(true);
+
+        for (let b in logo.endOfClampSignals[turtle]) {
+            logo.butNotThese[turtle][b] = [];
+            for (let i in logo.endOfClampSignals[turtle][b]) {
+                logo.butNotThese[turtle][b].push(i);
+            }
+        }
+
+        let actionArgs = [];
+        let saveNoteCount = logo.notesPlayed[turtle];
+        logo.turtles.turtleList[turtle].running = true;
+
+        if (logo.inNoteBlock[turtle]) {
+            logo.whichNoteToCount[turtle] += logo.inNoteBlock[turtle].length;
+        }
+
+        logo.runFromBlockNow(
+            logo, turtle, cblk, true, actionArgs, logo.turtles.turtleList[turtle].queue.length
+        );
+
+        let returnValue = rationalSum(
+            logo.notesPlayed[turtle], [-saveNoteCount[0], saveNoteCount[1]]
+        );
+        logo.notesPlayed[turtle] = saveNoteCount;
+
+        // Restore previous state
+        console.debug(saveBoxes);
+        logo.boxes = JSON.parse(saveBoxes);
+        console.debug(saveTurtleHeaps);
+        logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+        logo.turtles.turtleList[turtle].painter.doPenUp();
+        logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
+        logo.turtles.turtleList[turtle].painter.color = saveColor;
+        logo.turtles.turtleList[turtle].painter.value = saveValue;
+        logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
+        logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
+        logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
+        logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
+        logo.turtles.turtleList[turtle].painter.penState = savePenState;
+
+        logo.previousTurtleTime[turtle] = savePrevTurtleTime;
+        logo.turtleTime[turtle] = saveTurtleTime;
+
+        logo.whichNoteToCount[turtle] = saveWhichNoteToCount;
+
+        logo.justCounting[turtle].pop();
+        logo.suppressOutput[turtle] = saveSuppressStatus;
+
+        logo.butNotThese[turtle] = {};
+
+        return returnValue[0] / returnValue[1];
     }
 
     // ========================================================================
