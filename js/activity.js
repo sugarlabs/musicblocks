@@ -1048,12 +1048,14 @@ function Activity() {
 
         refreshCanvas();
     };
-
+    var selectedkey = "C";
+    var selectedmode = "major";
     chooseKeyMenu = () => {
+        console.log(selectedkey, selectedmode);
         docById("chooseKeyDiv").style.display = "";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
-        var addedOptionsWheel = new wheelnav("addedOptionsWheel", keyNameWheel.raphael); 
+        var addedOptionsWheel = new wheelnav("addedOptionsWheel", keyNameWheel.raphael);
         let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
         
         wheelnav.cssMode = true;
@@ -1096,7 +1098,7 @@ function Activity() {
         addedOptionsWheel.createWheel(labels);
 
         var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-        labels3 = ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"];
+        labels3 = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
         modenameWheel.slicePathFunction = slicePath().DonutSlice;
         modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -1131,23 +1133,81 @@ function Activity() {
         
         exitWheel.navItems[0].navigateFunction = __exitMenu;
 
-        let __setupAction = function(i, activeTabs) {
+        let __setupActionKey = function(i, activeTabs) {
             keyNameWheel.navItems[i].navigateFunction = function() {
                 for (let j = 0; j < labels.length; j++) {
                     if ( Math.floor(j/2) != i) {
                         addedOptionsWheel.navItems[j].navItem.hide();
                     } else {
-                        addedOptionsWheel.navItems[j].navItem.show();
+                        if (keys[i].length > 2) {
+                            addedOptionsWheel.navItems[j].navItem.show();
+                        }
                     }
                 }
+                __selectionChangedKey();
+            };
+        };
+
+        let __selectionChangedKey = () => {
+            let selection = keyNameWheel.navItems[
+                keyNameWheel.selectedNavItemIndex
+            ].title;
+            if (selection === "") {
+                keyNameWheel.navigateWheel(
+                    (keyNameWheel.selectedNavItemIndex + 1) %
+                    keyNameWheel.navItems.length
+                );
+            } else if (selection.length < 2) {
+                selectedkey = selection;
             }
-        }
+        };
 
         for (let i = 0; i < keys.length; i++) {
-            __setupAction(i);
+            __setupActionKey(i);
         }
-    
-    }
+
+        let __selectionChangedMode = () => {
+            let selection = modenameWheel.navItems[
+                modenameWheel.selectedNavItemIndex
+            ].title;
+            if (selection === "") {
+                modenameWheel.navigateWheel(
+                    (modenameWheel.selectedNavItemIndex + 1) %
+                    modenameWheel.navItems.length
+                );
+            } else {
+                selectedmode = selection;
+            }
+        };
+
+        let __setupActionMode = function(i) {
+            modenameWheel.navItems[i].navigateFunction = function() {
+                __selectionChangedMode();
+            };
+        };
+
+        for (let i = 0; i < labels3.length; i++) {
+            __setupActionMode(i);
+        }
+
+        let __selectionChangedKey2 = function() {
+            let selection = addedOptionsWheel.navItems[
+                addedOptionsWheel.selectedNavItemIndex
+            ].title;
+            // console.log(selection);
+            selectedkey = selection;
+        };
+
+        let __setupActionKey2 = function(i) {
+            addedOptionsWheel.navItems[i].navigateFunction = function() {
+                __selectionChangedKey2();
+            };
+        };
+
+        for (let i = 0; i < labels.length; i++) {
+            __setupActionKey2(i);
+        }
+    };
 
     // DEPRECATED
     doStopButton = function() {

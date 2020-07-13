@@ -6992,7 +6992,6 @@ function Block(protoblock, blocks, overrideName) {
                 numbers.push(j.toString());
             }
         }
-        console.log(labels, numbers);
         this._intervalWheel.createWheel(numbers);
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
