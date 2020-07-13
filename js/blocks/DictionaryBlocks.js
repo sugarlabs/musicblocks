@@ -42,10 +42,8 @@ function setupDictionaryBlocks() {
                     var key = blks[nextBlock.connections[1]].value;
                     var value = blks[nextBlock.connections[2]].value;
                     // temporary fix
-                    if (value === "true") {
-                        value = true;
-                    } else if (value === "false") {
-                        value = false;
+                    if (value === "true" || value === "false") {
+                        value = (value === "true")
                     }
                     dictionary[key] = value;
                 }
@@ -55,7 +53,7 @@ function setupDictionaryBlocks() {
 
             if (
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    === undefined
+                === undefined
             ) {
                 return JSON.stringify(dictionary);
             } else if (
@@ -137,10 +135,8 @@ function setupDictionaryBlocks() {
                     var key = blks[nextBlock.connections[1]].value;
                     var value = blks[nextBlock.connections[2]].value;
                     // temporary fix
-                    if (value === "true") {
-                        value = true;
-                    } else if (value === "false") {
-                        value = false;
+                    if (value === "true" || value === "false") {
+                        value = (value === "true")
                     }
                     dictionary[key] = value;
                 }
@@ -150,7 +146,7 @@ function setupDictionaryBlocks() {
 
             if (
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    === undefined
+                === undefined
             ) {
                 return JSON.stringify(dictionary);
             } else if (
@@ -205,7 +201,7 @@ function setupDictionaryBlocks() {
                     currBlock = x;
                 }
             }
-            
+
 
             var dictionary = {}
             while ((currBlock.connections.slice(-1)[0]) !== null) {
