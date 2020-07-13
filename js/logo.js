@@ -1038,7 +1038,7 @@ class Logo {
                 num1 += 2 * delta;
             } else {
                 // We need to calculate the scalar difference
-                let scalarSteps = this.scalarDistance(turtle, num2, num1);
+                let scalarSteps = Singer.scalarDistance(this, turtle, num2, num1);
                 let note3 = Singer.addScalarTransposition(
                     this, turtle, note2[0], note2[1],-scalarSteps
                 );
@@ -1055,60 +1055,6 @@ class Logo {
         }
 
         return delta;
-    }
-
-    /**
-     * Returns a distance for scalar transposition.
-     *
-     * @param turtle
-     * @param {number} firstNote
-     * @param {number} lastNote
-     * @returns {number}
-     */
-    scalarDistance(turtle, firstNote, lastNote) {
-        // Rather than just counting the semitones, we need to count
-        // the steps in the current key needed to get from firstNote pitch
-        // to lastNote pitch
-
-        if (lastNote === firstNote) {
-            return 0;
-        } else if (lastNote > firstNote) {
-            let noteObj = numberToPitch(
-                firstNote + this.pitchNumberOffset[turtle]
-            );
-            let n = firstNote + this.pitchNumberOffset[turtle];
-
-            let i = 0;
-            while (i < 100) {
-                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                ++i;
-                if (n >= lastNote + this.pitchNumberOffset[turtle]) {
-                    break;
-                }
-
-                noteObj = numberToPitch(n);
-            }
-
-            return i;
-        } else {
-            let noteObj = numberToPitch(
-                lastNote + this.pitchNumberOffset[turtle]
-            );
-            let n = lastNote + this.pitchNumberOffset[turtle];
-
-            let i = 0;
-            while (i < 100) {
-                n += getStepSizeUp(this.keySignature[turtle], noteObj[0]);
-                ++i;
-                if (n >= firstNote + this.pitchNumberOffset[turtle]) {
-                    break;
-                }
-
-                noteObj = numberToPitch(n);
-            }
-
-            return -i;
-        }
     }
 
     /**

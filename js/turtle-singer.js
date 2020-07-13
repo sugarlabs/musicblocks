@@ -98,12 +98,13 @@ class Singer {
     /**
      * Shifts pitches by n steps relative to the provided scale.
      *
+     * @static
      * @param {Object} logo
      * @param {Object} turtle
      * @param {String} note
      * @param {Number} octave
      * @param {Number} steps
-     * @returns {*[]} transposed [note, octave]
+     * @returns {[String, Number]} transposed [note, octave]
      */
     static addScalarTransposition(logo, turtle, note, octave, steps) {
         if (steps === 0)
@@ -155,6 +156,44 @@ class Singer {
         }
 
         return noteObj;
+    }
+
+    /**
+     * Returns a distance for scalar transposition.
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} firstNote
+     * @param {Number} lastNote
+     * @returns {Number} scalar distance
+     */
+    static scalarDistance(logo, turtle, firstNote, lastNote) {
+        if (lastNote === firstNote)
+            return 0;
+
+        // Rather than just counting the semitones, we need to count the steps in the current key
+        // needed to get from firstNote pitch to lastNote pitch
+
+        let positive = false;
+        if (lastNote > firstNote) {
+            [firstNote, lastNote] = [lastNote, firstNote];
+            positive = true;
+        }
+
+        let noteObj = numberToPitch(lastNote + logo.pitchNumberOffset[turtle]);
+        let n = firstNote + logo.pitchNumberOffset[turtle];
+
+        let i = 0;
+        while (i++ < 100) {
+            n += getStepSizeUp(logo.keySignature[turtle], noteObj[0]);
+            if (n >= firstNote + logo.pitchNumberOffset[turtle])
+                break;
+
+            noteObj = numberToPitch(n);
+        }
+
+        return positive ? i : -i;
     }
 
     // ========================================================================

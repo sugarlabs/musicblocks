@@ -355,10 +355,8 @@ function setupIntervalsBlocks() {
                     logo.firstPitch[turtle].length > 0 &&
                     logo.lastPitch[turtle].length > 0
                 ) {
-                    return logo.scalarDistance(
-                        turtle,
-                        last(logo.firstPitch[turtle]),
-                        last(logo.lastPitch[turtle])
+                    return Singer.scalarDistance(
+                        logo, turtle, last(logo.firstPitch[turtle]), last(logo.lastPitch[turtle])
                     );
 
                     logo.firstPitch[turtle].pop();
