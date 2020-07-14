@@ -43,7 +43,7 @@ function setupMeterBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            logo.beatFactor[turtle] = value;
+            logo.turtles.ithTurtle(turtle).singer.beatFactor = value;
         }
 
         arg(logo, turtle, blk) {
@@ -54,7 +54,7 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "beatfactor"]);
             } else {
-                return logo.beatFactor[turtle];
+                return logo.turtles.ithTurtle(turtle).singer.beatFactor;
             }
         }
     }

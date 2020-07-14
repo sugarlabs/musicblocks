@@ -92,6 +92,8 @@ function setupRhythmBlockPaletteBlocks() {
                     }
                 }
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 if (logo.drumStyle[turtle].length > 0) {
                     // Play rhythm block as if it were a drum.
                     logo.clearNoteParams(turtle, blk, logo.drumStyle[turtle]);
@@ -100,15 +102,9 @@ function setupRhythmBlockPaletteBlocks() {
                     // Or use the current synth.
                     logo.clearNoteParams(turtle, blk, []);
                     logo.inNoteBlock[turtle].push(blk);
-                    logo.notePitches[turtle][last(logo.inNoteBlock[turtle])] = [
-                        "G"
-                    ];
-                    logo.noteOctaves[turtle][last(logo.inNoteBlock[turtle])] = [
-                        4
-                    ];
-                    logo.noteCents[turtle][last(logo.inNoteBlock[turtle])] = [
-                        0
-                    ];
+                    tur.singer.notePitches[last(logo.inNoteBlock[turtle])] = ["G"];
+                    tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])] = [4];
+                    tur.singer.noteCents[last(logo.inNoteBlock[turtle])] = [0];
                 }
 
                 let bpmFactor =
@@ -133,7 +129,7 @@ function setupRhythmBlockPaletteBlocks() {
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
                         __callback = function() {
-                            delete logo.noteDrums[turtle][blk];
+                            delete tur.singer.noteDrums[blk];
                             let j = logo.inNoteBlock[turtle].indexOf(blk);
                             logo.inNoteBlock[turtle].splice(j, 1);
                         };
@@ -322,12 +318,12 @@ function setupRhythmBlockPaletteBlocks() {
                 if (logo.blocks.blockList[blk].name === "tuplet3") {
                     logo.tupletParams.push([
                         args[0],
-                        (1 / args[1]) * logo.beatFactor[turtle]
+                        (1 / args[1]) * logo.turtles.ithTurtle(turtle).singer.beatFactor
                     ]);
                 } else {
                     logo.tupletParams.push([
                         args[0],
-                        args[1] * logo.beatFactor[turtle]
+                        args[1] * logo.turtles.ithTurtle(turtle).singer.beatFactor
                     ]);
                 }
 
@@ -448,12 +444,16 @@ function setupRhythmBlockPaletteBlocks() {
 
             logo.tuplet = true;
             logo.addingNotesToTuplet = false;
-            logo.tupletParams.push([1, (1 / arg) * logo.beatFactor[turtle]]);
+            logo.tupletParams.push([
+                1, (1 / arg) * logo.turtles.ithTurtle(turtle).singer.beatFactor
+            ]);
 
             let listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = event => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 logo.tuplet = false;
                 logo.addingNotesToTuplet = false;
                 if (!logo.inMatrix) {
@@ -516,7 +516,7 @@ function setupRhythmBlockPaletteBlocks() {
 
                         if (i === beatValues.length - 1) {
                             __callback = function() {
-                                delete logo.noteDrums[turtle][blk];
+                                delete tur.singer.noteDrums[blk];
                                 let j = logo.inNoteBlock[turtle].indexOf(blk);
                                 logo.inNoteBlock[turtle].splice(j, 1);
                             };
@@ -655,7 +655,7 @@ function setupRhythmBlockPaletteBlocks() {
                 arg1 = args[1];
             }
 
-            let noteBeatValue = (1 / arg1) * logo.beatFactor[turtle];
+            let noteBeatValue = (1 / arg1) * logo.turtles.ithTurtle(turtle).singer.beatFactor;
             if (logo.inMatrix || logo.tuplet) {
                 logo.pitchTimeMatrix.addColBlock(blk, arg0);
                 if (logo.tuplet) {
@@ -672,11 +672,13 @@ function setupRhythmBlockPaletteBlocks() {
                     logo.tupletParams.push([1, noteBeatValue]);
                     let obj = ["simple", 0];
                     for (let i = 0; i < arg0; i++) {
-                        obj.push((1 / arg1) * logo.beatFactor[turtle]);
+                        obj.push((1 / arg1) * logo.turtles.ithTurtle(turtle).singer.beatFactor);
                     }
                     logo.tupletRhythms.push(obj);
                 }
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 // Play rhythm block as if it were a drum.
                 if (logo.drumStyle[turtle].length > 0) {
                     logo.clearNoteParams(turtle, blk, logo.drumStyle[turtle]);
@@ -707,7 +709,7 @@ function setupRhythmBlockPaletteBlocks() {
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
                         __callback = function() {
-                            delete logo.noteDrums[turtle][blk];
+                            delete tur.singer.noteDrums[blk];
                             let j = logo.inNoteBlock[turtle].indexOf(blk);
                             logo.inNoteBlock[turtle].splice(j, 1);
                         };

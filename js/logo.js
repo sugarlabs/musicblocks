@@ -189,34 +189,34 @@ class Logo {
         /** @deprecated */  // this._masterBPM = TARGETBPM;
         /** @deprecated */  // this.defaultBPMFactor = TONEBPM / TARGETBPM;
 
-        this.register = {};
-        this.beatFactor = {};
-        this.dotCount = {};
-        this.noteBeat = {};
-        this.noteValue = {};
-        this.oscList = {};
-        this.noteDrums = {};
-        this.notePitches = {};
-        this.noteOctaves = {};
-        this.noteCents = {};
-        this.noteHertz = {};
-        this.noteBeatValues = {};
-        this.embeddedGraphics = {};
-        this.lastNotePlayed = {};
-        this.lastPitchPlayed = {};          // for a stand-alone pitch block
-        this.previousNotePlayed = {};
-        this.noteStatus = {};
-        this.noteDirection = {};
-        this.pitchNumberOffset = [];        // 39, C4
-        this.currentOctave = {};
-        this.currentCalculatedOctave = {};  // for a stand-alone pitch block
-        this.inHarmonic = {};
-        this.partials = {};
-        this.inNeighbor = [];
-        this.neighborStepPitch = {};
-        this.neighborNoteValue = {};
-        this.inDefineMode = {};
-        this.defineMode = {};
+        /** @deprecated */  // this.register = {};
+        /** @deprecated */  // this.beatFactor = {};
+        /** @deprecated */  // this.dotCount = {};
+        /** @deprecated */  // this.noteBeat = {};
+        /** @deprecated */  // this.noteValue = {};
+        /** @deprecated */  // this.oscList = {};
+        /** @deprecated */  // this.noteDrums = {};
+        /** @deprecated */  // this.notePitches = {};
+        /** @deprecated */  // this.noteOctaves = {};
+        /** @deprecated */  // this.noteCents = {};
+        /** @deprecated */  // this.noteHertz = {};
+        /** @deprecated */  // this.noteBeatValues = {};
+        /** @deprecated */  // this.embeddedGraphics = {};
+        /** @deprecated */  // this.lastNotePlayed = {};
+        /** @deprecated */  // this.lastPitchPlayed = {};          // for a stand-alone pitch block
+        /** @deprecated */  // this.previousNotePlayed = {};
+        /** @deprecated */  // this.noteStatus = {};
+        /** @deprecated */  // this.noteDirection = {};
+        /** @deprecated */  // this.pitchNumberOffset = [];        // 39, C4
+        /** @deprecated */  // this.currentOctave = {};
+        /** @deprecated */  // this.currentCalculatedOctave = {};  // for a stand-alone pitch block
+        /** @deprecated */  // this.inHarmonic = {};
+        /** @deprecated */  // this.partials = {};
+        /** @deprecated */  // this.inNeighbor = [];
+        /** @deprecated */  // this.neighborStepPitch = {};
+        /** @deprecated */  // this.neighborNoteValue = {};
+        /** @deprecated */  // this.inDefineMode = {};
+        /** @deprecated */  // this.defineMode = {};
 
         // Parameters used in time signature
         this.pickup = {};
@@ -795,16 +795,28 @@ class Logo {
      * @returns {void}
      */
     clearNoteParams(turtle, blk, drums) {
-        this.oscList[turtle][blk] = [];
-        this.noteBeat[turtle][blk] = [];
-        this.noteBeatValues[turtle][blk] = [];
-        this.noteValue[turtle][blk] = null;
-        this.notePitches[turtle][blk] = [];
-        this.noteOctaves[turtle][blk] = [];
-        this.noteCents[turtle][blk] = [];
-        this.noteHertz[turtle][blk] = [];
-        this.embeddedGraphics[turtle][blk] = [];
-        this.noteDrums[turtle][blk] = drums !== null ? drums : [];
+        let tur = this.turtles.ithTurtle(turtle);
+
+        /** @deprecated */  // this.oscList[turtle][blk] = [];
+        tur.singer.oscList[blk] = [];
+        /** @deprecated */  // this.noteBeat[turtle][blk] = [];
+        tur.singer.noteBeat[blk] = [];
+        /** @deprecated */  // this.noteBeatValues[turtle][blk] = [];
+        tur.singer.noteBeatValues[blk] = [];
+        /** @deprecated */  // this.noteValue[turtle][blk] = null;
+        tur.singer.noteValue[blk] = null;
+        /** @deprecated */  // this.notePitches[turtle][blk] = [];
+        tur.singer.notePitches[blk] = [];
+        /** @deprecated */  // this.noteOctaves[turtle][blk] = [];
+        tur.singer.noteOctaves[blk] = [];
+        /** @deprecated */  // this.noteCents[turtle][blk] = [];
+        tur.singer.noteCents[blk] = [];
+        /** @deprecated */  // this.noteHertz[turtle][blk] = [];
+        tur.singer.noteHertz[blk] = [];
+        /** @deprecated */  // this.embeddedGraphics[turtle][blk] = [];
+        tur.singer.embeddedGraphics[blk] = [];
+        /** @deprecated */  // this.noteDrums[turtle][blk] = drums !== null ? drums : [];
+        tur.singer.noteDrums[blk] = drums !== null ? drums : [];
     }
 
     /**
@@ -989,6 +1001,8 @@ class Logo {
      * @returns {*}
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
+        let tur = logo.turtles.ithTurtle(turtle);
+
         // Retrieve the value of a block
         if (blk == null) {
             logo.errorMsg(NOINPUTERRORMSG, parentBlk);
@@ -1014,7 +1028,7 @@ class Logo {
 
         if (logo.blocks.blockList[blk].name === "intervalname") {
             if (typeof logo.blocks.blockList[blk].value === "string") {
-                logo.noteDirection[turtle] = getIntervalDirection(
+                tur.singer.noteDirection = getIntervalDirection(
                     logo.blocks.blockList[blk].value
                 );
                 return getIntervalNumber(logo.blocks.blockList[blk].value);
@@ -1276,11 +1290,39 @@ class Logo {
      * @returns {void}
      */
     initTurtle(turtle) {
-        let tur = this.turtles.ithTurtle(Number(turtle));
+        let tur = this.turtles.ithTurtle(turtle);
+
         tur.singer.scalarTransposition = 0;
         tur.singer.scalarTranspositionValues = [];
         tur.singer.transposition = 0;
         tur.singer.transpositionValues = [];
+
+        tur.singer.register = 0;
+        tur.singer.beatFactor = 1;
+        tur.singer.dotCount = 0;
+        tur.singer.noteBeat = {};
+        tur.singer.noteValue = {};
+        tur.singer.oscList = {};
+        tur.singer.noteDrums = {};
+        tur.singer.notePitches = {};
+        tur.singer.noteOctaves = {};
+        tur.singer.noteCents = {};
+        tur.singer.noteHertz = {};
+        tur.singer.noteBeatValues = {};
+        tur.singer.embeddedGraphics = {};
+        tur.singer.lastNotePlayed = null;
+        tur.singer.previousNotePlayed = null;
+        tur.singer.noteStatus = null;
+        tur.singer.noteDirection = 0;
+        tur.singer.pitchNumberOffset = 39;
+        tur.singer.currentOctave = 4;
+        tur.singer.inHarmonic = [];
+        tur.singer.partials = [];
+        tur.singer.inNeighbor = [];
+        tur.singer.neighborStepPitch = [];
+        tur.singer.neighborNoteValue = [];
+        tur.singer.inDefineMode = false;
+        tur.singer.defineMode = [];
 
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
@@ -1297,24 +1339,24 @@ class Logo {
         /** @deprecated */  // this.scalarTranspositionValues[turtle] = [];
         /** @deprecated */  // this.transposition[turtle] = 0;
         /** @deprecated */  // this.transpositionValues[turtle] = [];
-        this.noteBeat[turtle] = {};
-        this.noteValue[turtle] = {};
-        this.noteCents[turtle] = {};
-        this.noteHertz[turtle] = {};
-        this.lastNotePlayed[turtle] = null;
-        this.previousNotePlayed[turtle] = null;
-        this.noteStatus[turtle] = null;
-        this.noteDirection[turtle] = 0;
-        this.noteDrums[turtle] = {};
-        this.notePitches[turtle] = {};
-        this.noteOctaves[turtle] = {};
-        this.currentOctave[turtle] = 4;
-        this.register[turtle] = 0;
-        this.noteBeatValues[turtle] = {};
-        this.embeddedGraphics[turtle] = {};
+        /** @deprecated */  // this.noteBeat[turtle] = {};
+        /** @deprecated */  // this.noteValue[turtle] = {};
+        /** @deprecated */  // this.noteCents[turtle] = {};
+        /** @deprecated */  // this.noteHertz[turtle] = {};
+        /** @deprecated */  // this.lastNotePlayed[turtle] = null;
+        /** @deprecated */  // this.previousNotePlayed[turtle] = null;
+        /** @deprecated */  // this.noteStatus[turtle] = null;
+        /** @deprecated */  // this.noteDirection[turtle] = 0;
+        /** @deprecated */  // this.noteDrums[turtle] = {};
+        /** @deprecated */  // this.notePitches[turtle] = {};
+        /** @deprecated */  // this.noteOctaves[turtle] = {};
+        /** @deprecated */  // this.currentOctave[turtle] = 4;
+        /** @deprecated */  // this.register[turtle] = 0;
+        /** @deprecated */  // this.noteBeatValues[turtle] = {};
+        /** @deprecated */  // this.embeddedGraphics[turtle] = {};
         this.embeddedGraphicsFinished[turtle] = true;
-        this.beatFactor[turtle] = 1;
-        this.dotCount[turtle] = 0;
+        /** @deprecated */  // this.beatFactor[turtle] = 1;
+        /** @deprecated */  // this.dotCount[turtle] = 0;
         this.invertList[turtle] = [];
         this.beatList[turtle] = [];
         this.factorList[turtle] = [];
@@ -1330,7 +1372,7 @@ class Logo {
         this.whichNoteToCount[turtle] = 1;
         this.keySignature[turtle] = "C " + "major";
         this.pushedNote[turtle] = false;
-        this.oscList[turtle] = {};
+        /** @deprecated */  // this.oscList[turtle] = {};
         this.bpm[turtle] = [];
         this.inSetTimbre[turtle] = false;
         this.instrumentNames[turtle] = ["electronic synth"];
@@ -1374,8 +1416,8 @@ class Logo {
         this.neighborArgNote2[turtle] = [];
         this.neighborArgBeat[turtle] = [];
         this.neighborArgCurrentBeat[turtle] = [];
-        this.inDefineMode[turtle] = false;
-        this.defineMode[turtle] = [];
+        /** @deprecated */  // this.inDefineMode[turtle] = false;
+        /** @deprecated */  // this.defineMode[turtle] = [];
         this.dispatchFactor[turtle] = 1;
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
@@ -1390,15 +1432,15 @@ class Logo {
         this.notation.pickupPOW2[turtle] = false;
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
-        this.pitchNumberOffset[turtle] = 39;    // C4
+        /** @deprecated */  // this.pitchNumberOffset[turtle] = 39;    // C4
         this.suppressOutput[turtle] =
             this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.moveable[turtle] = false;
-        this.inNeighbor[turtle] = [];
-        this.neighborStepPitch[turtle] = [];
-        this.neighborNoteValue[turtle] = [];
-        this.inHarmonic[turtle] = [];
-        this.partials[turtle] = [];
+        /** @deprecated */  // this.inNeighbor[turtle] = [];
+        /** @deprecated */  // this.neighborStepPitch[turtle] = [];
+        /** @deprecated */  // this.neighborNoteValue[turtle] = [];
+        /** @deprecated */  // this.inHarmonic[turtle] = [];
+        /** @deprecated */  // this.partials[turtle] = [];
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
 
@@ -2309,17 +2351,17 @@ class Logo {
     async dispatchTurtleSignals(turtle, beatValue, blk, delay) {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration
-        if (!turtle in this.embeddedGraphics) {
-            console.debug("Could not find turtle " + turtle + "in embeddedGraphics.");
-            return;
-        }
 
-        if (!blk in this.embeddedGraphics[turtle]) {
-            console.debug("Could not find blk " + blk + "in embeddedGraphics.");
-            return;
-        }
+        let tur = this.turtles.ithTurtle(turtle);
 
-        if (this.embeddedGraphics[turtle][blk].length === 0) return;
+        if (tur.singer.embeddedGraphics === {})
+            return;
+
+        if (!blk in tur.singer.embeddedGraphics)
+            return;
+
+        if (tur.singer.embeddedGraphics[blk].length === 0)
+            return;
 
         // If the previous note's graphics are not complete, add a
         // slight delay before drawing any new graphics
@@ -2335,28 +2377,28 @@ class Logo {
             let _penSwitch = name => {
                 switch (name) {
                     case "penup":
-                        this.turtles.turtleList[turtle].painter.doPenUp();
+                        tur.painter.doPenUp();
                         break;
                     case "pendown":
-                        this.turtles.turtleList[turtle].painter.doPenDown();
+                        tur.painter.doPenDown();
                         break;
                     case "setcolor":
-                        this.turtles.turtleList[turtle].painter.doSetColor(arg);
+                        tur.painter.doSetColor(arg);
                         break;
                     case "sethue":
-                        this.turtles.turtleList[turtle].painter.doSetHue(arg);
+                        tur.painter.doSetHue(arg);
                         break;
                     case "setshade":
-                        this.turtles.turtleList[turtle].painter.doSetValue(arg);
+                        tur.painter.doSetValue(arg);
                         break;
                     case "settranslucency":
-                        this.turtles.turtleList[turtle].painter.doSetPenAlpha(arg);
+                        tur.painter.doSetPenAlpha(arg);
                         break;
                     case "setgrey":
-                        this.turtles.turtleList[turtle].painter.doSetChroma(arg);
+                        tur.painter.doSetChroma(arg);
                         break;
                     case "setpensize":
-                        this.turtles.turtleList[turtle].painter.doSetPensize(arg);
+                        tur.painter.doSetPensize(arg);
                         break;
                 }
             };
@@ -2370,82 +2412,67 @@ class Logo {
 
         let __clear = (turtle, timeout) => {
             if (this.suppressOutput[turtle]) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doSetXY(0, 0);
+                tur.painter.doSetHeading(0);
+                tur.painter.penState = savedPenState;
                 this.svgBackground = true;
             } else {
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.penState = true;
-                // this.turtles.turtleList[turtle].painter.doClear(true, true, true);
+                tur.painter.penState = false;
+                tur.painter.doSetHeading(0);
+                tur.painter.doSetXY(0, 0);
+                tur.painter.penState = true;
+                // tur.painter.doClear(true, true, true);
             }
         };
 
         let __right = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doRight(arg);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doRight(arg);
+                tur.painter.penState = savedPenState;
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doRight(arg),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doRight(arg), timeout);
             }
         };
 
         let __setheading = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                this.turtles.turtleList[turtle].painter.doSetHeading(arg);
+                tur.painter.doSetHeading(arg);
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doSetHeading(arg),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doSetHeading(arg), timeout);
             }
         };
 
         let __forward = (turtle, arg, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doForward(arg);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doForward(arg);
+                tur.painter.penState = savedPenState;
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doForward(arg),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doForward(arg), timeout);
             }
         };
 
         let __scrollxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                this.turtles.turtleList[turtle].painter.doScrollXY(arg1, arg2);
+                tur.painter.doScrollXY(arg1, arg2);
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doScrollXY(arg1, arg2),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doScrollXY(arg1, arg2), timeout);
             }
         };
 
         let __setxy = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(arg1, arg2);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doSetXY(arg1, arg2);
+                tur.painter.penState = savedPenState;
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doSetXY(arg1, arg2),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doSetXY(arg1, arg2), timeout);
             }
         };
 
@@ -2472,15 +2499,12 @@ class Logo {
 
         let __arc = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doArc(arg1, arg2);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doArc(arg1, arg2);
+                tur.painter.penState = savedPenState;
             } else {
-                setTimeout(
-                    () => this.turtles.turtleList[turtle].painter.doArc(arg1, arg2),
-                    timeout
-                );
+                setTimeout(() => tur.painter.doArc(arg1, arg2), timeout);
             }
         };
 
@@ -2510,9 +2534,9 @@ class Logo {
 
         let __bezier = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doBezier(
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
+                tur.painter.doBezier(
                     this.cp1x[turtle],
                     this.cp1y[turtle],
                     this.cp2x[turtle],
@@ -2520,10 +2544,10 @@ class Logo {
                     arg1,
                     arg2
                 );
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                tur.painter.penState = savedPenState;
             } else {
                 setTimeout(() => {
-                    this.turtles.turtleList[turtle].painter.doBezier(
+                    tur.painter.doBezier(
                         this.cp1x[turtle],
                         this.cp1y[turtle],
                         this.cp2x[turtle],
@@ -2538,24 +2562,23 @@ class Logo {
         let inFillClamp = false;
         let __fill = (turtle, timeout) => {
             if (suppressOutput) {
-                let savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
+                let savedPenState = tur.painter.penState;
+                tur.painter.penState = false;
                 if (inFillClamp) {
-                    this.turtles.turtleList[turtle].painter.doEndFill();
+                    tur.painter.doEndFill();
                     inFillClamp = false;
                 } else {
-                    this.turtles.turtleList[turtle].painter.doStartFill();
+                    tur.painter.doStartFill();
                     inFillClamp = true;
                 }
-
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+                tur.painter.penState = savedPenState;
             } else {
                 setTimeout(() => {
                     if (inFillClamp) {
-                        this.turtles.turtleList[turtle].painter.doEndFill();
+                        tur.painter.doEndFill();
                         inFillClamp = false;
                     } else {
-                        this.turtles.turtleList[turtle].painter.doStartFill();
+                        tur.painter.doStartFill();
                         inFillClamp = true;
                     }
                 }, timeout);
@@ -2566,19 +2589,19 @@ class Logo {
         let __hollowline = (turtle, timeout) => {
             if (suppressOutput) {
                 if (inHollowLineClamp) {
-                    this.turtles.turtleList[turtle].painter.doEndHollowLine();
+                    tur.painter.doEndHollowLine();
                     inHollowLineClamp = false;
                 } else {
-                    this.turtles.turtleList[turtle].painter.doStartHollowLine();
+                    tur.painter.doStartHollowLine();
                     inHollowLineClamp = true;
                 }
             } else {
                 setTimeout(() => {
                     if (inHollowLineClamp) {
-                        this.turtles.turtleList[turtle].painter.doEndHollowLine();
+                        tur.painter.doEndHollowLine();
                         inHollowLineClamp = false;
                     } else {
-                        this.turtles.turtleList[turtle].painter.doStartHollowLine();
+                        tur.painter.doStartHollowLine();
                         inHollowLineClamp = true;
                     }
                 }, timeout);
@@ -2586,8 +2609,8 @@ class Logo {
         };
 
         let extendedGraphicsCounter = 0;
-        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            let b = this.embeddedGraphics[turtle][blk][i];
+        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+            let b = tur.singer.embeddedGraphics[blk][i];
             switch (this.blocks.blockList[b].name) {
                 case "forward":
                 case "back":
@@ -2630,8 +2653,8 @@ class Logo {
             this.dispatchFactor[turtle] = NOTEDIV;
         }
 
-        for (let i = 0; i < this.embeddedGraphics[turtle][blk].length; i++) {
-            let b = this.embeddedGraphics[turtle][blk][i];
+        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+            let b = tur.singer.embeddedGraphics[blk][i];
             let name = this.blocks.blockList[b].name;
 
             let arg, arg1, arg2;

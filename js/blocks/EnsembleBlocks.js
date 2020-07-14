@@ -485,29 +485,24 @@ function setupEnsembleBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let value = null;
             let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(
-                logo,
-                turtle,
-                cblk,
-                blk,
-                receivedArg
-            );
+            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
             for (let i = 0; i < logo.turtles.turtleList.length; i++) {
                 let thisTurtle = logo.turtles.turtleList[i];
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
-                    if (logo.lastNotePlayed[i] !== null) {
-                        let len = logo.lastNotePlayed[i][0].length;
-                        let pitch = logo.lastNotePlayed[i][0].slice(0, len - 1);
-                        let octave = parseInt(
-                            logo.lastNotePlayed[i][0].slice(len - 1)
-                        );
+                    if (thisTurtle.singer.lastNotePlayed !== null) {
+                        let len = thisTurtle.singer.lastNotePlayed[0].length;
+                        let pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
+                        let octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
 
                         obj = [pitch, octave];
-                    } else if (logo.notePitches[i].length > 0) {
+                    } else if (thisTurtle.singer.notePitches.length > 0) {
                         obj = getNote(
-                            logo.notePitches[i][0],
-                            logo.noteOctaves[i][0],
+                            thisTurtle.singer.notePitches[0],
+                            thisTurtle.singer.noteOctaves[0],
                             0,
                             logo.keySignature[i],
                             logo.moveable[turtle],
@@ -523,7 +518,7 @@ function setupEnsembleBlocks() {
 
                     value =
                         pitchToNumber(obj[0], obj[1], logo.keySignature[i]) -
-                        logo.pitchNumberOffset[turtle];
+                        tur.singer.pitchNumberOffset;
                     logo.blocks.blockList[blk].value = value;
                     break;
                 }
@@ -543,24 +538,15 @@ function setupEnsembleBlocks() {
                 }
 
                 let obj;
-                if (logo.lastNotePlayed[turtle] !== null) {
-                    let len = logo.lastNotePlayed[turtle][0].length;
-                    let pitch = logo.lastNotePlayed[turtle][0].slice(
-                        0,
-                        len - 1
-                    );
-                    let octave = parseInt(
-                        logo.lastNotePlayed[turtle][0].slice(len - 1)
-                    );
+                if (tur.singer.lastNotePlayed !== null) {
+                    let len = tur.singer.lastNotePlayed[0].length;
+                    let pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
+                    let octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
                     obj = [pitch, octave];
-                } else if (logo.notePitches[turtle].length > 0) {
+                } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
-                        logo.notePitches[turtle][
-                            last(logo.inNoteBlock[turtle])
-                        ][0],
-                        logo.noteOctaves[turtle][
-                            last(logo.inNoteBlock[turtle])
-                        ][0],
+                        tur.singer.notePitches[last(logo.inNoteBlock[turtle])][0],
+                        tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
                         0,
                         logo.keySignature[turtle],
                         logo.moveable[turtle],
@@ -576,7 +562,7 @@ function setupEnsembleBlocks() {
 
                 value =
                     pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
-                    logo.pitchNumberOffset[turtle];
+                    tur.singer.pitchNumberOffset;
                 logo.blocks.blockList[blk].value = value;
             }
         }
@@ -599,26 +585,20 @@ function setupEnsembleBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let value = null;
             let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(
-                logo,
-                turtle,
-                cblk,
-                blk,
-                receivedArg
-            );
+            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
             for (let i = 0; i < logo.turtles.turtleList.length; i++) {
-                let thisTurtle = logo.turtles.turtleList[i];
+                let thisTurtle = logo.turtles.ithTurtle(i);
                 if (targetTurtle === thisTurtle.name) {
                     if (
                         logo.inNoteBlock[i].length > 0 &&
-                        last(logo.inNoteBlock[i]) in logo.noteValue[i]
+                        last(logo.inNoteBlock[i]) in thisTurtle.singer.noteValue
                     ) {
-                        value =
-                            1 / logo.noteValue[i][last(logo.inNoteBlock[i])];
-                    } else if (logo.lastNotePlayed[i] !== null) {
-                        value = logo.lastNotePlayed[i][1];
-                    } else if (logo.notePitches[i].length > 0) {
-                        value = logo.noteBeat[i][last(logo.inNoteBlock[i])];
+                        value = 1 / thisTurtle.singer.noteValue[last(logo.inNoteBlock[i])];
+                    } else if (thisTurtle.singer.lastNotePlayed !== null) {
+                        value = thisTurtle.singer.lastNotePlayed[1];
+                    } else if (thisTurtle.singer.notePitches.length > 0) {
+                        value = thisTurtle.singer.noteBeat[last(logo.inNoteBlock[i])];
                     } else {
                         value = -1;
                     }

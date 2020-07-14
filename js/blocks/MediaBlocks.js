@@ -243,12 +243,12 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 1) {
                 if (logo.meSpeak !== null) {
                     if (logo.inNoteBlock[turtle].length > 0) {
-                        logo.embeddedGraphics[turtle][
-                            last(logo.inNoteBlock[turtle])
-                        ].push(blk);
+                        tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
                     } else {
                         if (!logo.suppressOutput[turtle]) {
                             logo.processSpeak(args[0]);
@@ -385,6 +385,8 @@ function setupMediaBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 let block = logo.blocks.blockList[blk];
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
@@ -396,9 +398,9 @@ function setupMediaBlocks() {
                 let note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 let octave = Math.floor(
                     calcOctave(
-                        logo.currentOctave[turtle],
+                        tur.singer.currentOctave,
                         logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
-                        logo.lastNotePlayed[turtle],
+                        tur.singer.lastNotePlayed,
                         note
                     )
                 );
@@ -556,11 +558,11 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 2) {
                 if (logo.inNoteBlock[turtle].length > 0) {
-                    logo.embeddedGraphics[turtle][
-                        last(logo.inNoteBlock[turtle])
-                    ].push(blk);
+                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
                 } else {
                     if (!logo.suppressOutput[turtle]) {
                         logo.processShow(turtle, blk, args[0], args[1]);

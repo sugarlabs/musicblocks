@@ -507,13 +507,12 @@ function setupIntervalsBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
-                logo.semitoneIntervals[turtle].push([
-                    i,
-                    logo.noteDirection[turtle]
-                ]);
-                logo.noteDirection[turtle] = 0;
+                logo.semitoneIntervals[turtle].push([i, tur.singer.noteDirection]);
+                tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
@@ -722,8 +721,10 @@ function setupIntervalsBlocks() {
                 return;
             }
 
-            logo.inDefineMode[turtle] = true;
-            logo.defineMode[turtle] = [];
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inDefineMode = true;
+            tur.singer.defineMode = [];
             let modeName;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -737,12 +738,12 @@ function setupIntervalsBlocks() {
 
             let __listener = function(event) {
                 MUSICALMODES[modeName] = [];
-                if (logo.defineMode[turtle].indexOf(0) === -1) {
-                    logo.defineMode[turtle].push(0);
+                if (tur.singer.defineMode.indexOf(0) === -1) {
+                    tur.singer.defineMode.push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                let pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
+                let pitchNumbers = tur.singer.defineMode.sort(function(a, b) {
                     return a[0] - b[0];
                 });
 
@@ -775,7 +776,7 @@ function setupIntervalsBlocks() {
                     logo.blocks.updateBlockText(cblk);
                 }
 
-                logo.inDefineMode[turtle] = false;
+                tur.singer.inDefineMode = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
