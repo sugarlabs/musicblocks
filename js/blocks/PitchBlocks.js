@@ -273,7 +273,7 @@ function setupPitchBlocks() {
                                 octave,
                                 nhalf,
                                 logo.keySignature[turtle],
-                                logo.moveable[turtle],
+                                tur.singer.moveable,
                                 null,
                                 logo.errorMsg,
                                 logo.synth.inTemperament
@@ -302,7 +302,7 @@ function setupPitchBlocks() {
                                 octave,
                                 nhalf,
                                 logo.keySignature[turtle],
-                                logo.moveable[turtle],
+                                tur.singer.moveable,
                                 null,
                                 logo.errorMsg,
                                 logo.synth.inTemperament
@@ -391,7 +391,7 @@ function setupPitchBlocks() {
                         tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
                         0,
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg
                     );
@@ -495,7 +495,7 @@ function setupPitchBlocks() {
                             lc2 = lc2
                                         .replace("#", SHARP)
                                         .replace("b", FLAT);
-                            if (logo.moveable[turtle] === false) {
+                            if (tur.singer.moveable === false) {
                                 return SOLFEGECONVERSIONTABLE[lc2];
                             } else {
                                 let scale = _buildScale(logo.keySignature[turtle])[0];
@@ -519,7 +519,7 @@ function setupPitchBlocks() {
                             let scalarClass = scaleDegreeToPitchMapping(
                                 logo.keySignature[turtle],
                                 null,
-                                logo.moveable[turtle],
+                                tur.singer.moveable,
                                 note2
                             );
                             return scalarClass[0];
@@ -532,7 +532,7 @@ function setupPitchBlocks() {
                             let scalarClass1 = scaleDegreeToPitchMapping(
                                 logo.keySignature[turtle],
                                 null,
-                                logo.moveable[turtle],
+                                tur.singer.moveable,
                                 note3
                             );
                             return scalarClass1[0] + scalarClass1[1];
@@ -581,7 +581,7 @@ function setupPitchBlocks() {
                                     tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
                                     0,
                                     logo.keySignature[turtle],
-                                    logo.moveable[turtle],
+                                    tur.singer.moveable,
                                     null,
                                     logo.errorMsg
                                 );
@@ -1541,7 +1541,7 @@ function setupPitchBlocks() {
                     octave,
                     t,
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     direction,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -1572,7 +1572,7 @@ function setupPitchBlocks() {
                     octave,
                     0,
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     null,
                     logo.errorMsg
                 );
@@ -1635,7 +1635,7 @@ function setupPitchBlocks() {
                             noteObj1[1],
                             ii,
                             logo.keySignature[turtle],
-                            logo.moveable[turtle],
+                            tur.singer.moveable,
                             null,
                             logo.errorMsg,
                             logo.synth.inTemperament
@@ -1658,7 +1658,7 @@ function setupPitchBlocks() {
                             noteObj1[1],
                             logo.semitoneIntervals[turtle][i][0],
                             logo.keySignature[turtle],
-                            logo.moveable[turtle],
+                            tur.singer.moveable,
                             null,
                             logo.errorMsg,
                             logo.synth.inTemperament
@@ -2289,7 +2289,7 @@ function setupPitchBlocks() {
                         noteObj1[1],
                         ii,
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
@@ -2312,7 +2312,7 @@ function setupPitchBlocks() {
                         noteObj1[1],
                         logo.semitoneIntervals[turtle][i][0],
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament

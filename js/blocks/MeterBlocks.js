@@ -129,24 +129,23 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "measurevalue"]);
             } else {
-                if (
-                    logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] <
-                    logo.pickup[turtle]
-                ) {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
                     return 0;
                 } else {
                     return (
                         Math.floor(
-                            ((logo.notesPlayed[turtle][0] /
-                                logo.notesPlayed[turtle][1] -
-                                logo.pickup[turtle]) *
-                                logo.noteValuePerBeat[turtle]) /
-                                logo.beatsPerMeasure[turtle]
+                            (
+                                (
+                                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
+                                    logo.pickup[turtle]
+                                ) * logo.noteValuePerBeat[turtle]
+                            ) / logo.beatsPerMeasure[turtle]
                         ) + 1
                     );
                 }
@@ -199,25 +198,23 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "beatvalue"]);
             } else {
-                if (
-                    logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] <
-                    logo.pickup[turtle]
-                ) {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
                     return 0;
                 } else {
                     return (
-                        (((logo.notesPlayed[turtle][0] /
-                            logo.notesPlayed[turtle][1] -
-                            logo.pickup[turtle]) *
-                            logo.noteValuePerBeat[turtle]) %
-                            logo.beatsPerMeasure[turtle]) +
-                        1
-                    );
+                        (
+                            (
+                                tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
+                                logo.pickup[turtle]
+                            ) * logo.noteValuePerBeat[turtle]
+                        ) % logo.beatsPerMeasure[turtle]
+                    ) + 1;
                 }
             }
         }
@@ -284,14 +281,12 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "elapsednotes"]);
             } else {
-                return (
-                    logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1]
-                );
+                let tur = logo.turtles.ithTurtle(turtle);
+                return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
             }
         }
     }
@@ -348,11 +343,8 @@ function setupMeterBlocks() {
                 if (notevalue === null || notevalue === 0) {
                     return 0;
                 } else {
-                    return (
-                        logo.notesPlayed[turtle][0] /
-                        logo.notesPlayed[turtle][1] /
-                        notevalue
-                    );
+                    let tur = logo.turtles.ithTurtle(turtle);
+                    return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / notevalue;
                 }
             }
         }

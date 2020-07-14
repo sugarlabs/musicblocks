@@ -76,6 +76,13 @@ class Singer {
         this.neighborNoteValue = [];
         this.inDefineMode = false;
         this.defineMode = [];
+
+        // Music-related attributes
+        this.notesPlayed = [0, 1];
+        this.whichNoteToCount = 1;
+        this.moveable = false;                  // moveable solfege?
+
+        this.dispatchFactor = 1;                // scale factor for turtle graphics embedded in notes
     }
 
     // ========= Deprecated ===================================================
@@ -146,12 +153,14 @@ class Singer {
         if (steps === 0)
             return [note, octave];
 
+        let tur = logo.turtles.ithTurtle(turtle);
+
         let noteObj = getNote(
             note,
             octave,
             0,
             logo.keySignature[turtle],
-            logo.moveable[turtle],
+            tur.singer.moveable,
             null,
             logo.errorMsg,
             logo.synth.inTemperament
@@ -169,7 +178,7 @@ class Singer {
                         logo.keySignature[turtle], noteObj[0], steps, logo.synth.inTemperament
                     ),
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg,
                 logo.synth.inTemperament
@@ -183,7 +192,7 @@ class Singer {
                         getStepSizeUp(logo.keySignature[turtle], noteObj[0]) :
                         getStepSizeDown(logo.keySignature[turtle], noteObj[0]),
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     null,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -249,7 +258,7 @@ class Singer {
 
         let delta = 0;
         let note1 = getNote(
-            note, octave, 0, logo.keySignature[turtle], logo.moveable[turtle], null, logo.errorMsg
+            note, octave, 0, logo.keySignature[turtle], tur.singer.moveable, null, logo.errorMsg
         );
         let num1 =
             pitchToNumber(note1[0], note1[1], logo.keySignature[turtle]) -
@@ -261,7 +270,7 @@ class Singer {
                 logo.invertList[turtle][i][1],
                 0,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -306,23 +315,25 @@ class Singer {
         if (cblk === null)
             return 0;
 
+        let tur = logo.turtles.ithTurtle(turtle);
+
         let saveSuppressStatus = logo.suppressOutput[turtle];
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
         let saveBoxes = JSON.stringify(logo.boxes);
         let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
         // .. and the turtle state
-        let saveX = logo.turtles.turtleList[turtle].x;
-        let saveY = logo.turtles.turtleList[turtle].y;
-        let saveColor = logo.turtles.turtleList[turtle].painter.color;
-        let saveValue = logo.turtles.turtleList[turtle].painter.value;
-        let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
-        let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
-        let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
-        let saveOrientation = logo.turtles.turtleList[turtle].orientation;
-        let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+        let saveX = tur.x;
+        let saveY = tur.y;
+        let saveColor = tur.painter.color;
+        let saveValue = tur.painter.value;
+        let saveChroma = tur.painter.chroma;
+        let saveStroke = tur.painter.stroke;
+        let saveCanvasAlpha = tur.painter.canvasAlpha;
+        let saveOrientation = tur.orientation;
+        let savePenState = tur.painter.penState;
 
-        let saveWhichNoteToCount = logo.whichNoteToCount[turtle];
+        let saveWhichNoteToCount = tur.singer.whichNoteToCount;
 
         let savePrevTurtleTime = logo.previousTurtleTime[turtle];
         let saveTurtleTime = logo.turtleTime[turtle];
@@ -338,11 +349,11 @@ class Singer {
         }
 
         let actionArgs = [];
-        let saveNoteCount = logo.notesPlayed[turtle];
+        let saveNoteCount = tur.singer.notesPlayed;
         logo.turtles.turtleList[turtle].running = true;
 
         if (logo.inNoteBlock[turtle]) {
-            logo.whichNoteToCount[turtle] += logo.inNoteBlock[turtle].length;
+            tur.singer.whichNoteToCount += logo.inNoteBlock[turtle].length;
         }
 
         logo.runFromBlockNow(
@@ -350,9 +361,9 @@ class Singer {
         );
 
         let returnValue = rationalSum(
-            logo.notesPlayed[turtle], [-saveNoteCount[0], saveNoteCount[1]]
+            tur.singer.notesPlayed, [-saveNoteCount[0], saveNoteCount[1]]
         );
-        logo.notesPlayed[turtle] = saveNoteCount;
+        tur.singer.notesPlayed = saveNoteCount;
 
         // Restore previous state
         console.debug(saveBoxes);
@@ -360,20 +371,20 @@ class Singer {
         console.debug(saveTurtleHeaps);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-        logo.turtles.turtleList[turtle].painter.doPenUp();
-        logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-        logo.turtles.turtleList[turtle].painter.color = saveColor;
-        logo.turtles.turtleList[turtle].painter.value = saveValue;
-        logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
-        logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
-        logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-        logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-        logo.turtles.turtleList[turtle].painter.penState = savePenState;
+        tur.painter.doPenUp();
+        tur.painter.doSetXY(saveX, saveY);
+        tur.painter.color = saveColor;
+        tur.painter.value = saveValue;
+        tur.painter.chroma = saveChroma;
+        tur.painter.stroke = saveStroke;
+        tur.painter.canvasAlpha = saveCanvasAlpha;
+        tur.painter.doSetHeading(saveOrientation);
+        tur.painter.penState = savePenState;
 
         logo.previousTurtleTime[turtle] = savePrevTurtleTime;
         logo.turtleTime[turtle] = saveTurtleTime;
 
-        logo.whichNoteToCount[turtle] = saveWhichNoteToCount;
+        tur.singer.whichNoteToCount = saveWhichNoteToCount;
 
         logo.justCounting[turtle].pop();
         logo.suppressOutput[turtle] = saveSuppressStatus;
@@ -456,7 +467,7 @@ class Singer {
                 octave,
                 tur.singer.transposition,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg,
                 logo.synth.inTemperament
@@ -474,7 +485,7 @@ class Singer {
                         noteObj2[1],
                         tur.singer.transposition,
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
@@ -486,7 +497,7 @@ class Singer {
                     octave,
                     tur.singer.transposition + parseInt(tur.singer.neighborStepPitch),
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     null,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -508,7 +519,7 @@ class Singer {
                 octave,
                 transposition,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg,
                 logo.synth.inTemperament
@@ -543,7 +554,7 @@ class Singer {
                     octave,
                     transposition,
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     null,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -577,7 +588,7 @@ class Singer {
                     octave,
                     transposition,
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     null,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -622,7 +633,7 @@ class Singer {
                     octave,
                     transposition + tur.singer.register * 12,
                     logo.keySignature[turtle],
-                    logo.moveable[turtle],
+                    tur.singer.moveable,
                     direction,
                     logo.errorMsg,
                     logo.synth.inTemperament
@@ -661,7 +672,7 @@ class Singer {
                             noteObj1[0]
                         ),
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
@@ -677,7 +688,7 @@ class Singer {
                         noteObj1[1],
                         logo.semitoneIntervals[turtle][i][0],
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
@@ -704,7 +715,7 @@ class Singer {
                 octave,
                 transposition,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -716,7 +727,7 @@ class Singer {
                 octave,
                 0,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -751,7 +762,7 @@ class Singer {
                 octave,
                 transposition,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -776,7 +787,7 @@ class Singer {
                 octave,
                 0,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -821,11 +832,11 @@ class Singer {
         // Use the outer most note when nesting to determine the beat and triggering
         if (logo.inNoteBlock[turtle].length === 0) {
             let beatValue, measureValue;
-            if (logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] < logo.pickup[turtle]) {
+            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
                 beatValue = measureValue = 0;
             } else {
                 let beat = logo.noteValuePerBeat[turtle] * (
-                    logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] - logo.pickup[turtle]
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - logo.pickup[turtle]
                 );
                 beatValue = 1 + beat % logo.beatsPerMeasure[turtle];
                 measureValue = 1 + Math.floor(beat / logo.beatsPerMeasure[turtle]);
@@ -1138,7 +1149,7 @@ class Singer {
                 tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
                 0,
                 logo.keySignature[turtle],
-                logo.moveable[turtle],
+                tur.singer.moveable,
                 null,
                 logo.errorMsg
             );
@@ -1525,14 +1536,8 @@ class Singer {
                 // Stop playing notes if the stop button is pressed.
                 if (logo.stopTurtle) return;
 
-                if (
-                    logo.inNoteBlock[turtle].length ===
-                    logo.whichNoteToCount[turtle]
-                ) {
-                    logo.notesPlayed[turtle] = rationalSum(
-                        logo.notesPlayed[turtle],
-                        [1, noteValue]
-                    );
+                if (logo.inNoteBlock[turtle].length === tur.singer.whichNoteToCount) {
+                    tur.singer.notesPlayed = rationalSum(tur.singer.notesPlayed, [1, noteValue]);
                 }
 
                 var notes = [];
@@ -1630,7 +1635,7 @@ class Singer {
                                 tur.singer.noteOctaves[thisBlk][i],
                                 0,
                                 logo.keySignature[turtle],
-                                logo.moveable[turtle],
+                                tur.singer.moveable,
                                 null,
                                 logo.errorMsg,
                                 logo.synth.inTemperament

@@ -126,6 +126,7 @@ class Logo {
         // Don't dispatch these signals (when exiting note counter or interval measure)
         this.butNotThese = {};
 
+        // Related to running programs
         this._lastNoteTimeout = null;
         this._alreadyRunning = false;
         this._prematureRestart = false;
@@ -144,13 +145,6 @@ class Logo {
         this.cameraID = null;
         this.stopTurtle = false;
         this.lastKeyCode = null;
-
-        // Music-related attributes
-        this.notesPlayed = {};
-        this.whichNoteToCount = {};
-
-        // Moveable solfege?
-        this.moveable = {};
 
         // Widget-related attributes
         this.showPitchDrumMatrix = false;
@@ -246,9 +240,6 @@ class Logo {
         this.firstPitch = {};
         this.lastPitch = {};
         this.suppressOutput = {};
-
-        // Scale factor for turtle graphics embedded in notes
-        this.dispatchFactor = {};
 
         // tuplet
         this.tuplet = false;
@@ -1059,12 +1050,14 @@ class Logo {
         // Don't split the note if we are already splitting the note
         if (split == undefined) split = true;
 
+        let tur = logo.turtles.ithTurtle(turtle);
+
         // Check to see if this note straddles a measure boundary
         let durationTime = 1 / duration;
         let beatsIntoMeasure =
             (
                 (
-                    this.notesPlayed[turtle][0] / this.notesPlayed[turtle][1] -
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
                     this.pickup[turtle] -
                     durationTime
                 ) * this.noteValuePerBeat[turtle]
@@ -1263,6 +1256,12 @@ class Logo {
         tur.singer.inDefineMode = false;
         tur.singer.defineMode = [];
 
+        tur.singer.notesPlayed = [0, 1];
+        tur.singer.whichNoteToCount = 1;
+        tur.singer.moveable = false;
+
+        tur.singer.dispatchFactor = 1;
+
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
         this._waitTimes[turtle] = 0;
@@ -1286,8 +1285,6 @@ class Logo {
         this.inDuplicate[turtle] = false;
         this.skipFactor[turtle] = 1;
         this.skipIndex[turtle] = 0;
-        this.notesPlayed[turtle] = [0, 1];
-        this.whichNoteToCount[turtle] = 1;
         this.keySignature[turtle] = "C " + "major";
         this.pushedNote[turtle] = false;
         this.bpm[turtle] = [];
@@ -1333,7 +1330,6 @@ class Logo {
         this.neighborArgNote2[turtle] = [];
         this.neighborArgBeat[turtle] = [];
         this.neighborArgCurrentBeat[turtle] = [];
-        this.dispatchFactor[turtle] = 1;
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
         this.noteValuePerBeat[turtle] = 4;
@@ -1349,7 +1345,6 @@ class Logo {
         this.lastPitch[turtle] = [];
         this.suppressOutput[turtle] =
             this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
-        this.moveable[turtle] = false;
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
 
@@ -2548,17 +2543,17 @@ class Logo {
 
         // Update the turtle graphics every 50ms within a note
         if (stepTime > 200) {
-            this.dispatchFactor[turtle] = NOTEDIV / 32;
+            tur.singer.dispatchFactor = NOTEDIV / 32;
         } else if (stepTime > 100) {
-            this.dispatchFactor[turtle] = NOTEDIV / 16;
+            tur.singer.dispatchFactor = NOTEDIV / 16;
         } else if (stepTime > 50) {
-            this.dispatchFactor[turtle] = NOTEDIV / 8;
+            tur.singer.dispatchFactor = NOTEDIV / 8;
         } else if (stepTime > 25) {
-            this.dispatchFactor[turtle] = NOTEDIV / 4;
+            tur.singer.dispatchFactor = NOTEDIV / 4;
         } else if (stepTime > 12.5) {
-            this.dispatchFactor[turtle] = NOTEDIV / 2;
+            tur.singer.dispatchFactor = NOTEDIV / 2;
         } else {
-            this.dispatchFactor[turtle] = NOTEDIV;
+            tur.singer.dispatchFactor = NOTEDIV;
         }
 
         for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
@@ -2681,16 +2676,9 @@ class Logo {
                         this.receivedArg
                     );
 
-                    for (
-                        let t = 0;
-                        t < NOTEDIV / this.dispatchFactor[turtle];
-                        t++
-                    ) {
-                        let deltaTime =
-                            waitTime +
-                            t * stepTime * this.dispatchFactor[turtle];
-                        let deltaArg =
-                            arg / (NOTEDIV / this.dispatchFactor[turtle]);
+                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                        let deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                        let deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                         __right(turtle, deltaArg, deltaTime);
                     }
 
@@ -2706,16 +2694,9 @@ class Logo {
                         this.receivedArg
                     );
 
-                    for (
-                        let t = 0;
-                        t < NOTEDIV / this.dispatchFactor[turtle];
-                        t++
-                    ) {
-                        let deltaTime =
-                            waitTime +
-                            t * stepTime * this.dispatchFactor[turtle];
-                        let deltaArg =
-                            arg / (NOTEDIV / this.dispatchFactor[turtle]);
+                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                        let deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                        let deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                         __right(turtle, -deltaArg, deltaTime);
                     }
 
@@ -2731,16 +2712,9 @@ class Logo {
                         this.receivedArg
                     );
 
-                    for (
-                        let t = 0;
-                        t < NOTEDIV / this.dispatchFactor[turtle];
-                        t++
-                    ) {
-                        let deltaTime =
-                            waitTime +
-                            t * stepTime * this.dispatchFactor[turtle];
-                        let deltaArg =
-                            arg / (NOTEDIV / this.dispatchFactor[turtle]);
+                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                        let deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                        let deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                         __forward(turtle, deltaArg, deltaTime);
                     }
 
@@ -2756,16 +2730,9 @@ class Logo {
                         this.receivedArg
                     );
 
-                    for (
-                        let t = 0;
-                        t < NOTEDIV / this.dispatchFactor[turtle];
-                        t++
-                    ) {
-                        let deltaTime =
-                            waitTime +
-                            t * stepTime * this.dispatchFactor[turtle];
-                        let deltaArg =
-                            arg / (NOTEDIV / this.dispatchFactor[turtle]);
+                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                        let deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                        let deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                         __forward(turtle, -deltaArg, deltaTime);
                     }
 
@@ -2864,16 +2831,9 @@ class Logo {
                         this.receivedArg
                     );
 
-                    for (
-                        let t = 0;
-                        t < NOTEDIV / this.dispatchFactor[turtle];
-                        t++
-                    ) {
-                        let deltaTime =
-                            waitTime +
-                            t * stepTime * this.dispatchFactor[turtle];
-                        let deltaArg =
-                            arg1 / (NOTEDIV / this.dispatchFactor[turtle]);
+                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                        let deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                        let deltaArg = arg1 / (NOTEDIV / tur.singer.dispatchFactor);
                         __arc(turtle, deltaArg, arg2, deltaTime);
                     }
 

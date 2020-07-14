@@ -452,13 +452,19 @@ function setupEnsembleBlocks() {
             });
         }
 
+        /**
+         * @todo FIXME
+         */
         arg(logo, turtle, blk, receivedArg) {
             let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
-            if (thisTurtle)
-                return logo.notesPlayed[i][0] / logo.notesPlayed[i][1];
+            if (thisTurtle) {
+                let tur = logo.turtles.ithTurtle(thisTurtle);
+                return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
+            }
 
-            return logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1];
+            let tur = logo.turtles.ithTurtle(turtle);
+            return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
         }
     }
 
@@ -505,7 +511,7 @@ function setupEnsembleBlocks() {
                             thisTurtle.singer.noteOctaves[0],
                             0,
                             logo.keySignature[i],
-                            logo.moveable[turtle],
+                            tur.singer.moveable,
                             null,
                             logo.errorMsg,
                             logo.synth.inTemperament
@@ -549,7 +555,7 @@ function setupEnsembleBlocks() {
                         tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
                         0,
                         logo.keySignature[turtle],
-                        logo.moveable[turtle],
+                        tur.singer.moveable,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
