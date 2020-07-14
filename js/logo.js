@@ -179,45 +179,6 @@ class Logo {
         this.inNoteBlock = [];
         this.multipleVoices = [];
 
-        // Parameters used by pitch
-        /** @deprecated */  // this.scalarTransposition = {};
-        /** @deprecated */  // this.scalarTranspositionValues = {};
-        /** @deprecated */  // this.transposition = {};
-        /** @deprecated */  // this.transpositionValues = {};
-
-        // Parameters used by notes
-        /** @deprecated */  // this._masterBPM = TARGETBPM;
-        /** @deprecated */  // this.defaultBPMFactor = TONEBPM / TARGETBPM;
-
-        /** @deprecated */  // this.register = {};
-        /** @deprecated */  // this.beatFactor = {};
-        /** @deprecated */  // this.dotCount = {};
-        /** @deprecated */  // this.noteBeat = {};
-        /** @deprecated */  // this.noteValue = {};
-        /** @deprecated */  // this.oscList = {};
-        /** @deprecated */  // this.noteDrums = {};
-        /** @deprecated */  // this.notePitches = {};
-        /** @deprecated */  // this.noteOctaves = {};
-        /** @deprecated */  // this.noteCents = {};
-        /** @deprecated */  // this.noteHertz = {};
-        /** @deprecated */  // this.noteBeatValues = {};
-        /** @deprecated */  // this.embeddedGraphics = {};
-        /** @deprecated */  // this.lastNotePlayed = {};
-        /** @deprecated */  // this.lastPitchPlayed = {};          // for a stand-alone pitch block
-        /** @deprecated */  // this.previousNotePlayed = {};
-        /** @deprecated */  // this.noteStatus = {};
-        /** @deprecated */  // this.noteDirection = {};
-        /** @deprecated */  // this.pitchNumberOffset = [];        // 39, C4
-        /** @deprecated */  // this.currentOctave = {};
-        /** @deprecated */  // this.currentCalculatedOctave = {};  // for a stand-alone pitch block
-        /** @deprecated */  // this.inHarmonic = {};
-        /** @deprecated */  // this.partials = {};
-        /** @deprecated */  // this.inNeighbor = [];
-        /** @deprecated */  // this.neighborStepPitch = {};
-        /** @deprecated */  // this.neighborNoteValue = {};
-        /** @deprecated */  // this.inDefineMode = {};
-        /** @deprecated */  // this.defineMode = {};
-
         // Parameters used in time signature
         this.pickup = {};
         this.beatsPerMeasure = {};
@@ -789,34 +750,22 @@ class Logo {
     /**
      * Clears note params.
      *
-     * @param turtle
+     * @param {Object} turtle - Turtle object
      * @param blk
      * @param drums
      * @returns {void}
      */
     clearNoteParams(turtle, blk, drums) {
-        let tur = this.turtles.ithTurtle(turtle);
-
-        /** @deprecated */  // this.oscList[turtle][blk] = [];
-        tur.singer.oscList[blk] = [];
-        /** @deprecated */  // this.noteBeat[turtle][blk] = [];
-        tur.singer.noteBeat[blk] = [];
-        /** @deprecated */  // this.noteBeatValues[turtle][blk] = [];
-        tur.singer.noteBeatValues[blk] = [];
-        /** @deprecated */  // this.noteValue[turtle][blk] = null;
-        tur.singer.noteValue[blk] = null;
-        /** @deprecated */  // this.notePitches[turtle][blk] = [];
-        tur.singer.notePitches[blk] = [];
-        /** @deprecated */  // this.noteOctaves[turtle][blk] = [];
-        tur.singer.noteOctaves[blk] = [];
-        /** @deprecated */  // this.noteCents[turtle][blk] = [];
-        tur.singer.noteCents[blk] = [];
-        /** @deprecated */  // this.noteHertz[turtle][blk] = [];
-        tur.singer.noteHertz[blk] = [];
-        /** @deprecated */  // this.embeddedGraphics[turtle][blk] = [];
-        tur.singer.embeddedGraphics[blk] = [];
-        /** @deprecated */  // this.noteDrums[turtle][blk] = drums !== null ? drums : [];
-        tur.singer.noteDrums[blk] = drums !== null ? drums : [];
+        turtle.singer.oscList[blk] = [];
+        turtle.singer.noteBeat[blk] = [];
+        turtle.singer.noteBeatValues[blk] = [];
+        turtle.singer.noteValue[blk] = null;
+        turtle.singer.notePitches[blk] = [];
+        turtle.singer.noteOctaves[blk] = [];
+        turtle.singer.noteCents[blk] = [];
+        turtle.singer.noteHertz[blk] = [];
+        turtle.singer.embeddedGraphics[blk] = [];
+        turtle.singer.noteDrums[blk] = drums !== null ? drums : [];
     }
 
     /**
@@ -1335,28 +1284,7 @@ class Logo {
         this.cp2y[turtle] = 100;
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
-        /** @deprecated */  // this.scalarTransposition[turtle] = 0;
-        /** @deprecated */  // this.scalarTranspositionValues[turtle] = [];
-        /** @deprecated */  // this.transposition[turtle] = 0;
-        /** @deprecated */  // this.transpositionValues[turtle] = [];
-        /** @deprecated */  // this.noteBeat[turtle] = {};
-        /** @deprecated */  // this.noteValue[turtle] = {};
-        /** @deprecated */  // this.noteCents[turtle] = {};
-        /** @deprecated */  // this.noteHertz[turtle] = {};
-        /** @deprecated */  // this.lastNotePlayed[turtle] = null;
-        /** @deprecated */  // this.previousNotePlayed[turtle] = null;
-        /** @deprecated */  // this.noteStatus[turtle] = null;
-        /** @deprecated */  // this.noteDirection[turtle] = 0;
-        /** @deprecated */  // this.noteDrums[turtle] = {};
-        /** @deprecated */  // this.notePitches[turtle] = {};
-        /** @deprecated */  // this.noteOctaves[turtle] = {};
-        /** @deprecated */  // this.currentOctave[turtle] = 4;
-        /** @deprecated */  // this.register[turtle] = 0;
-        /** @deprecated */  // this.noteBeatValues[turtle] = {};
-        /** @deprecated */  // this.embeddedGraphics[turtle] = {};
         this.embeddedGraphicsFinished[turtle] = true;
-        /** @deprecated */  // this.beatFactor[turtle] = 1;
-        /** @deprecated */  // this.dotCount[turtle] = 0;
         this.invertList[turtle] = [];
         this.beatList[turtle] = [];
         this.factorList[turtle] = [];
@@ -1372,7 +1300,6 @@ class Logo {
         this.whichNoteToCount[turtle] = 1;
         this.keySignature[turtle] = "C " + "major";
         this.pushedNote[turtle] = false;
-        /** @deprecated */  // this.oscList[turtle] = {};
         this.bpm[turtle] = [];
         this.inSetTimbre[turtle] = false;
         this.instrumentNames[turtle] = ["electronic synth"];
@@ -1416,8 +1343,6 @@ class Logo {
         this.neighborArgNote2[turtle] = [];
         this.neighborArgBeat[turtle] = [];
         this.neighborArgCurrentBeat[turtle] = [];
-        /** @deprecated */  // this.inDefineMode[turtle] = false;
-        /** @deprecated */  // this.defineMode[turtle] = [];
         this.dispatchFactor[turtle] = 1;
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
@@ -1432,15 +1357,9 @@ class Logo {
         this.notation.pickupPOW2[turtle] = false;
         this.firstPitch[turtle] = [];
         this.lastPitch[turtle] = [];
-        /** @deprecated */  // this.pitchNumberOffset[turtle] = 39;    // C4
         this.suppressOutput[turtle] =
             this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.moveable[turtle] = false;
-        /** @deprecated */  // this.inNeighbor[turtle] = [];
-        /** @deprecated */  // this.neighborStepPitch[turtle] = [];
-        /** @deprecated */  // this.neighborNoteValue[turtle] = [];
-        /** @deprecated */  // this.inHarmonic[turtle] = [];
-        /** @deprecated */  // this.partials[turtle] = [];
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
 

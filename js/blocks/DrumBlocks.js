@@ -399,7 +399,7 @@ function setupDrumBlocks() {
                 last(logo.blocks.blockList[blk].connections) == null
             ) {
                 // Play a stand-alone drum block as a quarter note.
-                logo.clearNoteParams(turtle, blk, []);
+                logo.clearNoteParams(tur, blk, []);
                 logo.inNoteBlock[turtle].push(blk);
                 tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(drumname);
 

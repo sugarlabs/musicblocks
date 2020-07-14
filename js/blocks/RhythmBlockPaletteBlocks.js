@@ -96,11 +96,11 @@ function setupRhythmBlockPaletteBlocks() {
 
                 if (logo.drumStyle[turtle].length > 0) {
                     // Play rhythm block as if it were a drum.
-                    logo.clearNoteParams(turtle, blk, logo.drumStyle[turtle]);
+                    logo.clearNoteParams(tur, blk, logo.drumStyle[turtle]);
                     logo.inNoteBlock[turtle].push(blk);
                 } else {
                     // Or use the current synth.
-                    logo.clearNoteParams(turtle, blk, []);
+                    logo.clearNoteParams(tur, blk, []);
                     logo.inNoteBlock[turtle].push(blk);
                     tur.singer.notePitches[last(logo.inNoteBlock[turtle])] = ["G"];
                     tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])] = [4];
@@ -480,13 +480,9 @@ function setupRhythmBlockPaletteBlocks() {
 
                     // Play rhythm block as if it were a drum.
                     if (logo.drumStyle[turtle].length > 0) {
-                        logo.clearNoteParams(
-                            turtle,
-                            blk,
-                            logo.drumStyle[turtle]
-                        );
+                        logo.clearNoteParams(tur, blk, logo.drumStyle[turtle]);
                     } else {
-                        logo.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                        logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
                     }
 
                     logo.inNoteBlock[turtle].push(blk);
@@ -681,9 +677,9 @@ function setupRhythmBlockPaletteBlocks() {
 
                 // Play rhythm block as if it were a drum.
                 if (logo.drumStyle[turtle].length > 0) {
-                    logo.clearNoteParams(turtle, blk, logo.drumStyle[turtle]);
+                    logo.clearNoteParams(tur, blk, logo.drumStyle[turtle]);
                 } else {
-                    logo.clearNoteParams(turtle, blk, [DEFAULTDRUM]);
+                    logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
                 }
 
                 logo.inNoteBlock[turtle].push(blk);

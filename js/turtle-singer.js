@@ -766,7 +766,7 @@ class Singer {
             }
         } else {
             // Play a stand-alone pitch block as a quarter note.
-            logo.clearNoteParams(turtle, blk, []);
+            logo.clearNoteParams(tur, blk, []);
             if (tur.singer.currentCalculatedOctave === undefined) {
                 tur.singer.currentCalculatedOctave = 4;
             }
@@ -868,7 +868,7 @@ class Singer {
 
         // A note can contain multiple pitch blocks to create a chord. The chord is accumuated in
         // arrays, which are used when we play the note
-        logo.clearNoteParams(turtle, blk, []);
+        logo.clearNoteParams(tur, blk, []);
 
         let noteBeatValue = logo.blocks.blockList[blk].name === "newnote" ? 1 / value : value;
 
