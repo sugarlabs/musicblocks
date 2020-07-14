@@ -126,25 +126,24 @@ class Logo {
         // Don't dispatch these signals (when exiting note counter or interval measure)
         this.butNotThese = {};
 
-        this.lastNoteTimeout = null;
-        this.alreadyRunning = false;
-        this.prematureRestart = false;
-        this.runningBlock = null;
-        this.ignoringBlock = null;
+        this._lastNoteTimeout = null;
+        this._alreadyRunning = false;
+        this._prematureRestart = false;
+        this._runningBlock = null;
+        this._ignoringBlock = null;
 
         // Used to halt runtime during input
-        this.delayTimeout = {};
-        this.delayParameters = {};
+        this._delayTimeout = {};
+        this._delayParameters = {};
 
         this.time = 0;
         this.firstNoteTime = null;
-        this.waitTimes = {};
+        this._waitTimes = {};
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
         this.stopTurtle = false;
         this.lastKeyCode = null;
-        this.saveTimeout = 0;
 
         // Music-related attributes
         this.notesPlayed = {};
@@ -267,15 +266,9 @@ class Logo {
         this.runningLilypond = false;
         this.runningAbc = false;
         this.runningMxml = false;
-        this.checkingCompletionState = false;
+        this._checkingCompletionState = false;
         this.compiling = false;
         this.recording = false;
-        this.lastNote = {};
-
-        // Variables for progress bar
-        this.progressBar = docById("myBar");
-        this.progressBarWidth = 0;
-        this.progressBarDivision;
 
         this.temperamentSelected = [];
         this.customTemperamentDefined = false;
@@ -295,8 +288,6 @@ class Logo {
             // Load the default synthesizer
             this.synth = new Synth();
             this.synth.changeInTemperament = false;
-        } else {
-            this.turtleOscs = {};
         }
 
         // Mode widget
@@ -310,10 +301,9 @@ class Logo {
         this.updatingStatusMatrix = false;
         this.statusFields = [];
 
-        // When running in step-by-step mode, the next command to run is
-        // queued here
+        // When running in step-by-step mode, the next command to run is queued here
         this.stepQueue = {};
-        this.unhighlightStepQueue = {};
+        this._unhighlightStepQueue = {};
 
         // Control points for bezier curves
         this.cp1x = {};
@@ -1143,7 +1133,7 @@ class Logo {
      * @returns {void}
      */
     doWait(turtle, secs) {
-        this.waitTimes[turtle] = Number(secs) * 1000;
+        this._waitTimes[turtle] = Number(secs) * 1000;
     }
 
     /**
@@ -1153,15 +1143,15 @@ class Logo {
      * @returns {void}
      */
     clearTurtleRun(turtle) {
-        if (this.delayTimeout[turtle] !== null) {
-            clearTimeout(this.delayTimeout[turtle]);
-            this.delayTimeout[turtle] = null;
+        if (this._delayTimeout[turtle] !== null) {
+            clearTimeout(this._delayTimeout[turtle]);
+            this._delayTimeout[turtle] = null;
             this.runFromBlockNow(
                 this,
                 turtle,
-                this.delayParameters[turtle]['blk'],
-                this.delayParameters[turtle]['flow'],
-                this.delayParameters[turtle]['arg']
+                this._delayParameters[turtle]['blk'],
+                this._delayParameters[turtle]['flow'],
+                this._delayParameters[turtle]['arg']
             );
         }
     }
@@ -1275,7 +1265,7 @@ class Logo {
 
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
-        this.waitTimes[turtle] = 0;
+        this._waitTimes[turtle] = 0;
         this.endOfClampSignals[turtle] = {};
         this.butNotThese[turtle] = {};
         this.cp1x[turtle] = 0;
@@ -1439,13 +1429,13 @@ class Logo {
         for (let turtle in this.stepQueue) {
             if (this.stepQueue[turtle].length > 0) {
                 if (
-                    turtle in this.unhighlightStepQueue &&
-                    this.unhighlightStepQueue[turtle] != null
+                    turtle in this._unhighlightStepQueue &&
+                    this._unhighlightStepQueue[turtle] != null
                 ) {
                     if (this.blocks.visible) {
-                        this.blocks.unhighlight(this.unhighlightStepQueue[turtle]);
+                        this.blocks.unhighlight(this._unhighlightStepQueue[turtle]);
                     }
-                    this.unhighlightStepQueue[turtle] = null;
+                    this._unhighlightStepQueue[turtle] = null;
                 }
 
                 let blk = this.stepQueue[turtle].pop();
@@ -1464,18 +1454,18 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        this.prematureRestart = this.alreadyRunning;
-        if (this.alreadyRunning && this.runningBlock !== null) {
-            this.ignoringBlock = this.runningBlock;
-            console.debug(this.alreadyRunning + " " + this.runningBlock);
+        this._prematureRestart = this._alreadyRunning;
+        if (this._alreadyRunning && this._runningBlock !== null) {
+            this._ignoringBlock = this._runningBlock;
+            console.debug(this._alreadyRunning + " " + this._runningBlock);
         } else {
-            this.ignoringBlock = null;
+            this._ignoringBlock = null;
         }
 
-        if (this.lastNoteTimeout != null) {
+        if (this._lastNoteTimeout != null) {
             console.debug("clearing lastNoteTimeout");
-            clearTimeout(this.lastNoteTimeout);
-            this.lastNoteTimeout = null;
+            clearTimeout(this._lastNoteTimeout);
+            this._lastNoteTimeout = null;
         }
 
         this._restoreConnections();         // restore any broken connections
@@ -1509,7 +1499,7 @@ class Logo {
             this.synth.changeInTemperament = false;
         }
 
-        this.checkingCompletionState = false;
+        this._checkingCompletionState = false;
 
         this.embeddedGraphicsFinished = {};
 
@@ -1740,7 +1730,7 @@ class Logo {
             if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
                 this.suppressOutput[turtle] = false;
-                this.checkingCompletionState = false;
+                this._checkingCompletionState = false;
 
                 // Reset cursor
                 document.body.style.cursor = "default";
@@ -1761,13 +1751,13 @@ class Logo {
      * @returns {void}
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
-        this.runningBlock = blk;
+        this._runningBlock = blk;
         if (blk == null) return;
 
         this.receivedArg = receivedArg;
 
-        let delay = logo.turtleDelay + logo.waitTimes[turtle];
-        logo.waitTimes[turtle] = 0;
+        let delay = logo.turtleDelay + logo._waitTimes[turtle];
+        logo._waitTimes[turtle] = 0;
 
         if (!logo.stopTurtle) {
             if (logo.turtleDelay === TURTLESTEP) {
@@ -1777,9 +1767,8 @@ class Logo {
                 }
                 logo.stepQueue[turtle].push(blk);
             } else {
-                logo.delayParameters[turtle] =
-                    { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
-                logo.delayTimeout[turtle] = setTimeout(() => {
+                logo._delayParameters[turtle] = { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
+                logo._delayTimeout[turtle] = setTimeout(() => {
                     logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                 }, delay);
             }
@@ -1798,7 +1787,7 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        this.alreadyRunning = true;
+        this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
 
@@ -1941,7 +1930,7 @@ class Logo {
         ===========================================================================
         */
         // Is the block in a queued clamp?
-        if (blk !== logo.ignoringBlock) {
+        if (blk !== logo._ignoringBlock) {
             if (blk in logo.endOfClampSignals[turtle]) {
                 let n = logo.endOfClampSignals[turtle][blk].length;
                 for (let i = 0; i < n; i++) {
@@ -2004,10 +1993,10 @@ class Logo {
 
         if (nextBlock != null) {
             if (parentBlk !== blk) {
-                // The wait block waits waitTimes longer than other
+                // The wait block waits _waitTimes longer than other
                 // blocks before it is unhighlighted
                 if (logo.turtleDelay === TURTLESTEP) {
-                    logo.unhighlightStepQueue[turtle] = blk;
+                    logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (
                         !logo.suppressOutput[turtle] &&
@@ -2017,7 +2006,7 @@ class Logo {
                             if (logo.blocks.visible) {
                                 logo.blocks.unhighlight(blk);
                             }
-                        }, logo.turtleDelay + logo.waitTimes[turtle]);
+                        }, logo.turtleDelay + logo._waitTimes[turtle]);
                     }
                 }
             }
@@ -2083,9 +2072,9 @@ class Logo {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
         } else {
-            logo.alreadyRunning = false;
+            logo._alreadyRunning = false;
 
-            if (!logo.prematureRestart) {
+            if (!logo._prematureRestart) {
                 // console.debug('Make sure any unissued signals are dispatched.');
                 for (let b in logo.endOfClampSignals[turtle]) {
                     for (let i = 0; i < logo.endOfClampSignals[turtle][b].length; i++) {
@@ -2172,16 +2161,16 @@ class Logo {
                         " " +
                         logo.suppressOutput[turtle]
                     );
-                    logo.lastNoteTimeout = setTimeout(() => {
+                    logo._lastNoteTimeout = setTimeout(() => {
                         console.debug("LAST NOTE PLAYED");
-                        logo.lastNoteTimeout = null;
+                        logo._lastNoteTimeout = null;
                         if (logo.suppressOutput[turtle] && logo.recording) {
                             logo.suppressOutput[turtle] = false;
-                            logo.checkingCompletionState = false;
+                            logo._checkingCompletionState = false;
                             logo.saveLocally();
                         } else {
                             logo.suppressOutput[turtle] = false;
-                            logo.checkingCompletionState = false;
+                            logo._checkingCompletionState = false;
 
                             // Reset the cursor
                             document.body.style.cursor = "default";
@@ -2200,8 +2189,8 @@ class Logo {
                 queueStart === 0 &&
                 logo.justCounting[turtle].length === 0
             ) {
-                if (!logo.checkingCompletionState) {
-                    logo.checkingCompletionState = true;
+                if (!logo._checkingCompletionState) {
+                    logo._checkingCompletionState = true;
                     setTimeout(() => __checkCompletionState(), 250);
                 }
             }
