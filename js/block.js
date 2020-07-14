@@ -4900,7 +4900,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
@@ -5254,7 +5254,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             if (!that._triggerLock) {
                 //preview :
@@ -5530,7 +5530,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             //Play sample note and prevent extra sounds from playing
             if (!that._triggerLock) {
@@ -6210,7 +6210,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0]
                 .replace(SHARP, "#")
@@ -6256,7 +6256,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0]
                 .replace(SHARP, "#")
@@ -6866,7 +6866,7 @@ function Block(protoblock, blocks, overrideName) {
 
             setTimeout(function() {
                 that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-                that.blocks.Singer.setSynthVolume(logo, 0, voice, DEFAULTVOLUME);
+                Singer.setSynthVolume(that.blocks.logo, 0, voice, DEFAULTVOLUME);
                 that.blocks.logo.synth.trigger(
                     0,
                     "G4",
@@ -7172,7 +7172,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
@@ -7530,7 +7530,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.Singer.setSynthVolume(logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
             that.blocks.logo.synth.trigger(
                 0,
                 [obj[0] + obj[1]],
