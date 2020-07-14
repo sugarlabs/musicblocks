@@ -421,6 +421,8 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
+                    let tur = logo.turtles.ithTurtle(turtle);
+
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
@@ -435,18 +437,18 @@ function setupNumberBlocks() {
 
                         a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk1].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b = typeof logo.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk2].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -556,6 +558,8 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
+                    let tur = logo.turtles.ithTurtle(turtle);
+
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
@@ -570,18 +574,18 @@ function setupNumberBlocks() {
 
                         a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk1].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b = typeof logo.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk2].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -652,6 +656,8 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
+                    let tur = logo.turtles.ithTurtle(turtle);
+
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous. In the case of plus, since we use it
                     // for string concatenation as well, we check to see if the block is
@@ -660,26 +666,23 @@ function setupNumberBlocks() {
                     let cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (
-                        cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
-                    ) {
+                    if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
                         let noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
                         a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk1].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b = typeof logo.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
-                                    logo.currentOctave[turtle],
+                                    tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk2].value,
-                                    logo.lastNotePlayed[turtle],
+                                    tur.singer.lastNotePlayed,
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);

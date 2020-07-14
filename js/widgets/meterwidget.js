@@ -145,12 +145,7 @@ function MeterWidget() {
 
     this.__playDrum = function(drum) {
         this._logo.synth.trigger(
-            0,
-            "C4",
-            this._logo.defaultBPMFactor * this._beatValue,
-            drum,
-            null,
-            null
+            0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null
         );
     };
 
@@ -192,12 +187,8 @@ function MeterWidget() {
     };
 
     this._playBeat = function() {
-        let bpmFactor;
-        if (this._logo.bpm[0].length > 0) {
-            bpmFactor = TONEBPM / last(this._logo.bpm[0]);
-        } else {
-            bpmFactor = TONEBPM / this._logo._masterBPM;
-        }
+        let bpmFactor =
+            TONEBPM / this._logo.bpm[0].length > 0 ? last(this._logo.bpm[0]) : Singer.masterBPM;
 
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();

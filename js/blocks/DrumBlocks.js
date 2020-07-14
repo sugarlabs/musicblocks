@@ -91,11 +91,11 @@ function setupDrumBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.inNoteBlock[turtle].length > 0) {
                 // Add the noise sound as if it were a drum
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    noisename
-                );
+                tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(noisename);
                 if (logo.synthVolume[turtle][noisename] === undefined) {
                     logo.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
                     logo.crescendoInitialVolume[turtle][noisename] = [
@@ -111,9 +111,9 @@ function setupDrumBlocks() {
             }
 
             if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+                tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
+                    tur.singer.beatFactor
+                );
             }
 
             logo.pushedNote[turtle] = true;
@@ -365,6 +365,8 @@ function setupDrumBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             // If we are in a setdrum clamp, override the drum name.
             if (logo.drumStyle[turtle].length > 0) {
                 drumname = last(logo.drumStyle[turtle]);
@@ -385,9 +387,7 @@ function setupDrumBlocks() {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
+                tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(drumname);
                 if (logo.synthVolume[turtle][drumname] === undefined) {
                     logo.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
                     logo.crescendoInitialVolume[turtle][drumname] = [
@@ -399,19 +399,9 @@ function setupDrumBlocks() {
                 last(logo.blocks.blockList[blk].connections) == null
             ) {
                 // Play a stand-alone drum block as a quarter note.
-                logo.clearNoteParams(turtle, blk, []);
+                logo.clearNoteParams(tur, blk, []);
                 logo.inNoteBlock[turtle].push(blk);
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
-
-                // let bpmFactor;
-                // if (logo.bpm[turtle].length > 0) {
-                //     bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                // } else {
-                //     bpmFactor = TONEBPM / logo._masterBPM;
-                // }
-                // let beatValue = bpmFactor / noteBeatValue;
+                tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(drumname);
 
                 let noteBeatValue = 4;
 
@@ -426,14 +416,14 @@ function setupDrumBlocks() {
                 //     _("Drum Block: Did you mean to use a Note block?"),
                 //     blk
                 // );
-		console.debug('PLAY DRUM ERROR: missing context');
+                console.debug('PLAY DRUM ERROR: missing context');
                 return;
             }
 
             if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+                tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
+                    tur.singer.beatFactor
+                );
             }
 
             logo.pushedNote[turtle] = true;

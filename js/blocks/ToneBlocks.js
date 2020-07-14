@@ -293,9 +293,11 @@ function setupToneBlocks() {
                 return;
             }
 
-            if (logo.inHarmonic[turtle].length > 0) {
-                let n = logo.inHarmonic[turtle].length - 1;
-                logo.partials[turtle][n].push(args[0]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.inHarmonic.length > 0) {
+                let n = tur.singer.inHarmonic.length - 1;
+                tur.singer.partials[n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
                 logo.errorMsg(
@@ -335,15 +337,17 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            logo.inHarmonic[turtle].push(blk);
-            logo.partials[turtle].push([]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inHarmonic.push(blk);
+            tur.singer.partials.push([]);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inHarmonic[turtle].pop();
-                logo.partials[turtle].pop();
+            let __listener = event => {
+                tur.singer.inHarmonic.pop();
+                tur.singer.partials.pop();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -385,23 +389,25 @@ function setupToneBlocks() {
                 return;
             }
 
-            logo.inHarmonic[turtle].push(blk);
-            logo.partials[turtle].push([]);
-            let n = logo.partials[turtle].length - 1;
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inHarmonic.push(blk);
+            tur.singer.partials.push([]);
+            let n = tur.singer.partials.length - 1;
 
             for (let i = 0; i < args[0]; i++) {
-                logo.partials[turtle][n].push(0);
+                tur.singer.partials[n].push(0);
             }
 
-            logo.partials[turtle][n].push(1);
+            tur.singer.partials[n].push(1);
             logo.notation.notationBeginHarmonics(turtle);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inHarmonic[turtle].pop();
-                logo.partials[turtle].pop();
+            let __listener = event => {
+                tur.singer.inHarmonic.pop();
+                tur.singer.partials.pop();
                 logo.notation.notationEndHarmonics(turtle);
             };
 

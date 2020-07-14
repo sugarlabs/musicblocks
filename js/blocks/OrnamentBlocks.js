@@ -87,17 +87,19 @@ function setupOrnamentBlocks() {
                 return;
             }
 
-            logo.inNeighbor[turtle].push(blk);
-            logo.neighborStepPitch[turtle].push(args[0]);
-            logo.neighborNoteValue[turtle].push(args[1]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inNeighbor.push(blk);
+            tur.singer.neighborStepPitch.push(args[0]);
+            tur.singer.neighborNoteValue.push(args[1]);
 
             let listenerName = "_neighbor_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inNeighbor[turtle].pop();
-                logo.neighborStepPitch[turtle].pop();
-                logo.neighborNoteValue[turtle].pop();
+            let __listener = event => {
+                tur.singer.inNeighbor.pop();
+                tur.singer.neighborStepPitch.pop();
+                tur.singer.neighborNoteValue.pop();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
