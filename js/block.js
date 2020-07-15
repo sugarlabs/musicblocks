@@ -5461,7 +5461,7 @@ function Block(protoblock, blocks, overrideName) {
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                    ].title
+                ].title
             );
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
@@ -5491,7 +5491,7 @@ function Block(protoblock, blocks, overrideName) {
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                    ].title
+                ].title
             );
             octave += deltaOctave;
             if (octave < 1) {
@@ -5503,8 +5503,9 @@ function Block(protoblock, blocks, overrideName) {
             let note;
 
             // Use C major as of now; fix this to use current keySignature once that feature is in place
+            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
             if (noteValues[i] >= 0) {
-                note = nthDegreeToPitch("C major", noteValues[i]);
+                note = nthDegreeToPitch(keySignature, noteValues[i]);
             } else {
                 note = nthDegreeToPitch("C major", 7 + noteValues[i]);
             }

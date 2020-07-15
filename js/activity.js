@@ -15,6 +15,11 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+var KeySignatureEnv = [
+    "C",
+    "major"
+];
+
 function Activity() {
     _THIS_IS_MUSIC_BLOCKS_ = true;
     LEADING = 0;
@@ -998,7 +1003,7 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            Singer.setMasterVolume(logo, 0);
+            logo.setMasterVolume(0);
 
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -1048,10 +1053,9 @@ function Activity() {
 
         refreshCanvas();
     };
-    var selectedkey = "C";
-    var selectedmode = "major";
+
     chooseKeyMenu = () => {
-        console.log(selectedkey, selectedmode);
+        console.log(KeySignatureEnv);
         docById("chooseKeyDiv").style.display = "";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
@@ -1106,9 +1110,9 @@ function Activity() {
         modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
         modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
         modenameWheel.titleRotateAngle = 0;
-        modenameWheel.clickModeRotate = false;
+        // modenameWheel.clickModeRotate = false;
         modenameWheel.colors = ["#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#c0c0c0", "#c0c0c0"];
-        modenameWheel.animatetime = 0;
+        modenameWheel.animatetime = 0.2;
         
         modenameWheel.createWheel(labels3);
 
@@ -1158,7 +1162,7 @@ function Activity() {
                     keyNameWheel.navItems.length
                 );
             } else if (selection.length < 2) {
-                selectedkey = selection;
+                KeySignatureEnv[0] = selection;
             }
         };
 
@@ -1176,7 +1180,7 @@ function Activity() {
                     modenameWheel.navItems.length
                 );
             } else {
-                selectedmode = selection;
+                KeySignatureEnv[1] = selection;
             }
         };
 
@@ -1195,7 +1199,7 @@ function Activity() {
                 addedOptionsWheel.selectedNavItemIndex
             ].title;
             // console.log(selection);
-            selectedkey = selection;
+            KeySignatureEnv[0] = selection;
         };
 
         let __setupActionKey2 = function(i) {
@@ -1207,6 +1211,28 @@ function Activity() {
         for (let i = 0; i < labels.length; i++) {
             __setupActionKey2(i);
         }
+
+        // let i = keys.indexOf(selectedkey);
+        // if (i == -1) {
+        //     i = labels.indexOf(selectedkey);
+        //     if (i != -1) {
+        //         addedOptionsWheel.navigateWheel(i);
+        //         addedOptionsWheel.navItems[i].navItem.show();
+        //     }
+        // } else {
+        //     console.log(i);
+        //     keyNameWheel.navigateWheel(i);
+        //     addedOptionsWheel.navItems[2 * i].navItem.hide();
+        //     addedOptionsWheel.navItems[2 * i + 1].navItem.hide();
+        // }
+
+        // let j = labels3.indexOf(selectedmode);
+        // if (j !== -1) {
+        //     modenameWheel.navigateWheel(j);
+        // }
+
+
+
     };
 
     // DEPRECATED
@@ -1216,7 +1242,7 @@ function Activity() {
     };
 
     // function doMuteButton() {
-    //     Singer.setMasterVolume(logo, 0);
+    //     logo.setMasterVolume(0);
     // };
 
     // function _hideBoxes() {
