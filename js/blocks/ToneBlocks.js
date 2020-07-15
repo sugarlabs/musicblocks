@@ -293,9 +293,11 @@ function setupToneBlocks() {
                 return;
             }
 
-            if (logo.inHarmonic[turtle].length > 0) {
-                let n = logo.inHarmonic[turtle].length - 1;
-                logo.partials[turtle][n].push(args[0]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.inHarmonic.length > 0) {
+                let n = tur.singer.inHarmonic.length - 1;
+                tur.singer.partials[n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
                 logo.errorMsg(
@@ -335,18 +337,20 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            logo.inHarmonic[turtle].push(blk);
-            logo.partials[turtle].push([]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inHarmonic.push(blk);
+            tur.singer.partials.push([]);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inHarmonic[turtle].pop();
-                logo.partials[turtle].pop();
+            let __listener = event => {
+                tur.singer.inHarmonic.pop();
+                tur.singer.partials.pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -385,27 +389,29 @@ function setupToneBlocks() {
                 return;
             }
 
-            logo.inHarmonic[turtle].push(blk);
-            logo.partials[turtle].push([]);
-            let n = logo.partials[turtle].length - 1;
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inHarmonic.push(blk);
+            tur.singer.partials.push([]);
+            let n = tur.singer.partials.length - 1;
 
             for (let i = 0; i < args[0]; i++) {
-                logo.partials[turtle][n].push(0);
+                tur.singer.partials[n].push(0);
             }
 
-            logo.partials[turtle][n].push(1);
+            tur.singer.partials[n].push(1);
             logo.notation.notationBeginHarmonics(turtle);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inHarmonic[turtle].pop();
-                logo.partials[turtle].pop();
+            let __listener = event => {
+                tur.singer.inHarmonic.pop();
+                tur.singer.partials.pop();
                 logo.notation.notationEndHarmonics(turtle);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -439,13 +445,13 @@ function setupToneBlocks() {
             logo.distortionAmount[turtle].push(distortion);
 
             let listenerName = "_distortion_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.distortionAmount[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName][
@@ -511,14 +517,14 @@ function setupToneBlocks() {
             logo.tremoloDepth[turtle].push(depth);
 
             let listenerName = "_tremolo_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.tremoloFrequency[turtle].pop();
                 logo.tremoloDepth[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName][
                     "tremoloActive"
@@ -571,7 +577,7 @@ function setupToneBlocks() {
             logo.baseFrequency[turtle].push(baseFrequency);
 
             let listenerName = "_phaser_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.rate[turtle].pop();
@@ -579,7 +585,7 @@ function setupToneBlocks() {
                 logo.baseFrequency[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName][
                     "phaserActive"
@@ -640,7 +646,7 @@ function setupToneBlocks() {
             logo.chorusDepth[turtle].push(chorusDepth);
 
             let listenerName = "_chorus_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.chorusRate[turtle].pop();
@@ -648,7 +654,7 @@ function setupToneBlocks() {
                 logo.chorusDepth[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName][
@@ -727,14 +733,14 @@ function setupToneBlocks() {
             logo.vibratoRate[turtle].push(1 / rate);
 
             let listenerName = "_vibrato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.vibratoIntensity[turtle].pop();
                 logo.vibratoRate[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName][
@@ -803,13 +809,13 @@ function setupToneBlocks() {
             } else {
                 logo.voices[turtle].push(voicename);
                 let listenerName = "_setvoice_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     logo.voices[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
             }
 
             return [args[1], 1];
@@ -932,7 +938,7 @@ function setupToneBlocks() {
                 }
 
                 let listenerName = "_settimbre_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
                     logo.inSetTimbre[turtle] = false;
@@ -940,7 +946,7 @@ function setupToneBlocks() {
                     logo.instrumentNames[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 if (logo.inRhythmRuler) {
                     logo._currentDrumBlock = blk;

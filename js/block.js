@@ -55,7 +55,8 @@ const SPECIALINPUTS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 const WIDENAMES = [
     "intervalname",
@@ -66,7 +67,8 @@ const WIDENAMES = [
     "modename",
     "temperamentname",
     "modename",
-    "noisename"
+    "noisename",
+    "outputtools"
 ];
 const EXTRAWIDENAMES = [];
 const PIEMENUS = [
@@ -87,7 +89,8 @@ const PIEMENUS = [
     "temperamentname",
     "noisename",
     "customNote",
-    "grid"
+    "grid",
+    "outputtools"
 ];
 
 // Define block instance objects and any methods that are intra-block.
@@ -1044,7 +1047,7 @@ function Block(protoblock, blocks, overrideName) {
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
-        if (this.overrideName) {
+        if (this.overrideName && this.name !== "outputtools") {
             if (
                 [
                     "namedbox",
@@ -1233,6 +1236,8 @@ function Block(protoblock, blocks, overrideName) {
                 label = getDrumName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
+            } else if (this.name === "outputtools") {
+                label = this.overrideName;
             } else {
                 if (this.value !== null) {
                     label = this.value.toString();
@@ -1799,7 +1804,7 @@ function Block(protoblock, blocks, overrideName) {
     this.isLeftClampBlock = function() {
         return this.protoblock.isLeftClamp;
     };
-    
+
     this.isDoubleClampBlock = function() {
         return this.protoblock.style === "doubleclamp";
     };
@@ -2667,7 +2672,7 @@ function Block(protoblock, blocks, overrideName) {
                     event.nativeEvent.shiftKey
                 ) {
                     if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtle();
+                        that.blocks.logo.doStopTurtles();
 
                         setTimeout(function() {
                             that.blocks.logo.runLogoCommands(topBlock);
@@ -2737,7 +2742,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
 
                         if (that.blocks.turtles.running()) {
-                            that.blocks.logo.doStopTurtle();
+                            that.blocks.logo.doStopTurtles();
 
                             setTimeout(function() {
                                 that.blocks.logo.runLogoCommands(topBlock);
@@ -2761,7 +2766,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtle();
+                        that.blocks.logo.doStopTurtles();
 
                         setTimeout(function() {
                             that.blocks.logo.runLogoCommands(topBlock);
@@ -3313,27 +3318,30 @@ function Block(protoblock, blocks, overrideName) {
                     );
                 }
             } else {
+                let noteLabels = TEMPERAMENT ;
+
+                let customLabels =  [];
+                for (let lab in noteLabels)
+                    if (!(lab in PreDefinedTemperaments))customLabels.push(lab);
+
+                let selectedCustom ;
+                if (this.customID != null) {
+                    selectedCustom = this.customID ;
+                } else {
+                    selectedCustom = customLabels[0];
+                }
+
+                let selectedNote ;
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = TEMPERAMENT["custom"]["0"][1];
+                    selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
                 }
-
-                let noteLabels = [];
-                let noteValues = [];
-                for (let pitchNumber in TEMPERAMENT["custom"]) {
-                    if (pitchNumber !== "pitchNumber") {
-                        noteLabels.push(TEMPERAMENT["custom"][pitchNumber][1]);
-                        noteValues.push(TEMPERAMENT["custom"][pitchNumber][1]);
-                    }
-                }
-                this._piemenuPitches(
+                this._customNotes(
                     noteLabels,
-                    noteValues,
-                    "",
-                    selectednote,
-                    "",
-                    true
+                    customLabels,
+                    selectedCustom,
+                    selectedNote
                 );
             }
         } else if (this.name === "eastindiansolfege") {
@@ -3678,6 +3686,37 @@ function Block(protoblock, blocks, overrideName) {
             ];
             let Values = Labels ;
 
+            this._piemenuBasic(
+                Labels,
+                Values,
+                selectedvalue,
+                platformColor.piemenuBasic
+            );
+        } else if (this.name === "outputtools") {
+            selectedvalue = this.privateData;
+            let Labels;
+            if (beginnerMode) {
+                Labels = [
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("letter class"),
+                    _("staff y")
+                ];
+            } else {
+                Labels = [
+                    _("letter class"),
+                    _("solfege syllable"),
+                    _("pitch class"),
+                    _("pitch number"),
+                    _("pitch in hertz"),
+                    _("scalar class"),
+                    _("scale degree"),
+                    _("nth degree"),
+                    _("staff y")
+                ];
+            }
+
+            let Values = Labels;
             this._piemenuBasic(
                 Labels,
                 Values,
@@ -4659,7 +4698,8 @@ function Block(protoblock, blocks, overrideName) {
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
         if (i === -1) {
-            i = 4;
+            if (custom) i = 0 ;
+            else i = 4 ;
         }
 
         prevPitch = i;
@@ -4860,7 +4900,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
@@ -4915,6 +4955,338 @@ function Block(protoblock, blocks, overrideName) {
                 that._octavesWheel.removeWheel();
             }
         };
+    };
+
+    this._customNotes = function(
+        noteLabels,
+        customLabels,
+        selectedCustom,
+        selectedNote
+    ){
+        // pie menu for customNote selection
+        if (this.blocks.stageClick) {
+            return;
+        }
+
+        docById("wheelDiv").style.display = "";
+
+        // Some blocks have both pitch and octave, so we can modify
+        // both at once.
+        let hasOctaveWheel =
+            this.connections[0] !== null &&
+            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+                this.blocks.blockList[this.connections[0]].name
+            ) !== -1;
+
+        // Use advanced constructor for more wheelnav on same div
+        this._customWheel = new wheelnav("wheelDiv", null, 800, 800);
+
+
+        this._cusNoteWheel = new wheelnav(
+            "_cusNoteWheel",
+            this._customWheel.raphael
+        );
+        // exit button
+        this._exitWheel = new wheelnav(
+            "_exitWheel",
+            this._customWheel.raphael
+        );
+
+        // the octave selector
+        if (hasOctaveWheel) {
+            this._octavesWheel = new wheelnav(
+                "_octavesWheel",
+                this._customWheel.raphael
+            );
+        }
+
+
+        wheelnav.cssMode = true;
+
+        this._customWheel.keynavigateEnabled = false;
+
+        //Customize slicePaths for proper size
+        this._customWheel.colors = platformColor.intervalNameWheelcolors;
+        this._customWheel.slicePathFunction = slicePath().DonutSlice;
+        this._customWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._customWheel.slicePathCustom.minRadiusPercent = 0.1;
+        this._customWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        this._customWheel.sliceSelectedPathCustom = this._customWheel.slicePathCustom;
+        this._customWheel.sliceInitPathCustom = this._customWheel.slicePathCustom;
+        this._customWheel.titleRotateAngle = 0;
+        this._customWheel.animatetime = 0; // 300;
+        this._customWheel.clickModeRotate = false;
+        this._customWheel.createWheel(customLabels);
+
+        this._cusNoteWheel.colors = platformColor.intervalWheelcolors;
+        this._cusNoteWheel.slicePathFunction = slicePath().DonutSlice;
+        this._cusNoteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._cusNoteWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._cusNoteWheel.slicePathCustom.maxRadiusPercent = 0.85;
+        //this._cusNoteWheel.titleRotateAngle = 0;
+        this._cusNoteWheel.titleFont = '100 24px Impact, sans-serif';
+        this._cusNoteWheel.sliceSelectedPathCustom = this._cusNoteWheel.slicePathCustom;
+        this._cusNoteWheel.sliceInitPathCustom = this._cusNoteWheel.slicePathCustom;
+
+        if (hasOctaveWheel) {
+            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.85;
+            this._octavesWheel.slicePathCustom.maxRadiusPercent = 1;
+            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+            let octaveLabels = [
+                "8",
+                "7",
+                "6",
+                "5",
+                "4",
+                "3",
+                "2",
+                "1",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ];
+            this._octavesWheel.animatetime = 0; // 300;
+            this._octavesWheel.createWheel(octaveLabels);
+        }
+
+        //Disable rotation, set navAngle and create the menus
+        this._cusNoteWheel.clickModeRotate = false;
+        this._cusNoteWheel.animatetime = 0; // 300;
+        let labels = [];
+        let thisCustom=0;
+        let max =0 ;
+        for (let t of customLabels) {
+            max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"] ;
+        }
+        for (let t of customLabels) {
+            for(let k =noteLabels[t].length -1 ; k>=0 ;k--) {
+                if (k !== "pitchNumber") {
+                    labels.push(noteLabels[t][k][1]);
+                    thisCustom ++ ;
+                }
+            }
+            for (let extra = max - thisCustom ; extra > 0 ;extra--){
+                labels.push("");
+            }
+            thisCustom = 0 ;
+        }
+
+        this._cusNoteWheel.navAngle =
+            -(180 / customLabels.length) + 180 / labels.length;
+        this._cusNoteWheel.createWheel(labels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.1;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(["×", " "]);
+
+        let that = this;
+
+        // position widget
+        let x = this.container.x;
+        let y = this.container.y;
+
+        let canvasLeft =
+            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        let canvasTop =
+            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+
+        docById("wheelDiv").style.position = "absolute";
+        docById("wheelDiv").style.height = "400px";
+        docById("wheelDiv").style.width = "400px";
+        docById("wheelDiv").style.left =
+            Math.min(
+                this.blocks.turtles._canvas.width - 400,
+                Math.max(
+                    0,
+                    Math.round(
+                        (x + this.blocks.stage.x) *
+                        this.blocks.getStageScale() +
+                        canvasLeft
+                    ) - 200
+                )
+            ) + "px";
+        docById("wheelDiv").style.top =
+            Math.min(
+                this.blocks.turtles._canvas.height - 450,
+                Math.max(
+                    0,
+                    Math.round(
+                        (y + this.blocks.stage.y) *
+                        this.blocks.getStageScale() +
+                        canvasTop
+                    ) - 200
+                )
+            ) + "px";
+
+
+        if (hasOctaveWheel) {
+            // Use the octave associated with this block, if available.
+            let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
+
+            // Navigate to current octave
+            this._octavesWheel.navigateWheel(8 - pitchOctave);
+        }
+
+        // Add function to each main menu for show/hide sub menus
+        // FIXME: Add all tabs to each interval
+        let __setupAction = function(i) {
+            that._customWheel.navItems[i].navigateFunction = function() {
+                that.customID =
+                    that._customWheel.navItems[
+                        that._customWheel.selectedNavItemIndex
+                        ].title;
+                for (let l = 0; l < customLabels.length; l++) {
+                    for (let j = 0; j < max; j++) {
+                        if (l !== i) {
+                            that._cusNoteWheel.navItems[
+                            l * max + j
+                                ].navItem.hide();
+                            } else if (labels[l * max + j] == "") {
+                            that._cusNoteWheel.navItems[
+                            l * max + j
+                                ].navItem.hide();
+                        } else {
+                            that._cusNoteWheel.navItems[
+                            l * max + j
+                                ].navItem.show();
+                        }
+                    }
+                }
+            };
+        };
+
+        // Set up action for interval name so number tabs will
+        // initialize on load.
+        for (var i = 0; i < customLabels.length; i++) __setupAction(i);
+
+        // navigate to a specific starting point
+
+        for (var i = 0; i < customLabels.length; i++) {
+            if (selectedCustom === customLabels[i]) {
+                break;
+            }
+        }
+
+        if (i === customLabels.length) {
+            i = 0;
+        }
+
+        this._customWheel.navigateWheel(i);
+
+        let j = selectedNote ;
+        for (let x in noteLabels[selectedCustom]){
+            if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
+                j = +x ; break ;
+            }
+        }
+
+        if (typeof j  == "number")
+            this._cusNoteWheel.navigateWheel(max * customLabels.indexOf (selectedCustom) + j);
+
+        let __exitMenu = function() {
+            that._piemenuExitTime = new Date().getTime();
+            docById("wheelDiv").style.display = "none";
+        };
+
+        let __selectionChanged = function() {
+            let label =
+                that._customWheel.navItems[
+                    that._customWheel.selectedNavItemIndex
+                    ].title;
+            let note =
+                that._cusNoteWheel.navItems[
+                    that._cusNoteWheel.selectedNavItemIndex
+                    ].title;
+
+            that.value = note;
+            that.text.text =note;
+            let octave = 4 ;
+
+            if (hasOctaveWheel) {
+                // Set the octave of the pitch block if available
+                octave = Number(
+                    that._octavesWheel.navItems[
+                        that._octavesWheel.selectedNavItemIndex
+                        ].title
+                );
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
+            // Make sure text is on top.
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+
+            let obj = getNote(
+                note,
+                octave,
+                0,
+                "C major",
+                false,
+                null,
+                that.blocks.errorMsg,
+                label
+            );
+
+            if (
+                that.blocks.logo.instrumentNames[0] === undefined ||
+                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+            ) {
+                if (that.blocks.logo.instrumentNames[0] === undefined) {
+                    that.blocks.logo.instrumentNames[0] = [];
+                }
+
+                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                that.blocks.logo.synth.createDefaultSynth(0);
+                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            if (!that._triggerLock) {
+                //preview :
+                that._triggerLock = true;
+                let no = [obj[0]+obj[1]];
+                let notes1 = no ;
+                no = that.blocks.logo.synth.getCustomFrequency(no,that.customID);
+                if (no === undefined) {
+                    no = notes1;
+                }
+                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1/8);
+            }
+
+            setTimeout(function() {
+                that._triggerLock = false;
+            }, 1 / 8);
+        }
+        if (hasOctaveWheel) {
+            for (let i = 0; i < 8; i++) {
+                this._octavesWheel.navItems[
+                    i
+                    ].navigateFunction = __selectionChanged;
+            }
+        }
+        // Set up handlers for preview.
+        for (var i = 0; i < labels.length; i++) {
+            this._cusNoteWheel.navItems[
+                i
+            ].navigateFunction = __selectionChanged;
+        }
+
+        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
     };
 
     this._piemenuNthModalPitch = function(noteValues, note) {
@@ -5158,7 +5530,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             //Play sample note and prevent extra sounds from playing
             if (!that._triggerLock) {
@@ -5838,7 +6210,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0]
                 .replace(SHARP, "#")
@@ -5884,7 +6256,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
             actualPitch[0] = actualPitch[0]
                 .replace(SHARP, "#")
@@ -6141,8 +6513,15 @@ function Block(protoblock, blocks, overrideName) {
 
         docById("wheelDiv").style.display = "";
 
+        // reference to diameter of the basic wheel
+        let size = 800;
+        if (this.name === "outputtools" || this.name === "grid") {
+            // slightly larger menu
+            size = 1000;
+        }
+
         // the selectedValueh selector
-        this._basicWheel = new wheelnav("wheelDiv", null, 800, 800);
+        this._basicWheel = new wheelnav("wheelDiv", null, size, size);
 
         let labels = [];
         for (let i = 0; i < menuLabels.length; i++) {
@@ -6171,9 +6550,14 @@ function Block(protoblock, blocks, overrideName) {
                 that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex]
                     .title;
             let i = labels.indexOf(label);
-            that.value = menuValues[i];
-            that.text.text = menuLabels[i];
-
+            if (that.name === "outputtools") {
+                  that.overrideName = menuValues[i];
+                  that.privateData = menuValues[i];
+                  that.text.text = menuLabels[i];
+            } else {
+                that.value = menuValues[i];
+                that.text.text = menuLabels[i];
+            }
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
@@ -6482,7 +6866,7 @@ function Block(protoblock, blocks, overrideName) {
 
             setTimeout(function() {
                 that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-                that.blocks.logo.setSynthVolume(0, voice, DEFAULTVOLUME);
+                Singer.setSynthVolume(that.blocks.logo, 0, voice, DEFAULTVOLUME);
                 that.blocks.logo.synth.trigger(
                     0,
                     "G4",
@@ -6788,7 +7172,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
@@ -7146,7 +7530,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            that.blocks.logo.setSynthVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
             that.blocks.logo.synth.trigger(
                 0,
                 [obj[0] + obj[1]],
@@ -7606,6 +7990,12 @@ function Block(protoblock, blocks, overrideName) {
                             this.blocks.logo.synth.loadSynth(0, newValue);
                         }
                     }
+                    break;
+                case "temperament1":
+                    let temptemperament = TEMPERAMENT[oldValue];
+                    delete TEMPERAMENT[oldValue];
+                    TEMPERAMENT[newValue] = temptemperament;
+                    updateTEMPERAMENTS();
                     break;
                 default:
                     break;

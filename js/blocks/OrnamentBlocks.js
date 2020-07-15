@@ -87,20 +87,22 @@ function setupOrnamentBlocks() {
                 return;
             }
 
-            logo.inNeighbor[turtle].push(blk);
-            logo.neighborStepPitch[turtle].push(args[0]);
-            logo.neighborNoteValue[turtle].push(args[1]);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inNeighbor.push(blk);
+            tur.singer.neighborStepPitch.push(args[0]);
+            tur.singer.neighborNoteValue.push(args[1]);
 
             let listenerName = "_neighbor_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.inNeighbor[turtle].pop();
-                logo.neighborStepPitch[turtle].pop();
-                logo.neighborNoteValue[turtle].pop();
+            let __listener = event => {
+                tur.singer.inNeighbor.pop();
+                tur.singer.neighborStepPitch.pop();
+                tur.singer.neighborNoteValue.pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
         }
@@ -184,11 +186,11 @@ function setupOrnamentBlocks() {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            logo.glideOverride[turtle] = logo.noteCounter(turtle, args[1]);
+            logo.glideOverride[turtle] = Singer.noteCounter(logo, turtle, args[1]);
             console.debug("length of glide " + logo.glideOverride[turtle]);
 
             let listenerName = "_glide_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 if (logo.justCounting[turtle].length === 0) {
@@ -198,7 +200,7 @@ function setupOrnamentBlocks() {
                 logo.glide[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -248,7 +250,7 @@ function setupOrnamentBlocks() {
             }
 
             let listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.staccato[turtle].pop();
@@ -257,7 +259,7 @@ function setupOrnamentBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -302,13 +304,13 @@ function setupOrnamentBlocks() {
             }
 
             let listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.staccato[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }

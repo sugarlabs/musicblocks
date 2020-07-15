@@ -228,7 +228,7 @@ function setupExtrasBlocks() {
                 logo.unhighlightQueue[thisTurtle] = [];
                 logo.parameterQueue[thisTurtle] = [];
                 logo.turtles.turtleList[thisTurtle].running = true;
-                logo._runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
+                logo.runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
             } else {
                 return [args[0], 1];
             }
@@ -779,12 +779,9 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                let bpmFactor;
-                if (logo.bpm[turtle].length > 0) {
-                    bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    bpmFactor = TONEBPM / logo._masterBPM;
-                }
+                let bpmFactor =
+                    TONEBPM /
+                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
                 logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
@@ -846,6 +843,7 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {

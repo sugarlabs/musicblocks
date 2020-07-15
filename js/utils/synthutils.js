@@ -264,7 +264,7 @@ const SAMPLECENTERNO = {
     piano: ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     violin: ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
     cello: ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    bass: ["C2", 15], // pitchToNumber('C', 2, 'C Major')],
+    bass: ["C3", 27], // pitchToNumber('C', 2, 'C Major')],
     guitar: ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "acoustic guitar": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     flute: ["F#5", 57], // pitchToNumber('F#', 57, 'C Major')],
@@ -599,7 +599,7 @@ function Synth() {
         }
     };
 
-    this.getCustomFrequency = function(notes) {
+    this.getCustomFrequency = function(notes,customID) {
         let __getCustomFrequency = function(oneNote) {
             let octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
@@ -613,13 +613,13 @@ function Synth() {
             if (typeof oneNote === "number") {
                 oneNote = oneNote;
             } else {
-                for (let pitchNumber in TEMPERAMENT["custom"]) {
+                for (let pitchNumber in TEMPERAMENT[customID]) {
                     if (pitchNumber !== "pitchNumber") {
-                        if (oneNote == TEMPERAMENT["custom"][pitchNumber][1]) {
+                        if (oneNote == TEMPERAMENT[customID][pitchNumber][1]) {
                             let octaveDiff =
-                                octave - TEMPERAMENT["custom"][pitchNumber][2];
+                                octave - TEMPERAMENT[customID][pitchNumber][2];
                             return Number(
-                                TEMPERAMENT["custom"][pitchNumber][0] *
+                                TEMPERAMENT[customID][pitchNumber][0] *
                                     startPitchFrequency *
                                     Math.pow(OCTAVERATIO, octaveDiff)
                             );
@@ -1167,7 +1167,7 @@ function Synth() {
         paramsFilters,
         setNote
     ) {
-        if (this.inTemperament !== "equal" && this.inTemperament !== "custom") {
+        if (this.inTemperament !== "equal" && !isCustom(this.inTemperament)) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
@@ -1195,9 +1195,9 @@ function Synth() {
             }
         }
 
-        if (this.inTemperament == "custom") {
+        if (isCustom(this.inTemperament)) {
             let notes1 = notes;
-            notes = this.getCustomFrequency(notes);
+            notes = this.getCustomFrequency(notes,this.inTemperament);
             if (notes === undefined) {
                 notes = notes1;
             }

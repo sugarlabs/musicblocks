@@ -175,6 +175,36 @@ const SOLFEGENAMES1 = [
     "ti" + FLAT,
     "ti"
 ];
+const NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+const NOTENAMES1 = [
+    "C",
+    "C" + SHARP,
+    "C" + DOUBLESHARP,
+    "D" + DOUBLEFLAT,
+    "D" + FLAT,
+    "D",
+    "D" + SHARP,
+    "D" + DOUBLESHARP,
+    "E" + DOUBLEFLAT,
+    "E" + FLAT,
+    "E",
+    "F",
+    "F" + SHARP,
+    "F" + DOUBLESHARP,
+    "G" + DOUBLEFLAT,
+    "G" + FLAT,
+    "G",
+    "G" + SHARP,
+    "G" + DOUBLESHARP,
+    "A",
+    "A" + DOUBLEFLAT,
+    "A" + FLAT,
+    "A" + SHARP,
+    "A" + DOUBLESHARP,
+    "B" + DOUBLEFLAT,
+    "B" + FLAT,
+    "B"
+];
 const SOLFEGECONVERSIONTABLE = {
     C: "do",
     "C♯": "do" + SHARP,
@@ -926,6 +956,14 @@ var OSCTYPES = [
     [_("sawtooth"), "sawtooth"]
 ];
 
+const initialTEMPERAMENTS = [ 
+    [_("equal"), "equal", "equal"],
+    [_("just intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
+    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+];
+
 var TEMPERAMENTS = [
     [_("equal"), "equal", "equal"],
     [_("just intonation"), "just intonation", "just intonation"],
@@ -935,7 +973,24 @@ var TEMPERAMENTS = [
     [_("custom"), "custom", "custom"]
 ];
 
-const TEMPERAMENT = {
+let updateTEMPERAMENTS = () => {
+    TEMPERAMENTS = [...initialTEMPERAMENTS] ;
+    for (let i in TEMPERAMENT){
+        if (!(i in PreDefinedTemperaments)){
+            TEMPERAMENTS.push([_(i),i,i]);
+        }
+    }
+}
+
+var PreDefinedTemperaments = {
+    equal:true ,
+    "just intonation":true ,
+    Pythagorean:true ,
+    "1/3 comma meantone":true ,
+    "1/4 comma meantone":true 
+}
+
+var TEMPERAMENT = {
     equal: {
         "perfect 1": Math.pow(2, 0 / 12),
         "minor 2": Math.pow(2, 1 / 12),
@@ -1167,8 +1222,8 @@ const TEMPERAMENT = {
         "9": Math.pow(2, 9 / 12),
         "10": Math.pow(2, 10 / 12),
         "11": Math.pow(2, 11 / 12),
-        pitchNumber: 12
-        //'interval': ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
+        pitchNumber: 12,
+        "interval": ['perfect 1', 'minor 2', 'major 2', 'minor 3', 'major 3', 'perfect 4', 'diminished 5', 'perfect 5', 'minor 6', 'major 6', 'minor 7', 'major 7', 'perfect 8']
     }
 };
 
@@ -1647,7 +1702,7 @@ function _getStepSize(
     if (temperament === undefined) {
         temperament = "equal";
     }
-    if (temperament === "custom") {
+    if (isCustom(temperament)) {
         //Scalar = Semitone for custom Temperament.
         return transposition;
     }
@@ -1805,9 +1860,13 @@ function _buildScale(keySignature) {
     return [scale, halfSteps];
 }
 
-function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
+// A two-way function to get pitch according to scale degree and vice versa for a chosen mode
+
+function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
+    if (pitch === null ) {
+        scaleDegree -= 1;
+    }
     // Subtract one to make it zero-based as we're working with arrays
-    scaleDegree -= 1
 
     // Info variables according to chosen mode
     let chosenMode = keySignatureToMode(keySignature);
@@ -1824,18 +1883,63 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
 
     // Final 7 note scale combining chosen mode and arbitration
     let finalScale = [];
+    let sd = [];
 
     // if moveable do is present just return the major/perfect tones
     if (moveable) {
         finalScale = _buildScale(chosenMode[0] + " major")[0];
-        return finalScale[scaleDegree];
 
+        if (pitch === null) {
+            return finalScale[scaleDegree];
+        }
+        if (scaleDegree == null) {
+            for(let i in finalScale) {
+                if(finalScale[i][0] == pitch[0]) {
+                    sd.push(String(Number(i) + 1));
+                    if (finalScale[i] == pitch) {
+                        sd.push(NATURAL);
+                    } else {
+                        if (finalScale[i].includes(SHARP)) {
+                            sd.push(FLAT);
+                        } else if (finalScale[i].includes(FLAT)) {
+                            sd.push(FLAT);
+                        } else if (pitch.includes(SHARP)) {
+                            sd.push(SHARP);
+                        } else if (pitch.includes(FLAT)) {
+                            sd.push(FLAT);
+                        }
+                    }
+                }
+            }
+            return sd;
+        }
     } else {
-
         // For 7 note systems scale degrees have a one-one relation
         if (chosenModePattern.length == 7) {
-            return chosenModeScale[scaleDegree];
-    
+            if (pitch === null) {
+                return chosenModeScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in chosenModeScale) {
+                    if(chosenModeScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (chosenModeScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (chosenModeScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (chosenModeScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
             let majorScale = _buildScale(chosenMode[0] + " major")[0];
@@ -1894,8 +1998,31 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
                     finalScale.push(majorScale[i]);
                 }
             }
-
-            return finalScale[scaleDegree];
+            
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in finalScale) {
+                    if(finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
     
         } else {
             // For scales with greater than 7 notes 
@@ -1987,7 +2114,30 @@ function scaleDegreeToPitch(keySignature, scaleDegree, moveable) {
                 }
             }
 
-            return finalScale[scaleDegree];
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for(let i in finalScale) {
+                    if(finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
         }
     }
 }
@@ -2523,27 +2673,27 @@ function numberToPitch(i, temperament, startPitch, offset) {
             var pitchNumber = Math.floor(i - offset);
         }
     }
-    if (temperament === "custom") {
+    if (isCustom(temperament)) {
         pitchNumber = pitchNumber + "";
-        if (TEMPERAMENT["custom"][pitchNumber][1] === undefined) {
+        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
             //If custom temperament is not defined, then it will store equal temperament notes.
             for (var i = 0; i < 12; i++) {
                 var number = "" + i;
                 var interval = TEMPERAMENT["equal"]["interval"][i];
-                TEMPERAMENT["custom"][number] = [
+                TEMPERAMENT[temperament][number] = [
                     Math.pow(2, i / 12),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
             }
             return [
-                TEMPERAMENT["custom"][pitchNumber][1],
-                TEMPERAMENT["custom"][pitchNumber][2]
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
             ];
         } else {
             return [
-                TEMPERAMENT["custom"][pitchNumber][1],
-                TEMPERAMENT["custom"][pitchNumber][2]
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
             ];
         }
     } else {
@@ -2977,6 +3127,10 @@ function getCustomNote(notes) {
     }
     return notes;
 }
+
+var isCustom = (temperament) => {
+    return !(temperament in PreDefinedTemperaments) ;
+};
 
 function getNote(
     noteArg,
@@ -3450,11 +3604,11 @@ function getNote(
                 note = EQUIVALENTFLATS[note];
             }
         }
-    } else if (temperament === "custom") {
+    } else if (isCustom(temperament)) {
         var note = getCustomNote(noteArg);
-        for (var number in TEMPERAMENT["custom"]) {
+        for (var number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
-                if (note === TEMPERAMENT["custom"][number][1]) {
+                if (note === TEMPERAMENT[temperament][number][1]) {
                     var pitchNumber = Number(number);
                     break;
                 }
@@ -3472,7 +3626,7 @@ function getNote(
             );
         }
         var inOctave = octave;
-        var octaveLength = TEMPERAMENT["custom"]["pitchNumber"];
+        var octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         if (transposition !== 0) {
             if (transposition < 0) {
                 var deltaOctave = -Math.floor(-transposition / octaveLength);
@@ -3492,7 +3646,7 @@ function getNote(
             inOctave = inOctave + 1;
         }
         pitchNumber = pitchNumber + "";
-        note = TEMPERAMENT["custom"][pitchNumber][1];
+        note = TEMPERAMENT[temperament][pitchNumber][1];
         octave = inOctave;
     } else {
         //Return E# as E#, Fb as Fb etc. for different temperament systems.

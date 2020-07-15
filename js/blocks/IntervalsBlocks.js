@@ -189,6 +189,8 @@ function setupIntervalsBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
@@ -197,16 +199,15 @@ function setupIntervalsBlocks() {
                 let saveBoxes = JSON.stringify(logo.boxes);
                 let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                let saveX = logo.turtles.turtleList[turtle].x;
-                let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].painter.color;
-                let saveValue = logo.turtles.turtleList[turtle].painter.value;
-                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
-                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
-                let saveOrientation =
-                    logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+                let saveX = tur.x;
+                let saveY = tur.y;
+                let saveColor = tur.painter.color;
+                let saveValue = tur.painter.value;
+                let saveChroma = tur.painter.chroma;
+                let saveStroke = tur.painter.stroke;
+                let saveCanvasAlpha = tur.painter.canvasAlpha;
+                let saveOrientation = tur.orientation;
+                let savePenState = tur.painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -225,9 +226,9 @@ function setupIntervalsBlocks() {
                 }
 
                 let actionArgs = [];
-                let saveNoteCount = logo.notesPlayed[turtle];
+                let saveNoteCount = tur.singer.notesPlayed;
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     cblk,
@@ -254,7 +255,7 @@ function setupIntervalsBlocks() {
                     );
                 }
 
-                logo.notesPlayed[turtle] = saveNoteCount;
+                tur.singer.notesPlayed = saveNoteCount;
 
                 // Restore previous state
                 logo.boxes = JSON.parse(saveBoxes);
@@ -304,6 +305,8 @@ function setupIntervalsBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
@@ -312,16 +315,15 @@ function setupIntervalsBlocks() {
                 let saveBoxes = JSON.stringify(logo.boxes);
                 let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                let saveX = logo.turtles.turtleList[turtle].x;
-                let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].painter.color;
-                let saveValue = logo.turtles.turtleList[turtle].painter.value;
-                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
-                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
-                let saveOrientation =
-                    logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+                let saveX = tur.x;
+                let saveY = tur.y;
+                let saveColor = tur.painter.color;
+                let saveValue = tur.painter.value;
+                let saveChroma = tur.painter.chroma;
+                let saveStroke = tur.painter.stroke;
+                let saveCanvasAlpha = tur.painter.canvasAlpha;
+                let saveOrientation = tur.orientation;
+                let savePenState = tur.painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -340,25 +342,16 @@ function setupIntervalsBlocks() {
                 }
 
                 let actionArgs = [];
-                let saveNoteCount = logo.notesPlayed[turtle];
+                let saveNoteCount = tur.singer.notesPlayed;
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
-                    logo,
-                    turtle,
-                    cblk,
-                    true,
-                    actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
-                );
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
                 if (
                     logo.firstPitch[turtle].length > 0 &&
                     logo.lastPitch[turtle].length > 0
                 ) {
-                    return logo.scalarDistance(
-                        turtle,
-                        last(logo.firstPitch[turtle]),
-                        last(logo.lastPitch[turtle])
+                    return Singer.scalarDistance(
+                        logo, turtle, last(logo.firstPitch[turtle]), last(logo.lastPitch[turtle])
                     );
 
                     logo.firstPitch[turtle].pop();
@@ -372,7 +365,7 @@ function setupIntervalsBlocks() {
                     );
                 }
 
-                logo.notesPlayed[turtle] = saveNoteCount;
+                tur.singer.notesPlayed = saveNoteCount;
 
                 // Restore previous state
                 logo.boxes = JSON.parse(saveBoxes);
@@ -430,20 +423,24 @@ function setupIntervalsBlocks() {
                 ]);
             }
         }
-        for (let i = 2; i <= 8; i++)
-            new SemitoneIntervalMacroBlock("diminished", i).setup();
-        for (let i = 1; i <= 8; i++)
-            new SemitoneIntervalMacroBlock("augmented", i).setup();
-        for (let i in [8, 5, 4])
-            new SemitoneIntervalMacroBlock("perfect", i).setup();
-        new SemitoneIntervalMacroBlock("minor", 6, true).setup();
-        new SemitoneIntervalMacroBlock("minor", 3, true).setup();
-        for (let i in [7, 6, 3, 2])
-            new SemitoneIntervalMacroBlock("minor", i).setup();
-        new SemitoneIntervalMacroBlock("major", 6, true).setup();
-        new SemitoneIntervalMacroBlock("major", 3, true).setup();
-        for (let i in [7, 6, 3, 2])
-            new SemitoneIntervalMacroBlock("major", i).setup();
+        // DEPRECATED: no verbose macros required, only major 3rd for reference
+
+        // for (let i = 2; i <= 8; i++)
+        //     new SemitoneIntervalMacroBlock("diminished", i).setup();
+        // for (let i = 1; i <= 8; i++)
+        //     new SemitoneIntervalMacroBlock("augmented", i).setup();
+        // for (let i in [8, 5, 4])
+        //     new SemitoneIntervalMacroBlock("perfect", i).setup();
+        // new SemitoneIntervalMacroBlock("minor", 6, true).setup();
+        // new SemitoneIntervalMacroBlock("minor", 3, true).setup();
+        // for (let i in [7, 6, 3, 2])
+        //     new SemitoneIntervalMacroBlock("minor", i).setup();
+        // new SemitoneIntervalMacroBlock("major", 6, true).setup();
+
+        new SemitoneIntervalMacroBlock("major", 3, false).setup();
+        
+        // for (let i in [7, 6, 3, 2])
+        //     new SemitoneIntervalMacroBlock("major", i).setup();
     }
 
     class PerfectBlock extends FlowClampBlock {
@@ -505,115 +502,116 @@ function setupIntervalsBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
-                logo.semitoneIntervals[turtle].push([
-                    i,
-                    logo.noteDirection[turtle]
-                ]);
-                logo.noteDirection[turtle] = 0;
+                logo.semitoneIntervals[turtle].push([i, tur.singer.noteDirection]);
+                tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function() {
                     logo.semitoneIntervals[turtle].pop();
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
             }
 
             return [args[1], 1];
         }
     }
+    
+    // DEPRECATED: verbose macros, no longer needed
 
-    function makeIntervalMacroBlocks() {
-        class ChordIntervalMacroBlock extends FlowBlock {
-            constructor(name, display, value1, value2) {
-                super(name, _(display));
-                this.setPalette("intervals");
-                this.beginnerBlock(true);
-                this.setHelpString();
-                this.makeMacro((x, y) => [
-                    [0, "interval", x, y, [null, 1, 3, 2]],
-                    [1, ["number", { value: value1 }], 0, 0, [0]],
-                    [2, "hidden", 0, 0, [0, null]],
-                    [3, "interval", 0, 0, [0, 4, 6, 5]],
-                    [4, ["number", { value: value2 }], 0, 0, [3]],
-                    [5, "hidden", 0, 0, [3, null]],
-                    [
-                        6,
-                        ["newnote", { collapsed: false }],
-                        0,
-                        0,
-                        [3, 7, 10, 14]
-                    ],
-                    [7, "divide", 0, 0, [6, 8, 9]],
-                    [8, ["number", { value: 1 }], 0, 0, [7]],
-                    [9, ["number", { value: 1 }], 0, 0, [7]],
-                    [10, "vspace", 0, 0, [6, 11]],
-                    [11, "pitch", 0, 0, [10, 12, 13, null]],
-                    [12, ["solfege", { value: "do" }], 0, 0, [11]],
-                    [13, ["number", { value: 4 }], 0, 0, [11]],
-                    [14, "hidden", 0, 0, [6, null]]
-                ]);
-            }
-        }
-        class IntervalMacroBlock extends FlowBlock {
-            constructor(name, value, down) {
-                super(
-                    (down ? "down" : "") + name + "interval",
-                    _((down ? "down " : "") + name)
-                );
-                this.setPalette("intervals");
-                this.beginnerBlock(value === 2 || value === 5);
-                this.setHelpString();
-                this.makeMacro((x, y) => [
-                    [0, "interval", x, y, [null, 1, 6, 8]],
-                    [1, down ? "minus" : "plus", 0, 0, [0, 2, 3]],
-                    [2, ["number", { value: value }], 0, 0, [1]],
-                    [3, "multiply", 0, 0, [1, 4, 5]],
-                    [4, ["number", { value: 0 }], 0, 0, [3]],
-                    [5, "modelength", 0, 0, [3]],
-                    [6, "vspace", 0, 0, [0, 7]],
-                    [7, "vspace", 0, 0, [6, null]],
-                    [8, "hidden", 0, 0, [0, null]]
-                ]);
-            }
-        }
-        let lang = localStorage.languagePreference || navigator.language;
+    // function makeIntervalMacroBlocks() {
+    //     class ChordIntervalMacroBlock extends FlowBlock {
+    //         constructor(name, display, value1, value2) {
+    //             super(name, _(display));
+    //             this.setPalette("intervals");
+    //             this.beginnerBlock(true);
+    //             this.setHelpString();
+    //             this.makeMacro((x, y) => [
+    //                 [0, "interval", x, y, [null, 1, 3, 2]],
+    //                 [1, ["number", { value: value1 }], 0, 0, [0]],
+    //                 [2, "hidden", 0, 0, [0, null]],
+    //                 [3, "interval", 0, 0, [0, 4, 6, 5]],
+    //                 [4, ["number", { value: value2 }], 0, 0, [3]],
+    //                 [5, "hidden", 0, 0, [3, null]],
+    //                 [
+    //                     6,
+    //                     ["newnote", { collapsed: false }],
+    //                     0,
+    //                     0,
+    //                     [3, 7, 10, 14]
+    //                 ],
+    //                 [7, "divide", 0, 0, [6, 8, 9]],
+    //                 [8, ["number", { value: 1 }], 0, 0, [7]],
+    //                 [9, ["number", { value: 1 }], 0, 0, [7]],
+    //                 [10, "vspace", 0, 0, [6, 11]],
+    //                 [11, "pitch", 0, 0, [10, 12, 13, null]],
+    //                 [12, ["solfege", { value: "do" }], 0, 0, [11]],
+    //                 [13, ["number", { value: 4 }], 0, 0, [11]],
+    //                 [14, "hidden", 0, 0, [6, null]]
+    //             ]);
+    //         }
+    //     }
+    //     class IntervalMacroBlock extends FlowBlock {
+    //         constructor(name, value, down) {
+    //             super(
+    //                 (down ? "down" : "") + name + "interval",
+    //                 _((down ? "down " : "") + name)
+    //             );
+    //             this.setPalette("intervals");
+    //             this.beginnerBlock(value === 2 || value === 5);
+    //             this.setHelpString();
+    //             this.makeMacro((x, y) => [
+    //                 [0, "interval", x, y, [null, 1, 6, 8]],
+    //                 [1, down ? "minus" : "plus", 0, 0, [0, 2, 3]],
+    //                 [2, ["number", { value: value }], 0, 0, [1]],
+    //                 [3, "multiply", 0, 0, [1, 4, 5]],
+    //                 [4, ["number", { value: 0 }], 0, 0, [3]],
+    //                 [5, "modelength", 0, 0, [3]],
+    //                 [6, "vspace", 0, 0, [0, 7]],
+    //                 [7, "vspace", 0, 0, [6, null]],
+    //                 [8, "hidden", 0, 0, [0, null]]
+    //             ]);
+    //         }
+    //     }
+    //     let lang = localStorage.languagePreference || navigator.language;
 
-        new ChordIntervalMacroBlock(
-            "chordV",
-            lang === "ja" ? _("chord5") : _("chord") + " V",
-            3,
-            2
-        ).setup();
-        new ChordIntervalMacroBlock(
-            "chordIV",
-            lang === "ja" ? _("chord4") : _("chord") + " IV",
-            5,
-            2
-        ).setup();
-        new ChordIntervalMacroBlock(
-            "chordI",
-            lang === "ja" ? _("chord1") : _("chord") + " I",
-            4,
-            2
-        ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordV",
+    //         lang === "ja" ? _("chord5") : _("chord") + " V",
+    //         3,
+    //         2
+    //     ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordIV",
+    //         lang === "ja" ? _("chord4") : _("chord") + " IV",
+    //         5,
+    //         2
+    //     ).setup();
+    //     new ChordIntervalMacroBlock(
+    //         "chordI",
+    //         lang === "ja" ? _("chord1") : _("chord") + " I",
+    //         4,
+    //         2
+    //     ).setup();
 
-        //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
-        //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
-        new IntervalMacroBlock("sixth", -5, true).setup();
-        new IntervalMacroBlock("third", -2, true).setup();
-        new IntervalMacroBlock("seventh", 6, true).setup();
-        new IntervalMacroBlock("sixth", 5, true).setup();
-        new IntervalMacroBlock("fifth", 4, true).setup();
-        new IntervalMacroBlock("fourth", 3, true).setup();
-        new IntervalMacroBlock("third", 2, true).setup();
-        new IntervalMacroBlock("second", 1, true).setup();
-        new IntervalMacroBlock("unison", 0, true).setup();
-    }
+    //     //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
+    //     //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
+    //     new IntervalMacroBlock("sixth", -5, true).setup();
+    //     new IntervalMacroBlock("third", -2, true).setup();
+    //     new IntervalMacroBlock("seventh", 6, true).setup();
+    //     new IntervalMacroBlock("sixth", 5, true).setup();
+    //     new IntervalMacroBlock("fifth", 4, true).setup();
+    //     new IntervalMacroBlock("fourth", 3, true).setup();
+    //     new IntervalMacroBlock("third", 2, true).setup();
+    //     new IntervalMacroBlock("second", 1, true).setup();
+    //     new IntervalMacroBlock("unison", 0, true).setup();
+    // }
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -660,13 +658,13 @@ function setupIntervalsBlocks() {
             logo.intervals[turtle].push(i);
 
             let listenerName = "_interval_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 logo.intervals[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -718,8 +716,10 @@ function setupIntervalsBlocks() {
                 return;
             }
 
-            logo.inDefineMode[turtle] = true;
-            logo.defineMode[turtle] = [];
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inDefineMode = true;
+            tur.singer.defineMode = [];
             let modeName;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -729,16 +729,16 @@ function setupIntervalsBlocks() {
             }
 
             let listenerName = "_definemode_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
                 MUSICALMODES[modeName] = [];
-                if (logo.defineMode[turtle].indexOf(0) === -1) {
-                    logo.defineMode[turtle].push(0);
+                if (tur.singer.defineMode.indexOf(0) === -1) {
+                    tur.singer.defineMode.push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                let pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
+                let pitchNumbers = tur.singer.defineMode.sort(function(a, b) {
                     return a[0] - b[0];
                 });
 
@@ -771,10 +771,10 @@ function setupIntervalsBlocks() {
                     logo.blocks.updateBlockText(cblk);
                 }
 
-                logo.inDefineMode[turtle] = false;
+                tur.singer.inDefineMode = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -810,7 +810,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.moveable[turtle] = args[0];
+                logo.turtles.ithTurtle(turtle).singer.moveable = args[0];
             }
         }
     }
@@ -980,12 +980,13 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                // Check to see if there are any transpositions on the key.
-                if (turtle in logo.transposition) {
+                let tur = logo.turtles.ithTurtle(turtle);
+                // Check to see if there are any transpositions on the key
+                if (tur.singer.transposition !== 0) {
                     let noteObj = getNote(
                         args[0],
                         4,
-                        logo.transposition[turtle],
+                        tur.singer.transposition,
                         logo.keySignature[turtle],
                         false,
                         null,
@@ -1019,7 +1020,7 @@ function setupIntervalsBlocks() {
     makeSemitoneIntervalMacroBlocks();
     new PerfectBlock().setup();
     new SemitoneIntervalBlock().setup();
-    makeIntervalMacroBlocks();
+    // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup();
     new DefineModeBlock().setup();
     new MoveableBlock().setup();

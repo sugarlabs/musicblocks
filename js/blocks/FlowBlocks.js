@@ -29,7 +29,7 @@ function setupFlowBlocks() {
             let childFlowCount = 1;
 
             let listenerName = "_backward_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let nextBlock = logo.blocks.blockList[blk].connections[2];
             if (nextBlock === null) {
@@ -48,7 +48,7 @@ function setupFlowBlocks() {
                 logo.backward[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
         }
     }
@@ -104,7 +104,7 @@ function setupFlowBlocks() {
 
                 // Queue each block in the clamp.
                 let listenerName = "_duplicate_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __lookForOtherTurtles = function(blk, turtle) {
                     for (let t in logo.connectionStore) {
@@ -153,7 +153,7 @@ function setupFlowBlocks() {
                     logo.connectionStoreLock = false;
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 // Test for race condition.
                 // FIXME: Do something about the race condition.
@@ -363,7 +363,7 @@ function setupFlowBlocks() {
             logo.switchCases[turtle][blk] = [];
 
             let listenerName = "_switch_" + blk + "_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function() {
                 let switchBlk = last(logo.switchBlocks[turtle]);
@@ -411,7 +411,7 @@ function setupFlowBlocks() {
                 logo.switchBlocks[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }

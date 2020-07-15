@@ -475,7 +475,7 @@ as the *Start* block, do not have any external flow, so their
 will make this assignment for you (typically this is the block that
 immediately follows the clamp block).
 
-`that._setDispatchBlock(blk, turtle, listenerName);`
+`that.setDispatchBlock(blk, turtle, listenerName);`
 
 4. Create a listener event, where you typically clean up anything
 associated with the clamp block's childFlow.

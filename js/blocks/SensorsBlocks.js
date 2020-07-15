@@ -23,7 +23,6 @@ function setupSensorsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-
             // Pause the flow while we wait for input.
             logo.doWait(turtle, 120);
 
@@ -119,24 +118,25 @@ function setupSensorsBlocks() {
             if (logo.pitchAnalyser === null) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
-                    size: this.limit
+                    size: logo.limit,
+                    smoothing : 0
                 });
-
-                this.mic.connect(this.pitchAnalyser);
+                logo.mic.connect(logo.pitchAnalyser);
             }
+            
 
             let values = logo.pitchAnalyser.getValue();
-            let max = 0;
-            let idx = 0;
-            for (let i = 0; i < this.limit; i++) {
-                let v2 = values[i] * values[i];
-                if (v2 > max) {
+            let max = Infinity;
+            let idx = 0;                                // frequency bin
+            for (let i = 0; i < logo.limit; i++) {
+                let v2 = -values[i] ;
+                if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
-
-            return idx;
+            let freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
+            return freq ;
         }
     }
 

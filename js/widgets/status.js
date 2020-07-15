@@ -157,6 +157,11 @@ function StatusMatrix() {
                     }
                     console.debug(label);
                     break;
+                case "outputtools":
+                    var label = this._logo.blocks.blockList[
+                            this._logo.statusFields[i][0]
+                        ].privateData;
+                    break;
                 default:
                     var label = this._logo.blocks.blockList[
                         this._logo.statusFields[i][0]
@@ -216,6 +221,8 @@ function StatusMatrix() {
             turtle < this._logo.turtles.turtleList.length;
             turtle++
         ) {
+            let tur = this._logo.turtles.ithTurtle(turtle);
+
             if (this._logo.turtles.turtleList[turtle].inTrash) {
                 continue;
             }
@@ -292,8 +299,8 @@ function StatusMatrix() {
                         break;
                     case "pitchinhertz":
                         var value = "";
-                        if (this._logo.noteStatus[turtle] != null) {
-                            var notes = this._logo.noteStatus[turtle][0];
+                        if (tur.singer.noteStatus != null) {
+                            var notes = tur.singer.noteStatus[0];
                             for (var j = 0; j < notes.length; j++) {
                                 if (j > 0) {
                                     value += " ";
@@ -307,6 +314,8 @@ function StatusMatrix() {
                                     value += freq.toFixed(2);
                                 }
                             }
+                        } else {
+                            value = "";
                         }
                         break;
                     default:
@@ -331,8 +340,8 @@ function StatusMatrix() {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 var note = "";
                 var value = "";
-                if (this._logo.noteStatus[turtle] != null) {
-                    var notes = this._logo.noteStatus[turtle][0];
+                if (tur.singer.noteStatus != null) {
+                    var notes = tur.singer.noteStatus[0];
                     for (var j = 0; j < notes.length; j++) {
                         if (typeof notes[j] === "number") {
                             note += toFixed2(notes[j]);
@@ -342,7 +351,7 @@ function StatusMatrix() {
                             note += " ";
                         }
                     }
-                    var value = this._logo.noteStatus[turtle][1];
+                    var value = tur.singer.noteStatus[1];
 
                     var obj = rationalToFraction(value);
                     note += obj[1] + "/" + obj[0];

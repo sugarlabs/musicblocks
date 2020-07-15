@@ -574,7 +574,7 @@ function PitchTimeMatrix() {
             } else {
                 if (
                     noteIsSolfege(this.rowLabels[i]) &&
-                    this._logo.synth.inTemperament !== "custom"
+                    !isCustom(this._logo.synth.inTemperament)
                 ) {
                     cell.innerHTML =
                         i18nSolfege(this.rowLabels[i]) +
@@ -1980,7 +1980,7 @@ function PitchTimeMatrix() {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (
                 noteIsSolfege(that.rowLabels[i]) &&
-                that._logo.synth.inTemperament !== "custom"
+                !isCustom(that._logo.synth.inTemperament)
             ) {
                 cell.innerHTML =
                     i18nSolfege(that.rowLabels[index]) +
@@ -2042,7 +2042,7 @@ function PitchTimeMatrix() {
                 );
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
-                that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+                Singer.setSynthVolume(that._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(
                     0,
                     [obj[0] + obj[1]],
@@ -2074,7 +2074,7 @@ function PitchTimeMatrix() {
 
                 setTimeout(function() {
                     that._logo.synth.setMasterVolume(DEFAULTVOLUME);
-                    that._logo.setSynthVolume(0, label, DEFAULTVOLUME);
+                    Singer.setSynthVolume(that._logo, 0, label, DEFAULTVOLUME);
                     that._logo.synth.trigger(
                         0,
                         "G4",
@@ -4218,18 +4218,14 @@ function PitchTimeMatrix() {
             }
 
             if (note[0] !== "R" && pitchNotes.length > 0) {
-                this._playChord(
-                    pitchNotes,
-                    this._logo.defaultBPMFactor / noteValue
-                );
-                // this._logo.synth.trigger(0, pitchNotes[0], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
+                this._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
                 this._logo.synth.trigger(
                     0,
                     [Number(synthNotes[i])],
-                    this._logo.defaultBPMFactor / noteValue,
+                    Singer.defaultBPMFactor / noteValue,
                     this._instrumentName,
                     null,
                     null
@@ -4238,12 +4234,7 @@ function PitchTimeMatrix() {
 
             for (var i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(
-                    0,
-                    "C2",
-                    this._logo.defaultBPMFactor / noteValue,
-                    drumNotes[i],
-                    null,
-                    null
+                    0, "C2", Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                 );
             }
 
@@ -4421,18 +4412,14 @@ function PitchTimeMatrix() {
                 }
 
                 if (note[0] !== "R" && pitchNotes.length > 0) {
-                    that._playChord(
-                        pitchNotes,
-                        that._logo.defaultBPMFactor / noteValue
-                    );
-                    // that._logo.synth.trigger(0, pitchNotes[0], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
+                    that._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
                     that._logo.synth.trigger(
                         0,
                         [Number(synthNotes[i])],
-                        that._logo.defaultBPMFactor / noteValue,
+                        Singer.defaultBPMFactor / noteValue,
                         that._instrumentName,
                         null,
                         null
@@ -4441,12 +4428,7 @@ function PitchTimeMatrix() {
 
                 for (var i = 0; i < drumNotes.length; i++) {
                     that._logo.synth.trigger(
-                        0,
-                        ["C2"],
-                        that._logo.defaultBPMFactor / noteValue,
-                        drumNotes[i],
-                        null,
-                        null
+                        0, ["C2"], Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                     );
                 }
             }
@@ -4479,7 +4461,7 @@ function PitchTimeMatrix() {
                     );
                 }
             }
-        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+        }, Singer.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
     };
 
     this._playChord = function(notes, noteValue) {
@@ -4632,7 +4614,7 @@ function PitchTimeMatrix() {
         var cell = row.cells[colIndex];
 
         // Using the alt attribute to store the note value
-        var noteValue = cell.getAttribute("alt") * this._logo.defaultBPMFactor;
+        var noteValue = cell.getAttribute("alt") * Singer.defaultBPMFactor;
 
         if (obj.length === 1) {
             if (playNote) {
@@ -5052,7 +5034,7 @@ function PitchTimeMatrix() {
                         }
 
                         if (note[0][j][1] === "♯") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",
@@ -5142,7 +5124,7 @@ function PitchTimeMatrix() {
                                 thisBlock += 3;
                             }
                         } else if (note[0][j][1] === "♭") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",

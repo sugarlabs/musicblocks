@@ -476,6 +476,14 @@ Turtles.TurtlesModel = class {
         }
         return false;
     }
+
+    /**
+     * @param {Number} i - index number
+     * @returns {Object} ith Turtle object
+     */
+    ithTurtle(i) {
+        return this._turtleList[Number(i)];
+    }
 };
 
 /**
@@ -574,10 +582,16 @@ Turtles.TurtlesView = class {
     }
 
     /**
-     * @param {String} color - background color
+     * Changes body background in DOM to current colour.
+     *
+     * @param {Number} turtle - Turtle index in turtleList
+     * @returns {void}
      */
-    setBackgroundColor(color) {
+    setBackgroundColor(turtle) {
+        let color =
+            turtle === -1 ? platformColor.background : this.turtleList[turtle].painter.canvasColor;
         this._backgroundColor = color;
+        this.makeBackground(this.isShrunk());
     }
 
     /**
