@@ -1137,6 +1137,43 @@ function Activity() {
         
         exitWheel.navItems[0].navigateFunction = __exitMenu;
 
+        let __playNote = () => {
+            let obj = getNote(
+                KeySignatureEnv[0],
+                4,
+                null,
+                KeySignatureEnv[0] + " " + KeySignatureEnv[1],
+                false,
+                null,
+                null
+            );
+            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+
+            if (
+                blocks.logo.instrumentNames[0] === undefined ||
+                blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+            ) {
+                if (blocks.logo.instrumentNames[0] === undefined) {
+                    blocks.logo.instrumentNames[0] = [];
+                }
+
+                blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                blocks.logo.synth.createDefaultSynth(0);
+                blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            Singer.setSynthVolume(blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+            blocks.logo.synth.trigger(
+                0,
+                [obj[0] + obj[1]],
+                1 / 12,
+                DEFAULTVOICE,
+                null,
+                null
+            );
+        };
+
         let __setupActionKey = function(i, activeTabs) {
             keyNameWheel.navItems[i].navigateFunction = function() {
                 for (let j = 0; j < labels.length; j++) {
@@ -1149,6 +1186,8 @@ function Activity() {
                     }
                 }
                 __selectionChangedKey();
+                if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
+                    __playNote();
             };
         };
 
@@ -1161,7 +1200,7 @@ function Activity() {
                     (keyNameWheel.selectedNavItemIndex + 1) %
                     keyNameWheel.navItems.length
                 );
-            } else if (selection.length < 2) {
+            } else if (selection.length <= 2) {
                 KeySignatureEnv[0] = selection;
             }
         };
@@ -1200,6 +1239,7 @@ function Activity() {
             ].title;
             // console.log(selection);
             KeySignatureEnv[0] = selection;
+            __playNote();
         };
 
         let __setupActionKey2 = function(i) {
@@ -1212,27 +1252,32 @@ function Activity() {
             __setupActionKey2(i);
         }
 
-        // let i = keys.indexOf(selectedkey);
-        // if (i == -1) {
-        //     i = labels.indexOf(selectedkey);
-        //     if (i != -1) {
-        //         addedOptionsWheel.navigateWheel(i);
-        //         addedOptionsWheel.navItems[i].navItem.show();
-        //     }
-        // } else {
-        //     console.log(i);
-        //     keyNameWheel.navigateWheel(i);
-        //     addedOptionsWheel.navItems[2 * i].navItem.hide();
-        //     addedOptionsWheel.navItems[2 * i + 1].navItem.hide();
-        // }
+        let i = keys.indexOf(KeySignatureEnv[0]);
+        if (i == -1) {
+            i = labels.indexOf(KeySignatureEnv[0]);
+            if (i != -1) {
+                addedOptionsWheel.navigateWheel(i);
+                for (let j = 0; j < labels.length; j++) {
+                    addedOptionsWheel.navItems[j].navItem.hide();
+                    if (i % 2 == 0) {
+                        addedOptionsWheel.navItems[i].navItem.show();
+                        addedOptionsWheel.navItems[i + 1].navItem.show();
+                    } else {
+                        addedOptionsWheel.navItems[i].navItem.show();
+                        addedOptionsWheel.navItems[i-1].navItem.show();
+                    }
+                }
+            }
+        } else {
+            keyNameWheel.navigateWheel(i);
+            addedOptionsWheel.navItems[2 * i].navItem.hide();
+            addedOptionsWheel.navItems[2 * i + 1].navItem.hide();
+        }
 
-        // let j = labels3.indexOf(selectedmode);
-        // if (j !== -1) {
-        //     modenameWheel.navigateWheel(j);
-        // }
-
-
-
+        let j = labels3.indexOf(KeySignatureEnv[1]);
+        if (j !== -1) {
+            modenameWheel.navigateWheel(j);
+        }
     };
 
     // DEPRECATED
