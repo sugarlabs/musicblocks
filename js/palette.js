@@ -121,6 +121,7 @@ function Palettes() {
         if (!document.getElementById("palette")){
             let element = document.createElement("div");
             element.setAttribute("id","palette");
+            element.setAttribute("class","disable_highlighting");
             element.setAttribute("style",'position: fixed; display: none ; left :0px; top:'+this.top+'px');
             element.innerHTML ='<table style="float: left" bgcolor="white"><thead><tr></tr></thead><tbody></tbody></table>'
             document.body.appendChild(element);
@@ -486,7 +487,7 @@ function Palettes() {
             // myPalettes.dict[showPalette].showMenu();
             // myPalettes.dict[showPalette]._showMenuItems();
             myPalettes.dict[showPalette].hideMenu();
-            myPalettes.dict[showPalette]._hideMenuItems();
+            myPalettes.dict[showPalette].show();
         }
         if (this.mobile) {
             this.hide();
@@ -510,18 +511,7 @@ function Palettes() {
     };
 
     this.remove = function(name) {
-        if (!(name in this.buttons)) {
-            console.debug("Palette.remove: Cannot find palette " + name);
-            return;
-        }
 
-        console.debug(this.labels[name]);
-        this.labels[name].visible = false;
-        this.stage.removeChild(this.labels[name]);
-        this.buttons[name].visible = false;
-        this.buttons[name].removeAllChildren();
-        this.stage.removeChild(this.buttons[name]);
-        var btnKeys = Object.keys(this.dict);
         for (
             var btnKey = btnKeys.indexOf(name) + 1;
             btnKey < btnKeys.length;
@@ -619,13 +609,7 @@ function Palettes() {
 
         // Force an update if a block was removed.
         if (blockRemoved) {
-            // this.hide();
             this.updatePalettes("action");
-            // if (this.mobile) {
-            //     this.hide();
-            // } else {
-            //     this.show();
-            // }
         }
     };
 
@@ -984,19 +968,7 @@ function Palette(palettes, name) {
     };
 
     this.show = function() {
-        if (this.palettes.mobile) {
-            this.hideMenu();
-        } else {
-            this.showMenu();
-        }
-
-        for (var i in this.protoContainers) {
-            this.protoContainers[i].visible = true;
-        }
-        this._updateBlockMasks();
-        if (this.background !== null) {
-            this.background.visible = true;
-        }
+        this.showMenu(true);
     };
 
     this.hideMenu = function() {
@@ -1066,6 +1038,9 @@ function Palette(palettes, name) {
 
         let blocks = this.model.blocks;
         blocks.reverse();
+        let protoListScope = [...this.protoList] ;
+        if (last(blocks).blkname != last(protoListScope).name)
+            protoListScope.reverse();
         for (let blk in blocks) {
             let b = blocks[blk];
 
@@ -1128,7 +1103,7 @@ function Palette(palettes, name) {
                 
                 let up = function (event) {
                     document.body.style.cursor = "default";
-                    that.palettes._hideMenus()
+                    //that.palettes._hideMenus()
                     document.removeEventListener('mousemove', onMouseMove);
                     img.onmouseup = null;
 
@@ -1143,7 +1118,7 @@ function Palette(palettes, name) {
                     
                     if (!x || !y) return ;
                     that._makeBlockFromProtoblock(
-                        that.protoList[blk],
+                        protoListScope[blk],
                         true,
                         b.modname,
                         event,
@@ -1204,21 +1179,14 @@ function Palette(palettes, name) {
             }
         }
 
-        let list = docById("PaletteBody_items");
-        for (let i of list.children) {
-        }
-        delete this.protoContainers[name];
     };
 
     this.add = function(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
         // to the top.
         if (this.protoList.indexOf(protoblock) === -1) {
-            if (top === undefined) {
-                this.protoList.push(protoblock);
-            } else {
-                this.protoList.splice(0, 0, protoblock);
-            }
+            if (top)this.protoList.push(protoblock);
+            else this.protoList.push(protoblock);
         }
         return this;
     };
