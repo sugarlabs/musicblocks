@@ -539,25 +539,35 @@ Because many of the blocks behave differently depending on whether or not a *Mov
 Block(s) | Fixed | Movable Do or La | Modal
 ----- | ---------- | ---------- | -------
 Alphabet Pitch | Alphabet | Not movable | Modal cannot be specified
-Solfege | Fixed Do by default | Needs Movable=Do or La block | Modal can be defined (after) for modal blocks functionality*
+Solfege | Fixed Do by default | Needs Movable=Do or Movable=La block | Modal can be defined (after) for modal blocks functionality*
 Solfege and Movable Do | N/A (Movable Do) | Specified via "movable" block set to Do | Modal can be defined (after) for modal blocks functionality*
 Solfege and Movable La | N/A (Movable La) | Specified via "movable" block set to La | Modal can be defined (after) for modal blocks functionality*
 n^th modal pitch | N/A | N/A | Notes chosen by specified mode (from "set key" block)
-Scale Degree | N/A (needs some reference, otherwise uses default reference of c major) | Works just like Movable La by default | Modal can be defined for modal blocks functionality
-Scale Degree | N/A (needs some reference, otherwise uses default reference of c major) | When preceded by Movable=Do, the user can be explicit in their spelling*** | Modal can be defined for modal blocks functionality*
+Scale Degree | N/A (needs some reference, otherwise uses default of C Major) | Works just like Movable=La for Solfege by default | Modal can be defined for modal blocks functionality*
+Scale Degree | N/A (needs some reference, otherwise uses default of C Major) | When preceded by Movable=Do, the user can be explicit in their spelling*** | Modal can be defined for modal blocks functionality*
 Scalar Step --> "Modal" Step** | N/A | N/A | Modal motion up and down (or 0) by number
 Scalar Interval --> "Modal" Interval** | N/A | N/A | Modal interval up and down (or 0) by number
 Scalar Inversion --> "Modal" Inversion | N/A | N/A | Modal inversion around a specified axis
 
-*   Movable=NTH, if we decide to implement it
-**  We may consider renaming these for consistency.
-*** For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see [this code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html) as an example.
+`*`   Movable=NTH, if we decide to implement it.
+
+`**`  We may consider renaming these for consistency ("scalar" --> "modal").
+
+`***` For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see [this code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html) as an example.
 
 Scale vs. Mode terminology
 
 Scalar | Modal
 ------ | ------
 Degrees 1-7 are all defined without "overskewing" | Possibly a subset or superset of scale (or just the common "church modes", which overlap completely with scalar).
+
+Illustrative Examples:
+
+The following example exposes how the Scale Degree functionality combines math and musical modifiers. When combining numbers and accidentals, it recreates the same functionality as the *Scale Degree* block.
+
+![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/scale-degree-improv.svg "Scale Degree Improv")
+
+[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/charts/Scale-Degree-Improv.html)
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
@@ -584,9 +594,7 @@ The chart below shows two common examples, dotted quarter and dotted
 eighth, and how to achieve them with either the dot block or by direct
 calculation into a note's note value.
 
-![alt
- tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg
- "using dotted notes")
+![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
