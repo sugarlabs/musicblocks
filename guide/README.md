@@ -28,16 +28,17 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Dotted Notes](#DOTTED)
-      6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      7. [Repeating Notes](#REPETITION)
-      8. [Swinging Notes and Tied Notes](#SWINGING)
-      9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      10. [Intervals](#INTERVALS)
-      11. [Inversion](#INVERSION)
-      12. [Backwards](#BACKWARDS)
-      13. [Setting Voice and Keys](#SETTING)
-      14. [Vibrato, Tremelo, et al.](#VIBRATO)
+      5. [Fixed and Movable; Scalar and Modal] (##FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
+      6. [Dotted Notes](#DOTTED)
+      7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+      8. [Repeating Notes](#REPETITION)
+      9. [Swinging Notes and Tied Notes](#SWINGING)
+      10. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+      11. [Intervals](#INTERVALS)
+      12. [Inversion](#INVERSION)
+      13. [Backwards](#BACKWARDS)
+      14. [Setting Voice and Keys](#SETTING)
+      15. [Vibrato, Tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
@@ -471,7 +472,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
-| Music Blocks 
+| Music Blocks for Set Key and Movable Do | 
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.svg "scalar transposition") |
 
@@ -511,19 +512,19 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- | --- | --- |
 | Movable “Do” | Advanced transposition by mode | You also have the option of changing the mode to Minor, Major, Chromatic, and many other exotic modes like hirajoshi, as shown in the example below. |
 
-| Music Blocks |
+| Music Blocks for Set Key and Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.svg "moveable do") |
 
-| Standard Notation |
+| Standard Notation with Set Key and Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
 
-#### <a name="DOTTED"></a>3.2.5 Fixed and Movable; Scalar and Modal
+#### <a name="FIXED-AND-MOVABLE-SCALAR-AND-MODAL"></a>3.2.5 Fixed and Movable; Scalar and Modal
 
 One of the challenges of representing music is that there are both fixed and movable systems and that, in certain cases, we will use the same (musical) coding system for both. For example, some musicians used "fixed do" and others use "movable do". Music Blocks gives the user tools to conceptualize their programs in either system, and a complete toolkit of the most common forms of representation. The following are charts to help a user see which systems are fixed, movable, or both.
 
-Further, within the "movable" systems there are different types.
+Within the "movable" systems there are different types.
 
 One type is purely mathematical. Both *pitch number* and *nth modal pitch* fall into this category. The former disregards key completely, but its index of "0" may be affixed to any absolute pitch via *set pitch number offset*. The latter skips all notes outside of a given mode when specified via *set key/mode* block, but disregards octave and has an index of "0" which differs from *scale-degree*.
 
@@ -533,19 +534,24 @@ For Movable Do, there exists yet two more systems. One system, which we call Mov
 
 Alphabet pitch blocks are always absolute and solfege is fixed by default.
 
-Block(s) | Fixed | Movable | Modal
+Because many of the blocks behave differently depending on whether or not a *Movable Do* block is present, the following chart was created for clarity.
+
+Block(s) | Fixed | Movable Do or La | Modal
 ----- | ---------- | ---------- | -------
-Alphabet Pitch | Alphabet | Not movable | Modal can be defined (after) for modal blocks functionality
-Solfege | Fixed Do | Default for Solfege | Modal can be defined (after) for modal blocks functionality
-Solfege and Movable Do | N/A (Movable Do) | Specified via "movable" block set to Do | Modal can be defined (after) for modal blocks functionality
-Solfege and Movable La | N/A (Movable La) | Specified via "movable" block set to La | Modal can be defined (after) for modal blocks functionality
+Alphabet Pitch | Alphabet | Not movable | Modal cannot be specified
+Solfege | Fixed Do by default | Needs Movable=Do or La block | Modal can be defined (after) for modal blocks functionality*
+Solfege and Movable Do | N/A (Movable Do) | Specified via "movable" block set to Do | Modal can be defined (after) for modal blocks functionality*
+Solfege and Movable La | N/A (Movable La) | Specified via "movable" block set to La | Modal can be defined (after) for modal blocks functionality*
 n^th modal pitch | N/A | N/A | Notes chosen by specified mode (from "set key" block)
-Scale Degree | N/A (needs some reference, otherwise defaults to default reference of c major) | Works just like Movable Do | Modal can be defined for modal blocks functionality
+Scale Degree | N/A (needs some reference, otherwise uses default reference of c major) | Works just like Movable La by default | Modal can be defined for modal blocks functionality
+Scale Degree | N/A (needs some reference, otherwise uses default reference of c major) | When preceded by Movable=Do, the user can be explicit in their spelling*** | Modal can be defined for modal blocks functionality*
 Scalar Step --> "Modal" Step** | N/A | N/A | Modal motion up and down (or 0) by number
 Scalar Interval --> "Modal" Interval** | N/A | N/A | Modal interval up and down (or 0) by number
 Scalar Inversion --> "Modal" Inversion | N/A | N/A | Modal inversion around a specified axis
 
-Note: For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because this is how Movable=Do solfege works and Scale Degree works like Movable+La by default). Please see [](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html "this code") as an example.
+*   Movable=NTH, if we decide to implement it
+**  We may consider renaming these for consistency.
+*** For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html as an example.
 
 Scale vs. Mode terminology
 
@@ -616,7 +622,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.8 Swinging Notes and Tied Notes
+#### <a name="SWINGING"></a>3.2.9 Swinging Notes and Tied Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform7.svg
@@ -639,7 +645,7 @@ notes must be identical in pitch, but can vary in rhythm.)
  tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg
  "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.9 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg
@@ -685,7 +691,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS"></a>3.2.10 Intervals
+#### <a name="INTERVALS"></a>3.2.11 Intervals
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform9.svg
@@ -732,7 +738,7 @@ double diminishment.
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
 
-#### <a name= "INVERSION"></a>3.2.11 Inversion
+#### <a name= "INVERSION"></a>3.2.12 Inversion
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -841,7 +847,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="BACKWARDS"></a>3.2.12 Backwards
+#### <a name="BACKWARDS"></a>3.2.13 Backwards
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform11.svg
@@ -861,7 +867,7 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.13 Setting Voice and Keys
+#### <a name= "SETTING"></a>3.2.14 Setting Voice and Keys
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform12.svg
@@ -890,7 +896,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.15 Vibrato, Tremelo, et al.
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform15.svg
