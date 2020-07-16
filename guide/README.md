@@ -429,7 +429,7 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
+#### <a name="PITCH-MOVEMENT"></a>3.2.5 Summary of Pitch Movements
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -519,7 +519,41 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
 
-#### <a name="DOTTED"></a>3.2.5 Dotted Notes
+#### <a name="DOTTED"></a>3.2.5 Fixed and Movable; Scalar and Modal
+
+One of the challenges of representing music is that there are both fixed and movable systems and that, in certain cases, we will use the same (musical) coding system for both. For example, some musicians used "fixed do" and others use "movable do". Music Blocks gives the user tools to conceptualize their programs in either system, and a complete toolkit of the most common forms of representation. The following are charts to help a user see which systems are fixed, movable, or both.
+
+Further, within the "movable" systems there are different types.
+
+One type is purely mathematical. Both *pitch number* and *nth modal pitch* fall into this category. The former disregards key completely, but its index of "0" may be affixed to any absolute pitch via *set pitch number offset*. The latter skips all notes outside of a given mode when specified via *set key/mode* block, but disregards octave and has an index of "0" which differs from *scale-degree*.
+
+The next type is psuedo-mathematical as it combines a placement unit (`Do, Re, Mi` for movable do solfege or `1, 2, 3` for scale-degree) with musical modifiers (sharps, flats, etc.) Solfege pitch blocks function this way when preceded by a *set key* block. *Scale Degree* pitch block functions this way always (and C major is assumed to be the key if there is no *set key* block preceding). For this system, the octave is always maintained such that all Do's of various octaves (for solfege) and all 1's, 8's, etc (for scalar step) are of the same absolute pitch value regardless of the length of the mode.
+
+For Movable Do, there exists yet two more systems. One system, which we call Movable=Do, allows the user to express solfege syllables in relation to the Major mode. Therefore, if a user were to specify A minor, then La would be A, the first scale degree in A Minor. The other system, which we call Movable=La allows the user to express solfege in relation to the particular mode specified. Therefore, if a user were to specify A Minor, then Do would be A. *Scale Degree* works like Movable=La by default such that "1" is always the first pitch of a given mode.
+
+Alphabet pitch blocks are always absolute and solfege is fixed by default.
+
+Block(s) | Fixed | Movable | Modal
+----- | ---------- | ---------- | -------
+Alphabet Pitch | Alphabet | Not movable | Modal can be defined (after) for modal blocks functionality
+Solfege | Fixed Do | Default for Solfege | Modal can be defined (after) for modal blocks functionality
+Solfege and Movable Do | N/A (Movable Do) | Specified via "movable" block set to Do | Modal can be defined (after) for modal blocks functionality
+Solfege and Movable La | N/A (Movable La) | Specified via "movable" block set to La | Modal can be defined (after) for modal blocks functionality
+n^th modal pitch | N/A | N/A | Notes chosen by specified mode (from "set key" block)
+Scale Degree | N/A (needs some reference, otherwise defaults to default reference of c major) | Works just like Movable Do | Modal can be defined for modal blocks functionality
+Scalar Step --> "Modal" Step** | N/A | N/A | Modal motion up and down (or 0) by number
+Scalar Interval --> "Modal" Interval** | N/A | N/A | Modal interval up and down (or 0) by number
+Scalar Inversion --> "Modal" Inversion | N/A | N/A | Modal inversion around a specified axis
+
+Note: For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because this is how Movable=Do solfege works and Scale Degree works like Movable+La by default). Please see [](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html "this code") as an example.
+
+Scale vs. Mode terminology
+
+Scalar | Modal
+------ | ------
+Degrees 1-7 are all defined without "overskewing" | Possibly a subset or superset of scale (or just the common "church modes", which overlap completely with scalar).
+
+#### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform4.svg
@@ -548,7 +582,7 @@ calculation into a note's note value.
  tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg
  "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.6 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
@@ -568,7 +602,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.2.7 Repeating Notes
+#### <a name="REPETITION"></a>3.2.8 Repeating Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg
