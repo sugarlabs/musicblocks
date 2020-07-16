@@ -152,13 +152,7 @@ function setupBoxesBlocks() {
 
         updateParameter(logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            let boxname = logo.parseArg(
-                that,
-                turtle,
-                cblk,
-                blk,
-                logo.receivedArg
-            );
+            let boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
             if (boxname in logo.boxes) {
                 return logo.boxes[boxname];
             } else {

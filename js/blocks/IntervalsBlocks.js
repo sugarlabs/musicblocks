@@ -189,6 +189,8 @@ function setupIntervalsBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
@@ -197,16 +199,15 @@ function setupIntervalsBlocks() {
                 let saveBoxes = JSON.stringify(logo.boxes);
                 let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                let saveX = logo.turtles.turtleList[turtle].x;
-                let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].painter.color;
-                let saveValue = logo.turtles.turtleList[turtle].painter.value;
-                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
-                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
-                let saveOrientation =
-                    logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+                let saveX = tur.x;
+                let saveY = tur.y;
+                let saveColor = tur.painter.color;
+                let saveValue = tur.painter.value;
+                let saveChroma = tur.painter.chroma;
+                let saveStroke = tur.painter.stroke;
+                let saveCanvasAlpha = tur.painter.canvasAlpha;
+                let saveOrientation = tur.orientation;
+                let savePenState = tur.painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -225,7 +226,7 @@ function setupIntervalsBlocks() {
                 }
 
                 let actionArgs = [];
-                let saveNoteCount = logo.notesPlayed[turtle];
+                let saveNoteCount = tur.singer.notesPlayed;
                 logo.turtles.turtleList[turtle].running = true;
                 logo.runFromBlockNow(
                     logo,
@@ -254,7 +255,7 @@ function setupIntervalsBlocks() {
                     );
                 }
 
-                logo.notesPlayed[turtle] = saveNoteCount;
+                tur.singer.notesPlayed = saveNoteCount;
 
                 // Restore previous state
                 logo.boxes = JSON.parse(saveBoxes);
@@ -304,6 +305,8 @@ function setupIntervalsBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let saveSuppressStatus = logo.suppressOutput[turtle];
 
                 // We need to save the state of the boxes and heap
@@ -312,16 +315,15 @@ function setupIntervalsBlocks() {
                 let saveBoxes = JSON.stringify(logo.boxes);
                 let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
                 // And the turtle state
-                let saveX = logo.turtles.turtleList[turtle].x;
-                let saveY = logo.turtles.turtleList[turtle].y;
-                let saveColor = logo.turtles.turtleList[turtle].painter.color;
-                let saveValue = logo.turtles.turtleList[turtle].painter.value;
-                let saveChroma = logo.turtles.turtleList[turtle].painter.chroma;
-                let saveStroke = logo.turtles.turtleList[turtle].painter.stroke;
-                let saveCanvasAlpha = logo.turtles.turtleList[turtle].painter.canvasAlpha;
-                let saveOrientation =
-                    logo.turtles.turtleList[turtle].orientation;
-                let savePenState = logo.turtles.turtleList[turtle].painter.penState;
+                let saveX = tur.x;
+                let saveY = tur.y;
+                let saveColor = tur.painter.color;
+                let saveValue = tur.painter.value;
+                let saveChroma = tur.painter.chroma;
+                let saveStroke = tur.painter.stroke;
+                let saveCanvasAlpha = tur.painter.canvasAlpha;
+                let saveOrientation = tur.orientation;
+                let savePenState = tur.painter.penState;
 
                 logo.suppressOutput[turtle] = true;
 
@@ -340,25 +342,16 @@ function setupIntervalsBlocks() {
                 }
 
                 let actionArgs = [];
-                let saveNoteCount = logo.notesPlayed[turtle];
+                let saveNoteCount = tur.singer.notesPlayed;
                 logo.turtles.turtleList[turtle].running = true;
-                logo.runFromBlockNow(
-                    logo,
-                    turtle,
-                    cblk,
-                    true,
-                    actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
-                );
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
                 if (
                     logo.firstPitch[turtle].length > 0 &&
                     logo.lastPitch[turtle].length > 0
                 ) {
-                    return logo.scalarDistance(
-                        turtle,
-                        last(logo.firstPitch[turtle]),
-                        last(logo.lastPitch[turtle])
+                    return Singer.scalarDistance(
+                        logo, turtle, last(logo.firstPitch[turtle]), last(logo.lastPitch[turtle])
                     );
 
                     logo.firstPitch[turtle].pop();
@@ -372,7 +365,7 @@ function setupIntervalsBlocks() {
                     );
                 }
 
-                logo.notesPlayed[turtle] = saveNoteCount;
+                tur.singer.notesPlayed = saveNoteCount;
 
                 // Restore previous state
                 logo.boxes = JSON.parse(saveBoxes);
@@ -509,13 +502,12 @@ function setupIntervalsBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
-                logo.semitoneIntervals[turtle].push([
-                    i,
-                    logo.noteDirection[turtle]
-                ]);
-                logo.noteDirection[turtle] = 0;
+                logo.semitoneIntervals[turtle].push([i, tur.singer.noteDirection]);
+                tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
@@ -724,8 +716,10 @@ function setupIntervalsBlocks() {
                 return;
             }
 
-            logo.inDefineMode[turtle] = true;
-            logo.defineMode[turtle] = [];
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inDefineMode = true;
+            tur.singer.defineMode = [];
             let modeName;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -739,12 +733,12 @@ function setupIntervalsBlocks() {
 
             let __listener = function(event) {
                 MUSICALMODES[modeName] = [];
-                if (logo.defineMode[turtle].indexOf(0) === -1) {
-                    logo.defineMode[turtle].push(0);
+                if (tur.singer.defineMode.indexOf(0) === -1) {
+                    tur.singer.defineMode.push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                let pitchNumbers = logo.defineMode[turtle].sort(function(a, b) {
+                let pitchNumbers = tur.singer.defineMode.sort(function(a, b) {
                     return a[0] - b[0];
                 });
 
@@ -777,7 +771,7 @@ function setupIntervalsBlocks() {
                     logo.blocks.updateBlockText(cblk);
                 }
 
-                logo.inDefineMode[turtle] = false;
+                tur.singer.inDefineMode = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -816,7 +810,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.moveable[turtle] = args[0];
+                logo.turtles.ithTurtle(turtle).singer.moveable = args[0];
             }
         }
     }
@@ -986,12 +980,13 @@ function setupIntervalsBlocks() {
                     }
                 }
 
-                // Check to see if there are any transpositions on the key.
-                if (turtle in logo.transposition) {
+                let tur = logo.turtles.ithTurtle(turtle);
+                // Check to see if there are any transpositions on the key
+                if (tur.singer.transposition !== 0) {
                     let noteObj = getNote(
                         args[0],
                         4,
-                        logo.transposition[turtle],
+                        tur.singer.transposition,
                         logo.keySignature[turtle],
                         false,
                         null,
