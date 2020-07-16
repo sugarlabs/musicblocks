@@ -28,7 +28,7 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Fixed and Movable; Scalar and Modal] (##FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
+      5. [Fixed and Movable; Scalar and Modal] (#FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
       6. [Dotted Notes](#DOTTED)
       7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       8. [Repeating Notes](#REPETITION)
@@ -551,7 +551,7 @@ Scalar Inversion --> "Modal" Inversion | N/A | N/A | Modal inversion around a sp
 
 *   Movable=NTH, if we decide to implement it
 **  We may consider renaming these for consistency.
-*** For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html as an example.
+*** For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see [this code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html) as an example.
 
 Scale vs. Mode terminology
 
