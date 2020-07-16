@@ -166,7 +166,16 @@ The pitch of the next block is specified using a *Pitch-name* block
 (`G` in `Octave 4`), which contains the notes `C D E F G A B`.
 
 The next block is specified using a *Scale-degree* block (the `5th note`
-in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`
+in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`. The
+*Scale-Degree* block has numbers like the *Number* block, but also has 
+an accidental so that the user may play pitches outside a given key.
+
+The next blocks is specified using a *Nth Modal Pitch* block. This
+block takes a number argument and turns it into the "nth pitch of 
+a given scale" with an index of 0 (i.e. C for C major is 0). Therefore
+in order to get 'G', we input the number 4. The octave argument will
+force the octave up or down; otherwise the user may just keep going up
+or down in either direction to go through scalar pitches of any mode.
 
 The next block is specified using a *Pitch-number* block (the `7th
 semi-tone` above `C` in `Octave 4`). The offset for the pitch number
@@ -429,12 +438,12 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | -1=previous scalar pitch in current key and mode |
 | | | If the argument to scalar step is positive, it moves up the scale; if it is negative, it moves down the scale. |
 
-| Music Blocks |
+| Music Blocks Code for Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.svg "scalar") |
 | The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. |
 
-| Standard Notation |
+| Standard Notation with Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.png "scalar step up and down") |
 
@@ -446,11 +455,11 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | An argument of -12 will shift down one octave. |
 | | | An argument of zero will not change the pitch. |
 
-| Music Blocks |
+| Music Blocks Code with Scalar Transpose |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.svg "semi-tone transposition") |
 
-| Standard Notation |
+| Standard Notation for Scalar Transpose |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.png "semi-tone transposition") |
 
@@ -462,24 +471,24 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
-| Music Blocks |
+| Music Blocks 
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.svg "scalar transposition") |
 
-| Standard Notation |
+| Standard Notation for Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.png "scalar transposition") |
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
 | Scale Degree | Scalar | The key block sets the key and mode. |
-| | | The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic. |
+| | | The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic which is "scale degree 1". |
 
-| Music Blocks |
+| Music Blocks Code with Scale Degrees 1-5 |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.svg "scale degree") |
 
-| Standard Notation |
+| Standard Notation for Scale Degrees 1-5 |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.png "scale degree") |
 
@@ -490,11 +499,11 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example, in C major - Do is C, Re is D, Mi is E, etc. |
 | | | In F major - Do is F, Re is G, Mi is A |
 
-| Music Blocks |
+| Music Blocks Code with Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.svg "moveable do") |
 
-| Standard Notation |
+| Standard Notation Code for Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.png "moveable do") |
 
