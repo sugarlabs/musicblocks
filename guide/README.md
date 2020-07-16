@@ -28,7 +28,7 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Fixed and Movable; Scalar and Modal] (#FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
+      5. [Fixed and Movable](#FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
       6. [Dotted Notes](#DOTTED)
       7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       8. [Repeating Notes](#REPETITION)
