@@ -1438,3 +1438,6 @@ input.timbreName {
   ::-webkit-scrollbar {
     display: none;
   }
+  .disable_highlighting {
+    user-select: none;
+    }    
