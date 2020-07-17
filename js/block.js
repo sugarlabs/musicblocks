@@ -4755,7 +4755,7 @@ function Block(protoblock, blocks, overrideName) {
                 let attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
-                        ].title;
+                    ].title;
                 if (attr !== "♮") {
                     label += attr;
                     that.value += attr;
@@ -4773,7 +4773,7 @@ function Block(protoblock, blocks, overrideName) {
                 let octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                        ].title
+                    ].title
                 );
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
@@ -4827,7 +4827,7 @@ function Block(protoblock, blocks, overrideName) {
                 let attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
-                        ].title;
+                    ].title;
 
                 if (label === " ") {
                     return;
@@ -4841,7 +4841,7 @@ function Block(protoblock, blocks, overrideName) {
                 octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                        ].title
+                    ].title
                 );
             } else {
                 octave = 4;
@@ -4864,16 +4864,19 @@ function Block(protoblock, blocks, overrideName) {
                 let obj1 = splitScaleDegree(note);
                 note = SOLFEGENAMES[obj1[0] - 1];
                 if(obj1[1] != NATURAL) {
-                    note += obj1[1]
+                    note += obj1[1];
                 }
             }
-            // FIX ME: get key signature if available
+            
             // FIX ME: get moveable if availableconsole.log(note);
+            // Fetching key signature, in case of solfege not useful until moveable is known
+            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
+
             let obj = getNote(
                 note,
                 octave,
                 0,
-                "C major",
+                keySignature,
                 false,
                 null,
                 that.blocks.errorMsg,
@@ -4925,7 +4928,7 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[
                     i
-                    ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __pitchPreview;
             }
         }
 
@@ -4933,7 +4936,7 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[
                     i
-                    ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __pitchPreview;
             }
         }
 
@@ -5507,7 +5510,7 @@ function Block(protoblock, blocks, overrideName) {
             if (noteValues[i] >= 0) {
                 note = nthDegreeToPitch(keySignature, noteValues[i]);
             } else {
-                note = nthDegreeToPitch("C major", 7 + noteValues[i]);
+                note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
             }
 
             let tur = that.blocks.logo.turtles.ithTurtle(0);

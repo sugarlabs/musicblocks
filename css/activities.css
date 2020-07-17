@@ -1368,8 +1368,6 @@ input.timbreName {
 #chooseKeyDiv {
     height: 350px;
     width: 350px;
-    left: 700px;
-    top: 200px;
     margin: auto;
     z-index: 100;
     position: fixed;

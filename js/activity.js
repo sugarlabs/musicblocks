@@ -1055,7 +1055,6 @@ function Activity() {
     };
 
     chooseKeyMenu = () => {
-        console.log(KeySignatureEnv);
         docById("chooseKeyDiv").style.display = "";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
@@ -1129,7 +1128,15 @@ function Activity() {
         exitWheel.animatetime = 0;
         exitWheel.createWheel(["×", " "]);
 
+        let x = event.clientX;
+        let y = event.clientY;
+
+        // docById("chooseKeyDiv").style.position = "absolute";
+        docById("chooseKeyDiv").style.left = (x - 175) + "px";
+        docById("chooseKeyDiv").style.top = (y + 50) + "px";
+
         let __exitMenu = () => {
+            docById("chooseKeyDiv").style.display = "none";
             keyNameWheel.removeWheel();
             addedOptionsWheel.removeWheel();
             modenameWheel.removeWheel();
