@@ -1036,6 +1036,8 @@ function Palette(palettes, name) {
         this.model.update();
         let paletteList = docById("PaletteBody_items");
 
+        this.setupGrabScroll(paletteList);
+
         let blocks = this.model.blocks;
         blocks.reverse();
         let protoListScope = [...this.protoList] ;
@@ -1145,6 +1147,27 @@ function Palette(palettes, name) {
         }
 
     };
+
+    this.setupGrabScroll = (paletteList) => {
+        let posY,top;
+            
+        let mouseUpGrab = (evt) => {        
+            paletteList.onmousemove= null ;
+        };
+        let mouseMoveGrab = (evt) => {
+            let dy = evt.clientY - posY;
+            paletteList.scrollTop = top - dy;
+        };
+        let mouseDownGrab = (evt) => {
+            posY = evt.clientY
+            top = paletteList.scrollTop;
+            
+            paletteList.onmousemove =  mouseMoveGrab;
+            paletteList.onmouseup =  mouseUpGrab;
+            paletteList.onmouseleave =  mouseUpGrab;
+        };
+        paletteList.onmousedown = mouseDownGrab;
+    }
 
     this.getInfo = function() {
         var returnString = this.name + " palette:";
