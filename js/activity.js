@@ -5288,6 +5288,7 @@ function Activity() {
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
+                                        planet.saveLocally();
                                     };
 
                                     stage.addEventListener(
@@ -5299,6 +5300,7 @@ function Activity() {
                                     console.debug("clearing on load...");
                                     _allClear(false);
                                     if (planet) {
+                                        planet.closePlanet();
                                         planet.initialiseNewProject(
                                             fileChooser.files[0].name.substr(
                                                 0,
