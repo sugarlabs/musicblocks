@@ -146,18 +146,6 @@ function Blocks(activity) {
     };
 
     /*
-     * Set the Set Playback status variable
-     * DEPRECATED
-     * @param - setPlaybackStatus - new variable
-     * @public
-     * @return this
-     */
-    this.setSetPlaybackStatus = function(setPlaybackStatus) {
-        this.setPlaybackStatus = setPlaybackStatus;
-        return this;
-    };
-
-    /*
      * We need access to the canvas.
      * @param - canvas
      * @public
@@ -597,7 +585,7 @@ function Blocks(activity) {
 
         var myBlock = this.blockList[blk];
 
-        if (myBlock.isArgFlowClampBlock()) {
+        if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
             // Make sure myBlock is a clamp block.
         } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
             return;
@@ -618,7 +606,7 @@ function Blocks(activity) {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
-            if (myBlock.isArgFlowClampBlock()) {
+            if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
                 var c = 1; // 0: outie; and 1: child flow
             } else if (clamp === 0) {
                 var c = myBlock.connections.length - 2;
@@ -1251,15 +1239,25 @@ function Blocks(activity) {
                  */
                 let postProcess = (args) => {
                     let parentblk = args[0];
-                    let oldBlock = args[1];
+                    let value = args[1];
 
                     let blk = this.blockList.length - 1;
 
                     this.blockList[parentblk].connections[1] = blk;
 
-                    let pitch = this.blockList[oldBlock].value;
+                    let pitch = value;
                     this.blockList[blk].value = pitch;
-                    this.blockList[blk].text.text = pitch.toString();
+                    if (this.blockList[blk].name === "eastindiansolfege") {
+                        obj = splitSolfege(pitch);
+                        label = WESTERN2EISOLFEGENAMES[obj[0]];
+                        attr = obj[1];
+                        if (attr !== "♮") {
+                            label += attr;
+                        }
+                        this.blockList[blk].text.text = label;
+                    } else {
+                        this.blockList[blk].text.text = pitch.toString();
+                    }
                     // Make sure text is on top.
                     let z = this.blockList[blk].container.children.length - 1;
                     this.blockList[blk].container.setChildIndex(this.blockList[blk].text, z);
@@ -1268,12 +1266,31 @@ function Blocks(activity) {
                     this.adjustDocks(parentblk, true);
                 };
 
+                let newBlockName = "solfege";
+                let newBlockValue = "sol";
+                switch(this.blockList[oldBlock].name) {
+                case "eastindiansolfege":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "sol";
+                    break;
+                case "scaledegree2":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "5";
+                    break;
+                case "notename":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "G";
+                    break;
+                default:
+                    break;
+                }
+
                 this._makeNewBlockWithConnections(
-                    this.blockList[oldBlock].name,
+                    newBlockName,
                     0,
                     [parentblk],
                     postProcess,
-                    [parentblk, oldBlock]
+                    [parentblk, newBlockValue]
                 );
             }
         } else if (this.blockList[parentblk].name === "storein") {
@@ -3173,7 +3190,8 @@ function Blocks(activity) {
                 "nameddo",
                 "namedcalc",
                 "nameddoArg",
-                "namedcalcArg"
+                "namedcalcArg",
+                "outputtools"
             ].indexOf(name) !== -1
         ) {
             this.blockList.push(
@@ -3200,11 +3218,6 @@ function Blocks(activity) {
         // We copy the dock because expandable blocks modify it.
         var myBlock = last(this.blockList);
         myBlock.copySize();
-
-        // Create a new NoteController instance for each note block
-        if (myBlock.name === "newnote") {
-            myBlock.controller = new NoteController();
-        }
 
         // We may need to do some postProcessing to the block
         myBlock.postProcess = postProcess;
@@ -3286,7 +3299,15 @@ function Blocks(activity) {
             };
 
             postProcessArg = thisBlock;
-        } else if (name === "text") {
+        } 
+        else if (name === "outputtools") {
+            var postProcess = function(args) {
+                that.blockList[thisBlock].value = null;
+                that.blockList[thisBlock].privateData = args[1];
+            }
+            postProcessArg = [thisBlock, arg];
+        } 
+        else if (name === "text") {
             postProcessArg = [thisBlock, _("text")];
         } else if (name === "boolean") {
             console.debug("boolean" + " " + true);
@@ -3498,6 +3519,12 @@ function Blocks(activity) {
                     that.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
+                } else if (name === "outputtools") {
+                    if (that.protoBlockDict[proto].defaults[0] === undefined) {
+                        that.makeNewBlock(proto, postProcess, postProcessArg);
+                        protoFound = true;
+                        break;
+                    }
                 }
             }
         }
@@ -4492,7 +4519,7 @@ function Blocks(activity) {
             var cblk = this.blockList[blk].connections[0];
             if (this.blockList[cblk].isExpandableBlock()) {
                 // If it is the last connection, keep searching.
-                if (this.blockList[cblk].isArgFlowClampBlock()) {
+                if (this.blockList[cblk].isArgFlowClampBlock() || this.blockList[cblk].isLeftClampBlock()) {
                     return cblk;
                 } else if (blk === last(this.blockList[cblk].connections)) {
                     return this.insideExpandableBlock(cblk);
@@ -5183,6 +5210,7 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
+                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
@@ -5286,18 +5314,28 @@ function Blocks(activity) {
      * return {void}
      */
     this.loadNewBlocks = function(blockObjs) {
-        var playbackQueueStartsHere = null;
+        // Playback Queue has been deprecated, but some old projects
+        // may still have playback blocks appended, which we will
+        // remove.
+        let playbackQueueStartsHere = null;
+        for (var b = 0; b < blockObjs.length; b++) {
+            var blkData = blockObjs[b];
+            // Check for deprecated playbackQueue
+            if (typeof(blkData[1]) === 'number') {
+                playbackQueueStartsHere = b;
+                break;
+            }
+        }
+
+        if (playbackQueueStartsHere !== null) {
+            console.debug("Removing deprecated playback queue from project");
+            blockObjs.splice(playbackQueueStartsHere, blockObjs.length - playbackQueueStartsHere);
+        }
 
         // Check for blocks connected to themselves,
         // and for action blocks not connected to text blocks.
         for (var b = 0; b < blockObjs.length; b++) {
             var blkData = blockObjs[b];
-
-            // Check for playbackQueue
-            if (typeof blkData[1] === "number") {
-                playbackQueueStartsHere = b;
-                break;
-            }
 
             for (var c in blkData[4]) {
                 if (blkData[4][c] === blkData[0]) {
@@ -5308,24 +5346,6 @@ function Blocks(activity) {
                     console.debug(blockObjs);
                     return;
                 }
-            }
-        }
-
-        // Load any playback code into the queue...
-        if (playbackQueueStartsHere != null) {
-            for (var b = playbackQueueStartsHere; b < blockObjs.length; b++) {
-                var turtle = blockObjs[b][1];
-                if (turtle in this.logo.playbackQueue) {
-                    this.logo.playbackQueue[turtle].push(blockObjs[b][2]);
-                } else {
-                    this.logo.playbackQueue[turtle] = [blockObjs[b][2]];
-                }
-            }
-
-            // and remove the entries from the end of blockObjs.
-            var n = blockObjs.length;
-            for (var b = playbackQueueStartsHere; b < n; b++) {
-                blockObjs.pop();
             }
         }
 
@@ -5930,14 +5950,21 @@ function Blocks(activity) {
                         var thisBlock = args[0];
                         var value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
-                            TEMPERAMENT["custom"] =
-                                value.customTemperamentNotes;
-                            TEMPERAMENT["custom"]["pitchNumber"] =
-                                value.customTemperamentNotes.length;
+                            TEMPERAMENT = {...TEMPERAMENT,...value.customTemperamentNotes}
+                            for (let temp in value.customTemperamentNotes){
+                                if(!(temp in PreDefinedTemperaments)){
+                                    TEMPERAMENT[temp]["pitchNumber"] = value.customTemperamentNotes[temp].length;
+                                }
+                                console.debug(value.customTemperamentNotes[temp]);
+                            }
+                            updateTEMPERAMENTS();
                             that.logo.synth.startingPitch = value.startingPitch;
                             OCTAVERATIO = value.octaveSpace;
-                            console.debug(TEMPERAMENT["custom"]);
                             that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
+                            
+                            // if temperament is defined "customPitch" should be available
+                            that.logo.blocks.protoBlockDict["custompitch"].hidden = false;
+                            that.logo.blocks.palettes.updatePalettes("pitch");
                         }
                     };
                     this._makeNewBlockWithConnections(
@@ -6223,6 +6250,21 @@ function Blocks(activity) {
                         blkData[4],
                         postProcess,
                         [thisBlock, value]
+                    );
+                    break;
+                case "outputtools":
+                    var postProcess = function(args) {
+                        var thisBlock = args[0];
+                        var value = args[1];
+                        that.blockList[thisBlock].privateData = value;
+                        that.blockList[thisBlock].overrideName = value;
+                    }
+                    this._makeNewBlockWithConnections(
+                        "outputtools",
+                        blockOffset,
+                        blkData[4],
+                        postProcess,
+                        [thisBlock, blockObjs[b][1][1].value]
                     );
                     break;
                 case "text":
@@ -6537,7 +6579,7 @@ function Blocks(activity) {
                 default:
                     // Check that name is in the proto list
                     if (
-                        !name in this.protoBlockDict ||
+                        !(name in this.protoBlockDict) ||
                         this.protoBlockDict[name] == null
                     ) {
                         var postProcessUnknownBlock = function(args) {
@@ -6692,49 +6734,6 @@ function Blocks(activity) {
                     }
                 }
             }
-        }
-
-        if (playbackQueueStartsHere != null) {
-            var that = this;
-            setTimeout(function() {
-                // Now that we know how many turtles we have, we can make
-                // sure that the playback queue does not reference turtles
-                // that are not known to us.
-
-                // Find the first turtle not in the trash.
-                for (
-                    var firstTurtle = 0;
-                    firstTurtle < that.turtles.turtleList.length;
-                    firstTurtle++
-                ) {
-                    if (!that.turtles.turtleList[firstTurtle].inTrash) {
-                        break;
-                    }
-                }
-
-                if (firstTurtle === that.turtles.turtleList.length) {
-                    console.debug("Cannot find a turtle");
-                    firstTurtle = 0;
-                }
-
-                // Is the first turtle in the playbackQueue?
-                if (!(firstTurtle in that.logo.playbackQueue)) {
-                    for (turtle in that.logo.playbackQueue) {
-                        console.debug(
-                            "playbackQueue: remapping from " +
-                                turtle +
-                                " to " +
-                                firstTurtle
-                        );
-                        that.logo.playbackQueue[firstTurtle] =
-                            that.logo.playbackQueue[turtle];
-                        delete that.logo.playbackQueue[turtle];
-                        firstTurtle += 1;
-                    }
-                }
-
-                that.setPlaybackStatus();
-            }, 1500);
         }
     };
 
@@ -7090,16 +7089,25 @@ function Blocks(activity) {
 
             if (turtle != null && turtleNotInTrash > 1) {
                 console.debug("putting turtle " + turtle + " in the trash");
-                this.turtles.turtleList[turtle].inTrash = true;
-                this.turtles.turtleList[turtle].container.visible = false;
-            } 
-            // else {
-            //     this.errorMsg(
-            //         _("You must always have at least one start block.")
-            //     );
-            //     console.debug("null turtle");
-            //     return;
-            // }
+                let comp = this.turtles.turtleList[turtle].companionTurtle;
+                if (comp){
+                    if (turtleNotInTrash > 2){
+                        this.turtles.turtleList[comp].inTrash = true;
+                        this.turtles.turtleList[comp].container.visible = false;
+                        this.turtles.turtleList[turtle].inTrash = true;
+                        this.turtles.turtleList[turtle].container.visible = false;
+                    }
+                } else {
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
+                }
+            } else {
+                this.errorMsg(
+                    _("You must always have at least one start block.")
+                );
+                console.debug("null turtle");
+                return;
+            }
         } else if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);
@@ -7158,5 +7166,109 @@ function Blocks(activity) {
         }
     };
 
-    return this;
+    /**
+     * Clears all the blocks, updates the cache and refreshes the canvas.
+     *
+     * @returns {void}
+     */
+    this.clearParameterBlocks = function() {
+        for (let blk = 0; blk < this.blockList.length; blk++) {
+            if (
+                this.blockList[blk].protoblock.parameter &&
+                this.blockList[blk].text !== null
+            ) {
+                this.blockList[blk].text.text = "";
+                this.blockList[blk].container.updateCache();
+            }
+        }
+        this.refreshCanvas();
+    };
+
+    /**
+     * Updates the label on parameter blocks.
+     *
+     * @param logo
+     * @param turtle
+     * @param blk
+     * @returns {void}
+     */
+    this.updateParameterBlock = function(logo, turtle, blk) {
+        let name = this.blockList[blk].name;
+
+        if (
+            this.blockList[blk].protoblock.parameter &&
+            this.blockList[blk].text !== null
+        ) {
+            let value = 0;
+
+            if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
+                value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
+            } else {
+                if (name in this.evalParameterDict) {
+                    eval(this.evalParameterDict[name]);
+                } else {
+                    return;
+                }
+            }
+
+            if (typeof value === "string") {
+                if (value.length > 6) {
+                    value = value.substr(0, 5) + "...";
+                }
+
+                this.blockList[blk].text.text = value;
+            } else if (name === "divide") {
+                this.blockList[blk].text.text = mixedNumber(value);
+            } else {
+                this.blockList[blk].text.text = value.toString();
+            }
+
+            this.blockList[blk].container.updateCache();
+            this.refreshCanvas();
+        }
+    };
+
+    /**
+     * Changes a property according to a block name and a value.
+     *
+     * @param logo
+     * @param blk
+     * @param value
+     * @param turtle
+     * @returns {void}
+     */
+    this.blockSetter = function(logo, blk, value, turtle) {
+        if (typeof this.blockList[blk].protoblock.setter === "function") {
+            this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
+        } else {
+            if (this.blockList[blk].name in logo.evalSetterDict) {
+                eval(logo.evalSetterDict[this.blockList[blk].name]);
+            } else {
+                throw new Error();
+            }
+        }
+    };
+
+    /**
+     * Hides all the blocks.
+     *
+     * @returns {void}
+     */
+    this.hideBlocks = function() {
+        this.palettes.hide();
+        this.hide();
+        this.refreshCanvas();
+    }
+
+    /**
+     * Shows all the blocks.
+     *
+     * @returns {void}
+     */
+    this.showBlocks = function() {
+        this.palettes.show();
+        this.show();
+        this.bringToTop();
+        this.refreshCanvas();
+    }
 };

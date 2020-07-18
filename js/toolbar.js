@@ -424,6 +424,12 @@ function Toolbar() {
                 languageBox.pt_onclick();
             };
 
+	    var ko = docById("ko");
+
+	    ko.onclick = function() {
+		languageBox.ko_onclick();
+	    };
+
             var ja = docById("ja");
 
             ja.onclick = function() {
@@ -535,6 +541,7 @@ function Toolbar() {
             ["enUS", _("English (United States)"), "innerHTML"],
             ["enUK", _("English (United Kingdom)"), "innerHTML"],
             ["ja", _("日本語"), "innerHTML"],
+	    ["ko", _("한국어"), "innerHTML"],
             ["es", _("español"), "innerHTML"],
             ["pt", _("português"), "innerHTML"],
             ["kana", _("にほんご"), "innerHTML"],
@@ -621,6 +628,7 @@ function Toolbar() {
             ["enUS", _("English (United States)"), "innerHTML"],
             ["enUK", _("English (United Kingdom)"), "innerHTML"],
             ["ja", _("日本語"), "innerHTML"],
+	    ["ko", _("한국인"), "innerHTML"],
             ["es", _("español"), "innerHTML"],
             ["pt", _("português"), "innerHTML"],
             ["kana", _("にほんご"), "innerHTML"],

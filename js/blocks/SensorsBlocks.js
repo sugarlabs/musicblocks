@@ -23,9 +23,10 @@ function setupSensorsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            // Pause the flow while we wait for input.
-            logo._doWait(turtle, 120);
+            // Pause the flow while we wait for input
+            tur.doWait(120);
 
             // Display the input form.
             docById("labelDiv").innerHTML =
@@ -56,7 +57,7 @@ function setupSensorsBlocks() {
 
                     inputElem.blur();
                     inputElem.style.display = "none";
-                    logo.clearRunBlock(turtle);
+                    logo.clearTurtleRun(turtle);
                     docById("labelDiv").classList.remove("hasKeyboard");
                 }
             };
@@ -119,24 +120,25 @@ function setupSensorsBlocks() {
             if (logo.pitchAnalyser === null) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
-                    size: this.limit
+                    size: logo.limit,
+                    smoothing : 0
                 });
-
-                this.mic.connect(this.pitchAnalyser);
+                logo.mic.connect(logo.pitchAnalyser);
             }
 
+
             let values = logo.pitchAnalyser.getValue();
-            let max = 0;
-            let idx = 0;
-            for (let i = 0; i < this.limit; i++) {
-                let v2 = values[i] * values[i];
-                if (v2 > max) {
+            let max = Infinity;
+            let idx = 0;                                // frequency bin
+            for (let i = 0; i < logo.limit; i++) {
+                let v2 = -values[i] ;
+                if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
-
-            return idx;
+            let freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
+            return freq ;
         }
     }
 
@@ -217,6 +219,7 @@ function setupSensorsBlocks() {
                 _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
                 "documentation",
                 null,
+                "cursoroverhelp"
             ]);
         }
 
@@ -236,6 +239,7 @@ function setupSensorsBlocks() {
                 _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                 "documentation",
                 null,
+                "cursorouthelp"
             ]);
         }
 
@@ -253,6 +257,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
                 "documentation",
                 null,
+                "cursordownhelp"
             ]);
         }
 
@@ -270,6 +275,7 @@ function setupSensorsBlocks() {
                 _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
                 "documentation",
                 null,
+                "cursoruphelp"
             ]);
         }
 
@@ -297,7 +303,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[2] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");
@@ -324,7 +330,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[1] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");
@@ -351,7 +357,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[0] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
             let obj = colorString.split("(")[1].split(",");

@@ -243,7 +243,7 @@ function PitchTimeMatrix() {
             ICONSIZE,
             _("Play")
         ).onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
 
             that._logo.resetSynth(0);
             that.playAll();
@@ -574,7 +574,7 @@ function PitchTimeMatrix() {
             } else {
                 if (
                     noteIsSolfege(this.rowLabels[i]) &&
-                    this._logo.synth.inTemperament !== "custom"
+                    !isCustom(this._logo.synth.inTemperament)
                 ) {
                     cell.innerHTML =
                         i18nSolfege(this.rowLabels[i]) +
@@ -583,7 +583,7 @@ function PitchTimeMatrix() {
                         this.rowLabels[i],
                         this.rowArgs[i],
                         0,
-                        this._logo.keySignature[0],
+                        this._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         this._logo.errorMsg,
@@ -1909,7 +1909,7 @@ function PitchTimeMatrix() {
                         label,
                         octave,
                         0,
-                        that._logo.keySignature[0],
+                        that._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         that._logo.errorMsg,
@@ -1980,7 +1980,7 @@ function PitchTimeMatrix() {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (
                 noteIsSolfege(that.rowLabels[i]) &&
-                that._logo.synth.inTemperament !== "custom"
+                !isCustom(that._logo.synth.inTemperament)
             ) {
                 cell.innerHTML =
                     i18nSolfege(that.rowLabels[index]) +
@@ -1989,7 +1989,7 @@ function PitchTimeMatrix() {
                     that.rowLabels[index],
                     that.rowArgs[index],
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2034,7 +2034,7 @@ function PitchTimeMatrix() {
                     label,
                     octave,
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2042,7 +2042,7 @@ function PitchTimeMatrix() {
                 );
                 obj[0] = obj[0].replace(SHARP, '#').replace(FLAT, 'b');
                 that._logo.synth.setMasterVolume(PREVIEWVOLUME);
-                that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+                Singer.setSynthVolume(that._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
                 that._logo.synth.trigger(
                     0,
                     [obj[0] + obj[1]],
@@ -2052,15 +2052,13 @@ function PitchTimeMatrix() {
                     null
                 );
             } else if (condition === "drumblocks") {
-                if (
-                    that._logo.instrumentNames[0] === undefined ||
-                    that._logo.instrumentNames[0].indexOf(label) === -1
-                ) {
-                    if (that._logo.instrumentNames[0] === undefined) {
-                        that._logo.instrumentNames[0] = [];
-                    }
+                let tur = that._logo.turtles.ithTurtle(0);
 
-                    that._logo.instrumentNames[0].push(label);
+                if (
+                    tur.singer.instrumentNames.length === 0 ||
+                    tur.singer.instrumentNames.indexOf(label) === -1
+                ) {
+                    tur.singer.instrumentNames.push(label);
                     if (label === DEFAULTVOICE) {
                         that._logo.synth.createDefaultSynth(0);
                     }
@@ -2074,7 +2072,7 @@ function PitchTimeMatrix() {
 
                 setTimeout(function() {
                     that._logo.synth.setMasterVolume(DEFAULTVOLUME);
-                    that._logo.setSynthVolume(0, label, DEFAULTVOLUME);
+                    Singer.setSynthVolume(that._logo, 0, label, DEFAULTVOLUME);
                     that._logo.synth.trigger(
                         0,
                         "G4",
@@ -2269,7 +2267,7 @@ function PitchTimeMatrix() {
                 sortableList.push([
                     noteToFrequency(
                         this.rowLabels[i] + this.rowArgs[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     this.rowLabels[i],
                     this.rowArgs[i],
@@ -4218,18 +4216,14 @@ function PitchTimeMatrix() {
             }
 
             if (note[0] !== "R" && pitchNotes.length > 0) {
-                this._playChord(
-                    pitchNotes,
-                    this._logo.defaultBPMFactor / noteValue
-                );
-                // this._logo.synth.trigger(0, pitchNotes[0], this._logo.defaultBPMFactor / noteValue, this._instrumentName, null, null);
+                this._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
             }
 
             for (var i = 0; i < synthNotes.length; i++) {
                 this._logo.synth.trigger(
                     0,
                     [Number(synthNotes[i])],
-                    this._logo.defaultBPMFactor / noteValue,
+                    Singer.defaultBPMFactor / noteValue,
                     this._instrumentName,
                     null,
                     null
@@ -4238,12 +4232,7 @@ function PitchTimeMatrix() {
 
             for (var i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(
-                    0,
-                    "C2",
-                    this._logo.defaultBPMFactor / noteValue,
-                    drumNotes[i],
-                    null,
-                    null
+                    0, "C2", Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                 );
             }
 
@@ -4421,18 +4410,14 @@ function PitchTimeMatrix() {
                 }
 
                 if (note[0] !== "R" && pitchNotes.length > 0) {
-                    that._playChord(
-                        pitchNotes,
-                        that._logo.defaultBPMFactor / noteValue
-                    );
-                    // that._logo.synth.trigger(0, pitchNotes[0], that._logo.defaultBPMFactor / noteValue, that._instrumentName, null, null);
+                    that._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
                     that._logo.synth.trigger(
                         0,
                         [Number(synthNotes[i])],
-                        that._logo.defaultBPMFactor / noteValue,
+                        Singer.defaultBPMFactor / noteValue,
                         that._instrumentName,
                         null,
                         null
@@ -4441,12 +4426,7 @@ function PitchTimeMatrix() {
 
                 for (var i = 0; i < drumNotes.length; i++) {
                     that._logo.synth.trigger(
-                        0,
-                        ["C2"],
-                        that._logo.defaultBPMFactor / noteValue,
-                        drumNotes[i],
-                        null,
-                        null
+                        0, ["C2"], Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                     );
                 }
             }
@@ -4479,7 +4459,7 @@ function PitchTimeMatrix() {
                     );
                 }
             }
-        }, that._logo.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+        }, Singer.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
     };
 
     this._playChord = function(notes, noteValue) {
@@ -4538,44 +4518,44 @@ function PitchTimeMatrix() {
     this._processGraphics = function(obj) {
         switch (obj[0]) {
             case "forward":
-                this._logo.turtles.turtleList[0].doForward(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doForward(obj[1]);
                 break;
             case "back":
-                this._logo.turtles.turtleList[0].doForward(-obj[1]);
+                this._logo.turtles.turtleList[0].painter.doForward(-obj[1]);
                 break;
             case "right":
-                this._logo.turtles.turtleList[0].doRight(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doRight(obj[1]);
                 break;
             case "left":
-                this._logo.turtles.turtleList[0].doRight(-obj[1]);
+                this._logo.turtles.turtleList[0].painter.doRight(-obj[1]);
                 break;
             case "setcolor":
-                this._logo.turtles.turtleList[0].doSetColor(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetColor(obj[1]);
                 break;
             case "sethue":
-                this._logo.turtles.turtleList[0].doSetHue(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetHue(obj[1]);
                 break;
             case "setshade":
-                this._logo.turtles.turtleList[0].doSetValue(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetValue(obj[1]);
                 break;
             case "setgrey":
-                this._logo.turtles.turtleList[0].doSetChroma(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetChroma(obj[1]);
                 break;
             case "settranslucency":
                 var alpha = 1.0 - obj[1] / 100;
-                this._logo.turtles.turtleList[0].doSetPenAlpha(alpha);
+                this._logo.turtles.turtleList[0].painter.doSetPenAlpha(alpha);
                 break;
             case "setpensize":
-                this._logo.turtles.turtleList[0].doSetPensize(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetPensize(obj[1]);
                 break;
             case "setheading":
-                this._logo.turtles.turtleList[0].doSetHeading(obj[1]);
+                this._logo.turtles.turtleList[0].painter.doSetHeading(obj[1]);
                 break;
             case "arc":
-                this._logo.turtles.turtleList[0].doArc(obj[1], obj[2]);
+                this._logo.turtles.turtleList[0].painter.doArc(obj[1], obj[2]);
                 break;
             case "setxy":
-                this._logo.turtles.turtleList[0].doSetXY(obj[1], obj[2]);
+                this._logo.turtles.turtleList[0].painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
                 console.debug("unknown graphics command " + obj[0]);
@@ -4632,7 +4612,7 @@ function PitchTimeMatrix() {
         var cell = row.cells[colIndex];
 
         // Using the alt attribute to store the note value
-        var noteValue = cell.getAttribute("alt") * this._logo.defaultBPMFactor;
+        var noteValue = cell.getAttribute("alt") * Singer.defaultBPMFactor;
 
         if (obj.length === 1) {
             if (playNote) {
@@ -5052,7 +5032,7 @@ function PitchTimeMatrix() {
                         }
 
                         if (note[0][j][1] === "♯") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",
@@ -5142,7 +5122,7 @@ function PitchTimeMatrix() {
                                 thisBlock += 3;
                             }
                         } else if (note[0][j][1] === "♭") {
-                            if (this._logo.synth.inTemperament == "custom") {
+                            if (isCustom(this._logo.synth.inTemperament)) {
                                 newStack.push([
                                     thisBlock,
                                     "pitch",

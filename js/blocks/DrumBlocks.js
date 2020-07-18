@@ -91,32 +91,27 @@ function setupDrumBlocks() {
                 }
             }
 
-            if (logo.inNoteBlock[turtle].length > 0) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.inNoteBlock.length > 0) {
                 // Add the noise sound as if it were a drum
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    noisename
-                );
-                if (logo.synthVolume[turtle][noisename] === undefined) {
-                    logo.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][noisename] = [
-                        DEFAULTVOLUME
-                    ];
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(noisename);
+                if (tur.singer.synthVolume[noisename] === undefined) {
+                    tur.singer.synthVolume[noisename] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[noisename] = [DEFAULTVOLUME];
                 }
             } else {
-                logo.errorMsg(
-                    _("Noise Block: Did you mean to use a Note block?"),
-                    blk
-                );
+                logo.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
                 return;
             }
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
+                    tur.singer.beatFactor
+                );
             }
 
-            logo.pushedNote[turtle] = true;
+            tur.singer.pushedNote = true;
         }
     }
 
@@ -133,19 +128,12 @@ function setupDrumBlocks() {
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
                     [
-                        1,
-                        [
+                        1, [
                             isDrum ? "drumname" : "effectsname",
                             {
-                                value:
-                                    drumName || isDrum
-                                        ? displayName || name
-                                        : name
+                                value: drumName || isDrum ? displayName || name : name
                             }
-                        ],
-                        0,
-                        0,
-                        [0]
+                        ], 0, 0, [0]
                     ]
                 ]);
             }
@@ -171,12 +159,7 @@ function setupDrumBlocks() {
         new PlayDrumMacroBlock("hihat", "hi hat", true).setup();
         new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup();
         new PlayDrumMacroBlock("cup", "cup drum", true).setup();
-        new PlayDrumMacroBlock(
-            "floortom",
-            "floor tom",
-            true,
-            "floor tom tom"
-        ).setup();
+        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup();
         new PlayDrumMacroBlock("tom", "tom tom", true).setup();
         new PlayDrumMacroBlock("kick", "kick drum", true).setup();
         new PlayDrumMacroBlock("snare", "snare drum", true).setup();
@@ -218,16 +201,16 @@ function setupDrumBlocks() {
                 }
             }
 
-            logo.drumStyle[turtle].push(drumname);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.drumStyle.push(drumname);
 
             let listenerName = "_mapdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.drumStyle[turtle].pop();
-            };
+            let __listener = event => tur.singer.drumStyle.pop();
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
                 logo._currentDrumBlock = blk;
                 logo.rhythmRuler.Drums.push(blk);
@@ -296,17 +279,19 @@ function setupDrumBlocks() {
                 }
             }
 
-            logo.drumStyle[turtle].push(drumname);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.drumStyle.push(drumname);
 
             let listenerName = "_setdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                let drumname = logo.drumStyle[turtle].pop();
-                logo.pitchDrumTable[turtle] = {};
+            let __listener = event => {
+                tur.singer.drumStyle.pop();
+                tur.singer.pitchDrumTable = {};
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
                 logo._currentDrumBlock = blk;
                 logo.rhythmRuler.Drums.push(blk);
@@ -377,9 +362,11 @@ function setupDrumBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             // If we are in a setdrum clamp, override the drum name.
-            if (logo.drumStyle[turtle].length > 0) {
-                drumname = last(logo.drumStyle[turtle]);
+            if (tur.singer.drumStyle.length > 0) {
+                drumname = last(tur.singer.drumStyle);
             }
 
             if (logo.inPitchDrumMatrix) {
@@ -396,59 +383,39 @@ function setupDrumBlocks() {
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
-                if (logo.synthVolume[turtle][drumname] === undefined) {
-                    logo.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][drumname] = [
-                        DEFAULTVOLUME
-                    ];
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                if (tur.singer.synthVolume[drumname] === undefined) {
+                    tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
                 }
             } else if (
                 logo.blocks.blockList[blk].connections[0] == null &&
                 last(logo.blocks.blockList[blk].connections) == null
             ) {
                 // Play a stand-alone drum block as a quarter note.
-                logo.clearNoteParams(turtle, blk, []);
-                logo.inNoteBlock[turtle].push(blk);
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
-
-                // let bpmFactor;
-                // if (logo.bpm[turtle].length > 0) {
-                //     bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                // } else {
-                //     bpmFactor = TONEBPM / logo._masterBPM;
-                // }
-                // let beatValue = bpmFactor / noteBeatValue;
+                logo.clearNoteParams(tur, blk, []);
+                tur.singer.inNoteBlock.push(blk);
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
 
                 let noteBeatValue = 4;
 
-                __callback = function() {
-                    let j = logo.inNoteBlock[turtle].indexOf(blk);
-                    logo.inNoteBlock[turtle].splice(j, 1);
-                };
+                let __callback =
+                    () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
-                NoteController._processNote(logo, noteBeatValue, blk, turtle, __callback);
+                Singer.processNote(logo, noteBeatValue, blk, turtle, __callback);
             } else {
-                // logo.errorMsg(
-                //     _("Drum Block: Did you mean to use a Note block?"),
-                //     blk
-                // );
-		console.debug('PLAY DRUM ERROR: missing context');
+                console.debug('PLAY DRUM ERROR: missing context');
                 return;
             }
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
+                    tur.singer.beatFactor
+                );
             }
 
-            logo.pushedNote[turtle] = true;
+            tur.singer.pushedNote = true;
         }
     }
 

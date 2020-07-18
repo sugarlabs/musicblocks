@@ -134,8 +134,8 @@ processABCNotes = function(logo, turtle) {
     let tupletDuration = 0;
     let  notes, note;
 
-    for (let i = 0; i < logo.notationStaging[turtle].length; i++) {
-        let obj = logo.notationStaging[turtle][i];
+    for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
+        let obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
                 case "break":
@@ -174,9 +174,9 @@ processABCNotes = function(logo, turtle) {
                 case "meter":
                     logo.notationNotes[turtle] +=
                         "M:" +
-                        logo.notationStaging[turtle][i + 1] +
+                        logo.notation.notationStaging[turtle][i + 1] +
                         "/" +
-                        logo.notationStaging[turtle][i + 2] +
+                        logo.notation.notationStaging[turtle][i + 2] +
                         "\n";
                     i += 2;
                     break;
@@ -214,32 +214,32 @@ processABCNotes = function(logo, turtle) {
             // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] != null) {
                 targetDuration =
-                    1 / logo.notationStaging[turtle][i][NOTATIONDURATION];
+                    1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
                 tupletDuration =
-                    1 / logo.notationStaging[turtle][i][NOTATIONROUNDDOWN];
+                    1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
                 let j = 1;
                 let k = 1;
                 while (k < obj[NOTATIONTUPLETVALUE]) {
-                    if (i + j >= logo.notationStaging[turtle].length) {
+                    if (i + j >= logo.notation.notationStaging[turtle].length) {
                         incompleteTuplet = j;
                         break;
                     }
 
                     if (
-                        logo.notationStaging[turtle][i + j][
+                        logo.notation.notationStaging[turtle][i + j][
                             NOTATIONINSIDECHORD
                         ] > 0 &&
-                        logo.notationStaging[turtle][i + j][
+                        logo.notation.notationStaging[turtle][i + j][
                             NOTATIONINSIDECHORD
                         ] ===
-                            logo.notationStaging[turtle][i + j - 1][
+                            logo.notation.notationStaging[turtle][i + j - 1][
                                 NOTATIONINSIDECHORD
                             ]
                     ) {
                         // In a chord, so jump to next note.
                         j++;
                     } else if (
-                        logo.notationStaging[turtle][i + j][
+                        logo.notation.notationStaging[turtle][i + j][
                             NOTATIONTUPLETVALUE
                         ] !== obj[NOTATIONTUPLETVALUE]
                     ) {
@@ -248,12 +248,12 @@ processABCNotes = function(logo, turtle) {
                     } else {
                         targetDuration +=
                             1 /
-                            logo.notationStaging[turtle][i + j][
+                            logo.notation.notationStaging[turtle][i + j][
                                 NOTATIONDURATION
                             ];
                         tupletDuration +=
                             1 /
-                            logo.notationStaging[turtle][i + j][
+                            logo.notation.notationStaging[turtle][i + j][
                                 NOTATIONROUNDDOWN
                             ];
                         j++; // Jump to next note.
@@ -269,7 +269,7 @@ processABCNotes = function(logo, turtle) {
                 while (k < count) {
                     let tupletDuration =
                         2 *
-                        logo.notationStaging[turtle][i + j][NOTATIONDURATION];
+                        logo.notation.notationStaging[turtle][i + j][NOTATIONDURATION];
 
                     if (typeof notes === "object") {
                         if (notes.length > 1) {
@@ -292,7 +292,7 @@ processABCNotes = function(logo, turtle) {
                         }
 
                         logo.notationNotes[turtle] +=
-                            logo.notationStaging[turtle][i + j][
+                            logo.notation.notationStaging[turtle][i + j][
                                 NOTATIONROUNDDOWN
                             ];
                         j++; // Jump to next note.
@@ -305,8 +305,8 @@ processABCNotes = function(logo, turtle) {
                 }
 
                 // FIXME: Debug for ABC
-                if (i + j - 1 < logo.notationStaging[turtle].length - 1) {
-                    let nextObj = logo.notationStaging[turtle][i + j];
+                if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
+                    let nextObj = logo.notation.notationStaging[turtle][i + j];
                     if (typeof nextObj === "string" && nextObj === ")") {
                         // logo.notationNotes[turtle] += '';
                         i += 1;
@@ -378,7 +378,7 @@ processABCNotes = function(logo, turtle) {
                     // Is logo the first note in the chord?
                     if (
                         i === 0 ||
-                        logo.notationStaging[turtle][i - 1][
+                        logo.notation.notationStaging[turtle][i - 1][
                             NOTATIONINSIDECHORD
                         ] !== obj[NOTATIONINSIDECHORD]
                     ) {
@@ -390,8 +390,8 @@ processABCNotes = function(logo, turtle) {
 
                     // Is logo the last note in the chord?
                     if (
-                        i === logo.notationStaging[turtle].length - 1 ||
-                        logo.notationStaging[turtle][i + 1][
+                        i === logo.notation.notationStaging[turtle].length - 1 ||
+                        logo.notation.notationStaging[turtle][i + 1][
                             NOTATIONINSIDECHORD
                         ] !== obj[NOTATIONINSIDECHORD]
                     ) {
@@ -448,16 +448,16 @@ saveAbcOutput = function(logo) {
 
     logo.notationOutput = getABCHeader();
 
-    for (let t in logo.notationStaging) {
+    for (let t in logo.notation.notationStaging) {
         turtleCount += 1;
     }
     console.debug("saving as abc: " + turtleCount);
 
     let c = 0;
-    for (let t in logo.notationStaging) {
+    for (let t in logo.notation.notationStaging) {
         logo.notationOutput +=
             "K:" +
-            logo.keySignature[t]
+            logo.turtles.ithTurtle(t).singer.keySignature
                 .toUpperCase()
                 .replace(" ", "")
                 .replace("♭", "b")

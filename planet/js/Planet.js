@@ -47,6 +47,10 @@ function Planet(isMusicBlocks, storage) {
         this.ProjectStorage.saveLocally(data, image);
     };
 
+    this.setAnalyzeProject = function(func) {
+        this.analyzeProject = func;
+    };
+
     this.setLoadProjectFromData = function(func) {
         this.loadProjectFromData = func;
     };

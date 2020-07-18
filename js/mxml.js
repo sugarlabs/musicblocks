@@ -24,9 +24,9 @@ saveMxmlOutput = function(logo) {
     indent++;
     add("<part-list>");
     indent++;
-    // Why is logo.notationStaging an object and not an array?
-    Object.keys(logo.notationStaging).forEach(voice => {
-        if (logo.notationStaging[voice].length === 0) {
+    // Why is logo.notation.notationStaging an object and not an array?
+    Object.keys(logo.notation.notationStaging).forEach(voice => {
+        if (logo.notation.notationStaging[voice].length === 0) {
             return;
         }
         console.log("voice is " + voice);
@@ -41,8 +41,8 @@ saveMxmlOutput = function(logo) {
     add("</part-list>");
     indent--;
 
-    Object.keys(logo.notationStaging).forEach(voice => {
-        if (logo.notationStaging[voice].length === 0) {
+    Object.keys(logo.notation.notationStaging).forEach(voice => {
+        if (logo.notation.notationStaging[voice].length === 0) {
             return;
         }
         voiceNum = parseInt(voice) + 1;
@@ -67,7 +67,7 @@ saveMxmlOutput = function(logo) {
         var firstMeasure = true;
         indent++;
         var divisionsLeft = divisions;
-        var notes = logo.notationStaging[voice];
+        var notes = logo.notation.notationStaging[voice];
 
         console.log(notes);
         var cnter = 0;

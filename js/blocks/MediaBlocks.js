@@ -22,12 +22,12 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                logo.turtles._canvas.width / (2.0 * logo.turtles.getScale())
+                logo.turtles._canvas.width / (2.0 * logo.turtles.scale)
             );
         }
 
         arg(logo) {
-            return logo.turtles._canvas.width / (2.0 * logo.turtles.getScale());
+            return logo.turtles._canvas.width / (2.0 * logo.turtles.scale);
         }
     }
 
@@ -54,13 +54,13 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.getScale()))
+                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
             );
         }
 
         arg(logo) {
             return (
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.getScale()))
+                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
             );
         }
     }
@@ -87,12 +87,12 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                logo.turtles._canvas.height / (2.0 * logo.turtles.getScale())
+                logo.turtles._canvas.height / (2.0 * logo.turtles.scale)
             );
         }
 
         arg(logo) {
-            return logo.turtles._canvas.height / (2.0 * logo.turtles.getScale());
+            return logo.turtles._canvas.height / (2.0 * logo.turtles.scale);
         }
     }
 
@@ -118,13 +118,13 @@ function setupMediaBlocks() {
 
         updateParameter(logo, turtle, blk) {
             return toFixed2(
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.getScale()))
+                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
             );
         }
 
         arg(logo) {
             return (
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.getScale()))
+                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
             );
         }
     }
@@ -143,11 +143,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.width / logo.turtles.getScale());
+            return toFixed2(logo.turtles._canvas.width / logo.turtles.scale);
         }
 
         arg(logo) {
-            return logo.turtles._canvas.width / logo.turtles.getScale();
+            return logo.turtles._canvas.width / logo.turtles.scale;
         }
     }
 
@@ -165,11 +165,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.height / logo.turtles.getScale());
+            return toFixed2(logo.turtles._canvas.height / logo.turtles.scale);
         }
 
         arg(logo) {
-            return logo.turtles._canvas.height / logo.turtles.getScale();
+            return logo.turtles._canvas.height / logo.turtles.scale;
         }
     }
 
@@ -243,23 +243,15 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 1) {
                 if (logo.meSpeak !== null) {
-                    if (logo.inNoteBlock[turtle].length > 0) {
-                        logo.embeddedGraphics[turtle][
-                            last(logo.inNoteBlock[turtle])
-                        ].push(blk);
+                    if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
-                        if (!logo.suppressOutput[turtle]) {
-                            logo._processSpeak(args[0]);
-                        }
-
-                        if (logo.justCounting[turtle].length === 0) {
-                            logo._playbackPush(turtle, [
-                                logo.previousTurtleTime[turtle],
-                                "speak",
-                                args[0]
-                            ]);
+                        if (!tur.singer.suppressOutput) {
+                            logo.processSpeak(args[0]);
                         }
                     }
                 }
@@ -393,6 +385,8 @@ function setupMediaBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 let block = logo.blocks.blockList[blk];
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
@@ -404,15 +398,13 @@ function setupMediaBlocks() {
                 let note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 let octave = Math.floor(
                     calcOctave(
-                        logo.currentOctave[turtle],
+                        tur.singer.currentOctave,
                         logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
-                        logo.lastNotePlayed[turtle],
+                        tur.singer.lastNotePlayed,
                         note
                     )
                 );
-                return Math.round(
-                    pitchToFrequency(note, octave, 0, logo.keySignature[turtle])
-                );
+                return Math.round(pitchToFrequency(note, octave, 0, tur.singer.keySignature));
             } else {
                 const NOTENAMES = [
                     "A",
@@ -564,23 +556,14 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args.length === 2) {
-                if (logo.inNoteBlock[turtle].length > 0) {
-                    logo.embeddedGraphics[turtle][
-                        last(logo.inNoteBlock[turtle])
-                    ].push(blk);
-                } else {
-                    if (!logo.suppressOutput[turtle]) {
-                        logo._processShow(turtle, blk, args[0], args[1]);
-                    }
+            let tur = logo.turtles.ithTurtle(turtle);
 
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo._playbackPush(turtle, [
-                            logo.previousTurtleTime[turtle],
-                            "show",
-                            args[0],
-                            args[1]
-                        ]);
+            if (args.length === 2) {
+                if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                } else {
+                    if (!tur.singer.suppressOutput) {
+                        logo.processShow(turtle, blk, args[0], args[1]);
                     }
                 }
             }

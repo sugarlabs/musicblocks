@@ -121,7 +121,7 @@ function PitchDrumMatrix() {
             ICONSIZE,
             _("Play")
         ).onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
             that._playAll();
         };
 
@@ -624,7 +624,7 @@ function PitchDrumMatrix() {
             solfegeHTML,
             -1,
             0,
-            this._logo.keySignature[0],
+            this._logo.turtles.ithTurtle(0).singer.keySignature,
             false,
             null,
             this._logo.errorMsg
@@ -632,14 +632,9 @@ function PitchDrumMatrix() {
         var note = noteObj[0] + noteObj[1];
 
         if (playNote) {
-            var waitTime = this._logo.defaultBPMFactor * 1000 * 0.25;
+            var waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
             this._logo.synth.trigger(
-                0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
-                0.125,
-                "default",
-                null,
-                null
+                0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
             var that = this;
@@ -721,7 +716,7 @@ function PitchDrumMatrix() {
                 solfegeHTML,
                 -1,
                 0,
-                this._logo.keySignature[0],
+                this._logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
                 this._logo.errorMsg

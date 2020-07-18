@@ -24,7 +24,7 @@ function Activity() {
     let _MSGTIMEOUT_ = 60000;
     let cellSize = 55;
     let searchSuggestions = [];
-    let homeButtonContainers = [];
+    let homeButtonContainer ;
 
     let msgTimeoutID = null;
     let msgText = null;
@@ -74,7 +74,6 @@ function Activity() {
     _loadButtonDragHandler = this._loadButtonDragHandler;
 
     scrollBlockContainer = false;
-    scrollPaletteContainer = false;
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
@@ -186,15 +185,17 @@ function Activity() {
         "activity/toolbar",
         "activity/trash",
         "activity/boundary",
-        "activity/turtle",
-        "activity/turtles",
         "activity/palette",
-        "activity/note",
         "activity/protoblocks",
         "activity/blocks",
         "activity/block",
         "activity/turtledefs",
+        "activity/notation",
         "activity/logo",
+        "activity/turtle",
+        "activity/turtles",
+        "activity/turtle-singer",
+        "activity/turtle-painter",
         "activity/languagebox",
         "activity/basicblocks",
         "activity/blockfactory",
@@ -203,7 +204,7 @@ function Activity() {
         "activity/SaveInterface",
         "utils/musicutils",
         "utils/synthutils",
-        // 'activity/playbackbox',
+        "utils/mathutils",
         "activity/pastebox",
         "prefixfree.min"
     ];
@@ -312,7 +313,6 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
-        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -322,8 +322,6 @@ function Activity() {
         // On-screen buttons
         smallerContainer = null;
         largerContainer = null;
-        smallerOffContainer = null;
-        largerOffContainer = null;
         resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
@@ -446,7 +444,7 @@ function Activity() {
         let toppos;
         blocks.activeBlock = null;
         hideDOMLabel();
-        logo.showBlocks();
+        blocks.showBlocks();
         blocksContainer.x = 0;
         blocksContainer.y = 0;
 
@@ -541,11 +539,11 @@ function Activity() {
         // Return mice to the center of the screen.
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             console.debug("bringing turtle " + turtle + "home");
-            let savedPenState = turtles.turtleList[turtle].penState;
-            turtles.turtleList[turtle].penState = false;
-            turtles.turtleList[turtle].doSetXY(0, 0);
-            turtles.turtleList[turtle].doSetHeading(0);
-            turtles.turtleList[turtle].penState = savedPenState;
+            let savedPenState = turtles.turtleList[turtle].painter.penState;
+            turtles.turtleList[turtle].painter.penState = false;
+            turtles.turtleList[turtle].painter.doSetXY(0, 0);
+            turtles.turtleList[turtle].painter.doSetHeading(0);
+            turtles.turtleList[turtle].painter.penState = savedPenState;
         }
     };
 
@@ -554,13 +552,14 @@ function Activity() {
      * @param one {shows container}
      */
     setHomeContainers = function(zero, one) {
-        if (homeButtonContainers[0] === null) {
+        if (homeButtonContainer === null) {
             return;
         }
-
-        homeButtonContainers[0].visible = zero;
-        homeButtonContainers[1].visible = one;
-    };
+        if (zero)
+            changeImage(homeButtonContainer.children[0],GOHOMEFADEDBUTTON,GOHOMEBUTTON);
+        else 
+            changeImage(homeButtonContainer.children[0],GOHOMEBUTTON,GOHOMEFADEDBUTTON);
+        };
 
     __saveHelpBlock = function(name, delay) {
         // Save the artwork for an individual help block.
@@ -828,14 +827,16 @@ function Activity() {
         logo.boxes = {};
         logo.time = 0;
         hideMsgs();
-        logo.setBackgroundColor(-1);
+        hideGrids();
+        turtles.setBackgroundColor(-1);
+        logo.svgOutput = "";
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             logo.turtleHeaps[turtle] = [];
-            logo.notationStaging[turtle] = [];
-            logo.notationDrumStaging[turtle] = [];
+            logo.notation.notationStaging[turtle] = [];
+            logo.notation.notationDrumStaging[turtle] = [];
             if (noErase === undefined || !noErase) {
-                turtles.turtleList[turtle].doClear(true, true, true);
+                turtles.turtleList[turtle].painter.doClear(true, true, true);
             }
         }
 
@@ -872,7 +873,7 @@ function Activity() {
 
         let currentDelay = logo.turtleDelay;
         let playingWidget = false;
-        logo.setTurtleDelay(0);
+        logo.turtleDelay = 0;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
 
@@ -900,7 +901,8 @@ function Activity() {
         if (!turtles.running()) {
             console.debug("RUNNING");
             if (!turtles.isShrunk()) {
-                logo.hideBlocks(true);
+                blocks.hideBlocks();
+                logo.showBlocksAfterRun = true;
             }
 
             logo.runLogoCommands(null, env);
@@ -913,7 +915,7 @@ function Activity() {
                 // stop and restart
                 console.debug("STOPPING...");
                 document.getElementById("stop").style.color = "white";
-                logo.doStopTurtle();
+                logo.doStopTurtles();
 
                 setTimeout(function() {
                     console.debug("AND RUNNING");
@@ -932,7 +934,7 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        logo.setTurtleDelay(DEFAULTDELAY);
+        logo.turtleDelay = DEFAULTDELAY;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
         }
@@ -962,14 +964,14 @@ function Activity() {
         if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
             // Either we haven't set up a queue or we are
             // switching modes.
-            logo.setTurtleDelay(TURTLESTEP);
+            logo.turtleDelay = TURTLESTEP;
             // Queue and take first step.
             if (!turtles.running()) {
                 logo.runLogoCommands();
             }
             logo.step();
         } else {
-            logo.setTurtleDelay(TURTLESTEP);
+            logo.turtleDelay = TURTLESTEP;
             logo.step();
         }
     };
@@ -988,15 +990,15 @@ function Activity() {
             onblur = false;
         }
 
-        if (onblur && _THIS_IS_MUSIC_BLOCKS_ && logo.recordingStatus()) {
+        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
             console.debug("Ignoring hard stop due to blur");
             return;
         }
 
-        logo.doStopTurtle();
+        logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo._setMasterVolume(0);
+            Singer.setMasterVolume(logo, 0);
 
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -1050,11 +1052,11 @@ function Activity() {
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
-        logo.doStopTurtle();
+        logo.doStopTurtles();
     };
 
     // function doMuteButton() {
-    //     logo._setMasterVolume(0);
+    //     Singer.setMasterVolume(logo, 0);
     // };
 
     // function _hideBoxes() {
@@ -1070,7 +1072,6 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
         let enableHorizScrollIcon = docById("enableHorizScrollIcon");
         let disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
@@ -1138,7 +1139,7 @@ function Activity() {
         this.closeButton.on("click", function(event) {
             button.closeButton.visible = false;
             stage.removeChild(chartBitmap);
-            logo.showBlocks();
+            blocks.showBlocks();
             update = true;
             ctx.clearRect(0, 0, 600, 600);
         });
@@ -1191,7 +1192,8 @@ function Activity() {
                 chartBitmap.y = 200;
                 chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale =
                     600 / chartBitmap.image.width;
-                logo.hideBlocks();
+                blocks.hideBlocks();
+                logo.showBlocksAfterRun = false;
                 update = true;
                 document.body.style.cursor = "default";
                 loading = false;
@@ -1204,12 +1206,6 @@ function Activity() {
         myRadarChart = new Chart(ctx).Radar(data, options);
     };
 
-    // DEPRECATED
-    function doOptimize(state) {
-        blocks.activeBlock = null;
-        console.debug("Setting optimize to " + state);
-        logo.setOptimize(state);
-    }
     /*
      * Increases block size
      */
@@ -1259,20 +1255,16 @@ function Activity() {
      * then the icons to make them smaller/bigger will be hidden
      */
     setSmallerLargerStatus = function() {
-        if (BLOCKSCALES[blockscale] > 1) {
-            smallerContainer.visible = true;
-            smallerOffContainer.visible = false;
+        if (BLOCKSCALES[blockscale] < DEFAULTBLOCKSCALE) {
+            changeImage(smallerContainer.children[0],SMALLERBUTTON,SMALLERDISABLEBUTTON);
         } else {
-            smallerOffContainer.visible = true;
-            smallerContainer.visible = false;
+            changeImage(smallerContainer.children[0],SMALLERDISABLEBUTTON,SMALLERBUTTON);
         }
 
         if (BLOCKSCALES[blockscale] === 4) {
-            largerOffContainer.visible = true;
-            largerContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERBUTTON,BIGGERDISABLEBUTTON);
         } else {
-            largerContainer.visible = true;
-            largerOffContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERDISABLEBUTTON,BIGGERBUTTON);
         }
     };
 
@@ -1294,68 +1286,6 @@ function Activity() {
             }
         }
     };
-
-    // function getPlaybackQueueStatus() {
-    //     return Object.keys(logo.playbackQueue).length > 0;
-    // };
-
-    function setPlaybackStatus() {
-        // if (playbackBox != null) {
-        //     playbackBox.setPlaybackStatus();
-        // }
-    }
-
-    // function doPausePlayback() {
-    //     blocks.activeBlock = null;
-    //     logo.restartPlayback = false;
-    //     logo.playback(-1);
-    //     // playbackBox.playButton.visible = true;
-    //     // playbackBox.pauseButton.visible = false;
-    // };
-
-    // function doPlayback() {
-    //     blocks.activeBlock = null;
-    //     progressBar.style.visibility = 'visible';
-    //     progressBar.style.left = (playbackBox.getPos()[0] + 10) * turtleBlocksScale + 'px';
-    //     progressBar.style.top = (playbackBox.getPos()[1] + 10) * turtleBlocksScale + 'px';
-    //     logo.playback(-1);
-    //     // playbackBox.playButton.visible = false;
-    //     // playbackBox.pauseButton.visible = true;
-    //     // playbackBox.norewindButton.visible = false;
-    //     // playbackBox.rewindButton.visible = true;
-    // };
-
-    // function doRestartPlayback() {
-    //     blocks.activeBlock = null;
-    //     logo.doStopTurtle();
-    //     logo.restartPlayback = true;
-
-    //     /*
-    //     setTimeout(function () {
-    //         // logo.playback(-1);
-    //         playbackBox.playButton.visible = true;
-    //         playbackBox.pauseButton.visible = false;
-    //         playbackBox.norewindButton.visible = true;
-    //         playbackBox.rewindButton.visible = false;
-    //     }, 500);
-    //     */
-    // };
-
-    // // Deprecated
-    // function doCompile() {
-    //     blocks.activeBlock = null;
-    //     logo.restartPlayback = true;
-    //     document.body.style.cursor = 'wait';
-    //     console.debug('Compiling music for playback');
-
-    //     // Suppress music and turtle output when generating
-    //     // compiled output.
-    //     logo.setTurtleDelay(0); // Compile at full speed.
-    //     logo.playbackQueue = {};
-    //     logo.playbackTime = 0;
-    //     logo.compiling = true;
-    //     logo.runLogoCommands();
-    // };
 
     /*
      * Hides all grids (Cartesian/polar/treble/et al.)
@@ -1450,80 +1380,6 @@ function Activity() {
             delta: 0
         };
 
-        let __paletteWheelHandler = function(event) {
-            // vertical scroll
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                }
-            }
-
-            // horizontal scroll
-            if (scrollPaletteContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    }
-                }
-            } else {
-                event.preventDefault();
-            }
-
-            refreshCanvas();
-        };
-
-        let myCanvas = docById("myCanvas");
-
-        let __heightBasedScroll = function(event) {
-            actualReszieHandler(); // check size during init
-            window.addEventListener("resize", resizeThrottler, false);
-            let resizeTimeout;
-
-            function resizeThrottler() {
-                // Ignore resize events as long as an actualResizeHandler
-                // execution is in queue.
-                if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
-                        resizeTimeout = null;
-                        actualReszieHandler();
-                        // The actualResizeHandler will execute at the
-                        // rate of 15 FPS.
-                    }, 66);
-                }
-            }
-        };
-
-        function actualReszieHandler() {
-            // Handle the resize event
-            let h = window.innerHeight;
-
-            if (h < 500) {
-                //activate on mobile
-                myCanvas.addEventListener(
-                    "wheel",
-                    __paletteWheelHandler,
-                    false
-                );
-            } else {
-                // Cleanup event listeners
-                myCanvas.removeEventListener("wheel", __paletteWheelHandler);
-            }
-        }
-
-        __heightBasedScroll();
-
         let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
@@ -1534,35 +1390,17 @@ function Activity() {
         let __wheelHandler = function(event) {
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                }
+                blocksContainer.y -= event.deltaY;
             }
-
             // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    }
+                    blocksContainer.x -= event.deltaX;
                 }
             } else {
                 event.preventDefault();
             }
-
             refreshCanvas();
         };
 
@@ -1644,19 +1482,19 @@ function Activity() {
         let scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
-            palettes.menuScrollEvent(delta, scrollSpeed);
-            palettes.hidePaletteIconCircles();
+            //palettes.menuScrollEvent(delta, scrollSpeed);
+            //palettes.hidePaletteIconCircles();
         } else {
-            let palette = palettes.findPalette(
-                event.clientX / turtleBlocksScale,
-                event.clientY / turtleBlocksScale
-            );
-            if (palette) {
-                // if we are moving the palettes, deselect the active block.
-                blocks.activeBlock = null;
+            // let palette = palettes.findPalette(
+            //     event.clientX / turtleBlocksScale,
+            //     event.clientY / turtleBlocksScale
+            // );
+            // if (palette) {
+            //     // if we are moving the palettes, deselect the active block.
+            //     blocks.activeBlock = null;
 
-                palette.scrollEvent(delta, scrollSpeed);
-            }
+            //     //palette.scrollEvent(delta, scrollSpeed);
+            // }
         }
     }
 
@@ -1866,6 +1704,8 @@ function Activity() {
      * Shows search widget
      */
     showSearchWidget = function() {
+        //bring to top;
+        searchWidget.style.zIndex = 1 ;
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
@@ -1875,7 +1715,7 @@ function Activity() {
             }
 
             searchWidget.value = null;
-            docById("searchResults").style.visibility = "visible";
+            //docById("searchResults").style.visibility = "visible";
             searchWidget.style.visibility = "visible";
             searchWidget.style.left =
                 palettes.getSearchPos()[0] * turtleBlocksScale + "px";
@@ -1889,7 +1729,7 @@ function Activity() {
             setTimeout(function() {
                 searchWidget.focus();
                 doSearch();
-            }, 500);
+            }, 500);    
         }
     };
 
@@ -2138,10 +1978,6 @@ function Activity() {
         const KEYCODE_L = 76; // la
         const KEYCODE_T = 84; // ti
 
-        // Check for RETURN in search widget ahead of other events.
-        if (event.keyCode === RETURN && docById("search").value.length > 0) {
-            doSearch();
-        }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             disableKeys =
@@ -2184,16 +2020,13 @@ function Activity() {
                     textMsg("Alt-E " + _("Erase"));
                     _allClear(false);
                     break;
-                case 80: // 'P'
-                    // logo.playback(-1);
-                    break;
                 case 82: // 'R'
                     textMsg("Alt-R " + _("Play"));
                     that._doFastButton();
                     break;
                 case 83: // 'S'
                     textMsg("Alt-S " + _("Stop"));
-                    logo.doStopTurtle();
+                    logo.doStopTurtles();
                     break;
                 case 86: // 'V'
                     textMsg("Alt-V " + _("Paste"));
@@ -2311,9 +2144,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     STANDARDBLOCKHEIGHT,
@@ -2338,9 +2168,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(-1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     -STANDARDBLOCKHEIGHT,
@@ -2425,26 +2252,20 @@ function Activity() {
                         }
                         break;
                     case RETURN:
-                        if (docById("search").value.length > 0) {
-                            doSearch();
-                        } else {
-                            textMsg("Return " + _("Play"));
-                            if (inTempoWidget) {
-                                if (logo.tempo.isMoving) {
-                                    logo.tempo.pause();
-                                }
-
-                                logo.tempo.resume();
+                        textMsg("Return " + _("Play"));
+                        if (inTempoWidget) {
+                            if (logo.tempo.isMoving) {
+                                logo.tempo.pause();
                             }
-
-                            if (
-                                blocks.activeBlock == null ||
-                                SPECIALINPUTS.indexOf(
-                                    blocks.blockList[blocks.activeBlock].name
-                                ) === -1
-                            ) {
-                                logo.runLogoCommands();
-                            }
+                            logo.tempo.resume();
+                        }
+                        if (
+                            blocks.activeBlock == null ||
+                            SPECIALINPUTS.indexOf(
+                                blocks.blockList[blocks.activeBlock].name
+                            ) === -1
+                        ) {
+                            logo.runLogoCommands();
                         }
                         break;
                     case KEYCODE_D:
@@ -2565,22 +2386,6 @@ function Activity() {
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        if (largerContainer !== null) {
-            homeButtonContainers[0].x = this._innerWidth - 4 * 55 - 27.5;
-            homeButtonContainers[1].x = homeButtonContainers[0].x;
-            hideBlocksContainer.x = homeButtonContainers[0].x;
-            collapseBlocksContainer.x = homeButtonContainers[0].x;
-            smallerContainer.x = homeButtonContainers[0].x;
-            largerContainer.x = homeButtonContainers[0].x;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-        }
-
         if (docById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
@@ -2618,8 +2423,6 @@ function Activity() {
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
 
-        palettes.setScale(turtleBlocksScale);
-
         trashcan.resizeEvent(turtleBlocksScale);
 
         // We need to reposition the palette buttons
@@ -2651,11 +2454,10 @@ function Activity() {
             toolbar.disableTooltips($j);
         } else {
             palettes.setMobile(false);
-            palettes.bringToTop();
         }
 
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-            turtles.turtleList[turtle].doClear(false, false, true);
+            turtles.turtleList[turtle].painter.doClear(false, false, true);
         }
 
         let artcanvas = docById("overlayCanvas");
@@ -2817,11 +2619,6 @@ function Activity() {
         }
     };
 
-    // function _doPlaybackBox() {
-    //     // _hideBoxes();
-    //     // playbackBox.init(turtleBlocksScale, playbackButton.x - 27, playbackButton.y, _makeButton, logo);
-    // };
-
     /*
      * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
      * @param {boolean} doNotSave     {if true discards any changes to project}
@@ -2880,9 +2677,7 @@ function Activity() {
 
         if (addStartBlock) {
             console.debug("ADDING START BLOCK");
-            logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
-            setPlaybackStatus();
             _allClear(false);
         } else if (!doNotSave) {
             // Overwrite session data too.
@@ -2917,20 +2712,18 @@ function Activity() {
         hideDOMLabel();
 
         if (blocks.visible) {
-            logo.hideBlocks();
+            blocks.hideBlocks();
+            logo.showBlocksAfterRun = false;
             palettes.hide();
-            hideBlocksContainer[1].visible = true;
-            hideBlocksContainer[0].visible = false;
+            changeImage(hideBlocksContainer.children[0],SHOWBLOCKSBUTTON,HIDEBLOCKSFADEDBUTTON);
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-            hideBlocksContainer[1].visible = false;
-            hideBlocksContainer[0].visible = true;
-            logo.showBlocks();
+            changeImage(hideBlocksContainer.children[0],HIDEBLOCKSFADEDBUTTON,SHOWBLOCKSBUTTON);
+            blocks.showBlocks();
             palettes.show();
-            palettes.bringToTop();
         }
 
         // Combine block and palette visibility into one button.
@@ -2960,7 +2753,6 @@ function Activity() {
 
         if (stopTurtleContainer.visible) {
             _hideStopButton();
-            setPlaybackStatus();
         }
         */
     };
@@ -3015,8 +2807,14 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function() {
+        if (docById("palette").style.display != "none") 
+            docById("palette").style.display = "none";
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
+        if (docById("buttoncontainerBOTTOM").style.display != "none")
+            docById("buttoncontainerBOTTOM").style.display = "none";
+        if (docById("buttoncontainerTOP").style.display != "none")
+            docById("buttoncontainerTOP").style.display = "none";
     };
 
     /*
@@ -3151,7 +2949,7 @@ function Activity() {
                         turtle < turtles.turtleList.length;
                         turtle++
                     ) {
-                        turtles.turtleList[turtle].doClear(true, true, false);
+                        turtles.turtleList[turtle].painter.doClear(true, true, false);
                     }
 
                     textMsg(_("Click the run button to run the project."));
@@ -3203,6 +3001,7 @@ function Activity() {
      */
     this.showContents = function() {
         docById("loading-image-container").style.display = "none";
+        docById("palette").style.display = "block";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
 
@@ -3214,6 +3013,8 @@ function Activity() {
             console.debug('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
+       docById("buttoncontainerBOTTOM").style.display = "block";
+       docById("buttoncontainerTOP").style.display = "block";
     };
 
     this._loadStart = async function() {
@@ -3226,9 +3027,7 @@ function Activity() {
         // palettes.updatePalettes();
         justLoadStart = function() {
             console.debug("Loading start");
-            logo.playbackQueue = {};
             blocks.loadNewBlocks(DATAOBJS);
-            setPlaybackStatus();
         };
 
         sessionData = null;
@@ -3255,9 +3054,9 @@ function Activity() {
                         turtle++
                     ) {
                         logo.turtleHeaps[turtle] = [];
-                        logo.notationStaging[turtle] = [];
-                        logo.notationDrumStaging[turtle] = [];
-                        turtles.turtleList[turtle].doClear(true, true, false);
+                        logo.notation.notationStaging[turtle] = [];
+                        logo.notation.notationDrumStaging[turtle] = [];
+                        turtles.turtleList[turtle].painter.doClear(true, true, false);
                     }
                     const imgUrl =
                         "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+IDxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaWQ9InN2ZzExMjEiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDM0LjEzMTI0OSAxNC41NTIwODkiIGhlaWdodD0iNTUuMDAwMDE5IiB3aWR0aD0iMTI5Ij4gPGRlZnMgaWQ9ImRlZnMxMTE1Ij4gPGNsaXBQYXRoIGlkPSJjbGlwUGF0aDQzMzciIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4gPHJlY3QgeT0iNTUyIiB4PSI1ODgiIGhlaWdodD0iMTQzNiIgd2lkdGg9IjE5MDAiIGlkPSJyZWN0NDMzOSIgc3R5bGU9ImZpbGw6I2EzYjVjNDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDwvY2xpcFBhdGg+IDwvZGVmcz4gPG1ldGFkYXRhIGlkPSJtZXRhZGF0YTExMTgiPiA8cmRmOlJERj4gPGNjOldvcmsgcmRmOmFib3V0PSIiPiA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gPGRjOnR5cGUgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4gPGRjOnRpdGxlPjwvZGM6dGl0bGU+IDwvY2M6V29yaz4gPC9yZGY6UkRGPiA8L21ldGFkYXRhPiA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjA4Njc4MiwwLDAsMS4wODY3ODIsLTEuNTQ3MzI0NSwtMS4zMDU3OTkpIiBpZD0iZzE4MTIiPiA8ZWxsaXBzZSB0cmFuc2Zvcm09Im1hdHJpeCgwLjAxMDQ2MDk5LDAsMCwwLjAxMDQ2MDk5LDEuMDE2NzM4OSwtNi4yMDQ4NTI5KSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoNDMzNykiIHJ5PSI3NjgiIHJ4PSI3NDgiIGN5PSIxNDc2IiBjeD0iMTU0MCIgaWQ9InBhdGg0MzMzIiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYTNiNWM0O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoxNTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPGVsbGlwc2Ugcnk9IjEuNzgyNjg1OSIgcng9IjEuNjkzOTIxNiIgY3k9IjguODM0MzUzNCIgY3g9IjE2LjQ0NjczOSIgaWQ9InBhdGg0MjU2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYzlkYWQ4O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojYzlkYWQ4O3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDMyOCIgZD0ibSAxNy42MzAyNjYsMTMuNDg3MDkgMC4zMjU0NywwLjM5MjA0NCAwLjM0NzY2LDAuMjczNjkgMC4zMTA2NzYsMC4xMTA5NTUgMC4yMzY3MDUsLTAuMDUxNzggMC4xNDA1NDQsLTAuMTg0OTI2IDAuMTk5NzIsMC4wODEzNyAwLjE1NTMzOCwwLjA0NDM4IDAuNjEzOTU0LC0wLjQyMTYzMiAwLjQyMTYzMSwtMC4yNTE0OTkgYyAwLDAgMC44ODc2NDUsLTAuMDA3NCAxLjYwNTE1NywtMC41NTQ3NzcgMC43MTc1MTMsLTAuNTQ3MzgxIDAuNDk1NjAyLC0wLjY1MDkzOSAwLjQ5NTYwMiwtMC42NTA5MzkgbCAtMC4wMzY5OSwtMC40MjkwMjkgLTAuNTM5OTg0LC0wLjcxNzUxMyAtMC41NTQ3NzcsLTAuNTY5NTcxIC0wLjIyOTMwOSwtMC4xNDc5NDEgYyAwLDAgLTAuMDIyMTksLTAuMDQ0MzggLTAuMDczOTcsLTAuMDQ0MzggLTAuMDUxNzgsMCAtMC4yNDQxMDMsLTAuMDczOTcgLTAuNTE3NzkzLDAuMDQ0MzggLTAuMjczNjkxLDAuMTE4MzUzIC0wLjQ2NjAxNCwwLjE3MDEzMiAtMC44NDMyNjMsMC4zODQ2NDYgLTAuMzc3MjQ4LDAuMjE0NTE0IC0wLjcxMDExNSwwLjQyMTYzMSAtMC44MzU4NjUsMC40OTU2MDIgLTAuMTI1NzUsMC4wNzM5NyAtMC43NDcxLDAuNDI5MDI4IC0wLjc0NzEsMC40MjkwMjggbCAtMC4wOTYxNiwwLjY1ODMzNiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojZjhmOGY4O2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzMwIiBkPSJtIDE4LjA4MTQ4NSwxMy4xMTcyMzkgYyAwLDAgMS4wMTcyMDIsMC4yMTk4MDggMS40OTA2MTMsLTAuMTM1MjUgMC42ODI1NSwtMC42NzQwOTcgMS42NTU4OTMsLTEuMTU0NzMxIDEuODcwMzU1LC0xLjc0NTMwOCAwLjEwODI1NywtMC4yOTgxMTYgMC4wOTI2NSwtMC4zNzIzNzcgLTAuMDgwMTgsLTAuNjM3MTkxIC0wLjc4NDA4NSwtMS4xMTY5NTIzIC0yLjE4NjAyMywwLjQ4MzU2MyAtMi4xODYwMjMsMC40ODM1NjMgbCAtMS4yMjA1MTEsMS4wNDI5ODMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI4MSIgZD0ibSAxOC45MjM2MzgsMTEuOTExMTY2IGMgMCwwIC0yLjI2MjA3MywwLjM2MDA3MyAtMS4yNDU4MDcsMS42MzE0MjYgMS4wMTYyNjgsMS4yNzEzNTQgMS4zMzE1OSwwLjQ2ODQxNSAxLjMzMTU5LDAuNDY4NDE1IDAsMCAwLjIzNzM2NCwwLjI4NDAyMSAwLjU1MDIyMSwtMC4wMTI4OSAwLjMxMjg1NywtMC4yOTY5MSAwLjgwMTY1NywtMC40ODY1NjMgMC44MDE2NTcsLTAuNDg2NTYzIDAsMCAwLjgzMzQxOSwtMC4wODE1OCAxLjcyODg1MSwtMC42NDAzNDUgMC44OTU0MzIsLTAuNTU4NzY5IDAuMDI1NDUsLTEuNDk0NjQ0IDAuMDI1NDUsLTEuNDk0NjQ0IDAsMCAtMC43MDQwMDIsLTAuOTE0MzA1IC0xLjE5MTE1OCwtMS4wNjIwMDQgLTAuNDg3MTU1LC0wLjE0NzY5OSAtMS4yNjAyMDYsLTAuMjA1OTYzIC0xLjI2MDIwNiwtMC4yMDU5NjMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNTkyNiIgZD0ibSAxNi44ODkxNjUsMy45OTA3MDY3IGMgLTAuMjA1OTI1LDAuMDA5MDIgLTAuNDkwNTg0LDAuMDE2NDUyIC0wLjY4MjQzNCwwLjA5NDMwNiAtMC4zNjM1MSwwLjExMzE2MjUgLTAuNzg0MDE5LDAuMzA2NTkxNiAtMS4xMDIwMzksMC40MTQ1MTk3IEMgMTQuODA1NzA3LDQuNjAwOTk5MyAxNC41MjgzODMsNC44Njc1ODQxIDE0LjQ0MjUxNSw0Ljc3MDc2NzYgMTQuMzE0ODUsNC42MjY4MjQ0IDE0LjIyNDM1Myw0LjU5NTM2MyAxNC4wNDU2ODksNC40OTc1NTkgMTMuODAxNzgxLDQuMzk5NTA1IDEzLjg3Mzc3Myw0LjQ0NDgyNzIgMTMuNjYwODY2LDQuMzg2MzI4MyAxMy41MTM2ODEsNC4zNDU4ODcxIDEzLjQ0ODI5LDQuMjg4Mjk1OCAxMy4wNDc5NTQsNC4zMDIzNTY3IGMgLTAuMjE2MDg3LDAuMDA3NTkgLTAuNDczNTEsMC4wMDgwNCAtMC42NjAwODEsMC4wODk3MjUgLTAuMzc0NjE1LDAuMTY0MDE3OCAtMC4yOTksMC4yNDg0NzU3IC0wLjUzODU3MiwwLjQ5MDAyNTIgLTAuMTY1MTA4LDAuMTY2NDcwOSAtMC4yMjMwMjksMC41NzQ5ODMxIC0wLjI4MjA0MSwwLjgxODg1OCAtMC4wNjkzOSwwLjI4Njc3NzYgLTAuMDU0NywwLjYwMTAzOTMgLTAuMDIwMzEsMC45Njc0MDMxIDAuMDI3NjEsMC4yOTQxOTY1IDAuMDkxNzMsMC40OTczOTM5IDAuMjQ5Mzg4LDAuNzU5MDYzIDAuMTM1MDg0LDAuMjI0MTk4OSAwLjMyNDU2MSwwLjI4MzU4MjggMC41NDY1OSwwLjQ5NzI4OTMgMC4wNzc3NCwwLjA3NDgzIDAuMzY4Mzk4LC0wLjAzODk2NSAwLjQ4NDg4LC0wLjAxNTEwNCAwLjEwODcwOSwwLjAyMjI3IC0wLjA0ODE3LDAuMjE2NzA4OCAtMC4wNTMyLDAuMjQ1MzgzNCAtMC4wNTM4LDAuMjM5NTE2OSAtMC4xMTA1MDMsMC4wODc3NzEgLTAuMDgwNiwwLjYyNzQyNjEgMC4zNDgxMjMsMi4wMjY2ODkyIDEuMDA1MDg5LC0xLjA2NzI2NDcgMC4zMjY2NDksMC42Njg2MTk0IC0wLjA1Mjk4LDAuMTM1NTY0IC0wLjQzNzU5NCwwLjM4ODgwNjggLTAuNTAzMzY4LDAuNTg2ODUzOCAtMC4wMTI2NywwLjE2NTEwOSAwLjE5NzgzNSwwLjE5NDA4IDAuMzE4OTk3LDAuMTc4MDQ5IDAuMDYyNjYsMC40ODAzOTUgMC4xMjQ5ODIsMS4wNDIwNDggMC41MjIyNDIsMS4zNzI0MzkgMC4xMjAxNzcsMC4xMDY0MDIgMC4yODY2NTIsMC4wOTQ0NyAwLjQyOTMxNywwLjEyNjQ0MyAwLjIyMTY0MSwwLjI2ODEyOCAwLjQ0ODY2OCwwLjU1NzA2NiAwLjc4NDA4NywwLjY4OTc3NCAwLjI4Mzg0NSwwLjE0ODQzNSAwLjYyNDkxMywwLjA1MSAwLjg5NjEzOCwwLjIzMzA2NSAwLjcxMjkyNSwwLjM2MDkwMSAxLjU5NDM3LDAuMjI3NDI0IDIuMjQwMzA3LC0wLjIxNDM2NyAwLjIzOTczNiwtMC4wMjU4NCAwLjUwMTI0MywwLjA1MTE5IDAuNzUxMzkxLDAuMDIyMjIgMC41NzU4OTgsLTAuMDIwMDYgMS4xNjcyMDcsLTAuMjQwMDA1IDEuNTIzOTYyLC0wLjcxMTUwMiAwLjA3MjksLTAuMDY2IDAuMTAyMDgxLC0wLjE3ODE0IDAuMTY4ODAzLC0wLjI0MDYzNSAwLjA2NjE2LDAuMDgzMyAwLjIwMTA3OSwwLjE2NTI4OSAwLjI4NTY1MywwLjA1NTAyIDAuMTkzMDcyLC0wLjI1MzQzNiAwLjIyMzQxMywtMC41OTUxMDQgMC4zMjcxNDUsLTAuODgyNTU5IDAuMDg2NTgsMC4wMzY0MSAwLjA4NDIsMC4yNjU3MzQgMC4xOTA4MiwwLjE3NTk2OCAwLjA4ODU4LC0wLjI3NzUxIDAuMjMxMDU1LC0wLjU4OTU1NCAwLjE1NzQ4NywtMC44NzUxMDMgQyAyMS4wOTQ5NjgsOS44NjQxNTE0IDIwLjk5NDc5OSw5LjcxMDk4NzkgMjAuOTU5NzUxLDkuNjcwOTkxNCAyMS4wNjk3Myw5LjY2NDkyMTQgMjEuMzkyMTQ2LDkuNjA3NDEyNCAyMS4zNjQyMjYsOS40MzQyNzkgMjEuMjg0OTAyLDkuMjY0MDY1MSAyMC45MzAzMjQsOS4wNTgwODkzIDIwLjc4MTQ3LDguOTYzNjg5MyAyMC42Mjc0ODksNy4wODIzNjI5IDIwLjgzMTk0MSw3Ljk3MzAwNDMgMjAuMzc0NDc1LDYuNTcyMTY2OCAyMC4yODY2OTMsNi4yOTYzNjYgMjAuMTc5NTgyLDYuMDI1MzkwOCAyMC4wMzkxNDksNS43NjczNzc4IDE5LjgxNDE1NSw1LjM1NDAwNzYgMTkuNTAzNjMsNC45NzM5MDc1IDE5LjA1MDAzMSw0LjY2MDUzMjggMTguNjk0MTU3LDQuNDg2NjE1NyAxOC43NzkxNjcsNC40MTI0NTc4IDE4LjQxNjMxOSw0LjI4NDIxMTggMTguMDQwOTE2LDQuMTE0ODkzIDE3LjkyMzEyNiw0LjExNDQyOTQgMTcuNzA2MjE3LDQuMDQ5NTUxNCAxNy40MjE5OTMsNC4wMDQyMzgyIDE3LjE3NjIyNiwzLjk5MzQ2MTEgMTYuODg5MTY1LDMuOTkwNzA2NyBaIG0gLTAuNDE2Nzc3LDMuNzcwMjM0NSBjIDAuMjU4MDA1LDAuMDA5NzYgMC40MjkyNTksMC4yNTQ4MTQgMC41Mjc1MDEsMC40Njg0NDEgLTAuMDQ2NTEsMC4xMjA5MTIzIC0wLjIxNzYxMywwLjE4MDMzMTggLTAuMzE0MzE2LDAuMjcwODAwNSAtMC4wNTIyNywwLjAzMDg5OCAtMC4xOTUwNTcsMC4xNDE5ODI5IC0wLjA3Mzk3LDAuMTc2MjU4MyAwLjE2NzU3NCwtMC4wMDgwMSAwLjM0MTEyNSwtMC4xMDE3NzYgMC41MDIzNjMsLTAuMDgxMjUzIDAuMDM4OCwwLjMxMzY5MjcgMC4wMTAzOCwwLjcyNTUwMzEgLTAuMjk1OTM5LDAuOTAyMTQ5NSAtMC4zMTY4ODQsMC4wODI4MjcgLTAuNTYyMDUzLC0wLjIxMjE0MTYgLTAuNjc2ODI5LC0wLjQ3MTYxOCAtMC4xNDcwOTYsLTAuMzY2NjkwMiAtMC4xODU5MzQsLTAuODQyODQzMSAwLjA3NjUxLC0xLjE2Njk5ODggMC4wNjUzMSwtMC4wNjgyNjggMC4xNjAwMTEsLTAuMTA2MzQ3NSAwLjI1NDY3OCwtMC4wOTc3OCB6IG0gMi44NTkyNDQsMi41NzU3ODc4IGMgLTAuMDc2NzMsMC4xODQ3NTggLTAuMjMwNjU5LDAuMzMwMTU2IC0wLjQwNzAxMSwwLjQxMzI1MiAtMC4wNTUzOSwwLjE1MDcwNSAwLjA0MDA0LDAuMzU0MzggMC4wMjk3LDAuNDgzMjM0IC0wLjA0OTA3LC0wLjE2MDM1NyAtMC4wMDE2LC0wLjM2MTQyNiAtMC4xMDg4NzUsLTAuNDk2NzU3IC0wLjA3MDE4LC0wLjAyMjcxIC0wLjE0Nzc0NywtMC4wMjgxIC0wLjIxMTc0MSwtMC4wNzIwNiAwLjIxMjc5NCwwLjExNzcxNyAwLjQ5NTYxLDAuMDM5MjQgMC42MDQ3NjYsLTAuMTgyMDk0IDAuMDI5MzQsLTAuMDM3NjIgMC4wODE1OSwtMC4xNDU1NzUgMC4wOTMxNiwtMC4xNDU1NzEgeiBtIC0wLjk2NTM3MiwwLjE0MTk4OCBjIDAuMDQ1NjYsMC4wMzQwOSAwLjIwNDg5NywwLjE2Mjg1NyAwLjA3NzQ0LDAuMDY3ODUgLTAuMDE2NDEsLTAuMDExMzggLTAuMDkwMTksLTAuMDcwODYgLTAuMDc3NDQsLTAuMDY3ODUgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wNTIzMDQ5NTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjU3IiBkPSJtIDE4LjU2MjI5Miw0LjM0MDY1NDMgYyAwLDAgLTAuMDE4MjMsLTAuMTI2MDkyNSAwLjA1NTAzLC0wLjI2MzA5MTEgMC4xMDcwNjUsLTAuMjAwMjExOCAwLjM2NDA0MywtMC40MDk5NDg1IDAuNjYxOTUxLC0wLjU5NjUyOTEgMC4zOTA1NzksLTAuMjQ0NjIwMiAwLjg3ODEwNSwtMC40MDE1NzcyIDEuNDU3NjUzLDAuMDM1OTg1IDAuMTUwMzMxLDAuMTEzNTAwOCAwLjI3NTEyLDAuMzU2MTg0OSAwLjQzNjUyLDAuNTQ2MjQ1OCAwLDAgMC40NDM4MjIsMC41MzI1ODcxIDAuMDU5MTgsMS43OTAwODI5IEMgMjAuODQ3OTc4LDcuMTEwODQ1IDIwLjI0MTQyLDYuNTMzODc1NCAyMC4yNDE0Miw2LjUzMzg3NTQgWiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1OSIgZD0ibSAxNS41NDQ5NjIsNC4zMTU2Mjk4IGMgMC42NzQwMTYsMC44NjIwMTcgMi4yMjQ5NDUsMy4zNjQ2NDY3IDIuNTUyNDgxLDIuMTM1NzQ3MSAwLjIwOTIyLC0wLjkxMDEwNjEgMC4wMTUzMiwtMi4zMDI1OTczIDAuMDE1MzIsLTIuMzAyNTk3MyAwLDAgLTEuMjUyMDM4LC0wLjQ2NTg4NTcgLTIuNTY3ODAyLDAuMTY2ODUwMiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojODk5YmIwO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojODk5YmIwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3NiIgZD0ibSAxNC41NTMyNiw5LjMxOTI1NjMgYyAwLDAgLTAuMTY3Mzc2LDAuMDUyMzA1IDEuMDk4NDA0LDAuMzM0NzUxNyAxLjI2NTc4LDAuMjgyNDQ2NyAxLjYyMTQ1MywtMC42Njk1MDM0IDEuNjIxNDUzLC0wLjY2OTUwMzQgMCwwIDEuMDM1NjM4LC0xLjUxNjg0MzYgMi4xNDQ1MDMsLTAuMzAzMzY4NyAwLDAgMC4yODI0NDcsMC4zMDMzNjg3IDAuNzg0NTc1LDAuMjkyOTA3NyAwLDAgMC4zMTM4MjksLTAuMTc3ODM2OCAwLjU3NTM1NCwtMC4wMTA0NjEgMC4yNjE1MjUsMC4xNjczNzU5IDAuNDkxNjY3LDAuMzI0MjkwNyAwLjQ5MTY2NywwLjMyNDI5MDcgMCwwIDAuMzg3MDU2LDAuMzY2MTM0NyAtMC4yOTI5MDgsMC4zNTU2NzM3IDAsMCAwLjQyODksMC4xMDQ2MDk5IC0wLjA4MzY5LDEuMzM5MDA3IGwgLTAuMTQ2NDU0LC0wLjMzNDc1MiBjIDAsMCAtMC4yMDkyMiwxLjQwMTc3MyAtMC41NzUzNTQsMC44NjgyNjIgMCwwIC0wLjE2ODU2NywwLjI4NDA0MiAtMC41NDkzMzUsMC41MzgxMTEgLTAuNDYxNzA0LDAuMzA4MDczIC0xLjIwMDYyLDAuNTc5MDM0IC0xLjg4Mjg0NiwwLjMzNTM4MiAwLDAgLTAuOTI5NDM2LDEuMDIzNTYzIC0yLjUxMjQwMiwwLjEyMTEyNSAwLDAgLTAuODcxNzI4LDAuMTY2NTUyIC0xLjQ1NzU0MywtMC44MTY3ODEgMCwwIC0wLjgwNTQ5NiwwLjE5ODc1OSAtMC45NTE5NSwtMS40OTU5MjIgMCwwIC0wLjY3OTk2NSwwLjA0MTg0IC0wLjA0MTg0LC0wLjU0Mzk3MSAwLjYzODEyLC0wLjU4NTgxNTUgMS4yMDMwMTQsLTAuNDYwMjgzNiAxLjIwMzAxNCwtMC40NjAyODM2IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzNjUiIGQ9Im0gMTMuNTM4NTQ0LDUuMzE3OTI3NiBjIC0wLjAxNjk4LDAuMDAzMzMgLTAuMjk1NDI5LDAuMDA0MTEgLTAuNTQyNjE0LC0wLjEyODc4OTQgLTAuMTI2Mjk4LC0wLjA2NzkwNiAtMC4yNDcwMjYsLTAuMTI3MDA2OSAtMC4yOTEyNywtMC4xODU5ODA3IC0wLjAzNTY0LC0wLjA0NzUwOCAwLjAwNDEsLTAuMTExNDU4NyAtMC4wNjY4NSwtMC4wNTMwMjIgLTAuOTQ5ODUyLDAuNzgyODExNiAtMC40ODU4NjcsMi4wNDg5MTU3IDAuMzkxNTE4LDIuMzgxNzQ5OSAwLDAgMC4xNjgwMywtMC45MzA1MDIgMS4wODQ1NzEsLTEuOTg3ODA1NyIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzY3IiBkPSJtIDE4Ljk2OTEyOSw0LjU1MTQ2OTcgYyAwLDAgMC45NjE2MTUsMC42ODA1MjcxIDEuMTk4MzIsMS42MTI1NTQzIDAsMCAxLjE1MzkzOSwtMS43MzA5MDY4IC0wLjA3Mzk3LC0yLjQyNjIyODIgMCwwIC0wLjIwNzExOCwwLjc5ODg4IC0xLjEyNDM1MSwwLjgxMzY3MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIxNSIgZD0ibSAxMi44Mzg2ODUsMTAuMjA5MDE4IGMgMC4xNDQzOTksMS43NjE2ODIgMC45Mzg2MDEsMS40NzI4ODIgMC45Mzg2MDEsMS40NzI4ODIgMC42MzUzNiwxLjAxMDggMS40Mjk1NjEsMC44MjMwOCAxLjQyOTU2MSwwLjgyMzA4IDEuMzcxODAyLDAuODM3NTIyIDIuNTI3MDAzLC0wLjEwMTA3OSAyLjUyNzAwMywtMC4xMDEwNzkgMS45MzQ5NjMsMC4zMTc2OCAyLjQxMTQ4MywtMC45MjQxNjIgMi40MTE0ODMsLTAuOTI0MTYyIDAuMzc1NDQxLDAuNTc3NjAxIDAuNjA2NDgxLC0wLjgwODY0MSAwLjYwNjQ4MSwtMC44MDg2NDEgMC4wNTc3NiwtMC4xMTU1MiAwLjE0NDQwMSwwLjM0NjU2IDAuMTQ0NDAxLDAuMzQ2NTYgMC40NjIwNzksLTEuMjEyOTYwNSAwLjA4MzI0LC0xLjM3NzgzMyAwLjA4MzI0LC0xLjM3NzgzMyAxLjAxMDgwMSwwLjAyODg4IC0wLjIwMzYyNiwtMC43MDI4NzQgLTAuMjAzNjI2LC0wLjcwMjg3NCAtMC4wMjU1MywtMS4wNTkwNjU0IC0wLjAyNTA4LC0xLjMyOTIxMzEgLTAuMzkwMDU0LC0yLjMzMzQzNzggMC44MDk3OTcsMC4yMTYzODc3IDAuODExMDU3LC0wLjk2MDY1ODkgMC45NDkxNywtMS4yMjk3ODc3IDAuMTk5OTE5LC0wLjUzOTAyNDUgLTAuMDM1NiwtMS41MDQ0OTA0IC0wLjY3OTY0MSwtMS45MTk1MzIzIC0wLjI2NTQxMSwtMC4xNzEwMzg3IC0wLjYwMDIsLTAuMjQ4NjAwOSAtMS4wMDI0ODYsLTAuMTY0MzE5OCAtMC4zMDI3NTUsMC4xMzkwMTI4IC0wLjY5MjU0LDAuMzk0OTg5NSAtMC45MDc2MjgsMC42MDg2NjE5IC0wLjE5MzYxMywwLjE5MjMzOTUgLTAuMjE5NjQ5LDAuMzAzMjExNCAtMC4xOTU0NDIsMC40MTU1NTciIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjI3IiBkPSJtIDEyLjgzODY4NSwxMC4yMTE0OTUgYyAwLDAgLTAuOTA5NzIxLDAuMDk4NiAwLjI1OTkyLC0wLjgxMTExNzkgMCwwIDAuNDkwOTYsLTAuNDE4NzYwOCAxLjQ3Mjg4MSwtMC4wNTc3NiIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMjkiIGQ9Ik0gMTIuOTA0OTA0LDkuNTY1NTUzIEMgMTIuNTA1NjUzLDguNzczODU0OCAxMi42NzA3OTcsOC4xNjU2MDM3IDEyLjg1MDI0NCw3Ljk1ODI5NCIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMDEiIGQ9Im0gMTQuNTgxMzAzLDQuODIyNzY5MiBjIDAsMCAxLjc5NTc0OSwtMS40NTE3MDY2IDMuOTY3MjA3LC0wLjUxNTAzMDkiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiBkPSJNIDEyLjkxMzUyNyw3Ljg5OTY1ODEgQyAxMC44OTQzNTYsOC4zNTIwMTQzIDExLjE2ODQwMiw0LjI1NDUyNDcgMTIuNzY0OTUyLDQuMzAyNTA3MyAxMy4zODM1NjksNC4yODU3MzczIDE0LjA5NzQyNCw0LjI2Nzg1NSAxNC42NTY4MSw1LjAwMTUxMyIgaWQ9InBhdGg0MjA3IiAvPiA8cGF0aCBpZD0icGF0aDQyMzMiIGQ9Im0gMTguMzQwMzMxLDEwLjQ1NDQ5OSBjIDAsMCAwLjY2NDI0LDAuNzIyIDEuMDEwODAxLC0wLjE3MzI4IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIzNSIgZD0ibSAxOC44ODkwNTIsMTAuNzI4ODU5IDAuMDcyMiwwLjU2MzE2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1MSIgZD0ibSAxNC4xMzQ4Miw1LjM0NDA4MDEgYyAtMC4xNzgzOTEsMCAtMC42MzI5NDYsMC4wMDY5OCAtMC45OTQxOTIsLTAuMDg2ODE2IEMgMTIuOTA4NzMsNS4xOTcwNTE5IDEyLjcxNTI4NCw1LjA5NTMxMjUgMTIuNjU4MDI2LDQuOTIzNTM3OCIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMDEiIGQ9Im0gMTIuNjcyOTA2LDExLjI0OTk1OSBjIDAsMCAtMS4yMTMxMTMsMC44ODAyNDcgLTAuNzI0OTA5LDEuNTQ1OTgxIGwgMC41OTkxNiwwLjUzMjU4NiAwLjgyMTA3MiwwLjQ0MzgyMyAxLjIyNzkwNywwLjA2NjU3IDAuODA2Mjc3LC0wLjE0Nzk0MSAwLjQxNDIzNCwtMC4xODQ5MjYgMC40NDM4MjIsMC4zNzcyNSAwLjM5OTQ0MSwwLjAxNDc5IDAuMjI5MzA4LC0wLjExMDk1NiAwLjY4NzkyNCwtMC4yNzM2OTEgMC4zNjI0NTYsLTAuMjg0Nzg2IDAuMjA3MTE3LC0wLjMxNDM3MyAtMC4wMjk1OSwtMC4zNDAyNjQgYyAwLDAgLTAuMzg0NjQ2LC0xLjE2MTMzNSAtMC43OTg4OCwtMS4zNDYyNjEgMCwwIC0wLjUzMjU4NywtMC41NzY5NjkgLTEuMjcyMjkxLC0wLjA4MTM3IDAsMCAtMS4xMTY5NTIsMC4zNjk4NTIgLTIuMDg1OTY0LDAuMDQ0MzggLTAuOTY5MDEyLC0wLjMyNTQ3IC0xLjI4NzA4NSwwLjA1OTE4IC0xLjI4NzA4NSwwLjA1OTE4IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMjUiIGQ9Im0gMTEuODUzMTgsMTIuNDgxMDk0IGMgMCwwIDEuMjIwNTExLC0wLjcwMjcxOSAzLjA2OTc3LC0wLjE4NDkyNyAwLDAgMC45MTcyMzQsMC4xNjI3MzYgMS41MDg5OTYsLTAuMDY2NTcgMC41OTE3NjQsLTAuMjI5MzA5IDAuNzkxNDgzLDAuMjczNjkgMC43OTE0ODMsMC4yNzM2OSAwLDAgMC40NjYwMTQsMC44NDMyNjIgMC4zOTk0NCwwLjkwMjQzOCBsIDAuMTc3NTI5LC0wLjA1MTc4IDAuMjY2MjkzLC0wLjM0MDI2NCAwLjA3Mzk3LC0wLjI1ODg5NyAtMC4xNDA1NDMsLTAuNDI5MDI4IC0wLjI3MzY5MSwtMC41NzY5NjggLTAuMzEwNjc2LC0wLjQ0MzgyMiAtMC4yNTE0OTksLTAuMTg0OTI3IC0wLjQyMTYzMSwtMC4xODQ5MjUgLTAuNDA2ODM4LDAuMDI5NTkgLTAuNjA2NTU2LDAuMjUxNDk5IGMgMCwwIC0xLjAyODE4OSwwLjI4ODQ4NSAtMi4yNDg3LC0wLjE4NDkyNSAwLDAgLTAuOTAyNDM4LC0wLjE2MjczNiAtMS41MTYzOTIsMC45ODM4MDYgbCAtMC4xMTgzNTMsMC4zOTk0MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3OSIgZD0ibSAxNi44MzM2NzIsMTMuNzg1MjE3IGMgMC4xNTM0MjMsLTAuMTAyOTY3IDEuNDU0MTIyLC0wLjQwNTE0NCAxLjI3MTUzLC0xLjEwNzA1MiAtMC4xODI1OSwtMC43MDE5MDYgLTAuODEwNDg4LC0yLjE4MzA4IC0xLjk2Mjc0OSwtMS42MjExNTEgLTEuMTUyMjY0LDAuNTYxOTMyIC0yLjQyODI3MSwwLjA0NDIyIC0yLjQyODI3MSwwLjA0NDIyIDAsMCAtMC41MDI1NzUsLTAuMTkxMTk4IC0wLjkxNzEzNywwLjA0NDc1IC0wLjQxNDU2MiwwLjIzNTk1MSAtMC44MzU2OTEsMC42MjQyODUgLTAuOTY5NjcsMS4yNjM4MzYgLTAuMTMzOTgyLDAuNjM5NTU3IDEuNTU5NzQ1LDEuMzQxOTkxIDEuNTU5NzQ1LDEuMzQxOTkxIDAsMCAxLjYyODU2NywwLjIzODgxMyAyLjM5NTY5MywtMC4yNzYwMzUgMCwwIDAuNjI5NzI5LDAuNjk3NzcxIDEuMDUwODU5LDAuMzA5NDM3IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggZD0ibSAxNy4xMTQwMTYsOC41MDk4MjQxIGEgMC45NDk4OTcwOCwwLjU4NjQwNTg3IDc4LjA3ODA2MiAwIDEgLTAuMzQwNjEzLDEuMDQwNjk1NSAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAtMC43NzY1NjIsLTAuNjc4NzU2IDAuOTQ5ODk3MDgsMC41ODY0MDU4NyA3OC4wNzgwNjIgMCAxIDAuMjM5NTYsLTEuMTI5MDIxNiAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAwLjgwNzczNiwwLjUzMTgzNzIgbCAtMC41MDM4NzgsMC4zNTYzODM5IHoiIGlkPSJwYXRoNDI2NSIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggZD0iTSAyMC40MTM5NzcsOC4wMzE1OTA2IEEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMjAuMTA2NzYsOC45NzAyNDk4IDAuODU2NzYzMjUsMC41Mjg5MTA5NSA3OC4wNzgwNjIgMCAxIDE5LjQwNjMzNiw4LjM1ODA0MzEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMTkuNjIyNDA3LDcuMzM5NzE3NiAwLjg1Njc2MzI1LDAuNTI4OTEwOTUgNzguMDc4MDYyIDAgMSAyMC4zNTA5NDgsNy44MTk0MTA4IGwgLTAuNDU0NDc0LDAuMzIxNDQxNiB6IiBpZD0icGF0aDQyNjUtMiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggaWQ9InBhdGg1NzIwIiBkPSJtIDIxLjEzNDgzMiw3LjY5NjM2MzQgYyAtMC4xMTIzMTgsLTAuMDI3NzU3IC0wLjI2MjQ5NywtMC4wODEwNTQgLTAuMzMzNzMxLC0wLjExODQzODMgLTAuMTQ0MDA1LC0wLjA3NTU3MyAtMC4yOTkzMjksLTAuMjY5ODY1MyAtMC4yOTkzMjksLTAuMzc0NDI2IDAsLTAuMDk2NjA3IC0wLjE5MzI5OCwtMC44NDY4MTQgLTAuMjk0MTMzLC0xLjE0MTU1OTcgQyAxOS45MTc4NSw1LjIxNDg4MjcgMTkuNDI2NzM2LDQuNjc1ODIwNSAxOC44MDY4MDgsNC41MjQzNDIzIDE4LjU3NDU0Myw0LjQ2NzU4OTMgMTguMzc3OTYsNC4zNzc3MTcyIDE4LjM3Nzk2LDQuMzI4Mjg1MSBjIDAsLTAuMTE2NTg3NCAwLjUxODc4NywtMC4zNzIwNTkgMC43NTU1ODcsLTAuMzcyMDgxOCAwLjIyNTEyOSwtMi4wOWUtNSAwLjU1MTc3MywwLjE5NTUxMDUgMC43NTQwMDcsMC40NTEzNTU2IDAuMDg5NTgsMC4xMTMzMjYgMC4zMzY4NDMsMC41NTg3ODc0IDAuNTQ5NDc2LDAuOTg5OTE0MSAwLjYzMDg5MSwxLjI3OTE3MTkgMS4xMjc0NjQsMS45Njg0NzM4IDEuNTY3NTYzLDIuMTc1OTYzMyAwLjIxNzMwOCwwLjEwMjQ1MTggMC4yMjYxMTYsMC4xMTE5NDIgMC4xMzA4ODEsMC4xNDEwMjE1IC0wLjE1OTgzNSwwLjA0ODgwNCAtMC43NzQ5NSwwLjAzNzY4MSAtMS4wMDA2NDIsLTAuMDE4MDk0IHoiIHN0eWxlPSJmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjA7c3Ryb2tlLXdpZHRoOjAuMDUyMzA0OTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lIiAvPiA8cGF0aCBpZD0icGF0aDQyNDUiIGQ9Im0gMTUuNTQ0Mzg3LDQuMzE0MzcwOSBjIDAsMCAxLjU1NTIyNiwyLjEwODgwNTMgMi4wNzgyNzYsMi4yNzYxODExIDAuNTIzMDQ5LDAuMTY3Mzc1OSAwLjU1MDA5OSwtMS4yNjczOTM5IDAuNTUwMDk5LC0xLjI2NzM5MzkgMCwwIDAuMDEwNDYsLTAuODA1NDk2MiAtMC4wMzEzOCwtMS4xNjExNyIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyNDkiIGQ9Im0gMTguOTQ0Mzc3LDQuNTQ1NjI2MiBjIDAuMjUwMTgyLDAuMDI5NjUgMC44NTMyMzUsLTAuMDU1OTAzIDEuMTM0NjY1LC0wLjc3MjM2OTQiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHRleHQgaWQ9InRleHQ0MjQ1IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MC4xMjU1MzE4OHB4O2xpbmUtaGVpZ2h0OjAlO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7bGV0dGVyLXNwYWNpbmc6MHB4O3dvcmQtc3BhY2luZzowcHg7ZmlsbDojMDAwMDAwO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRzcGFuIHN0eWxlPSJmb250LXNpemU6MC40MTg0Mzk2cHg7bGluZS1oZWlnaHQ6MS4yNTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgaWQ9InRzcGFuNDI0NyI+wqA8L3RzcGFuPjwvdGV4dD4gPC9nPiA8L3N2Zz4=";
@@ -3274,8 +3073,6 @@ function Activity() {
 
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     keyboardEnableFlag = 1;
-
-                    // playbackOnLoad();
                 }, 1000);
             }
 
@@ -3304,14 +3101,8 @@ function Activity() {
                             50
                         )}...`
                     );
-                    // First, hide the palettes as they will need updating.
-                    for (let name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
-
-                    logo.playbackQueue = {};
+                    
                     blocks.loadNewBlocks(JSON.parse(sessionData));
-                    setPlaybackStatus();
                 }
             } catch (e) {
                 console.debug(e);
@@ -3373,11 +3164,6 @@ function Activity() {
     };
 
     errorMsg = function(msg, blk, text, timeout) {
-        /*
-        if (logo.optimize) {
-            return;
-        }
-        */
         if (errorMsgTimeoutID != null) {
             clearTimeout(errorMsgTimeoutID);
         }
@@ -3682,9 +3468,6 @@ function Activity() {
     /*
      * We don't save blocks in the trash, so we need to
      * consolidate the block list and remap the connections.
-     *
-     * Next, save the playback queue, but don't save the
-     * playback queue if we are saving to Lilypond.
      */
     function prepareExport() {
         let blockMap = [];
@@ -3718,6 +3501,7 @@ function Activity() {
                 switch (myBlock.name) {
                     case "namedbox":
                     case "namedarg":
+                    case "outputtools":
                         args = {
                             value: myBlock.privateData
                         };
@@ -3752,10 +3536,10 @@ function Activity() {
                                 xcor: turtle.x,
                                 ycor: turtle.y,
                                 heading: turtle.orientation,
-                                color: turtle.color,
-                                shade: turtle.value,
-                                pensize: turtle.stroke,
-                                grey: turtle.chroma
+                                color: turtle.painter.color,
+                                shade: turtle.painter.value,
+                                pensize: turtle.painter.stroke,
+                                grey: turtle.painter.chroma
                                 // 'name': turtle.name
                             };
                         }
@@ -3763,8 +3547,10 @@ function Activity() {
                     case "temperament1":
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
+                            custom ={};
+                            for (let temp in TEMPERAMENT)if(!(temp in PreDefinedTemperaments)) custom[temp] = TEMPERAMENT[temp];
                             args = {
-                                customTemperamentNotes: TEMPERAMENT["custom"],
+                                customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
                                 octaveSpace: OCTAVERATIO
                             };
@@ -3847,28 +3633,6 @@ function Activity() {
             }
         }
 
-        // remap block connections
-
-        if (logo.runningLilypond) {
-            logo.playbackQueue = {};
-        }
-
-        let i = data.length;
-        if (i > 0) {
-            for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                if (turtle in logo.playbackQueue) {
-                    for (
-                        let j = 0;
-                        j < logo.playbackQueue[turtle].length;
-                        j++
-                    ) {
-                        data.push([i, turtle, logo.playbackQueue[turtle][j]]);
-                        i += 1;
-                    }
-                }
-            }
-        }
-
         return JSON.stringify(data);
     }
 
@@ -3932,124 +3696,60 @@ function Activity() {
      * These menu items are on the canvas, not the toolbar.
      */
     _setupPaletteMenu = function(turtleBlocksScale) {
-        // Clean up if we've been here before.
-        if (homeButtonContainers.length !== 0) {
-            stage.removeChild(homeButtonContainers[0]);
-            stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer[0]);
-            stage.removeChild(hideBlocksContainer[1]);
-            stage.removeChild(collapseBlocksContainer);
-            stage.removeChild(smallerContainer);
-            stage.removeChild(smallerOffContainer);
-            stage.removeChild(largerContainer);
-            stage.removeChild(largerOffContainer);
+        let removed = false ;
+        if(docById("buttoncontainerBOTTOM")){
+            removed = true ;
+            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
         }
-
         let btnSize = cellSize;
         // Upper left
         // var x = 27.5 + 6;
         // var y = toolbarHeight + 95.5 + 6;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
-        let y = this._innerHeight - 27.5;
+        let y = this._innerHeight - 57.5;
         let dx = btnSize;
 
-        homeButtonContainers = [];
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            homeButtonContainers[0],
+        let ButtonHolder = document.createElement("div");
+        ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
+        if(!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
+        document.body.appendChild(ButtonHolder);
+
+        homeButtonContainer = _makeButton(
+            GOHOMEFADEDBUTTON,
+            _("Home") + " [" + _("Home").toUpperCase() + "]",
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
-        );
-
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
+            btnSize,
+            0,
+            
+        )
         that._loadButtonDragHandler(
-            homeButtonContainers[1],
+            homeButtonContainer,
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
+            _findBlocks
         );
-        homeButtonContainers[1].visible = false;
 
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
         boundary.hide();
 
         x += dx;
 
-        hideBlocksContainer = [];
-        hideBlocksContainer.push(
+        hideBlocksContainer = 
             _makeButton(
-                HIDEBLOCKSBUTTON,
+                SHOWBLOCKSBUTTON,
                 _("Show/hide block"),
                 x,
                 y,
                 btnSize,
                 0
             )
-        );
         that._loadButtonDragHandler(
-            hideBlocksContainer[0],
+            hideBlocksContainer,
             x,
             y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
+            _changeBlockVisibility            
         );
-
-        hideBlocksContainer.push(
-            _makeButton(
-                HIDEBLOCKSFADEDBUTTON,
-                _("Show/hide block"),
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            hideBlocksContainer[1],
-            x,
-            y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
-        );
-        hideBlocksContainer[1].visible = false;
-
-        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
@@ -4065,11 +3765,7 @@ function Activity() {
             collapseBlocksContainer,
             x,
             y,
-            _toggleCollapsibleStacks,
-            null,
-            null,
-            null,
-            null
+            _toggleCollapsibleStacks
         );
 
         x += dx;
@@ -4086,22 +3782,8 @@ function Activity() {
             smallerContainer,
             x,
             y,
-            doSmallerBlocks,
-            null,
-            null,
-            null,
-            null
+            doSmallerBlocks
         );
-
-        smallerOffContainer = _makeButton(
-            SMALLERDISABLEBUTTON,
-            _("Cannot be further decreased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        smallerOffContainer.visible = false;
 
         x += dx;
 
@@ -4117,22 +3799,9 @@ function Activity() {
             largerContainer,
             x,
             y,
-            doLargerBlocks,
-            null,
-            null,
-            null,
-            null
+            doLargerBlocks
         );
 
-        largerOffContainer = _makeButton(
-            BIGGERDISABLEBUTTON,
-            _("Cannot be further increased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        largerOffContainer.visible = false;
     };
 
     // function doPopdownPalette() {
@@ -4258,155 +3927,38 @@ function Activity() {
     /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
-    _makeButton = function(name, label, x, y, size, rotation, parent) {
-        let container = new createjs.Container();
+    _makeButton = function(name, label, x, y,) {
+        let container = document.createElement("div");
+        container.setAttribute("id", ""+label);
 
-        if (parent === undefined) {
-            stage.addChild(container);
-        } else {
-            parent.addChild(container);
-        }
-
-        container.x = x;
-        container.y = y;
-
-        let text = new createjs.Text(label, "14px Sans", "#282828");
-        if (container.x < 55) {
-            text.textAlign = "left";
-            text.x = -14;
-        } else if (container.x > 255) {
-            text.textAlign = "right";
-            text.x = 14;
-        } else {
-            text.textAlign = "center";
-            text.x = 0;
-        }
-
-        if (y > 255) {
-            text.y = -60;
-        } else {
-            text.y = 30;
-        }
-
-        text.visible = false;
-
-        let circles;
-        container.on("mouseover", function(event) {
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = true;
-                    // Do we need to add a background?
-                    // Should be image and text, hence === 2
-                    if ([2, 5, 8].indexOf(container.children.length) !== -1) {
-                        let b = container.children[c].getBounds();
-                        let bg = new createjs.Shape();
-                        if (container.children[c].textAlign === "center") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else if (container.children[c].textAlign === "left") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 22,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x + 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        }
-                        container.addChildAt(bg, 0);
-                    }
-
-                    container.children[0].visible = true;
-                    stage.update();
-                    break;
-                }
-            }
-
-            let r = size / 2;
-            circles = showButtonHighlight(
-                container.x,
-                container.y,
-                r,
-                event,
-                palettes.scale,
-                stage
-            );
+        
+        container.setAttribute("class","tooltipped");
+        container.setAttribute("data-tooltip",label);
+        container.setAttribute("data-position","top");
+        jQuery.noConflict()(".tooltipped").tooltip({
+            html: true,
+            delay: 100
         });
-
-        container.on("mouseout", function(event) {
-            hideButtonHighlight(circles, stage);
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = false;
-                    container.children[0].visible = false;
-                    stage.update();
-                    break;
-                }
+        container.onmouseover = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "pointer";
             }
-        });
-
-        let img = new Image();
-
-        img.onload = function() {
-            let originalSize = 55; // this is the original svg size
-            let halfSize = Math.floor(size / 2);
-
-            let bitmap = new createjs.Bitmap(img);
-            if (size !== originalSize) {
-                bitmap.scaleX = size / originalSize;
-                bitmap.scaleY = size / originalSize;
+        };
+        
+        container.onmouseout = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "default";
             }
-
-            bitmap.regX = halfSize / bitmap.scaleX;
-            bitmap.regY = halfSize / bitmap.scaleY;
-            if (rotation !== undefined) {
-                bitmap.rotation = rotation;
-            }
-
-            container.addChild(bitmap);
-            let hitArea = new createjs.Shape();
-            hitArea.graphics
-                .beginFill("#FFF")
-                .drawEllipse(-halfSize, -halfSize, size, size);
-            hitArea.x = 0;
-            hitArea.y = 0;
-            container.hitArea = hitArea;
-            bitmap.cache(0, 0, size, size);
-            bitmap.updateCache();
-            update = true;
         };
 
+        let img = new Image();
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(name)));
-        container.addChild(text);
+        
+        container.appendChild(img);
+        container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
+        docById("buttoncontainerBOTTOM").appendChild(container);
         return container;
     };
 
@@ -4423,158 +3975,16 @@ function Activity() {
         ox,
         oy,
         action,
-        hoverAction
+        actionClick,
+        arg
     ) {
-        // Prevent multiple button presses (i.e., debounce).
-        let lockTimer = null;
-        let locked = false;
-
-        /*
-        if (longAction === null) {
-            longAction = action;
-        }
-
-        if (extraLongAction === null) {
-            extraLongAction = longAction;
-        }
-
-        // Long and extra-long press variables declaration
-        var pressTimer = null;
-        var isLong = false;
-        var pressTimerExtra = null;
-        var isExtraLong = false;
-
-        var formerContainer = container;
-        */
-
-        // Long hover variables
-        let hoverTimer = null;
-        let isLongHover = false;
-
-        container.on("mouseover", function(event) {
-            if (!loading) {
-                document.body.style.cursor = "pointer";
-            }
-
-            if (hoverAction === null) {
-                return;
-            }
-
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-                lockTimer = setTimeout(function() {
-                    locked = false;
-
-                    clearTimeout(hoverTimer);
-                }, 2000);
-            }
-
-            hoverTimer = setTimeout(function() {
-                isLongHover = true;
-                console.debug("HOVER ACTION");
-                hoverAction(false);
-            }, 1500);
-        });
-
-        container.on("mouseout", function(event) {
+        container.onmousedown = function(event) {
             if (!loading) {
                 document.body.style.cursor = "default";
             }
-
-            if (hoverTimer !== null) {
-                clearTimeout(hoverTimer);
-            }
-        });
-
-        container.removeAllEventListeners("mousedown");
-        container.on("mousedown", function(event) {
-            /*
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-
-                lockTimer = setTimeout(function () {
-                    locked = false;
-
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-                    if (longImg !== null || extraLongImg !== null) {
-                        container.visible = false;
-                        container = formerContainer;
-                        container.visible = true;
-                    }
-                }, 1500);
-            }
-
-            var mousedown = true;
-
-            pressTimer = setTimeout(function () {
-                isLong = true;
-                if (longImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
-                }
-            }, 500);
-
-            pressTimerExtra = setTimeout(function () {
-                isExtraLong = true;
-                if (extraLongImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
-                }
-            }, 1000);
-            */
-            let circles = showButtonHighlight(
-                ox,
-                oy,
-                cellSize / 2,
-                event,
-                turtleBlocksScale,
-                stage
-            );
-
-            function __pressupFunction(event) {
-                hideButtonHighlight(circles, stage);
-
-                /*
-                clearTimeout(lockTimer);
-
-                if (longImg !== null || extraLongImg !== null) {
-                    container.visible = false;
-                    container = formerContainer;
-                    container.visible = true;
-                }
-
-                locked = false;
-
-                if (action != null && mousedown && !locked) {
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-
-                    if (!isLong) {
-                        action();
-                    } else if (!isExtraLong) {
-                        longAction();
-                    } else {
-                        extraLongAction();
-                    }
-                }
-                */
-
-                action();
-                mousedown = false;
-            }
-
-            container.removeAllEventListeners("pressup");
-            let closure = container.on("pressup", __pressupFunction);
-
-            isLongHover = false;
-            // isLong = false;
-            // isExtraLong = false;
-        });
+            action();
+            if (actionClick)actionClick(arg);
+        };
     };
 
     /*
@@ -4619,14 +4029,6 @@ function Activity() {
             onscreenButtons[i].y += dy;
         }
 
-        // logoContainer.y += dy;
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = homeButtonContainers[0].y;
-        hideBlocksContainer.y = homeButtonContainers[0].y;
-        collapseBlocksContainer.y = homeButtonContainers[0].y;
-        smallerContainer.y = homeButtonContainers[0].y;
-        largerContainer.y = homeButtonContainers[0].y;
-
         for (let i = 0; i < onscreenMenu.length; i++) {
             onscreenMenu[i].y += dy;
         }
@@ -4664,14 +4066,6 @@ function Activity() {
             dy = cellsize + LEADING + 5;
             toolbarHeight = dy;
 
-            // These buttons are smaller, hence + 6
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-
             palettes.deltaY(dy);
             turtles.deltaY(dy);
 
@@ -4680,13 +4074,6 @@ function Activity() {
         } else {
             dy = toolbarHeight;
             toolbarHeight = 0;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
 
             palettes.deltaY(-dy);
             turtles.deltaY(-dy);
@@ -4815,19 +4202,11 @@ function Activity() {
          *   turtles
          *   logo (drawing)
          */
-        palettesContainer = new createjs.Container();
         blocksContainer = new createjs.Container();
         trashContainer = new createjs.Container();
         turtleContainer = new createjs.Container();
-        /*
-        console.debug(turtleContainer);
-        turtleContainer.scaleX = 0.5;
-        turtleContainer.scaleY = 0.5;
-        turtleContainer.x = 100;
-        turtleContainer.y = 100;
-        */
         stage.addChild(turtleContainer);
-        stage.addChild(trashContainer, blocksContainer, palettesContainer);
+        stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
         trashcan = new Trashcan();
@@ -4841,15 +4220,14 @@ function Activity() {
         // Put the boundary in the turtles container so it scrolls
         // with the blocks.
         turtles = new Turtles();
-        turtles
-            .setCanvas(canvas)
-            .setClear(_allClear)
-            .setHideMenu(hideAuxMenu)
-            .setMasterStage(stage)
-            .setStage(turtleContainer)
-            .setHideGrids(hideGrids)
-            .setDoGrid(_doCartesianPolar)
-            .setRefreshCanvas(refreshCanvas);
+        turtles.masterStage = stage;
+        turtles.stage = turtleContainer;
+        turtles.canvas = canvas;
+        turtles.hideMenu = hideAuxMenu;
+        turtles.doClear = _allClear;
+        turtles.hideGrids = hideGrids;
+        turtles.doGrid = _doCartesianPolar;
+        turtles.refreshCanvas = refreshCanvas;
 
         // Put the boundary in the blocks container so it scrolls
         // with the blocks.
@@ -4866,17 +4244,13 @@ function Activity() {
             .setUpdateStage(stage.update)
             .setGetStageScale(getStageScale)
             .setTurtles(turtles)
-            .setSetPlaybackStatus(setPlaybackStatus)
             .setErrorMsg(errorMsg)
             .setHomeContainers(setHomeContainers, boundary);
 
         palettes = new Palettes();
         palettes
-            .setCanvas(canvas)
-            .setStage(palettesContainer)
-            .setRefreshCanvas(refreshCanvas)
+            .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
-            .setTrashcan(trashcan)
             .setSearch(showSearchWidget, hideSearchWidget)
             .setBlocks(blocks)
             .init();
@@ -4884,23 +4258,22 @@ function Activity() {
         // initPalettes(palettes);
 
         logo = new Logo();
-        logo.setCanvas(canvas)
-            .setBlocks(blocks)
-            .setTurtles(turtles)
-            .setStage(turtleContainer)
-            .setRefreshCanvas(refreshCanvas)
-            .setTextMsg(textMsg)
-            .setErrorMsg(errorMsg)
-            .setHideMsgs(hideMsgs)
-            .setOnStopTurtle(that.onStopTurtle)
-            .setOnRunTurtle(that.onRunTurtle)
-            .setGetStageX(getStageX)
-            .setGetStageY(getStageY)
-            .setGetStageMouseDown(getStageMouseDown)
-            .setGetCurrentKeyCode(that.getCurrentKeyCode)
-            .setClearCurrentKeyCode(that.clearCurrentKeyCode)
-            // .setMeSpeak(meSpeak)
-            .setSetPlaybackStatus(setPlaybackStatus);
+        logo.canvas = canvas;
+        logo.blocks = blocks;
+        logo.turtles = turtles;
+        logo.stage = turtleContainer;
+        logo.refreshCanvas = refreshCanvas;
+        logo.textMsg = textMsg;
+        logo.errorMsg = errorMsg;
+        logo.hideMsgs = hideMsgs;
+        logo.onStopTurtle = that.onStopTurtle;
+        logo.onRunTurtle = that.onRunTurtle;
+        logo.getStageX = getStageX;
+        logo.getStageY = getStageY;
+        logo.getStageMouseDown = getStageMouseDown;
+        logo.getCurrentKeyCode = that.getCurrentKeyCode;
+        logo.clearCurrentKeyCode = that.clearCurrentKeyCode;
+        // logo.meSpeak = meSpeak;
 
         blocks.setLogo(logo);
 
@@ -4919,22 +4292,6 @@ function Activity() {
             _showHelp();
         }
 
-        playbackOnLoad = function() {
-            /*
-            if (_THIS_IS_TURTLE_BLOCKS_) {
-                // Play playback queue if there is one.
-                for (turtle in logo.playbackQueue) {
-                    if (logo.playbackQueue[turtle].length > 0) {
-                        setTimeout(function () {
-                            logo.playback(-1);
-                        }, 3000);
-                        break;
-                    }
-                }
-            }
-            */
-        };
-
         function PlanetInterface(storage) {
             this.planet = null;
             this.iframe = null;
@@ -4944,7 +4301,7 @@ function Activity() {
                 hideSearchWidget();
                 widgetWindows.hideAllWindows();
 
-                logo.doStopTurtle();
+                logo.doStopTurtles();
                 docById("helpElem").style.visibility = "hidden";
                 document.querySelector(".canvasHolder").classList.add("hide");
                 document.querySelector("#canvas").style.display = "none";
@@ -4958,6 +4315,7 @@ function Activity() {
 
             this.showMusicBlocks = function() {
                 document.getElementById("toolbars").style.display = "block";
+                document.getElementById("palette").style.display = "block";
 
                 widgetWindows.showWindows();
 
@@ -4969,6 +4327,8 @@ function Activity() {
                     platformColor.header;
                 stage.enableDOMEvents(true);
                 window.scroll(0, 0);
+                docById("buttoncontainerBOTTOM").style.display = "block";
+                docById("buttoncontainerTOP").style.display = "block";
             };
 
             this.showPlanet = function() {
@@ -5026,12 +4386,9 @@ function Activity() {
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
-                for (let name in blocks.palettes.dict) {
-                    blocks.palettes.dict[name].hideMenu(true);
-                }
-
+                blocks.palettes._hideMenus(true);
+                
                 let __afterLoad = function() {
-                    // playbackOnLoad();
                     document.removeEventListener(
                         "finishedLoading",
                         __afterLoad
@@ -5046,9 +4403,7 @@ function Activity() {
 
                 try {
                     let obj = JSON.parse(data);
-                    logo.playbackQueue = {};
                     blocks.loadNewBlocks(obj);
-                    setPlaybackStatus();
                 } catch (e) {
                     console.debug(
                         "loadRawProject: could not parse project data"
@@ -5328,7 +4683,7 @@ function Activity() {
         }
 
         window.saveLocally = saveLocally;
-        logo.setSaveLocally(saveLocally);
+        logo.saveLocally = saveLocally;
 
         initPalettes(palettes);
 
@@ -5428,12 +4783,11 @@ function Activity() {
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
                                     let __listener = function(event) {
-                                        logo.playbackQueue = {};
                                         blocks.loadNewBlocks(obj);
-                                        setPlaybackStatus();
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
+                                        planet.saveLocally();
                                     };
 
                                     stage.addEventListener(
@@ -5445,6 +4799,7 @@ function Activity() {
                                     console.debug("clearing on load...");
                                     _allClear(false);
                                     if (planet) {
+                                        planet.closePlanet();
                                         planet.initialiseNewProject(
                                             fileChooser.files[0].name.substr(
                                                 0,
@@ -5456,9 +4811,7 @@ function Activity() {
                                     }
                                 } else {
                                     merging = false;
-                                    logo.playbackQueue = {};
                                     blocks.loadNewBlocks(obj);
-                                    setPlaybackStatus();
                                 }
 
                                 loading = false;
@@ -5521,7 +4874,6 @@ function Activity() {
                             stage.removeAllEventListeners("trashsignal");
 
                             let __afterLoad = function() {
-                                // playbackOnLoad();
                                 document.removeEventListener(
                                     "finishedLoading",
                                     __afterLoad
@@ -5530,9 +4882,7 @@ function Activity() {
 
                             // Wait for the old blocks to be removed.
                             let __listener = function(event) {
-                                logo.playbackQueue = {};
                                 blocks.loadNewBlocks(obj);
-                                setPlaybackStatus();
                                 stage.removeAllEventListeners("trashsignal");
 
                                 if (document.addEventListener) {
@@ -5644,8 +4994,6 @@ function Activity() {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
-
-                            palettes.bringToTop();
                         }, 1000);
 
                         document.body.style.cursor = "default";
@@ -5824,6 +5172,7 @@ function Activity() {
 
         document.onkeydown = __keyPressed;
         _hideStopButton();
+        planet.planet.setAnalyzeProject(analyzeProject)
     };
 }
 

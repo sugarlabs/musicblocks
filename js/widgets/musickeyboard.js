@@ -300,7 +300,7 @@ function MusicKeyboard() {
 
         var __startNote = function(element) {
             startDate = new Date();
-            startTime = startDate.getTime(); // Milliseconds();
+            startTime = startDate.getTime();  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
             that._logo.synth.trigger(
                 0,
@@ -420,7 +420,7 @@ function MusicKeyboard() {
         );
 
         this.playButton.onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
             that.processSelected();
             that.playAll();
         };
@@ -451,6 +451,15 @@ function MusicKeyboard() {
             _("Add note")
         ).onclick = function() {
             that._createAddRowPieSubmenu();
+        };
+
+        this.midiButton = widgetWindow.addButton(
+            "midi.svg",
+            ICONSIZE,
+            _("MIDI")
+        )
+        this.midiButton.onclick = function () {
+            that.doMIDI();
         };
 
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
@@ -761,7 +770,7 @@ function MusicKeyboard() {
                 sortableList.push({
                     frequency: noteToFrequency(
                         this.noteNames[i] + this.octaves[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
@@ -1600,7 +1609,7 @@ function MusicKeyboard() {
             } else {
                 aValue = noteToFrequency(
                     a.noteName + a.noteOctave,
-                    that._logo.keySignature[0]
+                    that._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
             if (b.noteName == "hertz") {
@@ -1608,7 +1617,7 @@ function MusicKeyboard() {
             } else {
                 bValue = noteToFrequency(
                     b.noteName + b.noteOctave,
-                    that._logo.keySignature[0]
+                    that._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
 
@@ -2009,14 +2018,14 @@ function MusicKeyboard() {
                 labelValue,
                 octave,
                 0,
-                that._logo.keySignature[0],
+                that._logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
                 that._logo.errorMsg,
                 that._logo.synth.inTemperament
             );
             that._logo.synth.setMasterVolume(PREVIEWVOLUME);
-            that._logo.setSynthVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            Singer.setSynthVolume(that._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
             that._logo.synth.trigger(
                 0,
                 [obj[0] + obj[1]],
@@ -2084,7 +2093,7 @@ function MusicKeyboard() {
                 this.noteNames.push(PITCHES3[i]);
                 this.octaves.push(4);
                 if (i === 4) {
-                    this.noteNames.push(null); // missing black key
+                    this.noteNames.push(null);  // missing black key
                     this.octaves.push(4);
                 }
             }
@@ -2371,17 +2380,17 @@ function MusicKeyboard() {
             }
             return newNotes;
         }
-     
+
         // finds Position of next setTimbre block
         this.findLen = (selectedNotesGrp, selectedNotes) => {
             let ans = 0;
             for (let i = 0; i < selectedNotesGrp.length; i++) {
                 note = selectedNotes[selectedNotesGrp[i]];
                 if (note.noteOctave[0] === "R") {
-                    ans += 6;   //rest note uses 6 
+                    ans += 6;   //rest note uses 6
                 }
                 else {
-                    ans += 5 + (3 * note.noteOctave.length);   // notes with pitches 
+                    ans += 5 + (3 * note.noteOctave.length);   // notes with pitches
                 }
             }
             return ans;
@@ -2628,4 +2637,129 @@ function MusicKeyboard() {
         return cell;
     };
 
+    this.doMIDI = () => {
+
+        var duration = 0;
+        var startTime = 0;
+
+        this.getElement = {};
+
+        for (let idx = 0; idx < this.layout.length; idx++) {
+            key = this.layout[idx];
+            this.getElement[key.noteName.toString()+ key.noteOctave.toString()] = key.objId;
+            this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] = key.objId ; //convet solfege to alphabetic.
+        }
+
+        let __startNote = (event, element) => {
+            if (!element) return;
+            startTime = event.timeStamp;  // Milliseconds();
+            element.style.backgroundColor = platformColor.orange;
+            this._logo.synth.trigger(
+                0,
+                this.noteMapper[element.id],
+                1,
+                this.instrumentMapper[element.id],
+                null,
+                null
+            );
+        };
+
+        let __endNote = (event, element) => {
+            if (!element) return;
+
+            var id = element.id;
+            if (id.includes("blackRow")) {
+                element.style.backgroundColor = "black";
+            } else {
+                element.style.backgroundColor = "white";
+            }
+
+            var now = event.timeStamp;
+            duration = now - startTime;
+            duration /= 1000;
+            this._logo.synth.stopSound(
+                0,
+                this.instrumentMapper[element.id],
+                this.noteMapper[element.id]
+            );
+            if (beginnerMode === "true") {
+                duration = parseFloat(
+                    (Math.round(duration * 8) / 8).toFixed(3)
+                );
+            } else {
+                duration = parseFloat(
+                    (Math.round(duration * 16) / 16).toFixed(4)
+                );
+            }
+
+            if (duration === 0) {
+                duration = 0.125;
+            } else if (duration < 0) {
+                duration = -duration;
+            }
+
+            this._notesPlayed.push({
+                startTime: startTime,
+                noteOctave: this.noteMapper[element.id],
+                objId: element.id,
+                duration: duration,
+                voice: this.instrumentMapper[element.id],
+                blockNumber: this.blockNumberMapper[element.id]
+            });
+            this._createTable();
+        };
+
+        let numberToPitch = (num) => {
+            let offset = 4;
+            let octave = offset + Math.floor((num - 60) / 12);
+            let pitch1 = NOTESSHARP[num % 12];
+            let pitch2 = NOTESFLAT[num % 12];
+            return [pitch1, pitch2, octave];
+        }
+
+        //event attributes : timeStamp , data
+        //data : length -3 [0] : 144/128 : noteOn/NoteOff
+        //                 [1] : noteNumber : middle C always 60
+        //                 [2] : velocity ,(currently not used).
+
+        let onMIDIMessage = (event) => {
+            let pitchOctave = numberToPitch(event.data[1]);
+            let pitch1 = pitchOctave[0];
+            let pitch2 = pitchOctave[1];
+            let octave = pitchOctave[2];
+            let key = this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 +"" + octave];
+            console.debug(pitch1, octave);
+            if (event.data[0] == 144 && event.data[2] != 0) {
+                __startNote(event, docById(key));
+
+            } else {
+		__endNote(event, docById(key));
+            }
+        }
+
+        let onMIDISuccess = (midiAccess) => {
+            // re-init widget
+            if (this.midiON){
+                this.midiButton.style.background = "#00FF00";
+                // logo.textMsg(_("MIDI device present."));
+                return;
+            }
+            midiAccess.inputs.forEach((input) => { input.onmidimessage = onMIDIMessage; });
+            if (midiAccess.inputs.size) {
+                this.midiButton.style.background = "#00FF00";
+                // logo.textMsg(_("MIDI device present."));
+                this.midiON = true;
+            } else {
+                logo.textMsg(_("No MIDI device found."));
+	    }
+        }
+
+        let  onMIDIFailure= () => {
+            logo.errorMsg(_("Failed to get MIDI access in browser."));
+            this.midiON = false;
+        }
+
+        navigator.requestMIDIAccess()
+            .then(onMIDISuccess, onMIDIFailure);
+    }
 }
