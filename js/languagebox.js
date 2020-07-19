@@ -29,6 +29,11 @@ function LanguageBox() {
         this.hide();
     };
 
+    this.ko_onclick = function() {
+        language = "ko";
+        this.hide();
+    };
+
     this.ja_onclick = function() {
         language = "ja";
         localStorage.kanaPreference = "kanji";
@@ -111,6 +116,7 @@ function LanguageBox() {
             enUK: "Refresh your browser to change your language preference.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
             kana: "げんごを かえるには、ブラウザを こうしんしてください。",
+	    ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
             es: "Actualice su navegador para cambiar su preferencia de idioma.",
             pt:
                 "Atualize seu navegador para alterar sua preferência de idioma.",
