@@ -1239,15 +1239,25 @@ function Blocks(activity) {
                  */
                 let postProcess = (args) => {
                     let parentblk = args[0];
-                    let oldBlock = args[1];
+                    let value = args[1];
 
                     let blk = this.blockList.length - 1;
 
                     this.blockList[parentblk].connections[1] = blk;
 
-                    let pitch = this.blockList[oldBlock].value;
+                    let pitch = value;
                     this.blockList[blk].value = pitch;
-                    this.blockList[blk].text.text = pitch.toString();
+                    if (this.blockList[blk].name === "eastindiansolfege") {
+                        obj = splitSolfege(pitch);
+                        label = WESTERN2EISOLFEGENAMES[obj[0]];
+                        attr = obj[1];
+                        if (attr !== "♮") {
+                            label += attr;
+                        }
+                        this.blockList[blk].text.text = label;
+                    } else {
+                        this.blockList[blk].text.text = pitch.toString();
+                    }
                     // Make sure text is on top.
                     let z = this.blockList[blk].container.children.length - 1;
                     this.blockList[blk].container.setChildIndex(this.blockList[blk].text, z);
@@ -1256,12 +1266,31 @@ function Blocks(activity) {
                     this.adjustDocks(parentblk, true);
                 };
 
+                let newBlockName = "solfege";
+                let newBlockValue = "sol";
+                switch(this.blockList[oldBlock].name) {
+                case "eastindiansolfege":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "sol";
+                    break;
+                case "scaledegree2":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "5";
+                    break;
+                case "notename":
+                    newBlockName = this.blockList[oldBlock].name;
+                    newBlockValue = "G";
+                    break;
+                default:
+                    break;
+                }
+
                 this._makeNewBlockWithConnections(
-                    this.blockList[oldBlock].name,
+                    newBlockName,
                     0,
                     [parentblk],
                     postProcess,
-                    [parentblk, oldBlock]
+                    [parentblk, newBlockValue]
                 );
             }
         } else if (this.blockList[parentblk].name === "storein") {
