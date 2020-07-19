@@ -59,11 +59,12 @@ function setupBoxesBlocks() {
                 let value = args[0] + i;
 
                 // A special case for solfege stored in boxes.
+		console.log(logo.blocks.blockList[cblk].name);
                 if (logo.blocks.blockList[cblk].name === "namedbox") {
                     let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
                     if (j !== -1) {
-                        j = j >= SOLFEGENAMES.length ? 0 : SOLFEGENAMES.length - 1;
-                        value = SOLFEGENAMES[j] + i;
+                        j = j >= SOLFEGENAMES.length ? 0 : j;
+                        value = SOLFEGENAMES[j + i];
                     }
                 }
 
