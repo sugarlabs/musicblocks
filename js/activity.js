@@ -17,7 +17,8 @@
 
 var KeySignatureEnv = [
     "C",
-    "major"
+    "major",
+    "false"
 ];
 
 function Activity() {
@@ -1056,6 +1057,7 @@ function Activity() {
 
     chooseKeyMenu = () => {
         docById("chooseKeyDiv").style.display = "";
+        docById("moveable").style.display = "block";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
         var addedOptionsWheel = new wheelnav("addedOptionsWheel", keyNameWheel.raphael);
@@ -1134,9 +1136,18 @@ function Activity() {
         // docById("chooseKeyDiv").style.position = "absolute";
         docById("chooseKeyDiv").style.left = (x - 175) + "px";
         docById("chooseKeyDiv").style.top = (y + 50) + "px";
+        docById("moveable").style.left = (x - 175) + "px";
+        docById("moveable").style.top = (y + 400) + "px";
 
         let __exitMenu = () => {
             docById("chooseKeyDiv").style.display = "none";
+            docById("moveable").style.display = "none";
+            let ele = document.getElementsByName("moveable");
+            for (let i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    KeySignatureEnv[2] = ele[i].value;
+                }
+            }
             keyNameWheel.removeWheel();
             addedOptionsWheel.removeWheel();
             modenameWheel.removeWheel();

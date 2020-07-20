@@ -1369,7 +1369,7 @@ input.timbreName {
     height: 350px;
     width: 350px;
     margin: auto;
-    z-index: 100;
+    z-index: 10;
     position: fixed;
 }
 
@@ -1377,6 +1377,15 @@ input.timbreName {
     width: 100%;
     height: 100%;
     transition: width 2s linear 1s;
+}
+
+#moveable {
+    height: 100%;
+    width: 100%;
+    margin: auto;
+    z-index: 10;
+    position: fixed;
+    display: none;
 }
 
 @media (max-width: 880px) {
