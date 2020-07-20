@@ -4872,16 +4872,32 @@ function Block(protoblock, blocks, overrideName) {
             // Fetching key signature, in case of solfege not useful until moveable is known
             let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
 
-            let obj = getNote(
-                note,
-                octave,
-                0,
-                keySignature,
-                false,
-                null,
-                that.blocks.errorMsg,
-                that.blocks.logo.synth.inTemperament
-            );
+            let obj;
+            if (that.name == "scaledegree2") {
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    true,
+                    null,
+                    that.blocks.errorMsg,
+                    that.blocks.logo.synth.inTemperament
+                );
+            } else {
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    KeySignatureEnv[2],
+                    null,
+                    that.blocks.errorMsg,
+                    that.blocks.logo.synth.inTemperament
+                );
+            }
+
+            
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
             }

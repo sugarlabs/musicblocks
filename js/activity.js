@@ -18,7 +18,7 @@
 var KeySignatureEnv = [
     "C",
     "major",
-    "false"
+    false
 ];
 
 function Activity() {
@@ -1145,7 +1145,7 @@ function Activity() {
             let ele = document.getElementsByName("moveable");
             for (let i = 0; i < ele.length; i++) {
                 if (ele[i].checked) {
-                    KeySignatureEnv[2] = ele[i].value;
+                    KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
                 }
             }
             keyNameWheel.removeWheel();
