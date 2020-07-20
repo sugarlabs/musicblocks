@@ -722,6 +722,34 @@ function setupPitchBlocks() {
         }
     }
 
+    class StaffYToPitch extends LeftBlock {
+        constructor(name, displayName) {
+            super("ytopitch", _("y to pitch"));
+            this.setPalette("pitch");
+            this.formBlock({
+                args: 1,
+                defaults: [50]
+            });
+        }
+        
+        arg(logo, turtle, blk, receivedArg) {
+            let cblk0 = logo.blocks.blockList[blk].connections[0];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            console.log(logo.blocks.blockList[cblk1].name);
+            if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
+                let posY = logo.blocks.blockList[cblk1].value;
+                let o = Math.floor(posY / 87.5);
+                posY %= 87.5;
+                let lc = 0;
+                for (let i = 0; i < posY / 12.5; i++) {
+                    lc += MUSICALMODES["major"][i];
+                }
+                return (lc + (12 * o));
+            }
+
+        }
+    }
+
     class AccidentalNameBlock extends ValueBlock {
         constructor() {
             super("accidentalname");
@@ -1712,6 +1740,7 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            console.log(args);
             let arg0;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -2461,4 +2490,5 @@ function setupPitchBlocks() {
     new StepPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();
+    new StaffYToPitch().setup();
 }
