@@ -541,7 +541,7 @@ function Toolbar() {
             ["enUS", _("English (United States)"), "innerHTML"],
             ["enUK", _("English (United Kingdom)"), "innerHTML"],
             ["ja", _("日本語"), "innerHTML"],
-	    ["ko", _("한국인"), "innerHTML"],
+	    ["ko", _("한국어"), "innerHTML"],
             ["es", _("español"), "innerHTML"],
             ["pt", _("português"), "innerHTML"],
             ["kana", _("にほんご"), "innerHTML"],
