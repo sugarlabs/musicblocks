@@ -15,7 +15,7 @@
 #.TRANS: rhythm block
 #.TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
-msgstr ""
+msgstr "박자"
 
 #: js/RhythmBlockPaletteBlocks.js:16
 #: js/RhythmBlockPaletteBlocks.js:179
@@ -27,7 +27,7 @@ msgstr ""
 #: js/rhythmruler.js:1490
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "박자"
 
 #: js/RhythmBlockPaletteBlocks.js:19
 #: js/RhythmBlockPaletteBlocks.js:182
@@ -35,7 +35,7 @@ msgstr ""
 #: js/RhythmBlockPaletteBlocks.js:366
 #: js/RhythmBlockPaletteBlocks.js:628
 msgid "number of notes"
-msgstr ""
+msgstr "음표 개수"
 
 #: js/RhythmBlockPaletteBlocks.js:19
 #: js/RhythmBlockPaletteBlocks.js:182
@@ -56,7 +56,7 @@ msgstr ""
 #: js/pitchtimematrix.js:2667
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
-msgstr ""
+msgstr "음표 값"
 
 #: js/RhythmBlockPaletteBlocks.js:70
 msgid "polyphonic rhythm"
@@ -64,31 +64,31 @@ msgstr ""
 
 #: js/RhythmBlockPaletteBlocks.js:167
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "박자 블록은 박자 패턴을 만드는 데 사용된다"
 
 #: js/RhythmBlockPaletteBlocks.js:198
 msgid "1/64 note"
-msgstr ""
+msgstr "64분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:214
 msgid "1/32 note"
-msgstr ""
+msgstr "32분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:230
 msgid "1/16 note"
-msgstr ""
+msgstr "16분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:246
 msgid "eighth note"
-msgstr ""
+msgstr "8분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:262
 msgid "quarter note"
-msgstr ""
+msgstr "4분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:278
 msgid "half note"
-msgstr ""
+msgstr "2분 음표"
 
 #: js/RhythmBlockPaletteBlocks.js:294
 msgid "whole note"
@@ -114,7 +114,7 @@ msgstr ""
 #: js/RhythmBlockPaletteBlocks.js:592
 #.TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
-msgstr ""
+msgstr "셋잇단음표"
 
 #: js/RhythmBlockPaletteBlocks.js:608
 msgid "simple tuplet"
@@ -129,21 +129,21 @@ msgstr ""
 #: js/RhythmBlocks.js:203
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
-msgstr ""
+msgstr "스윙"
 
 #: js/RhythmBlocks.js:208
 #.TRANS: the amount to shift to the offbeat note
 msgid "swing value"
-msgstr ""
+msgstr "스윙 값"
 
 #: js/RhythmBlocks.js:238
 msgid "The Skip notes block will cause notes to be skipped."
-msgstr ""
+msgstr "음표 건너뛰기 블록은 음표들을 건너 뛰고 연주하지 않는다."
 
 #: js/RhythmBlocks.js:246
 #.TRANS: substitute rests on notes being skipped
 msgid "skip notes"
-msgstr ""
+msgstr "음표 건너뛰기"
 
 #: js/RhythmBlocks.js:274
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
@@ -153,7 +153,7 @@ msgstr ""
 #: js/RhythmBlocks.js:339
 #.TRANS: tie notes together into one longer note
 msgid "tie"
-msgstr ""
+msgstr "붙임줄"
 
 #: js/RhythmBlocks.js:475
 #: js/RhythmBlocks.js:508
@@ -186,7 +186,7 @@ msgstr ""
 
 #: js/RhythmBlocks.js:615
 msgid "392 hertz"
-msgstr ""
+msgstr "392 헤르츠"
 
 #: js/RhythmBlocks.js:798
 #: js/ExtrasBlocks.js:356
@@ -197,7 +197,7 @@ msgstr ""
 #: plugins/rodi.rtp:196
 #.TRANS: a musical note consisting of pitch and duration
 msgid "note"
-msgstr ""
+msgstr "음표"
 
 #: js/RhythmBlocks.js:800
 msgid "value2"
@@ -209,72 +209,72 @@ msgstr ""
 #: js/HeapBlocks.js:397
 #: plugins/bitcoin.rtp:27
 msgid "value"
-msgstr ""
+msgstr "값"
 
 #: js/RhythmBlocks.js:829
 msgid "define frequency"
-msgstr ""
+msgstr "진동수를 정의하시오"
 
 #: js/RhythmBlocks.js:838
 msgid "octave space"
-msgstr ""
+msgstr "옥타브 공간"
 
 #: js/PenBlocks.js:4
 msgid "purple"
-msgstr ""
+msgstr "보라"
 
 #: js/PenBlocks.js:17
 #: js/SensorsBlocks.js:287
 #: plugins/rodi.rtp:223
 msgid "blue"
-msgstr ""
+msgstr "파랑"
 
 #: js/PenBlocks.js:30
 #: js/SensorsBlocks.js:314
 #: plugins/rodi.rtp:222
 msgid "green"
-msgstr ""
+msgstr "초록"
 
 #: js/PenBlocks.js:43
 msgid "yellow"
-msgstr ""
+msgstr "노랑"
 
 #: js/PenBlocks.js:56
 #: plugins/nutrition.rtp:164
 msgid "orange"
-msgstr ""
+msgstr "주황"
 
 #: js/PenBlocks.js:69
 #: js/SensorsBlocks.js:341
 #: plugins/rodi.rtp:221
 msgid "red"
-msgstr ""
+msgstr "빨강"
 
 #: js/PenBlocks.js:82
 msgid "white"
-msgstr ""
+msgstr "하양"
 
 #: js/PenBlocks.js:95
 msgid "black"
-msgstr ""
+msgstr "검정"
 
 #: js/PenBlocks.js:108
 msgid "begin fill"
-msgstr ""
+msgstr "채우기 시작"
 
 #: js/PenBlocks.js:121
 msgid "end fill"
-msgstr ""
+msgstr "채우기 끝"
 
 #: js/PenBlocks.js:135
 #: js/PenBlocks.js:329
 #.TRANS: set the background color
 msgid "background"
-msgstr ""
+msgstr "배경"
 
 #: js/PenBlocks.js:163
 msgid "grey"
-msgstr ""
+msgstr "회색"
 
 #: js/PenBlocks.js:167
 msgid "The Grey block returns the current pen grey value."
@@ -306,15 +306,15 @@ msgstr ""
 
 #: js/PenBlocks.js:300
 msgid "set font"
-msgstr ""
+msgstr "폰트 설정"
 
 #: js/PenBlocks.js:303
 msgid "The Set font block sets the font used by the Show block."
-msgstr ""
+msgstr "폰트 설정 블록은"
 
 #: js/PenBlocks.js:334
 msgid "The Background block sets the window background color."
-msgstr ""
+msgstr "배경 블록은 윈도 배경 색을 설정한다."
 
 #: js/PenBlocks.js:350
 msgid "The Hollow line block creates a line with a hollow center."
@@ -323,7 +323,7 @@ msgstr ""
 #: js/PenBlocks.js:357
 #.TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
-msgstr ""
+msgstr "빈 선."
 
 #: js/PenBlocks.js:406
 msgid "The Fill block fills in a shape with a color."
@@ -332,16 +332,16 @@ msgstr ""
 #: js/PenBlocks.js:414
 #.TRANS: fill in as a solid color
 msgid "fill"
-msgstr ""
+msgstr "채우기."
 
 #: js/PenBlocks.js:475
 #.TRANS: raise up the pen so logo it does not draw when it is moved
 msgid "pen up"
-msgstr "펜 그리기 않기"
+msgstr "펜 그리지 않기."
 
 #: js/PenBlocks.js:480
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "펜 그리지 않기 블록은 팬을 들어올려 더이상 그려지지 않게 한다."
 
 #: js/PenBlocks.js:500
 #.TRANS: put down the pen so logo it draws when it is moved
@@ -350,7 +350,7 @@ msgstr "펜 그리기"
 
 #: js/PenBlocks.js:505
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "펜 그리기 블록은 펜을 내려 그릴 수 있게 한다."
 
 #: js/PenBlocks.js:525
 #.TRANS: set the width of the line drawn by the pen
@@ -364,11 +364,11 @@ msgstr ""
 #: js/PenBlocks.js:572
 #.TRANS: set degree of translucence of the pen color
 msgid "set translucency"
-msgstr ""
+msgstr "투명도 설정."
 
 #: js/PenBlocks.js:575
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "투병도 설정 블록은 펜의 투명도를 바꾼다."
 
 #: js/PenBlocks.js:618
 msgid "set hue"
@@ -397,7 +397,7 @@ msgstr "색 지정"
 
 #: js/PenBlocks.js:760
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "색 설정 블록은 펜의 색을 바꾼다."
 
 #: js/DrumBlocks.js:25
 msgid "The Drum name block is used to select a drum."
@@ -405,18 +405,18 @@ msgstr ""
 
 #: js/DrumBlocks.js:40
 msgid "The Effects name block is used to select a sound effect."
-msgstr ""
+msgstr "효과 명 블록은 음향 효과를 선택하는 데 사용된다."
 
 #: js/DrumBlocks.js:50
 msgid "noise"
-msgstr ""
+msgstr "소음."
 
 #: js/DrumBlocks.js:61
 #: js/synthutils.js:16
 #: js/musicutils.js:613
 #.TRANS: white noise synthesizer
 msgid "white noise"
-msgstr ""
+msgstr "백색 소음."
 
 #: js/DrumBlocks.js:107
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -434,11 +434,11 @@ msgstr ""
 #: js/DrumBlocks.js:273
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
-msgstr ""
+msgstr "드럼 설정."
 
 #: js/DrumBlocks.js:322
 msgid "sound effect"
-msgstr ""
+msgstr "음향 효과."
 
 #: js/DrumBlocks.js:340
 msgid "You can use multiple Drum blocks within a Note block."
@@ -496,7 +496,7 @@ msgstr ""
 #: js/WidgetBlocks.js:94
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
-msgstr ""
+msgstr "필터."
 
 #: js/WidgetBlocks.js:99
 #: js/musicutils.js:567
@@ -575,7 +575,7 @@ msgstr ""
 #: js/WidgetBlocks.js:458
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "빠르기."
 
 #: js/WidgetBlocks.js:505
 #.TRANS: makes a mapping between pitches and drum sounds
@@ -610,11 +610,11 @@ msgstr ""
 
 #: js/WidgetBlocks.js:887
 msgid "G major scale"
-msgstr ""
+msgstr "사장조 스케일."
 
 #: js/WidgetBlocks.js:915
 msgid "C major scale"
-msgstr ""
+msgstr "다장조 스케일."
 
 #: js/WidgetBlocks.js:957
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
@@ -647,7 +647,7 @@ msgstr ""
 #: js/ActionBlocks.js:283
 #: js/ActionBlocks.js:406
 msgid "calculate"
-msgstr ""
+msgstr "계산하기."
 
 #: js/ActionBlocks.js:99
 #: js/ActionBlocks.js:147
@@ -1147,13 +1147,13 @@ msgstr ""
 #: js/OrnamentBlocks.js:332
 #.TRANS: slur or legato is an overlap successive notes
 msgid "slur"
-msgstr ""
+msgstr "이음줄."
 
 #: js/OrnamentBlocks.js:272
 #: js/OrnamentBlocks.js:364
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
-msgstr ""
+msgstr "스타카토."
 
 #: js/VolumeBlocks.js:5
 #.TRANS: the volume for this synth
@@ -1243,12 +1243,12 @@ msgstr ""
 #: js/VolumeBlocks.js:697
 #.TRANS: a gradual increase in loudness
 msgid "decrescendo"
-msgstr ""
+msgstr "디크레센도."
 
 #: js/VolumeBlocks.js:779
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
-msgstr ""
+msgstr "크레센도."
 
 #: js/ExtrasBlocks.js:4
 msgid "fraction"
@@ -1364,7 +1364,7 @@ msgstr ""
 
 #: js/ExtrasBlocks.js:674
 msgid "open project"
-msgstr ""
+msgstr "프로젝트 열기."
 
 #: js/ExtrasBlocks.js:700
 msgid "Please enter a valid URL."
@@ -1422,22 +1422,22 @@ msgstr ""
 
 #: js/ExtrasBlocks.js:933
 msgid "mezzo-soprano"
-msgstr ""
+msgstr "메조 소프라노."
 
 #: js/ExtrasBlocks.js:936
 msgid "alto"
-msgstr ""
+msgstr "알토."
 
 #: js/ExtrasBlocks.js:939
 msgid "tenor"
-msgstr ""
+msgstr "테너."
 
 #: js/ExtrasBlocks.js:942
 #: js/synthutils.js:33
 #: js/musicutils.js:597
 #.TRANS: musical instrument
 msgid "bass"
-msgstr ""
+msgstr "베이스."
 
 #: js/ExtrasBlocks.js:945
 msgid "none"
@@ -1468,7 +1468,7 @@ msgstr ""
 #: js/status.js:152
 #.TRANS: number of beats played per minute
 msgid "beats per minute2"
-msgstr ""
+msgstr "분당 비트2"
 
 #: js/MeterBlocks.js:80
 #: js/MeterBlocks.js:858
@@ -1476,7 +1476,7 @@ msgstr ""
 #: js/MeterBlocks.js:1007
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "beats per minute"
-msgstr ""
+msgstr "분당 비트."
 
 #: js/MeterBlocks.js:115
 #.TRANS: count of current musical measure in meter
@@ -1530,7 +1530,7 @@ msgstr ""
 
 #: js/MeterBlocks.js:488
 msgid "beat"
-msgstr ""
+msgstr "비트."
 
 #: js/MeterBlocks.js:560
 msgid "on every beat do"
@@ -10798,4 +10798,3 @@ msgstr ""
 
 #~msgid "Spanish"
 #~msgstr ""
-
