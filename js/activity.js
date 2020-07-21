@@ -1056,7 +1056,7 @@ function Activity() {
     };
 
     chooseKeyMenu = () => {
-        docById("chooseKeyDiv").style.display = "";
+        docById("chooseKeyDiv").style.display = "block";
         docById("moveable").style.display = "block";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);

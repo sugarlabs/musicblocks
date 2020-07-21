@@ -398,11 +398,12 @@ function Toolbar() {
     };
 
     this.renderChooseKeyIcon = function(onclick) {
-        var chooseKeyIcon = docById("chooseKeyIcon")
+        var chooseKeyIcon = docById("chooseKeyIcon");
+        docById("chooseKeyDiv").style.display = "none";
         chooseKeyIcon.onclick = () => {
             onclick();
-        }
-    }
+        };
+    };
 
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
