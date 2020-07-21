@@ -735,7 +735,6 @@ function setupPitchBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let cblk0 = logo.blocks.blockList[blk].connections[0];
             let cblk1 = logo.blocks.blockList[blk].connections[1];
-            console.log(logo.blocks.blockList[cblk1].name);
             if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
                 let posY = logo.blocks.blockList[cblk1].value;
                 let o = Math.floor(posY / 87.5);
@@ -745,6 +744,12 @@ function setupPitchBlocks() {
                     lc += MUSICALMODES["major"][i];
                 }
                 return (lc + (12 * o));
+            } else if (logo.blocks.blockList[cblk0].name == "nthmodalpitch") {
+                let posY1 = logo.blocks.blockList[cblk1].value;
+                let o1 = Math.floor(posY1 / 87.5);
+                posY1 %= 87.5;
+                let lc1 = posY1 / 12.5;
+                return (lc1 + (o1 * 7));
             }
 
         }
@@ -1949,8 +1954,18 @@ function setupPitchBlocks() {
 
                 let isNegativeArg = arg0 < 0 ? true : false;
                 arg0 = Math.abs(arg0);
+                
+                let obj;
+                if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch") {
+                    obj = keySignatureToMode("C major");
+                } else {
+                    obj = keySignatureToMode(logo.keySignature[turtle]);
+                }
 
+<<<<<<< HEAD
                 let obj = keySignatureToMode(tur.singer.keySignature);
+=======
+>>>>>>> Staff Y: Nthmodalpitch
                 let modeLength = MUSICALMODES[obj[1]].length;
                 let scaleDegree = Math.floor(arg0 - 1) % modeLength + 1;
 
@@ -1996,7 +2011,13 @@ function setupPitchBlocks() {
                 */
 
                 scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
-                let note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+                let note;
+
+                if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch") {
+                    note = nthDegreeToPitch("C major", scaleDegree);
+                } else {
+                    note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+                }
 
                 let semitones =
                     ref +
