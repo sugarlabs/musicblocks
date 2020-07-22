@@ -353,6 +353,7 @@ function Palettes() {
     };
 
     this.makePalettes = function(hide) {
+        makePalettesNew(0);
     };
 
     this.makePalettesNew = function(i) {
@@ -984,7 +985,7 @@ function Palette(palettes, name) {
         x.setAttribute("id","PaletteBody")
         x.setAttribute("bgcolor","white");
         x.setAttribute("style","float: left");
-        x.innerHTML= '<thead></thead><tbody style = "display: block; height: 400px; overflow: auto;" id ="PaletteBody_items" class="PalScrol"></tbody>'
+        x.innerHTML= '<thead></thead><tbody style = "display: block; height: '+(window.innerHeight-this.palettes.top-this.palettes.cellSize-15)+'px; overflow: auto;" id ="PaletteBody_items" class="PalScrol"></tbody>'
         palDiv.appendChild(x)
         this.menuContainer=x ;
 
@@ -994,7 +995,8 @@ function Palette(palettes, name) {
                 
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.innerHTML='<td style ="width: 10px"></td><td></td>';
+            header.style.background = platformColor.selectorSelected;
+            header.innerHTML='<td style ="width: 10px ;height: 42px"></td><td></td>';
             let closeImg = makePaletteIcons(
                 CLOSEICON.replace("fill_color", platformColor.selectorSelected),
                 this.palettes.cellSize,
@@ -1564,8 +1566,6 @@ async function initPalettes(palettes) {
     palettes.makePalettesNew(0);
     console.debug("Time to show the palettes.");
     palettes.show();
-    palettes.showSelection(0);
-
 }
 
 const MODEUNSURE = 0;
