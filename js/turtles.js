@@ -933,6 +933,7 @@ Turtles.TurtlesView = class {
             if (docById("buttoncontainerTOP"))docById("buttoncontainerTOP").parentElement.removeChild(docById("buttoncontainerTOP"));
             let cont = document.createElement("div");
             document.body.appendChild(cont)
+            cont.style.display = "none";
             cont.setAttribute("id","buttoncontainerTOP");
             __makeExpandButton();
             __makeClearButton();

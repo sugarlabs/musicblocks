@@ -2915,6 +2915,10 @@ function Activity() {
     _doOpenSamples = function() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
+        if (docById("buttoncontainerBOTTOM").style.display != "none")
+            docById("buttoncontainerBOTTOM").style.display = "none";
+        if (docById("buttoncontainerTOP").style.display != "none")
+            docById("buttoncontainerTOP").style.display = "none";
     };
 
     /*
@@ -3112,6 +3116,8 @@ function Activity() {
             console.debug('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
+       docById("buttoncontainerBOTTOM").style.display = "block";
+       docById("buttoncontainerTOP").style.display = "block";
     };
 
     this._loadStart = async function() {
@@ -3809,6 +3815,7 @@ function Activity() {
 
         let ButtonHolder = document.createElement("div");
         ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
+        ButtonHolder.style.display = "none";
         document.body.appendChild(ButtonHolder);
 
         homeButtonContainer = _makeButton(
@@ -4426,6 +4433,8 @@ function Activity() {
                     platformColor.header;
                 stage.enableDOMEvents(true);
                 window.scroll(0, 0);
+                docById("buttoncontainerBOTTOM").style.display = "block";
+                docById("buttoncontainerTOP").style.display = "block";
             };
 
             this.showPlanet = function() {
