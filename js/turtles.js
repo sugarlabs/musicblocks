@@ -708,25 +708,31 @@ Turtles.TurtlesView = class {
             let container = document.createElement("div");
             container.setAttribute("id", ""+label);
 
-            let text = document.createElement("p");
-            text.textContent = label;
-            text.style = 'font-size:5px';
+            container.setAttribute("class","tooltipped");
+            container.setAttribute("data-tooltip",label);
+            container.setAttribute("data-position","bottom");
+            jQuery.noConflict()(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+
             container.onmouseover = (event) => {
-                text.style.display="";
+                if (!loading) {
+                    document.body.style.cursor = "pointer";
+                }
             };
-            
+
             container.onmouseout = (event) => {
-                text.style.display="none";
-            };
-            text.style.display="none";
-    
+                if (!loading) {
+                    document.body.style.cursor = "default";
+                }
+            };    
             let img = new Image();
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(svg)));
 
             container.appendChild(img);
-            container.appendChild(text);
             container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth -x)+"px;  top: "+y+"px;")
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -825,12 +831,6 @@ Turtles.TurtlesView = class {
          */
         let __makeCollapseButton = () => {
             this._collapseButton = _makeButton(COLLAPSEBUTTON,_("Collapse"),this._w - 55,70 + LEADING + 6);
-            this._collapseLabel = null;
-            this._collapseLabelBG = null;
-
-            if (this._collapseButton !== null) {
-                this._collapseButton.visible = false;
-            }
 
             this._collapseButton.onclick = event => {
                 // If the aux toolbar is open, close it.
@@ -841,6 +841,9 @@ Turtles.TurtlesView = class {
                     menuIcon.innerHTML = "menu";
                     docById("toggleAuxBtn").className -= "blue darken-1";
                 }
+                this._expandButton.style.visibility = "visible";
+                this._collapseButton.style.visibility = "hidden";
+
                 __collapse();
             };
 
@@ -857,18 +860,18 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
         let __makeExpandButton = () => {
-            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 10 - 4 * 55, 70 + LEADING + 6)
+            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 55, 70 + LEADING + 6)
             this._expandLabel = null;
             this._expandLabelBG = null;
             if (this._expandButton !== null) {
-                this._expandButton.visible = false;
+                this._expandButton.style.visibility = "hidden";
             }
 
-            // this._expandButton.onmouseover = event => {
-            // };
+            this._expandButton.onmouseover = event => {
+            };
 
-            // this._expandButton.onmouseout = event => {
-            // };
+            this._expandButton.onmouseout = event => {
+            };
 
             this._expandButton.onpressmove = event => {
                 let w = (this._w - 10 - CONTAINERSCALEFACTOR * 55) / CONTAINERSCALEFACTOR;
@@ -891,9 +894,9 @@ Turtles.TurtlesView = class {
                 this.hideMenu();
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
-                this._collapseButton.visible = true;
+                this._collapseButton.style.visibility = "visible";
+                this._expandButton.style.visibility = "hidden";
                 this._collapsedBoundary.visible = false;
-                this._expandButton.visible = false;
                 turtlesStage.x = 0;
                 turtlesStage.y = 0;
                 this._isShrunk = false;

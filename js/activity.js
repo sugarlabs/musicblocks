@@ -558,9 +558,9 @@ function Activity() {
             return;
         }
         if (zero)
-            homeButtonContainer.style.background = "red";
+            changeImage(homeButtonContainer.children[0],GOHOMEFADEDBUTTON,GOHOMEBUTTON);
         else 
-            homeButtonContainer.style.background = "";
+            changeImage(homeButtonContainer.children[0],GOHOMEBUTTON,GOHOMEFADEDBUTTON);
         };
 
     __saveHelpBlock = function(name, delay) {
@@ -1258,16 +1258,16 @@ function Activity() {
      * then the icons to make them smaller/bigger will be hidden
      */
     setSmallerLargerStatus = function() {
-        if (BLOCKSCALES[blockscale] > 1) {
-            smallerContainer.style.background = "yellow";
+        if (BLOCKSCALES[blockscale] < DEFAULTBLOCKSCALE) {
+            changeImage(smallerContainer.children[0],SMALLERBUTTON,SMALLERDISABLEBUTTON);
         } else {
-            smallerContainer.style.background = "";
+            changeImage(smallerContainer.children[0],SMALLERDISABLEBUTTON,SMALLERBUTTON);
         }
 
         if (BLOCKSCALES[blockscale] === 4) {
-            largerContainer.style.background  = "yellow";
+            changeImage(largerContainer.children[0],BIGGERBUTTON,BIGGERDISABLEBUTTON);
         } else {
-            largerContainer.style.background  = "";
+            changeImage(largerContainer.children[0],BIGGERDISABLEBUTTON,BIGGERBUTTON);
         }
     };
 
@@ -2820,13 +2820,13 @@ function Activity() {
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             palettes.hide();
-            hideBlocksContainer.style.background = "red";
+            changeImage(hideBlocksContainer.children[0],SHOWBLOCKSBUTTON,HIDEBLOCKSFADEDBUTTON);
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-            hideBlocksContainer.style.background = "";
+            changeImage(hideBlocksContainer.children[0],HIDEBLOCKSFADEDBUTTON,SHOWBLOCKSBUTTON);
             blocks.showBlocks();
             palettes.show();
             palettes.bringToTop();
@@ -4025,19 +4025,27 @@ function Activity() {
      */
     _makeButton = function(name, label, x, y,) {
         let container = document.createElement("div");
-        container.setAttribute("id", "okoko"+label);
-        // container.style.top = y;
-        // container.style.left = x;
+        container.setAttribute("id", ""+label);
 
         
-        let text = document.createElement("p");
-        //text.textContent = label ;
+        container.setAttribute("class","tooltipped");
+        container.setAttribute("data-tooltip",label);
+        container.setAttribute("data-position","top");
+        jQuery.noConflict()(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
+        container.onmouseover = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "pointer";
+            }
+        };
         
-        // container.on("mouseover", function(event) {
-        // });
-
-        // container.on("mouseout", function(event) {
-        // });
+        container.onmouseout = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "default";
+            }
+        };
 
         let img = new Image();
         img.src =
@@ -4045,7 +4053,6 @@ function Activity() {
             window.btoa(unescape(encodeURIComponent(name)));
         
         container.appendChild(img);
-        container.appendChild(text);
         container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
         docById("buttoncontainerBOTTOM").appendChild(container);
         return container;
@@ -4067,16 +4074,6 @@ function Activity() {
         actionClick,
         arg
     ) {
-        container.onmouseover = function(event) {
-            if (!loading) {
-                document.body.style.cursor = "pointer";
-            }
-        };
-        container.onmouseout = function(event) {
-            if (!loading) {
-                document.body.style.cursor = "default";
-            }
-        };
         container.onmousedown = function(event) {
             if (!loading) {
                 document.body.style.cursor = "default";
