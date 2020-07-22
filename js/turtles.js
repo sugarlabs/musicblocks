@@ -684,12 +684,7 @@ Turtles.TurtlesView = class {
         let borderContainer = this.borderContainer;
 
         // Remove any old background containers
-        for (let i = 0; i < borderContainer.children.length; i++) {
-            borderContainer.children[i].visible = false;
-            borderContainer.removeChild(
-                borderContainer.children[i]
-            );
-        }
+        borderContainer.removeAllChildren();
 
         let turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
@@ -897,15 +892,21 @@ Turtles.TurtlesView = class {
          * initializes all Buttons.
          */
         let __makeAllButtons = () => {
-            if (docById("buttoncontainerTOP"))docById("buttoncontainerTOP").parentElement.removeChild(docById("buttoncontainerTOP"));
+            let second = false;
+            if (docById("buttoncontainerTOP")){
+                jQuery.noConflict()(".tooltipped").tooltip("close");
+                docById("buttoncontainerTOP").parentElement.removeChild(docById("buttoncontainerTOP"));
+                second = true;
+            }
             let cont = document.createElement("div");
             document.body.appendChild(cont)
-            cont.style.display = "none";
+            cont.style.display = second ?"block":"none";
             cont.setAttribute("id","buttoncontainerTOP");
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
             __makeCollapseButton();
+            this._locked = false;
         }
 
         /**
