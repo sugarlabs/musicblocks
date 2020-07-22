@@ -177,55 +177,6 @@ function Palettes() {
     }
 
     this.showSelection = function(i) {
-        for (var j = 0; j < this.selectorButtonsOn.length; j++) {
-            if (j === i) {
-                this.selectorButtonsOn[j].visible = true;
-            } else {
-                this.selectorButtonsOn[j].visible = false;
-            }
-        }
-
-        for (var name in this.buttons) {
-            if (this.buttons[name] === undefined) {
-                continue;
-            }
-
-            if (this.labels[name] === undefined) {
-                continue;
-            }
-
-            if (name === "search") {
-                this.buttons[name].visible = true;
-                this.labels[name].visible = true;
-            } else if (MULTIPALETTES[i].indexOf(name) === -1) {
-                this.buttons[name].visible = false;
-                this.labels[name].visible = false;
-                if (i === MULTIPALETTES.length - 1) {
-                    // last selector
-                    if (this.pluginPalettes.indexOf(name) > -1) {
-                        console.debug("Showing " + name);
-                        this.buttons[name].visible = true;
-                        this.labels[name].visible = true;
-                    }
-                }
-            } else {
-                if (name === "myblocks") {
-                    var n = palettes.countProtoBlocks("myblocks");
-                    if (n === 0) {
-                        this.buttons[name].visible = false;
-                        this.labels[name].visible = false;
-                    } else {
-                        this.buttons[name].visible = true;
-                        this.labels[name].visible = true;
-                    }
-                } else {
-                    this.buttons[name].visible = true;
-                    this.labels[name].visible = true;
-                }
-            }
-        }
-
-        this.refreshCanvas();
     };
 
     this.setCanvas = function(canvas) {
@@ -372,6 +323,12 @@ function Palettes() {
             ,listBody                
         );
         for (let name of MULTIPALETTES[i] ) {
+            if (name ==="myblocks" ) {
+                var n = this.countProtoBlocks("myblocks");
+                if (n === 0) {
+                    continue;
+                }
+            }
             this.makeButton(
                 name,
                 makePaletteIcons(
@@ -446,22 +403,6 @@ function Palettes() {
     };
 
     this._showMenus = function() {
-        // Show the menu buttons, but not the palettes.
-        if (this.mobile) {
-            return;
-        }
-
-        for (var i = 0; i < this.selectorButtonsOff.length; i++) {
-            this.selectorButtonsOff[i].visible = true;
-        }
-
-        this.showSelection(0);
-
-        if (this.background != null) {
-            this.background.visible = true;
-        }
-
-        this.refreshCanvas();
     };
 
     this._hideMenus = function() {
@@ -943,16 +884,6 @@ function Palette(palettes, name) {
     };
 
     this._getOverflowWidth = function() {
-        var maxWidth = 0;
-        for (var i in this.protoList) {
-            if (this.protoList[i].hidden) {
-                continue;
-            }
-
-            maxWidth = Math.max(maxWidth, this.protoList[i].textWidth);
-        }
-
-        return maxWidth > 100 ? (maxWidth - 30) * PROTOBLOCKSCALE : 0;
     };
 
     this._resetLayout = function() {
