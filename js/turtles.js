@@ -511,17 +511,9 @@ Turtles.TurtlesView = class {
         this._expandedBoundary = null;
         this._collapsedBoundary = null;
         this._expandButton = null;      // used by add method
-        this._expandLabel = null;
-        this._expandLabelBG = null;
         this._collapseButton = null;    // used by add method
-        this._collapseLabel = null;
-        this._collapseLabelBG = null;
         this._clearButton = null;       // used by add method
-        this._clearLabel = null;
-        this._clearLabelBG = null;
         this._gridButton = null;        // used by add method
-        this._gridLabel = null;
-        this._gridLabelBG = null;
 
         // canvas background color
         this._backgroundColor = platformColor.background;
@@ -574,9 +566,7 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     setGridLabel(text) {
-        if (this._gridLabel !== null) {
-            this._gridLabel.text = text;
-        }
+        this._gridLabel = text;
     }
 
     /**
@@ -739,6 +729,29 @@ Turtles.TurtlesView = class {
         };
 
         /**
+         * Setup dragging of smaller canvas .
+         */
+        let dragCanvas = () =>{
+            let offset ;
+            turtlesStage.removeAllEventListeners("pressmove");
+            turtlesStage.removeAllEventListeners("mousedown");
+            turtlesStage.on("mousedown",event => {
+                offset ={
+                    y:event.stageY - turtlesStage.y,
+                    x:event.stageX - turtlesStage.x
+                }
+            });
+            turtlesStage.on("pressmove",event => {
+                let x = event.stageX - offset.x ;
+                let y = event.stageY - offset.y;
+                turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
+                turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
+                this.refreshCanvas();
+                    
+            })
+        }
+
+        /**
          * Toggles visibility of menu and grids.
          * Scales down all 'turtles' in turtleList.
          * Removes the stage and adds it back at the top.
@@ -759,22 +772,10 @@ Turtles.TurtlesView = class {
                 this.turtleList[i].container.scale = CONTAINERSCALEFACTOR;
             }
 
-            this._clearButton.scaleX = CONTAINERSCALEFACTOR;
-            this._clearButton.scaleY = CONTAINERSCALEFACTOR;
-            this._clearButton.scale = CONTAINERSCALEFACTOR;
-            this._clearButton.x = this._w - 5 - 8 * 55;
-
-            if (this._gridButton !== null) {
-                this._gridButton.scaleX = CONTAINERSCALEFACTOR;
-                this._gridButton.scaleY = CONTAINERSCALEFACTOR;
-                this._gridButton.scale = CONTAINERSCALEFACTOR;
-                this._gridButton.x = this._w - 10 - 12 * 55;
-                this._gridButton.visible = false;
-            }
-
             // remove the stage and add it back at the top
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChild(turtlesStage);
+            dragCanvas();
 
             this.refreshCanvas();
         }
@@ -785,18 +786,12 @@ Turtles.TurtlesView = class {
          */
         let __makeGridButton = () => {
             this._gridButton = _makeButton(CARTESIANBUTTON,_("show Cartesian"),this._w - 10 - 3 * 55, 70 + LEADING + 6);
-            this._gridLabel = null;
-            this._gridLabelBG = null;
-
+            
             this._gridButton.onclick = event => {
                 this.doGrid();
+                this._gridButton.setAttribute("data-tooltip", this._gridLabel);
+                jQuery.noConflict()(".tooltipped").tooltip("close");
             };
-
-            // this._gridButton.onmouseover = event => {
-            // };
-
-            // this._gridButton.onmouseout = event => {
-            // };
 
         };
 
@@ -806,18 +801,10 @@ Turtles.TurtlesView = class {
          */
         let __makeClearButton = () => {
             this._clearButton = _makeButton(CLEARBUTTON,_("Clean"),this._w - 5 - 2 * 55, 70 + LEADING + 6);
-            this._clearLabel = null;
-            this._clearLabelBG = null;
 
             this._clearButton.onclick = event => {
                 this.doClear();
             };
-
-            // this._clearButton.onmouseover =  event => {
-            // };
-
-            // this._clearButton.onmouseout = event => {
-            // };
 
             if (doCollapse) {
                 __collapse();
@@ -843,16 +830,9 @@ Turtles.TurtlesView = class {
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
-
+                this._gridButton.style.visibility = "hidden";
                 __collapse();
             };
-
-            // this._collapseButton.onmouseover = event => {
-            // };
-
-            // this._collapseButton.onmouseout = event => {
-            // };
-
         };
 
         /**
@@ -860,27 +840,10 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
         let __makeExpandButton = () => {
-            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 55, 70 + LEADING + 6)
-            this._expandLabel = null;
-            this._expandLabelBG = null;
+            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 55, 70 + LEADING + 6);
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
             }
-
-            this._expandButton.onmouseover = event => {
-            };
-
-            this._expandButton.onmouseout = event => {
-            };
-
-            this._expandButton.onpressmove = event => {
-                let w = (this._w - 10 - CONTAINERSCALEFACTOR * 55) / CONTAINERSCALEFACTOR;
-                let x = event.stageX / this._scale - w;
-                let y = event.stageY / this._scale - 16;
-                turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
-                turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
-                this.refreshCanvas();
-            };
 
             this._expandButton.onclick = event => {
                 // If the aux toolbar is open, close it.
@@ -894,13 +857,17 @@ Turtles.TurtlesView = class {
                 this.hideMenu();
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
+                this._gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
                 this._collapsedBoundary.visible = false;
+                turtlesStage.removeAllEventListeners("pressmove");
+                turtlesStage.removeAllEventListeners("mousedown");
+                
                 turtlesStage.x = 0;
                 turtlesStage.y = 0;
                 this._isShrunk = false;
-
+                
                 for (let i = 0; i < this.turtleList.length; i++) {
                     this.turtleList[i].container.scaleX = 1;
                     this.turtleList[i].container.scaleY = 1;

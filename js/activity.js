@@ -2527,9 +2527,6 @@ function Activity() {
         trashcan.resizeEvent(turtleBlocksScale);
 
         // We need to reposition the palette buttons
-        if(docById("buttoncontainerBOTTOM")){
-            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
-        }
         _setupPaletteMenu(turtleBlocksScale);
 
         // Reposition coordinate grids.
@@ -3803,7 +3800,11 @@ function Activity() {
      * These menu items are on the canvas, not the toolbar.
      */
     _setupPaletteMenu = function(turtleBlocksScale) {
-
+        let removed = false ;
+        if(docById("buttoncontainerBOTTOM")){
+            removed = true ;
+            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
+        }
         let btnSize = cellSize;
         // Upper left
         // var x = 27.5 + 6;
@@ -3815,7 +3816,7 @@ function Activity() {
 
         let ButtonHolder = document.createElement("div");
         ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
-        ButtonHolder.style.display = "none";
+        if(!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
         document.body.appendChild(ButtonHolder);
 
         homeButtonContainer = _makeButton(
