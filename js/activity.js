@@ -982,6 +982,73 @@ function Activity() {
         }
     };
 
+    __generateSetKeyBlocks = () => {
+        // Find all setkey blocks in the code
+        let flag = 0;
+        let setKeyBlocks = [];
+        for (let i in logo.blocks.blockList) {
+            if (logo.blocks.blockList[i].name === "setkey2") {
+                flag = 1;
+                setKeyBlocks.push(i);
+            }
+        }
+        
+        if (!flag) {
+            blocks.findStacks();
+            let stacks = blocks.stackList;
+            stacks.sort();
+            for (let i in stacks) {
+                if (logo.blocks.blockList[stacks[i]].name === "start" ||
+                logo.blocks.blockList[stacks[i]].name === "action") {
+                    let bottomBlock;
+                    if (logo.blocks.blockList[stacks[i]].name == "start") {
+                        bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
+                    } else {
+                        bottomBlock = logo.blocks.blockList[stacks[i]].connections[2];
+                    }
+
+                    let connection = [stacks[i], null, null, bottomBlock];
+                    blocks._makeNewBlockWithConnections(
+                        "setkey2",
+                        0,
+                        connection,
+                        null,
+                        null
+                    );
+                    let setKey = logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[bottomBlock].connections[0] = setKey;
+                    if (logo.blocks.blockList[stacks[i]].name == "start") {
+                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
+                    } else {
+                        logo.blocks.blockList[stacks[i]].connections[2] = setKey;
+                    }
+                    
+                    blocks.adjustExpandableClampBlock();
+
+                    blocks._makeNewBlockWithConnections(
+                        "notename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[1] =
+                    logo.blocks.blockList.length - 1;
+                    blocks._makeNewBlockWithConnections(
+                        "modename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[2] =
+                    logo.blocks.blockList.length - 1;
+                }
+
+            }
+        }
+    };
+
     /*
      * @param onblur {when object loses focus}
      *
@@ -1004,8 +1071,6 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.setMasterVolume(0);
-
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1136,7 +1201,7 @@ function Activity() {
         // docById("chooseKeyDiv").style.position = "absolute";
         docById("chooseKeyDiv").style.left = (x - 175) + "px";
         docById("chooseKeyDiv").style.top = (y + 50) + "px";
-        docById("moveable").style.left = (x - 175) + "px";
+        docById("moveable").style.left = (x - 110) + "px";
         docById("moveable").style.top = (y + 400) + "px";
 
         let __exitMenu = () => {
@@ -1151,6 +1216,7 @@ function Activity() {
             keyNameWheel.removeWheel();
             addedOptionsWheel.removeWheel();
             modenameWheel.removeWheel();
+            __generateSetKeyBlocks();
         };
         
         exitWheel.navItems[0].navigateFunction = __exitMenu;
@@ -1255,7 +1321,6 @@ function Activity() {
             let selection = addedOptionsWheel.navItems[
                 addedOptionsWheel.selectedNavItemIndex
             ].title;
-            // console.log(selection);
             KeySignatureEnv[0] = selection;
             __playNote();
         };
