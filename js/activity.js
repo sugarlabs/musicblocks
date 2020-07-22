@@ -2527,8 +2527,8 @@ function Activity() {
         trashcan.resizeEvent(turtleBlocksScale);
 
         // We need to reposition the palette buttons
-        if(docById("buttoncontainer")){
-            docById("buttoncontainer").parentNode.removeChild(buttonContainer);
+        if(docById("buttoncontainerBOTTOM")){
+            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
         }
         _setupPaletteMenu(turtleBlocksScale);
 
@@ -3808,7 +3808,7 @@ function Activity() {
         let dx = btnSize;
 
         let ButtonHolder = document.createElement("div");
-        ButtonHolder.setAttribute("id","buttoncontainer")
+        ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
         document.body.appendChild(ButtonHolder);
 
         homeButtonContainer = _makeButton(
@@ -4047,7 +4047,7 @@ function Activity() {
         container.appendChild(img);
         container.appendChild(text);
         container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
-        docById("buttoncontainer").appendChild(container);
+        docById("buttoncontainerBOTTOM").appendChild(container);
         return container;
     };
 

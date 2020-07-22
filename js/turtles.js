@@ -115,8 +115,6 @@ class Turtles {
 
         let turtlesStage = this.stage;
 
-        this.reorderButtons(turtlesStage);
-
         let i = this.turtleList.length % 10;    // used for turtle (mouse) skin color
         this.turtleList.push(turtle);           // add new turtle to turtle list
 
@@ -656,26 +654,6 @@ Turtles.TurtlesView = class {
     }
 
     /**
-     * Brings stage control buttons to front.
-     *
-     * @param {Object} turtlesStage
-     * @returns {void}
-     */
-    reorderButtons(turtlesStage) {
-        // Ensure that the buttons are on top
-        turtlesStage.removeChild(this._expandButton);
-        turtlesStage.addChild(this._expandButton);
-        turtlesStage.removeChild(this._collapseButton);
-        turtlesStage.addChild(this._collapseButton);
-        turtlesStage.removeChild(this._clearButton);
-        turtlesStage.addChild(this._clearButton);
-        if (this._gridButton !== null) {
-            turtlesStage.removeChild(this._gridButton);
-            turtlesStage.addChild(this._gridButton);
-        }
-    }
-
-    /**
      * Creates the artwork for the turtle (mouse) 's skin.
      *
      * @param {Object} turtle
@@ -725,23 +703,34 @@ Turtles.TurtlesView = class {
 
         let turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
-        if (this._expandButton !== null) {
-            turtlesStage.removeChild(this._expandButton);
-        }
 
-        if (this._collapseButton !== null) {
-            turtlesStage.removeChild(this._collapseButton);
-        }
+        let _makeButton = (svg, label, x, y) => {
+            let container = document.createElement("div");
+            container.setAttribute("id", ""+label);
 
-        if (this._clearButton !== null) {
-            turtlesStage.removeChild(this._clearButton);
-        }
+            let text = document.createElement("p");
+            text.textContent = label;
+            text.style = 'font-size:5px';
+            container.onmouseover = (event) => {
+                text.style.display="";
+            };
+            
+            container.onmouseout = (event) => {
+                text.style.display="none";
+            };
+            text.style.display="none";
+    
+            let img = new Image();
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(svg)));
 
-        if (this._gridButton !== null) {
-            turtlesStage.removeChild(this._gridButton);
-        }
-
-        let circles = null;
+            container.appendChild(img);
+            container.appendChild(text);
+            container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth -x)+"px;  top: "+y+"px;")
+            docById("buttoncontainerTOP").appendChild(container);
+            return container;
+        };
 
         /**
          * Toggles visibility of menu and grids.
@@ -753,9 +742,7 @@ Turtles.TurtlesView = class {
             this.hideGrids();
             this.setStageScale(0.25);
             this._collapsedBoundary.visible = true;
-            this._expandButton.visible = true;
             this._expandedBoundary.visible = false;
-            this._collapseButton.visible = false;
             turtlesStage.x = (this._w * 3) / 4 - 10;
             turtlesStage.y = 55 + LEADING + 6;
             this._isShrunk = true;
@@ -791,106 +778,20 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to doGrid() method.
          */
         let __makeGridButton = () => {
-            this._gridButton = new createjs.Container();
+            this._gridButton = _makeButton(CARTESIANBUTTON,_("show Cartesian"),this._w - 10 - 3 * 55, 70 + LEADING + 6);
             this._gridLabel = null;
             this._gridLabelBG = null;
 
-            this._gridButton.removeAllEventListeners("click");
-            this._gridButton.on("click", event => {
+            this._gridButton.onclick = event => {
                 this.doGrid();
-            });
-
-            this._gridLabel = new createjs.Text(
-                _("show Cartesian"),
-                "14px Sans",
-                "#282828"
-            );
-            this._gridLabel.textAlign = "center";
-            this._gridLabel.x = 27.5;
-            this._gridLabel.y = 55;
-            this._gridLabel.visible = false;
-
-            let img = new Image();
-            img.onload = () => {
-                let bitmap = new createjs.Bitmap(img);
-                this._gridButton.addChild(bitmap);
-                this._gridButton.addChild(this._gridLabel);
-
-                bitmap.visible = true;
-                this._gridButton.x = this._w - 10 - 3 * 55;
-                this._gridButton.y = 70 + LEADING + 6;
-                this._gridButton.visible = true;
-
-                // borderContainer.addChild(this._gridButton);
-                turtlesStage.addChild(this._gridButton);
-                this.refreshCanvas();
-
-                this._gridButton.removeAllEventListeners("mouseover");
-                this._gridButton.on("mouseover", event => {
-                    if (this._gridLabel !== null) {
-                        this._gridLabel.visible = true;
-
-                        if (this._gridLabelBG === null) {
-                            let b = this._gridLabel.getBounds();
-                            this._gridLabelBG = new createjs.Shape();
-                            this._gridLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    this._gridLabel.x + b.x - 8,
-                                    this._gridLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            this._gridButton.addChildAt(this._gridLabelBG, 0);
-                        } else {
-                            this._gridLabelBG.visible = true;
-                        }
-
-                        let r = 55 / 2;
-                        circles = showButtonHighlight(
-                            this._gridButton.x + 28,
-                            this._gridButton.y + 28,
-                            r,
-                            event,
-                            palettes.scale,
-                            turtlesStage
-                        );
-                    }
-
-                    this.refreshCanvas();
-                });
-
-                this._gridButton.removeAllEventListeners("mouseout");
-                this._gridButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, turtlesStage);
-                    if (this._gridLabel !== null) {
-                        this._gridLabel.visible = false;
-                        this._gridLabelBG.visible = false;
-                        this.refreshCanvas();
-                    }
-                });
-
-                if (doCollapse) {
-                    __collapse();
-                }
-
-                this._locked = false;
-                if (this._queue.length === 3) {
-                    this._scale = this._queue[2];
-                    this._w = this._queue[0] / this._scale;
-                    this._h = this._queue[1] / this._scale;
-                    this._queue = [];
-                    this.makeBackground();
-                }
             };
 
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)));
+            // this._gridButton.onmouseover = event => {
+            // };
+
+            // this._gridButton.onmouseout = event => {
+            // };
+
         };
 
         /**
@@ -898,106 +799,24 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to call doClear() method.
          */
         let __makeClearButton = () => {
-            this._clearButton = new createjs.Container();
+            this._clearButton = _makeButton(CLEARBUTTON,_("Clean"),this._w - 5 - 2 * 55, 70 + LEADING + 6);
             this._clearLabel = null;
             this._clearLabelBG = null;
 
-            this._clearButton.removeAllEventListeners("click");
-            this._clearButton.on("click", event => {
+            this._clearButton.onclick = event => {
                 this.doClear();
-            });
-
-            this._clearLabel = new createjs.Text(
-                _("Clean"),
-                "14px Sans",
-                "#282828"
-            );
-            this._clearLabel.textAlign = "center";
-            this._clearLabel.x = 27.5;
-            this._clearLabel.y = 55;
-            this._clearLabel.visible = false;
-
-            let img = new Image();
-            img.onload = () => {
-                let bitmap = new createjs.Bitmap(img);
-                this._clearButton.addChild(bitmap);
-                this._clearButton.addChild(this._clearLabel);
-
-                bitmap.visible = true;
-                this._clearButton.x = this._w - 5 - 2 * 55;
-                this._clearButton.y = 70 + LEADING + 6;
-                this._clearButton.visible = true;
-
-                // borderContainer.addChild(this._clearButton);
-                turtlesStage.addChild(this._clearButton);
-                this.refreshCanvas();
-
-                this._clearButton.removeAllEventListeners("mouseover");
-                this._clearButton.on("mouseover", event => {
-                    if (this._clearLabel !== null) {
-                        this._clearLabel.visible = true;
-
-                        if (this._clearLabelBG === null) {
-                            let b = this._clearLabel.getBounds();
-                            this._clearLabelBG = new createjs.Shape();
-                            this._clearLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    this._clearLabel.x + b.x - 8,
-                                    this._clearLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            this._clearButton.addChildAt(this._clearLabelBG, 0);
-                        } else {
-                            this._clearLabelBG.visible = true;
-                        }
-
-                        let r = 55 / 2;
-                        circles = showButtonHighlight(
-                            this._clearButton.x + 28,
-                            this._clearButton.y + 28,
-                            r,
-                            event,
-                            palettes.scale,
-                            turtlesStage
-                        );
-                    }
-
-                    this.refreshCanvas();
-                });
-
-                this._clearButton.removeAllEventListeners("mouseout");
-                this._clearButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, turtlesStage);
-                    if (this._clearLabel !== null) {
-                        this._clearLabel.visible = false;
-                    }
-
-                    if (this._clearLabelBG !== null) {
-                        this._clearLabelBG.visible = false;
-                    }
-
-                    this.refreshCanvas();
-                });
-
-                if (doCollapse) {
-                    __collapse();
-                }
-
-                let language = localStorage.languagePreference;
-                // if (!beginnerMode || language !== 'ja') {
-                __makeGridButton();
-                // }
             };
 
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(CLEARBUTTON)));
+            // this._clearButton.onmouseover =  event => {
+            // };
+
+            // this._clearButton.onmouseout = event => {
+            // };
+
+            if (doCollapse) {
+                __collapse();
+            }
+
         };
 
         /**
@@ -1005,110 +824,32 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to call __collapse() method.
          */
         let __makeCollapseButton = () => {
-            this._collapseButton = new createjs.Container();
+            this._collapseButton = _makeButton(COLLAPSEBUTTON,_("Collapse"),this._w - 55,70 + LEADING + 6);
             this._collapseLabel = null;
             this._collapseLabelBG = null;
 
-            this._collapseLabel = new createjs.Text(
-                _("Collapse"),
-                "14px Sans",
-                "#282828"
-            );
-            this._collapseLabel.textAlign = "center";
-            this._collapseLabel.x = 11.5;
-            this._collapseLabel.y = 55;
-            this._collapseLabel.visible = false;
+            if (this._collapseButton !== null) {
+                this._collapseButton.visible = false;
+            }
 
-            let img = new Image();
-            img.onload = () => {
-                if (this._collapseButton !== null) {
-                    this._collapseButton.visible = false;
+            this._collapseButton.onclick = event => {
+                // If the aux toolbar is open, close it.
+                let auxToolbar = docById("aux-toolbar");
+                if (auxToolbar.style.display === "block") {
+                    let menuIcon = docById("menu");
+                    auxToolbar.style.display = "none";
+                    menuIcon.innerHTML = "menu";
+                    docById("toggleAuxBtn").className -= "blue darken-1";
                 }
-
-                let bitmap = new createjs.Bitmap(img);
-                this._collapseButton.addChild(bitmap);
-                bitmap.visible = true;
-                this._collapseButton.addChild(this._collapseLabel);
-
-                // borderContainer.addChild(this._collapseButton);
-                turtlesStage.addChild(this._collapseButton);
-
-                this._collapseButton.visible = true;
-                this._collapseButton.x = this._w - 55;
-                this._collapseButton.y = 70 + LEADING + 6;
-                this.refreshCanvas();
-
-                this._collapseButton.removeAllEventListeners("click");
-                this._collapseButton.on("click", event => {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    __collapse();
-                });
-
-                this._collapseButton.removeAllEventListeners("mouseover");
-                this._collapseButton.on("mouseover", event => {
-                    if (this._collapseLabel !== null) {
-                        this._collapseLabel.visible = true;
-
-                        if (this._collapseLabelBG === null) {
-                            let b = this._collapseLabel.getBounds();
-                            this._collapseLabelBG = new createjs.Shape();
-                            this._collapseLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    this._collapseLabel.x + b.x - 8,
-                                    this._collapseLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            this._collapseButton.addChildAt(
-                                this._collapseLabelBG,
-                                0
-                            );
-                        } else {
-                            this._collapseLabelBG.visible = true;
-                        }
-
-                        let r = 55 / 2;
-                        circles = showButtonHighlight(
-                            this._collapseButton.x + 28,
-                            this._collapseButton.y + 28,
-                            r,
-                            event,
-                            palettes.scale,
-                            turtlesStage
-                        );
-                    }
-
-                    this.refreshCanvas();
-                });
-
-                this._collapseButton.removeAllEventListeners("mouseout");
-                this._collapseButton.on("mouseout", event => {
-                    hideButtonHighlight(circles, turtlesStage);
-                    if (this._collapseLabel !== null) {
-                        this._collapseLabel.visible = false;
-                        this._collapseLabelBG.visible = false;
-                        this.refreshCanvas();
-                    }
-                });
-
-                __makeClearButton();
+                __collapse();
             };
 
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+            // this._collapseButton.onmouseover = event => {
+            // };
+
+            // this._collapseButton.onmouseout = event => {
+            // };
+
         };
 
         /**
@@ -1116,142 +857,85 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
         let __makeExpandButton = () => {
-            this._expandButton = new createjs.Container();
+            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 10 - 4 * 55, 70 + LEADING + 6)
             this._expandLabel = null;
             this._expandLabelBG = null;
-
-            this._expandLabel = new createjs.Text(
-                _("Expand"),
-                "14px Sans",
-                "#282828"
-            );
-            this._expandLabel.textAlign = "center";
-            this._expandLabel.x = 11.5;
-            this._expandLabel.y = 55;
-            this._expandLabel.visible = false;
-
-            let img = new Image();
-            img.onload = () => {
-                if (this._expandButton !== null) {
-                    this._expandButton.visible = false;
-                }
-
-                let bitmap = new createjs.Bitmap(img);
-                this._expandButton.addChild(bitmap);
-                bitmap.visible = true;
-                this._expandButton.addChild(this._expandLabel);
-
-                this._expandButton.x = this._w - 10 - 4 * 55;
-                this._expandButton.y = 70 + LEADING + 6;
-                this._expandButton.scaleX = CONTAINERSCALEFACTOR;
-                this._expandButton.scaleY = CONTAINERSCALEFACTOR;
-                this._expandButton.scale = CONTAINERSCALEFACTOR;
+            if (this._expandButton !== null) {
                 this._expandButton.visible = false;
-                // borderContainer.addChild(this._expandButton);
-                turtlesStage.addChild(this._expandButton);
+            }
 
-                this._expandButton.removeAllEventListeners("mouseover");
-                this._expandButton.on("mouseover", event => {
-                    if (this._expandLabel !== null) {
-                        this._expandLabel.visible = true;
+            // this._expandButton.onmouseover = event => {
+            // };
 
-                        if (this._expandLabelBG === null) {
-                            let b = this._expandLabel.getBounds();
-                            this._expandLabelBG = new createjs.Shape();
-                            this._expandLabelBG.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    this._expandLabel.x + b.x - 8,
-                                    this._expandLabel.y + b.y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                            this._expandButton.addChildAt(
-                                this._expandLabelBG,
-                                0
-                            );
-                        } else {
-                            this._expandLabelBG.visible = true;
-                        }
-                    }
+            // this._expandButton.onmouseout = event => {
+            // };
 
-                    this.refreshCanvas();
-                });
-
-                this._expandButton.removeAllEventListeners("mouseout");
-                this._expandButton.on("mouseout", event => {
-                    if (this._expandLabel !== null) {
-                        this._expandLabel.visible = false;
-                        this._expandLabelBG.visible = false;
-                        this.refreshCanvas();
-                    }
-                });
-
-                this._expandButton.removeAllEventListeners("pressmove");
-                this._expandButton.on("pressmove", event => {
-                    let w = (this._w - 10 - CONTAINERSCALEFACTOR * 55) / CONTAINERSCALEFACTOR;
-                    let x = event.stageX / this._scale - w;
-                    let y = event.stageY / this._scale - 16;
-                    turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
-                    turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
-                    this.refreshCanvas();
-                });
-
-                this._expandButton.removeAllEventListeners("click");
-                this._expandButton.on("click", event => {
-                    // If the aux toolbar is open, close it.
-                    let auxToolbar = docById("aux-toolbar");
-                    if (auxToolbar.style.display === "block") {
-                        let menuIcon = docById("menu");
-                        auxToolbar.style.display = "none";
-                        menuIcon.innerHTML = "menu";
-                        docById("toggleAuxBtn").className -= "blue darken-1";
-                    }
-                    this.hideMenu();
-                    this.setStageScale(1.0);
-                    this._expandedBoundary.visible = true;
-                    this._collapseButton.visible = true;
-                    this._collapsedBoundary.visible = false;
-                    this._expandButton.visible = false;
-                    turtlesStage.x = 0;
-                    turtlesStage.y = 0;
-                    this._isShrunk = false;
-
-                    for (let i = 0; i < this.turtleList.length; i++) {
-                        this.turtleList[i].container.scaleX = 1;
-                        this.turtleList[i].container.scaleY = 1;
-                        this.turtleList[i].container.scale = 1;
-                    }
-
-                    this._clearButton.scaleX = 1;
-                    this._clearButton.scaleY = 1;
-                    this._clearButton.scale = 1;
-                    this._clearButton.x = this._w - 5 - 2 * 55;
-
-                    if (this._gridButton !== null) {
-                        this._gridButton.scaleX = 1;
-                        this._gridButton.scaleY = 1;
-                        this._gridButton.scale = 1;
-                        this._gridButton.x = this._w - 10 - 3 * 55;
-                        this._gridButton.visible = true;
-                    }
-
-                    // remove the stage and add it back in position 0
-                    this.masterStage.removeChild(turtlesStage);
-                    this.masterStage.addChildAt(turtlesStage, 0);
-                });
-
-                __makeCollapseButton();
+            this._expandButton.onpressmove = event => {
+                let w = (this._w - 10 - CONTAINERSCALEFACTOR * 55) / CONTAINERSCALEFACTOR;
+                let x = event.stageX / this._scale - w;
+                let y = event.stageY / this._scale - 16;
+                turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
+                turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
+                this.refreshCanvas();
             };
 
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+            this._expandButton.onclick = event => {
+                // If the aux toolbar is open, close it.
+                let auxToolbar = docById("aux-toolbar");
+                if (auxToolbar.style.display === "block") {
+                    let menuIcon = docById("menu");
+                    auxToolbar.style.display = "none";
+                    menuIcon.innerHTML = "menu";
+                    docById("toggleAuxBtn").className -= "blue darken-1";
+                }
+                this.hideMenu();
+                this.setStageScale(1.0);
+                this._expandedBoundary.visible = true;
+                this._collapseButton.visible = true;
+                this._collapsedBoundary.visible = false;
+                this._expandButton.visible = false;
+                turtlesStage.x = 0;
+                turtlesStage.y = 0;
+                this._isShrunk = false;
+
+                for (let i = 0; i < this.turtleList.length; i++) {
+                    this.turtleList[i].container.scaleX = 1;
+                    this.turtleList[i].container.scaleY = 1;
+                    this.turtleList[i].container.scale = 1;
+                }
+
+                this._clearButton.scaleX = 1;
+                this._clearButton.scaleY = 1;
+                this._clearButton.scale = 1;
+                this._clearButton.x = this._w - 5 - 2 * 55;
+
+                if (this._gridButton !== null) {
+                    this._gridButton.scaleX = 1;
+                    this._gridButton.scaleY = 1;
+                    this._gridButton.scale = 1;
+                    this._gridButton.x = this._w - 10 - 3 * 55;
+                    this._gridButton.visible = true;
+                }
+
+                // remove the stage and add it back in position 0
+                this.masterStage.removeChild(turtlesStage);
+                this.masterStage.addChildAt(turtlesStage, 0);
+            };
         };
+        
+        /**
+         * initializes all Buttons.
+         */
+        let __makeAllButtons = () => {
+            if (docById("buttoncontainerTOP"))docById("buttoncontainerTOP").parentElement.removeChild(docById("buttoncontainerTOP"));
+            let cont = document.createElement("div");
+            document.body.appendChild(cont)
+            cont.setAttribute("id","buttoncontainerTOP");
+            __makeExpandButton();
+            __makeClearButton();
+            __makeGridButton();
+            __makeCollapseButton();
+        }
 
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
@@ -1269,7 +953,6 @@ Turtles.TurtlesView = class {
                 borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
 
-                __makeExpandButton();
             };
 
             let dx = this._w - 20;
@@ -1294,6 +977,7 @@ Turtles.TurtlesView = class {
                         )
                     )
                 );
+            __makeAllButtons();
         };
 
         /**
