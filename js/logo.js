@@ -234,22 +234,10 @@ class Logo {
         this.runningAbc = false;
         this.runningMxml = false;
         this._checkingCompletionState = false;
-        this.compiling = false;
         this.recording = false;
 
         this.temperamentSelected = [];
         this.customTemperamentDefined = false;
-
-        // A place to save turtle state in order to store it after a compile
-        this._saveX = {};
-        this._saveY = {};
-        this._saveColor = {};
-        this._saveValue = {};
-        this._saveChroma = {};
-        this._saveStroke = {};
-        this._saveCanvasAlpha = {};
-        this._saveOrientation = {};
-        this._savePenState = {};
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the default synthesizer
@@ -1254,8 +1242,7 @@ class Logo {
         tur.singer.justMeasuring = [];
         tur.singer.firstPitch = [];
         tur.singer.lastPitch = [];
-        tur.singer.suppressOutput =
-            this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
+        tur.singer.suppressOutput = this.runningLilypond || this.runningAbc || this.runningMxml;
 
         tur.singer.dispatchFactor = 1;
 
@@ -1323,18 +1310,6 @@ class Logo {
         this.notation.pickupPOW2[turtle] = false;
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
-
-        if (this.compiling) {
-            this._saveX[turtle] = this.turtles.turtleList[turtle].x;
-            this._saveY[turtle] = this.turtles.turtleList[turtle].y;
-            this._saveColor[turtle] = this.turtles.turtleList[turtle].painter.color;
-            this._saveValue[turtle] = this.turtles.turtleList[turtle].painter.value;
-            this._saveChroma[turtle] = this.turtles.turtleList[turtle].painter.chroma;
-            this._saveStroke[turtle] = this.turtles.turtleList[turtle].painter.stroke;
-            this._saveCanvasAlpha[turtle] = this.turtles.turtleList[turtle].painter.canvasAlpha;
-            this._saveOrientation[turtle] = this.turtles.turtleList[turtle].orientation;
-            this._savePenState[turtle] = this.turtles.turtleList[turtle].painter.penState;
-        }
     }
 
     /**
@@ -2104,25 +2079,6 @@ class Logo {
                         console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.errorMsg(_("Playback is ready."));
-                        }
-
-                        logo.compiling = false;
-                        for (t in logo.turtles.turtleList) {
-                            logo.turtles.turtleList[t].painter.doPenUp();
-                            logo.turtles.turtleList[t].painter.doSetXY(
-                                logo._saveX[t],
-                                logo._saveY[t]
-                            );
-                            logo.turtles.turtleList[t].painter.color = logo._saveColor[t];
-                            logo.turtles.turtleList[t].painter.value = logo._saveValue[t];
-                            logo.turtles.turtleList[t].painter.chroma = logo._saveChroma[t];
-                            logo.turtles.turtleList[t].painter.stroke = logo._saveStroke[t];
-                            logo.turtles.turtleList[t].painter.canvasAlpha =
-                                logo._saveCanvasAlpha[t];
-                            logo.turtles.turtleList[t].painter.doSetHeading(
-                                logo._saveOrientation[t]
-                            );
-                            logo.turtles.turtleList[t].painter.penState = logo._savePenState[t];
                         }
                     }
 
