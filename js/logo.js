@@ -184,8 +184,6 @@ class Logo {
         this.previousTurtleTime = [];
         this.turtleTime = [];
         this._noteDelay = 0;
-        this.playedNote = {};
-        this.playedNoteTimes = {};
         this.pushedNote = {};
         this.connectionStore = {};
         this.connectionStoreLock = false;
