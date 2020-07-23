@@ -85,6 +85,11 @@ class Singer {
         this.dispatchFactor = 1;                // scale factor for turtle graphics embedded in notes
     }
 
+    // ========= Class variables ==============================================
+    // Parameters used by notes
+    static masterBPM = TARGETBPM;
+    static defaultBPMFactor = TONEBPM / TARGETBPM;
+
     // ========= Deprecated ===================================================
 
     /**
@@ -2320,8 +2325,3 @@ class Singer {
         stage.update(event);
     }
 }
-
-// ========= Static variables =============================================
-// Parameters used by notes
-Singer.masterBPM = TARGETBPM;
-Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
