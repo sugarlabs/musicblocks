@@ -1565,7 +1565,7 @@ function setupPitchBlocks() {
             if (note === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
-            } else if (logo.justMeasuring[turtle].length > 0) {
+            } else if (tur.singer.justMeasuring.length > 0) {
                 // TODO: account for cents
                 let noteObj = getNote(
                     note,
@@ -1577,17 +1577,17 @@ function setupPitchBlocks() {
                     logo.errorMsg
                 );
 
-                let n = logo.justMeasuring[turtle].length;
+                let n = tur.singer.justMeasuring.length;
                 let pitchNumber =
                     pitchToNumber(
                         noteObj[0],
                         noteObj[1],
                         logo.keySignature[turtle]
                     ) - tur.singer.pitchNumberOffset;
-                if (logo.firstPitch[turtle].length < n) {
-                    logo.firstPitch[turtle].push(pitchNumber);
-                } else if (logo.lastPitch[turtle].length < n) {
-                    logo.lastPitch[turtle].push(pitchNumber);
+                if (tur.singer.firstPitch.length < n) {
+                    tur.singer.firstPitch.push(pitchNumber);
+                } else if (tur.singer.lastPitch.length < n) {
+                    tur.singer.lastPitch.push(pitchNumber);
                 }
             } else if (logo.inMatrix) {
                 logo.pitchTimeMatrix.addRowBlock(blk);
@@ -2112,10 +2112,7 @@ function setupPitchBlocks() {
             }
 
             // If we are just counting notes we don't care about the pitch.
-            if (
-                logo.justCounting[turtle].length > 0 &&
-                tur.singer.lastNotePlayed === null
-            ) {
+            if (tur.singer.justCounting.length > 0 && tur.singer.lastNotePlayed === null) {
                 console.debug("Just counting, so spoofing last note played.");
                 tur.singer.previousNotePlayed = ["G4", 4];
                 tur.singer.lastNotePlayed = ["G4", 4];

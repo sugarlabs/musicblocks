@@ -814,7 +814,7 @@ function setupExtrasBlocks() {
         flow(args, logo, turtle) {
             if (args[0] !== null) {
                 console.debug(args[0].toString());
-                if (!logo.suppressOutput[turtle] && logo.turtleDelay > 0) {
+                if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput && logo.turtleDelay > 0) {
                     logo.textMsg(args[0].toString());
                 }
             }
@@ -847,7 +847,9 @@ function setupExtrasBlocks() {
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        if (!logo.suppressOutput[turtle]) {
+                        let tur = logo.turtles.ithTurtle(turtle);
+
+                        if (!tur.singer.suppressOutput) {
                             if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {

@@ -180,9 +180,11 @@ function setupOrnamentBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.glide[turtle].push(arg);
 
-            if (logo.justCounting[turtle].length === 0) {
+            if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationBeginSlur(turtle);
             }
 
@@ -192,8 +194,8 @@ function setupOrnamentBlocks() {
             let listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                if (logo.justCounting[turtle].length === 0) {
+            let __listener = event => {
+                if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
 
@@ -239,22 +241,24 @@ function setupOrnamentBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.blocks.blockList[blk].name === "slur") {
                 logo.staccato[turtle].push(-arg);
             } else {
                 logo.staccato[turtle].push(-1 / arg);
             }
 
-            if (logo.justCounting[turtle].length === 0) {
+            if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationBeginSlur(turtle);
             }
 
             let listenerName = "_staccato_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = event => {
                 logo.staccato[turtle].pop();
-                if (logo.justCounting[turtle].length === 0) {
+                if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
             };

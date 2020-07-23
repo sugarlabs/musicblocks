@@ -73,7 +73,7 @@ function setupVolumeBlocks() {
         setter(logo, value, turtle, blk) {
             let len = logo.masterVolume.length;
             logo.masterVolume[len - 1] = value;
-            if (!logo.suppressOutput[turtle]) {
+            if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput) {
                 Singer.setMasterVolume(logo, value);
             }
         }
@@ -290,6 +290,8 @@ function setupVolumeBlocks() {
                 synth = "electronic synth";
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.instrumentNames[turtle].indexOf(synth) === -1) {
                 logo.instrumentNames[turtle].push(synth);
                 logo.synth.loadSynth(turtle, synth);
@@ -303,7 +305,7 @@ function setupVolumeBlocks() {
             }
 
             logo.synthVolume[turtle][synth].push(arg1);
-            if (!logo.suppressOutput[turtle]) {
+            if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(logo, turtle, synth, arg1);
             }
 
@@ -314,7 +316,7 @@ function setupVolumeBlocks() {
                 logo.synthVolume[turtle][synth].pop();
                 // Restore previous volume.
                 if (
-                    logo.justCounting[turtle].length === 0 &&
+                    tur.singer.justCounting.length === 0 &&
                     logo.synthVolume[turtle][synth].length > 0
                 ) {
                     Singer.setSynthVolume(
@@ -446,20 +448,20 @@ function setupVolumeBlocks() {
                 synth = "electronic synth";
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.instrumentNames[turtle].indexOf(synth) === -1) {
                 logo.instrumentNames[turtle].push(synth);
                 logo.synth.loadSynth(turtle, synth);
 
                 if (logo.synthVolume[turtle][synth] === undefined) {
                     logo.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][synth] = [
-                        DEFAULTVOLUME
-                    ];
+                    logo.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
                 }
             }
 
             logo.synthVolume[turtle][synth].push(args[1]);
-            if (!logo.suppressOutput[turtle]) {
+            if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(logo, turtle, synth, args[1]);
             }
         }
@@ -502,7 +504,7 @@ function setupVolumeBlocks() {
                     }
 
                     logo.masterVolume.push(arg);
-                    if (!logo.suppressOutput[turtle]) {
+                    if (!tur.singer.suppressOutput) {
                         Singer.setMasterVolume(logo, arg);
                     }
                 }
@@ -557,8 +559,10 @@ function setupVolumeBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.masterVolume.push(arg);
-            if (!logo.suppressOutput[turtle]) {
+            if (!tur.singer.suppressOutput) {
                 Singer.setMasterVolume(logo, arg);
             }
 
@@ -568,10 +572,7 @@ function setupVolumeBlocks() {
             let __listener = function(event) {
                 logo.masterVolume.pop();
                 // Restore previous volume.
-                if (
-                    logo.justCounting[turtle].length === 0 &&
-                    logo.masterVolume.length > 0
-                ) {
+                if (tur.singer.justCounting.length === 0 && logo.masterVolume.length > 0) {
                     Singer.setMasterVolume(logo, last(logo.masterVolume));
                 }
             };
@@ -621,6 +622,8 @@ function setupVolumeBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             for (let synth in logo.synthVolume[turtle]) {
                 let newVolume =
                     (last(logo.synthVolume[turtle][synth]) * (100 + arg)) / 100;
@@ -638,19 +641,19 @@ function setupVolumeBlocks() {
                     logo.synthVolume[turtle][synth].push(newVolume);
                 }
 
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     Singer.setSynthVolume(logo, turtle, synth, newVolume);
                 }
             }
 
-            if (logo.justCounting[turtle].length === 0) {
+            if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationBeginArticulation(turtle);
             }
 
             let listenerName = "_articulation_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            let __listener = event => {
                 for (let synth in logo.synthVolume[turtle]) {
                     logo.synthVolume[turtle][synth].pop();
                     Singer.setSynthVolume(
@@ -658,7 +661,7 @@ function setupVolumeBlocks() {
                     );
                 }
 
-                if (logo.justCounting[turtle].length === 0) {
+                if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndArticulation(turtle);
                 }
             };
@@ -702,6 +705,8 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length > 1 && args[0] !== 0) {
                 if (logo.blocks.blockList[blk].name === "crescendo") {
                     logo.crescendoDelta[turtle].push(args[0]);
@@ -726,11 +731,10 @@ function setupVolumeBlocks() {
                 let listenerName = "_crescendo_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
-                    if (logo.justCounting[turtle].length === 0) {
+                let __listener = event => {
+                    if (tur.singer.justCounting.length === 0) {
                         logo.notation.notationEndCrescendo(
-                            turtle,
-                            last(logo.crescendoDelta[turtle])
+                            turtle, last(logo.crescendoDelta[turtle])
                         );
                     }
 

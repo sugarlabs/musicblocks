@@ -431,7 +431,7 @@ function setupPenBlocks() {
             if (logo.inNoteBlock[turtle].length > 0) {
                 tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
             } else {
-                if (logo.suppressOutput[turtle]) {
+                if (tur.singer.suppressOutput) {
                     let savedPenState = tur.painter.penState;
                     tur.painter.penState = false;
                     tur.painter.doStartFill();
@@ -448,7 +448,7 @@ function setupPenBlocks() {
                 if (logo.inNoteBlock[turtle].length > 0) {
                     tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doEndFill();

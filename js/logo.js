@@ -234,13 +234,6 @@ class Logo {
         this.neighborArgBeat = {};
         this.neighborArgCurrentBeat = {};
 
-        // When counting notes, measuring intervals, or generating lilypond output
-        this.justCounting = {};
-        this.justMeasuring = {};
-        this.firstPitch = {};
-        this.lastPitch = {};
-        this.suppressOutput = {};
-
         // tuplet
         this.tuplet = false;
         this.tupletParams = [];
@@ -665,12 +658,10 @@ class Logo {
             };
         }
 
-        if (!this.suppressOutput[turtle]) {
-            Singer.setMasterVolume(this, DEFAULTVOLUME);
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                for (let synth in this.synthVolume[turtle]) {
-                    Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
-                }
+        Singer.setMasterVolume(this, DEFAULTVOLUME);
+        for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            for (let synth in this.synthVolume[turtle]) {
+                Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
     }
@@ -1260,6 +1251,13 @@ class Logo {
         tur.singer.whichNoteToCount = 1;
         tur.singer.moveable = false;
 
+        tur.singer.justCounting = [];
+        tur.singer.justMeasuring = [];
+        tur.singer.firstPitch = [];
+        tur.singer.lastPitch = [];
+        tur.singer.suppressOutput =
+            this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
+
         tur.singer.dispatchFactor = 1;
 
         this.previousTurtleTime[turtle] = 0;
@@ -1335,16 +1333,10 @@ class Logo {
         this.noteValuePerBeat[turtle] = 4;
         this.currentBeat[turtle] = 0;
         this.currentMeasure[turtle] = 0;
-        this.justCounting[turtle] = [];
-        this.justMeasuring[turtle] = [];
         this.notation.notationStaging[turtle] = [];
         this.notation.notationDrumStaging[turtle] = [];
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
-        this.firstPitch[turtle] = [];
-        this.lastPitch[turtle] = [];
-        this.suppressOutput[turtle] =
-            this.runningLilypond || this.runningAbc || this.runningMxml || this.compiling;
         this.returns[turtle] = [];
         this.defaultStrongBeats[turtle] = false;
 
@@ -1720,11 +1712,13 @@ class Logo {
                 }
             }, delayStart);
         } else {
-            console.debug("Empty start block: " + turtle + " " + this.suppressOutput[turtle]);
+            let tur = this.turtles.ithTurtle(turtle);
 
-            if (this.suppressOutput[turtle] || this.suppressOutput[turtle] == undefined) {
+            console.debug("Empty start block: " + turtle + " " + tur.singer.suppressOutput);
+
+            if (tur.singer.suppressOutput || tur.singer.suppressOutput == undefined) {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
-                this.suppressOutput[turtle] = false;
+                tur.singer.suppressOutput = false;
                 this._checkingCompletionState = false;
 
                 // Reset cursor
@@ -1822,6 +1816,8 @@ class Logo {
         (2) Run function associated with the block
         ===========================================================================
         */
+        let tur = logo.turtles.ithTurtle(turtle);
+
         let nextFlow = null;
         if (!logo.blocks.blockList[blk].isValueBlock()) {
             // (nextFlow remains null for valueBlock)
@@ -1881,7 +1877,7 @@ class Logo {
         let actionArgs = [];
 
         if (logo.blocks.visible) {
-            if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
+            if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                 logo.blocks.highlight(blk, false);
             }
         }
@@ -1993,10 +1989,7 @@ class Logo {
                 if (logo.turtleDelay === TURTLESTEP) {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
-                    if (
-                        !logo.suppressOutput[turtle] &&
-                        logo.justCounting[turtle].length === 0
-                    ) {
+                    if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                         setTimeout(() => {
                             if (logo.blocks.visible) {
                                 logo.blocks.unhighlight(blk);
@@ -2016,7 +2009,7 @@ class Logo {
                     last(logo.blocks.blockList[blk].connections) == null
                 )
             ) {
-                if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
+                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // If we are at the end of the child flow, queue the
                     // unhighlighting of the parent block to the flow
                     if (logo.unhighlightQueue[turtle] === undefined) {
@@ -2109,7 +2102,7 @@ class Logo {
                 if (
                     !logo.turtles.running() &&
                     queueStart === 0 &&
-                    logo.justCounting[turtle].length === 0
+                    tur.singer.justCounting.length === 0
                 ) {
                     if (logo.runningLilypond) {
                         console.debug("saving lilypond output:");
@@ -2123,7 +2116,7 @@ class Logo {
                         console.log('saving mxml output');
                         save.afterSaveMxml();
                         logo.runningMxml = false;
-                    } else if (logo.suppressOutput[turtle]) {
+                    } else if (tur.singer.suppressOutput) {
                         console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.errorMsg(_("Playback is ready."));
@@ -2154,17 +2147,17 @@ class Logo {
                         "SETTING LAST NOTE TIMEOUT: " +
                         logo.recording +
                         " " +
-                        logo.suppressOutput[turtle]
+                        tur.singer.suppressOutput
                     );
                     logo._lastNoteTimeout = setTimeout(() => {
                         console.debug("LAST NOTE PLAYED");
                         logo._lastNoteTimeout = null;
-                        if (logo.suppressOutput[turtle] && logo.recording) {
-                            logo.suppressOutput[turtle] = false;
+                        if (tur.singer.suppressOutput && logo.recording) {
+                            tur.singer.suppressOutput = false;
                             logo._checkingCompletionState = false;
                             logo.saveLocally();
                         } else {
-                            logo.suppressOutput[turtle] = false;
+                            tur.singer.suppressOutput = false;
                             logo._checkingCompletionState = false;
 
                             // Reset the cursor
@@ -2174,7 +2167,7 @@ class Logo {
                             logo.saveLocally();
                         }
                     }, 1000);
-                } else if (logo.suppressOutput[turtle]) {
+                } else if (tur.singer.suppressOutput) {
                     setTimeout(() => __checkCompletionState(), 250);
                 }
             };
@@ -2182,7 +2175,7 @@ class Logo {
             if (
                 !logo.turtles.running() &&
                 queueStart === 0 &&
-                logo.justCounting[turtle].length === 0
+                tur.singer.justCounting.length === 0
             ) {
                 if (!logo._checkingCompletionState) {
                     logo._checkingCompletionState = true;
@@ -2190,7 +2183,7 @@ class Logo {
                 }
             }
 
-            if (!logo.suppressOutput[turtle] && logo.justCounting[turtle].length === 0) {
+            if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                 // Nothing else to do. Clean up.
                 if (
                     logo.turtles.turtleList[turtle].queue.length === 0 ||
@@ -2274,7 +2267,7 @@ class Logo {
 
         this.embeddedGraphicsFinished[turtle] = false;
 
-        let suppressOutput = this.suppressOutput[turtle];
+        let suppressOutput = tur.singer.suppressOutput;
 
         let __pen = (turtle, name, arg, timeout) => {
             let _penSwitch = name => {
@@ -2314,7 +2307,7 @@ class Logo {
         };
 
         let __clear = (turtle, timeout) => {
-            if (this.suppressOutput[turtle]) {
+            if (tur.singer.suppressOutput) {
                 let savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
                 tur.painter.doSetXY(0, 0);

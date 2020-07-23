@@ -465,15 +465,13 @@ function setupFlowBlocks() {
         }
 
         flow(_, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.doBreak(turtle);
-            // Since we pop the queue, we need to unhighlight our
-            // parent.
+            // Since we pop the queue, we need to unhighlight our parent
             let parentBlk = logo.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
-                if (
-                    !logo.suppressOutput[turtle] &&
-                    logo.justCounting[turtle].length === 0
-                ) {
+                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     logo.unhighlightQueue[turtle].push(parentBlk);
                 }
             }
@@ -799,7 +797,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle) {
             if (args.length !== 1) return;
 
-            return [args[0], logo.suppressOutput[turtle] ? 20 : -1];
+            return [args[0], logo.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
         }
     }
 

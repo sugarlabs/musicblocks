@@ -219,8 +219,10 @@ function setupActionBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (name in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
+                if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
@@ -379,7 +381,7 @@ function setupActionBlocks() {
 
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
-                    if (logo.justCounting[turtle].length === 0) {
+                    if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                         logo.notation.notationLineBreak(turtle);
                     }
                     return [logo.actions[args[0]], 1];
@@ -575,7 +577,7 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
+                if (logo.turtles.ithTurtle(turtle).singer.justCounting[turtle].length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
@@ -779,7 +781,7 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
+                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
@@ -811,7 +813,10 @@ function setupActionBlocks() {
             if (!(name in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
             }
-            if (logo.justCounting[turtle].length === 0) {
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationLineBreak(turtle);
             }
 

@@ -159,6 +159,8 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.swing[turtle].push(args[0]);
             logo.swingTarget[turtle].push(null);
 
@@ -168,7 +170,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -206,6 +208,8 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.swing[turtle].push(1 / args[0]);
             logo.swingTarget[turtle].push(null);
 
@@ -215,7 +219,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -282,7 +286,9 @@ function setupRhythmBlocks() {
             let arg1 =
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
 
-            if (logo.suppressOutput[turtle]) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.suppressOutput) {
                 logo.notation.notationSwing(turtle);
             } else {
                 logo.swing[turtle].push(1 / arg0);
@@ -295,7 +301,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -446,7 +452,7 @@ function setupRhythmBlocks() {
                 // If tieCarryOver > 0, we have one more note to
                 // play.
                 if (logo.tieCarryOver[turtle] > 0) {
-                    if (logo.justCounting[turtle].length === 0) {
+                    if (tur.singer.justCounting.length === 0) {
                         let lastNote = last(logo.inNoteBlock[turtle]);
                         if (lastNote != null && lastNote in tur.singer.notePitches) {
                             // Remove the note from the Lilypond list.

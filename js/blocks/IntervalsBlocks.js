@@ -191,7 +191,7 @@ function setupIntervalsBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                let saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = tur.singer.suppressOutput;
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
@@ -209,10 +209,10 @@ function setupIntervalsBlocks() {
                 let saveOrientation = tur.orientation;
                 let savePenState = tur.painter.penState;
 
-                logo.suppressOutput[turtle] = true;
+                tur.singer.suppressOutput = true;
 
-                logo.justCounting[turtle].push(true);
-                logo.justMeasuring[turtle].push(true);
+                tur.singer.justCounting.push(true);
+                tur.singer.justMeasuring.push(true);
 
                 for (let b in logo.endOfClampSignals[turtle]) {
                     logo.butNotThese[turtle][b] = [];
@@ -237,22 +237,15 @@ function setupIntervalsBlocks() {
                     logo.turtles.turtleList[turtle].queue.length
                 );
                 if (
-                    logo.firstPitch[turtle].length > 0 &&
-                    logo.lastPitch[turtle].length > 0
+                    tur.singer.firstPitch.length > 0 &&
+                    tur.singer.lastPitch.length > 0
                 ) {
-                    return (
-                        last(logo.lastPitch[turtle]) -
-                        last(logo.firstPitch[turtle])
-                    );
-                    logo.firstPitch[turtle].pop();
-                    logo.lastPitch[turtle].pop();
+                    return (last(tur.singer.lastPitch) - last(tur.singer.firstPitch));
+                    tur.singer.firstPitch.pop();
+                    tur.singer.lastPitch.pop();
                 } else {
                     return 0;
-                    logo.errorMsg(
-                        _(
-                            "You must use two pitch blocks when measuring an interval."
-                        )
-                    );
+                    logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
                 }
 
                 tur.singer.notesPlayed = saveNoteCount;
@@ -261,19 +254,19 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].painter.doPenUp();
-                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].painter.color = saveColor;
-                logo.turtles.turtleList[turtle].painter.value = saveValue;
-                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
-                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
-                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].painter.penState = savePenState;
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
 
-                logo.justCounting[turtle].pop();
-                logo.justMeasuring[turtle].pop();
-                logo.suppressOutput[turtle] = saveSuppressStatus;
+                tur.singer.justCounting.pop();
+                tur.singer.justMeasuring.pop();
+                tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
                 logo.butNotThese[turtle] = {};
@@ -307,7 +300,7 @@ function setupIntervalsBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                let saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = tur.singer.suppressOutput;
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
@@ -325,10 +318,10 @@ function setupIntervalsBlocks() {
                 let saveOrientation = tur.orientation;
                 let savePenState = tur.painter.penState;
 
-                logo.suppressOutput[turtle] = true;
+                tur.singer.suppressOutput = true;
 
-                logo.justCounting[turtle].push(true);
-                logo.justMeasuring[turtle].push(true);
+                tur.singer.justCounting.push(true);
+                tur.singer.justMeasuring.push(true);
 
                 for (let b in logo.endOfClampSignals[turtle]) {
                     logo.butNotThese[turtle][b] = [];
@@ -346,16 +339,13 @@ function setupIntervalsBlocks() {
                 logo.turtles.turtleList[turtle].running = true;
                 logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
-                if (
-                    logo.firstPitch[turtle].length > 0 &&
-                    logo.lastPitch[turtle].length > 0
-                ) {
+                if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
                     return Singer.scalarDistance(
-                        logo, turtle, last(logo.firstPitch[turtle]), last(logo.lastPitch[turtle])
+                        logo, turtle, last(tur.singer.firstPitch), last(tur.singer.lastPitch)
                     );
 
-                    logo.firstPitch[turtle].pop();
-                    logo.lastPitch[turtle].pop();
+                    tur.singer.firstPitch.pop();
+                    tur.singer.lastPitch.pop();
                 } else {
                     return 0;
                     logo.errorMsg(
@@ -371,19 +361,19 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].painter.doPenUp();
-                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].painter.color = saveColor;
-                logo.turtles.turtleList[turtle].painter.value = saveValue;
-                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
-                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
-                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].painter.penState = savePenState;
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
 
-                logo.justCounting[turtle].pop();
-                logo.justMeasuring[turtle].pop();
-                logo.suppressOutput[turtle] = saveSuppressStatus;
+                tur.singer.justCounting.pop();
+                tur.singer.justMeasuring.pop();
+                tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
                 logo.butNotThese[turtle] = {};
@@ -438,7 +428,7 @@ function setupIntervalsBlocks() {
         // new SemitoneIntervalMacroBlock("major", 6, true).setup();
 
         new SemitoneIntervalMacroBlock("major", 3, false).setup();
-        
+
         // for (let i in [7, 6, 3, 2])
         //     new SemitoneIntervalMacroBlock("major", i).setup();
     }
@@ -522,7 +512,7 @@ function setupIntervalsBlocks() {
             return [args[1], 1];
         }
     }
-    
+
     // DEPRECATED: verbose macros, no longer needed
 
     // function makeIntervalMacroBlocks() {
