@@ -82,6 +82,23 @@ class Singer {
         this.whichNoteToCount = 1;
         this.moveable = false;                  // moveable solfege?
 
+        // Effects parameters
+        this.vibratoIntensity = [];
+        this.vibratoRate = [];
+        this.distortionAmount = [];
+        this.tremoloFrequency = [];
+        this.tremoloDepth = [];
+        this.rate = [];
+        this.octaves = [];
+        this.baseFrequency = [];
+        this.chorusRate = [];
+        this.delayTime = [];
+        this.chorusDepth = [];
+        this.neighborArgNote1 = [];
+        this.neighborArgNote2 = [];
+        this.neighborArgBeat = [];
+        this.neighborArgCurrentBeat = [];
+
         // When counting notes, measuring intervals, or generating lilypond output
         this.justCounting = [];
         this.justMeasuring = [];
@@ -484,7 +501,7 @@ class Singer {
                 logo.errorMsg,
                 logo.synth.inTemperament
             );
-            logo.neighborArgNote1[turtle].push(noteObj[0] + noteObj[1]);
+            tur.singer.neighborArgNote1.push(noteObj[0] + noteObj[1]);
 
             let noteObj2;
             if (logo.blocks.blockList[last(tur.singer.inNeighbor)].name === "neighbor2") {
@@ -516,7 +533,7 @@ class Singer {
                 );
             }
 
-            logo.neighborArgNote2[turtle].push(noteObj2[0] + noteObj2[1]);
+            tur.singer.neighborArgNote2.push(noteObj2[0] + noteObj2[1]);
         }
 
         let delta =
@@ -913,14 +930,12 @@ class Singer {
             if (logo.inNoteBlock[turtle].length > 0) {
                 if (tur.singer.inNeighbor.length > 0) {
                     let neighborNoteValue = tur.singer.neighborNoteValue;
-                    logo.neighborArgBeat[turtle].push(
+                    tur.singer.neighborArgBeat.push(
                         tur.singer.beatFactor * (1 / neighborNoteValue)
                     );
 
                     let nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
-                    logo.neighborArgCurrentBeat[turtle].push(
-                        tur.singer.beatFactor * (1 / nextBeat)
-                    );
+                    tur.singer.neighborArgCurrentBeat.push(tur.singer.beatFactor * (1 / nextBeat));
                 }
 
                 Singer.processNote(
@@ -1058,34 +1073,34 @@ class Singer {
         }
 
         // Apply effects.
-        if (logo.vibratoRate[turtle].length > 0) {
-            vibratoRate = last(logo.vibratoRate[turtle]);
-            vibratoIntensity = last(logo.vibratoIntensity[turtle]);
+        if (tur.singer.vibratoRate.length > 0) {
+            vibratoRate = last(tur.singer.vibratoRate);
+            vibratoIntensity = last(tur.singer.vibratoIntensity);
             doVibrato = true;
         }
 
-        if (logo.distortionAmount[turtle].length > 0) {
-            distortionAmount = last(logo.distortionAmount[turtle]);
+        if (tur.singer.distortionAmount.length > 0) {
+            distortionAmount = last(tur.singer.distortionAmount);
             doDistortion = true;
         }
 
-        if (logo.tremoloDepth[turtle].length > 0) {
-            tremoloFrequency = last(logo.tremoloFrequency[turtle]);
-            tremoloDepth = last(logo.tremoloDepth[turtle]);
+        if (tur.singer.tremoloDepth.length > 0) {
+            tremoloFrequency = last(tur.singer.tremoloFrequency);
+            tremoloDepth = last(tur.singer.tremoloDepth);
             doTremolo = true;
         }
 
-        if (logo.rate[turtle].length > 0) {
-            rate = last(logo.rate[turtle]);
-            octaves = last(logo.octaves[turtle]);
-            baseFrequency = last(logo.baseFrequency[turtle]);
+        if (tur.singer.rate.length > 0) {
+            rate = last(tur.singer.rate);
+            octaves = last(tur.singer.octaves);
+            baseFrequency = last(tur.singer.baseFrequency);
             doPhaser = true;
         }
 
-        if (logo.chorusRate[turtle].length > 0) {
-            chorusRate = last(logo.chorusRate[turtle]);
-            delayTime = last(logo.delayTime[turtle]);
-            chorusDepth = last(logo.chorusDepth[turtle]);
+        if (tur.singer.chorusRate.length > 0) {
+            chorusRate = last(tur.singer.chorusRate);
+            delayTime = last(tur.singer.delayTime);
+            chorusDepth = last(tur.singer.chorusDepth);
             doChorus = true;
         }
 
@@ -1104,15 +1119,14 @@ class Singer {
         }
 
         if (tur.singer.inNeighbor.length > 0) {
-            let len = logo.neighborArgNote1[turtle].length;
+            let len = tur.singer.neighborArgNote1.length;
             for (let i = 0; i < len; i++) {
-                neighborArgNote1.push(logo.neighborArgNote1[turtle].pop());
-                neighborArgNote2.push(logo.neighborArgNote2[turtle].pop());
+                neighborArgNote1.push(tur.singer.neighborArgNote1.pop());
+                neighborArgNote2.push(tur.singer.neighborArgNote2.pop());
             }
 
-            neighborArgBeat = bpmFactor / last(logo.neighborArgBeat[turtle]);
-            neighborArgCurrentBeat =
-                bpmFactor / last(logo.neighborArgCurrentBeat[turtle]);
+            neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
+            neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
             doNeighbor = true;
         }
 

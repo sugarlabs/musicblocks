@@ -217,23 +217,6 @@ class Logo {
         this.voices = {};
         this.backward = {};
 
-        // Effects parameters
-        this.vibratoIntensity = {};
-        this.vibratoRate = {};
-        this.distortionAmount = {};
-        this.tremoloFrequency = {};
-        this.tremoloDepth = {};
-        this.rate = {};
-        this.octaves = {};
-        this.baseFrequency = {};
-        this.chorusRate = {};
-        this.delayTime = {};
-        this.chorusDepth = {};
-        this.neighborArgNote1 = {};
-        this.neighborArgNote2 = {};
-        this.neighborArgBeat = {};
-        this.neighborArgCurrentBeat = {};
-
         // tuplet
         this.tuplet = false;
         this.tupletParams = [];
@@ -1251,6 +1234,22 @@ class Logo {
         tur.singer.whichNoteToCount = 1;
         tur.singer.moveable = false;
 
+        tur.singer.vibratoIntensity = [];
+        tur.singer.vibratoRate = [];
+        tur.singer.distortionAmount = [];
+        tur.singer.tremoloFrequency = [];
+        tur.singer.tremoloDepth = [];
+        tur.singer.rate = [];
+        tur.singer.octaves = [];
+        tur.singer.baseFrequency = [];
+        tur.singer.chorusRate = [];
+        tur.singer.delayTime = [];
+        tur.singer.chorusDepth = [];
+        tur.singer.neighborArgNote1 = [];
+        tur.singer.neighborArgNote2 = [];
+        tur.singer.neighborArgBeat = [];
+        tur.singer.neighborArgCurrentBeat = [];
+
         tur.singer.justCounting = [];
         tur.singer.justMeasuring = [];
         tur.singer.firstPitch = [];
@@ -1309,25 +1308,10 @@ class Logo {
         this.voices[turtle] = [];
         this.pitchDrumTable[turtle] = {};
         this.backward[turtle] = [];
-        this.vibratoIntensity[turtle] = [];
-        this.vibratoRate[turtle] = [];
-        this.tremoloDepth[turtle] = [];
-        this.tremoloFrequency[turtle] = [];
-        this.distortionAmount[turtle] = [];
         this.attack[turtle] = [];
         this.decay[turtle] = [];
         this.sustain[turtle] = [];
         this.release[turtle] = [];
-        this.rate[turtle] = [];
-        this.octaves[turtle] = [];
-        this.baseFrequency[turtle] = [];
-        this.chorusRate[turtle] = [];
-        this.delayTime[turtle] = [];
-        this.chorusDepth[turtle] = [];
-        this.neighborArgNote1[turtle] = [];
-        this.neighborArgNote2[turtle] = [];
-        this.neighborArgBeat[turtle] = [];
-        this.neighborArgCurrentBeat[turtle] = [];
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
         this.noteValuePerBeat[turtle] = 4;
