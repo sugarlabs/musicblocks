@@ -260,12 +260,6 @@ class Logo {
         this.stepQueue = {};
         this._unhighlightStepQueue = {};
 
-        // Control points for bezier curves
-        this.cp1x = {};
-        this.cp1y = {};
-        this.cp2x = {};
-        this.cp2y = {};
-
         this.svgOutput = "";
         this.svgBackground = true;
 
@@ -274,9 +268,7 @@ class Logo {
         this.pitchAnalyser = null;
     }
 
-    // ============================================================================================
-    //  Setters, Getters
-    // ============================================================================================
+    // ========= Setters, Getters =================================================================
 
     /**
      * @param {Object} canvas - createjs canvas
@@ -557,9 +549,7 @@ class Logo {
         return this._notation;
     }
 
-    // ============================================================================================
-    //  Utility methods
-    // ============================================================================================
+    // ========= Utilities ========================================================================
 
     /**
      * Restores any broken connections made in duplicate notes clamps.
@@ -800,9 +790,7 @@ class Logo {
         this.cameraID = id;
     }
 
-    // ============================================================================================
-    //  Action methods
-    // ============================================================================================
+    // ========= Action ===========================================================================
 
     /**
      * Sets a named listener after removing any existing listener in the same place.
@@ -1173,9 +1161,7 @@ class Logo {
         }
     }
 
-    // ============================================================================================
-    //  Behavior methods
-    // ============================================================================================
+    // ========= Behavior =========================================================================
 
     /**
      * Initialises a turtle.
@@ -1246,15 +1232,16 @@ class Logo {
 
         tur.singer.dispatchFactor = 1;
 
+        tur.painter.cp1x = 0;
+        tur.painter.cp1y = 100;
+        tur.painter.cp2x = 100;
+        tur.painter.cp2y = 100;
+
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
         this._waitTimes[turtle] = 0;
         this.endOfClampSignals[turtle] = {};
         this.butNotThese[turtle] = {};
-        this.cp1x[turtle] = 0;
-        this.cp1y[turtle] = 100;
-        this.cp2x[turtle] = 100;
-        this.cp2y[turtle] = 100;
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
         this.embeddedGraphicsFinished[turtle] = true;
@@ -2346,24 +2333,24 @@ class Logo {
 
         let __cp1 = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                this.cp1x[turtle] = arg1;
-                this.cp1y[turtle] = arg2;
+                tur.painter.cp1x = arg1;
+                tur.painter.cp1y = arg2;
             } else {
                 setTimeout(() => {
-                    this.cp1x[turtle] = arg1;
-                    this.cp1y[turtle] = arg2;
+                    tur.painter.cp1x = arg1;
+                    tur.painter.cp1y = arg2;
                 }, timeout);
             }
         };
 
         let __cp2 = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) {
-                this.cp2x[turtle] = arg1;
-                this.cp2y[turtle] = arg2;
+                tur.painter.cp2x = arg1;
+                tur.painter.cp2y = arg2;
             } else {
                 setTimeout(() => {
-                    this.cp2x[turtle] = arg1;
-                    this.cp2y[turtle] = arg2;
+                    tur.painter.cp2x = arg1;
+                    tur.painter.cp2y = arg2;
                 }, timeout);
             }
         };
@@ -2372,26 +2359,10 @@ class Logo {
             if (suppressOutput) {
                 let savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
-                tur.painter.doBezier(
-                    this.cp1x[turtle],
-                    this.cp1y[turtle],
-                    this.cp2x[turtle],
-                    this.cp2y[turtle],
-                    arg1,
-                    arg2
-                );
+                tur.painter.doBezier(arg1, arg2);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => {
-                    tur.painter.doBezier(
-                        this.cp1x[turtle],
-                        this.cp1y[turtle],
-                        this.cp2x[turtle],
-                        this.cp2y[turtle],
-                        arg1,
-                        arg2
-                    );
-                }, timeout);
+                setTimeout(() => tur.painter.doBezier(arg1, arg2), timeout);
             }
         };
 

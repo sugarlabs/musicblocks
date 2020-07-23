@@ -242,8 +242,8 @@ function setupGraphicsBlocks() {
                 } else if (logo.inNoteBlock[turtle].length > 0) {
                     tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
                 } else {
-                    logo.cp2x[turtle] = args[0];
-                    logo.cp2y[turtle] = args[1];
+                    tur.painter.cp2x = args[0];
+                    tur.painter.cp2y = args[1];
                 }
             }
         }
@@ -280,8 +280,8 @@ function setupGraphicsBlocks() {
                 } else if (logo.inNoteBlock[turtle].length > 0) {
                     tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
                 } else {
-                    logo.cp1x[turtle] = args[0];
-                    logo.cp1y[turtle] = args[1];
+                    tur.painter.cp1x = args[0];
+                    tur.painter.cp1y = args[1];
                 }
             }
         }
@@ -319,24 +319,10 @@ function setupGraphicsBlocks() {
                     if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
-                        tur.painter.doBezier(
-                            logo.cp1x[turtle],
-                            logo.cp1y[turtle],
-                            logo.cp2x[turtle],
-                            logo.cp2y[turtle],
-                            args[0],
-                            args[1]
-                        );
+                        tur.painter.doBezier(args[0], args[1]);
                         tur.painter.penState = savedPenState;
                     } else {
-                        tur.painter.doBezier(
-                            logo.cp1x[turtle],
-                            logo.cp1y[turtle],
-                            logo.cp2x[turtle],
-                            logo.cp2y[turtle],
-                            args[0],
-                            args[1]
-                        );
+                        tur.painter.doBezier(args[0], args[1]);
                     }
                 }
             }
