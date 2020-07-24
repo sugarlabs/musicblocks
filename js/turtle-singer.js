@@ -42,6 +42,12 @@ class Singer {
         this.turtle = turtle;
         this.turtles = turtle.turtles;
 
+        // Parameters used by envelope block
+        /** @deprecated */  this.attack = [];
+        /** @deprecated */  this.decay = [];
+        /** @deprecated */  this.sustain = [];
+        /** @deprecated */  this.release = [];
+
         // Parameters used by pitch
         this.scalarTransposition = 0;
         this.scalarTranspositionValues = [];

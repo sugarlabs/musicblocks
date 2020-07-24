@@ -129,9 +129,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 
@@ -906,9 +908,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 
@@ -966,9 +970,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 

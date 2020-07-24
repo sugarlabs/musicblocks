@@ -88,11 +88,6 @@ class Logo {
         this.meterWidget = null;
         this.statusMatrix = null;
 
-        this.attack = {};
-        this.decay = {};
-        this.sustain = {};
-        this.release = {};
-
         /** @deprecated */  this.evalFlowDict = {};
         /** @deprecated */  this.evalArgDict = {};
         /** @deprecated */  this.evalParameterDict = {};
@@ -102,10 +97,6 @@ class Logo {
 
         this.eventList = {};
         this.receivedArg = null;
-
-        this.parentFlowQueue = {};
-        this.unhighlightQueue = {};
-        this.parameterQueue = {};
 
         this.inputValues = {};
         this.boxes = {};
@@ -889,19 +880,15 @@ class Logo {
         }
 
         if (logo.blocks.blockList[blk].protoblock.parameter) {
-            if (turtle in logo.parameterQueue) {
-                if (logo.parameterQueue[turtle].indexOf(blk) === -1) {
-                    logo.parameterQueue[turtle].push(blk);
-                }
-            } else {
-                // console.debug('turtle ' + turtle + ' has no parameterQueue');
+            if (tur.parameterQueue.indexOf(blk) === -1) {
+                tur.parameterQueue.push(blk);
             }
         }
 
         if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
-            return (logo.blocks.blockList[blk].value = logo.blocks.blockList[
-                blk
-            ].protoblock.arg(logo, turtle, blk, receivedArg));
+            return (logo.blocks.blockList[blk].value = logo.blocks.blockList[blk].protoblock.arg(
+                logo, turtle, blk, receivedArg
+            ));
         }
 
         if (logo.blocks.blockList[blk].name === "intervalname") {
@@ -1100,7 +1087,7 @@ class Logo {
     /**
      * Breaks a loop.
      *
-     * @param turtle
+     * @param turtle - Turtle object
      * @returns {void}
      */
     doBreak(turtle) {
@@ -1108,41 +1095,40 @@ class Logo {
         let parentLoopBlock = null;
         let loopBlkIdx = -1;
 
-        let queueLength = this.turtles.turtleList[turtle].queue.length;
+        let queueLength = turtle.queue.length;
         for (let i = queueLength - 1; i > -1; i--) {
             if (
                 ["forever", "repeat", "while", "until"].indexOf(
-                    this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].blk].name
+                    this.blocks.blockList[turtle.queue[i].blk].name
                 ) !== -1
             ) {
                 // while or until
-                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].blk;
+                loopBlkIdx = turtle.queue[i].blk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                this.turtles.turtleList[turtle].queue.pop();
+                turtle.queue.pop();
                 break;
             } else if (
                 ["forever", "repeat", "while", "until"].indexOf(
-                    this.blocks.blockList[this.turtles.turtleList[turtle].queue[i].parentBlk].name
+                    this.blocks.blockList[turtle.queue[i].parentBlk].name
                 ) !== -1
             ) {
                 // repeat or forever
-                loopBlkIdx = this.turtles.turtleList[turtle].queue[i].parentBlk;
+                loopBlkIdx = turtle.queue[i].parentBlk;
                 parentLoopBlock = this.blocks.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                this.turtles.turtleList[turtle].queue.pop();
+                turtle.queue.pop();
                 break;
             }
         }
 
         if (parentLoopBlock == null) {
             // Flush the child flow
-            this.turtles.turtleList[turtle].queue.pop();
+            turtle.queue.pop();
             return;
         }
 
-        // For while and until, we need to add any childflow from the
-        // parent to the queue
+        // For while and until, we need to add any childflow from the parent to the queue
         if (
             parentLoopBlock.name === "while" ||
             parentLoopBlock.name === "until"
@@ -1150,11 +1136,10 @@ class Logo {
             let childFlow = last(parentLoopBlock.connections);
             if (childFlow != null) {
                 let queueBlock = new Queue(childFlow, 1, loopBlkIdx);
-                // We need to keep track of the parent block to the
-                // child flow so we can unlightlight the parent block
-                // after the child flow completes
-                this.parentFlowQueue[turtle].push(loopBlkIdx);
-                this.turtles.turtleList[turtle].queue.push(queueBlock);
+                // We need to keep track of the parent block to the child flow so we can
+                // unlightlight the parent block after the child flow completes
+                turtle.parentFlowQueue.push(loopBlkIdx);
+                turtle.queue.push(queueBlock);
             }
         }
     }
@@ -1169,6 +1154,11 @@ class Logo {
      */
     initTurtle(turtle) {
         let tur = this.turtles.ithTurtle(turtle);
+
+        /** @deprecated */  tur.singer.attack = [];
+        /** @deprecated */  tur.singer.decay = [];
+        /** @deprecated */  tur.singer.sustain = [];
+        /** @deprecated */  tur.singer.release = [];
 
         tur.singer.scalarTransposition = 0;
         tur.singer.scalarTranspositionValues = [];
@@ -1280,10 +1270,6 @@ class Logo {
         this.voices[turtle] = [];
         this.pitchDrumTable[turtle] = {};
         this.backward[turtle] = [];
-        this.attack[turtle] = [];
-        this.decay[turtle] = [];
-        this.sustain[turtle] = [];
-        this.release[turtle] = [];
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
         this.noteValuePerBeat[turtle] = 4;
@@ -1337,7 +1323,9 @@ class Logo {
         this.blocks.bringToTop();
 
         this.stepQueue = {};
-        this.unhighlightQueue = {};
+        for (let turtle of this.turtles.turtleList) {
+            turtle.unhighlightQueue = [];
+        }
 
         this._restoreConnections();
 
@@ -1537,18 +1525,10 @@ class Logo {
         this.svgOutput = "";
         this.svgBackground = true;
 
-        for (let turtle in this.turtles.turtleList) {
-            if (turtle in this.parentFlowQueue) {
-                this.parentFlowQueue[turtle] = [];
-            }
-
-            if (turtle in this.unhighlightQueue) {
-                this.unhighlightQueue[turtle] = [];
-            }
-
-            if (turtle in this.parameterQueue) {
-                this.parameterQueue[turtle] = [];
-            }
+        for (let turtle of this.turtles.turtleList) {
+            turtle.parentFlowQueue = [];
+            turtle.unhighlightQueue = [];
+            turtle.parameterQueue = [];
         }
 
         if (this.turtleDelay === 0) {
@@ -1593,16 +1573,18 @@ class Logo {
                 turtle = this.blocks.blockList[startHere].value;
             }
 
-            this.turtles.turtleList[turtle].queue = [];
-            this.parentFlowQueue[turtle] = [];
-            this.unhighlightQueue[turtle] = [];
-            this.parameterQueue[turtle] = [];
+            let tur = this.turtles.ithTurtle(turtle);
 
-            if (this.turtles.turtleList[turtle].running) {
+            tur.queue = [];
+            tur.parentFlowQueue = [];
+            tur.unhighlightQueue = [];
+            tur.parameterQueue = [];
+
+            if (tur.running) {
                 console.debug("already running...");
             }
 
-            this.turtles.turtleList[turtle].running = true;
+            tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
@@ -1613,16 +1595,18 @@ class Logo {
                     !this.blocks.blockList[startBlocks[b]].trash
                 ) {
                     let turtle = 0;
-                    this.turtles.turtleList[turtle].queue = [];
-                    this.parentFlowQueue[turtle] = [];
-                    this.unhighlightQueue[turtle] = [];
-                    this.parameterQueue[turtle] = [];
+                    let tur = this.turtles.ithTurtle(turtle);
 
-                    if (this.turtles.turtleList[turtle].running) {
+                    tur.queue = [];
+                    tur.parentFlowQueue = [];
+                    tur.unhighlightQueue = [];
+                    tur.parameterQueue = [];
+
+                    if (tur.running) {
                         console.debug("already running...");
                     }
 
-                    this.turtles.turtleList[turtle].running = true;
+                    tur.running = true;
                     delayStart = 250;
                     this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                 }
@@ -1639,17 +1623,19 @@ class Logo {
                 for (let b = 0; b < startBlocks.length; b++) {
                     if (this.blocks.blockList[startBlocks[b]].name !== "status") {
                         let turtle = this.blocks.blockList[startBlocks[b]].value;
-                        this.turtles.turtleList[turtle].queue = [];
-                        this.parentFlowQueue[turtle] = [];
-                        this.unhighlightQueue[turtle] = [];
-                        this.parameterQueue[turtle] = [];
+                        let tur = this.turtles.ithTurtle(turtle);
 
-                        if (!this.turtles.turtleList[turtle].inTrash) {
-                            if (this.turtles.turtleList[turtle].running) {
+                        tur.queue = [];
+                        tur.parentFlowQueue = [];
+                        tur.unhighlightQueue = [];
+                        tur.parameterQueue = [];
+
+                        if (!tur.inTrash) {
+                            if (tur.running) {
                                 console.debug("already running...");
                             }
 
-                            this.turtles.turtleList[turtle].running = true;
+                            tur.running = true;
                             this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                         }
                     }
@@ -1898,9 +1884,9 @@ class Logo {
             // We need to keep track of the parent block to the child
             // flow so we can unhighlight the parent block after the
             // child flow completes.
-            if (logo.parentFlowQueue[turtle] != undefined) {
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+            if (tur.parentFlowQueue != undefined) {
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             } else {
                 console.debug("cannot find queue for turtle " + turtle);
             }
@@ -1911,18 +1897,18 @@ class Logo {
         let passArg = null;
 
         // Run the last flow in the queue
-        if (logo.turtles.turtleList[turtle].queue.length > queueStart) {
-            nextBlock = last(logo.turtles.turtleList[turtle].queue).blk;
-            parentBlk = last(logo.turtles.turtleList[turtle].queue).parentBlk;
-            passArg = last(logo.turtles.turtleList[turtle].queue).args;
+        if (tur.queue.length > queueStart) {
+            nextBlock = last(tur.queue).blk;
+            parentBlk = last(tur.queue).parentBlk;
+            passArg = last(tur.queue).args;
 
             // Since the forever block starts at -1, it will never === 1
-            if (last(logo.turtles.turtleList[turtle].queue).count === 1) {
+            if (last(tur.queue).count === 1) {
                 // Finished child so pop it off the queue
-                logo.turtles.turtleList[turtle].queue.pop();
+                tur.queue.pop();
             } else {
                 // Decrement the counter for repeating the flow
-                last(logo.turtles.turtleList[turtle].queue).count -= 1;
+                last(tur.queue).count -= 1;
             }
         }
 
@@ -1954,33 +1940,22 @@ class Logo {
                 )
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                    // If we are at the end of the child flow, queue the
-                    // unhighlighting of the parent block to the flow
-                    if (logo.unhighlightQueue[turtle] === undefined) {
-                        console.debug(
-                            "cannot find highlight queue for turtle " + turtle
-                        );
+                    // If we are at the end of the child flow, queue the unhighlighting of the parent block to the flow
+                    if (tur.unhighlightQueue === undefined) {
+                        console.debug("cannot find highlight queue for turtle " + turtle);
                     } else if (
-                        logo.parentFlowQueue[turtle].length > 0 &&
-                        logo.turtles.turtleList[turtle].queue.length > 0 &&
-                        last(logo.turtles.turtleList[turtle].queue).parentBlk !==
-                            last(logo.parentFlowQueue[turtle])
+                        tur.parentFlowQueue.length > 0 &&
+                        tur.queue.length > 0 &&
+                        last(tur.queue).parentBlk !== last(tur.parentFlowQueue)
                     ) {
-                        logo.unhighlightQueue[turtle].push(last(logo.parentFlowQueue[turtle]));
-                    } else if (logo.unhighlightQueue[turtle].length > 0) {
+                        tur.unhighlightQueue.push(last(tur.parentFlowQueue));
+                    } else if (tur.unhighlightQueue.length > 0) {
                         // The child flow is finally complete, so unhighlight
                         setTimeout(() => {
-                            if (!turtle in logo.unhighlightQueue) {
-                                console.debug(
-                                    "turtle " + turtle + " not found in unhighlightQueue"
-                                );
-                                return;
-                            }
-
                             if (logo.blocks.visible) {
-                                logo.blocks.unhighlight(logo.unhighlightQueue[turtle].pop());
+                                logo.blocks.unhighlight(tur.unhighlightQueue.pop());
                             } else {
-                                logo.unhighlightQueue[turtle].pop();
+                                tur.unhighlightQueue.pop();
                             }
                         }, logo.turtleDelay);
                     }
@@ -1989,12 +1964,8 @@ class Logo {
 
             // We don't update parameter blocks when running full speed
             if (logo.turtleDelay !== 0) {
-                for (let pblk in logo.parameterQueue[turtle]) {
-                    logo.blocks.updateParameterBlock(
-                        logo,
-                        turtle,
-                        logo.parameterQueue[turtle][pblk]
-                    );
+                for (let pblk in tur.parameterQueue) {
+                    logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk]);
                 }
             }
 
@@ -2122,9 +2093,9 @@ class Logo {
                 }
 
                 // Unhighlight any parent blocks still highlighted
-                for (let b in logo.parentFlowQueue[turtle]) {
+                for (let b in tur.parentFlowQueue) {
                     if (logo.blocks.visible) {
-                        logo.blocks.unhighlight(logo.parentFlowQueue[turtle][b]);
+                        logo.blocks.unhighlight(tur.parentFlowQueue[b]);
                     }
                 }
 

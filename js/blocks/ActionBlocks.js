@@ -638,31 +638,22 @@ function setupActionBlocks() {
             if (!(args[1] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
-                    if (logo.turtles.turtleList[turtle].running) {
-                        let queueBlock = new Queue(
-                            logo.actions[args[1]],
-                            1,
-                            blk
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let __listener = event => {
+                    if (tur.running) {
+                        let queueBlock = new Queue(logo.actions[args[1]], 1, blk);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped
-                        // running, we must run the stack
-                        // from here.
+                        // Since the turtle has stopped running, we must run the stack from here
                         logo.runFromBlockNow(
-                            logo,
-                            turtle,
-                            logo.actions[args[1]],
-                            false,
-                            receivedArg
+                            logo, turtle, logo.actions[args[1]], false, receivedArg
                         );
                     }
                 };
 
-                // If there is already a listener, remove it
-                // before adding the new one.
+                // If there is already a listener, remove it before adding the new one
                 logo.setTurtleListener(turtle, args[0], __listener);
             }
         }

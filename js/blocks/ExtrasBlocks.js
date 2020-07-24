@@ -221,13 +221,15 @@ function setupExtrasBlocks() {
 
             if (logo.blocks.blockList[args[0]].name === "start") {
                 let thisTurtle = logo.blocks.blockList[args[0]].value;
+                let tur = logo.turtles.ithTurtle(thisTurtle);
                 console.debug("run start " + thisTurtle);
+
                 logo.initTurtle(thisTurtle);
-                logo.turtles.turtleList[thisTurtle].queue = [];
-                logo.parentFlowQueue[thisTurtle] = [];
-                logo.unhighlightQueue[thisTurtle] = [];
-                logo.parameterQueue[thisTurtle] = [];
-                logo.turtles.turtleList[thisTurtle].running = true;
+                tur.queue = [];
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
+                tur.running = true;
                 logo.runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
             } else {
                 return [args[0], 1];

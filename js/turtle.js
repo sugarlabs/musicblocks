@@ -195,6 +195,48 @@ class Turtle {
     }
 
     /**
+     * @param {Object[]} queue
+     */
+    set parentFlowQueue(queue) {
+        this._parentFlowQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get parentFlowQueue() {
+        return this._parentFlowQueue;
+    }
+
+    /**
+     * @param {Object[]} queue
+     */
+    set unhighlightQueue(queue) {
+        this._unhighlightQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get unhighlightQueue() {
+        return this._unhighlightQueue;
+    }
+
+    /**
+     * @param {Object[]} queue
+     */
+    set parameterQueue(queue) {
+        this._parameterQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get parameterQueue() {
+        return this._parameterQueue;
+    }
+
+    /**
      * @param {Function[]} listeners - list of listeners
      */
     set listeners(listeners) {
@@ -409,6 +451,9 @@ Turtle.TurtleModel = class {
         this._startBlock = null;    // Which start block is associated with this turtle?
 
         this._queue = [];           // Queue of blocks this turtle is executing
+        this._parentFlowQueue = [];
+        this._unhighlightQueue = [];
+        this._parameterQueue = [];
 
         this._listeners = {};       // Event listeners
 
