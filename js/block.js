@@ -4705,6 +4705,20 @@ function Block(protoblock, blocks, overrideName) {
         prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
+        let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
+        
+        // auto selection of sharps and flats in fixed solfege
+        // handles the case of opening the pie-menu, not whilst in the pie-menu
+        if (!KeySignatureEnv[2] && accidental == "") {
+            for (let i in scale) {
+                if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note]) {
+                    accidental = scale[i].substr(1);
+                    this.value += accidental;
+                    this.text.text = this.value;
+                }
+            }
+        }
+
         if (!custom) {
             // Navigate to a the current accidental value.
             if (accidental === "") {
@@ -4868,8 +4882,6 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
             
-            // FIX ME: get moveable if availableconsole.log(note);
-            // Fetching key signature, in case of solfege not useful until moveable is known
             let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
 
             let obj;
