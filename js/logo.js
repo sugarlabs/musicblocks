@@ -112,21 +112,12 @@ class Logo {
         this.switchCases = {};
         this.switchBlocks = {};
 
-        // When we leave a clamp block, we need to dispatch a signal
-        this.endOfClampSignals = {};
-        // Don't dispatch these signals (when exiting note counter or interval measure)
-        this.butNotThese = {};
-
         // Related to running programs
         this._lastNoteTimeout = null;
         this._alreadyRunning = false;
         this._prematureRestart = false;
         this._runningBlock = null;
         this._ignoringBlock = null;
-
-        // Used to halt runtime during input
-        this._delayTimeout = {};
-        this._delayParameters = {};
 
         this.time = 0;
         this.firstNoteTime = null;
@@ -811,49 +802,38 @@ class Logo {
      * @returns {void}
      */
     setDispatchBlock(blk, turtle, listenerName) {
+        let tur = this.turtles.ithTurtle(turtle);
+
         if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
-            let c =
-                this.blocks.blockList[last(this.backward[turtle])].name ===
-                    "backward" ?
-                    1 : 2;
+            let c = this.blocks.blockList[last(this.backward[turtle])].name === "backward" ? 1 : 2;
             if (
                 this.blocks.sameGeneration(
-                    this.blocks.blockList[last(this.backward[turtle])]
-                        .connections[c],
-                    blk
+                    this.blocks.blockList[last(this.backward[turtle])].connections[c], blk
                 )
             ) {
                 let nextBlock = this.blocks.blockList[blk].connections[0];
-                if (nextBlock in this.endOfClampSignals[turtle]) {
-                    this.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
+                if (nextBlock in tur.endOfClampSignals) {
+                    tur.endOfClampSignals[nextBlock].push(listenerName);
                 } else {
-                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    tur.endOfClampSignals[nextBlock] = [listenerName];
                 }
             } else {
                 let nextBlock = last(this.blocks.blockList[blk].connections);
                 if (nextBlock != null) {
-                    if (nextBlock in this.endOfClampSignals[turtle]) {
-                        this.endOfClampSignals[turtle][nextBlock].push(
-                            listenerName
-                        );
+                    if (nextBlock in tur.endOfClampSignals) {
+                        tur.endOfClampSignals[nextBlock].push(listenerName);
                     } else {
-                        this.endOfClampSignals[turtle][nextBlock] = [
-                            listenerName
-                        ];
+                        tur.endOfClampSignals[nextBlock] = [listenerName];
                     }
                 }
             }
         } else {
             let nextBlock = last(this.blocks.blockList[blk].connections);
             if (nextBlock != null) {
-                if (nextBlock in this.endOfClampSignals[turtle]) {
-                    this.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
+                if (nextBlock in tur.endOfClampSignals) {
+                    tur.endOfClampSignals[nextBlock].push(listenerName);
                 } else {
-                    this.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    tur.endOfClampSignals[nextBlock] = [listenerName];
                 }
             }
         }
@@ -1071,15 +1051,17 @@ class Logo {
      * @returns {void}
      */
     clearTurtleRun(turtle) {
-        if (this._delayTimeout[turtle] !== null) {
-            clearTimeout(this._delayTimeout[turtle]);
-            this._delayTimeout[turtle] = null;
+        let tur = this.turtles.ithTurtle(turtle);
+
+        if (tur.delayTimeout !== null) {
+            clearTimeout(tur.delayTimeout);
+            tur.delayTimeout = null;
             this.runFromBlockNow(
                 this,
                 turtle,
-                this._delayParameters[turtle]['blk'],
-                this._delayParameters[turtle]['flow'],
-                this._delayParameters[turtle]['arg']
+                tur.delayParameters['blk'],
+                tur.delayParameters['flow'],
+                tur.delayParameters['arg']
             );
         }
     }
@@ -1155,6 +1137,9 @@ class Logo {
     initTurtle(turtle) {
         let tur = this.turtles.ithTurtle(turtle);
 
+        tur.endOfClampSignals = {};
+        tur.butNotThese = {};
+
         /** @deprecated */  tur.singer.attack = [];
         /** @deprecated */  tur.singer.decay = [];
         /** @deprecated */  tur.singer.sustain = [];
@@ -1228,8 +1213,6 @@ class Logo {
         this.previousTurtleTime[turtle] = 0;
         this.turtleTime[turtle] = 0;
         this._waitTimes[turtle] = 0;
-        this.endOfClampSignals[turtle] = {};
-        this.butNotThese[turtle] = {};
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
         this.embeddedGraphicsFinished[turtle] = true;
@@ -1675,6 +1658,8 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
+        let tur = logo.turtles.ithTurtle(turtle);
+
         let delay = logo.turtleDelay + logo._waitTimes[turtle];
         logo._waitTimes[turtle] = 0;
 
@@ -1686,10 +1671,10 @@ class Logo {
                 }
                 logo.stepQueue[turtle].push(blk);
             } else {
-                logo._delayParameters[turtle] = { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
-                logo._delayTimeout[turtle] = setTimeout(() => {
-                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
-                }, delay);
+                tur.delayParameters = { 'blk': blk, 'flow': isflow, 'arg': receivedArg };
+                tur.delayTimeout = setTimeout(
+                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg), delay
+                );
             }
         }
     }
@@ -1852,10 +1837,10 @@ class Logo {
         */
         // Is the block in a queued clamp?
         if (blk !== logo._ignoringBlock) {
-            if (blk in logo.endOfClampSignals[turtle]) {
-                let n = logo.endOfClampSignals[turtle][blk].length;
+            if (blk in tur.endOfClampSignals) {
+                let n = tur.endOfClampSignals[blk].length;
                 for (let i = 0; i < n; i++) {
-                    let signal = logo.endOfClampSignals[turtle][blk].pop();
+                    let signal = tur.endOfClampSignals[blk].pop();
                     if (signal != null) {
                         logo.stage.dispatchEvent(signal);
                     }
@@ -1979,14 +1964,13 @@ class Logo {
 
             if (!logo._prematureRestart) {
                 // console.debug('Make sure any unissued signals are dispatched.');
-                for (let b in logo.endOfClampSignals[turtle]) {
-                    for (let i = 0; i < logo.endOfClampSignals[turtle][b].length; i++) {
-                        if (logo.endOfClampSignals[turtle][b][i] != null) {
+                for (let b in tur.endOfClampSignals) {
+                    for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
+                        if (tur.endOfClampSignals[b][i] != null) {
                             if (
-                                logo.butNotThese[turtle][b] == null ||
-                                logo.butNotThese[turtle][b].indexOf(i) === -1
+                                tur.butNotThese[b] == null || tur.butNotThese[b].indexOf(i) === -1
                             ) {
-                                logo.stage.dispatchEvent(logo.endOfClampSignals[turtle][b][i]);
+                                logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
                             }
                         }
                     }

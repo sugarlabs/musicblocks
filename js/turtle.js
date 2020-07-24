@@ -456,6 +456,14 @@ Turtle.TurtleModel = class {
         this._parameterQueue = [];
 
         this._listeners = {};       // Event listeners
+        // When we leave a clamp block, we need to dispatch a signal
+        this.endOfClampSignals = {};
+        // Don't dispatch these signals (when exiting note counter or interval measure)
+        this.butNotThese = {};
+
+        // Used to halt runtime during input
+        this.delayTimeout = {};
+        this.delayParameters = {};
 
         this._media = [];           // media (text, images) we need to remove on clear
 

@@ -376,10 +376,10 @@ class Singer {
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
-        for (let b in logo.endOfClampSignals[turtle]) {
-            logo.butNotThese[turtle][b] = [];
-            for (let i in logo.endOfClampSignals[turtle][b]) {
-                logo.butNotThese[turtle][b].push(i);
+        for (let b in tur.endOfClampSignals) {
+            tur.butNotThese[b] = [];
+            for (let i in tur.endOfClampSignals[b]) {
+                tur.butNotThese[b].push(i);
             }
         }
 
@@ -424,7 +424,7 @@ class Singer {
         tur.singer.justCounting.pop();
         tur.singer.suppressOutput = saveSuppressStatus;
 
-        logo.butNotThese[turtle] = {};
+        tur.butNotThese = {};
 
         return returnValue[0] / returnValue[1];
     }

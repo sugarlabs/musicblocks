@@ -214,32 +214,18 @@ function setupIntervalsBlocks() {
                 tur.singer.justCounting.push(true);
                 tur.singer.justMeasuring.push(true);
 
-                for (let b in logo.endOfClampSignals[turtle]) {
-                    logo.butNotThese[turtle][b] = [];
-                    for (
-                        let i = 0;
-                        i < logo.endOfClampSignals[turtle][b].length;
-                        i++
-                    ) {
-                        logo.butNotThese[turtle][b].push(i);
+                for (let b in tur.endOfClampSignals) {
+                    tur.butNotThese[b] = [];
+                    for (let i in tur.endOfClampSignals[b]) {
+                        tur.butNotThese[b].push(i);
                     }
                 }
 
                 let actionArgs = [];
                 let saveNoteCount = tur.singer.notesPlayed;
-                logo.turtles.turtleList[turtle].running = true;
-                logo.runFromBlockNow(
-                    logo,
-                    turtle,
-                    cblk,
-                    true,
-                    actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
-                );
-                if (
-                    tur.singer.firstPitch.length > 0 &&
-                    tur.singer.lastPitch.length > 0
-                ) {
+                tur.running = true;
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
+                if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
                     return (last(tur.singer.lastPitch) - last(tur.singer.firstPitch));
                     tur.singer.firstPitch.pop();
                     tur.singer.lastPitch.pop();
@@ -269,7 +255,7 @@ function setupIntervalsBlocks() {
                 tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
-                logo.butNotThese[turtle] = {};
+                tur.butNotThese = {};
             }
         }
     }
@@ -323,20 +309,16 @@ function setupIntervalsBlocks() {
                 tur.singer.justCounting.push(true);
                 tur.singer.justMeasuring.push(true);
 
-                for (let b in logo.endOfClampSignals[turtle]) {
-                    logo.butNotThese[turtle][b] = [];
-                    for (
-                        let i = 0;
-                        i < logo.endOfClampSignals[turtle][b].length;
-                        i++
-                    ) {
-                        logo.butNotThese[turtle][b].push(i);
+                for (let b in tur.endOfClampSignals) {
+                    tur.butNotThese[b] = [];
+                    for (let i in tur.endOfClampSignals[b]) {
+                        tur.butNotThese[b].push(i);
                     }
                 }
 
                 let actionArgs = [];
                 let saveNoteCount = tur.singer.notesPlayed;
-                logo.turtles.turtleList[turtle].running = true;
+                tur.running = true;
                 logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
                 if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
@@ -348,11 +330,7 @@ function setupIntervalsBlocks() {
                     tur.singer.lastPitch.pop();
                 } else {
                     return 0;
-                    logo.errorMsg(
-                        _(
-                            "You must use two pitch blocks when measuring an interval."
-                        )
-                    );
+                    logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
                 }
 
                 tur.singer.notesPlayed = saveNoteCount;
@@ -376,7 +354,7 @@ function setupIntervalsBlocks() {
                 tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
-                logo.butNotThese[turtle] = {};
+                tur.butNotThese = {};
             }
         }
     }

@@ -242,14 +242,10 @@ function setupActionBlocks() {
                     if (nextBlock === null) {
                         logo.backward[turtle].pop();
                     } else {
-                        if (nextBlock in logo.endOfClampSignals[turtle]) {
-                            logo.endOfClampSignals[turtle][nextBlock].push(
-                                listenerName
-                            );
+                        if (nextBlock in tur.endOfClampSignals) {
+                            tur.endOfClampSignals[nextBlock].push(listenerName);
                         } else {
-                            logo.endOfClampSignals[turtle][nextBlock] = [
-                                listenerName
-                            ];
+                            tur.endOfClampSignals[nextBlock] = [listenerName];
                         }
                     }
 
@@ -824,14 +820,10 @@ function setupActionBlocks() {
                 if (nextBlock === null) {
                     logo.backward[turtle].pop();
                 } else {
-                    if (nextBlock in logo.endOfClampSignals[turtle]) {
-                        logo.endOfClampSignals[turtle][nextBlock].push(
-                            listenerName
-                        );
+                    if (nextBlock in tur.endOfClampSignals) {
+                        tur.endOfClampSignals[nextBlock].push(listenerName);
                     } else {
-                        logo.endOfClampSignals[turtle][nextBlock] = [
-                            listenerName
-                        ];
+                        tur.endOfClampSignals[nextBlock] = [listenerName];
                     }
                 }
 

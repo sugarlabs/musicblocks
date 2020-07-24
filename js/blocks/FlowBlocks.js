@@ -23,6 +23,8 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.backward[turtle].push(blk);
             // Set child to bottom block inside clamp
             let childFlow = logo.blocks.findBottomBlock(args[0]);
@@ -35,12 +37,10 @@ function setupFlowBlocks() {
             if (nextBlock === null) {
                 logo.backward[turtle].pop();
             } else {
-                if (nextBlock in logo.endOfClampSignals[turtle]) {
-                    logo.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
+                if (nextBlock in tur.endOfClampSignals) {
+                    tur.endOfClampSignals[nextBlock].push(listenerName);
                 } else {
-                    logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    tur.endOfClampSignals[nextBlock] = [listenerName];
                 }
             }
 
