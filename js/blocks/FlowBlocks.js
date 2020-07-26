@@ -25,7 +25,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.backward[turtle].push(blk);
+            tur.singer.backward.push(blk);
             // Set child to bottom block inside clamp
             let childFlow = logo.blocks.findBottomBlock(args[0]);
             let childFlowCount = 1;
@@ -35,7 +35,7 @@ function setupFlowBlocks() {
 
             let nextBlock = logo.blocks.blockList[blk].connections[2];
             if (nextBlock === null) {
-                logo.backward[turtle].pop();
+                tur.singer.backward.pop();
             } else {
                 if (nextBlock in tur.endOfClampSignals) {
                     tur.endOfClampSignals[nextBlock].push(listenerName);
@@ -44,9 +44,7 @@ function setupFlowBlocks() {
                 }
             }
 
-            let __listener = function() {
-                logo.backward[turtle].pop();
-            };
+            let __listener = event => tur.singer.backward.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
@@ -508,8 +506,8 @@ function setupFlowBlocks() {
                 }
 
                 let elapsedTime = (new Date().getTime() - this.firstNoteTime) / 1000;
-                logo.turtleTime[turtle] = elapsedTime;
-                logo.previousTurtleTime[turtle] = elapsedTime;
+                tur.singer.turtleTime = elapsedTime;
+                tur.singer.previousTurtleTime = elapsedTime;
             }
         }
     }

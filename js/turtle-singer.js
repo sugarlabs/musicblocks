@@ -88,6 +88,23 @@ class Singer {
         this.whichNoteToCount = 1;
         this.moveable = false;                  // moveable solfege?
 
+        // Parameters used by the note block
+        this.bpm = [];
+        this.previousTurtleTime = 0;
+        this.turtleTime = 0;
+        this.pushedNote = false;
+        //////
+        this.tie = false;
+        this.tieNotePitches = [];
+        this.tieNoteExtras = [];
+        this.tieCarryOver = 0;
+        this.tieFirstDrums = [];
+        this.synthVolume = {};
+        this.drift = 0;
+        this.drumStyle = [];
+        this.voices = [];
+        this.backward = [];
+
         // Effects parameters
         this.vibratoIntensity = [];
         this.vibratoRate = [];
@@ -119,6 +136,7 @@ class Singer {
     // Parameters used by notes
     static masterBPM = TARGETBPM;
     static defaultBPMFactor = TONEBPM / TARGETBPM;
+    static masterVolume = [DEFAULTVOLUME];
 
     // ========= Deprecated ===================================================
 
@@ -166,7 +184,7 @@ class Singer {
                 tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
                     tur.singer.beatFactor
                 );
-                logo.pushedNote[turtle] = true;
+                tur.singer.pushedNote = true;
             }
         }
     }
@@ -370,8 +388,8 @@ class Singer {
 
         let saveWhichNoteToCount = tur.singer.whichNoteToCount;
 
-        let savePrevTurtleTime = logo.previousTurtleTime[turtle];
-        let saveTurtleTime = logo.turtleTime[turtle];
+        let savePrevTurtleTime = tur.singer.previousTurtleTime;
+        let saveTurtleTime = tur.singer.turtleTime;
 
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
@@ -416,8 +434,8 @@ class Singer {
         tur.painter.doSetHeading(saveOrientation);
         tur.painter.penState = savePenState;
 
-        logo.previousTurtleTime[turtle] = savePrevTurtleTime;
-        logo.turtleTime[turtle] = saveTurtleTime;
+        tur.singer.previousTurtleTime = savePrevTurtleTime;
+        tur.singer.turtleTime = saveTurtleTime;
 
         tur.singer.whichNoteToCount = saveWhichNoteToCount;
 
@@ -442,9 +460,9 @@ class Singer {
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.setMasterVolume(volume);
-            for (let turtle in logo.turtles.turtleList) {
-                for (let synth in logo.synthVolume[turtle]) {
-                    logo.synthVolume[turtle][synth].push(volume);
+            for (let turtle of logo.turtles.turtleList) {
+                for (let synth in turtle.singer.synthVolume) {
+                    turtle.singer.synthVolume[synth].push(volume);
                 }
             }
         }
@@ -596,8 +614,8 @@ class Singer {
                 );
                 nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
 
-                if (logo.drumStyle[turtle].length > 0) {
-                    logo.pitchDrumMatrix.drums.push(last(logo.drumStyle[turtle]));
+                if (tur.singer.drumStyle.length > 0) {
+                    logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
                 } else {
                     logo.pitchDrumMatrix.rowLabels.push(nnote[0]);
                     logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
@@ -640,9 +658,9 @@ class Singer {
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
-                if (logo.drumStyle[turtle].length > 0) {
+                if (tur.singer.drumStyle.length > 0) {
                     logo.pitchTimeMatrix.rowLabels.push(
-                        last(logo.drumStyle[turtle])
+                        last(tur.singer.drumStyle)
                     );
                     logo.pitchTimeMatrix.rowArgs.push(-1);
                 } else {
@@ -674,8 +692,8 @@ class Singer {
                     logo.synth.inTemperament
                 );
 
-                if (logo.drumStyle[turtle].length > 0) {
-                    let drumname = last(logo.drumStyle[turtle]);
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
                     logo.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                 }
 
@@ -740,9 +758,9 @@ class Singer {
                 );
             }
 
-            logo.pushedNote[turtle] = true;
-        } else if (logo.drumStyle[turtle].length > 0) {
-            let drumname = last(logo.drumStyle[turtle]);
+            tur.singer.pushedNote = true;
+        } else if (tur.singer.drumStyle.length > 0) {
+            let drumname = last(tur.singer.drumStyle);
             let transposition = tur.singer.transposition;
 
             let noteObj1 = getNote(
@@ -803,7 +821,7 @@ class Singer {
             );
             nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
 
-            if (logo.drumStyle[turtle].length === 0) {
+            if (tur.singer.drumStyle.length === 0) {
                 logo.musicKeyboard.instruments.push(last(logo.instrumentNames[turtle]));
                 logo.musicKeyboard.noteNames.push(nnote[0]);
                 logo.musicKeyboard.octaves.push(nnote[1]);
@@ -991,7 +1009,7 @@ class Singer {
         let tur = logo.turtles.ithTurtle(turtle);
 
         let bpmFactor =
-            TONEBPM / (logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM);
+            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
         let noteBeatValue;
         if (logo.blocks.blockList[blk].name === "osctime") {
@@ -1143,30 +1161,26 @@ class Singer {
             logo.crescendoDelta[turtle].length === 0
         ) {
             logo.inCrescendo[turtle].pop();
-            for (let synth in logo.synthVolume[turtle]) {
+            for (let synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(
-                    logo, turtle, "electronic synth", last(logo.synthVolume[turtle][synth])
+                    logo, turtle, "electronic synth", last(tur.singer.synthVolume[synth])
                 );
             }
         } else if (logo.crescendoDelta[turtle].length > 0) {
             if (
-                last(logo.synthVolume[turtle]["electronic synth"]) ===
+                last(tur.singer.synthVolume["electronic synth"]) ===
                     last(logo.crescendoInitialVolume[turtle]["electronic synth"]) &&
                 tur.singer.justCounting.length === 0
             ) {
                 logo.notation.notationBeginCrescendo(turtle, last(logo.crescendoDelta[turtle]));
             }
 
-            for (let synth in logo.synthVolume[turtle]) {
-                let len = logo.synthVolume[turtle][synth].length;
-                logo.synthVolume[turtle][synth][len - 1] += last(
-                    logo.crescendoDelta[turtle]
-                );
-                console.debug(synth + "= " + logo.synthVolume[turtle][synth][len - 1]);
+            for (let synth in tur.singer.synthVolume) {
+                let len = tur.singer.synthVolume[synth].length;
+                tur.singer.synthVolume[synth][len - 1] += last(logo.crescendoDelta[turtle]);
+                console.debug(synth + "= " + tur.singer.synthVolume[synth][len - 1]);
                 if (!tur.singer.suppressOutput) {
-                    Singer.setSynthVolume(
-                        logo, turtle, synth, last(logo.synthVolume[turtle][synth])
-                    );
+                    Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
                 }
             }
         }
@@ -1237,56 +1251,38 @@ class Singer {
                 logo.firstNoteTime = new Date().getTime();
             }
 
-            // Calculate a lag: In case this turtle has fallen behind,
-            // we need to catch up.
+            // Calculate a lag: In case this turtle has fallen behind, we need to catch up
             let elapsedTime = (new Date().getTime() - logo.firstNoteTime) / 1000;
-            let turtleLag;
-            if (logo.drift[turtle] === 0) {
-                // How far behind is this turtle lagging?
-                turtleLag = Math.max(
-                    elapsedTime - logo.turtleTime[turtle],
-                    0
-                );
-            } else {
-                // When we are "drifting", we don't bother with lag.
-                turtleLag = 0;
-            }
+            // When we are "drifting", we don't bother with lag
+            let turtleLag =
+                tur.singer.drift === 0 ? Math.max(elapsedTime - tur.singer.turtleTime, 0) : 0;
 
-            // Delay running graphics from second note in tie.
-            let tieDelay;
-            if (logo.tie[turtle]) {
-                tieDelay = logo.tieCarryOver[turtle];
-            } else {
-                tieDelay = 0;
-            }
+            // Delay running graphics from second note in tie
+            let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;
 
             // If we are in a tie, depending upon parity, we either
             // add the duration from the prvious note to the current
             // note, or we cache the duration and set the wait to
             // zero. TESTME: May not work when using dup and skip.
-            if (logo.tie[turtle]) {
+            if (tur.singer.tie) {
                 var saveBlk = last(logo.inNoteBlock[turtle]);
 
-                if (logo.tieCarryOver[turtle] > 0) {
-                    // We need to check to see if we are tying together
-                    // similar notes.
+                if (tur.singer.tieCarryOver > 0) {
+                    // We need to check to see if we are tying together similar notes
 
-                    var match = true;
+                    let match = true;
                     if (
-                        logo.tieNotePitches[turtle].length !==
+                        tur.singer.tieNotePitches.length !==
                         tur.singer.notePitches[last(logo.inNoteBlock[turtle])].length
                     ) {
                         match = false;
                     } else {
-                        // FIXME: This check assumes that the order of
-                        // the pitch blocks in a chord are the same.
-                        for (
-                            var i = 0;
-                            i < logo.tieNotePitches[turtle].length;
-                            i++
-                        ) {
+                        /**
+                         * @todo FIXME: This check assumes that the order of the pitch blocks in a chord are the same
+                         */
+                        for (let i = 0; i < tur.singer.tieNotePitches.length; i++) {
                             if (
-                                logo.tieNotePitches[turtle][i][0] !=
+                                tur.singer.tieNotePitches[i][0] !=
                                     tur.singer.notePitches[last(logo.inNoteBlock[turtle])][i]
                             ) {
                                 match = false;
@@ -1294,7 +1290,7 @@ class Singer {
                             }
 
                             if (
-                                logo.tieNotePitches[turtle][i][1] !=
+                                tur.singer.tieNotePitches[i][1] !=
                                     tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][i]
                             ) {
                                 match = false;
@@ -1304,8 +1300,7 @@ class Singer {
                     }
 
                     if (!match) {
-                        // If we don't have a match, then we need to
-                        // play the previous note.
+                        // If we don't have a match, then we need to play the previous note
                         logo.errorMsg(
                             _(
                                 "You can only tie notes of the same pitch. Did you mean to use slur?"
@@ -1339,46 +1334,38 @@ class Singer {
                             tur.singer.embeddedGraphics[saveBlk]
                         ];
 
-                        // Swap in the previous note.
-                        saveBlk = logo.tieNoteExtras[turtle][0];
+                        // Swap in the previous note
+                        saveBlk = tur.singer.tieNoteExtras[0];
                         logo.inNoteBlock[turtle].push(saveBlk);
 
                         tur.singer.notePitches[saveBlk] = [];
                         tur.singer.noteOctaves[saveBlk] = [];
                         tur.singer.noteCents[saveBlk] = [];
                         tur.singer.noteHertz[saveBlk] = [];
-                        for (
-                            var i = 0;
-                            i < logo.tieNotePitches[turtle].length;
-                            i++
-                        ) {
-                            tur.singer.notePitches[saveBlk].push(logo.tieNotePitches[turtle][i][0]);
-                            tur.singer.noteOctaves[saveBlk].push(logo.tieNotePitches[turtle][i][1]);
-                            tur.singer.noteCents[saveBlk].push(logo.tieNotePitches[turtle][i][2]);
-                            tur.singer.noteHertz[saveBlk].push(logo.tieNotePitches[turtle][i][3]);
+                        for (let i = 0; i < tur.singer.tieNotePitches.length; i++) {
+                            tur.singer.notePitches[saveBlk].push(tur.singer.tieNotePitches[i][0]);
+                            tur.singer.noteOctaves[saveBlk].push(tur.singer.tieNotePitches[i][1]);
+                            tur.singer.noteCents[saveBlk].push(tur.singer.tieNotePitches[i][2]);
+                            tur.singer.noteHertz[saveBlk].push(tur.singer.tieNotePitches[i][3]);
                         }
 
-                        tur.singer.oscList[saveBlk] = logo.tieNoteExtras[turtle][1];
-                        tur.singer.noteBeat[saveBlk] = logo.tieNoteExtras[turtle][2];
-                        tur.singer.noteBeatValues[saveBlk] = logo.tieNoteExtras[turtle][3];
-                        tur.singer.noteDrums[saveBlk] = logo.tieNoteExtras[turtle][4];
-                        tur.singer.embeddedGraphics[saveBlk] = logo.tieNoteExtras[turtle][5];
+                        tur.singer.oscList[saveBlk] = tur.singer.tieNoteExtras[1];
+                        tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
+                        tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
+                        tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
+                        tur.singer.embeddedGraphics[saveBlk] = tur.singer.tieNoteExtras[5];
 
                         if (tur.singer.justCounting.length === 0) {
-                            // Remove the note from the Lilypond list.
+                            // Remove the note from the Lilypond list
                             for (let i = 0; i < tur.singer.notePitches[saveBlk].length; i++) {
                                 logo.notation.notationRemoveTie(turtle);
                             }
                         }
 
-                        // Play previous note.
-                        logo.tie[turtle] = false;
+                        // Play previous note
+                        tur.singer.tie = false;
                         tieDelay = 0;
-                        Singer.processNote(
-                            logo.tieCarryOver[turtle],
-                            saveBlk,
-                            turtle
-                        );
+                        Singer.processNote(tur.singer.tieCarryOver, saveBlk, turtle);
 
                         logo.inNoteBlock[turtle].pop();
 
@@ -1386,7 +1373,7 @@ class Singer {
                             logo.doWait(
                                 turtle,
                                 Math.max(
-                                    bpmFactor / logo.tieCarryOver[turtle] +
+                                    bpmFactor / tur.singer.tieCarryOver +
                                     logo.noteDelay / 1000 -
                                     turtleLag,
                                     0
@@ -1394,9 +1381,9 @@ class Singer {
                             );
                         }
 
-                        tieDelay = logo.tieCarryOver[turtle];
-                        logo.tieCarryOver[turtle] = 0;
-                        logo.tie[turtle] = true;
+                        tieDelay = tur.singer.tieCarryOver;
+                        tur.singer.tieCarryOver = 0;
+                        tur.singer.tie = true;
 
                         // Restore the current note.
                         saveBlk = saveCurrentExtras[0];
@@ -1419,13 +1406,13 @@ class Singer {
                     }
                 }
 
-                if (logo.tieCarryOver[turtle] === 0) {
-                    // We need to save the first note in the pair.
-                    logo.tieNotePitches[turtle] = [];
-                    logo.tieCarryOver[turtle] = noteBeatValue;
+                if (tur.singer.tieCarryOver === 0) {
+                    // We need to save the first note in the pair
+                    tur.singer.tieNotePitches = [];
+                    tur.singer.tieCarryOver = noteBeatValue;
 
                     for (let i = 0; i < tur.singer.notePitches[saveBlk].length; i++) {
-                        logo.tieNotePitches[turtle].push([
+                        tur.singer.tieNotePitches.push([
                             tur.singer.notePitches[saveBlk][i],
                             tur.singer.noteOctaves[saveBlk][i],
                             tur.singer.noteCents[saveBlk][i],
@@ -1433,7 +1420,7 @@ class Singer {
                         ]);
                     }
 
-                    logo.tieNoteExtras[turtle] = [
+                    tur.singer.tieNoteExtras = [
                         saveBlk,
                         tur.singer.oscList[saveBlk],
                         tur.singer.noteBeat[saveBlk],
@@ -1442,15 +1429,13 @@ class Singer {
                         []
                     ];
 
-                    // We play any drums in the first tied note along
-                    // with the drums in the second tied note.
-                    logo.tieFirstDrums[turtle] = tur.singer.noteDrums[saveBlk];
+                    // We play any drums in the first tied note along with the drums in the second tied note
+                    tur.singer.tieFirstDrums = tur.singer.noteDrums[saveBlk];
                     noteBeatValue = 0;
                 } else {
-                    carry = logo.tieCarryOver[turtle];
-                    noteBeatValue =
-                        1 / (1 / noteBeatValue + 1 / logo.tieCarryOver[turtle]);
-                    logo.tieCarryOver[turtle] = 0;
+                    carry = tur.singer.tieCarryOver;
+                    noteBeatValue = 1 / (1 / noteBeatValue + 1 / tur.singer.tieCarryOver);
+                    tur.singer.tieCarryOver = 0;
                 }
             }
 
@@ -1496,17 +1481,13 @@ class Singer {
                 }
             }
 
-            // Duration is the duration of the note to be
-            // played. doWait sets the wait time for the turtle before
-            // the next block is executed.
-            var duration = noteBeatValue;
-            // For the outermost note (when nesting), calculate the
-            // time for the next note.
+            // Duration is the duration of the note to be played. doWait sets the wait time for the turtle before the next block is executed
+            let duration = noteBeatValue;
+            // For the outermost note (when nesting), calculate the time for the next note
             if (duration > 0) {
-                logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
+                tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (logo.inNoteBlock[turtle].length === 1) {
-                    logo.turtleTime[turtle] +=
-                        bpmFactor / duration + logo.noteDelay / 1000;
+                    tur.singer.turtleTime += bpmFactor / duration + logo.noteDelay / 1000;
                     if (!tur.singer.suppressOutput) {
                         logo.doWait(
                             turtle,
@@ -1725,7 +1706,7 @@ class Singer {
                                     }
                                 }
                             }
-                        } else if (logo.tieCarryOver[turtle] > 0) {
+                        } else if (tur.singer.tieCarryOver > 0) {
                             if (tur.singer.justCounting.length === 0) {
                                 if (courtesy[i]) {
                                     if (chordNotes.indexOf(note) === -1) {
@@ -1746,18 +1727,12 @@ class Singer {
                                 } else {
                                     var d = duration;
                                 }
-                            } else if (logo.tieCarryOver[turtle] > 0) {
-                                var d = logo.tieCarryOver[turtle];
+                            } else if (tur.singer.tieCarryOver > 0) {
+                                var d = tur.singer.tieCarryOver;
                             }
 
                             if (logo.runningLilypond || logo.runningMxml || logo.runningAbc) {
-                                logo.updateNotation(
-                                    chordNotes,
-                                    d,
-                                    turtle,
-                                    -1,
-                                    chordDrums
-                                );
+                                logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
                     }
@@ -1845,10 +1820,7 @@ class Singer {
                     }
 
                     if (!tur.singer.suppressOutput) {
-                        logo.turtles.turtleList[turtle].blink(
-                            duration,
-                            last(logo.masterVolume)
-                        );
+                        tur.blink(duration, last(Singer.masterVolume));
                     }
 
                     if (notes.length > 0) {
@@ -1928,9 +1900,8 @@ class Singer {
                                 // settimbre block, which in turn is inside a
                                 // setdrum block
                                 let hasSetTimbreInSetDrum = false;
-                                // This case is only applicable if the note
-                                // block is at all inside a setdrum block
-                                if (logo.drumStyle[turtle].length > 0) {
+                                // This case is only applicable if the note block is at all inside a setdrum block
+                                if (tur.singer.drumStyle.length > 0) {
                                     // Start from the note block's parent
                                     let par =
                                         logo.blocks.blockList[blk]
@@ -1973,16 +1944,15 @@ class Singer {
                                         );
                                     }
                                 } else if (
-                                    logo.drumStyle[turtle].length > 0 &&
                                     // Don't play drum if settimbre encountered
-                                    !hasSetTimbreInSetDrum
+                                    tur.singer.drumStyle.length > 0 && !hasSetTimbreInSetDrum
                                 ) {
                                     if (!tur.singer.suppressOutput) {
                                         logo.synth.trigger(
                                             turtle,
                                             notes,
                                             beatValue,
-                                            last(logo.drumStyle[turtle]),
+                                            last(tur.singer.drumStyle),
                                             null,
                                             null,
                                             false
@@ -2110,19 +2080,14 @@ class Singer {
                                                     );
                                                 }
                                             }
-                                        } else if (
-                                            turtle in logo.voices &&
-                                            last(logo.voices[turtle])
-                                        ) {
+                                        } else if (tur.singer.voices.length > 0 && last(tur.singer.voices)) {
                                             if (!tur.singer.suppressOutput) {
-                                                console.debug(
-                                                    logo.glide[turtle].length
-                                                );
+                                                console.debug(logo.glide[turtle].length);
                                                 logo.synth.trigger(
                                                     turtle,
                                                     notes[d],
                                                     beatValue,
-                                                    last(logo.voices[turtle]),
+                                                    last(tur.singer.voices),
                                                     paramsEffects,
                                                     null,
                                                     false
@@ -2159,20 +2124,13 @@ class Singer {
                         drums.push(tur.singer.noteDrums[thisBlk][i]);
                     }
 
-                    for (
-                        var i = 0;
-                        i < logo.tieFirstDrums[turtle].length;
-                        i++
-                    ) {
-                        if (
-                            drums.indexOf(logo.tieFirstDrums[turtle][i]) === -1
-                        ) {
-                            drums.push(logo.tieFirstDrums[turtle][i]);
+                    for (let i = 0; i < tur.singer.tieFirstDrums[turtle].length; i++) {
+                        if (drums.indexOf(tur.singer.tieFirstDrums[i]) === -1) {
+                            drums.push(tur.singer.tieFirstDrums[i]);
                         }
                     }
 
-                    // If it is > 0, we already counted this note
-                    // (e.g. pitch & drum combination).
+                    // If it is > 0, we already counted this note (e.g. pitch & drum combination)
                     if (tur.singer.notePitches[thisBlk].length === 0) {
                         var obj = rationalToFraction(1 / noteBeatValue);
                         if (obj[0] > 0) {
@@ -2198,38 +2156,31 @@ class Singer {
                         }
 
                         if (!tur.singer.suppressOutput) {
-                            logo.turtles.turtleList[turtle].blink(
-                                duration,
-                                last(logo.masterVolume)
-                            );
+                            tur.blink(duration, last(Singer.masterVolume));
                         }
                     }
 
-                    if (
-                        (logo.tie[turtle] && logo.tieCarryOver[turtle] > 0) ||
-                        duration > 0
-                    ) {
-                        // If we are in a tie, play the drum as if it
-                        // were tied.
-                        if (logo.tie[turtle] && noteBeatValue === 0) {
+                    if ((tur.singer.tie && tur.singer.tieCarryOver > 0) || duration > 0) {
+                        // If we are in a tie, play the drum as if it were tied
+                        if (tur.singer.tie && noteBeatValue === 0) {
                             var newBeatValue = 0;
                         } else {
                             var newBeatValue = beatValue;
                             if (tieDelay > 0) {
-                                logo.tieFirstDrums[turtle] = [];
+                                tur.singer.tieFirstDrums = [];
                             }
                         }
 
                         if (newBeatValue > 0) {
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
-                                for (var i = 0; i < drums.length; i++) {
-                                    if (logo.drumStyle[turtle].length > 0) {
+                                for (let i = 0; i < drums.length; i++) {
+                                    if (tur.singer.drumStyle.length > 0) {
                                         if (!tur.singer.suppressOutput) {
                                             logo.synth.trigger(
                                                 turtle,
                                                 ["C2"],
                                                 newBeatValue,
-                                                last(logo.drumStyle[turtle]),
+                                                last(tur.singer.drumStyle),
                                                 null,
                                                 null,
                                                 false
@@ -2260,22 +2211,15 @@ class Singer {
                     }
                 }
 
-                // While we tie notes together, we don't want to tie
-                // the corresponding graphics.
-                if (logo.tie[turtle] && noteBeatValue === 0) {
+                // While we tie notes together, we don't want to tie the corresponding graphics
+                if (tur.singer.tie && noteBeatValue === 0) {
                     if (tieDelay > 0) {
                         logo.dispatchTurtleSignals(
-                            turtle,
-                            bpmFactor / logo.tieCarryOver[turtle],
-                            blk,
-                            bpmFactor / tieDelay
+                            turtle, bpmFactor / tur.singer.tieCarryOver, blk, bpmFactor / tieDelay
                         );
                     } else {
                         logo.dispatchTurtleSignals(
-                            turtle,
-                            bpmFactor / logo.tieCarryOver[turtle],
-                            blk,
-                            0
+                            turtle, bpmFactor / tur.singer.tieCarryOver, blk, 0
                         );
                     }
                 } else {
@@ -2313,7 +2257,7 @@ class Singer {
             }
         }
 
-        logo.pushedNote[turtle] = false;
+        tur.singer.pushedNote = false;
 
         if (callback !== undefined && callback !== null) {
             callback();

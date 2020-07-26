@@ -227,20 +227,17 @@ function setupActionBlocks() {
                 }
 
                 let childFlow;
-                if (logo.backward[turtle].length > 0) {
+                if (tur.singer.backward.length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
-                    let actionBlk = logo.blocks.findTopBlock(
-                        logo.actions[name]
-                    );
-                    logo.backward[turtle].push(actionBlk);
+                    let actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                    tur.singer.backward.push(actionBlk);
 
                     let listenerName = "_backward_action_" + turtle + "_" + blk;
                     logo.setDispatchBlock(blk, turtle, listenerName);
 
-                    let nextBlock =
-                        logo.blocks.blockList[actionBlk].connections[2];
+                    let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
                     if (nextBlock === null) {
-                        logo.backward[turtle].pop();
+                        tur.singer.backward.pop();
                     } else {
                         if (nextBlock in tur.endOfClampSignals) {
                             tur.endOfClampSignals[nextBlock].push(listenerName);
@@ -249,9 +246,7 @@ function setupActionBlocks() {
                         }
                     }
 
-                    let __listener = function(event) {
-                        logo.backward[turtle].pop();
-                    };
+                    let __listener = event => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
@@ -573,7 +568,7 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.turtles.ithTurtle(turtle).singer.justCounting[turtle].length === 0) {
+                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
@@ -808,17 +803,17 @@ function setupActionBlocks() {
             }
 
             let childFlow;
-            if (logo.backward[turtle].length > 0) {
+            if (tur.singer.backward.length > 0) {
                 childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
                 let actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
-                logo.backward[turtle].push(actionBlk);
+                tur.singer.backward.push(actionBlk);
 
                 let listenerName = "_backward_action_" + turtle + "_" + blk;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
                 if (nextBlock === null) {
-                    logo.backward[turtle].pop();
+                    tur.singer.backward.pop();
                 } else {
                     if (nextBlock in tur.endOfClampSignals) {
                         tur.endOfClampSignals[nextBlock].push(listenerName);
@@ -827,8 +822,8 @@ function setupActionBlocks() {
                     }
                 }
 
-                let __listener = function(event) {
-                    logo.backward[turtle].pop();
+                let __listener = event => {
+                    tur.singer.backward.pop();
                 };
 
                 logo.setTurtleListener(turtle, listenerName, __listener);

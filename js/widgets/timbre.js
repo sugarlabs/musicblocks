@@ -331,7 +331,7 @@ function TimbreWidget() {
     };
 
     this._playNote = function(note, duration) {
-        this._logo.synth.setMasterVolume(last(this._logo.masterVolume));
+        this._logo.synth.setMasterVolume(last(Singer.masterVolume));
 
         var timbreEffects = instrumentsEffects[0][this.instrumentName];
         var paramsEffects = {

@@ -679,7 +679,8 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                logo.turtleTime[turtle] = logo.turtleTime[targetTurtle];
+                logo.turtles.ithTurtle(turtle).singer.turtleTime =
+                    logo.turtles.ithTurtle(targetTurtle).singer.turtleTime;
             }
         }
     }

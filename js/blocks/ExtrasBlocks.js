@@ -780,14 +780,15 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 1) {
                 let bpmFactor =
-                    TONEBPM /
-                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
+                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
-                logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
-                logo.turtleTime[turtle] += noteBeatValue;
+                tur.singer.previousTurtleTime = tur.singer.turtleTime;
+                tur.singer.turtleTime += noteBeatValue;
                 logo.doWait(turtle, args[0]);
             }
         }

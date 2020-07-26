@@ -774,16 +774,16 @@ function setupToneBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (voicename === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
-                logo.voices[turtle].push(voicename);
+                tur.singer.voices.push(voicename);
                 let listenerName = "_setvoice_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
-                    logo.voices[turtle].pop();
-                };
+                let __listener = event => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -894,16 +894,16 @@ function setupToneBlocks() {
                     logo.pitchTimeMatrix._instrumentName = synth;
                 }
 
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 if (logo.instrumentNames[turtle].indexOf(synth) === -1) {
                     // console.debug('pushing ' + synth + ' to instrumentNames');
                     logo.instrumentNames[turtle].push(synth);
                     logo.synth.loadSynth(turtle, synth);
 
-                    if (logo.synthVolume[turtle][synth] === undefined) {
-                        logo.synthVolume[turtle][synth] = [DEFAULTVOLUME];
-                        logo.crescendoInitialVolume[turtle][synth] = [
-                            DEFAULTVOLUME
-                        ];
+                    if (tur.singer.synthVolume[synth] === undefined) {
+                        tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                        logo.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
                     }
                 }
 
@@ -912,7 +912,6 @@ function setupToneBlocks() {
 
                 let __listener = function(event) {
                     logo.inSetTimbre[turtle] = false;
-                    // console.debug('popping ' + logo.instrumentNames[turtle].pop() + ' from instrumentNames');
                     logo.instrumentNames[turtle].pop();
                 };
 

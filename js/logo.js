@@ -162,11 +162,8 @@ class Logo {
         this.currentMeasure = {};
 
         // Parameters used by the note block
-        this.bpm = {};
-        this.previousTurtleTime = [];
-        this.turtleTime = [];
         this._noteDelay = 0;
-        this.pushedNote = {};
+
         this.connectionStore = {};
         this.connectionStoreLock = false;
         this.duplicateFactor = {};
@@ -185,17 +182,6 @@ class Logo {
         this.swing = {};
         this.swingTarget = {};
         this.swingCarryOver = {};
-        this.tie = {};
-        this.tieNotePitches = {};
-        this.tieNoteExtras = {};
-        this.tieCarryOver = {};
-        this.tieFirstDrums = {};
-        this.masterVolume = [];
-        this.synthVolume = {};
-        this.drift = {};
-        this.drumStyle = {};
-        this.voices = {};
-        this.backward = {};
 
         // tuplet
         this.tuplet = false;
@@ -561,6 +547,8 @@ class Logo {
 
         let turtle = 0;
         for ( ; turtle < this.turtles.turtleList.length; turtle++) {
+            let tur = this.turtles.ithTurtle(turtle);
+
             if (!(turtle in instruments)) {
                 instruments[turtle] = {};
                 instrumentsFilters[turtle] = {};
@@ -591,7 +579,7 @@ class Logo {
                 }
             }
 
-            this.synthVolume[turtle] = {
+            tur.singer.synthVolume = {
                 "electronic synth": [DEFAULTVOLUME],
                 noise1: [DEFAULTVOLUME],
                 noise2: [DEFAULTVOLUME],
@@ -601,7 +589,7 @@ class Logo {
 
         Singer.setMasterVolume(this, DEFAULTVOLUME);
         for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-            for (let synth in this.synthVolume[turtle]) {
+            for (let synth in this.turtles.ithTurtle(turtle).singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -804,11 +792,11 @@ class Logo {
     setDispatchBlock(blk, turtle, listenerName) {
         let tur = this.turtles.ithTurtle(turtle);
 
-        if (!this.inDuplicate[turtle] && this.backward[turtle].length > 0) {
-            let c = this.blocks.blockList[last(this.backward[turtle])].name === "backward" ? 1 : 2;
+        if (!this.inDuplicate[turtle] && tur.singer.backward.length > 0) {
+            let c = this.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
             if (
                 this.blocks.sameGeneration(
-                    this.blocks.blockList[last(this.backward[turtle])].connections[c], blk
+                    this.blocks.blockList[last(tur.singer.backward)].connections[c], blk
                 )
             ) {
                 let nextBlock = this.blocks.blockList[blk].connections[0];
@@ -1181,6 +1169,21 @@ class Logo {
         tur.singer.whichNoteToCount = 1;
         tur.singer.moveable = false;
 
+        tur.singer.bpm = [];
+        tur.singer.previousTurtleTime = 0;
+        tur.singer.turtleTime = 0;
+        tur.singer.pushedNote = false;
+        ////////
+        tur.singer.tie = false;
+        tur.singer.tieNotePitches = [];
+        tur.singer.tieNoteExtras = [];
+        tur.singer.tieCarryOver = 0;
+        tur.singer.tieFirstDrums = [];
+        tur.singer.drift = 0;
+        tur.singer.drumStyle = [];
+        tur.singer.voices = [];
+        tur.singer.backward = [];
+
         tur.singer.vibratoIntensity = [];
         tur.singer.vibratoRate = [];
         tur.singer.distortionAmount = [];
@@ -1210,8 +1213,6 @@ class Logo {
         tur.painter.cp2x = 100;
         tur.painter.cp2y = 100;
 
-        this.previousTurtleTime[turtle] = 0;
-        this.turtleTime[turtle] = 0;
         this._waitTimes[turtle] = 0;
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
@@ -1228,8 +1229,6 @@ class Logo {
         this.skipFactor[turtle] = 1;
         this.skipIndex[turtle] = 0;
         this.keySignature[turtle] = "C " + "major";
-        this.pushedNote[turtle] = false;
-        this.bpm[turtle] = [];
         this.inSetTimbre[turtle] = false;
         this.instrumentNames[turtle] = ["electronic synth"];
         this.inCrescendo[turtle] = [];
@@ -1243,16 +1242,7 @@ class Logo {
         this.swing[turtle] = [];
         this.swingTarget[turtle] = [];
         this.swingCarryOver[turtle] = 0;
-        this.tie[turtle] = false;
-        this.tieNotePitches[turtle] = [];
-        this.tieNoteExtras[turtle] = [];
-        this.tieCarryOver[turtle] = 0;
-        this.tieFirstDrums[turtle] = [];
-        this.drift[turtle] = 0;
-        this.drumStyle[turtle] = [];
-        this.voices[turtle] = [];
         this.pitchDrumTable[turtle] = {};
-        this.backward[turtle] = [];
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
         this.noteValuePerBeat[turtle] = 4;
@@ -1396,7 +1386,7 @@ class Logo {
 
         Singer.masterBPM = TARGETBPM;
         Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.masterVolume = [DEFAULTVOLUME];
+        Singer.masterVolume = [DEFAULTVOLUME];
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this.synth.changeInTemperament = false;
         }
@@ -1737,17 +1727,15 @@ class Logo {
         if (!logo.blocks.blockList[blk].isValueBlock()) {
             // (nextFlow remains null for valueBlock)
 
-            // All flow blocks have a last connection (nextFlow), but
-            // it can be null (i.e., end of a flow)
-            if (logo.backward[turtle].length > 0) {
+            // All flow blocks have a last connection (nextFlow), but it can be null (i.e., end of a flow)
+            if (tur.singer.backward.length > 0) {
                 // We only run backwards in the "first generation" children
                 let c =
-                    logo.blocks.blockList[last(logo.backward[turtle])].name === "backward" ? 1 : 2;
+                    logo.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
 
                 if (
                     !logo.blocks.sameGeneration(
-                        logo.blocks.blockList[last(logo.backward[turtle])].connections[c],
-                        blk
+                        logo.blocks.blockList[last(tur.singer.backward)].connections[c], blk
                     )
                 ) {
                     nextFlow = last(logo.blocks.blockList[blk].connections);
@@ -1761,7 +1749,7 @@ class Logo {
                     } else {
                         if (
                             !logo.blocks.sameGeneration(
-                                logo.blocks.blockList[last(logo.backward[turtle])].connections[c],
+                                logo.blocks.blockList[last(tur.singer.backward)].connections[c],
                                 nextFlow
                             )
                         ) {
@@ -1916,11 +1904,11 @@ class Logo {
 
             if (
                 (
-                    logo.backward[turtle].length > 0 &&
+                    tur.singer.backward.length > 0 &&
                     logo.blocks.blockList[blk].connections[0] == null
                 ) ||
                 (
-                    logo.backward[turtle].length === 0 &&
+                    tur.singer.backward.length === 0 &&
                     last(logo.blocks.blockList[blk].connections) == null
                 )
             ) {

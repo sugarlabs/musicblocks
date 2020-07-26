@@ -1546,11 +1546,9 @@ function setupPitchBlocks() {
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
-                if (logo.drumStyle[turtle].length > 0) {
-                    let drumname = last(logo.drumStyle[turtle]);
-                    logo.pitchDrumTable[turtle][
-                        noteObj[0] + noteObj[1]
-                    ] = drumname;
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
+                    logo.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                 }
 
                 tur.singer.notePitches[last(logo.inNoteBlock[turtle])].push(noteObj[0]);
@@ -1676,7 +1674,7 @@ function setupPitchBlocks() {
                 tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
                     tur.singer.beatFactor
                 );
-                logo.pushedNote[turtle] = true;
+                tur.singer.pushedNote = true;
                 if (logo.runningLilypond) {
                     logo.notation.notationMarkup(turtle, pitchToFrequency(noteObj1[0], noteObj1[1], cents, logo.keySignature[turtle]));
                 }
@@ -2143,16 +2141,12 @@ function setupPitchBlocks() {
                     logo.synth.inTemperament
                 );
 
-                if (logo.drumStyle[turtle].length > 0) {
-                    let drumname = last(logo.drumStyle[turtle]);
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
                     if (EFFECTSNAMES.indexOf(drumname) === -1) {
-                        logo.pitchDrumTable[turtle][
-                            noteObj[0] + noteObj[1]
-                        ] = drumname;
+                        logo.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
                     } else {
-                        logo.pitchDrumTable[turtle][
-                            noteObj[0] + noteObj[1]
-                        ] = effectsname;
+                        logo.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = effectsname;
                     }
                 }
 
@@ -2234,10 +2228,8 @@ function setupPitchBlocks() {
                 tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                 tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
             } else if (logo.inMusicKeyboard) {
-                if (logo.drumStyle[turtle].length === 0) {
-                    logo.musicKeyboard.instruments.push(
-                        last(logo.instrumentNames[turtle])
-                    );
+                if (tur.singer.drumStyle.length === 0) {
+                    logo.musicKeyboard.instruments.push(last(logo.instrumentNames[turtle]));
                     if (logo.musicKeyboard.noteNames.length > 0) {
                         if (last(logo.musicKeyboard.noteNames) === "hertz") {
                             let freq = pitchToFrequency(
@@ -2329,7 +2321,7 @@ function setupPitchBlocks() {
                 );
             }
 
-            logo.pushedNote[turtle] = true;
+            tur.singer.pushedNote = true;
         }
     }
 
