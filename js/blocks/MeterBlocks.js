@@ -558,12 +558,12 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
             let orgTurtle = turtle;
-            console.debug("used from :",orgTurtle)
+            console.debug("used from: ", orgTurtle)
             if (!turtles.turtleList[orgTurtle].companionTurtle){
                 turtle = logo.turtles.turtleList.length;
                 turtles.turtleList[orgTurtle].companionTurtle = turtle ;
                 logo.turtles.addTurtle(logo.blocks.blockList[blk], []);
-                console.debug("beat Turtle : ",turtle);
+                console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
 
@@ -601,14 +601,14 @@ function setupMeterBlocks() {
 
                 let turOrg = logo.turtles.ithTurtle(orgTurtle);
                 let duration =
-                    60 / turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM;
+                    60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
                 if (tur.interval !== undefined) {
-                    clearInterval(this.interval);
+                    clearInterval(tur.interval);
                 }
                 tur.interval = setInterval(
                     () => logo.stage.dispatchEvent(eventName), duration * 1000
                 );
-                console.debug("set listener", eventName);
+                // console.debug("set listener: ", eventName);
             }
         }
     }
