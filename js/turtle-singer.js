@@ -2124,7 +2124,7 @@ class Singer {
                         drums.push(tur.singer.noteDrums[thisBlk][i]);
                     }
 
-                    for (let i = 0; i < tur.singer.tieFirstDrums[turtle].length; i++) {
+                    for (let i = 0; i < tur.singer.tieFirstDrums.length; i++) {
                         if (drums.indexOf(tur.singer.tieFirstDrums[i]) === -1) {
                             drums.push(tur.singer.tieFirstDrums[i]);
                         }

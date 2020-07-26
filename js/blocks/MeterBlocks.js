@@ -379,7 +379,7 @@ function setupMeterBlocks() {
             if (args[0] === undefined)
                 return;
 
-            let tur = log.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.drift++;
 
