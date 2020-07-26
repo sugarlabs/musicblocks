@@ -139,13 +139,15 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                logo.turtles.turtleList[targetTurtle].queue = [];
-                logo.parentFlowQueue[targetTurtle] = [];
-                logo.unhighlightQueue[targetTurtle] = [];
-                logo.parameterQueue[targetTurtle] = [];
+                let tur = logo.turtles.ithTurtle(targetTurtle);
+
+                tur.queue = [];
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
                 console.debug("stopping " + targetTurtle);
-                logo.turtles.turtleList[turtle].running = false;
-                logo.doBreak(targetTurtle);
+                logo.turtles.ithTurtle(turtle).running = false;
+                logo.doBreak(tur);
             }
         }
     }
@@ -182,7 +184,9 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                if (logo.turtles.turtleList[targetTurtle].running) {
+                let tur = logo.turtles.ithTurtle(targetTurtle);
+
+                if (tur.running) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         logo.errorMsg(_("Mouse is already running."), blk);
                     } else {
@@ -190,19 +194,16 @@ function setupEnsembleBlocks() {
                     }
                     return;
                 }
-                logo.turtles.turtleList[targetTurtle].queue = [];
-                logo.turtles.turtleList[targetTurtle].running = true;
-                logo.parentFlowQueue[targetTurtle] = [];
-                logo.unhighlightQueue[targetTurtle] = [];
-                logo.parameterQueue[targetTurtle] = [];
+                tur.queue = [];
+                tur.running = true;
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
                 // Find the start block associated with this turtle.
                 let foundStartBlock = false;
                 let startBlk = null;
                 for (let i = 0; i < logo.blocks.blockList.length; i++) {
-                    if (
-                        logo.blocks.blockList[i] ===
-                        logo.turtles.turtleList[targetTurtle].startBlock
-                    ) {
+                    if (logo.blocks.blockList[i] === tur.startBlock) {
                         foundStartBlock = true;
                         startBlk = i;
                         break;
@@ -218,10 +219,7 @@ function setupEnsembleBlocks() {
                         receivedArg
                     );
                 } else {
-                    logo.errorMsg(
-                        _("Cannot find start block") + " " + args[0],
-                        blk
-                    );
+                    logo.errorMsg(_("Cannot find start block") + " " + args[0], blk);
                 }
             }
         }
@@ -681,7 +679,8 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                logo.turtleTime[turtle] = logo.turtleTime[targetTurtle];
+                logo.turtles.ithTurtle(turtle).singer.turtleTime =
+                    logo.turtles.ithTurtle(targetTurtle).singer.turtleTime;
             }
         }
     }
@@ -742,51 +741,34 @@ function setupEnsembleBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            let turtleName = logo.parseArg(
-                logo,
-                turtle,
-                cblk,
-                blk,
-                receivedArg
-            );
+            let turtleName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
             if (_getTargetTurtle(logo.turtles, turtleName) === null) {
                 let blockNumber = logo.blocks.blockList.length;
 
-                let x = logo.turtles.turtleX2screenX(
-                    logo.turtles.turtleList[turtle].x
-                );
-                let y = logo.turtles.turtleY2screenY(
-                    logo.turtles.turtleList[turtle].y
-                );
+                let x = logo.turtles.turtleX2screenX(logo.turtles.turtleList[turtle].x);
+                let y = logo.turtles.turtleY2screenY(logo.turtles.turtleList[turtle].y);
 
                 let newBlock = [
                     [0, "start", x, y, [null, 1, null]],
                     [1, "setturtlename2", 0, 0, [0, 2, null]],
                     [2, ["text", { value: turtleName }], 0, 0, [1]]
                 ];
-                let __afterLoad = function() {
+                let __afterLoad = () => {
                     console.debug("AFTERLOAD");
                     let thisTurtle = logo.blocks.blockList[blockNumber].value;
+                    let tur = logo.turtles.ithTurtle(thisTurtle);
+
                     logo.initTurtle(thisTurtle);
-                    logo.turtles.turtleList[thisTurtle].queue = [];
-                    logo.parentFlowQueue[thisTurtle] = [];
-                    logo.unhighlightQueue[thisTurtle] = [];
-                    logo.parameterQueue[thisTurtle] = [];
-                    logo.turtles.turtleList[thisTurtle].running = true;
-                    logo.runFromBlock(
-                        logo,
-                        thisTurtle,
-                        blockNumber,
-                        0,
-                        receivedArg
-                    );
-                    // Dispatch an event to indicate logo this turtle
-                    // is running.
+                    tur.queue = [];
+                    tur.parentFlowQueue = [];
+                    tur.unhighlightQueue = [];
+                    tur.parameterQueue = [];
+                    tur.running = true;
+                    logo.runFromBlock(logo, thisTurtle, blockNumber, 0, receivedArg);
+                    // Dispatch an event to indicate logo this turtle is running
                     logo.stage.dispatchEvent(turtleName);
-                    document.removeEventListener(
-                        "finishedLoading",
-                        __afterLoad
-                    );
+                    document.removeEventListener("finishedLoading", __afterLoad);
                 };
 
                 if (document.addEventListener) {

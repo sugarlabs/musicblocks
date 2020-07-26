@@ -129,9 +129,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 
@@ -159,6 +161,8 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.swing[turtle].push(args[0]);
             logo.swingTarget[turtle].push(null);
 
@@ -168,7 +172,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -206,6 +210,8 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.swing[turtle].push(1 / args[0]);
             logo.swingTarget[turtle].push(null);
 
@@ -215,7 +221,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -282,7 +288,9 @@ function setupRhythmBlocks() {
             let arg1 =
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
 
-            if (logo.suppressOutput[turtle]) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.suppressOutput) {
                 logo.notation.notationSwing(turtle);
             } else {
                 logo.swing[turtle].push(1 / arg0);
@@ -295,7 +303,7 @@ function setupRhythmBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                if (!logo.suppressOutput[turtle]) {
+                if (!tur.singer.suppressOutput) {
                     logo.swingTarget[turtle].pop();
                     logo.swing[turtle].pop();
                 }
@@ -430,23 +438,22 @@ function setupRhythmBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            // Tie notes together in pairs.
-            logo.tie[turtle] = true;
-            logo.tieNotePitches[turtle] = [];
-            logo.tieNoteExtras[turtle] = [];
-            logo.tieCarryOver[turtle] = 0;
-            logo.tieFirstDrums[turtle] = [];
+            // Tie notes together in pairs
+            tur.singer.tie = true;
+            tur.singer.tieNotePitches = [];
+            tur.singer.tieNoteExtras = [];
+            tur.singer.tieCarryOver = 0;
+            tur.singer.tieFirstDrums = [];
 
             let listenerName = "_tie_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                logo.tie[turtle] = false;
+                tur.singer.tie = false;
 
-                // If tieCarryOver > 0, we have one more note to
-                // play.
-                if (logo.tieCarryOver[turtle] > 0) {
-                    if (logo.justCounting[turtle].length === 0) {
+                // If tieCarryOver > 0, we have one more note to play
+                if (tur.singer.tieCarryOver > 0) {
+                    if (tur.singer.justCounting.length === 0) {
                         let lastNote = last(logo.inNoteBlock[turtle]);
                         if (lastNote != null && lastNote in tur.singer.notePitches) {
                             // Remove the note from the Lilypond list.
@@ -461,9 +468,9 @@ function setupRhythmBlocks() {
                     }
 
                     // Restore the extra note and play it
-                    let saveBlk = logo.tieNoteExtras[turtle][0];
-                    let noteValue = logo.tieCarryOver[turtle];
-                    logo.tieCarryOver[turtle] = 0;
+                    let saveBlk = tur.singer.tieNoteExtras[0];
+                    let noteValue = tur.singer.tieCarryOver;
+                    tur.singer.tieCarryOver = 0;
 
                     logo.inNoteBlock[turtle].push(saveBlk);
 
@@ -471,29 +478,24 @@ function setupRhythmBlocks() {
                     tur.singer.noteOctaves[saveBlk] = [];
                     tur.singer.noteCents[saveBlk] = [];
                     tur.singer.noteHertz[saveBlk] = [];
-                    for (
-                        let i = 0;
-                        i < logo.tieNotePitches[turtle].length;
-                        i++
-                    ) {
-                        tur.singer.notePitches[saveBlk].push(logo.tieNotePitches[turtle][i][0]);
-                        tur.singer.noteOctaves[saveBlk].push(logo.tieNotePitches[turtle][i][1]);
-                        tur.singer.noteCents[saveBlk].push(logo.tieNotePitches[turtle][i][2]);
-                        tur.singer.noteHertz[saveBlk].push(logo.tieNotePitches[turtle][i][3]);
+                    for (let i = 0; i < tur.singer.tieNotePitches.length; i++) {
+                        tur.singer.notePitches[saveBlk].push(tur.singer.tieNotePitches[i][0]);
+                        tur.singer.noteOctaves[saveBlk].push(tur.singer.tieNotePitches[i][1]);
+                        tur.singer.noteCents[saveBlk].push(tur.singer.tieNotePitches[i][2]);
+                        tur.singer.noteHertz[saveBlk].push(tur.singer.tieNotePitches[i][3]);
                     }
 
-                    tur.singer.oscList[saveBlk] = logo.tieNoteExtras[turtle][1];
-                    tur.singer.noteBeat[saveBlk] = logo.tieNoteExtras[turtle][2];
-                    tur.singer.noteBeatValues[saveBlk] = logo.tieNoteExtras[turtle][3];
-                    tur.singer.noteDrums[saveBlk] = logo.tieNoteExtras[turtle][4];
+                    tur.singer.oscList[saveBlk] = tur.singer.tieNoteExtras[1];
+                    tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
+                    tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
+                    tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
                     tur.singer.embeddedGraphics[saveBlk] = [];  // graphics will have already been rendered
 
                     Singer.processNote(logo, noteValue, saveBlk, turtle);
                     let bpmFactor =
-                        TONEBPM /
-                        logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
+                        TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
-                    // Wait until this note is played before continuing.
+                    // Wait until this note is played before continuing
                     logo.doWait(turtle, bpmFactor / noteValue);
 
                     logo.inNoteBlock[turtle].pop();
@@ -512,8 +514,8 @@ function setupRhythmBlocks() {
                     logo.notation.notationStaging[turtle].pop();
                 }
 
-                logo.tieNotePitches[turtle] = [];
-                logo.tieNoteExtras[turtle] = [];
+                tur.singer.tieNotePitches = [];
+                tur.singer.tieNoteExtras = [];
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -676,7 +678,7 @@ function setupRhythmBlocks() {
                 tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
                     tur.singer.beatFactor
                 );
-                logo.pushedNote[turtle] = true;
+                tur.singer.pushedNote = true;
             }
         }
     }
@@ -900,9 +902,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 
@@ -960,9 +964,11 @@ function setupRhythmBlocks() {
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
                 let queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             }
             Singer.playNote(value, logo, turtle, blk, _callback);
 

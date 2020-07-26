@@ -23,6 +23,8 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
                     logo.errorMsg(_("Attack value should be from 0 to 100."));
@@ -37,25 +39,17 @@ function setupWidgetBlocks() {
                     logo.errorMsg(_("Release value should be from 0-100."));
                 }
 
-                logo.attack[turtle].push(args[0] / 100);
-                logo.decay[turtle].push(args[1] / 100);
-                logo.sustain[turtle].push(args[2] / 100);
-                logo.release[turtle].push(args[3] / 100);
+                turtle.singer.attack.push(args[0] / 100);
+                turtle.singer.decay.push(args[1] / 100);
+                turtle.singer.sustain.push(args[2] / 100);
+                turtle.singer.release.push(args[3] / 100);
             }
 
             if (logo.inTimbre) {
-                logo.timbre.synthVals["envelope"]["attack"] = last(
-                    logo.attack[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["decay"] = last(
-                    logo.decay[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["sustain"] = last(
-                    logo.sustain[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["release"] = last(
-                    logo.release[turtle]
-                );
+                logo.timbre.synthVals["envelope"]["attack"] = last(tur.singer.attack);
+                logo.timbre.synthVals["envelope"]["decay"] = last(tur.singer.decay);
+                logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
+                logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
                 if (logo.timbre.env.length != 0) {
                     logo.errorMsg(
@@ -72,18 +66,10 @@ function setupWidgetBlocks() {
                 }
 
                 logo.timbre.env.push(blk);
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.attack[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.decay[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.sustain[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.release[turtle]) * 100)
-                );
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.attack) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.decay) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.sustain) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.release) * 100));
             }
         }
     }

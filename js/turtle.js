@@ -144,7 +144,6 @@ class Turtle {
     }
 
     // ================================ MODEL =================================
-    // ========================================================================
 
     /**
      * @returns {Number} unique ID of Turtle
@@ -193,6 +192,48 @@ class Turtle {
      */
     get queue() {
         return this._queue;
+    }
+
+    /**
+     * @param {Object[]} queue
+     */
+    set parentFlowQueue(queue) {
+        this._parentFlowQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get parentFlowQueue() {
+        return this._parentFlowQueue;
+    }
+
+    /**
+     * @param {Object[]} queue
+     */
+    set unhighlightQueue(queue) {
+        this._unhighlightQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get unhighlightQueue() {
+        return this._unhighlightQueue;
+    }
+
+    /**
+     * @param {Object[]} queue
+     */
+    set parameterQueue(queue) {
+        this._parameterQueue = queue;
+    }
+
+    /**
+     * @returns {Object[]}
+     */
+    get parameterQueue() {
+        return this._parameterQueue;
     }
 
     /**
@@ -280,7 +321,6 @@ class Turtle {
     }
 
     // ================================ VIEW ==================================
-    // ========================================================================
 
     /**
      * @returns {Object} createjs object of start block (decoration)
@@ -408,22 +448,48 @@ Turtle.TurtleModel = class {
         this._name = name;          // name of the turtle
         this._turtles = turtles;    // object handling behavior of all turtles
 
-        // Which start block is associated with this turtle?
-        this._startBlock = null;
+        this._startBlock = null;    // Which start block is associated with this turtle?
 
-        // Queue of blocks this turtle is executing
-        this._queue = [];
+        this._queue = [];           // Queue of blocks this turtle is executing
+        this._parentFlowQueue = [];
+        this._unhighlightQueue = [];
+        this._parameterQueue = [];
 
-        // Event listeners
-        this._listeners = {};
+        this._listeners = {};       // Event listeners
+        // When we leave a clamp block, we need to dispatch a signal
+        this.endOfClampSignals = {};
+        // Don't dispatch these signals (when exiting note counter or interval measure)
+        this.butNotThese = {};
 
-        this._media = [];   // media (text, images) we need to remove on clear
+        // Used to halt runtime during input
+        this.delayTimeout = {};
+        this.delayParameters = {};
+
+        this._media = [];           // media (text, images) we need to remove on clear
 
         this._x = 0;    // x coordinate
         this._y = 0;    // y coordinate
 
         this._running = false;      // is the turtle running?
         this._trash = false;        // in the trash?
+    }
+
+    /**
+     * Renames start (of corresponding Turtle) block.
+     *
+     * @param {String} name - name string which is assigned to startBlock
+     */
+    rename(name) {
+        this._name = name;
+
+        let startBlock = this._startBlock;
+        // Use the name on the label of the start block
+        if (startBlock != null) {
+            startBlock.overrideName = this._name;
+            startBlock.collapseText.text = this._name;
+            startBlock.regenerateArtwork(false);
+            startBlock.value = this._turtles.turtleList.indexOf(this);
+        }
     }
 };
 
@@ -454,25 +520,6 @@ Turtle.TurtleView = class {
 
         this._canvas = document.getElementById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
-    }
-
-    /**
-     * Renames start block.
-     *
-     * @param {String} name - name string which is assigned to startBlock
-     */
-    rename(name) {
-        this.name = name;
-
-        let startBlock = this.startBlock;
-        // Use the name on the label of the start block
-        if (startBlock != null) {
-            startBlock.overrideName = this.name;
-            startBlock.collapseText.text = this.name;
-            startBlock.regenerateArtwork(false);
-            startBlock.value =
-                this.turtles.turtleList.indexOf(this);
-        }
     }
 
     /**

@@ -60,6 +60,12 @@ class Painter {
         this._stroke = DEFAULTSTROKE;
         this._font = DEFAULTFONT;
 
+        // Control points for bezier curves
+        this.cp1x = 0;
+        this.cp1y = 100;
+        this.cp2x = 100;
+        this.cp2y = 100;
+
         this._canvasColor = "rgba(255,0,49,1)"; // '#ff0031';
         this._canvasAlpha = 1.0;
         this._fillState = false;
@@ -67,11 +73,7 @@ class Painter {
         this._penDown = true;
     }
 
-    /*
-    ===============================================================================================
-     Setters, Getters
-    ===============================================================================================
-    */
+    // ========= Setters, Getters =============================================
 
     /**
      * @param {String} svgOutput - SVG output
@@ -192,11 +194,7 @@ class Painter {
         return this._penDown;
     }
 
-    /*
-    ===============================================================================================
-     Utility methods
-    ===============================================================================================
-    */
+    // ========= Utilities ====================================================
 
     /**
      * Checks if x, y is out of ctx.
@@ -682,11 +680,7 @@ class Painter {
         }
     }
 
-    /*
-    ===============================================================================================
-     Action methods
-    ===============================================================================================
-    */
+    // ========= Action =======================================================
 
     /**
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
@@ -882,14 +876,15 @@ class Painter {
     /**
      * Draws a bezier curve.
      *
-     * @param cp1x - the x-coordinate of the first bezier control point
-     * @param cp1y - the y-coordinate of the first bezier control point
-     * @param cp2x - the x-coordinate of the second bezier control point
-     * @param cp2y - the y-coordinate of the second bezier control point
      * @param x2 - the x-coordinate of the ending point
      * @param y2 - the y-coordinate of the ending point
      */
-    doBezier(cp1x, cp1y, cp2x, cp2y, x2, y2) {
+    doBezier(x2, y2) {
+        let cp1x = this.cp1x;
+        let cp1y = this.cp1y;
+        let cp2x = this.cp2x;
+        let cp2y = this.cp2y;
+
         // FIXME: Add SVG output
 
         let fx, fy;
@@ -925,8 +920,7 @@ class Painter {
 
             /* We need both the initial and final headings */
             // The initial heading is the angle between (cp1x, cp1y) and (this.turtle.x, this.turtle.y)
-            let degreesInitial =
-                Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
+            let degreesInitial = Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
             degreesInitial = (180 * degreesInitial) / Math.PI;
             if (degreesInitial < 0) {
                 degreesInitial += 360;

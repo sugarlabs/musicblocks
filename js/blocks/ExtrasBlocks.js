@@ -221,13 +221,15 @@ function setupExtrasBlocks() {
 
             if (logo.blocks.blockList[args[0]].name === "start") {
                 let thisTurtle = logo.blocks.blockList[args[0]].value;
+                let tur = logo.turtles.ithTurtle(thisTurtle);
                 console.debug("run start " + thisTurtle);
+
                 logo.initTurtle(thisTurtle);
-                logo.turtles.turtleList[thisTurtle].queue = [];
-                logo.parentFlowQueue[thisTurtle] = [];
-                logo.unhighlightQueue[thisTurtle] = [];
-                logo.parameterQueue[thisTurtle] = [];
-                logo.turtles.turtleList[thisTurtle].running = true;
+                tur.queue = [];
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
+                tur.running = true;
                 logo.runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
             } else {
                 return [args[0], 1];
@@ -778,14 +780,15 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 1) {
                 let bpmFactor =
-                    TONEBPM /
-                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
+                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
-                logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
-                logo.turtleTime[turtle] += noteBeatValue;
+                tur.singer.previousTurtleTime = tur.singer.turtleTime;
+                tur.singer.turtleTime += noteBeatValue;
                 logo.doWait(turtle, args[0]);
             }
         }
@@ -814,7 +817,7 @@ function setupExtrasBlocks() {
         flow(args, logo, turtle) {
             if (args[0] !== null) {
                 console.debug(args[0].toString());
-                if (!logo.suppressOutput[turtle] && logo.turtleDelay > 0) {
+                if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput && logo.turtleDelay > 0) {
                     logo.textMsg(args[0].toString());
                 }
             }
@@ -847,7 +850,9 @@ function setupExtrasBlocks() {
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        if (!logo.suppressOutput[turtle]) {
+                        let tur = logo.turtles.ithTurtle(turtle);
+
+                        if (!tur.singer.suppressOutput) {
                             if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {
