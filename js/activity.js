@@ -984,16 +984,16 @@ function Activity() {
 
     __generateSetKeyBlocks = () => {
         // Find all setkey blocks in the code
-        let flag = 0;
+        let isSetKeyBlockPresent = 0;
         let setKeyBlocks = [];
         for (let i in logo.blocks.blockList) {
             if (logo.blocks.blockList[i].name === "setkey2") {
-                flag = 1;
+                isSetKeyBlockPresent = 1;
                 setKeyBlocks.push(i);
             }
         }
         
-        if (!flag) {
+        if (!isSetKeyBlockPresent) {
             blocks.findStacks();
             let stacks = blocks.stackList;
             stacks.sort();
@@ -1125,7 +1125,7 @@ function Activity() {
         docById("moveable").style.display = "block";
 
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
-        var addedOptionsWheel = new wheelnav("addedOptionsWheel", keyNameWheel.raphael);
+        var keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
         let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
         
         wheelnav.cssMode = true;
@@ -1138,37 +1138,37 @@ function Activity() {
         keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
         keyNameWheel.titleRotateAngle = 0;
         keyNameWheel.clickModeRotate = false;
-        keyNameWheel.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
-        // keyNameWheel.animatetime = 0;
+        keyNameWheel.colors = platformColor.pitchWheelcolors;
+        keyNameWheel.animatetime = 0;
         
         keyNameWheel.createWheel(keys);
 
-        addedOptionsWheel.colors = ["#77c428", "#93e042", "#5ba900", "#77c428", "#93e042", "#adfd55"];
-        addedOptionsWheel.slicePathFunction = slicePath().DonutSlice;
-        addedOptionsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        addedOptionsWheel.slicePathCustom.minRadiusPercent = 0.8;
-        addedOptionsWheel.slicePathCustom.maxRadiusPercent = 1;
-        addedOptionsWheel.sliceSelectedPathCustom = addedOptionsWheel.slicePathCustom;
-        addedOptionsWheel.sliceInitPathCustom = addedOptionsWheel.slicePathCustom;
-        let labels = [];
+        keyNameWheel2.colors = platformColor.pitchWheelcolors;
+        keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+        keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
+        keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
+        keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
+        let keys2 = [];
 
         for (let i = 0; i < keys.length; i++) {
             if (keys[i].length > 2) {
                 let obj = keys[i].split("/");
-                labels.push(obj[0]);
-                labels.push(obj[1]);
+                keys2.push(obj[0]);
+                keys2.push(obj[1]);
             } else {
-                labels.push("");
-                labels.push("");
+                keys2.push("");
+                keys2.push("");
             }
         }
 
-        addedOptionsWheel.navAngle = -7.45;
-        addedOptionsWheel.clickModeRotate = false;
-        addedOptionsWheel.createWheel(labels);
+        keyNameWheel2.navAngle = -7.45;
+        keyNameWheel2.clickModeRotate = false;
+        keyNameWheel2.createWheel(keys2);
 
         var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-        labels3 = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
         modenameWheel.slicePathFunction = slicePath().DonutSlice;
         modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -1176,11 +1176,10 @@ function Activity() {
         modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
         modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
         modenameWheel.titleRotateAngle = 0;
-        // modenameWheel.clickModeRotate = false;
-        modenameWheel.colors = ["#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#ffb2bc", "#ffccd6", "#c0c0c0", "#c0c0c0"];
-        modenameWheel.animatetime = 0.2;
+        modenameWheel.colors = platformColor.modeGroupWheelcolors;
+        modenameWheel.animatetime = 0;
         
-        modenameWheel.createWheel(labels3);
+        modenameWheel.createWheel(modes);
 
         var exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
         exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1198,7 +1197,6 @@ function Activity() {
         let x = event.clientX;
         let y = event.clientY;
 
-        // docById("chooseKeyDiv").style.position = "absolute";
         docById("chooseKeyDiv").style.left = (x - 175) + "px";
         docById("chooseKeyDiv").style.top = (y + 50) + "px";
         docById("moveable").style.left = (x - 110) + "px";
@@ -1214,7 +1212,7 @@ function Activity() {
                 }
             }
             keyNameWheel.removeWheel();
-            addedOptionsWheel.removeWheel();
+            keyNameWheel2.removeWheel();
             modenameWheel.removeWheel();
             __generateSetKeyBlocks();
         };
@@ -1258,14 +1256,14 @@ function Activity() {
             );
         };
 
-        let __setupActionKey = function(i, activeTabs) {
+        let __setupActionKey = function(i) {
             keyNameWheel.navItems[i].navigateFunction = function() {
-                for (let j = 0; j < labels.length; j++) {
+                for (let j = 0; j < keys2.length; j++) {
                     if ( Math.floor(j/2) != i) {
-                        addedOptionsWheel.navItems[j].navItem.hide();
+                        keyNameWheel2.navItems[j].navItem.hide();
                     } else {
                         if (keys[i].length > 2) {
-                            addedOptionsWheel.navItems[j].navItem.show();
+                            keyNameWheel2.navItems[j].navItem.show();
                         }
                     }
                 }
@@ -1307,57 +1305,49 @@ function Activity() {
             }
         };
 
-        let __setupActionMode = function(i) {
+        for (let i = 0; i < modes.length; i++) {
             modenameWheel.navItems[i].navigateFunction = function() {
                 __selectionChangedMode();
             };
-        };
-
-        for (let i = 0; i < labels3.length; i++) {
-            __setupActionMode(i);
         }
 
         let __selectionChangedKey2 = function() {
-            let selection = addedOptionsWheel.navItems[
-                addedOptionsWheel.selectedNavItemIndex
+            let selection = keyNameWheel2.navItems[
+                keyNameWheel2.selectedNavItemIndex
             ].title;
             KeySignatureEnv[0] = selection;
             __playNote();
         };
 
-        let __setupActionKey2 = function(i) {
-            addedOptionsWheel.navItems[i].navigateFunction = function() {
+        for (let i = 0; i < keys2.length; i++) {
+            keyNameWheel2.navItems[i].navigateFunction = function() {
                 __selectionChangedKey2();
             };
-        };
-
-        for (let i = 0; i < labels.length; i++) {
-            __setupActionKey2(i);
         }
 
         let i = keys.indexOf(KeySignatureEnv[0]);
         if (i == -1) {
-            i = labels.indexOf(KeySignatureEnv[0]);
+            i = keys2.indexOf(KeySignatureEnv[0]);
             if (i != -1) {
-                addedOptionsWheel.navigateWheel(i);
-                for (let j = 0; j < labels.length; j++) {
-                    addedOptionsWheel.navItems[j].navItem.hide();
+                keyNameWheel2.navigateWheel(i);
+                for (let j = 0; j < keys2.length; j++) {
+                    keyNameWheel2.navItems[j].navItem.hide();
                     if (i % 2 == 0) {
-                        addedOptionsWheel.navItems[i].navItem.show();
-                        addedOptionsWheel.navItems[i + 1].navItem.show();
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i + 1].navItem.show();
                     } else {
-                        addedOptionsWheel.navItems[i].navItem.show();
-                        addedOptionsWheel.navItems[i-1].navItem.show();
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i-1].navItem.show();
                     }
                 }
             }
         } else {
             keyNameWheel.navigateWheel(i);
-            addedOptionsWheel.navItems[2 * i].navItem.hide();
-            addedOptionsWheel.navItems[2 * i + 1].navItem.hide();
+            keyNameWheel2.navItems[2 * i].navItem.hide();
+            keyNameWheel2.navItems[2 * i + 1].navItem.hide();
         }
 
-        let j = labels3.indexOf(KeySignatureEnv[1]);
+        let j = modes.indexOf(KeySignatureEnv[1]);
         if (j !== -1) {
             modenameWheel.navigateWheel(j);
         }

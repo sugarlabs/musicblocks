@@ -4706,7 +4706,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.navigateWheel(i);
         let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
-        console.log(scale, note);
+
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
         if (!KeySignatureEnv[2]) {
