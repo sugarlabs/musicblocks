@@ -4758,25 +4758,51 @@ function Block(protoblock, blocks, overrideName) {
 
         // Set up event handlers
         let that = this;
+        let selection = {
+            "note": note,
+            "attr": accidental
+        };
 
-        let __selectionChanged = function() {
-            let label =
+        let __selectionChangedSolfege = function() {
+            selection["note"] =
                 that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
                     .title;
-            let i = noteLabels.indexOf(label);
+            let i = noteLabels.indexOf(selection["note"]);
             that.value = noteValues[i];
-            if (!custom) {
-                let attr =
-                    that._accidentalsWheel.navItems[
-                        that._accidentalsWheel.selectedNavItemIndex
-                    ].title;
-                if (attr !== "♮") {
-                    label += attr;
-                    that.value += attr;
+
+            let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
+        
+            // auto selection of sharps and flats in fixed solfege
+            // handles the case of opening the pie-menu, not whilst in the pie-menu
+            if (!KeySignatureEnv[2]) {
+                for (let i in scale) {
+                    if (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] && scale[i].substr(1) != "") {
+                        selection["attr"] = scale[i].substr(1);
+                        that.value = selection["note"] + selection["attr"];
+                        switch (selection["attr"]) {
+                            case DOUBLEFLAT:
+                                that._accidentalsWheel.navigateWheel(4);
+                                break;
+                            case FLAT:
+                                that._accidentalsWheel.navigateWheel(3);
+                                break;
+                            case NATURAL:
+                                that._accidentalsWheel.navigateWheel(2);
+                                break;
+                            case SHARP:
+                                that._accidentalsWheel.navigateWheel(1);
+                                break;
+                            case DOUBLESHARP:
+                                that._accidentalsWheel.navigateWheel(0);
+                                break;
+                            default:
+                                that._accidentalsWheel.navigateWheel(2);
+                                break;
+                        }
+                    }
                 }
             }
-
-            that.text.text = label;
+            that.text.text = selection["note"] + selection["attr"];
 
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -4795,12 +4821,31 @@ function Block(protoblock, blocks, overrideName) {
             if (
                 that.connections[0] !== null &&
                 ["setkey", "setkey2"].indexOf(
-                    this.blocks.blockList[that.connections[0]].name
+                    that.blocks.blockList[that.connections[0]].name
                 ) !== -1
             ) {
                 // We may need to update the mode widget.
                 that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
             }
+            __pitchPreview();
+        };
+
+
+        let __selectionChangedAccidental = () => {
+            selection["attr"] =
+                that._accidentalsWheel.navItems[
+                    that._accidentalsWheel.selectedNavItemIndex
+                ].title;
+
+            if (selection["attr"] !== "♮") {
+                that.value = selection["note"] + selection["attr"];
+            } else {
+                that.value = selection["note"];
+            }
+            that.text.text = that.value;
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+            __pitchPreview();
         };
 
         /*
@@ -4944,19 +4989,18 @@ function Block(protoblock, blocks, overrideName) {
                 that._triggerLock = false;
             }, 1 / 8);
 
-            __selectionChanged();
         };
 
         // Set up handlers for pitch preview.
         for (let i = 0; i < noteValues.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+            this._pitchWheel.navItems[i].navigateFunction = __selectionChangedSolfege;
         }
 
         if (!custom) {
             for (let i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[
                     i
-                ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __selectionChangedAccidental;
             }
         }
 
