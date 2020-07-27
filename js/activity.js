@@ -2955,8 +2955,8 @@ function Activity() {
      */
     this.doPlay = async function(midi) {
         let currentMidi = midi;        
+        let jsONON = [] ;
         currentMidi.tracks.forEach(track => {
-            let jsONON = [] ;
             if (!track.notes.length)return;
             let r = jsONON.length; 
             jsONON.push(
@@ -3075,7 +3075,7 @@ function Activity() {
                 }
                 let pitches = getPitch(val+2,notes,val);
                 jsONON.push(
-                    [val,["newnote",{"collapsed":true}],0,0,[first ? 0 : val-1,val+1,val+2,val+pitches.length+2]],
+                    [val,["newnote",{"collapsed":true}],0,0,[first ? val - 3 : val-1,val+1,val+2,val+pitches.length+2]],
                     [val+1,["number",{"value":duration*3/8}],0,0,[val]]
                 );
                 jsONON = jsONON.concat(pitches);
@@ -3086,8 +3086,8 @@ function Activity() {
             console.debug(JSON.stringify(jsONON));
             console.debug ('midi track loading ... be patient ');
             console.debug ('finished when you see: "block loading finished "');
-            blocks.loadNewBlocks(jsONON);
         })
+        blocks.loadNewBlocks(jsONON);
         return null ;
     }
     //synth.triggerAttackRelease(note.name, note.duration, note.time + now, note.velocity)
