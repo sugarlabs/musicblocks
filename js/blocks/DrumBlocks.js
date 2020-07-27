@@ -98,7 +98,7 @@ function setupDrumBlocks() {
                 tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(noisename);
                 if (tur.singer.synthVolume[noisename] === undefined) {
                     tur.singer.synthVolume[noisename] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][noisename] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[noisename] = [DEFAULTVOLUME];
                 }
             } else {
                 logo.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
@@ -387,7 +387,7 @@ function setupDrumBlocks() {
                 tur.singer.noteDrums[last(logo.inNoteBlock[turtle])].push(drumname);
                 if (tur.singer.synthVolume[drumname] === undefined) {
                     tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][drumname] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
                 }
             } else if (
                 logo.blocks.blockList[blk].connections[0] == null &&

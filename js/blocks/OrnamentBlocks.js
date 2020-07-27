@@ -14,14 +14,15 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "staccato"]);
-            } else if (logo.staccato[turtle].length > 0) {
-                return last(logo.staccato[turtle]);
+            } else if (tur.singer.staccato.length > 0) {
+                return last(tur.singer.staccato);
             } else {
                 return 0;
             }
@@ -43,14 +44,15 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "slur"]);
-            } else if (logo.staccato[turtle].length > 0) {
-                return -last(logo.staccato[turtle]);
+            } else if (tur.singer.staccato.length > 0) {
+                return -last(tur.singer.staccato);
             } else {
                 return 0;
             }
@@ -182,14 +184,14 @@ function setupOrnamentBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.glide[turtle].push(arg);
+            tur.singer.glide.push(arg);
 
             if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            logo.glideOverride[turtle] = Singer.noteCounter(logo, turtle, args[1]);
-            console.debug("length of glide " + logo.glideOverride[turtle]);
+            tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
+            console.debug("length of glide " + tur.singer.glideOverride);
 
             let listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -199,7 +201,7 @@ function setupOrnamentBlocks() {
                     logo.notation.notationEndSlur(turtle);
                 }
 
-                logo.glide[turtle].pop();
+                tur.singer.glide.pop();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -244,9 +246,9 @@ function setupOrnamentBlocks() {
             let tur = logo.turtles.ithTurtle(turtle);
 
             if (logo.blocks.blockList[blk].name === "slur") {
-                logo.staccato[turtle].push(-arg);
+                tur.singer.staccato.push(-arg);
             } else {
-                logo.staccato[turtle].push(-1 / arg);
+                tur.singer.staccato.push(-1 / arg);
             }
 
             if (tur.singer.justCounting.length === 0) {
@@ -257,7 +259,7 @@ function setupOrnamentBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                logo.staccato[turtle].pop();
+                tur.singer.staccato.pop();
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
@@ -288,10 +290,8 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
@@ -301,18 +301,18 @@ function setupOrnamentBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.blocks.blockList[blk].name === "newstaccato") {
-                logo.staccato[turtle].push(1 / arg);
+                tur.singer.staccato.push(1 / arg);
             } else {
-                logo.staccato[turtle].push(arg);
+                tur.singer.staccato.push(arg);
             }
 
             let listenerName = "_staccato_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.staccato[turtle].pop();
-            };
+            let __listener = event => tur.singer.staccato.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 

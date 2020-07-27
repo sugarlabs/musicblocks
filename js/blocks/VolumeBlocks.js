@@ -284,13 +284,13 @@ function setupVolumeBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.instrumentNames[turtle].indexOf(synth) === -1) {
-                logo.instrumentNames[turtle].push(synth);
+            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+                tur.singer.instrumentNames.push(synth);
                 logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
                 }
             }
 
@@ -437,13 +437,13 @@ function setupVolumeBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.instrumentNames[turtle].indexOf(synth) === -1) {
-                logo.instrumentNames[turtle].push(synth);
+            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+                tur.singer.instrumentNames.push(synth);
                 logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][synth] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
                 }
             }
 
@@ -693,42 +693,38 @@ function setupVolumeBlocks() {
 
             if (args.length > 1 && args[0] !== 0) {
                 if (logo.blocks.blockList[blk].name === "crescendo") {
-                    logo.crescendoDelta[turtle].push(args[0]);
+                    tur.singer.crescendoDelta.push(args[0]);
                 } else {
-                    logo.crescendoDelta[turtle].push(-args[0]);
+                    tur.singer.crescendoDelta.push(-args[0]);
                 }
 
                 for (let synth in tur.singer.synthVolume) {
                     let vol = last(tur.singer.synthVolume[synth]);
                     tur.singer.synthVolume[synth].push(vol);
-                    if (
-                        logo.crescendoInitialVolume[turtle][synth] === undefined
-                    ) {
-                        logo.crescendoInitialVolume[turtle][synth] = [vol];
+                    if (tur.singer.crescendoInitialVolume[synth] === undefined) {
+                        tur.singer.crescendoInitialVolume[synth] = [vol];
                     } else {
-                        logo.crescendoInitialVolume[turtle][synth].push(vol);
+                        tur.singer.crescendoInitialVolume[synth].push(vol);
                     }
                 }
 
-                logo.inCrescendo[turtle].push(true);
+                tur.singer.inCrescendo.push(true);
 
                 let listenerName = "_crescendo_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = event => {
                     if (tur.singer.justCounting.length === 0) {
-                        logo.notation.notationEndCrescendo(
-                            turtle, last(logo.crescendoDelta[turtle])
-                        );
+                        logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
                     }
 
-                    logo.crescendoDelta[turtle].pop();
+                    tur.singer.crescendoDelta.pop();
                     for (let synth in tur.singer.synthVolume) {
                         let len = tur.singer.synthVolume[synth].length;
                         tur.signer.synthVolume[synth][len - 1] = last(
-                            logo.crescendoInitialVolume[turtle][synth]
+                            tur.singer.crescendoInitialVolume[synth]
                         );
-                        logo.crescendoInitialVolume[turtle][synth].pop();
+                        tur.singer.crescendoInitialVolume[synth].pop();
                     }
                 };
 

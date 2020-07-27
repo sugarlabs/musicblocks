@@ -100,7 +100,7 @@ function setupFlowBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                logo.duplicateFactor[turtle] *= factor;
+                tur.singer.duplicateFactor *= factor;
 
                 // Queue each block in the clamp.
                 let listenerName = "_duplicate_" + turtle;
@@ -120,11 +120,11 @@ function setupFlowBlocks() {
                     return null;
                 };
 
-                logo.inDuplicate[turtle] = true;
+                tur.singer.inDuplicate = true;
 
-                let __listener = function(event) {
-                    logo.inDuplicate[turtle] = false;
-                    logo.duplicateFactor[turtle] /= factor;
+                let __listener = event => {
+                    tur.singer.inDuplicate = false;
+                    tur.singer.duplicateFactor /= factor;
 
                     // Check for a race condition.
                     // FIXME: Do something about the race condition.
@@ -824,7 +824,8 @@ function setupFlowBlocks() {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+                logo.blocks.blockList[blk].value =
+                    logo.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }

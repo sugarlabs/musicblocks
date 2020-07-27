@@ -474,15 +474,13 @@ function setupIntervalsBlocks() {
 
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
-                logo.semitoneIntervals[turtle].push([i, tur.singer.noteDirection]);
+                tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
                 tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function() {
-                    logo.semitoneIntervals[turtle].pop();
-                };
+                let __listener = () => tur.singer.semitoneIntervals.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -609,10 +607,8 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
@@ -622,15 +618,15 @@ function setupIntervalsBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            logo.intervals[turtle].push(i);
+            tur.singer.intervals.push(i);
 
             let listenerName = "_interval_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.intervals[turtle].pop();
-            };
+            let __listener = event => tur.singer.intervals.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
