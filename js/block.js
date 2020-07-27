@@ -4706,12 +4706,13 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.navigateWheel(i);
         let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
-        
+        console.log(scale, note);
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
-        if (!KeySignatureEnv[2] && accidental == "") {
+        if (!KeySignatureEnv[2]) {
             for (let i in scale) {
-                if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note]) {
+                if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note] ||
+                scale[i].substr(0, 1) == note) {
                     accidental = scale[i].substr(1);
                     this.value += accidental;
                     this.text.text = this.value;
@@ -4760,7 +4761,8 @@ function Block(protoblock, blocks, overrideName) {
         let that = this;
         let selection = {
             "note": note,
-            "attr": accidental
+            "attr": accidental,
+            "autoSelect": true
         };
 
         let __selectionChangedSolfege = function() {
@@ -4774,9 +4776,16 @@ function Block(protoblock, blocks, overrideName) {
         
             // auto selection of sharps and flats in fixed solfege
             // handles the case of opening the pie-menu, not whilst in the pie-menu
+            // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
+            // In case of alphabet, direct comparison is performed
+
             if (!KeySignatureEnv[2]) {
                 for (let i in scale) {
-                    if (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] && scale[i].substr(1) != "") {
+                    if (
+                        (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] || scale[i].substr(0, 1) == selection["note"]) &&
+                        scale[i].substr(1) != "" &&
+                        selection["autoSelect"]) {
+                        console.log(scale[i].substr(0, 1), selection["note"]);
                         selection["attr"] = scale[i].substr(1);
                         that.value = selection["note"] + selection["attr"];
                         switch (selection["attr"]) {
@@ -4802,7 +4811,10 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             }
-            that.text.text = selection["note"] + selection["attr"];
+            that.text.text = selection["note"];
+            if (selection["attr"] !== "♮") {
+                that.text.text += selection["attr"];
+            }
 
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -4836,6 +4848,7 @@ function Block(protoblock, blocks, overrideName) {
                 that._accidentalsWheel.navItems[
                     that._accidentalsWheel.selectedNavItemIndex
                 ].title;
+            selection["autoSelect"] = false;
 
             if (selection["attr"] !== "♮") {
                 that.value = selection["note"] + selection["attr"];
