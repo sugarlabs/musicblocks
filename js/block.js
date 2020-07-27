@@ -4714,6 +4714,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note] ||
                 scale[i].substr(0, 1) == note) {
                     accidental = scale[i].substr(1);
+                    this.value = this.value.replace(SHARP, "").replace(FLAT, "");
                     this.value += accidental;
                     this.text.text = this.value;
                 }
@@ -4761,8 +4762,7 @@ function Block(protoblock, blocks, overrideName) {
         let that = this;
         let selection = {
             "note": note,
-            "attr": accidental,
-            "autoSelect": true
+            "attr": accidental
         };
 
         let __selectionChangedSolfege = function() {
@@ -4783,9 +4783,7 @@ function Block(protoblock, blocks, overrideName) {
                 for (let i in scale) {
                     if (
                         (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] || scale[i].substr(0, 1) == selection["note"]) &&
-                        scale[i].substr(1) != "" &&
-                        selection["autoSelect"]) {
-                        console.log(scale[i].substr(0, 1), selection["note"]);
+                        scale[i].substr(1) != "") {
                         selection["attr"] = scale[i].substr(1);
                         that.value = selection["note"] + selection["attr"];
                         switch (selection["attr"]) {
@@ -4848,7 +4846,6 @@ function Block(protoblock, blocks, overrideName) {
                 that._accidentalsWheel.navItems[
                     that._accidentalsWheel.selectedNavItemIndex
                 ].title;
-            selection["autoSelect"] = false;
 
             if (selection["attr"] !== "♮") {
                 that.value = selection["note"] + selection["attr"];
