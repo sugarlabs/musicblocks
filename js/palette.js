@@ -428,8 +428,10 @@ function Palettes() {
             // nameddo blocks.
             // myPalettes.dict[showPalette].showMenu();
             // myPalettes.dict[showPalette]._showMenuItems();
-            myPalettes.dict[showPalette].hideMenu();
-            myPalettes.dict[showPalette].show();
+            if (showPalette in myPalettes.dict){
+                myPalettes.dict[showPalette].hideMenu();
+                myPalettes.dict[showPalette].show();
+            }
         }
         if (this.mobile) {
             this.hide();
@@ -437,9 +439,11 @@ function Palettes() {
     };
 
     this.hide = function() {
+        docById("palette").style.visibility = "hidden";
     };
 
     this.show = function() {
+        docById("palette").style.visibility = "visible";
     };
 
     this.setBlocks = function(blocks) {
@@ -500,7 +504,7 @@ function Palettes() {
         }
         row.onclick = (evt) => {
             if (name == "search")this.showSearchWidget();
-            this.showPalette(name)
+            else this.showPalette(name)
         }
         row.onmouseup = (evt) => {
             document.body.style.cursor = "default";
@@ -876,25 +880,6 @@ function Palette(palettes, name) {
     this.fadedDownButton = null;
     this.count = 0;
 
-    this.makeMenu = function(createHeader) {
-
-    };
-
-    this._updateBlockMasks = function() {
-    };
-
-    this._getOverflowWidth = function() {
-    };
-
-    this._resetLayout = function() {
-    }
-
-    this._moveMenu = function(x, y) {
-    };
-
-    this._moveMenuRelative = function(dx, dy) {
-    };
-
     this.hide = function() {
         this.hideMenu();
     };
@@ -910,7 +895,7 @@ function Palette(palettes, name) {
     this.showMenu = function(createHeader) {
         
         let palDiv = docById("palette");
-        if (docById("PaletteBody")) 
+        if (docById("PaletteBody"))
             palDiv.removeChild(docById("PaletteBody"));
         let x = document.createElement("table");
         x.setAttribute("id","PaletteBody")
@@ -918,12 +903,15 @@ function Palette(palettes, name) {
         x.setAttribute("style","float: left");
         x.innerHTML= '<thead></thead><tbody style = "display: block; height: '+(window.innerHeight-this.palettes.top-this.palettes.cellSize-15)+'px; overflow: auto;" id ="PaletteBody_items" class="PalScrol"></tbody>'
         palDiv.appendChild(x)
+        let buttonContainers = document.createDocumentFragment();
+        let down = makePaletteIcons(DOWNICON,15,15);
+        down.style.position = "relative";
+        down.style.left = "-10px";
+        down.style.top = (window.innerHeight-this.palettes.top-this.palettes.cellSize-20)+"px";
+        buttonContainers.appendChild(down);
         this.menuContainer=x ;
 
         if (createHeader) {
-            var paletteWidth =
-                MENUWIDTH * PROTOBLOCKSCALE + this._getOverflowWidth();
-                
             let header = this.menuContainer.children[0];
             header = header.insertRow();
             header.style.background = platformColor.selectorSelected;
@@ -952,6 +940,7 @@ function Palette(palettes, name) {
             label.textContent = toTitleCase(_(this.name));
             header.children[0].appendChild(label);
             header.children[1].appendChild(closeImg);
+            header.children[1].appendChild(buttonContainers) ;
         }
         this._showMenuItems();
     };
@@ -968,6 +957,8 @@ function Palette(palettes, name) {
 
         this.model.update();
         let paletteList = docById("PaletteBody_items");
+        let padding = paletteList.insertRow();
+        padding.style.height = "7px";
 
         this.setupGrabScroll(paletteList);
 
@@ -1339,10 +1330,6 @@ function Palette(palettes, name) {
         }
     };
 
-    this.cleanup = function() {
-        this._updateBlockMasks();
-    };
-
     this._makeBlockFromProtoblock = function(
         protoblk,
         moved,
@@ -1479,7 +1466,6 @@ function Palette(palettes, name) {
             }
 
             // Put the protoblock back on the palette...
-            this.cleanup();
         }
     };
 
