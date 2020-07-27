@@ -73,12 +73,11 @@ function setupRhythmBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "skip"]);
             } else {
-                return logo.skipFactor[turtle];
+                return logo.turtles.ithTurtle(turtle).singer.skipFactor;
             }
         }
     }
@@ -163,21 +162,21 @@ function setupRhythmBlocks() {
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.swing[turtle].push(args[0]);
-            logo.swingTarget[turtle].push(null);
+            tur.singer.swing.push(args[0]);
+            tur.singer.swingTarget.push(null);
 
-            logo.swingCarryOver[turtle] = 0;
+            tur.singer.swingCarryOver = 0;
 
             let listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
                 if (!tur.singer.suppressOutput) {
-                    logo.swingTarget[turtle].pop();
-                    logo.swing[turtle].pop();
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
                 }
 
-                logo.swingCarryOver[turtle] = 0;
+                tur.singer.swingCarryOver = 0;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -212,21 +211,21 @@ function setupRhythmBlocks() {
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.swing[turtle].push(1 / args[0]);
-            logo.swingTarget[turtle].push(null);
+            tur.singer.swing.push(1 / args[0]);
+            tur.singer.swingTarget.push(null);
 
-            logo.swingCarryOver[turtle] = 0;
+            tur.singer.swingCarryOver = 0;
 
             let listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
                 if (!tur.singer.suppressOutput) {
-                    logo.swingTarget[turtle].pop();
-                    logo.swing[turtle].pop();
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
                 }
 
-                logo.swingCarryOver[turtle] = 0;
+                tur.singer.swingCarryOver = 0;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -293,22 +292,22 @@ function setupRhythmBlocks() {
             if (tur.singer.suppressOutput) {
                 logo.notation.notationSwing(turtle);
             } else {
-                logo.swing[turtle].push(1 / arg0);
-                logo.swingTarget[turtle].push(1 / arg1);
+                tur.singer.swing.push(1 / arg0);
+                tur.singer.swingTarget.push(1 / arg1);
             }
 
-            logo.swingCarryOver[turtle] = 0;
+            tur.singer.swingCarryOver = 0;
 
             let listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
                 if (!tur.singer.suppressOutput) {
-                    logo.swingTarget[turtle].pop();
-                    logo.swing[turtle].pop();
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
                 }
 
-                logo.swingCarryOver[turtle] = 0;
+                tur.singer.swingCarryOver = 0;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

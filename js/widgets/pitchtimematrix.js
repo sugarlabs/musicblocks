@@ -2052,15 +2052,17 @@ function PitchTimeMatrix() {
                     null
                 );
             } else if (condition === "drumblocks") {
+                let tur = that._logo.turtles.ithTurtle(0);
+
                 if (
-                    that._logo.instrumentNames[0] === undefined ||
-                    that._logo.instrumentNames[0].indexOf(label) === -1
+                    tur.singer.instrumentNames === undefined ||
+                    tur.singer.instrumentNames.indexOf(label) === -1
                 ) {
-                    if (that._logo.instrumentNames[0] === undefined) {
-                        that._logo.instrumentNames[0] = [];
+                    if (tur.singer.instrumentNames === undefined) {
+                        tur.singer.instrumentNames = [];
                     }
 
-                    that._logo.instrumentNames[0].push(label);
+                    tur.singer.instrumentNames.push(label);
                     if (label === DEFAULTVOICE) {
                         that._logo.synth.createDefaultSynth(0);
                     }

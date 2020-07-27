@@ -166,22 +166,6 @@ class Logo {
 
         this.connectionStore = {};
         this.connectionStoreLock = false;
-        this.duplicateFactor = {};
-        this.inDuplicate = {};
-        this.skipFactor = {};
-        this.skipIndex = {};
-        this.instrumentNames = {};
-        this.inCrescendo = {};
-        this.crescendoDelta = {};
-        this.crescendoInitialVolume = {};
-        this.intervals = {};            // relative interval (based on scale degree)
-        this.semitoneIntervals = {};    // absolute interval (based on semitones)
-        this.staccato = {};
-        this.glide = {};
-        this.glideOverride = {};
-        this.swing = {};
-        this.swingTarget = {};
-        this.swingCarryOver = {};
 
         // tuplet
         this.tuplet = false;
@@ -792,7 +776,7 @@ class Logo {
     setDispatchBlock(blk, turtle, listenerName) {
         let tur = this.turtles.ithTurtle(turtle);
 
-        if (!this.inDuplicate[turtle] && tur.singer.backward.length > 0) {
+        if (!tur.singer.inDuplicate && tur.singer.backward.length > 0) {
             let c = this.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
             if (
                 this.blocks.sameGeneration(
@@ -1174,6 +1158,22 @@ class Logo {
         tur.singer.turtleTime = 0;
         tur.singer.pushedNote = false;
         ////////
+        tur.singer.duplicateFactor = 1;
+        tur.singer.inDuplicate = false;
+        tur.singer.skipFactor = 1;
+        tur.singer.skipIndex = 0;
+        tur.singer.instrumentNames = ["electronic synth"];
+        tur.singer.inCrescendo = [];
+        tur.singer.crescendoDelta = [];
+        tur.singer.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
+        tur.singer.intervals = [];
+        tur.singer.semitoneIntervals = [];
+        tur.singer.staccato = [];
+        tur.singer.glide = [];
+        tur.singer.glideOverride = 0;
+        tur.singer.swing = [];
+        tur.singer.swingTarget = [];
+        tur.singer.swingCarryOver = 0;
         tur.singer.tie = false;
         tur.singer.tieNotePitches = [];
         tur.singer.tieNoteExtras = [];
@@ -1224,24 +1224,8 @@ class Logo {
         this.switchBlocks[turtle] = [];
         this.connectionStore[turtle] = {};
         this.connectionStoreLock = false;
-        this.duplicateFactor[turtle] = 1;
-        this.inDuplicate[turtle] = false;
-        this.skipFactor[turtle] = 1;
-        this.skipIndex[turtle] = 0;
         this.keySignature[turtle] = "C " + "major";
         this.inSetTimbre[turtle] = false;
-        this.instrumentNames[turtle] = ["electronic synth"];
-        this.inCrescendo[turtle] = [];
-        this.crescendoDelta[turtle] = [];
-        this.crescendoInitialVolume[turtle] = {"electronic synth": [DEFAULTVOLUME]};
-        this.intervals[turtle] = [];
-        this.semitoneIntervals[turtle] = [];
-        this.staccato[turtle] = [];
-        this.glide[turtle] = [];
-        this.glideOverride[turtle] = 0;
-        this.swing[turtle] = [];
-        this.swingTarget[turtle] = [];
-        this.swingCarryOver[turtle] = 0;
         this.pitchDrumTable[turtle] = {};
         this.pickup[turtle] = 0;
         this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time

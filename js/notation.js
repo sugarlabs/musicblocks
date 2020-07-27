@@ -146,6 +146,8 @@ class Notation {
     ) {
         let obj = durationToNoteValue(duration);
 
+        let tur = this._logo.turtles.ithTurtle(turtle);
+
         this._notationStaging[turtle].push([
             note,
             obj[0],
@@ -153,7 +155,7 @@ class Notation {
             obj[2],
             obj[3],
             insideChord,
-            this._logo.staccato[turtle].length > 0 && last(this._logo.staccato[turtle]) > 0
+            tur.staccato.length > 0 && last(tur.staccato) > 0
         ]);
 
         // If no drum is specified, add a rest to the drum line.
