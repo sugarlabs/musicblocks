@@ -354,7 +354,7 @@ function Palettes() {
         let row = listBody.insertRow(-1);
         let img = row.insertCell(-1);
         let label = row.insertCell(-1).appendChild(document.createElement("p"));
-        label.setAttribute("style","width: 10px ; height: 4px");
+        label.setAttribute("style","width: 10px ; height: 12px");
         img.appendChild(icon);
         // Add tooltip for palette buttons
         if (localStorage.kanaPreference === "kana") {
@@ -910,6 +910,15 @@ function Palette(palettes, name) {
         down.style.top = (window.innerHeight-this.palettes.top-this.palettes.cellSize-20)+"px";
         buttonContainers.appendChild(down);
         this.menuContainer=x ;
+        docById("PaletteBody_items").onscroll = () => {
+            console.debug("scrolling");
+            let list = docById("PaletteBody_items");
+            if( list.scrollTop >= (list.scrollHeight - list.offsetHeight)){
+                down.style.visibility = "hidden";
+            } else {
+                down.style.visibility = "visible";
+            }
+        }
 
         if (createHeader) {
             let header = this.menuContainer.children[0];
