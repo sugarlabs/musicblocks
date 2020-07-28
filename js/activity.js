@@ -1214,6 +1214,7 @@ function Activity() {
             keyNameWheel.removeWheel();
             keyNameWheel2.removeWheel();
             modenameWheel.removeWheel();
+            localStorage.KeySignatureEnv = KeySignatureEnv;
             __generateSetKeyBlocks();
         };
         
@@ -1324,7 +1325,18 @@ function Activity() {
                 __selectionChangedKey2();
             };
         }
-
+        if (localStorage.KeySignatureEnv !== undefined) {
+            let ks = localStorage.KeySignatureEnv.split(",");
+            KeySignatureEnv[0] = ks[0];
+            KeySignatureEnv[1] = ks[1];
+            KeySignatureEnv[2] = (ks[2] == "true" ? true: false);
+        } else {
+            KeySignatureEnv = [
+                "C",
+                "major",
+                false
+            ];
+        }
         let i = keys.indexOf(KeySignatureEnv[0]);
         if (i == -1) {
             i = keys2.indexOf(KeySignatureEnv[0]);
