@@ -1410,6 +1410,13 @@ input.timbreName {
     visibility: hidden;
 }
 
+#palette td ,thead ,tr ,table {
+    border-collapse: collapse;
+    padding: 0; 
+    margin: 0;
+    border:0;
+ }
+
  #printText {
     border: 2px solid rgb(150, 150, 150);
     z-index: 100;
@@ -1435,3 +1442,9 @@ input.timbreName {
     height: 28px;
     filter: invert(100%);
   }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .disable_highlighting {
+    user-select: none;
+    }    
