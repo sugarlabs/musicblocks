@@ -998,14 +998,9 @@ function Activity() {
             let stacks = blocks.stackList;
             stacks.sort();
             for (let i in stacks) {
-                if (logo.blocks.blockList[stacks[i]].name === "start" ||
-                logo.blocks.blockList[stacks[i]].name === "action") {
+                if (logo.blocks.blockList[stacks[i]].name === "start") {
                     let bottomBlock;
-                    if (logo.blocks.blockList[stacks[i]].name == "start") {
-                        bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
-                    } else {
-                        bottomBlock = logo.blocks.blockList[stacks[i]].connections[2];
-                    }
+                    bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
 
                     let connection = [stacks[i], null, null, bottomBlock];
                     blocks._makeNewBlockWithConnections(
@@ -1017,11 +1012,7 @@ function Activity() {
                     );
                     let setKey = logo.blocks.blockList.length - 1;
                     logo.blocks.blockList[bottomBlock].connections[0] = setKey;
-                    if (logo.blocks.blockList[stacks[i]].name == "start") {
-                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
-                    } else {
-                        logo.blocks.blockList[stacks[i]].connections[2] = setKey;
-                    }
+                    logo.blocks.blockList[stacks[i]].connections[1] = setKey;
                     
                     blocks.adjustExpandableClampBlock();
 
