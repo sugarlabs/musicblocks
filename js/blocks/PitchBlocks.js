@@ -2034,7 +2034,34 @@ function setupPitchBlocks() {
             ]);
         }
         arg(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            let tur = logo.turtles.ithTurtle(turtle);
+            let scaledegree = logo.blocks.blockList[blk].value;
+            let attr;
+
+            if (scaledegree.indexOf(SHARP) !==-1) {
+                attr = SHARP;
+            } else if (scaledegree.indexOf(FLAT) !== -1) {
+                attr = FLAT;
+            } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
+                attr = DOUBLESHARP;
+            } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
+                attr = DOUBLEFLAT;
+            } else {
+                attr = NATURAL;
+            }
+
+            scaledegree = Number(scaledegree.replace(attr, ""));
+            let note = scaleDegreeToPitchMapping(
+                logo.keySignature[turtle],
+                scaledegree,
+                tur.singer.moveable,
+                null
+            );
+            if(attr != NATURAL) {
+                note += attr;
+            }
+
+            return note;
         }
     }
 
