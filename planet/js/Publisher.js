@@ -40,15 +40,18 @@ function Publisher(Planet) {
         }
         //convert blocks to score.
         let score = Planet.analyzeProject(blocks);
-        //_("rhythm"),_("pitch"),_("tone"),_("mouse"),_("pen"),_("number"),_("flow"),_("action"),_("sensors"),_("media"),_("mice")
+
+        //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
+        //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
+
         //use score to map tags.
         let tags = [];
         //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2] ){
+        if (score[1] && score[2]){
             tags.push("2");//music
         }
         //pen,mouse
-        if (score[3] && score[4] ){
+        if (score[3] && score[4]){
             tags.push("3");//art
         }
         //sensors
