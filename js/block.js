@@ -4782,8 +4782,8 @@ function Block(protoblock, blocks, overrideName) {
             if (!KeySignatureEnv[2]) {
                 for (let i in scale) {
                     if (
-                        (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] || scale[i].substr(0, 1) == selection["note"]) &&
-                        scale[i].substr(1) != "") {
+                        (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] ||
+                        scale[i].substr(0, 1) == selection["note"])) {
                         selection["attr"] = scale[i].substr(1);
                         that.value = selection["note"] + selection["attr"];
                         switch (selection["attr"]) {
