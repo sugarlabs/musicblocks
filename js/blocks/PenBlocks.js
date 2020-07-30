@@ -373,8 +373,8 @@ function setupPenBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doStartHollowLine();
             }
@@ -383,8 +383,8 @@ function setupPenBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = () => {
-                if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     tur.painter.doEndHollowLine();
                 }
@@ -428,8 +428,8 @@ function setupPenBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 if (tur.singer.suppressOutput) {
                     let savedPenState = tur.painter.penState;
@@ -445,8 +445,8 @@ function setupPenBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = () => {
-                if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
@@ -482,8 +482,8 @@ function setupPenBlocks() {
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doPenUp();
             }
@@ -507,8 +507,8 @@ function setupPenBlocks() {
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doPenDown();
             }
@@ -554,8 +554,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doSetPensize(args[0]);
             }
@@ -599,8 +599,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 let arg = args[0] % 101;
                 let alpha = 1.0 - arg / 100;
@@ -645,8 +645,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doSetHue(args[0]);
             }
@@ -693,8 +693,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doSetValue(args[0]);
             }
@@ -738,8 +738,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doSetChroma(args[0]);
             }
@@ -784,8 +784,8 @@ function setupPenBlocks() {
                     logo.blocks.blockList[blk].name
                 );
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 tur.painter.doSetColor(args[0]);
             }

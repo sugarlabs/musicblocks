@@ -419,7 +419,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // Set up a listener for this turtle/offbeat combo.
+            // Set up a listener for this turtle/offbeat combo
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
@@ -448,7 +448,7 @@ function setupMeterBlocks() {
                 let eventName = "__offbeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("offbeat");
+                logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
             }
         }
     }
@@ -507,9 +507,9 @@ function setupMeterBlocks() {
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
                     if (logo.defaultStrongBeats[turtle]) {
-                        for (let i = 0; i < logo.beatList[turtle].length; i++) {
-                            if (logo.beatList[turtle][i] !== "everybeat" && logo.beatList[turtle][i] !== "offbeat") {
-                                logo.beatList[turtle].splice(i, 1);
+                        for (let i = 0; i < tur.singer.beatList.length; i++) {
+                            if (tur.singer.beatList[i] !== "everybeat" && tur.singer.beatList[i] !== "offbeat") {
+                                tur.singer.beatList.splice(i, 1);
                                 i--;
                             }
                         }
@@ -517,9 +517,9 @@ function setupMeterBlocks() {
                     }
 
                     if (args[0] > logo.beatsPerMeasure[turtle]) {
-                        logo.factorList[turtle].push(args[0]);
+                        tur.singer.factorList.push(args[0]);
                     } else {
-                        logo.beatList[turtle].push(args[0]);
+                        tur.singer.beatList.push(args[0]);
                     }
                 }
             }
@@ -666,7 +666,7 @@ function setupMeterBlocks() {
                 let eventName = "__everybeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("everybeat");
+                tur.singer.beatList.push("everybeat");
             }
         }
     }
@@ -1084,6 +1084,8 @@ function setupMeterBlocks() {
                 arg1 = 1 / 4;
             } else arg1 = args[1];
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (arg0 <= 0) logo.beatsPerMeasure[turtle] = 4;
             else logo.beatsPerMeasure[turtle] = arg0;
 
@@ -1093,21 +1095,21 @@ function setupMeterBlocks() {
             // setup default strong / weak beats until any strong beat block is used
 
             if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 4) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(3);
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(3);
                 logo.defaultStrongBeats[turtle] = true;
             }
             else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 2) {
-                logo.beatList[turtle].push(1);
+                tur.singer.beatList.push(1);
                 logo.defaultStrongBeats[turtle] = true;
             }
             else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 3) {
-                logo.beatList[turtle].push(1);
+                tur.singer.beatList.push(1);
                 logo.defaultStrongBeats[turtle] = true;
             }
             else if (logo.noteValuePerBeat[turtle] == 8 && logo.beatsPerMeasure[turtle] == 6) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(4);
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(4);
                 logo.defaultStrongBeats[turtle] = true;
             }
 

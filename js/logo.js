@@ -103,9 +103,6 @@ class Logo {
         this.actions = {};
         this.returns = {};
         this.turtleHeaps = {};
-        this.invertList = {};
-        this.beatList = {};
-        this.factorList = {};
         this.defaultStrongBeats = {}
 
         // We store each case arg and flow by switch block no. and turtle
@@ -145,13 +142,10 @@ class Logo {
 
         // pitch-rhythm matrix
         this.inMatrix = false;
-        this.keySignature = {};
         this.tupletRhythms = [];
         this.addingNotesToTuplet = false;
         this.drumBlocks = [];
         this.pitchBlocks = [];
-        this.inNoteBlock = [];
-        this.multipleVoices = [];
 
         // Parameters used in time signature
         this.pickup = {};
@@ -1174,6 +1168,13 @@ class Logo {
         tur.singer.neighborArgBeat = [];
         tur.singer.neighborArgCurrentBeat = [];
 
+        tur.singer.inNoteBlock = [];
+        tur.singer.multipleVoices = false;
+        tur.singer.invertList = [];
+        tur.singer.beatList = [];
+        tur.singer.factorList = [];
+        tur.singer.keySignature = "C " + "major";
+
         tur.singer.justCounting = [];
         tur.singer.justMeasuring = [];
         tur.singer.firstPitch = [];
@@ -1182,20 +1183,16 @@ class Logo {
 
         tur.singer.dispatchFactor = 1;
 
+        tur.embeddedGraphicsFinished = true;
+
         tur.painter.cp1x = 0;
         tur.painter.cp1y = 100;
         tur.painter.cp2x = 100;
         tur.painter.cp2y = 100;
 
-        this.inNoteBlock[turtle] = [];
-        this.multipleVoices[turtle] = false;
-        this.embeddedGraphicsFinished[turtle] = true;
-        this.invertList[turtle] = [];
-        this.beatList[turtle] = [];
-        this.factorList[turtle] = [];
         this.switchCases[turtle] = {};
         this.switchBlocks[turtle] = [];
-        this.keySignature[turtle] = "C " + "major";
+
         this.inSetTimbre[turtle] = false;
         this.pitchDrumTable[turtle] = {};
         this.pickup[turtle] = 0;
@@ -1348,7 +1345,9 @@ class Logo {
 
         this._checkingCompletionState = false;
 
-        this.embeddedGraphicsFinished = {};
+        for (let turtle of this.turtles.turtleList) {
+            turtle.embeddedGraphicsFinished = true;
+        }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this._prepSynths();
@@ -2082,13 +2081,12 @@ class Logo {
         if (tur.singer.embeddedGraphics[blk].length === 0)
             return;
 
-        // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics
-        if (!this.embeddedGraphicsFinished[turtle]) {
+        // If the previous note's graphics are not complete, add a slight delay before drawing any new graphics
+        if (!tur.embeddedGraphicsFinished) {
             delay += 0.1;
         }
 
-        this.embeddedGraphicsFinished[turtle] = false;
+        tur.embeddedGraphicsFinished = false;
 
         let suppressOutput = tur.singer.suppressOutput;
 
@@ -2650,7 +2648,7 @@ class Logo {
 
         // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
-        this.embeddedGraphicsFinished[turtle] = true;
+        tur.embeddedGraphicsFinished = true;
     }
 }
 

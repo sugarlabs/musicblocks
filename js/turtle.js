@@ -49,8 +49,10 @@ class Turtle {
         this.singer = new Singer(this);     // for music logic
         this.painter = new Painter(this);   // for drawing logic
 
-        this._blinkFinished = true;         // whether not blinking or blinking
         this._waitTime = 0;
+        this.embeddedGraphicsFinished = true;
+
+        this._blinkFinished = true;         // whether not blinking or blinking
     }
 
     /**

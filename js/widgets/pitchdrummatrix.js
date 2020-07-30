@@ -624,7 +624,7 @@ function PitchDrumMatrix() {
             solfegeHTML,
             -1,
             0,
-            this._logo.keySignature[0],
+            this._logo.turtles.ithTurtle(0).singer.keySignature,
             false,
             null,
             this._logo.errorMsg
@@ -716,7 +716,7 @@ function PitchDrumMatrix() {
                 solfegeHTML,
                 -1,
                 0,
-                this._logo.keySignature[0],
+                this._logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
                 this._logo.errorMsg

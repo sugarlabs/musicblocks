@@ -859,7 +859,7 @@ function setupExtrasBlocks() {
                                 logo.textMsg(args[0].toString());
                             }
                         } else if (logo.runningLilypond) {
-                            if (logo.inNoteBlock[turtle].length > 0) {
+                            if (tur.singer.inNoteBlock.length > 0) {
                                 logo.notation.notationMarkup(turtle, args[0].toString());
                             }
                         }

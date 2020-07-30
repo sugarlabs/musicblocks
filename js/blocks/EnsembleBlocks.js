@@ -508,7 +508,7 @@ function setupEnsembleBlocks() {
                             thisTurtle.singer.notePitches[0],
                             thisTurtle.singer.noteOctaves[0],
                             0,
-                            logo.keySignature[i],
+                            thisTurtle.singer.keySignature,
                             tur.singer.moveable,
                             null,
                             logo.errorMsg,
@@ -521,7 +521,7 @@ function setupEnsembleBlocks() {
                     }
 
                     value =
-                        pitchToNumber(obj[0], obj[1], logo.keySignature[i]) -
+                        pitchToNumber(obj[0], obj[1], thisTurtle.singer.keySignature) -
                         tur.singer.pitchNumberOffset;
                     logo.blocks.blockList[blk].value = value;
                     break;
@@ -530,15 +530,9 @@ function setupEnsembleBlocks() {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    logo.errorMsg(
-                        _("Cannot find mouse") + " " + targetTurtle,
-                        blk
-                    );
+                    logo.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
                 } else {
-                    logo.errorMsg(
-                        _("Cannot find turtle") + " " + targetTurtle,
-                        blk
-                    );
+                    logo.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
                 }
 
                 let obj;
@@ -549,10 +543,10 @@ function setupEnsembleBlocks() {
                     obj = [pitch, octave];
                 } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
-                        tur.singer.notePitches[last(logo.inNoteBlock[turtle])][0],
-                        tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
+                        tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+                        tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
-                        logo.keySignature[turtle],
+                        tur.singer.keySignature,
                         tur.singer.moveable,
                         null,
                         logo.errorMsg,
@@ -565,7 +559,7 @@ function setupEnsembleBlocks() {
                 }
 
                 value =
-                    pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
+                    pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
                     tur.singer.pitchNumberOffset;
                 logo.blocks.blockList[blk].value = value;
             }
@@ -595,14 +589,15 @@ function setupEnsembleBlocks() {
                 let thisTurtle = logo.turtles.ithTurtle(i);
                 if (targetTurtle === thisTurtle.name) {
                     if (
-                        logo.inNoteBlock[i].length > 0 &&
-                        last(logo.inNoteBlock[i]) in thisTurtle.singer.noteValue
+                        thisTurtle.singer.inNoteBlock.length > 0 &&
+                        last(thisTurtle.singer.inNoteBlock) in thisTurtle.singer.noteValue
                     ) {
-                        value = 1 / thisTurtle.singer.noteValue[last(logo.inNoteBlock[i])];
+                        value =
+                            1 / thisTurtle.singer.noteValue[last(thisTurtle.singer.inNoteBlock)];
                     } else if (thisTurtle.singer.lastNotePlayed !== null) {
                         value = thisTurtle.singer.lastNotePlayed[1];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
-                        value = thisTurtle.singer.noteBeat[last(logo.inNoteBlock[i])];
+                        value = thisTurtle.singer.noteBeat[last(thisTurtle.singer.inNoteBlock)];
                     } else {
                         value = -1;
                     }
