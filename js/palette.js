@@ -877,6 +877,14 @@ function Palette(palettes, name) {
                 b.artwork
             );
 
+            //use artwork.js strings as images for : cameraPALETTE,videoPALETTE,mediaPALETTE
+            if (b.image){
+                console.log(b);
+                img = makePaletteIcons(
+                    eval(b.blkname+"PALETTE")
+                );
+            }
+
             img.onmouseover = (evt) => {
                 document.body.style.cursor = "pointer";
             }
