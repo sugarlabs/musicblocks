@@ -866,7 +866,7 @@ function setupMeterBlocks() {
                 }
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.turtles.ithTurtle(turtle).bpm.push(bpm);
+                logo.turtles.ithTurtle(turtle).singer.bpm.push(bpm);
             }
 
             if (logo.inTempo) {
