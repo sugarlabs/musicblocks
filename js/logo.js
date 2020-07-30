@@ -1060,141 +1060,16 @@ class Logo {
     initTurtle(turtle) {
         this.connectionStore[turtle] = {};
         this.connectionStoreLock = false;
-        this.returns[turtle] = [];
-
-        let tur = this.turtles.ithTurtle(turtle);
-
-        tur.doWait(0);
-        tur.endOfClampSignals = {};
-        tur.butNotThese = {};
-
-        tur.embeddedGraphicsFinished = true;
-
-        tur.inSetTimbre = false;
-
-        tur.painter.cp1x = 0;
-        tur.painter.cp1y = 100;
-        tur.painter.cp2x = 100;
-        tur.painter.cp2y = 100;
-
-        /** @deprecated */  tur.singer.attack = [];
-        /** @deprecated */  tur.singer.decay = [];
-        /** @deprecated */  tur.singer.sustain = [];
-        /** @deprecated */  tur.singer.release = [];
-
-        tur.singer.scalarTransposition = 0;
-        tur.singer.scalarTranspositionValues = [];
-        tur.singer.transposition = 0;
-        tur.singer.transpositionValues = [];
-
-        tur.singer.register = 0;
-        tur.singer.beatFactor = 1;
-        tur.singer.dotCount = 0;
-        tur.singer.noteBeat = {};
-        tur.singer.noteValue = {};
-        tur.singer.oscList = {};
-        tur.singer.noteDrums = {};
-        tur.singer.notePitches = {};
-        tur.singer.noteOctaves = {};
-        tur.singer.noteCents = {};
-        tur.singer.noteHertz = {};
-        tur.singer.noteBeatValues = {};
-        tur.singer.embeddedGraphics = {};
-        tur.singer.lastNotePlayed = null;
-        tur.singer.previousNotePlayed = null;
-        tur.singer.noteStatus = null;
-        tur.singer.noteDirection = 0;
-        tur.singer.pitchNumberOffset = 39;
-        tur.singer.currentOctave = 4;
-        tur.singer.inHarmonic = [];
-        tur.singer.partials = [];
-        tur.singer.inNeighbor = [];
-        tur.singer.neighborStepPitch = [];
-        tur.singer.neighborNoteValue = [];
-        tur.singer.inDefineMode = false;
-        tur.singer.defineMode = [];
-
-        tur.singer.notesPlayed = [0, 1];
-        tur.singer.whichNoteToCount = 1;
-        tur.singer.moveable = false;
-
-        tur.singer.bpm = [];
-        tur.singer.previousTurtleTime = 0;
-        tur.singer.turtleTime = 0;
-        tur.singer.pushedNote = false;
-        ////////
-        tur.singer.duplicateFactor = 1;
-        tur.singer.inDuplicate = false;
-        tur.singer.skipFactor = 1;
-        tur.singer.skipIndex = 0;
-        tur.singer.instrumentNames = ["electronic synth"];
-        tur.singer.inCrescendo = [];
-        tur.singer.crescendoDelta = [];
-        tur.singer.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
-        tur.singer.intervals = [];
-        tur.singer.semitoneIntervals = [];
-        tur.singer.staccato = [];
-        tur.singer.glide = [];
-        tur.singer.glideOverride = 0;
-        tur.singer.swing = [];
-        tur.singer.swingTarget = [];
-        tur.singer.swingCarryOver = 0;
-        tur.singer.tie = false;
-        tur.singer.tieNotePitches = [];
-        tur.singer.tieNoteExtras = [];
-        tur.singer.tieCarryOver = 0;
-        tur.singer.tieFirstDrums = [];
-        tur.singer.drift = 0;
-        tur.singer.drumStyle = [];
-        tur.singer.voices = [];
-        tur.singer.backward = [];
-
-        tur.singer.vibratoIntensity = [];
-        tur.singer.vibratoRate = [];
-        tur.singer.distortionAmount = [];
-        tur.singer.tremoloFrequency = [];
-        tur.singer.tremoloDepth = [];
-        tur.singer.rate = [];
-        tur.singer.octaves = [];
-        tur.singer.baseFrequency = [];
-        tur.singer.chorusRate = [];
-        tur.singer.delayTime = [];
-        tur.singer.chorusDepth = [];
-        tur.singer.neighborArgNote1 = [];
-        tur.singer.neighborArgNote2 = [];
-        tur.singer.neighborArgBeat = [];
-        tur.singer.neighborArgCurrentBeat = [];
-
-        tur.singer.inNoteBlock = [];
-        tur.singer.multipleVoices = false;
-        tur.singer.invertList = [];
-        tur.singer.beatList = [];
-        tur.singer.factorList = [];
-        tur.singer.keySignature = "C " + "major";
-        tur.singer.pitchDrumTable = {};
-        tur.singer.defaultStrongBeats = false;
-
-        tur.singer.pickup = 0;
-        tur.singer.beatsPerMeasure = 4;         // default is 4/4 time
-        tur.singer.noteValuePerBeat = 4;
-        tur.singer.currentBeat = 0;
-        tur.singer.currentMeasure = 0;
-
-        tur.singer.justCounting = [];
-        tur.singer.justMeasuring = [];
-        tur.singer.firstPitch = [];
-        tur.singer.lastPitch = [];
-        tur.singer.suppressOutput = this.runningLilypond || this.runningAbc || this.runningMxml;
-
-        tur.singer.dispatchFactor = 1;
-
         this.switchCases[turtle] = {};
         this.switchBlocks[turtle] = [];
+        this.returns[turtle] = [];
 
         this.notation.notationStaging[turtle] = [];
         this.notation.notationDrumStaging[turtle] = [];
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
+
+        this.turtles.ithTurtle(turtle).initTurtle();
     }
 
     /**
