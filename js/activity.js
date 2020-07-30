@@ -987,7 +987,9 @@ function Activity() {
         let isSetKeyBlockPresent = 0;
         let setKeyBlocks = [];
         for (let i in logo.blocks.blockList) {
-            if (logo.blocks.blockList[i].name === "setkey2") {
+            if (logo.blocks.blockList[i].name === "setkey2" &&
+            !logo.blocks.blockList[i].trash
+            ) {
                 isSetKeyBlockPresent = 1;
                 setKeyBlocks.push(i);
             }
@@ -1034,6 +1036,10 @@ function Activity() {
                     );
                     logo.blocks.blockList[setKey].connections[2] =
                     logo.blocks.blockList.length - 1;
+                    textMsg(
+                        _("You have chosen key ") + KeySignatureEnv[0] + " " + KeySignatureEnv[1] +
+                        _(" for your pitch preview.")
+                    );
                 }
 
             }
@@ -1260,8 +1266,8 @@ function Activity() {
                     }
                 }
                 __selectionChangedKey();
-                if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
-                    __playNote();
+                // if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
+                //     __playNote();
             };
         };
 
@@ -1308,7 +1314,7 @@ function Activity() {
                 keyNameWheel2.selectedNavItemIndex
             ].title;
             KeySignatureEnv[0] = selection;
-            __playNote();
+            // __playNote();
         };
 
         for (let i = 0; i < keys2.length; i++) {
@@ -1331,6 +1337,7 @@ function Activity() {
         let i = keys.indexOf(KeySignatureEnv[0]);
         if (i == -1) {
             i = keys2.indexOf(KeySignatureEnv[0]);
+            console.log("index is", i);
             if (i != -1) {
                 keyNameWheel2.navigateWheel(i);
                 for (let j = 0; j < keys2.length; j++) {
