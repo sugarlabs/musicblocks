@@ -750,6 +750,16 @@ function setupPitchBlocks() {
                 posY1 %= 87.5;
                 let lc1 = posY1 / 12.5;
                 return (lc1 + (o1 * 7));
+            } else if (logo.blocks.blockList[cblk0].name == "print") {
+                let posY2 = logo.blocks.blockList[cblk1].value;
+                let o2 = Math.floor(posY2 / 87.5) + 4;
+                posY2 %= 87.5;
+                let note = NOTENAMES[Math.floor(posY2 / 12.5)];
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, "ytopitch"]);
+                } else {
+                    return (note + o2);
+                }
             }
 
         }
