@@ -15,16 +15,13 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmeter"]);
             } else {
-                return (
-                    logo.beatsPerMeasure[turtle] +
-                    ":" +
-                    logo.noteValuePerBeat[turtle]
-                );
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
             }
         }
     }
@@ -139,7 +136,7 @@ function setupMeterBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     return 0;
                 } else {
                     return (
@@ -147,9 +144,9 @@ function setupMeterBlocks() {
                             (
                                 (
                                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                                    logo.pickup[turtle]
-                                ) * logo.noteValuePerBeat[turtle]
-                            ) / logo.beatsPerMeasure[turtle]
+                                    tur.singer.pickup
+                                ) * tur.singer.noteValuePerBeat
+                            ) / tur.singer.beatsPerMeasure
                         ) + 1
                     );
                 }
@@ -208,16 +205,16 @@ function setupMeterBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     return 0;
                 } else {
                     return (
                         (
                             (
                                 tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                                logo.pickup[turtle]
-                            ) * logo.noteValuePerBeat[turtle]
-                        ) % logo.beatsPerMeasure[turtle]
+                                tur.singer.pickup
+                            ) * tur.singer.noteValuePerBeat
+                        ) % tur.singer.beatsPerMeasure
                     ) + 1;
                 }
             }
@@ -419,7 +416,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // Set up a listener for this turtle/offbeat combo.
+            // Set up a listener for this turtle/offbeat combo
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
@@ -448,7 +445,7 @@ function setupMeterBlocks() {
                 let eventName = "__offbeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("offbeat");
+                logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
             }
         }
     }
@@ -506,20 +503,20 @@ function setupMeterBlocks() {
                     logo.setTurtleListener(turtle, eventName, __listener);
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
-                    if (logo.defaultStrongBeats[turtle]) {
-                        for (let i = 0; i < logo.beatList[turtle].length; i++) {
-                            if (logo.beatList[turtle][i] !== "everybeat" && logo.beatList[turtle][i] !== "offbeat") {
-                                logo.beatList[turtle].splice(i, 1);
+                    if (tur.singer.defaultStrongBeats) {
+                        for (let i = 0; i < tur.singer.beatList.length; i++) {
+                            if (tur.singer.beatList[i] !== "everybeat" && tur.singer.beatList[i] !== "offbeat") {
+                                tur.singer.beatList.splice(i, 1);
                                 i--;
                             }
                         }
-                        logo.defaultStrongBeats[turtle] = false;
+                        tur.singer.defaultStrongBeats = false;
                     }
 
-                    if (args[0] > logo.beatsPerMeasure[turtle]) {
-                        logo.factorList[turtle].push(args[0]);
+                    if (args[0] > tur.singer.beatsPerMeasure) {
+                        tur.singer.factorList.push(args[0]);
                     } else {
-                        logo.beatList[turtle].push(args[0]);
+                        tur.singer.beatList.push(args[0]);
                     }
                 }
             }
@@ -666,7 +663,7 @@ function setupMeterBlocks() {
                 let eventName = "__everybeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("everybeat");
+                tur.singer.beatList.push("everybeat");
             }
         }
     }
@@ -869,7 +866,7 @@ function setupMeterBlocks() {
                 }
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.turtles.ithTurtle(turtle).bpm.push(bpm);
+                logo.turtles.ithTurtle(turtle).singer.bpm.push(bpm);
             }
 
             if (logo.inTempo) {
@@ -1028,13 +1025,11 @@ function setupMeterBlocks() {
                 arg0 = args[0];
             }
 
-            if (arg0 < 0) {
-                logo.pickup[turtle] = 0;
-            } else {
-                logo.pickup[turtle] = arg0;
-            }
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.notation.notationPickup(turtle, logo.pickup[turtle]);
+            tur.singer.pickup = Math.max(0, arg0);
+
+            logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
     }
 
@@ -1084,37 +1079,34 @@ function setupMeterBlocks() {
                 arg1 = 1 / 4;
             } else arg1 = args[1];
 
-            if (arg0 <= 0) logo.beatsPerMeasure[turtle] = 4;
-            else logo.beatsPerMeasure[turtle] = arg0;
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            if (arg1 <= 0) logo.noteValuePerBeat[turtle] = 4;
-            else logo.noteValuePerBeat[turtle] = 1 / arg1;
+            tur.singer.beatsPerMeasure = arg0 <= 0 ? 4 : arg0;
+            tur.singer.noteValuePerBeat = arg1 <= 0 ? 4 : 1 / arg1;
 
             // setup default strong / weak beats until any strong beat block is used
 
-            if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 4) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(3);
-                logo.defaultStrongBeats[turtle] = true;
+            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(3);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 2) {
-                logo.beatList[turtle].push(1);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 3) {
-                logo.beatList[turtle].push(1);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 8 && logo.beatsPerMeasure[turtle] == 6) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(4);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(4);
+                tur.singer.defaultStrongBeats = true;
             }
 
             logo.notation.notationMeter(
-                turtle,
-                logo.beatsPerMeasure[turtle],
-                logo.noteValuePerBeat[turtle]
+                turtle, tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat
             );
         }
     }

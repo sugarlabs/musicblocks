@@ -103,10 +103,6 @@ class Logo {
         this.actions = {};
         this.returns = {};
         this.turtleHeaps = {};
-        this.invertList = {};
-        this.beatList = {};
-        this.factorList = {};
-        this.defaultStrongBeats = {}
 
         // We store each case arg and flow by switch block no. and turtle
         this.switchCases = {};
@@ -121,7 +117,6 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
-        this._waitTimes = {};
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -142,37 +137,21 @@ class Logo {
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
-        this.inSetTimbre = {};
 
         // pitch-rhythm matrix
         this.inMatrix = false;
-        this.keySignature = {};
         this.tupletRhythms = [];
         this.addingNotesToTuplet = false;
         this.drumBlocks = [];
         this.pitchBlocks = [];
-        this.inNoteBlock = [];
-        this.multipleVoices = [];
 
-        // Parameters used in time signature
-        this.pickup = {};
-        this.beatsPerMeasure = {};
-        this.noteValuePerBeat = {};
-        this.currentBeat = {};
-        this.currentMeasure = {};
-
-        // Parameters used by the note block
-        this._noteDelay = 0;
-
+        // Parameters used by duplicate block
         this.connectionStore = {};
         this.connectionStoreLock = false;
 
         // tuplet
         this.tuplet = false;
         this.tupletParams = [];
-
-        // pitch to drum mapping
-        this.pitchDrumTable = {};
 
         // object that deals with notations
         this._notation = new Notation(this);
@@ -467,7 +446,6 @@ class Logo {
      */
     set turtleDelay(turtleDelay) {
         this._turtleDelay = turtleDelay;
-        this._noteDelay = 0;
     }
 
     /**
@@ -475,21 +453,6 @@ class Logo {
      */
     get turtleDelay() {
         return this._turtleDelay;
-    }
-
-    /**
-     * @param {number} noteDelay - pause between each note as the program executes
-     */
-    set noteDelay(noteDelay) {
-        this._noteDelay = noteDelay;
-        this._turtleDelay = 0;
-    }
-
-    /**
-     * @returns {Number} pause between each note as the program executes
-     */
-    get noteDelay() {
-        return this._noteDelay;
     }
 
     /**
@@ -937,7 +900,7 @@ class Logo {
         // Don't split the note if we are already splitting the note
         if (split == undefined) split = true;
 
-        let tur = logo.turtles.ithTurtle(turtle);
+        let tur = this.turtles.ithTurtle(turtle);
 
         // Check to see if this note straddles a measure boundary
         let durationTime = 1 / duration;
@@ -945,19 +908,18 @@ class Logo {
             (
                 (
                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                    this.pickup[turtle] -
+                    tur.singer.pickup -
                     durationTime
-                ) * this.noteValuePerBeat[turtle]
-            ) % this.beatsPerMeasure[turtle];
-        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+                ) * tur.singer.noteValuePerBeat
+            ) % tur.singer.beatsPerMeasure;
+        let timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
         let timeLeftInMeasure =
-            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
-            timeIntoMeasure;
+            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
             let d = durationTime - timeLeftInMeasure;
             let d2 = timeLeftInMeasure;
-            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            let b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
             console.debug("splitting note across measure boundary.");
             let obj = rationalToFraction(d);
 
@@ -1004,17 +966,6 @@ class Logo {
     }
 
     // ========================================================================
-
-    /**
-     * Sets wait duration of turtle.
-     *
-     * @param turtle
-     * @param secs
-     * @returns {void}
-     */
-    doWait(turtle, secs) {
-        this._waitTimes[turtle] = Number(secs) * 1000;
-    }
 
     /**
      * Clears the delay timeout after a successful input, and runs from next block.
@@ -1107,137 +1058,18 @@ class Logo {
      * @returns {void}
      */
     initTurtle(turtle) {
-        let tur = this.turtles.ithTurtle(turtle);
-
-        tur.endOfClampSignals = {};
-        tur.butNotThese = {};
-
-        /** @deprecated */  tur.singer.attack = [];
-        /** @deprecated */  tur.singer.decay = [];
-        /** @deprecated */  tur.singer.sustain = [];
-        /** @deprecated */  tur.singer.release = [];
-
-        tur.singer.scalarTransposition = 0;
-        tur.singer.scalarTranspositionValues = [];
-        tur.singer.transposition = 0;
-        tur.singer.transpositionValues = [];
-
-        tur.singer.register = 0;
-        tur.singer.beatFactor = 1;
-        tur.singer.dotCount = 0;
-        tur.singer.noteBeat = {};
-        tur.singer.noteValue = {};
-        tur.singer.oscList = {};
-        tur.singer.noteDrums = {};
-        tur.singer.notePitches = {};
-        tur.singer.noteOctaves = {};
-        tur.singer.noteCents = {};
-        tur.singer.noteHertz = {};
-        tur.singer.noteBeatValues = {};
-        tur.singer.embeddedGraphics = {};
-        tur.singer.lastNotePlayed = null;
-        tur.singer.previousNotePlayed = null;
-        tur.singer.noteStatus = null;
-        tur.singer.noteDirection = 0;
-        tur.singer.pitchNumberOffset = 39;
-        tur.singer.currentOctave = 4;
-        tur.singer.inHarmonic = [];
-        tur.singer.partials = [];
-        tur.singer.inNeighbor = [];
-        tur.singer.neighborStepPitch = [];
-        tur.singer.neighborNoteValue = [];
-        tur.singer.inDefineMode = false;
-        tur.singer.defineMode = [];
-
-        tur.singer.notesPlayed = [0, 1];
-        tur.singer.whichNoteToCount = 1;
-        tur.singer.moveable = false;
-
-        tur.singer.bpm = [];
-        tur.singer.previousTurtleTime = 0;
-        tur.singer.turtleTime = 0;
-        tur.singer.pushedNote = false;
-        ////////
-        tur.singer.duplicateFactor = 1;
-        tur.singer.inDuplicate = false;
-        tur.singer.skipFactor = 1;
-        tur.singer.skipIndex = 0;
-        tur.singer.instrumentNames = ["electronic synth"];
-        tur.singer.inCrescendo = [];
-        tur.singer.crescendoDelta = [];
-        tur.singer.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
-        tur.singer.intervals = [];
-        tur.singer.semitoneIntervals = [];
-        tur.singer.staccato = [];
-        tur.singer.glide = [];
-        tur.singer.glideOverride = 0;
-        tur.singer.swing = [];
-        tur.singer.swingTarget = [];
-        tur.singer.swingCarryOver = 0;
-        tur.singer.tie = false;
-        tur.singer.tieNotePitches = [];
-        tur.singer.tieNoteExtras = [];
-        tur.singer.tieCarryOver = 0;
-        tur.singer.tieFirstDrums = [];
-        tur.singer.drift = 0;
-        tur.singer.drumStyle = [];
-        tur.singer.voices = [];
-        tur.singer.backward = [];
-
-        tur.singer.vibratoIntensity = [];
-        tur.singer.vibratoRate = [];
-        tur.singer.distortionAmount = [];
-        tur.singer.tremoloFrequency = [];
-        tur.singer.tremoloDepth = [];
-        tur.singer.rate = [];
-        tur.singer.octaves = [];
-        tur.singer.baseFrequency = [];
-        tur.singer.chorusRate = [];
-        tur.singer.delayTime = [];
-        tur.singer.chorusDepth = [];
-        tur.singer.neighborArgNote1 = [];
-        tur.singer.neighborArgNote2 = [];
-        tur.singer.neighborArgBeat = [];
-        tur.singer.neighborArgCurrentBeat = [];
-
-        tur.singer.justCounting = [];
-        tur.singer.justMeasuring = [];
-        tur.singer.firstPitch = [];
-        tur.singer.lastPitch = [];
-        tur.singer.suppressOutput = this.runningLilypond || this.runningAbc || this.runningMxml;
-
-        tur.singer.dispatchFactor = 1;
-
-        tur.painter.cp1x = 0;
-        tur.painter.cp1y = 100;
-        tur.painter.cp2x = 100;
-        tur.painter.cp2y = 100;
-
-        this._waitTimes[turtle] = 0;
-        this.inNoteBlock[turtle] = [];
-        this.multipleVoices[turtle] = false;
-        this.embeddedGraphicsFinished[turtle] = true;
-        this.invertList[turtle] = [];
-        this.beatList[turtle] = [];
-        this.factorList[turtle] = [];
-        this.switchCases[turtle] = {};
-        this.switchBlocks[turtle] = [];
         this.connectionStore[turtle] = {};
         this.connectionStoreLock = false;
-        this.keySignature[turtle] = "C " + "major";
-        this.inSetTimbre[turtle] = false;
-        this.pitchDrumTable[turtle] = {};
-        this.pickup[turtle] = 0;
-        this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
-        this.noteValuePerBeat[turtle] = 4;
-        this.currentBeat[turtle] = 0;
-        this.currentMeasure[turtle] = 0;
+        this.switchCases[turtle] = {};
+        this.switchBlocks[turtle] = [];
+        this.returns[turtle] = [];
+
         this.notation.notationStaging[turtle] = [];
         this.notation.notationDrumStaging[turtle] = [];
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
-        this.returns[turtle] = [];
-        this.defaultStrongBeats[turtle] = false;
+
+        this.turtles.ithTurtle(turtle).initTurtle();
     }
 
     /**
@@ -1377,7 +1209,9 @@ class Logo {
 
         this._checkingCompletionState = false;
 
-        this.embeddedGraphicsFinished = {};
+        for (let turtle of this.turtles.turtleList) {
+            turtle.embeddedGraphicsFinished = true;
+        }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             this._prepSynths();
@@ -1634,8 +1468,8 @@ class Logo {
 
         let tur = logo.turtles.ithTurtle(turtle);
 
-        let delay = logo.turtleDelay + logo._waitTimes[turtle];
-        logo._waitTimes[turtle] = 0;
+        let delay = logo.turtleDelay + tur.waitTime;
+        tur.doWait(0);
 
         if (!logo.stopTurtle) {
             if (logo.turtleDelay === TURTLESTEP) {
@@ -1881,7 +1715,7 @@ class Logo {
                             if (logo.blocks.visible) {
                                 logo.blocks.unhighlight(blk);
                             }
-                        }, logo.turtleDelay + logo._waitTimes[turtle]);
+                        }, logo.turtleDelay + tur.waitTime);
                     }
                 }
             }
@@ -2111,13 +1945,12 @@ class Logo {
         if (tur.singer.embeddedGraphics[blk].length === 0)
             return;
 
-        // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics
-        if (!this.embeddedGraphicsFinished[turtle]) {
+        // If the previous note's graphics are not complete, add a slight delay before drawing any new graphics
+        if (!tur.embeddedGraphicsFinished) {
             delay += 0.1;
         }
 
-        this.embeddedGraphicsFinished[turtle] = false;
+        tur.embeddedGraphicsFinished = false;
 
         let suppressOutput = tur.singer.suppressOutput;
 
@@ -2679,7 +2512,7 @@ class Logo {
 
         // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
-        this.embeddedGraphicsFinished[turtle] = true;
+        tur.embeddedGraphicsFinished = true;
     }
 }
 

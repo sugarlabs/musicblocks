@@ -804,12 +804,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
-                return getModeLength(logo.keySignature[turtle]);
+                return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
             }
         }
     }
@@ -830,12 +829,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
-                let obj = logo.keySignature[turtle].split(" ");
+                let obj = logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ");
                 return obj[1];
             }
         }
@@ -857,12 +855,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
-                return logo.keySignature[turtle].split(' ')[0];
+                return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
             }
         }
     }
@@ -886,7 +883,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.keySignature[turtle] = args[0];
+                logo.turtles.ithTurtle(turtle).singer.keySignature = args[0];
             }
         }
     }
@@ -951,23 +948,22 @@ function setupIntervalsBlocks() {
                         args[0],
                         4,
                         tur.singer.transposition,
-                        logo.keySignature[turtle],
+                        tur.singer.keySignature,
                         false,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
                     );
-                    logo.keySignature[turtle] = noteObj[0] + " " + modename;
+                    tur.singer.keySignature = noteObj[0] + " " + modename;
                     logo.notation.notationKey(turtle, noteObj[0], modename);
                 } else {
-                    logo.keySignature[turtle] = args[0] + " " + modename;
+                    tur.singer.keySignature = args[0] + " " + modename;
                     logo.notation.notationKey(turtle, args[0], modename);
                 }
 
                 if (logo.insideModeWidget) {
-                    // Ensure logo the mode for Turtle 0 is set, since it
-                    // is used by the mode widget.
-                    logo.keySignature[0] = args[0] + " " + modename;
+                    // Ensure logo the mode for Turtle 0 is set, since it is used by the mode widget
+                    logo.turtles.ithTurtle(0).singer.keySignature = args[0] + " " + modename;
                     logo.notation.notationKey(0, args[0], modename);
                 }
             }

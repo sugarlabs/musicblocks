@@ -49,6 +49,12 @@ class Turtle {
         this.singer = new Singer(this);     // for music logic
         this.painter = new Painter(this);   // for drawing logic
 
+        this._waitTime = 0;
+        this.embeddedGraphicsFinished = true;
+
+        // Widget-related attributes
+        this.inSetTimbre = false;
+
         this._blinkFinished = true;         // whether not blinking or blinking
     }
 
@@ -57,6 +63,16 @@ class Turtle {
      */
     blinking() {
         return !this._blinkFinished;
+    }
+
+    /**
+     * Sets wait duration of turtle.
+     *
+     * @param secs
+     * @returns {void}
+     */
+    doWait(secs) {
+        this._waitTime = Number(secs) * 1000;
     }
 
     /**
@@ -141,6 +157,145 @@ class Turtle {
         this._blinkFinished = true;
         this.container.visible = true;
         this.turtles.refreshCanvas();
+    }
+
+    /**
+     * Initialises turtle state variables.
+     *
+     * @returns {void}
+     */
+    initTurtle() {
+        this.doWait(0);
+        this.endOfClampSignals = {};
+        this.butNotThese = {};
+
+        this.embeddedGraphicsFinished = true;
+
+        this.inSetTimbre = false;
+
+        this.painter.cp1x = 0;
+        this.painter.cp1y = 100;
+        this.painter.cp2x = 100;
+        this.painter.cp2y = 100;
+
+        /** @deprecated */  this.singer.attack = [];
+        /** @deprecated */  this.singer.decay = [];
+        /** @deprecated */  this.singer.sustain = [];
+        /** @deprecated */  this.singer.release = [];
+
+        this.singer.scalarTransposition = 0;
+        this.singer.scalarTranspositionValues = [];
+        this.singer.transposition = 0;
+        this.singer.transpositionValues = [];
+
+        this.singer.register = 0;
+        this.singer.beatFactor = 1;
+        this.singer.dotCount = 0;
+        this.singer.noteBeat = {};
+        this.singer.noteValue = {};
+        this.singer.oscList = {};
+        this.singer.noteDrums = {};
+        this.singer.notePitches = {};
+        this.singer.noteOctaves = {};
+        this.singer.noteCents = {};
+        this.singer.noteHertz = {};
+        this.singer.noteBeatValues = {};
+        this.singer.embeddedGraphics = {};
+        this.singer.lastNotePlayed = null;
+        this.singer.previousNotePlayed = null;
+        this.singer.noteStatus = null;
+        this.singer.noteDirection = 0;
+        this.singer.pitchNumberOffset = 39;
+        this.singer.currentOctave = 4;
+        this.singer.inHarmonic = [];
+        this.singer.partials = [];
+        this.singer.inNeighbor = [];
+        this.singer.neighborStepPitch = [];
+        this.singer.neighborNoteValue = [];
+        this.singer.inDefineMode = false;
+        this.singer.defineMode = [];
+
+        this.singer.notesPlayed = [0, 1];
+        this.singer.whichNoteToCount = 1;
+        this.singer.moveable = false;
+
+        this.singer.bpm = [];
+        this.singer.previousTurtleTime = 0;
+        this.singer.turtleTime = 0;
+        this.singer.pushedNote = false;
+        this.singer.duplicateFactor = 1;
+        this.singer.inDuplicate = false;
+        this.singer.skipFactor = 1;
+        this.singer.skipIndex = 0;
+        this.singer.instrumentNames = ["electronic synth"];
+        this.singer.inCrescendo = [];
+        this.singer.crescendoDelta = [];
+        this.singer.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
+        this.singer.intervals = [];
+        this.singer.semitoneIntervals = [];
+        this.singer.staccato = [];
+        this.singer.glide = [];
+        this.singer.glideOverride = 0;
+        this.singer.swing = [];
+        this.singer.swingTarget = [];
+        this.singer.swingCarryOver = 0;
+        this.singer.tie = false;
+        this.singer.tieNotePitches = [];
+        this.singer.tieNoteExtras = [];
+        this.singer.tieCarryOver = 0;
+        this.singer.tieFirstDrums = [];
+        this.singer.drift = 0;
+        this.singer.drumStyle = [];
+        this.singer.voices = [];
+        this.singer.backward = [];
+
+        this.singer.vibratoIntensity = [];
+        this.singer.vibratoRate = [];
+        this.singer.distortionAmount = [];
+        this.singer.tremoloFrequency = [];
+        this.singer.tremoloDepth = [];
+        this.singer.rate = [];
+        this.singer.octaves = [];
+        this.singer.baseFrequency = [];
+        this.singer.chorusRate = [];
+        this.singer.delayTime = [];
+        this.singer.chorusDepth = [];
+        this.singer.neighborArgNote1 = [];
+        this.singer.neighborArgNote2 = [];
+        this.singer.neighborArgBeat = [];
+        this.singer.neighborArgCurrentBeat = [];
+
+        this.singer.inNoteBlock = [];
+        this.singer.multipleVoices = false;
+        this.singer.invertList = [];
+        this.singer.beatList = [];
+        this.singer.factorList = [];
+        this.singer.keySignature = "C " + "major";
+        this.singer.pitchDrumTable = {};
+        this.singer.defaultStrongBeats = false;
+
+        this.singer.pickup = 0;
+        this.singer.beatsPerMeasure = 4;         // default is 4/4 time
+        this.singer.noteValuePerBeat = 4;
+        this.singer.currentBeat = 0;
+        this.singer.currentMeasure = 0;
+
+        this.singer.justCounting = [];
+        this.singer.justMeasuring = [];
+        this.singer.firstPitch = [];
+        this.singer.lastPitch = [];
+        this.singer.suppressOutput = this.runningLilypond || this.runningAbc || this.runningMxml;
+
+        this.singer.dispatchFactor = 1;
+    }
+
+    // ================================ CONTROLLER ============================
+
+    /**
+     * @returns {Number} waiting delay of Turtle
+     */
+    get waitTime() {
+        return this._waitTime;
     }
 
     // ================================ MODEL =================================

@@ -5179,6 +5179,7 @@ function Activity() {
 
         document.onkeydown = __keyPressed;
         _hideStopButton();
+        planet.planet.setAnalyzeProject(analyzeProject)
     };
 }
 

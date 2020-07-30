@@ -247,8 +247,8 @@ function setupMediaBlocks() {
 
             if (args.length === 1) {
                 if (logo.meSpeak !== null) {
-                    if (logo.inNoteBlock[turtle].length > 0) {
-                        tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                    if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
                         if (!tur.singer.suppressOutput) {
                             logo.processSpeak(args[0]);
@@ -404,9 +404,7 @@ function setupMediaBlocks() {
                         note
                     )
                 );
-                return Math.round(
-                    pitchToFrequency(note, octave, 0, logo.keySignature[turtle])
-                );
+                return Math.round(pitchToFrequency(note, octave, 0, tur.singer.keySignature));
             } else {
                 const NOTENAMES = [
                     "A",
@@ -561,8 +559,8 @@ function setupMediaBlocks() {
             let tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 2) {
-                if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (!tur.singer.suppressOutput) {
                         logo.processShow(turtle, blk, args[0], args[1]);

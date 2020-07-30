@@ -583,7 +583,7 @@ function PitchTimeMatrix() {
                         this.rowLabels[i],
                         this.rowArgs[i],
                         0,
-                        this._logo.keySignature[0],
+                        this._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         this._logo.errorMsg,
@@ -1909,7 +1909,7 @@ function PitchTimeMatrix() {
                         label,
                         octave,
                         0,
-                        that._logo.keySignature[0],
+                        that._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         that._logo.errorMsg,
@@ -1989,7 +1989,7 @@ function PitchTimeMatrix() {
                     that.rowLabels[index],
                     that.rowArgs[index],
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2034,7 +2034,7 @@ function PitchTimeMatrix() {
                     label,
                     octave,
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2271,7 +2271,7 @@ function PitchTimeMatrix() {
                 sortableList.push([
                     noteToFrequency(
                         this.rowLabels[i] + this.rowArgs[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     this.rowLabels[i],
                     this.rowArgs[i],

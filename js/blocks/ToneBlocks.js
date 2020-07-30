@@ -876,7 +876,9 @@ function setupToneBlocks() {
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
-                logo.inSetTimbre[turtle] = true;
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                tur.inSetTimbre = true;
 
                 let synth = args[0];
                 for (let voice in VOICENAMES) {
@@ -893,8 +895,6 @@ function setupToneBlocks() {
                     logo.pitchTimeMatrix._instrumentName = synth;
                 }
 
-                let tur = logo.turtles.ithTurtle(turtle);
-
                 if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                     tur.singer.instrumentNames.push(synth);
                     logo.synth.loadSynth(turtle, synth);
@@ -909,7 +909,7 @@ function setupToneBlocks() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = event => {
-                    logo.inSetTimbre[turtle] = false;
+                    tur.inSetTimbre = false;
                     tur.singer.instrumentNames.pop();
                 };
 

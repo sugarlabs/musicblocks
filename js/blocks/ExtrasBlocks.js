@@ -382,15 +382,13 @@ function setupExtrasBlocks() {
             let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             let blockNumber = logo.blocks.blockList.length;
 
-            let x = logo.turtles.turtleX2screenX(
-                logo.turtles.turtleList[turtle].x
-            );
-            let y = logo.turtles.turtleY2screenY(
-                logo.turtles.turtleList[turtle].y
-            );
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            // We need to wait for the new block to load before continuing.
-            logo.doWait(turtle, 1);
+            let x = logo.turtles.turtleX2screenX(tur.x);
+            let y = logo.turtles.turtleY2screenY(tur.y);
+
+            // We need to wait for the new block to load before continuing
+            tur.doWait(1);
 
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
@@ -789,7 +787,7 @@ function setupExtrasBlocks() {
                 let noteBeatValue = bpmFactor / (1 / args[0]);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 tur.singer.turtleTime += noteBeatValue;
-                logo.doWait(turtle, args[0]);
+                tur.doWait(args[0]);
             }
         }
     }
@@ -861,7 +859,7 @@ function setupExtrasBlocks() {
                                 logo.textMsg(args[0].toString());
                             }
                         } else if (logo.runningLilypond) {
-                            if (logo.inNoteBlock[turtle].length > 0) {
+                            if (tur.singer.inNoteBlock.length > 0) {
                                 logo.notation.notationMarkup(turtle, args[0].toString());
                             }
                         }
