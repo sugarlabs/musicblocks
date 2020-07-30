@@ -879,7 +879,6 @@ function Palette(palettes, name) {
 
             //use artwork.js strings as images for : cameraPALETTE,videoPALETTE,mediaPALETTE
             if (b.image){
-                console.log(b);
                 img = makePaletteIcons(
                     eval(b.blkname+"PALETTE")
                 );
