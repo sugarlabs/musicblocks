@@ -2474,7 +2474,6 @@ function Activity() {
             toolbar.disableTooltips($j);
         } else {
             palettes.setMobile(false);
-            palettes.bringToTop();
         }
 
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -2747,7 +2746,6 @@ function Activity() {
             hideBlocksContainer[0].visible = true;
             blocks.showBlocks();
             palettes.show();
-            palettes.bringToTop();
         }
 
         // Combine block and palette visibility into one button.
@@ -4644,11 +4642,8 @@ function Activity() {
 
         palettes = new Palettes();
         palettes
-            .setCanvas(canvas)
-            .setRefreshCanvas(refreshCanvas)
             .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
-            .setTrashcan(trashcan)
             .setSearch(showSearchWidget, hideSearchWidget)
             .setBlocks(blocks)
             .init();
@@ -5388,8 +5383,6 @@ function Activity() {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
-
-                            palettes.bringToTop();
                         }, 1000);
 
                         document.body.style.cursor = "default";

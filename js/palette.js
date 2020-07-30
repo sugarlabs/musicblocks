@@ -16,27 +16,12 @@ const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
-function maxPaletteHeight(menuSize, scale) {
-    // Palettes don't start at the top of the screen and the last
-    // block in a palette cannot start at the bottom of the screen,
-    // hence - 2 * menuSize.
-
-    // var h = (windowHeight() * canvasPixelRatio()) / scale - (2 * menuSize);
-    var h = windowHeight() / scale - 2 * menuSize;
-    return h - (h % STANDARDBLOCKHEIGHT) + STANDARDBLOCKHEIGHT / 2;
-}
-
 function paletteBlockButtonPush(blocks, name, arg) {
     var blk = blocks.makeBlock(name, arg);
     return blk;
 }
 
 // There are several components to the palette system:
-//
-// (1) A palette button (in the Palettes.buttons dictionary) is a
-// button that envokes a palette; The buttons have artwork associated
-// with them: a bitmap and a highlighted bitmap that is shown when the
-// mouse is over the button. (The artwork is found in artwork.js.)
 //
 // loadPaletteButtonHandler is the event handler for palette buttons.
 //
@@ -50,24 +35,13 @@ function paletteBlockButtonPush(blocks, name, arg) {
 const NPALETTES = 3;
 
 function Palettes() {
-    this.canvas = null;
     this.blocks = null;
-    this.refreshCanvas = null;
-    this.stage = null;
     this.cellSize = null;
     this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
     this.scrollDiff = 0;
     this.originalSize = 55; // this is the original svg size
-    this.trashcan = null;
     this.firstTime = true;
     this.background = null;
-    this.circles = {};
-    // paletteText is used for the highlighted tooltip
-    this.paletteText = new createjs.Text(
-        "",
-        "20px Sans",
-        platformColor.paletteText
-    );
     this.mouseOver = false;
     this.activePalette = null;
     this.paletteObject = null;
@@ -123,11 +97,11 @@ function Palettes() {
             element.setAttribute("id","palette");
             element.setAttribute("class","disable_highlighting");
             element.setAttribute("style",'position: fixed; display: none ; left :0px; top:'+this.top+'px');
-            element.innerHTML ='<table style="float: left" bgcolor="white"><thead><tr></tr></thead><tbody></tbody></table>'
+            element.innerHTML ='<div style="float: left"><table width ="'+(1.5*this.cellSize)+'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="'+(4.5*this.cellSize)+'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>'
             document.body.appendChild(element);
         }
             let palette = document.getElementById("palette");
-            let tr = palette.children[0].children[0].children[0]
+            let tr = palette.children[0].children[0].children[0].children[0];
             let td = tr.insertCell();
             td.width=1.5*this.cellSize;
             td.height=1.5*this.cellSize;
@@ -140,14 +114,13 @@ function Palettes() {
                 .replace(/fill_color/g, platformColor.background)
                 ,1.5*this.cellSize
                 ,1.5*this.cellSize))
-            var listBody = palette.children[0].children[1];
             td.onmouseover = (evt) =>{
-                this.showSelectionnew(i,tr);
-                this.makePalettesNew(i);
+                this.showSelection(i,tr);
+                this.makePalettes(i);
             }
     };
 
-    this.showSelectionnew = (i,tr) => {
+    this.showSelection = (i,tr) => {
         //selector menu design.
         for (var j = 0; j < MULTIPALETTES.length ; j++) {
             let img;
@@ -175,29 +148,6 @@ function Palettes() {
             tr.children[j].children[0].src= img.src;
         }
     }
-
-    this.showSelection = function(i) {
-    };
-
-    this.setCanvas = function(canvas) {
-        this.canvas = canvas;
-        return this;
-    };
-
-    this.setStage = function(stage) {
-        this.stage = stage;
-        return this;
-    };
-
-    this.setRefreshCanvas = function(refreshCanvas) {
-        this.refreshCanvas = refreshCanvas;
-        return this;
-    };
-
-    this.setTrashcan = function(trashcan) {
-        this.trashcan = trashcan;
-        return this;
-    };
 
     this.setSize = function(size) {
         this.cellSize = Math.floor(size * PALETTE_SCALE_FACTOR + 0.5);
@@ -260,25 +210,6 @@ function Palettes() {
         return n;
     };
 
-    this._updateButtonMasks = function() {
-        for (var name in this.buttons) {
-            var s = new createjs.Shape();
-            s.graphics.r(0, 0, this.cellSize, windowHeight() / this.scale);
-            s.x = 0;
-            s.y = this.cellSize / 2;
-            this.buttons[name].mask = s;
-        }
-    };
-
-    this.hidePaletteIconCircles = function() {
-        // paletteText might not be defined yet.
-        if (!sugarizerCompatibility.isInsideSugarizer()) {
-            hidePaletteNameDisplay(this.paletteText, this.stage);
-        }
-
-        hideButtonHighlight(this.circles, this.stage);
-    };
-
     this.getProtoNameAndPalette = function(name) {
         for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
@@ -303,15 +234,11 @@ function Palettes() {
         return [null, null, null];
     };
 
-    this.makePalettes = function(hide) {
-        makePalettesNew(0);
-    };
-
-    this.makePalettesNew = function(i) {
+    this.makePalettes = function(i) {
         let palette = docById("palette");
-        let listBody = palette.children[0].children[1];
+        let listBody = palette.children[0].children[1].children[1];
         listBody.parentNode.removeChild(listBody);
-        listBody = palette.children[0].appendChild(document.createElement("tbody"));
+        listBody = palette.children[0].children[1].appendChild(document.createElement("tbody"));
         // Make an icon/button for each palette
         this.makeButton(
             "search",
@@ -353,16 +280,16 @@ function Palettes() {
     this.makeButton = function (name,icon,listBody){
         let row = listBody.insertRow(-1);
         let img = row.insertCell(-1);
-        let label = row.insertCell(-1).appendChild(document.createElement("p"));
-        label.setAttribute("style","width: 10px ; height: 12px");
+        let label = row.insertCell(-1);
         img.appendChild(icon);
         // Add tooltip for palette buttons
+        row.setAttribute("style","width: 126px");
         if (localStorage.kanaPreference === "kana") {
             label.textContent = toTitleCase(_(name)) ;
-            //label.setAttribute("style","font-size: 12px; color:platformColor.paletteText");
+            label.setAttribute("style","font-size: 12px; color:platformColor.paletteText");
         } else {
             label.textContent = toTitleCase(_(name)) ;
-            //label.setAttribute("style","font-size: 16px; color:platformColor.paletteText");
+            label.setAttribute("style","font-size: 16px; color:platformColor.paletteText");
         }
 
         this._loadPaletteButtonHandler(name,row);
@@ -454,47 +381,6 @@ function Palettes() {
     this.add = function(name) {
         this.dict[name] = new Palette(this, name);
         return this;
-    };
-
-    this.remove = function(name) {
-
-        for (
-            var btnKey = btnKeys.indexOf(name) + 1;
-            btnKey < btnKeys.length;
-            btnKey++
-        ) {
-            this.buttons[btnKeys[btnKey]].y -= this.cellSize;
-        }
-        delete this.buttons[name];
-        delete this.labels[name];
-        delete this.dict[name];
-        this.y -= this.cellSize;
-        this.makePalettes(true);
-    };
-
-    this.bringToTop = function() {
-
-    };
-
-    this.findPalette = function(x, y) {
-        for (var name in this.dict) {
-            var px = this.dict[name].menuContainer.x;
-            var py = this.dict[name].menuContainer.y;
-            var height = Math.min(
-                maxPaletteHeight(this.cellSize, this.scale),
-                this.dict[name].y
-            );
-            if (
-                this.dict[name].menuContainer.visible &&
-                px < x &&
-                x < px + MENUWIDTH * PROTOBLOCKSCALE &&
-                py < y &&
-                y < py + height
-            ) {
-                return this.dict[name];
-            }
-        }
-        return null;
     };
 
     // Palette Button event handlers
@@ -903,15 +789,16 @@ function Palette(palettes, name) {
         x.setAttribute("style","float: left");
         x.innerHTML= '<thead></thead><tbody style = "display: block; height: '+(window.innerHeight-this.palettes.top-this.palettes.cellSize-15)+'px; overflow: auto;" id ="PaletteBody_items" class="PalScrol"></tbody>'
         palDiv.appendChild(x)
+
         let buttonContainers = document.createDocumentFragment();
         let down = makePaletteIcons(DOWNICON,15,15);
         down.style.position = "relative";
         down.style.left = "-10px";
         down.style.top = (window.innerHeight-this.palettes.top-this.palettes.cellSize-20)+"px";
         buttonContainers.appendChild(down);
+
         this.menuContainer=x ;
         docById("PaletteBody_items").onscroll = () => {
-            console.debug("scrolling");
             let list = docById("PaletteBody_items");
             if( list.scrollTop >= (list.scrollHeight - list.offsetHeight)){
                 down.style.visibility = "hidden";
@@ -951,6 +838,7 @@ function Palette(palettes, name) {
             header.children[1].appendChild(closeImg);
             header.children[1].appendChild(buttonContainers) ;
         }
+
         this._showMenuItems();
     };
 
@@ -1145,13 +1033,6 @@ function Palette(palettes, name) {
             else this.protoList.push(protoblock);
         }
         return this;
-    };
-
-    this._restoreProtoblock = function(name, x, y) {
-        // Return protoblock we've been dragging back to the palette.
-        this.protoContainers[name].x = x;
-        this.protoContainers[name].y = y;
-        // console.debug('restore ' + name);
     };
 
     this.makeBlockFromSearch = function(protoblk, blkname, callback) {
@@ -1489,7 +1370,7 @@ async function initPalettes(palettes) {
     }
 
     palettes.init_selectors();
-    palettes.makePalettesNew(0);
+    palettes.makePalettes(0);
     console.debug("Time to show the palettes.");
     palettes.show();
 }
@@ -1498,9 +1379,6 @@ const MODEUNSURE = 0;
 const MODEDRAG = 1;
 const MODESCROLL = 2;
 const DECIDEDISTANCE = 20;
-
-function makePaletteBitmap(palette, data, name, callback, extras) {
-}
 
 function makePaletteIcons(data,width,height)  {
     let img = new Image();
