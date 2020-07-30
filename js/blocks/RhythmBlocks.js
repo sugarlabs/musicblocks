@@ -495,7 +495,7 @@ function setupRhythmBlocks() {
                         TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
                     // Wait until this note is played before continuing
-                    logo.doWait(turtle, bpmFactor / noteValue);
+                    tur.doWait(bpmFactor / noteValue);
 
                     logo.inNoteBlock[turtle].pop();
 

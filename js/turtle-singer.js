@@ -1369,14 +1369,8 @@ class Singer {
                         logo.inNoteBlock[turtle].pop();
 
                         if (!tur.singer.suppressOutput) {
-                            logo.doWait(
-                                turtle,
-                                Math.max(
-                                    bpmFactor / tur.singer.tieCarryOver +
-                                    logo.noteDelay / 1000 -
-                                    turtleLag,
-                                    0
-                                )
+                            tur.doWait(
+                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
                             );
                         }
 
@@ -1480,17 +1474,9 @@ class Singer {
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (logo.inNoteBlock[turtle].length === 1) {
-                    tur.singer.turtleTime += bpmFactor / duration + logo.noteDelay / 1000;
+                    tur.singer.turtleTime += bpmFactor / duration;
                     if (!tur.singer.suppressOutput) {
-                        logo.doWait(
-                            turtle,
-                            Math.max(
-                                bpmFactor / duration +
-                                logo.noteDelay / 1000 -
-                                turtleLag,
-                                0
-                            )
-                        );
+                        tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
                     }
                 }
             }
@@ -2197,13 +2183,7 @@ class Singer {
             };
 
             if (last(logo.inNoteBlock[turtle]) != null) {
-                if (logo.noteDelay === 0 || !tur.singer.suppressOutput) {
-                    __playnote();
-                } else {
-                    setTimeout(function () {
-                        __playnote();
-                    }, logo.noteDelay);
-                }
+                __playnote();
             }
         }
 

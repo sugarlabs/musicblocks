@@ -121,7 +121,6 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
-        this._waitTimes = {};
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -161,9 +160,7 @@ class Logo {
         this.currentBeat = {};
         this.currentMeasure = {};
 
-        // Parameters used by the note block
-        this._noteDelay = 0;
-
+        // Parameters used by duplicate block
         this.connectionStore = {};
         this.connectionStoreLock = false;
 
@@ -467,7 +464,6 @@ class Logo {
      */
     set turtleDelay(turtleDelay) {
         this._turtleDelay = turtleDelay;
-        this._noteDelay = 0;
     }
 
     /**
@@ -475,21 +471,6 @@ class Logo {
      */
     get turtleDelay() {
         return this._turtleDelay;
-    }
-
-    /**
-     * @param {number} noteDelay - pause between each note as the program executes
-     */
-    set noteDelay(noteDelay) {
-        this._noteDelay = noteDelay;
-        this._turtleDelay = 0;
-    }
-
-    /**
-     * @returns {Number} pause between each note as the program executes
-     */
-    get noteDelay() {
-        return this._noteDelay;
     }
 
     /**
@@ -1006,17 +987,6 @@ class Logo {
     // ========================================================================
 
     /**
-     * Sets wait duration of turtle.
-     *
-     * @param turtle
-     * @param secs
-     * @returns {void}
-     */
-    doWait(turtle, secs) {
-        this._waitTimes[turtle] = Number(secs) * 1000;
-    }
-
-    /**
      * Clears the delay timeout after a successful input, and runs from next block.
      *
      * @param {Object} turtle
@@ -1107,8 +1077,12 @@ class Logo {
      * @returns {void}
      */
     initTurtle(turtle) {
+        this.connectionStore[turtle] = {};
+        this.connectionStoreLock = false;
+
         let tur = this.turtles.ithTurtle(turtle);
 
+        tur.doWait(0);
         tur.endOfClampSignals = {};
         tur.butNotThese = {};
 
@@ -1213,7 +1187,6 @@ class Logo {
         tur.painter.cp2x = 100;
         tur.painter.cp2y = 100;
 
-        this._waitTimes[turtle] = 0;
         this.inNoteBlock[turtle] = [];
         this.multipleVoices[turtle] = false;
         this.embeddedGraphicsFinished[turtle] = true;
@@ -1222,8 +1195,6 @@ class Logo {
         this.factorList[turtle] = [];
         this.switchCases[turtle] = {};
         this.switchBlocks[turtle] = [];
-        this.connectionStore[turtle] = {};
-        this.connectionStoreLock = false;
         this.keySignature[turtle] = "C " + "major";
         this.inSetTimbre[turtle] = false;
         this.pitchDrumTable[turtle] = {};
@@ -1634,8 +1605,8 @@ class Logo {
 
         let tur = logo.turtles.ithTurtle(turtle);
 
-        let delay = logo.turtleDelay + logo._waitTimes[turtle];
-        logo._waitTimes[turtle] = 0;
+        let delay = logo.turtleDelay + tur.waitTime;
+        tur.doWait(0);
 
         if (!logo.stopTurtle) {
             if (logo.turtleDelay === TURTLESTEP) {
@@ -1881,7 +1852,7 @@ class Logo {
                             if (logo.blocks.visible) {
                                 logo.blocks.unhighlight(blk);
                             }
-                        }, logo.turtleDelay + logo._waitTimes[turtle]);
+                        }, logo.turtleDelay + tur.waitTime);
                     }
                 }
             }

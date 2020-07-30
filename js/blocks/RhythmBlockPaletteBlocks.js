@@ -145,7 +145,7 @@ function setupRhythmBlockPaletteBlocks() {
                     );
                 }
 
-                logo.doWait(turtle, (arg0 - 1) * beatValue);
+                tur.doWait((arg0 - 1) * beatValue);
             }
         }
     }
@@ -530,7 +530,7 @@ function setupRhythmBlockPaletteBlocks() {
                         totalBeats += beatValue;
                     }
 
-                    logo.doWait(turtle, totalBeats - beatValue);
+                    tur.doWait(totalBeats - beatValue);
                 }
             };
 
@@ -719,7 +719,7 @@ function setupRhythmBlockPaletteBlocks() {
                     );
                 }
 
-                logo.doWait(turtle, (arg0 - 1) * beatValue);
+                tur.doWait((arg0 - 1) * beatValue);
             }
         }
     }

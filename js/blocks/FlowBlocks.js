@@ -161,8 +161,7 @@ function setupFlowBlocks() {
 
                 logo.connectionStoreLock = true;
 
-                // Check to see if another turtle has already disconnected
-                // these blocks.
+                // Check to see if another turtle has already disconnected these blocks
                 let otherTurtle = __lookForOtherTurtles(blk, turtle);
                 if (otherTurtle != null) {
                     // Copy the connections and queue the blocks.
@@ -482,7 +481,7 @@ function setupFlowBlocks() {
                 let queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
-                logo.doWait(0.05);
+                tur.doWait(0.05);
             } else {
                 // Since a wait for block was requeued each
                 // time, we need to flush the queue of all but

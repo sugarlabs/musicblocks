@@ -50,6 +50,7 @@ class Turtle {
         this.painter = new Painter(this);   // for drawing logic
 
         this._blinkFinished = true;         // whether not blinking or blinking
+        this._waitTime = 0;
     }
 
     /**
@@ -57,6 +58,16 @@ class Turtle {
      */
     blinking() {
         return !this._blinkFinished;
+    }
+
+    /**
+     * Sets wait duration of turtle.
+     *
+     * @param secs
+     * @returns {void}
+     */
+    doWait(secs) {
+        this._waitTime = Number(secs) * 1000;
     }
 
     /**
@@ -141,6 +152,15 @@ class Turtle {
         this._blinkFinished = true;
         this.container.visible = true;
         this.turtles.refreshCanvas();
+    }
+
+    // ================================ CONTROLLER ============================
+
+    /**
+     * @returns {Number} waiting delay of Turtle
+     */
+    get waitTime() {
+        return this._waitTime;
     }
 
     // ================================ MODEL =================================
