@@ -288,7 +288,7 @@ function setupDrumBlocks() {
 
             let __listener = event => {
                 tur.singer.drumStyle.pop();
-                logo.pitchDrumTable[turtle] = {};
+                tur.singer.pitchDrumTable = {};
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

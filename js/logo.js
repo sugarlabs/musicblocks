@@ -103,7 +103,6 @@ class Logo {
         this.actions = {};
         this.returns = {};
         this.turtleHeaps = {};
-        this.defaultStrongBeats = {}
 
         // We store each case arg and flow by switch block no. and turtle
         this.switchCases = {};
@@ -138,7 +137,6 @@ class Logo {
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
-        this.inSetTimbre = {};
 
         // pitch-rhythm matrix
         this.inMatrix = false;
@@ -147,13 +145,6 @@ class Logo {
         this.drumBlocks = [];
         this.pitchBlocks = [];
 
-        // Parameters used in time signature
-        this.pickup = {};
-        this.beatsPerMeasure = {};
-        this.noteValuePerBeat = {};
-        this.currentBeat = {};
-        this.currentMeasure = {};
-
         // Parameters used by duplicate block
         this.connectionStore = {};
         this.connectionStoreLock = false;
@@ -161,9 +152,6 @@ class Logo {
         // tuplet
         this.tuplet = false;
         this.tupletParams = [];
-
-        // pitch to drum mapping
-        this.pitchDrumTable = {};
 
         // object that deals with notations
         this._notation = new Notation(this);
@@ -912,7 +900,7 @@ class Logo {
         // Don't split the note if we are already splitting the note
         if (split == undefined) split = true;
 
-        let tur = logo.turtles.ithTurtle(turtle);
+        let tur = this.turtles.ithTurtle(turtle);
 
         // Check to see if this note straddles a measure boundary
         let durationTime = 1 / duration;
@@ -920,19 +908,18 @@ class Logo {
             (
                 (
                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                    this.pickup[turtle] -
+                    tur.singer.pickup -
                     durationTime
-                ) * this.noteValuePerBeat[turtle]
-            ) % this.beatsPerMeasure[turtle];
-        let timeIntoMeasure = beatsIntoMeasure / this.noteValuePerBeat[turtle];
+                ) * tur.singer.noteValuePerBeat
+            ) % tur.singer.beatsPerMeasure;
+        let timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
         let timeLeftInMeasure =
-            this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle] -
-            timeIntoMeasure;
+            tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
             let d = durationTime - timeLeftInMeasure;
             let d2 = timeLeftInMeasure;
-            let b = this.beatsPerMeasure[turtle] / this.noteValuePerBeat[turtle];
+            let b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
             console.debug("splitting note across measure boundary.");
             let obj = rationalToFraction(d);
 
@@ -1073,12 +1060,22 @@ class Logo {
     initTurtle(turtle) {
         this.connectionStore[turtle] = {};
         this.connectionStoreLock = false;
+        this.returns[turtle] = [];
 
         let tur = this.turtles.ithTurtle(turtle);
 
         tur.doWait(0);
         tur.endOfClampSignals = {};
         tur.butNotThese = {};
+
+        tur.embeddedGraphicsFinished = true;
+
+        tur.inSetTimbre = false;
+
+        tur.painter.cp1x = 0;
+        tur.painter.cp1y = 100;
+        tur.painter.cp2x = 100;
+        tur.painter.cp2y = 100;
 
         /** @deprecated */  tur.singer.attack = [];
         /** @deprecated */  tur.singer.decay = [];
@@ -1174,6 +1171,14 @@ class Logo {
         tur.singer.beatList = [];
         tur.singer.factorList = [];
         tur.singer.keySignature = "C " + "major";
+        tur.singer.pitchDrumTable = {};
+        tur.singer.defaultStrongBeats = false;
+
+        tur.singer.pickup = 0;
+        tur.singer.beatsPerMeasure = 4;         // default is 4/4 time
+        tur.singer.noteValuePerBeat = 4;
+        tur.singer.currentBeat = 0;
+        tur.singer.currentMeasure = 0;
 
         tur.singer.justCounting = [];
         tur.singer.justMeasuring = [];
@@ -1183,29 +1188,13 @@ class Logo {
 
         tur.singer.dispatchFactor = 1;
 
-        tur.embeddedGraphicsFinished = true;
-
-        tur.painter.cp1x = 0;
-        tur.painter.cp1y = 100;
-        tur.painter.cp2x = 100;
-        tur.painter.cp2y = 100;
-
         this.switchCases[turtle] = {};
         this.switchBlocks[turtle] = [];
 
-        this.inSetTimbre[turtle] = false;
-        this.pitchDrumTable[turtle] = {};
-        this.pickup[turtle] = 0;
-        this.beatsPerMeasure[turtle] = 4;       // default is 4/4 time
-        this.noteValuePerBeat[turtle] = 4;
-        this.currentBeat[turtle] = 0;
-        this.currentMeasure[turtle] = 0;
         this.notation.notationStaging[turtle] = [];
         this.notation.notationDrumStaging[turtle] = [];
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
-        this.returns[turtle] = [];
-        this.defaultStrongBeats[turtle] = false;
     }
 
     /**

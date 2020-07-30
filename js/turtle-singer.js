@@ -145,6 +145,18 @@ class Singer {
         this.factorList = [];
         this.keySignature = "C " + "major";
 
+        // pitch to drum mapping
+        this.pitchDrumTable = {};
+
+        this.defaultStrongBeats = false;
+
+        // Parameters used in time signature
+        this.pickup = 0;
+        this.beatsPerMeasure = 4;
+        this.noteValuePerBeat = 4;
+        this.currentBeat = 0;
+        this.currentMeasure = 0;
+
         // When counting notes, measuring intervals, or generating lilypond output
         this.justCounting = [];
         this.justMeasuring = [];
@@ -715,7 +727,7 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     let drumname = last(tur.singer.drumStyle);
-                    logo.pitchDrumTable[turtle][noteObj[0] + noteObj[1]] = drumname;
+                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                 }
 
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
@@ -783,7 +795,7 @@ class Singer {
                 null,
                 logo.errorMsg
             );
-            logo.pitchDrumTable[turtle][noteObj1[0] + noteObj1[1]] = drumname;
+            tur.singer.pitchDrumTable[noteObj1[0] + noteObj1[1]] = drumname;
         } else if (logo.inPitchStaircase) {
             let frequency = pitchToFrequency(note, octave, 0, tur.singer.keySignature);
             let noteObj1 = getNote(
@@ -896,18 +908,18 @@ class Singer {
         // Use the outer most note when nesting to determine the beat and triggering
         if (tur.singer.inNoteBlock.length === 0) {
             let beatValue, measureValue;
-            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
+            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                 beatValue = measureValue = 0;
             } else {
-                let beat = logo.noteValuePerBeat[turtle] * (
-                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - logo.pickup[turtle]
+                let beat = tur.singer.noteValuePerBeat * (
+                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup
                 );
-                beatValue = 1 + beat % logo.beatsPerMeasure[turtle];
-                measureValue = 1 + Math.floor(beat / logo.beatsPerMeasure[turtle]);
+                beatValue = 1 + beat % tur.singer.beatsPerMeasure;
+                measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
             }
 
-            logo.currentBeat[turtle] = beatValue;
-            logo.currentMeasure[turtle] = measureValue;
+            tur.singer.currentBeat = beatValue;
+            tur.singer.currentMeasure = measureValue;
 
             /**
              * Queue any beat actions.
@@ -930,8 +942,7 @@ class Singer {
                 logo.stage.dispatchEvent("__offbeat_" + turtleID + "__");
             }
 
-            let thisBeat =
-                beatValue + logo.beatsPerMeasure[turtle] * (logo.currentMeasure[turtle] - 1);
+            let thisBeat = beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1);
             for (let f = 0; f < tur.singer.factorList.length; f++) {
                 if (thisBeat % tur.singer.factorList[f] === 0) {
                     _enqueue();
@@ -1060,7 +1071,7 @@ class Singer {
         let filters = null;
 
         // Apply any effects and filters associated with a custom timbre
-        if (logo.inSetTimbre[turtle] && last(tur.singer.instrumentNames)) {
+        if (tur.inSetTimbre && last(tur.singer.instrumentNames)) {
             let name = last(tur.singer.instrumentNames);
 
             if (name in instrumentsEffects[turtle]) {
@@ -1939,10 +1950,9 @@ class Singer {
                                         );
                                     }
                                 } else {
-                                    for (var d = 0; d < notes.length; d++) {
+                                    for (let d = 0; d < notes.length; d++) {
                                         if (
-                                            notes[d] in
-                                            logo.pitchDrumTable[turtle] &&
+                                            notes[d] in tur.singer.pitchDrumTable &&
                                             // Don't play drum if settimbre encountered
                                             !hasSetTimbreInSetDrum
                                         ) {
@@ -1952,9 +1962,7 @@ class Singer {
                                                     turtle,
                                                     notes[d],
                                                     beatValue,
-                                                    logo.pitchDrumTable[turtle][
-                                                    notes[d]
-                                                    ],
+                                                    tur.singer.pitchDrumTable[notes[d]],
                                                     null,
                                                     null,
                                                     false

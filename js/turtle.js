@@ -52,6 +52,9 @@ class Turtle {
         this._waitTime = 0;
         this.embeddedGraphicsFinished = true;
 
+        // Widget-related attributes
+        this.inSetTimbre = false;
+
         this._blinkFinished = true;         // whether not blinking or blinking
     }
 
