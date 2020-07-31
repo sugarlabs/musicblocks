@@ -1003,18 +1003,48 @@ function Activity() {
                 if (logo.blocks.blockList[stacks[i]].name === "start") {
                     let bottomBlock;
                     bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
+                    let connectionsSetKey;
+                    let movable;
+                    if (KeySignatureEnv[2]) {
+                        blocks._makeNewBlockWithConnections(
+                            "movable",
+                            0,
+                            [stacks[i], null, null],
+                            null,
+                            null
+                        );
+                        movable = logo.blocks.blockList.length - 1;
+                        blocks._makeNewBlockWithConnections(
+                            "boolean",
+                            0,
+                            [movable],
+                            null,
+                            null
+                        );
+                        logo.blocks.blockList[movable].connections[1] =
+                        logo.blocks.blockList.length - 1;
+                        connectionsSetKey = [movable, null, null, bottomBlock];
+                    } else {
+                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                    }
 
-                    let connection = [stacks[i], null, null, bottomBlock];
                     blocks._makeNewBlockWithConnections(
                         "setkey2",
                         0,
-                        connection,
+                        connectionsSetKey,
                         null,
                         null
                     );
+
                     let setKey = logo.blocks.blockList.length - 1;
                     logo.blocks.blockList[bottomBlock].connections[0] = setKey;
-                    logo.blocks.blockList[stacks[i]].connections[1] = setKey;
+
+                    if (KeySignatureEnv[2]) {
+                        logo.blocks.blockList[stacks[i]].connections[1] = movable;
+                        logo.blocks.blockList[movable].connections[2] = setKey;
+                    } else {
+                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
+                    }
                     
                     blocks.adjustExpandableClampBlock();
 
