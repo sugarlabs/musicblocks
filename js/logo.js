@@ -1068,7 +1068,9 @@ class Logo {
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
 
-        this.turtles.ithTurtle(turtle).initTurtle();
+        this.turtles.ithTurtle(turtle).initTurtle(
+            this.runningLilypond || this.runningAbc || this.runningMxml
+        );
     }
 
     /**
