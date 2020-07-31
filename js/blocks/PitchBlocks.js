@@ -2018,7 +2018,7 @@ function setupPitchBlocks() {
             ]);
         }
         arg(logo, turtle, blk) {
-	    return logo.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value;
         }
     }
 
@@ -2292,7 +2292,6 @@ function setupPitchBlocks() {
 
         flow(args, logo, turtle, blk) {
             // Default value is G4 or (sol, 4)
-	    console.log(args[0]);
             let arg0 = args[0] !== null ? args[0] : "sol";
             let arg1 = args[1] !== null ? args[1] : 4;
 
@@ -2305,42 +2304,42 @@ function setupPitchBlocks() {
             let note, octave, cents;
 
             // is the arg a scaledegree block?
-	    let c = logo.blocks.blockList[blk].connections[1];
-	    let cname = null;
-	    if (c !== null) {
-		let cname = logo.blocks.blockList[c].name;
-	    }
+            let c = logo.blocks.blockList[blk].connections[1];
+            let cname = null;
+            if (c !== null) {
+                cname = logo.blocks.blockList[c].name;
+            }
 
-	    if (cname === "scaledegree2") {
-		let scaledegree = logo.blocks.blockList[c].value;
-		let attr;
+            if (cname === "scaledegree2") {
+                let scaledegree = logo.blocks.blockList[c].value;
+                let attr;
 
-		if (scaledegree.indexOf(SHARP) !==-1) {
+                if (scaledegree.indexOf(SHARP) !==-1) {
                     attr = SHARP;
-		} else if (scaledegree.indexOf(FLAT) !== -1) {
+                } else if (scaledegree.indexOf(FLAT) !== -1) {
                     attr = FLAT;
-		} else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
+                } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
                     attr = DOUBLESHARP;
-		} else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
+                } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
                     attr = DOUBLEFLAT;
-		} else {
+                } else {
                     attr = NATURAL;
-		}
+                }
 
-		scaledegree = Number(scaledegree.replace(attr, ""));
-		let note = scaleDegreeToPitchMapping(
-		    tur.singer.keySignature,
+                scaledegree = Number(scaledegree.replace(attr, ""));
+                note = scaleDegreeToPitchMapping(
+                    tur.singer.keySignature,
                     scaledegree,
                     tur.singer.moveable,
                     null
-		);
+                );
 
-		if(attr != NATURAL) {
+                if (attr != NATURAL) {
                     note += attr;
-		}
+                }
 
                 octave = Math.floor(Math.min(9, Math.max(0, arg1)));
-		cents = 0;
+                cents = 0;
             } else if (typeof arg0 === "number" || !isNaN(Number(arg0))) {
                 arg0 = Number(arg0);
 
