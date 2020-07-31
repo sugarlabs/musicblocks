@@ -159,11 +159,11 @@ function setupPitchBlocks() {
             if (tur.singer.lastNotePlayed !== null) {
                 let len = tur.singer.lastNotePlayed[0].length;
                 return getStepSizeDown(
-                    logo.keySignature[turtle],
+                    tur.singer.keySignature,
                     tur.singer.lastNotePlayed[0].slice(0, len - 1)
                 );
             } else {
-                return getStepSizeDown(logo.keySignature[turtle], "G");
+                return getStepSizeDown(tur.singer.keySignature, "G");
             }
         }
     }
@@ -193,11 +193,11 @@ function setupPitchBlocks() {
             if (tur.singer.lastNotePlayed !== null) {
                 let len = tur.singer.lastNotePlayed[0].length;
                 return getStepSizeUp(
-                    logo.keySignature[turtle],
+                    tur.singer.keySignature,
                     tur.singer.lastNotePlayed[0].slice(0, len - 1)
                 );
             } else {
-                return getStepSizeUp(logo.keySignature[turtle], "G");
+                return getStepSizeUp(tur.singer.keySignature, "G");
             }
         }
     }
@@ -227,8 +227,7 @@ function setupPitchBlocks() {
 
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else if (tur.singer.previousNotePlayed == null) {
@@ -241,15 +240,13 @@ function setupPitchBlocks() {
                 let previousValue = pitchToNumber(
                     obj[0],
                     obj[1],
-                    logo.keySignature[turtle]
+                    tur.singer.keySignature
                 );
                 len = tur.singer.lastNotePlayed[0].length;
                 pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
                 octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
                 obj = [pitch, octave];
-                let delta =
-                    pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
-                    previousValue;
+                let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
                 if (logo.blocks.blockList[blk].name === "deltapitch") {
                     // half-step difference
                     return delta;
@@ -260,19 +257,14 @@ function setupPitchBlocks() {
                     if (delta > 0) {
                         while (delta > 0) {
                             i += 1;
-                            let nhalf = getStepSizeUp(
-                                logo.keySignature[turtle],
-                                pitch,
-                                0,
-                                "equal"
-                            );
+                            let nhalf = getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal");
                             delta -= nhalf;
                             scalarDelta += 1;
                             obj = getNote(
                                 pitch,
                                 octave,
                                 nhalf,
-                                logo.keySignature[turtle],
+                                tur.singer.keySignature,
                                 tur.singer.moveable,
                                 null,
                                 logo.errorMsg,
@@ -289,19 +281,14 @@ function setupPitchBlocks() {
                     } else {
                         while (delta < 0) {
                             i += 1;
-                            let nhalf = getStepSizeDown(
-                                logo.keySignature[turtle],
-                                pitch,
-                                0,
-                                "equal"
-                            );
+                            let nhalf = getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal");
                             delta -= nhalf;
                             scalarDelta -= 1;
                             obj = getNote(
                                 pitch,
                                 octave,
                                 nhalf,
-                                logo.keySignature[turtle],
+                                tur.singer.keySignature,
                                 tur.singer.moveable,
                                 null,
                                 logo.errorMsg,
@@ -383,14 +370,14 @@ function setupPitchBlocks() {
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
                     }
                 } else if (
-                    logo.inNoteBlock[turtle] in tur.singer.notePitches &&
-                    tur.singer.notePitches[last(logo.inNoteBlock[turtle])].length > 0
+                    tur.singer.inNoteBlock in tur.singer.notePitches &&
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
                 ) {
                     obj = getNote(
-                        tur.singer.notePitches[last(logo.inNoteBlock[turtle])][0],
-                        tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
+                        tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+                        tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
-                        logo.keySignature[turtle],
+                        tur.singer.keySignature,
                         tur.singer.moveable,
                         null,
                         logo.errorMsg
@@ -405,7 +392,7 @@ function setupPitchBlocks() {
                 }
 
                 value =
-                    pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
+                    pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
                     tur.singer.pitchNumberOffset;
                 return value;
             }
@@ -498,7 +485,7 @@ function setupPitchBlocks() {
                             if (tur.singer.moveable === false) {
                                 return SOLFEGECONVERSIONTABLE[lc2];
                             } else {
-                                let scale = _buildScale(logo.keySignature[turtle])[0];
+                                let scale = _buildScale(tur.singer.keySignature)[0];
                                 let i = scale.indexOf(lc2);
                                 return SOLFEGENAMES[i];
                             }
@@ -507,7 +494,7 @@ function setupPitchBlocks() {
                             let num = pitchToNumber(
                                 note.substr(0, note.length - 1 ),
                                 note[note.length - 1],
-                                logo.keySignature[turtle]
+                                tur.singer.keySignature
                             );
                             return (num - 3) % 12;
                         case "scalar class":
@@ -517,7 +504,7 @@ function setupPitchBlocks() {
                                         .replace("#", SHARP)
                                         .replace("b", FLAT);
                             let scalarClass = scaleDegreeToPitchMapping(
-                                logo.keySignature[turtle],
+                                tur.singer.keySignature,
                                 null,
                                 tur.singer.moveable,
                                 note2
@@ -530,7 +517,7 @@ function setupPitchBlocks() {
                                         .replace("#", SHARP)
                                         .replace("b", FLAT);
                             let scalarClass1 = scaleDegreeToPitchMapping(
-                                logo.keySignature[turtle],
+                                tur.singer.keySignature,
                                 null,
                                 tur.singer.moveable,
                                 note3
@@ -542,7 +529,7 @@ function setupPitchBlocks() {
                             note4 = note4
                                         .replace("#", SHARP)
                                         .replace("b", FLAT);
-                            let scale = _buildScale(logo.keySignature[turtle])[0];
+                            let scale = _buildScale(tur.singer.keySignature)[0];
                             return scale.indexOf(note4);
                         case "staff y":
                             if (tur.singer.lastNotePlayed.length === 0) {
@@ -573,14 +560,14 @@ function setupPitchBlocks() {
                                     obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
                                 }
                             } else if (
-                                logo.inNoteBlock[turtle] in tur.singer.notePitches &&
-                                tur.singer.notePitches[last(logo.inNoteBlock[turtle])].length > 0
+                                tur.singer.inNoteBlock in tur.singer.notePitches &&
+                                tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
                             ) {
                                 obj = getNote(
-                                    tur.singer.notePitches[last(logo.inNoteBlock[turtle])][0],
-                                    tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])][0],
+                                    tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+                                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                                     0,
-                                    logo.keySignature[turtle],
+                                    tur.singer.keySignature,
                                     tur.singer.moveable,
                                     null,
                                     logo.errorMsg
@@ -595,7 +582,7 @@ function setupPitchBlocks() {
                             }
 
                             value =
-                                pitchToNumber(obj[0], obj[1], logo.keySignature[turtle]) -
+                                pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
                                 tur.singer.pitchNumberOffset;
                             return value;
                         case "pitch in hertz":
@@ -680,7 +667,7 @@ function setupPitchBlocks() {
                     tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, arg0
                 )
             );
-            tur.singer.pitchNumberOffset = pitchToNumber(arg0, octave, logo.keySignature[turtle]);
+            tur.singer.pitchNumberOffset = pitchToNumber(arg0, octave, tur.singer.keySignature);
         }
     }
 
@@ -897,16 +884,13 @@ function setupPitchBlocks() {
                 let octave = calcOctave(
                     tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, arg0
                 );
-                logo.invertList[turtle].push([arg0, octave, arg2]);
+                tur.singer.invertList.push([arg0, octave, arg2]);
             }
 
             let listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.invertList[turtle].pop();
-            };
-
+            let __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[3], 1];
@@ -928,18 +912,17 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (logo.blocks.blockList[blk].name === "invert") {
-                logo.invertList[turtle].push([args[0], args[1], "even"]);
+                tur.singer.invertList.push([args[0], args[1], "even"]);
             } else {
-                logo.invertList[turtle].push([args[0], args[1], "odd"]);
+                tur.singer.invertList.push([args[0], args[1], "odd"]);
             }
             let listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.invertList[turtle].pop();
-            };
-
+            let __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
@@ -1025,25 +1008,23 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
             if (args[0] !== null && typeof args[0] === "number") {
                 let transValue = args[0];
                 let tur = logo.turtles.ithTurtle(turtle);
                 tur.singer.transposition +=
-                    logo.invertList[turtle].length > 0 ? -transValue : transValue;
+                    tur.singer.invertList.length > 0 ? -transValue : transValue;
                 tur.singer.transpositionValues.push(transValue);
 
                 let listenerName = "_transposition_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                let __listener = event => {
                     transValue = tur.singer.transpositionValues.pop();
                     tur.singer.transposition +=
-                        logo.invertList[turtle].length > 0 ? transValue : -transValue;
+                        tur.singer.invertList.length > 0 ? transValue : -transValue;
                 };
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1311,7 +1292,7 @@ function setupPitchBlocks() {
 
             let tur = logo.turtles.ithTurtle(turtle);
             tur.singer.scalarTransposition +=
-                logo.invertList[turtle].length > 0 ? transValue : -transValue;
+                tur.singer.invertList.length > 0 ? transValue : -transValue;
             tur.singer.scalarTranspositionValues.push(transValue);
 
             let listenerName = "_scalar_transposition_" + turtle;
@@ -1320,7 +1301,7 @@ function setupPitchBlocks() {
             let __listener = event => {
                 transValue = tur.singer.scalarTranspositionValues.pop();
                 tur.singer.scalarTransposition +=
-                    logo.invertList[turtle].length > 0 ? transValue : -transValue;
+                    tur.singer.invertList.length > 0 ? transValue : -transValue;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1392,13 +1373,13 @@ function setupPitchBlocks() {
             }
 
             let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.transposition += logo.invertList[turtle].length > 0 ? -value : value;
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -value : value;
 
             let listenerName = "_accidental_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                tur.singer.transposition += logo.invertList[turtle].length > 0 ? value : -value;
+                tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1434,13 +1415,13 @@ function setupPitchBlocks() {
                 return;
 
             let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.transposition += logo.invertList[turtle].length > 0 ? 1 : -1;
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
 
             let listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                tur.singer.transposition += logo.invertList[turtle].length > 0 ? -1 : 1;
+                tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1478,13 +1459,13 @@ function setupPitchBlocks() {
             }
 
             let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.transposition += logo.invertList[turtle].length > 0 ? -1 : 1;
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
 
             let listenerName = "_sharp_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => {
-                tur.singer.transposition += logo.invertList[turtle].length > 0 ? 1 : -1;
+                tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1540,23 +1521,21 @@ function setupPitchBlocks() {
                     note,
                     octave,
                     t,
-                    logo.keySignature[turtle],
+                    tur.singer.keySignature,
                     tur.singer.moveable,
                     direction,
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
-                if (logo.drumStyle[turtle].length > 0) {
-                    let drumname = last(logo.drumStyle[turtle]);
-                    logo.pitchDrumTable[turtle][
-                        noteObj[0] + noteObj[1]
-                    ] = drumname;
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
+                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                 }
 
-                tur.singer.notePitches[last(logo.inNoteBlock[turtle])].push(noteObj[0]);
-                tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])].push(noteObj[1]);
-                tur.singer.noteCents[last(logo.inNoteBlock[turtle])].push(cents);
-                tur.singer.noteHertz[last(logo.inNoteBlock[turtle])].push(frequency);
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
+                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
+                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
+                tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(frequency);
                 return noteObj;
             }
 
@@ -1565,29 +1544,29 @@ function setupPitchBlocks() {
             if (note === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
-            } else if (logo.justMeasuring[turtle].length > 0) {
+            } else if (tur.singer.justMeasuring.length > 0) {
                 // TODO: account for cents
                 let noteObj = getNote(
                     note,
                     octave,
                     0,
-                    logo.keySignature[turtle],
+                    tur.singer.keySignature,
                     tur.singer.moveable,
                     null,
                     logo.errorMsg
                 );
 
-                let n = logo.justMeasuring[turtle].length;
+                let n = tur.singer.justMeasuring.length;
                 let pitchNumber =
                     pitchToNumber(
                         noteObj[0],
                         noteObj[1],
-                        logo.keySignature[turtle]
+                        tur.singer.keySignature
                     ) - tur.singer.pitchNumberOffset;
-                if (logo.firstPitch[turtle].length < n) {
-                    logo.firstPitch[turtle].push(pitchNumber);
-                } else if (logo.lastPitch[turtle].length < n) {
-                    logo.lastPitch[turtle].push(pitchNumber);
+                if (tur.singer.firstPitch.length < n) {
+                    tur.singer.firstPitch.push(pitchNumber);
+                } else if (tur.singer.lastPitch.length < n) {
+                    tur.singer.lastPitch.push(pitchNumber);
                 }
             } else if (logo.inMatrix) {
                 logo.pitchTimeMatrix.addRowBlock(blk);
@@ -1603,82 +1582,63 @@ function setupPitchBlocks() {
                 let note = frequencyToPitch(arg);
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
-                logo.musicKeyboard.instruments.push(
-                    last(logo.instrumentNames[turtle])
-                );
+                logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
                 logo.musicKeyboard.noteNames.push("hertz");
                 logo.musicKeyboard.octaves.push(arg);
                 logo.musicKeyboard.addRowBlock(blk);
                 // convert hertz to note/octave
                 let note = frequencyToPitch(arg);
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                if (!(logo.invertList[turtle].length === 0)) {
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                if (!(tur.singer.invertList.length === 0)) {
                     delta += Singer.calculateInvert(logo, turtle, note, octave);
                 }
 
                 let noteObj1 = addPitch(note, octave, cents, arg);
                 let noteObj2;
 
-                if (
-                    turtle in logo.intervals &&
-                    logo.intervals[turtle].length > 0
-                ) {
-                    for (let i = 0; i < logo.intervals[turtle].length; i++) {
-                        let ii = getInterval(
-                            logo.intervals[turtle][i],
-                            logo.keySignature[turtle],
-                            noteObj1[0]
-                        );
-                        noteObj2 = getNote(
-                            noteObj1[0],
-                            noteObj1[1],
-                            ii,
-                            logo.keySignature[turtle],
-                            tur.singer.moveable,
-                            null,
-                            logo.errorMsg,
-                            logo.synth.inTemperament
-                        );
-                        addPitch(noteObj2[0], noteObj2[1], cents, 0);
-                    }
+                for (let i = 0; i < tur.singer.intervals.length; i++) {
+                    let ii = getInterval(
+                        tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]
+                    );
+                    noteObj2 = getNote(
+                        noteObj1[0],
+                        noteObj1[1],
+                        ii,
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
                 }
 
-                if (
-                    turtle in logo.semitoneIntervals &&
-                    logo.semitoneIntervals[turtle].length > 0
-                ) {
-                    for (
-                        let i = 0;
-                        i < logo.semitoneIntervals[turtle].length;
-                        i++
-                    ) {
-                        noteObj2 = getNote(
-                            noteObj1[0],
-                            noteObj1[1],
-                            logo.semitoneIntervals[turtle][i][0],
-                            logo.keySignature[turtle],
-                            tur.singer.moveable,
-                            null,
-                            logo.errorMsg,
-                            logo.synth.inTemperament
-                        );
-                        addPitch(
-                            noteObj2[0],
-                            noteObj2[1],
-                            cents,
-                            0,
-                            logo.semitoneIntervals[turtle][i][1]
-                        );
-                    }
+                for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
+                    noteObj2 = getNote(
+                        noteObj1[0],
+                        noteObj1[1],
+                        tur.singer.semitoneIntervals[i][0],
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    addPitch(
+                        noteObj2[0], noteObj2[1], cents, 0, tur.singer.semitoneIntervals[i][1]
+                    );
                 }
 
-                tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
                     tur.singer.beatFactor
                 );
-                logo.pushedNote[turtle] = true;
+                tur.singer.pushedNote = true;
                 if (logo.runningLilypond) {
-                    logo.notation.notationMarkup(turtle, pitchToFrequency(noteObj1[0], noteObj1[1], cents, logo.keySignature[turtle]));
+                    logo.notation.notationMarkup(
+                        turtle,
+                        pitchToFrequency(noteObj1[0], noteObj1[1], cents, tur.singer.keySignature)
+                    );
                 }
             } else if (logo.inPitchStaircase) {
                 let frequency = arg;
@@ -1845,7 +1805,7 @@ function setupPitchBlocks() {
                 let isNegativeArg = arg0 < 0 ? true : false;
                 arg0 = Math.abs(arg0);
 
-                let obj = keySignatureToMode(logo.keySignature[turtle]);
+                let obj = keySignatureToMode(tur.singer.keySignature);
                 let modeLength = MUSICALMODES[obj[1]].length;
                 let scaleDegree = Math.floor(arg0 - 1) % modeLength + 1;
 
@@ -1891,7 +1851,7 @@ function setupPitchBlocks() {
                 */
 
                 scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
-                let note = nthDegreeToPitch(logo.keySignature[turtle], scaleDegree);
+                let note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
 
                 let semitones =
                     ref +
@@ -1961,7 +1921,7 @@ function setupPitchBlocks() {
                 let isNegativeArg = arg0 < 0 ? true : false;
                 arg0 = Math.abs(arg0);
 
-                let obj = keySignatureToMode(logo.keySignature[turtle]);
+                let obj = keySignatureToMode(tur.singer.keySignature);
                 let modeLength = MUSICALMODES[obj[1]].length;
                 let scaleDegree = Math.floor(arg0 - 1) % modeLength + 1;
 
@@ -2007,7 +1967,7 @@ function setupPitchBlocks() {
                 */
 
                 scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
-                let note = nthDegreeToPitch(logo.keySignature[turtle], scaleDegree);
+                let note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
 
                 let semitones =
                     ref +
@@ -2090,17 +2050,8 @@ function setupPitchBlocks() {
             let tur = logo.turtles.ithTurtle(turtle);
 
             // Similar to pitch but calculated from previous note played.
-            if (
-                !logo.inMatrix &&
-                !logo.inMusicKeyboard &&
-                logo.inNoteBlock[turtle].length === 0
-            ) {
-                logo.errorMsg(
-                    _(
-                        "The Scalar Step Block must be used inside of a Note Block."
-                    ),
-                    blk
-                );
+            if (!logo.inMatrix && !logo.inMusicKeyboard && tur.singer.inNoteBlock.length === 0) {
+                logo.errorMsg(_("The Scalar Step Block must be used inside of a Note Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -2112,25 +2063,15 @@ function setupPitchBlocks() {
             }
 
             // If we are just counting notes we don't care about the pitch.
-            if (
-                logo.justCounting[turtle].length > 0 &&
-                tur.singer.lastNotePlayed === null
-            ) {
+            if (tur.singer.justCounting.length > 0 && tur.singer.lastNotePlayed === null) {
                 console.debug("Just counting, so spoofing last note played.");
                 tur.singer.previousNotePlayed = ["G4", 4];
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
             if (tur.singer.lastNotePlayed === null) {
-                logo.errorMsg(
-                    _(
-                        "The Scalar Step Block must be preceded by a Pitch Block."
-                    ),
-                    blk
-                );
+                logo.errorMsg(_("The Scalar Step Block must be preceded by a Pitch Block."), blk);
                 tur.singer.lastNotePlayed = ["G4", 4];
-                // logo.stopTurtle = true;
-                // return;
             }
 
             function addPitch(note, octave, cents, direction) {
@@ -2139,38 +2080,34 @@ function setupPitchBlocks() {
                     note,
                     octave,
                     t,
-                    logo.keySignature[turtle],
+                    tur.singer.keySignature,
                     true,
                     direction,
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
 
-                if (logo.drumStyle[turtle].length > 0) {
-                    let drumname = last(logo.drumStyle[turtle]);
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
                     if (EFFECTSNAMES.indexOf(drumname) === -1) {
-                        logo.pitchDrumTable[turtle][
-                            noteObj[0] + noteObj[1]
-                        ] = drumname;
+                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                     } else {
-                        logo.pitchDrumTable[turtle][
-                            noteObj[0] + noteObj[1]
-                        ] = effectsname;
+                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = effectsname;
                     }
                 }
 
                 if (!logo.inMatrix && !logo.inMusicKeyboard) {
-                    tur.singer.notePitches[last(logo.inNoteBlock[turtle])].push(noteObj[0]);
-                    tur.singer.noteOctaves[last(logo.inNoteBlock[turtle])].push(noteObj[1]);
-                    tur.singer.noteCents[last(logo.inNoteBlock[turtle])].push(cents);
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
+                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
+                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
                     if (cents !== 0) {
-                        tur.singer.noteHertz[last(logo.inNoteBlock[turtle])].push(
+                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
                             pitchToFrequency(
-                                noteObj[0], noteObj[1], cents, logo.keySignature[turtle]
+                                noteObj[0], noteObj[1], cents, tur.singer.keySignature
                             )
                         );
                     } else {
-                        tur.singer.noteHertz[last(logo.inNoteBlock[turtle])].push(0);
+                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
                     }
                 }
 
@@ -2188,7 +2125,7 @@ function setupPitchBlocks() {
             );
 
             let delta = 0;
-            if (!(logo.invertList[turtle].length === 0)) {
+            if (!(tur.singer.invertList.length === 0)) {
                 delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
             }
 
@@ -2210,7 +2147,7 @@ function setupPitchBlocks() {
                             noteObj[0],
                             noteObj[1],
                             0,
-                            logo.keySignature[turtle]
+                            tur.singer.keySignature
                         );
                         logo.pitchTimeMatrix.rowLabels.push("hertz");
                         logo.pitchTimeMatrix.rowArgs.push(parseInt(freq));
@@ -2237,17 +2174,15 @@ function setupPitchBlocks() {
                 tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                 tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
             } else if (logo.inMusicKeyboard) {
-                if (logo.drumStyle[turtle].length === 0) {
-                    logo.musicKeyboard.instruments.push(
-                        last(logo.instrumentNames[turtle])
-                    );
+                if (tur.singer.drumStyle.length === 0) {
+                    logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
                     if (logo.musicKeyboard.noteNames.length > 0) {
                         if (last(logo.musicKeyboard.noteNames) === "hertz") {
                             let freq = pitchToFrequency(
                                 noteObj[0],
                                 noteObj[1],
                                 0,
-                                logo.keySignature[turtle]
+                                tur.singer.keySignature
                             );
                             logo.musicKeyboard.noteNames.push("hertz");
                             logo.musicKeyboard.octaves.push(parseInt(freq));
@@ -2277,62 +2212,44 @@ function setupPitchBlocks() {
             }
 
             let noteObj2;
-            if (turtle in logo.intervals && logo.intervals[turtle].length > 0) {
-                for (let i = 0; i < logo.intervals[turtle].length; i++) {
-                    let ii = getInterval(
-                        logo.intervals[turtle][i],
-                        logo.keySignature[turtle],
-                        noteObj1[0]
-                    );
-                    noteObj2 = getNote(
-                        noteObj1[0],
-                        noteObj1[1],
-                        ii,
-                        logo.keySignature[turtle],
-                        tur.singer.moveable,
-                        null,
-                        logo.errorMsg,
-                        logo.synth.inTemperament
-                    );
-                    addPitch(noteObj2[0], noteObj2[1], 0);
-                }
+            for (let i = 0; i < tur.singer.intervals.length; i++) {
+                let ii = getInterval(
+                    tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]
+                );
+                noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    ii,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], 0);
             }
 
-            if (
-                turtle in logo.semitoneIntervals &&
-                logo.semitoneIntervals[turtle].length > 0
-            ) {
-                for (
-                    let i = 0;
-                    i < logo.semitoneIntervals[turtle].length;
-                    i++
-                ) {
-                    noteObj2 = getNote(
-                        noteObj1[0],
-                        noteObj1[1],
-                        logo.semitoneIntervals[turtle][i][0],
-                        logo.keySignature[turtle],
-                        tur.singer.moveable,
-                        null,
-                        logo.errorMsg,
-                        logo.synth.inTemperament
-                    );
-                    addPitch(
-                        noteObj2[0],
-                        noteObj2[1],
-                        0,
-                        logo.semitoneIntervals[turtle][i][1]
-                    );
-                }
+            for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
+                noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    tur.singer.semitoneIntervals[i][0],
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], 0, tur.singer.semitoneIntervals[i][1]);
             }
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.noteBeatValues[last(logo.inNoteBlock[turtle])].push(
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
                     tur.singer.beatFactor
                 );
             }
 
-            logo.pushedNote[turtle] = true;
+            tur.singer.pushedNote = true;
         }
     }
 
@@ -2401,7 +2318,7 @@ function setupPitchBlocks() {
                         arg0 = 7;   // set default value to 7th semitone
                     }
 
-                    note = nthDegreeToPitch(logo.keySignature[turtle], Math.round(arg0));
+                    note = nthDegreeToPitch(tur.singer.keySignature, Math.round(arg0));
                     octave = Math.floor(
                         calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
                     );

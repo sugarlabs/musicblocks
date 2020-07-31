@@ -21,6 +21,51 @@ function Publisher(Planet) {
     this.ProjectTable = Planet.LocalPlanet.ProjectTable;
     this.IsShareLink = false;
 
+    this.dataToTags = (DATA) => {
+        // convert to blocks like structure.
+        DATA = JSON.parse(DATA);
+        let blocks = {
+            blockList: []
+        };
+
+        for (let i of DATA) {
+            let block = {};
+            if (typeof i[1] === "string") {
+                block.name = i[1];
+            } else {
+                block.name = i[1][0];
+            }
+            block.connections = i[4];
+            blocks.blockList.push(block);
+        }
+        //convert blocks to score.
+        let score = Planet.analyzeProject(blocks);
+
+        //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
+        //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
+
+        //use score to map tags.
+        let tags = [];
+        //Pitch, Tone, and/or Rhythm
+        if (score[1] && score[2]){
+            tags.push("2");//music
+        }
+        //pen,mouse
+        if (score[3] && score[4]){
+            tags.push("3");//art
+        }
+        //sensors
+        if (score[8]){
+            tags.push("5")//interactive;
+        }
+        //number
+        if (score[5]){
+            tags.push("4")//math;
+        }
+
+        return tags ;
+    } 
+
     this.findTagWithName = function(name) {
         let keys = Object.keys(Planet.TagsManifest);
         for (let i = 0; i < keys.length; i++) {
@@ -115,6 +160,7 @@ function Publisher(Planet) {
         let name = this.ProjectTable[id].ProjectName;
         let image = this.ProjectTable[id].ProjectImage;
         let published = this.ProjectTable[id].PublishedData;
+        let DATA = this.ProjectTable[id].ProjectData;
         let description;
         let tags;
         if (published !== null) {
@@ -123,7 +169,7 @@ function Publisher(Planet) {
             document.getElementById('publisher-ptitle').textContent = _('Republish Project');
         } else {
             description = '';
-            tags = [];
+            tags = this.dataToTags(DATA);
             document.getElementById('publisher-ptitle').textContent = _('Publish Project');
         }
 

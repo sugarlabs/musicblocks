@@ -583,7 +583,7 @@ function PitchTimeMatrix() {
                         this.rowLabels[i],
                         this.rowArgs[i],
                         0,
-                        this._logo.keySignature[0],
+                        this._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         this._logo.errorMsg,
@@ -1909,7 +1909,7 @@ function PitchTimeMatrix() {
                         label,
                         octave,
                         0,
-                        that._logo.keySignature[0],
+                        that._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         that._logo.errorMsg,
@@ -1989,7 +1989,7 @@ function PitchTimeMatrix() {
                     that.rowLabels[index],
                     that.rowArgs[index],
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2034,7 +2034,7 @@ function PitchTimeMatrix() {
                     label,
                     octave,
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2052,15 +2052,17 @@ function PitchTimeMatrix() {
                     null
                 );
             } else if (condition === "drumblocks") {
+                let tur = that._logo.turtles.ithTurtle(0);
+
                 if (
-                    that._logo.instrumentNames[0] === undefined ||
-                    that._logo.instrumentNames[0].indexOf(label) === -1
+                    tur.singer.instrumentNames === undefined ||
+                    tur.singer.instrumentNames.indexOf(label) === -1
                 ) {
-                    if (that._logo.instrumentNames[0] === undefined) {
-                        that._logo.instrumentNames[0] = [];
+                    if (tur.singer.instrumentNames === undefined) {
+                        tur.singer.instrumentNames = [];
                     }
 
-                    that._logo.instrumentNames[0].push(label);
+                    tur.singer.instrumentNames.push(label);
                     if (label === DEFAULTVOICE) {
                         that._logo.synth.createDefaultSynth(0);
                     }
@@ -2269,7 +2271,7 @@ function PitchTimeMatrix() {
                 sortableList.push([
                     noteToFrequency(
                         this.rowLabels[i] + this.rowArgs[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     this.rowLabels[i],
                     this.rowArgs[i],

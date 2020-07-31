@@ -24,7 +24,7 @@ function Activity() {
     let _MSGTIMEOUT_ = 60000;
     let cellSize = 55;
     let searchSuggestions = [];
-    let homeButtonContainers = [];
+    let homeButtonContainer ;
 
     let msgTimeoutID = null;
     let msgText = null;
@@ -74,7 +74,6 @@ function Activity() {
     _loadButtonDragHandler = this._loadButtonDragHandler;
 
     scrollBlockContainer = false;
-    scrollPaletteContainer = false;
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
@@ -186,10 +185,6 @@ function Activity() {
         "activity/toolbar",
         "activity/trash",
         "activity/boundary",
-        "activity/turtle",
-        "activity/turtles",
-        "activity/turtle-singer",
-        "activity/turtle-painter",
         "activity/palette",
         "activity/protoblocks",
         "activity/blocks",
@@ -197,6 +192,10 @@ function Activity() {
         "activity/turtledefs",
         "activity/notation",
         "activity/logo",
+        "activity/turtle",
+        "activity/turtles",
+        "activity/turtle-singer",
+        "activity/turtle-painter",
         "activity/languagebox",
         "activity/basicblocks",
         "activity/blockfactory",
@@ -314,7 +313,6 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
-        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -324,8 +322,6 @@ function Activity() {
         // On-screen buttons
         smallerContainer = null;
         largerContainer = null;
-        smallerOffContainer = null;
-        largerOffContainer = null;
         resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
@@ -556,13 +552,14 @@ function Activity() {
      * @param one {shows container}
      */
     setHomeContainers = function(zero, one) {
-        if (homeButtonContainers[0] === null) {
+        if (homeButtonContainer === null) {
             return;
         }
-
-        homeButtonContainers[0].visible = zero;
-        homeButtonContainers[1].visible = one;
-    };
+        if (zero)
+            changeImage(homeButtonContainer.children[0],GOHOMEFADEDBUTTON,GOHOMEBUTTON);
+        else 
+            changeImage(homeButtonContainer.children[0],GOHOMEBUTTON,GOHOMEFADEDBUTTON);
+        };
 
     __saveHelpBlock = function(name, delay) {
         // Save the artwork for an individual help block.
@@ -1075,7 +1072,6 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
         let enableHorizScrollIcon = docById("enableHorizScrollIcon");
         let disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
@@ -1259,20 +1255,16 @@ function Activity() {
      * then the icons to make them smaller/bigger will be hidden
      */
     setSmallerLargerStatus = function() {
-        if (BLOCKSCALES[blockscale] > 1) {
-            smallerContainer.visible = true;
-            smallerOffContainer.visible = false;
+        if (BLOCKSCALES[blockscale] < DEFAULTBLOCKSCALE) {
+            changeImage(smallerContainer.children[0],SMALLERBUTTON,SMALLERDISABLEBUTTON);
         } else {
-            smallerOffContainer.visible = true;
-            smallerContainer.visible = false;
+            changeImage(smallerContainer.children[0],SMALLERDISABLEBUTTON,SMALLERBUTTON);
         }
 
         if (BLOCKSCALES[blockscale] === 4) {
-            largerOffContainer.visible = true;
-            largerContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERBUTTON,BIGGERDISABLEBUTTON);
         } else {
-            largerContainer.visible = true;
-            largerOffContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERDISABLEBUTTON,BIGGERBUTTON);
         }
     };
 
@@ -1388,80 +1380,6 @@ function Activity() {
             delta: 0
         };
 
-        let __paletteWheelHandler = function(event) {
-            // vertical scroll
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                }
-            }
-
-            // horizontal scroll
-            if (scrollPaletteContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    }
-                }
-            } else {
-                event.preventDefault();
-            }
-
-            refreshCanvas();
-        };
-
-        let myCanvas = docById("myCanvas");
-
-        let __heightBasedScroll = function(event) {
-            actualReszieHandler(); // check size during init
-            window.addEventListener("resize", resizeThrottler, false);
-            let resizeTimeout;
-
-            function resizeThrottler() {
-                // Ignore resize events as long as an actualResizeHandler
-                // execution is in queue.
-                if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
-                        resizeTimeout = null;
-                        actualReszieHandler();
-                        // The actualResizeHandler will execute at the
-                        // rate of 15 FPS.
-                    }, 66);
-                }
-            }
-        };
-
-        function actualReszieHandler() {
-            // Handle the resize event
-            let h = window.innerHeight;
-
-            if (h < 500) {
-                //activate on mobile
-                myCanvas.addEventListener(
-                    "wheel",
-                    __paletteWheelHandler,
-                    false
-                );
-            } else {
-                // Cleanup event listeners
-                myCanvas.removeEventListener("wheel", __paletteWheelHandler);
-            }
-        }
-
-        __heightBasedScroll();
-
         let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
@@ -1472,35 +1390,17 @@ function Activity() {
         let __wheelHandler = function(event) {
             if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                }
+                blocksContainer.y -= event.deltaY;
             }
-
             // horizontal scroll
             if (scrollBlockContainer) {
                 if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    }
+                    blocksContainer.x -= event.deltaX;
                 }
             } else {
                 event.preventDefault();
             }
-
             refreshCanvas();
         };
 
@@ -1582,19 +1482,19 @@ function Activity() {
         let scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
-            palettes.menuScrollEvent(delta, scrollSpeed);
-            palettes.hidePaletteIconCircles();
+            //palettes.menuScrollEvent(delta, scrollSpeed);
+            //palettes.hidePaletteIconCircles();
         } else {
-            let palette = palettes.findPalette(
-                event.clientX / turtleBlocksScale,
-                event.clientY / turtleBlocksScale
-            );
-            if (palette) {
-                // if we are moving the palettes, deselect the active block.
-                blocks.activeBlock = null;
+            // let palette = palettes.findPalette(
+            //     event.clientX / turtleBlocksScale,
+            //     event.clientY / turtleBlocksScale
+            // );
+            // if (palette) {
+            //     // if we are moving the palettes, deselect the active block.
+            //     blocks.activeBlock = null;
 
-                palette.scrollEvent(delta, scrollSpeed);
-            }
+            //     //palette.scrollEvent(delta, scrollSpeed);
+            // }
         }
     }
 
@@ -1804,6 +1704,8 @@ function Activity() {
      * Shows search widget
      */
     showSearchWidget = function() {
+        //bring to top;
+        searchWidget.style.zIndex = 1 ;
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
@@ -1813,7 +1715,7 @@ function Activity() {
             }
 
             searchWidget.value = null;
-            docById("searchResults").style.visibility = "visible";
+            //docById("searchResults").style.visibility = "visible";
             searchWidget.style.visibility = "visible";
             searchWidget.style.left =
                 palettes.getSearchPos()[0] * turtleBlocksScale + "px";
@@ -1827,7 +1729,7 @@ function Activity() {
             setTimeout(function() {
                 searchWidget.focus();
                 doSearch();
-            }, 500);
+            }, 500);    
         }
     };
 
@@ -2242,9 +2144,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     STANDARDBLOCKHEIGHT,
@@ -2269,9 +2168,6 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(-1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     -STANDARDBLOCKHEIGHT,
@@ -2490,22 +2386,6 @@ function Activity() {
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        if (largerContainer !== null) {
-            homeButtonContainers[0].x = this._innerWidth - 4 * 55 - 27.5;
-            homeButtonContainers[1].x = homeButtonContainers[0].x;
-            hideBlocksContainer.x = homeButtonContainers[0].x;
-            collapseBlocksContainer.x = homeButtonContainers[0].x;
-            smallerContainer.x = homeButtonContainers[0].x;
-            largerContainer.x = homeButtonContainers[0].x;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-        }
-
         if (docById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
@@ -2543,8 +2423,6 @@ function Activity() {
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
 
-        palettes.setScale(turtleBlocksScale);
-
         trashcan.resizeEvent(turtleBlocksScale);
 
         // We need to reposition the palette buttons
@@ -2576,7 +2454,6 @@ function Activity() {
             toolbar.disableTooltips($j);
         } else {
             palettes.setMobile(false);
-            palettes.bringToTop();
         }
 
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -2838,18 +2715,15 @@ function Activity() {
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             palettes.hide();
-            hideBlocksContainer[1].visible = true;
-            hideBlocksContainer[0].visible = false;
+            changeImage(hideBlocksContainer.children[0],SHOWBLOCKSBUTTON,HIDEBLOCKSFADEDBUTTON);
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-            hideBlocksContainer[1].visible = false;
-            hideBlocksContainer[0].visible = true;
+            changeImage(hideBlocksContainer.children[0],HIDEBLOCKSFADEDBUTTON,SHOWBLOCKSBUTTON);
             blocks.showBlocks();
             palettes.show();
-            palettes.bringToTop();
         }
 
         // Combine block and palette visibility into one button.
@@ -2933,8 +2807,14 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function() {
+        if (docById("palette").style.display != "none") 
+            docById("palette").style.display = "none";
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
+        if (docById("buttoncontainerBOTTOM").style.display != "none")
+            docById("buttoncontainerBOTTOM").style.display = "none";
+        if (docById("buttoncontainerTOP").style.display != "none")
+            docById("buttoncontainerTOP").style.display = "none";
     };
 
     /*
@@ -3121,6 +3001,7 @@ function Activity() {
      */
     this.showContents = function() {
         docById("loading-image-container").style.display = "none";
+        docById("palette").style.display = "block";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
 
@@ -3132,6 +3013,8 @@ function Activity() {
             console.debug('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
+       docById("buttoncontainerBOTTOM").style.display = "block";
+       docById("buttoncontainerTOP").style.display = "block";
     };
 
     this._loadStart = async function() {
@@ -3218,11 +3101,7 @@ function Activity() {
                             50
                         )}...`
                     );
-                    // First, hide the palettes as they will need updating.
-                    for (let name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
-
+                    
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
             } catch (e) {
@@ -3817,124 +3696,60 @@ function Activity() {
      * These menu items are on the canvas, not the toolbar.
      */
     _setupPaletteMenu = function(turtleBlocksScale) {
-        // Clean up if we've been here before.
-        if (homeButtonContainers.length !== 0) {
-            stage.removeChild(homeButtonContainers[0]);
-            stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer[0]);
-            stage.removeChild(hideBlocksContainer[1]);
-            stage.removeChild(collapseBlocksContainer);
-            stage.removeChild(smallerContainer);
-            stage.removeChild(smallerOffContainer);
-            stage.removeChild(largerContainer);
-            stage.removeChild(largerOffContainer);
+        let removed = false ;
+        if(docById("buttoncontainerBOTTOM")){
+            removed = true ;
+            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
         }
-
         let btnSize = cellSize;
         // Upper left
         // var x = 27.5 + 6;
         // var y = toolbarHeight + 95.5 + 6;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
-        let y = this._innerHeight - 27.5;
+        let y = this._innerHeight - 57.5;
         let dx = btnSize;
 
-        homeButtonContainers = [];
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            homeButtonContainers[0],
+        let ButtonHolder = document.createElement("div");
+        ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
+        if(!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
+        document.body.appendChild(ButtonHolder);
+
+        homeButtonContainer = _makeButton(
+            GOHOMEFADEDBUTTON,
+            _("Home") + " [" + _("Home").toUpperCase() + "]",
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
-        );
-
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
+            btnSize,
+            0,
+            
+        )
         that._loadButtonDragHandler(
-            homeButtonContainers[1],
+            homeButtonContainer,
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
+            _findBlocks
         );
-        homeButtonContainers[1].visible = false;
 
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
         boundary.hide();
 
         x += dx;
 
-        hideBlocksContainer = [];
-        hideBlocksContainer.push(
+        hideBlocksContainer = 
             _makeButton(
-                HIDEBLOCKSBUTTON,
+                SHOWBLOCKSBUTTON,
                 _("Show/hide block"),
                 x,
                 y,
                 btnSize,
                 0
             )
-        );
         that._loadButtonDragHandler(
-            hideBlocksContainer[0],
+            hideBlocksContainer,
             x,
             y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
+            _changeBlockVisibility            
         );
-
-        hideBlocksContainer.push(
-            _makeButton(
-                HIDEBLOCKSFADEDBUTTON,
-                _("Show/hide block"),
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            hideBlocksContainer[1],
-            x,
-            y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
-        );
-        hideBlocksContainer[1].visible = false;
-
-        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
@@ -3950,11 +3765,7 @@ function Activity() {
             collapseBlocksContainer,
             x,
             y,
-            _toggleCollapsibleStacks,
-            null,
-            null,
-            null,
-            null
+            _toggleCollapsibleStacks
         );
 
         x += dx;
@@ -3971,22 +3782,8 @@ function Activity() {
             smallerContainer,
             x,
             y,
-            doSmallerBlocks,
-            null,
-            null,
-            null,
-            null
+            doSmallerBlocks
         );
-
-        smallerOffContainer = _makeButton(
-            SMALLERDISABLEBUTTON,
-            _("Cannot be further decreased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        smallerOffContainer.visible = false;
 
         x += dx;
 
@@ -4002,22 +3799,9 @@ function Activity() {
             largerContainer,
             x,
             y,
-            doLargerBlocks,
-            null,
-            null,
-            null,
-            null
+            doLargerBlocks
         );
 
-        largerOffContainer = _makeButton(
-            BIGGERDISABLEBUTTON,
-            _("Cannot be further increased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        largerOffContainer.visible = false;
     };
 
     // function doPopdownPalette() {
@@ -4143,155 +3927,38 @@ function Activity() {
     /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
-    _makeButton = function(name, label, x, y, size, rotation, parent) {
-        let container = new createjs.Container();
+    _makeButton = function(name, label, x, y,) {
+        let container = document.createElement("div");
+        container.setAttribute("id", ""+label);
 
-        if (parent === undefined) {
-            stage.addChild(container);
-        } else {
-            parent.addChild(container);
-        }
-
-        container.x = x;
-        container.y = y;
-
-        let text = new createjs.Text(label, "14px Sans", "#282828");
-        if (container.x < 55) {
-            text.textAlign = "left";
-            text.x = -14;
-        } else if (container.x > 255) {
-            text.textAlign = "right";
-            text.x = 14;
-        } else {
-            text.textAlign = "center";
-            text.x = 0;
-        }
-
-        if (y > 255) {
-            text.y = -60;
-        } else {
-            text.y = 30;
-        }
-
-        text.visible = false;
-
-        let circles;
-        container.on("mouseover", function(event) {
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = true;
-                    // Do we need to add a background?
-                    // Should be image and text, hence === 2
-                    if ([2, 5, 8].indexOf(container.children.length) !== -1) {
-                        let b = container.children[c].getBounds();
-                        let bg = new createjs.Shape();
-                        if (container.children[c].textAlign === "center") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else if (container.children[c].textAlign === "left") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 22,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x + 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        }
-                        container.addChildAt(bg, 0);
-                    }
-
-                    container.children[0].visible = true;
-                    stage.update();
-                    break;
-                }
-            }
-
-            let r = size / 2;
-            circles = showButtonHighlight(
-                container.x,
-                container.y,
-                r,
-                event,
-                palettes.scale,
-                stage
-            );
+        
+        container.setAttribute("class","tooltipped");
+        container.setAttribute("data-tooltip",label);
+        container.setAttribute("data-position","top");
+        jQuery.noConflict()(".tooltipped").tooltip({
+            html: true,
+            delay: 100
         });
-
-        container.on("mouseout", function(event) {
-            hideButtonHighlight(circles, stage);
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = false;
-                    container.children[0].visible = false;
-                    stage.update();
-                    break;
-                }
+        container.onmouseover = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "pointer";
             }
-        });
-
-        let img = new Image();
-
-        img.onload = function() {
-            let originalSize = 55; // this is the original svg size
-            let halfSize = Math.floor(size / 2);
-
-            let bitmap = new createjs.Bitmap(img);
-            if (size !== originalSize) {
-                bitmap.scaleX = size / originalSize;
-                bitmap.scaleY = size / originalSize;
+        };
+        
+        container.onmouseout = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "default";
             }
-
-            bitmap.regX = halfSize / bitmap.scaleX;
-            bitmap.regY = halfSize / bitmap.scaleY;
-            if (rotation !== undefined) {
-                bitmap.rotation = rotation;
-            }
-
-            container.addChild(bitmap);
-            let hitArea = new createjs.Shape();
-            hitArea.graphics
-                .beginFill("#FFF")
-                .drawEllipse(-halfSize, -halfSize, size, size);
-            hitArea.x = 0;
-            hitArea.y = 0;
-            container.hitArea = hitArea;
-            bitmap.cache(0, 0, size, size);
-            bitmap.updateCache();
-            update = true;
         };
 
+        let img = new Image();
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(name)));
-        container.addChild(text);
+        
+        container.appendChild(img);
+        container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
+        docById("buttoncontainerBOTTOM").appendChild(container);
         return container;
     };
 
@@ -4308,158 +3975,16 @@ function Activity() {
         ox,
         oy,
         action,
-        hoverAction
+        actionClick,
+        arg
     ) {
-        // Prevent multiple button presses (i.e., debounce).
-        let lockTimer = null;
-        let locked = false;
-
-        /*
-        if (longAction === null) {
-            longAction = action;
-        }
-
-        if (extraLongAction === null) {
-            extraLongAction = longAction;
-        }
-
-        // Long and extra-long press variables declaration
-        var pressTimer = null;
-        var isLong = false;
-        var pressTimerExtra = null;
-        var isExtraLong = false;
-
-        var formerContainer = container;
-        */
-
-        // Long hover variables
-        let hoverTimer = null;
-        let isLongHover = false;
-
-        container.on("mouseover", function(event) {
-            if (!loading) {
-                document.body.style.cursor = "pointer";
-            }
-
-            if (hoverAction === null) {
-                return;
-            }
-
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-                lockTimer = setTimeout(function() {
-                    locked = false;
-
-                    clearTimeout(hoverTimer);
-                }, 2000);
-            }
-
-            hoverTimer = setTimeout(function() {
-                isLongHover = true;
-                console.debug("HOVER ACTION");
-                hoverAction(false);
-            }, 1500);
-        });
-
-        container.on("mouseout", function(event) {
+        container.onmousedown = function(event) {
             if (!loading) {
                 document.body.style.cursor = "default";
             }
-
-            if (hoverTimer !== null) {
-                clearTimeout(hoverTimer);
-            }
-        });
-
-        container.removeAllEventListeners("mousedown");
-        container.on("mousedown", function(event) {
-            /*
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-
-                lockTimer = setTimeout(function () {
-                    locked = false;
-
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-                    if (longImg !== null || extraLongImg !== null) {
-                        container.visible = false;
-                        container = formerContainer;
-                        container.visible = true;
-                    }
-                }, 1500);
-            }
-
-            var mousedown = true;
-
-            pressTimer = setTimeout(function () {
-                isLong = true;
-                if (longImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
-                }
-            }, 500);
-
-            pressTimerExtra = setTimeout(function () {
-                isExtraLong = true;
-                if (extraLongImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
-                }
-            }, 1000);
-            */
-            let circles = showButtonHighlight(
-                ox,
-                oy,
-                cellSize / 2,
-                event,
-                turtleBlocksScale,
-                stage
-            );
-
-            function __pressupFunction(event) {
-                hideButtonHighlight(circles, stage);
-
-                /*
-                clearTimeout(lockTimer);
-
-                if (longImg !== null || extraLongImg !== null) {
-                    container.visible = false;
-                    container = formerContainer;
-                    container.visible = true;
-                }
-
-                locked = false;
-
-                if (action != null && mousedown && !locked) {
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-
-                    if (!isLong) {
-                        action();
-                    } else if (!isExtraLong) {
-                        longAction();
-                    } else {
-                        extraLongAction();
-                    }
-                }
-                */
-
-                action();
-                mousedown = false;
-            }
-
-            container.removeAllEventListeners("pressup");
-            let closure = container.on("pressup", __pressupFunction);
-
-            isLongHover = false;
-            // isLong = false;
-            // isExtraLong = false;
-        });
+            action();
+            if (actionClick)actionClick(arg);
+        };
     };
 
     /*
@@ -4504,14 +4029,6 @@ function Activity() {
             onscreenButtons[i].y += dy;
         }
 
-        // logoContainer.y += dy;
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = homeButtonContainers[0].y;
-        hideBlocksContainer.y = homeButtonContainers[0].y;
-        collapseBlocksContainer.y = homeButtonContainers[0].y;
-        smallerContainer.y = homeButtonContainers[0].y;
-        largerContainer.y = homeButtonContainers[0].y;
-
         for (let i = 0; i < onscreenMenu.length; i++) {
             onscreenMenu[i].y += dy;
         }
@@ -4549,14 +4066,6 @@ function Activity() {
             dy = cellsize + LEADING + 5;
             toolbarHeight = dy;
 
-            // These buttons are smaller, hence + 6
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-
             palettes.deltaY(dy);
             turtles.deltaY(dy);
 
@@ -4565,13 +4074,6 @@ function Activity() {
         } else {
             dy = toolbarHeight;
             toolbarHeight = 0;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
 
             palettes.deltaY(-dy);
             turtles.deltaY(-dy);
@@ -4700,12 +4202,11 @@ function Activity() {
          *   turtles
          *   logo (drawing)
          */
-        palettesContainer = new createjs.Container();
         blocksContainer = new createjs.Container();
         trashContainer = new createjs.Container();
         turtleContainer = new createjs.Container();
         stage.addChild(turtleContainer);
-        stage.addChild(trashContainer, blocksContainer, palettesContainer);
+        stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
         trashcan = new Trashcan();
@@ -4748,11 +4249,8 @@ function Activity() {
 
         palettes = new Palettes();
         palettes
-            .setCanvas(canvas)
-            .setStage(palettesContainer)
-            .setRefreshCanvas(refreshCanvas)
+            .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
-            .setTrashcan(trashcan)
             .setSearch(showSearchWidget, hideSearchWidget)
             .setBlocks(blocks)
             .init();
@@ -4817,6 +4315,7 @@ function Activity() {
 
             this.showMusicBlocks = function() {
                 document.getElementById("toolbars").style.display = "block";
+                document.getElementById("palette").style.display = "block";
 
                 widgetWindows.showWindows();
 
@@ -4828,6 +4327,8 @@ function Activity() {
                     platformColor.header;
                 stage.enableDOMEvents(true);
                 window.scroll(0, 0);
+                docById("buttoncontainerBOTTOM").style.display = "block";
+                docById("buttoncontainerTOP").style.display = "block";
             };
 
             this.showPlanet = function() {
@@ -4885,10 +4386,8 @@ function Activity() {
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
-                for (let name in blocks.palettes.dict) {
-                    blocks.palettes.dict[name].hideMenu(true);
-                }
-
+                blocks.palettes._hideMenus(true);
+                
                 let __afterLoad = function() {
                     document.removeEventListener(
                         "finishedLoading",
@@ -5495,8 +4994,6 @@ function Activity() {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
-
-                            palettes.bringToTop();
                         }, 1000);
 
                         document.body.style.cursor = "default";
@@ -5675,6 +5172,7 @@ function Activity() {
 
         document.onkeydown = __keyPressed;
         _hideStopButton();
+        planet.planet.setAnalyzeProject(analyzeProject)
     };
 }
 

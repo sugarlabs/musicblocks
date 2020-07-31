@@ -8,6 +8,13 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+const changeImage = (imgElement ,from ,to) => {
+    oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
+    newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
+    if (imgElement.src === oldSrc){
+        imgElement.src = newSrc
+    }
+} 
 
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
@@ -509,7 +516,7 @@ function processPluginData(
     if (newPalette) {
         try {
             console.debug("CALLING makePalettes");
-            palettes.makePalettes();
+            palettes.makePalettes(1);
         } catch (e) {
             console.debug("makePalettes: " + e);
         }
@@ -721,7 +728,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
             blocks.addToMyPalette(name, macroDict[name]);
         }
 
-        palettes.makePalettes();
+        palettes.makePalettes(1);
     }
 }
 

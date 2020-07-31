@@ -50,7 +50,6 @@ function setupBoxesBlocks() {
                     // Look for a namedbox with this text value.
                     let name = logo.blocks.blockList[cblk].value;
                     if (name in logo.boxes) {
-                        console.log(logo.boxes[name]);
                         logo.boxes[name] = logo.boxes[name] + i;
                         return;
                     }
@@ -59,7 +58,6 @@ function setupBoxesBlocks() {
                 let value = args[0] + i;
 
                 // A special case for solfege stored in boxes.
-		console.log(logo.blocks.blockList[cblk].name);
                 if (logo.blocks.blockList[cblk].name === "namedbox") {
                     let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
                     if (j !== -1) {

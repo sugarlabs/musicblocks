@@ -770,7 +770,7 @@ function MusicKeyboard() {
                 sortableList.push({
                     frequency: noteToFrequency(
                         this.noteNames[i] + this.octaves[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
@@ -1609,7 +1609,7 @@ function MusicKeyboard() {
             } else {
                 aValue = noteToFrequency(
                     a.noteName + a.noteOctave,
-                    that._logo.keySignature[0]
+                    that._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
             if (b.noteName == "hertz") {
@@ -1617,7 +1617,7 @@ function MusicKeyboard() {
             } else {
                 bValue = noteToFrequency(
                     b.noteName + b.noteOctave,
-                    that._logo.keySignature[0]
+                    that._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
 
@@ -2018,7 +2018,7 @@ function MusicKeyboard() {
                 labelValue,
                 octave,
                 0,
-                that._logo.keySignature[0],
+                that._logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
                 that._logo.errorMsg,
@@ -2650,7 +2650,7 @@ function MusicKeyboard() {
             this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] = key.objId ; //convet solfege to alphabetic.
         }
 
-        let __startNote = (event, element) => { 
+        let __startNote = (event, element) => {
             if (!element) return;
             startTime = event.timeStamp;  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
@@ -2717,11 +2717,11 @@ function MusicKeyboard() {
             return [pitch1, pitch2, octave];
         }
 
-        //event attributes : timeStamp , data 
+        //event attributes : timeStamp , data
         //data : length -3 [0] : 144/128 : noteOn/NoteOff
-        //                 [1] : noteNumber : middle C always 60 
+        //                 [1] : noteNumber : middle C always 60
         //                 [2] : velocity ,(currently not used).
- 
+
         let onMIDIMessage = (event) => {
             let pitchOctave = numberToPitch(event.data[1]);
             let pitch1 = pitchOctave[0];
@@ -2738,7 +2738,7 @@ function MusicKeyboard() {
         }
 
         let onMIDISuccess = (midiAccess) => {
-            // re-init widget 
+            // re-init widget
             if (this.midiON){
                 this.midiButton.style.background = "#00FF00";
                 // logo.textMsg(_("MIDI device present."));

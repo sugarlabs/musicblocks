@@ -4795,13 +4795,10 @@ function Block(protoblock, blocks, overrideName) {
          * @private
          */
         let __pitchPreview = function() {
-            let label =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
-                    .title;
+            let label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             let i = noteLabels.indexOf(label);
 
-            // Are we wrapping across C? We need to compare with the
-            // previous pitch.
+            // Are we wrapping across C? We need to compare with the previous pitch
             if (prevPitch === null) {
                 prevPitch = i;
             }
@@ -4886,15 +4883,17 @@ function Block(protoblock, blocks, overrideName) {
                 obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
             }
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -5240,15 +5239,17 @@ function Block(protoblock, blocks, overrideName) {
                 label
             );
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -5516,15 +5517,17 @@ function Block(protoblock, blocks, overrideName) {
                 note = nthDegreeToPitch("C major", 7 + noteValues[i]);
             }
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6189,22 +6192,21 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let __pitchPreviewForNum = function() {
-            let label =
-                that._numberWheel.navItems[
-                    that._numberWheel.selectedNavItemIndex
-                    ].title;
+            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
             let i = wheelLabels.indexOf(label);
             let actualPitch = numberToPitch(wheelValues[i] + 3);
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6235,22 +6237,21 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let __hertzPreview = function() {
-            let label =
-                that._numberWheel.navItems[
-                    that._numberWheel.selectedNavItemIndex
-                    ].title;
+            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
             let i = wheelLabels.indexOf(label);
             let actualPitch = frequencyToPitch(wheelValues[i]);
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6839,22 +6840,22 @@ function Block(protoblock, blocks, overrideName) {
          * @private
          */
         let __voicePreview = function() {
-            let label =
-                that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex]
-                    .title;
+            let label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             let i = voiceLabels.indexOf(label);
             let voice = voiceValues[i];
             let timeout = 0;
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(voice) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(voice) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(voice);
+                tur.singer.instrumentNames.push(voice);
                 if (voice === DEFAULTVOICE) {
                     that.blocks.logo.synth.createDefaultSynth(0);
                 }
@@ -7127,16 +7128,11 @@ function Block(protoblock, blocks, overrideName) {
             let label =
                 that._intervalNameWheel.navItems[
                     that._intervalNameWheel.selectedNavItemIndex
-                    ].title;
+                ].title;
             let number =
-                that._intervalWheel.navItems[
-                    that._intervalWheel.selectedNavItemIndex
-                    ].title;
+                that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
-            that.value =
-                INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] +
-                " " +
-                number;
+            that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
             if (label === "perfect 1") {
                 that.text.text = _("unison");
             } else {
@@ -7147,26 +7143,20 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
 
-            let obj = getNote(
-                "C",
-                4,
-                INTERVALVALUES[that.value][0],
-                "C major",
-                false,
-                null,
-                null
-            );
+            let obj = getNote("C", 4, INTERVALVALUES[that.value][0], "C major", false, null, null);
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -7504,27 +7494,21 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             let i = that._modeWheel.selectedNavItemIndex;
-            // The mode doesn't matter here, since we are using semi-tones.
-            let obj = getNote(
-                key,
-                4,
-                i + o,
-                key + " chromatic",
-                false,
-                null,
-                null
-            );
+            // The mode doesn't matter here, since we are using semi-tones
+            let obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
+
             if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
+                if (tur.singer.instrumentNames === undefined) {
+                    tur.singer.instrumentNames = [];
                 }
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -8081,9 +8065,9 @@ function Block(protoblock, blocks, overrideName) {
         ];
 
         let topBlock = this.blocks.findTopBlock(thisBlock);
-        // if (this.name === 'action') {
-        //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        // }
+        if (this.name === 'action') {
+            labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        }
         let message =
             this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
         let helpButton;
