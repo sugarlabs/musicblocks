@@ -2953,16 +2953,29 @@ function Activity() {
      * first converts midi files to sched array , 
      * then converts that array to json code. 
      */
-    this.doPlay = async function(midi) {
+    this.transcribeMidi = async function(midi) {
         let currentMidi = midi;        
         let jsONON = [] ;
         currentMidi.tracks.forEach(track => {
             if (!track.notes.length)return;
             let r = jsONON.length; 
+
+            // find matching instrument
+            let instrument = "electronic synth";
+            if (track.instrument.name){
+            for (let voices of VOICENAMES){
+                    if (track.instrument.name.indexOf(voices[1])>-1){
+                        instrument = voices[0];
+                    }
+                }
+            }
+
             jsONON.push(
-                [r,"settimbre",100,100,[null,r+1,r+3,r+2]],
-                [r+1,["voicename",{"value":"guitar"}],0,0,[r]],
-                [r+2,"hidden",0,0,[r,null]]
+                [r,["action", { collapsed: false }],100,100,[null, r+1, r+2, null]],
+                [r+1, ["text", { value: "track"+ currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
+                [r+2,"settimbre",0,0,[r,r+3,r+5,r+4]],
+                [r+3,["voicename",{"value": instrument}],0,0,[r+2]],
+                [r+4,"hidden",0,0,[r+2,null]]
             )
             let time = 0 ;
             let sched = [] ;
@@ -3009,7 +3022,6 @@ function Activity() {
                     let prevNotes = [...sched[sched.length-1].notes];
                     let oldEnd = sched[sched.length-1].end ;
                     sched[sched.length-1].end = start;
-                    //
                     let newNotes = [...prevNotes]
                     newNotes.push(name);
                     if (start<oldEnd){
@@ -3068,15 +3080,18 @@ function Activity() {
                                 [x+1,["notename",{"value":name.substring(0,name.length-1)}],0,0,[x]],
                                 [x+2,["number",{"value":parseInt(name[name.length-1])}],0,0,[x]]
                             );
-                            x+=3;
+                            x += 3;
                         }
                     }
                     return ar ;
                 }
-                let pitches = getPitch(val+2,notes,val);
+                var obj = toFraction(duration*3/8);
+                let pitches = getPitch(val+4,notes,val);
                 jsONON.push(
-                    [val,["newnote",{"collapsed":true}],0,0,[first ? val - 3 : val-1,val+1,val+2,val+pitches.length+2]],
-                    [val+1,["number",{"value":duration*3/8}],0,0,[val]]
+                    [val,["newnote",{"collapsed":true}],0,0,[first ?val-3:val-1, val+1, val+4, val+pitches.length+4]],
+                    [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
+                    [val + 2,["number", { value: obj[0] }],0,0,[val + 1]],
+                    [val + 3,["number", { value: obj[1] }],0,0,[val + 1]]
                 );
                 jsONON = jsONON.concat(pitches);
                 jsONON.push(
@@ -5483,7 +5498,7 @@ function Activity() {
 
             let files = event.dataTransfer.files;
             let reader = new FileReader();
-            let reader1 = new FileReader();
+            let midiReader = new FileReader();
 
             reader.onload = function(theFile) {
                 loading = true;
@@ -5572,10 +5587,10 @@ function Activity() {
                 }, 200);
             };
 
-            reader1.onload = (e) => {
+            midiReader.onload = (e) => {
                 const midi = new Midi(e.target.result)
                 console.debug(midi);
-                this.doPlay(midi);
+                this.transcribeMidi(midi);
             }
             // Work-around in case the handler is called by the
             // widget drag & drop code.
@@ -5583,7 +5598,7 @@ function Activity() {
                 let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
                 let isMidi = (extension == "mid") || (extension == "midi");
                 if (isMidi){
-                    reader1.readAsArrayBuffer(files[0]);
+                    midiReader.readAsArrayBuffer(files[0]);
                     return;
                 }
                 reader.readAsText(files[0]);
