@@ -4886,13 +4886,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -5242,13 +5238,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -5520,13 +5512,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -6199,13 +6187,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -6244,13 +6228,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -6848,13 +6828,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(voice) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(voice);
                 if (voice === DEFAULTVOICE) {
                     that.blocks.logo.synth.createDefaultSynth(0);
@@ -7149,13 +7125,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -7501,13 +7473,9 @@ function Block(protoblock, blocks, overrideName) {
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
             if (
-                tur.singer.instrumentNames === undefined ||
+                tur.singer.instrumentNames.length === 0 ||
                 tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (tur.singer.instrumentNames === undefined) {
-                    tur.singer.instrumentNames = [];
-                }
-
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);

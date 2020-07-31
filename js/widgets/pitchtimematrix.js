@@ -2055,13 +2055,9 @@ function PitchTimeMatrix() {
                 let tur = that._logo.turtles.ithTurtle(0);
 
                 if (
-                    tur.singer.instrumentNames === undefined ||
+                    tur.singer.instrumentNames.length === 0 ||
                     tur.singer.instrumentNames.indexOf(label) === -1
                 ) {
-                    if (tur.singer.instrumentNames === undefined) {
-                        tur.singer.instrumentNames = [];
-                    }
-
                     tur.singer.instrumentNames.push(label);
                     if (label === DEFAULTVOICE) {
                         that._logo.synth.createDefaultSynth(0);
