@@ -492,8 +492,7 @@ class Logo {
     _prepSynths() {
         this.synth.newTone();
 
-        let turtle = 0;
-        for ( ; turtle < this.turtles.turtleList.length; turtle++) {
+        for (let turtle in this.turtles.turtleList) {
             let tur = this.turtles.ithTurtle(turtle);
 
             if (!(turtle in instruments)) {
@@ -535,7 +534,7 @@ class Logo {
         }
 
         Singer.setMasterVolume(this, DEFAULTVOLUME);
-        for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+        for (let turtle in this.turtles.turtleList) {
             for (let synth in this.turtles.ithTurtle(turtle).singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
