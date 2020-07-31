@@ -516,7 +516,7 @@ function processPluginData(
     if (newPalette) {
         try {
             console.debug("CALLING makePalettes");
-            palettes.makePalettes();
+            palettes.makePalettes(1);
         } catch (e) {
             console.debug("makePalettes: " + e);
         }
@@ -728,7 +728,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
             blocks.addToMyPalette(name, macroDict[name]);
         }
 
-        palettes.makePalettes();
+        palettes.makePalettes(1);
     }
 }
 
