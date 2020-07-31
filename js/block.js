@@ -8065,9 +8065,9 @@ function Block(protoblock, blocks, overrideName) {
         ];
 
         let topBlock = this.blocks.findTopBlock(thisBlock);
-        // if (this.name === 'action') {
-        //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        // }
+        if (this.name === 'action') {
+            labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        }
         let message =
             this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
         let helpButton;

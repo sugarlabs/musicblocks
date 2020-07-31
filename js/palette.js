@@ -356,8 +356,13 @@ function Palettes() {
             // myPalettes.dict[showPalette].showMenu();
             // myPalettes.dict[showPalette]._showMenuItems();
             if (showPalette in myPalettes.dict){
+                let wasOpen = false;
+                if(docById("PaletteBody"))
+                    wasOpen = true;
+
                 myPalettes.dict[showPalette].hideMenu();
-                myPalettes.dict[showPalette].show();
+                if(wasOpen)
+                    myPalettes.dict[showPalette].show();
             }
         }
         if (this.mobile) {
