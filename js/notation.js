@@ -149,7 +149,7 @@ class Notation {
             obj[2],
             obj[3],
             insideChord,
-            tur.staccato.length > 0 && last(tur.staccato) > 0
+            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0
         ]);
 
         // If no drum is specified, add a rest to the drum line.
