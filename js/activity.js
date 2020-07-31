@@ -1057,6 +1057,8 @@ function Activity() {
                     );
                     logo.blocks.blockList[setKey].connections[1] =
                     logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[0];
                     blocks._makeNewBlockWithConnections(
                         "modename",
                         0,
@@ -1066,6 +1068,8 @@ function Activity() {
                     );
                     logo.blocks.blockList[setKey].connections[2] =
                     logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[1];
                     textMsg(
                         _("You have chosen key ") + KeySignatureEnv[0] + " " + KeySignatureEnv[1] +
                         _(" for your pitch preview.")
