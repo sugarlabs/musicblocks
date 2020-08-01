@@ -292,37 +292,37 @@ msgstr "うがん（ざひょう）をひょうじ"
 #: js/block.js:3677
 #: js/ExtrasBlocks.js:917
 msgid "polar"
-msgstr ""
+msgstr "きょくざひょう をひょうじ"
 
 #: js/block.js:3678
 #: js/ExtrasBlocks.js:920
 msgid "Cartesian+polar"
-msgstr ""
+msgstr "うがんざひょうと きょくざひょうを ひょうじ"
 
 #: js/block.js:3679
 #: js/ExtrasBlocks.js:924
 msgid "treble"
-msgstr ""
+msgstr "トレブルきごう"
 
 #: js/block.js:3680
 #: js/ExtrasBlocks.js:927
 msgid "grand staff"
-msgstr ""
+msgstr "トレブルとバスきごう"
 
 #: js/block.js:3681
 #: js/ExtrasBlocks.js:930
 msgid "mezzo-soprano"
-msgstr ""
+msgstr "メゾソプラノきごう"
 
 #: js/block.js:3682
 #: js/ExtrasBlocks.js:933
 msgid "alto"
-msgstr ""
+msgstr "アルトきごう"
 
 #: js/block.js:3683
 #: js/ExtrasBlocks.js:936
 msgid "tenor"
-msgstr ""
+msgstr "テノールきごう"
 
 #: js/block.js:3684
 #: js/ExtrasBlocks.js:939
@@ -335,7 +335,7 @@ msgstr "コントラバス"
 #: js/block.js:3685
 #: js/ExtrasBlocks.js:942
 msgid "none"
-msgstr ""
+msgstr "なし"
 
 #: js/block.js:3700
 #: js/block.js:3710
@@ -356,24 +356,24 @@ msgstr "おとのたかさを ヘルツで ひょうじ"
 #: js/block.js:3702
 #: js/block.js:3707
 msgid "letter class"
-msgstr ""
+msgstr "アルファベット・クラス"
 
 #: js/block.js:3703
 #: js/block.js:3715
 msgid "staff y"
-msgstr ""
+msgstr "おんぶきごうのｙざひょう"
 
 #: js/block.js:3708
 msgid "solfege syllable"
-msgstr ""
+msgstr "かいめい（ド、レ、ミ）"
 
 #: js/block.js:3709
 msgid "pitch class"
-msgstr ""
+msgstr "ピッチクラス"
 
 #: js/block.js:3712
 msgid "scalar class"
-msgstr ""
+msgstr "おんかいクラス"
 
 #: js/block.js:3713
 msgid "scale degree"
@@ -381,7 +381,7 @@ msgstr "おんど"
 
 #: js/block.js:3714
 msgid "nth degree"
-msgstr ""
+msgstr "ピッチど"
 
 #: js/block.js:4626
 #: js/musickeyboard.js:1789
@@ -479,7 +479,7 @@ msgstr "エオリアンおんかい"
 
 #: js/block.js:7839
 msgid "Not a number"
-msgstr ""
+msgstr "すうじではありません"
 
 #: js/block.js:8109
 msgid "Duplicate"
@@ -574,7 +574,7 @@ msgstr "ほうがん（ざひょう）を ひょうじ"
 #: js/activity.js:1319
 #.TRANS: show treble clef
 msgid "show treble"
-msgstr ""
+msgstr "トレブルきごう を ひょうじ"
 
 #: js/activity.js:1322
 #.TRANS: hide Polar coordinate overlay grid
@@ -586,27 +586,27 @@ msgstr "ちゅうしんの かくどを かくす"
 #.TRANS: show bass clef
 #.TRANS: show bass clef
 msgid "show bass"
-msgstr ""
+msgstr "バスきごうを ひょうじ"
 
 #: js/activity.js:1338
 #.TRANS: show mezzo-soprano staff
 msgid "show mezzo-soprano"
-msgstr ""
+msgstr "メゾソプラノきごうを ひょうじ"
 
 #: js/activity.js:1343
 #.TRANS: show alto clef
 msgid "show alto"
-msgstr ""
+msgstr "アルトきごうを ひょうじ"
 
 #: js/activity.js:1348
 #.TRANS: show tenor clef
 msgid "show tenor"
-msgstr ""
+msgstr "テノールを ひょうじ"
 
 #: js/activity.js:1358
 #.TRANS: hide bass clef
 msgid "hide bass"
-msgstr ""
+msgstr "バスを かくす"
 
 #: js/activity.js:1365
 #.TRANS: show Polar coordinate overlay grid
@@ -628,7 +628,7 @@ msgstr "ブロックが みつかりません。"
 
 #: js/activity.js:2102
 msgid "Saving block artwork"
-msgstr ""
+msgstr "ブロックの アートを ほぞんちゅう"
 
 #: js/activity.js:2106
 #: js/LocalCard.js:17
@@ -637,7 +637,7 @@ msgstr "コピー"
 
 #: js/activity.js:2113
 msgid "Erase"
-msgstr ""
+msgstr "けす"
 
 #: js/activity.js:2117
 #: js/activity.js:2354
@@ -700,7 +700,7 @@ msgstr "はりつけ"
 
 #: js/activity.js:2129
 msgid "Save block help"
-msgstr ""
+msgstr "ブロックの ヘルプを ほぞん"
 
 #: js/activity.js:2207
 msgid "Jumping to the bottom of the page."
@@ -755,7 +755,7 @@ msgstr "じぶんの プロジェクト"
 
 #: js/activity.js:3056
 msgid "Click the run button to run the project."
-msgstr ""
+msgstr "プロジェクトを さいせいするため、さいせいの ボタンを クリックして ください。"
 
 #: js/activity.js:3112
 msgid "Please set browser zoom level to 100%"
@@ -942,7 +942,7 @@ msgstr "ひょうじする"
 
 #: js/palette.js:2423
 msgid "myblocks"
-msgstr ""
+msgstr "マイ・ブロックス"
 
 #: js/turtledefs.js:23
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
@@ -1049,19 +1049,19 @@ msgstr "がっそう"
 
 #: js/turtledefs.js:87
 msgid "extras"
-msgstr "その他"
+msgstr "そのた"
 
 #: js/turtledefs.js:88
 msgid "my blocks"
-msgstr ""
+msgstr "わたしの ブロック"
 
 #: js/turtledefs.js:122
 msgid "music"
-msgstr "音楽"
+msgstr "おんがく"
 
 #: js/turtledefs.js:122
 msgid "logic"
-msgstr "論理"
+msgstr "ろんり"
 
 #: js/turtledefs.js:122
 msgid "artwork"
@@ -1372,7 +1372,7 @@ msgstr "SVGでほぞん"
 
 #: js/turtledefs.js:543
 msgid "Save graphics from your project to as SVG."
-msgstr ""
+msgstr "プロジェクトの グラフィックを SVGで ほぞん"
 
 #: js/turtledefs.js:545
 #: js/toolbar.js:527
@@ -1385,7 +1385,7 @@ msgstr "PNGでほぞん"
 
 #: js/turtledefs.js:547
 msgid "Save graphics from your project as PNG."
-msgstr ""
+msgstr "プロジェクトの グラフィックを PNGで ほぞん"
 
 #: js/turtledefs.js:549
 #: js/toolbar.js:531
@@ -1395,7 +1395,7 @@ msgstr "WAVでほぞん"
 
 #: js/turtledefs.js:551
 msgid "Save audio from your project as WAV."
-msgstr ""
+msgstr "プロジェクトの おとを WAVで ほぞん"
 
 #: js/turtledefs.js:553
 #: js/toolbar.js:532
@@ -1405,7 +1405,7 @@ msgstr "ABCのフォーマットでほぞん"
 
 #: js/turtledefs.js:555
 msgid "Save your project to as an ABC file."
-msgstr ""
+msgstr "プロジェクトを ABCがくふで ほぞん"
 
 #: js/turtledefs.js:557
 #: js/toolbar.js:533
@@ -1427,7 +1427,7 @@ msgstr "ブロックの アートを ほぞん"
 
 #: js/turtledefs.js:563
 msgid "Save block artwork as an SVG file."
-msgstr ""
+msgstr "ブロックの グラフィックを SVGで ほぞん"
 
 #: js/turtledefs.js:568
 msgid "Load samples from server"
@@ -1475,11 +1475,11 @@ msgstr "せんたく した プラグインを けす。"
 
 #: js/turtledefs.js:698
 msgid "Wrap Turtle"
-msgstr ""
+msgstr "アートを つつむ"
 
 #: js/turtledefs.js:699
 msgid "Turn Turtle wrapping On or Off."
-msgstr ""
+msgstr "アートつつむか・つつまない"
 
 #: js/toolbar.js:503
 #: js/toolbar.js:561
@@ -1559,7 +1559,7 @@ msgstr "はってん モードに する"
 
 #: js/toolbar.js:534
 msgid "Save sheet music as MusicXML"
-msgstr ""
+msgstr "プロジェクトを MusicXMLがくふで ほぞん"
 
 #: js/toolbar.js:540
 #: js/toolbar.js:591
@@ -1650,7 +1650,7 @@ msgstr ""
 #: js/toolbar.js:596
 #: js/toolbar.js:648
 msgid "About Turtle Blocks"
-msgstr ""
+msgstr "タートル・ブロックスについて"
 
 #: js/toolbar.js:631
 msgid "한국인"
@@ -1658,11 +1658,11 @@ msgstr ""
 
 #: js/toolbar.js:670
 msgid "Save turtle artwork as SVG"
-msgstr ""
+msgstr "アートを SVGで ほぞん"
 
 #: js/toolbar.js:671
 msgid "Save turtle artwork as PNG"
-msgstr ""
+msgstr "アートを PNGで ほぞん"
 
 #: js/SaveInterface.js:26
 #: js/SaveInterface.js:28
@@ -1781,7 +1781,7 @@ msgstr "ネズミたちのかんけい"
 #: js/turtle-singer.js:1810
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Warning: Note value greater than 2."
-msgstr ""
+msgstr "ちゅうい：おとのながさは ２より おおきいです"
 
 #: js/turtle-singer.js:1962
 msgid "synth cannot play chords."
@@ -3173,7 +3173,7 @@ msgstr "<h2>ひょうじ ブロック（けっか）</h2><br>がめんの じょ
 
 #: js/ExtrasBlocks.js:886
 msgid "display grid"
-msgstr ""
+msgstr "グリッドをひょうじ"
 
 #: js/ExtrasBlocks.js:891
 msgid "The Display Grid Block changes the grid type"
@@ -3274,7 +3274,7 @@ msgstr "びょうし"
 
 #: js/MeterBlocks.js:552
 msgid "on every beat do"
-msgstr ""
+msgstr "すべてのびょうしにアクションじっこう"
 
 #: js/MeterBlocks.js:653
 msgid "on every note do"
@@ -3559,15 +3559,15 @@ msgstr "ねいろを せってい"
 
 #: js/SensorsBlocks.js:16
 msgid "input"
-msgstr ""
+msgstr "インプット"
 
 #: js/SensorsBlocks.js:19
 msgid "Input a value"
-msgstr ""
+msgstr "価値をインプット"
 
 #: js/SensorsBlocks.js:69
 msgid "input value"
-msgstr ""
+msgstr "インプットの価値"
 
 #: js/SensorsBlocks.js:145
 ## 音量＝おんりょう
@@ -3584,7 +3584,7 @@ msgstr ""
 
 #: js/SensorsBlocks.js:213
 msgid "cursor over"
-msgstr ""
+msgstr "カーソル（うえ）"
 
 #: js/SensorsBlocks.js:217
 msgid "The Cursor over block triggers an event when the cursor is moved over a mouse."
@@ -3592,7 +3592,7 @@ msgstr ""
 
 #: js/SensorsBlocks.js:232
 msgid "cursor out"
-msgstr ""
+msgstr "カーソル（外）"
 
 #: js/SensorsBlocks.js:237
 msgid "The Cursor out block triggers an event when the cursor is moved off of a mouse."
@@ -3600,7 +3600,7 @@ msgstr ""
 
 #: js/SensorsBlocks.js:251
 msgid "cursor button down"
-msgstr ""
+msgstr "カーソルクリック（した）"
 
 #: js/SensorsBlocks.js:255
 msgid "The Cursor button down block triggers an event when the curson button is press on a mouse."
@@ -3608,7 +3608,7 @@ msgstr ""
 
 #: js/SensorsBlocks.js:269
 msgid "cursor button up"
-msgstr ""
+msgstr "カーソルクリック（うえ）"
 
 #: js/SensorsBlocks.js:273
 msgid "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
@@ -4008,7 +4008,7 @@ msgstr "ヘルツ・ブロック：おんぷ ブロックを つかいますか�
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "nth modal pitch"
-msgstr ""
+msgstr "ピッチど"
 
 #: js/PitchBlocks.js:2068
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
@@ -4665,12 +4665,12 @@ msgstr "おんぷをた"
 #: js/musickeyboard.js:465
 #: js/temperament.js:2164
 msgid "Table"
-msgstr ""
+msgstr "グリッド"
 
 #: js/musickeyboard.js:1076
 #: plugins/rodi.rtp:197
 msgid "duration"
-msgstr "期間のせってい"
+msgstr "きかんのせってい"
 
 #: js/musickeyboard.js:2599
 #: js/pitchtimematrix.js:5286
@@ -4682,20 +4682,20 @@ msgstr "期間のせってい"
 #: js/modewidget.js:920
 #: js/pitchstaircase.js:520
 msgid "New action block generated!"
-msgstr ""
+msgstr "あたらしいアクションを つくりました！"
 
 #: js/musickeyboard.js:2744
 #: js/musickeyboard.js:2750
 msgid "MIDI device present."
-msgstr ""
+msgstr "MIDIデバイスがみつかりました。"
 
 #: js/musickeyboard.js:2753
 msgid "No MIDI device found."
-msgstr ""
+msgstr "MIDIデバイスがみつかりません。"
 
 #: js/musickeyboard.js:2758
 msgid "Failed to get MIDI access in browser."
-msgstr ""
+msgstr "ブラウザはMIDIのアクセスができませんでした。"
 
 #: js/pitchdrummatrix.js:184
 #: js/musicutils.js:226
@@ -4840,7 +4840,7 @@ msgstr "いちじ ていし"
 
 #: js/tempo.js:318
 msgid "Save tempo"
-msgstr ""
+msgstr "テンポをほぞん"
 
 #: js/tempo.js:353
 msgid "speed up"
