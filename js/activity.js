@@ -1262,16 +1262,14 @@ function Activity() {
                 null
             );
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+            let tur = blocks.logo.turtles.ithTurtle(0);
 
             if (
-                blocks.logo.instrumentNames[0] === undefined ||
-                blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
             ) {
-                if (blocks.logo.instrumentNames[0] === undefined) {
-                    blocks.logo.instrumentNames[0] = [];
-                }
 
-                blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 blocks.logo.synth.createDefaultSynth(0);
                 blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -1300,8 +1298,8 @@ function Activity() {
                     }
                 }
                 __selectionChangedKey();
-                // if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
-                //     __playNote();
+                if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
+                    __playNote();
             };
         };
 
@@ -1348,7 +1346,7 @@ function Activity() {
                 keyNameWheel2.selectedNavItemIndex
             ].title;
             KeySignatureEnv[0] = selection;
-            // __playNote();
+            __playNote();
         };
 
         for (let i = 0; i < keys2.length; i++) {
