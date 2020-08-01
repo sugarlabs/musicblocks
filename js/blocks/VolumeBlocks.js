@@ -473,6 +473,7 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
             if (args.length === 1) {
                 let arg;
                 if (typeof args[0] !== "number") {
@@ -721,7 +722,7 @@ function setupVolumeBlocks() {
                     tur.singer.crescendoDelta.pop();
                     for (let synth in tur.singer.synthVolume) {
                         let len = tur.singer.synthVolume[synth].length;
-                        tur.signer.synthVolume[synth][len - 1] = last(
+                        tur.singer.synthVolume[synth][len - 1] = last(
                             tur.singer.crescendoInitialVolume[synth]
                         );
                         tur.singer.crescendoInitialVolume[synth].pop();
