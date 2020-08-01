@@ -1162,9 +1162,9 @@ function Synth() {
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);
-            this.setVolume(turtle, sourceName, DEFAULTVOLUME);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
+        this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
             return instruments[turtle][sourceName].toMaster();
