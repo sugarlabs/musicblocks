@@ -641,7 +641,6 @@ function processPluginData(
 
     setTimeout(function() {
         palettes.show();
-        palettes.bringToTop();
     }, 2000);
 
     // Return the object in case we need to save it to local storage.

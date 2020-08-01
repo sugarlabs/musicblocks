@@ -162,9 +162,10 @@ class Turtle {
     /**
      * Initialises turtle state variables.
      *
+     * @param {Boolean} suppressOutput - whether to suppress output
      * @returns {void}
      */
-    initTurtle() {
+    initTurtle(suppressOutput) {
         this.doWait(0);
         this.endOfClampSignals = {};
         this.butNotThese = {};
@@ -284,7 +285,7 @@ class Turtle {
         this.singer.justMeasuring = [];
         this.singer.firstPitch = [];
         this.singer.lastPitch = [];
-        this.singer.suppressOutput = this.runningLilypond || this.runningAbc || this.runningMxml;
+        this.singer.suppressOutput = suppressOutput;
 
         this.singer.dispatchFactor = 1;
     }

@@ -1937,7 +1937,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                             }
                         }
                     }
-                }
+                } 
                 return sd;
             }
         } else if (chosenModePattern.length < 7) {

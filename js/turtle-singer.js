@@ -93,12 +93,11 @@ class Singer {
         this.previousTurtleTime = 0;
         this.turtleTime = 0;
         this.pushedNote = false;
-        //////
         this.duplicateFactor = 1;
         this.inDuplicate = false;
         this.skipFactor = 1;
         this.skipIndex = 0;
-        this.instrumentNames = ["electronic synth"];
+        this.instrumentNames = [];
         this.inCrescendo = [];
         this.crescendoDelta = [];
         this.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
