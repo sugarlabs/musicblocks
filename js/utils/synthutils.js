@@ -1578,8 +1578,8 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
-        console.debug("Crescendo(decibels)",instrumentName,":",synth.volume.value,"to",db,"t:",rampTime);
-        console.debug("Crescendo",instrumentName,":",oldVol,"to",volume,"t:",rampTime);
+        console.debug("Crescendo(decibels)",instrumentName ,":" ,synth.volume.value ,"to" ,db ,"t:" ,rampTime );
+        console.debug("Crescendo",instrumentName ,":" ,oldVol ,"to" ,volume ,"t:" ,rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
     } 
