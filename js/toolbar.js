@@ -397,6 +397,14 @@ function Toolbar() {
         };
     };
 
+    this.renderChooseKeyIcon = function(onclick) {
+        var chooseKeyIcon = docById("chooseKeyIcon");
+        docById("chooseKeyDiv").style.display = "none";
+        chooseKeyIcon.onclick = () => {
+            onclick();
+        };
+    };
+
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = function() {
@@ -519,6 +527,7 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Select Key/Mode")],
             ["restoreIcon", _("Restore")],
             ["beginnerMode", _("Switch to beginner mode")],
             ["advancedMode", _("Switch to advanced mode")],
@@ -577,6 +586,7 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Select Key/Mode"),
             _("Restore"),
             _("Switch to beginner mode"),
             _("Switch to advanced mode"),
@@ -612,6 +622,7 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Select Key/Mode")],
             ["restoreIcon", _("Restore")],
             ["languageSelectIcon", _("Select language")],
             ["save-html-beg", _("Save project as HTML"), "innerHTML"],
@@ -664,6 +675,7 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Select Key/Mode"),
             _("Restore"),
             _("Select language"),
             _("Save project as HTML"),

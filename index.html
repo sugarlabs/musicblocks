@@ -119,6 +119,20 @@
     </head>
 
     <!-- #96D3F3-->
+    <div 
+            id="chooseKeyDiv"
+            tabindex="-1"
+        >
+    </div>
+    <div
+            id="moveable"
+            tabindex="-1"
+        >
+        <input class="radioBtn" type="radio" name="moveable" value="true">
+            <label for="moveabledo">Moveable Do</label>
+        <input class="radioBtn" type="radio" name="moveable" id="fixed" checked="checked" value="false">
+            <label for="fixed">Fixed</label>
+    </div>
 
     <body
         onload="init();"
@@ -686,6 +700,16 @@
                                         data-position="bottom"
                                         ><i class="material-icons md-48"
                                             >wrap_text</i
+                                        ></a
+                                    >
+                                </li>
+                                <li>
+                                    <a 
+                                        id="chooseKeyIcon" 
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        ><i class="material-icons md-48"
+                                            >music_note</i
                                         ></a
                                     >
                                 </li>

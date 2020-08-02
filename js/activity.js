@@ -15,6 +15,12 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+var KeySignatureEnv = [
+    "C",
+    "major",
+    false
+];
+
 function Activity() {
     _THIS_IS_MUSIC_BLOCKS_ = true;
     LEADING = 0;
@@ -976,6 +982,104 @@ function Activity() {
         }
     };
 
+    __generateSetKeyBlocks = () => {
+        // Find all setkey blocks in the code
+        let isSetKeyBlockPresent = 0;
+        let setKeyBlocks = [];
+        for (let i in logo.blocks.blockList) {
+            if (logo.blocks.blockList[i].name === "setkey2" &&
+            !logo.blocks.blockList[i].trash
+            ) {
+                isSetKeyBlockPresent = 1;
+                setKeyBlocks.push(i);
+            }
+        }
+        
+        if (!isSetKeyBlockPresent) {
+            blocks.findStacks();
+            let stacks = blocks.stackList;
+            stacks.sort();
+            for (let i in stacks) {
+                if (logo.blocks.blockList[stacks[i]].name === "start") {
+                    let bottomBlock;
+                    bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
+                    let connectionsSetKey;
+                    let movable;
+                    if (KeySignatureEnv[2]) {
+                        blocks._makeNewBlockWithConnections(
+                            "movable",
+                            0,
+                            [stacks[i], null, null],
+                            null,
+                            null
+                        );
+                        movable = logo.blocks.blockList.length - 1;
+                        blocks._makeNewBlockWithConnections(
+                            "boolean",
+                            0,
+                            [movable],
+                            null,
+                            null
+                        );
+                        logo.blocks.blockList[movable].connections[1] =
+                        logo.blocks.blockList.length - 1;
+                        connectionsSetKey = [movable, null, null, bottomBlock];
+                    } else {
+                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                    }
+
+                    blocks._makeNewBlockWithConnections(
+                        "setkey2",
+                        0,
+                        connectionsSetKey,
+                        null,
+                        null
+                    );
+
+                    let setKey = logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[bottomBlock].connections[0] = setKey;
+
+                    if (KeySignatureEnv[2]) {
+                        logo.blocks.blockList[stacks[i]].connections[1] = movable;
+                        logo.blocks.blockList[movable].connections[2] = setKey;
+                    } else {
+                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
+                    }
+                    
+                    blocks.adjustExpandableClampBlock();
+
+                    blocks._makeNewBlockWithConnections(
+                        "notename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[1] =
+                    logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[0];
+                    blocks._makeNewBlockWithConnections(
+                        "modename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[2] =
+                    logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[1];
+                    textMsg(
+                        _("You have chosen key ") + KeySignatureEnv[0] + " " + KeySignatureEnv[1] +
+                        _(" for your pitch preview.")
+                    );
+                }
+
+            }
+        }
+    };
+
     /*
      * @param onblur {when object loses focus}
      *
@@ -998,8 +1102,6 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            Singer.setMasterVolume(logo, 0);
-
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1049,6 +1151,250 @@ function Activity() {
         refreshCanvas();
     };
 
+    chooseKeyMenu = () => {
+        docById("chooseKeyDiv").style.display = "block";
+        docById("moveable").style.display = "block";
+
+        var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+        var keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
+        let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+        
+        wheelnav.cssMode = true;
+
+        keyNameWheel.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
+        keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.titleRotateAngle = 0;
+        keyNameWheel.clickModeRotate = false;
+        keyNameWheel.colors = platformColor.pitchWheelcolors;
+        keyNameWheel.animatetime = 0;
+        
+        keyNameWheel.createWheel(keys);
+
+        keyNameWheel2.colors = platformColor.pitchWheelcolors;
+        keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+        keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
+        keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
+        keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
+        let keys2 = [];
+
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].length > 2) {
+                let obj = keys[i].split("/");
+                keys2.push(obj[0]);
+                keys2.push(obj[1]);
+            } else {
+                keys2.push("");
+                keys2.push("");
+            }
+        }
+
+        keyNameWheel2.navAngle = -7.45;
+        keyNameWheel2.clickModeRotate = false;
+        keyNameWheel2.createWheel(keys2);
+
+        var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
+        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        modenameWheel.slicePathFunction = slicePath().DonutSlice;
+        modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.titleRotateAngle = 0;
+        modenameWheel.colors = platformColor.modeGroupWheelcolors;
+        modenameWheel.animatetime = 0;
+        
+        modenameWheel.createWheel(modes);
+
+        var exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
+        exitWheel.slicePathFunction = slicePath().DonutSlice;
+        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+        exitWheel.titleRotateAngle = 0;
+        exitWheel.clickModeRotate = false;
+        exitWheel.colors = platformColor.exitWheelcolors;
+        exitWheel.animatetime = 0;
+        exitWheel.createWheel(["×", " "]);
+
+        let x = event.clientX;
+        let y = event.clientY;
+
+        docById("chooseKeyDiv").style.left = (x - 175) + "px";
+        docById("chooseKeyDiv").style.top = (y + 50) + "px";
+        docById("moveable").style.left = (x - 110) + "px";
+        docById("moveable").style.top = (y + 400) + "px";
+
+        let __exitMenu = () => {
+            docById("chooseKeyDiv").style.display = "none";
+            docById("moveable").style.display = "none";
+            let ele = document.getElementsByName("moveable");
+            for (let i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+                }
+            }
+            keyNameWheel.removeWheel();
+            keyNameWheel2.removeWheel();
+            modenameWheel.removeWheel();
+            localStorage.KeySignatureEnv = KeySignatureEnv;
+            __generateSetKeyBlocks();
+        };
+        
+        exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+        let __playNote = () => {
+            let obj = getNote(
+                KeySignatureEnv[0],
+                4,
+                null,
+                KeySignatureEnv[0] + " " + KeySignatureEnv[1],
+                false,
+                null,
+                null
+            );
+            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+            let tur = blocks.logo.turtles.ithTurtle(0);
+
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
+                blocks.logo.synth.createDefaultSynth(0);
+                blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            Singer.setSynthVolume(blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+            blocks.logo.synth.trigger(
+                0,
+                [obj[0] + obj[1]],
+                1 / 12,
+                DEFAULTVOICE,
+                null,
+                null
+            );
+        };
+
+        let __setupActionKey = function(i) {
+            keyNameWheel.navItems[i].navigateFunction = function() {
+                for (let j = 0; j < keys2.length; j++) {
+                    if ( Math.floor(j/2) != i) {
+                        keyNameWheel2.navItems[j].navItem.hide();
+                    } else {
+                        if (keys[i].length > 2) {
+                            keyNameWheel2.navItems[j].navItem.show();
+                        }
+                    }
+                }
+                __selectionChangedKey();
+                if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
+                    __playNote();
+            };
+        };
+
+        let __selectionChangedKey = () => {
+            let selection = keyNameWheel.navItems[
+                keyNameWheel.selectedNavItemIndex
+            ].title;
+            if (selection === "") {
+                keyNameWheel.navigateWheel(
+                    (keyNameWheel.selectedNavItemIndex + 1) %
+                    keyNameWheel.navItems.length
+                );
+            } else if (selection.length <= 2) {
+                KeySignatureEnv[0] = selection;
+            }
+        };
+
+        for (let i = 0; i < keys.length; i++) {
+            __setupActionKey(i);
+        }
+
+        let __selectionChangedMode = () => {
+            let selection = modenameWheel.navItems[
+                modenameWheel.selectedNavItemIndex
+            ].title;
+            if (selection === "") {
+                modenameWheel.navigateWheel(
+                    (modenameWheel.selectedNavItemIndex + 1) %
+                    modenameWheel.navItems.length
+                );
+            } else {
+                KeySignatureEnv[1] = selection;
+            }
+        };
+
+        for (let i = 0; i < modes.length; i++) {
+            modenameWheel.navItems[i].navigateFunction = function() {
+                __selectionChangedMode();
+            };
+        }
+
+        let __selectionChangedKey2 = function() {
+            let selection = keyNameWheel2.navItems[
+                keyNameWheel2.selectedNavItemIndex
+            ].title;
+            KeySignatureEnv[0] = selection;
+            __playNote();
+        };
+
+        for (let i = 0; i < keys2.length; i++) {
+            keyNameWheel2.navItems[i].navigateFunction = function() {
+                __selectionChangedKey2();
+            };
+        }
+        if (localStorage.KeySignatureEnv !== undefined) {
+            let ks = localStorage.KeySignatureEnv.split(",");
+            KeySignatureEnv[0] = ks[0];
+            KeySignatureEnv[1] = ks[1];
+            KeySignatureEnv[2] = (ks[2] == "true" ? true: false);
+        } else {
+            KeySignatureEnv = [
+                "C",
+                "major",
+                false
+            ];
+        }
+        let i = keys.indexOf(KeySignatureEnv[0]);
+        if (i == -1) {
+            i = keys2.indexOf(KeySignatureEnv[0]);
+            console.log("index is", i);
+            if (i != -1) {
+                keyNameWheel2.navigateWheel(i);
+                for (let j = 0; j < keys2.length; j++) {
+                    keyNameWheel2.navItems[j].navItem.hide();
+                    if (i % 2 == 0) {
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i + 1].navItem.show();
+                    } else {
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i-1].navItem.show();
+                    }
+                }
+            }
+        } else {
+            keyNameWheel.navigateWheel(i);
+            keyNameWheel2.navItems[2 * i].navItem.hide();
+            keyNameWheel2.navItems[2 * i + 1].navItem.hide();
+        }
+
+        let j = modes.indexOf(KeySignatureEnv[1]);
+        if (j !== -1) {
+            modenameWheel.navigateWheel(j);
+        }
+    };
+
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
@@ -1056,7 +1402,7 @@ function Activity() {
     };
 
     // function doMuteButton() {
-    //     Singer.setMasterVolume(logo, 0);
+    //     logo.setMasterVolume(0);
     // };
 
     // function _hideBoxes() {
@@ -4601,6 +4947,7 @@ function Activity() {
         );
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
+        toolbar.renderChooseKeyIcon(chooseKeyMenu);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 
