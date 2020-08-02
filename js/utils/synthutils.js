@@ -286,6 +286,20 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
+const percussionInstruments = [
+    "koto",
+    "banjo",
+    "dulcimer",
+    "xylophone",
+    "celeste"
+];
+const stringInstruments = [
+    "piano",
+    "guitar",
+    "acoustic guitar",
+    "electric guitar"
+];
+
 // Validate the passed on parameters in a function as per the default
 // parameters values
 function validateAndSetParams(defaultParams, params) {
@@ -1148,9 +1162,9 @@ function Synth() {
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);
-            this.setVolume(turtle, sourceName, DEFAULTVOLUME);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
+        this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
             return instruments[turtle][sourceName].toMaster();
@@ -1539,6 +1553,36 @@ function Synth() {
     this.stop = function() {
         Tone.Transport.stop();
     };
+
+    this.rampTo = function(turtle, instrumentName,oldVol, volume, rampTime){
+        if (percussionInstruments.includes(instrumentName) || stringInstruments.includes(instrumentName))
+            return;
+
+        let nv;
+        if (instrumentName in DEFAULTSYNTHVOLUME) {
+            let sv = DEFAULTSYNTHVOLUME[instrumentName];
+            if (volume > 50) {
+                let d = 100 - sv;
+                nv = ((volume - 50) / 50) * d + sv;
+            } else {
+                nv = (volume / 50) * sv;
+            }
+        } else {
+            nv = volume;
+        }
+
+        let db = Tone.gainToDb(nv / 100);
+
+        let synth = instruments[turtle]["electronic synth"] ;
+        if (instrumentName in instruments[turtle]) {
+            synth = instruments[turtle][instrumentName];
+        }
+
+        console.debug("Crescendo(decibels)",instrumentName ,":" ,synth.volume.value ,"to" ,db ,"t:" ,rampTime );
+        console.debug("Crescendo",instrumentName ,":" ,oldVol ,"to" ,volume ,"t:" ,rampTime);
+
+        synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
+    } 
 
     this.setVolume = function(turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.

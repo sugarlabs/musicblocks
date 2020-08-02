@@ -900,8 +900,8 @@ function setupToneBlocks() {
                     logo.synth.loadSynth(turtle, synth);
 
                     if (tur.singer.synthVolume[synth] === undefined) {
-                        tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                        tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
+                        tur.singer.synthVolume[synth] = [last(Singer.masterVolume)];
+                        tur.singer.crescendoInitialVolume[synth] = [last(Singer.masterVolume)];
                     }
                 }
 

@@ -1190,11 +1190,13 @@ class Singer {
             }
 
             for (let synth in tur.singer.synthVolume) {
+                let oldVol = last(tur.singer.synthVolume[synth]);
                 let len = tur.singer.synthVolume[synth].length;
                 tur.singer.synthVolume[synth][len - 1] += last(tur.singer.crescendoDelta);
                 console.debug(synth + "= " + tur.singer.synthVolume[synth][len - 1]);
                 if (!tur.singer.suppressOutput) {
-                    Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
+                    Singer.setSynthVolume(logo, turtle, synth, oldVol);
+                    logo.synth.rampTo(turtle,synth,oldVol,last(tur.singer.synthVolume[synth]),bpmFactor/noteBeatValue);
                 }
             }
         }
