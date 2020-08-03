@@ -3098,9 +3098,11 @@ function Activity() {
                     [jsONON.length,"hidden",0,0,[val, last ? null: jsONON.length +1]]                  
                 );
             }
-            console.debug(JSON.stringify(jsONON));
-            console.debug ('midi track loading ... be patient ');
+            //console.debug(JSON.stringify(jsONON));
             console.debug ('finished when you see: "block loading finished "');
+            document.body.style.cursor = "wait";
+            logo.textMsg ('midi tracks loading');
+            logo.errorMsg ("this may take some time depending on the number of notes in the track");
         })
         blocks.loadNewBlocks(jsONON);
         return null ;
