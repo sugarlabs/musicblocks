@@ -1733,16 +1733,62 @@ function Activity() {
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         }
 
+        let normalizeWheel = (event) => {
+            let PIXEL_STEP  = 10;
+            let LINE_HEIGHT = 40;
+            let PAGE_HEIGHT = 800;
+
+            let sX = 0, sY = 0,       // spinX, spinY
+                pX = 0, pY = 0;       // pixelX, pixelY
+
+            if ('detail'      in event) sY = event.detail;
+            if ('wheelDelta'  in event) sY = -event.wheelDelta / 120;
+            if ('wheelDeltaY' in event) sY = -event.wheelDeltaY / 120;
+            if ('wheelDeltaX' in event) sX = -event.wheelDeltaX / 120;
+          
+            // side scrolling on FF with DOMMouseScroll
+            if ( 'axis' in event && event.axis === event.HORIZONTAL_AXIS ) {
+              sX = sY;
+              sY = 0;
+            }
+          
+            pX = sX * PIXEL_STEP;
+            pY = sY * PIXEL_STEP;
+          
+            if ('deltaY' in event) pY = event.deltaY;
+            if ('deltaX' in event) pX = event.deltaX;
+
+            if ((pX || pY) && event.deltaMode) {
+              if (event.deltaMode == 1) {          // ff uses deltamode = 1
+                pX *= LINE_HEIGHT;
+                pY *= LINE_HEIGHT;
+              } else {                             // delta in PAGE units
+                pX *= PAGE_HEIGHT;
+                pY *= PAGE_HEIGHT;
+              }
+            }
+          
+            // Fall-back if spin cannot be determined
+            if (pX && !sX) sX = (pX < 1) ? -1 : 1;
+            if (pY && !sY) sY = (pY < 1) ? -1 : 1;
+          
+            return { pixelX : pX,
+                     pixelY : pY };
+        }
+
         let __wheelHandler = function(event) {
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
+            let data = normalizeWheel(event);// normalize over different browsers
+            let delY = data.pixelY;
+            let delX = data.pixelX;
+            if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
-                blocksContainer.y -= event.deltaY;
+                blocksContainer.y -= delY;
             }
             // horizontal scroll
             if (scrollBlockContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
+                if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    blocksContainer.x -= event.deltaX;
+                    blocksContainer.x -= delX;
                 }
             } else {
                 event.preventDefault();
