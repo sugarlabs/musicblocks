@@ -760,8 +760,14 @@ function setupPitchBlocks() {
                 } else {
                     return (note + o2);
                 }
+            } else if (logo.blocks.blockList[cblk0].name == "pitch") {
+                let posY3 = logo.blocks.blockList[cblk1].value;
+                let o3 = Math.floor(posY3 / 87.5) + 4;
+                posY3 %= 87.5;
+                let sol = SOLFEGENAMES[Math.floor(posY3 / 12.5)];
+                console.log(sol, o3);
+                return [sol, o3];
             }
-
         }
     }
 
@@ -1972,10 +1978,6 @@ function setupPitchBlocks() {
                     obj = keySignatureToMode(logo.keySignature[turtle]);
                 }
 
-<<<<<<< HEAD
-                let obj = keySignatureToMode(tur.singer.keySignature);
-=======
->>>>>>> Staff Y: Nthmodalpitch
                 let modeLength = MUSICALMODES[obj[1]].length;
                 let scaleDegree = Math.floor(arg0 - 1) % modeLength + 1;
 
