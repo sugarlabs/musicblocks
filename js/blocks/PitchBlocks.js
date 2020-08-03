@@ -543,7 +543,7 @@ function setupPitchBlocks() {
                                 o1 = tur.singer.lastNotePlayed[0][2];
                             }
                             // these numbers are subject to staff artwork
-                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;
+                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
                         case "pitch number":
                             let value = null;
                             let obj;
@@ -737,24 +737,24 @@ function setupPitchBlocks() {
             let cblk1 = logo.blocks.blockList[blk].connections[1];
             if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
                 let posY = logo.blocks.blockList[cblk1].value;
-                let o = Math.floor(posY / 87.5);
-                posY %= 87.5;
+                let o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
+                posY %= YSTAFFOCTAVEHEIGHT;
                 let lc = 0;
-                for (let i = 0; i < posY / 12.5; i++) {
+                for (let i = 0; i < posY / YSTAFFNOTEHEIGHT; i++) {
                     lc += MUSICALMODES["major"][i];
                 }
                 return (lc + (12 * o));
             } else if (logo.blocks.blockList[cblk0].name == "nthmodalpitch") {
                 let posY1 = logo.blocks.blockList[cblk1].value;
-                let o1 = Math.floor(posY1 / 87.5);
-                posY1 %= 87.5;
-                let lc1 = posY1 / 12.5;
+                let o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
+                posY1 %= YSTAFFOCTAVEHEIGHT;
+                let lc1 = posY1 / YSTAFFNOTEHEIGHT;
                 return (lc1 + (o1 * 7));
             } else if (logo.blocks.blockList[cblk0].name == "print") {
                 let posY2 = logo.blocks.blockList[cblk1].value;
-                let o2 = Math.floor(posY2 / 87.5) + 4;
-                posY2 %= 87.5;
-                let note = NOTENAMES[Math.floor(posY2 / 12.5)];
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, "ytopitch"]);
                 } else {
@@ -762,9 +762,9 @@ function setupPitchBlocks() {
                 }
             } else if (logo.blocks.blockList[cblk0].name == "pitch") {
                 let posY3 = logo.blocks.blockList[cblk1].value;
-                let o3 = Math.floor(posY3 / 87.5) + 4;
-                posY3 %= 87.5;
-                let sol = SOLFEGENAMES[Math.floor(posY3 / 12.5)];
+                let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY3 %= YSTAFFOCTAVEHEIGHT;
+                let sol = SOLFEGENAMES[Math.floor(posY3 / YSTAFFNOTEHEIGHT)];
                 console.log(sol, o3);
                 return [sol, o3];
             }
