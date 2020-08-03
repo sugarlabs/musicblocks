@@ -570,11 +570,11 @@ msgstr "ブロックをさがす"
 
 #: js/activity.js:1074
 msgid "You have chosen key "
-msgstr ""
+msgstr "おとのたかさは"
 
 #: js/activity.js:1075
 msgid " for your pitch preview."
-msgstr ""
+msgstr "のおんかいによってしています。"
 
 #: js/activity.js:1135
 msgid "Refresh your browser to change to advanced mode."
