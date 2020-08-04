@@ -3101,8 +3101,7 @@ function Activity() {
             //console.debug(JSON.stringify(jsONON));
             console.debug ('finished when you see: "block loading finished "');
             document.body.style.cursor = "wait";
-            logo.textMsg ('midi tracks loading');
-            logo.errorMsg ("this may take some time depending on the number of notes in the track");
+            logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
         })
         blocks.loadNewBlocks(jsONON);
         return null ;
