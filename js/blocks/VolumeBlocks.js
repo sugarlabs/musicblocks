@@ -454,6 +454,46 @@ function setupVolumeBlocks() {
         }
     }
 
+    class setPanBlock extends FlowBlock {
+        constructor() {
+            //.TRANS: set the distribution of volume
+            super("setpanning", _("set panning"));
+            this.setPalette("volume");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Set Panning block sets the panning for all synthesizers."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({ args: 1, defaults: [0] });
+        }
+
+        flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            if (args.length === 1) {
+                let arg;
+                if (typeof args[0] !== "number") {
+                    logo.errorMsg(NANERRORMSG, blk);
+                } else {
+                    if (args[0] < -100) {
+                        arg = -100;
+                    } else if (args[0] > 100) {
+                        arg = 100;
+                    } else {
+                        arg = args[0];
+                    }
+                    arg /= 100;
+
+                    Singer.setPanner(logo, arg ,turtle);
+                }
+            }
+        }
+    }
+
     class SetNoteVolumeBlock extends FlowBlock {
         constructor() {
             //.TRANS: set the loudness level
@@ -782,6 +822,7 @@ function setupVolumeBlocks() {
     new SetSynthVolume2Block().setup();
     new SetDrumVolumeBlock().setup();
     new SetSynthVolumeBlock().setup();
+    new setPanBlock().setup();
     new SetNoteVolumeBlock().setup();
     new SetNoteVolume2Block().setup();
     new ArticulationBlock().setup();
