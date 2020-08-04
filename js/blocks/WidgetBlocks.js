@@ -381,6 +381,29 @@ function setupWidgetBlocks() {
         }
     }
 
+    class oscilloscopeWidgetBlock extends StackClampBlock {
+        constructor() {
+            super("oscilloscope");
+            this.setPalette("widgets");
+            this.setHelpString([
+                _(
+                    "The oscilloscope block opens a tool to visualize waveforms."
+                ),
+                "documentation",
+                null,
+                "meterwidget"
+            ]);
+            this.formBlock({ name: _("oscilloscope"), canCollapse: true });
+        }
+
+        flow(args, logo, turtle, blk) {
+            logo.Oscilloscope = new Oscilloscope();
+            
+            logo.Oscilloscope.init(logo);
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
     class ModeWidgetBlock extends StackClampBlock {
         constructor() {
             super("modewidget");
@@ -1133,5 +1156,6 @@ function setupWidgetBlocks() {
     new MatrixGMajorBlock().setup();
     new MatrixCMajorBlock().setup();
     new MatrixBlock().setup();
+    new oscilloscopeWidgetBlock().setup();
     new StatusBlock().setup();
 }
