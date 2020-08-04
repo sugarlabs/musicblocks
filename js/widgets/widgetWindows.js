@@ -203,6 +203,17 @@ function WidgetWindow(key, title) {
         return el.querySelector("input");
     };
 
+    this.addSelectorButton = function(list, initial, parent) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML = '<select value="' + initial + '" />';
+        let selector = el.querySelector("select");
+        for (let i of list) {
+            let newOption = new Option('turtle '+i,i);
+            selector.add(newOption);
+        }
+        return selector;
+    };
+
     this.addDivider = function() {
         let el = create("div", "wfbtHR", this._toolbar);
         return el;

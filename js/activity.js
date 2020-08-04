@@ -230,6 +230,7 @@ function Activity() {
             "widgets/pitchslider",
             "widgets/musickeyboard",
             "widgets/timbre",
+            "widgets/oscilloscope",
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
