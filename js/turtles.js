@@ -40,6 +40,8 @@ class Turtles {
     constructor() {
         // Import members of model and view (no arguments for model or view)
         importMembers(this);
+        // Inititalize all actions related to blocks executed by Turtle objects
+        this.initActions();
 
         this._refreshCanvas = null;     // function to refresh canvas
     }
@@ -56,6 +58,15 @@ class Turtles {
      */
     get refreshCanvas() {
         return this._refreshCanvas;
+    }
+
+    /**
+     * Inititalizes all supporting action related classes & methods of Turtle.
+     *
+     * @returns {void}
+     */
+    initActions() {
+        setupPitchActions();
     }
 
     /**
@@ -711,7 +722,7 @@ Turtles.TurtlesView = class {
                 if (!loading) {
                     document.body.style.cursor = "default";
                 }
-            };    
+            };
             let img = new Image();
             img.src =
                 "data:image/svg+xml;base64," +
@@ -742,7 +753,7 @@ Turtles.TurtlesView = class {
                 turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
                 turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
                 this.refreshCanvas();
-                    
+
             })
         }
 
@@ -781,7 +792,7 @@ Turtles.TurtlesView = class {
          */
         let __makeGridButton = () => {
             this._gridButton = _makeButton(CARTESIANBUTTON,_("show Cartesian"),this._w - 10 - 3 * 55, 70 + LEADING + 6);
-            
+
             this._gridButton.onclick = event => {
                 this.doGrid();
                 this._gridButton.setAttribute("data-tooltip", this._gridLabel);
@@ -858,11 +869,11 @@ Turtles.TurtlesView = class {
                 this._collapsedBoundary.visible = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
-                
+
                 turtlesStage.x = 0;
                 turtlesStage.y = 0;
                 this._isShrunk = false;
-                
+
                 for (let i = 0; i < this.turtleList.length; i++) {
                     this.turtleList[i].container.scaleX = 1;
                     this.turtleList[i].container.scaleY = 1;
@@ -887,7 +898,7 @@ Turtles.TurtlesView = class {
                 this.masterStage.addChildAt(turtlesStage, 0);
             };
         };
-        
+
         /**
          * initializes all Buttons.
          */
