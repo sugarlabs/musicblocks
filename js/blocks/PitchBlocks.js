@@ -736,7 +736,7 @@ function setupPitchBlocks() {
             let cblk0 = logo.blocks.blockList[blk].connections[0];
             let cblk1 = logo.blocks.blockList[blk].connections[1];
             if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
-                let posY = logo.blocks.blockList[cblk1].value;
+                let posY = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
                 posY %= YSTAFFOCTAVEHEIGHT;
                 let lc = 0;
@@ -745,13 +745,13 @@ function setupPitchBlocks() {
                 }
                 return (lc + (12 * o));
             } else if (logo.blocks.blockList[cblk0].name == "nthmodalpitch") {
-                let posY1 = logo.blocks.blockList[cblk1].value;
+                let posY1 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
                 posY1 %= YSTAFFOCTAVEHEIGHT;
                 let lc1 = posY1 / YSTAFFNOTEHEIGHT;
                 return (lc1 + (o1 * 7));
             } else if (logo.blocks.blockList[cblk0].name == "print") {
-                let posY2 = logo.blocks.blockList[cblk1].value;
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
                 let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
@@ -761,11 +761,10 @@ function setupPitchBlocks() {
                     return (note + o2);
                 }
             } else if (logo.blocks.blockList[cblk0].name == "pitch") {
-                let posY3 = logo.blocks.blockList[cblk1].value;
+                let posY3 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY3 %= YSTAFFOCTAVEHEIGHT;
-                let sol = SOLFEGENAMES[Math.floor(posY3 / YSTAFFNOTEHEIGHT)];
-                console.log(sol, o3);
+                let sol = SOLFEGENAMES[Math.floor(Math.abs(posY3 / YSTAFFNOTEHEIGHT))];
                 return [sol, o3];
             }
         }
@@ -2490,6 +2489,7 @@ function setupPitchBlocks() {
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
     new Number2OctaveBlock().setup();
+    new StaffYToPitch().setup();
     new AccidentalNameBlock().setup();
     new EastIndianSolfegeBlock().setup();
     new NoteNameBlock().setup();
@@ -2523,5 +2523,4 @@ function setupPitchBlocks() {
     new StepPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();
-    new StaffYToPitch().setup();
 }
