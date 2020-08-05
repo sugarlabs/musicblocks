@@ -2350,6 +2350,11 @@ function Blocks(activity) {
             return true;
         }
         if (
+            type1 === "pitchout" && type2 === "pitchin"
+        ) {
+            return true;
+        }
+        if (
             type2 === "notein" &&
             ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type1) !== -1
         ) {
