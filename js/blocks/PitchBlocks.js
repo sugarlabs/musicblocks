@@ -623,6 +623,22 @@ function setupPitchBlocks() {
                                 notePlayed,
                                 logo.synth.changeInTemperament
                             );
+                        case "pitch to color":
+                            let note5 = notePlayed;
+                            note5 = note5.substr(0, note5.length - 1);
+                            let attr;
+                            if (note5.includes("#")) {
+                                attr = "#";
+                            } else if (note5.includes("b")) {
+                                attr = "b";
+                            } else {
+                                attr = NATURAL;
+                            }
+                            note5 = note5.replace(attr, "");
+                            let color = NOTENAMES.indexOf(note5) * 16;
+                            if (attr = "#") color += 8;
+                            else if (attr = "b") color -= 8;
+                            return color;
                         default:
                             return "__INVALID_INPUT__";
                     }

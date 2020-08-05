@@ -3722,7 +3722,9 @@ function Block(protoblock, blocks, overrideName) {
                     _("scalar class"),
                     _("scale degree"),
                     _("nth degree"),
-                    _("staff y")
+                    _("staff y"),
+                    _("pitch to octave"),
+                    _("pitch to color")
                 ];
             }
 
