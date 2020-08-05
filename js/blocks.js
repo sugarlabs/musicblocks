@@ -2521,6 +2521,21 @@ function Blocks(activity) {
     };
 
     /*
+     * Moves all blocks except given stack
+     * @param blk - exception
+     * @param dx - delta x 
+     * @param dy - delta y
+     * @public
+     * @return {void}
+     */
+    this.moveAllBlocksExcept = function(blk, dx, dy) {
+        for (let block in this.blockList){
+            let topBlock = this.blockList[this.findTopBlock(block)];
+            if (topBlock !== blk) this.moveBlockRelative(block, dx, dy);
+        }
+    };
+
+    /*
      * Update the block labels.
      * When we create new blocks, we may not have assigned the value yet.
      * @param - blk - block

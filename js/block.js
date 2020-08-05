@@ -2863,6 +2863,16 @@ function Block(protoblock, blocks, overrideName) {
                 dy += 45 - finalPos;
             }
 
+            // scroll when reached edges.
+            if (event.stageX < 10 && scrollBlockContainer)
+                that.blocks.moveAllBlocksExcept(that,10,0);
+            else if (event.stageX > window.innerWidth-10 && scrollBlockContainer)
+                that.blocks.moveAllBlocksExcept(that,-10,0);
+            else if (event.stageY > window.innerHeight-10)
+                that.blocks.moveAllBlocksExcept(that,0,-10);
+            else if (event.stageY < 60)
+                that.blocks.moveAllBlocksExcept(that,0,10);
+
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
