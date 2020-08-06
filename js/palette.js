@@ -214,7 +214,7 @@ function Palettes() {
         for (var b in this.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
             if (
-                name === this.blocks.protoBlockDict[b].staticLabels[0] &&
+                name === this.blocks.protoBlockDict[b].name &&
                 !this.blocks.protoBlockDict[b].hidden
             ) {
                 return [
