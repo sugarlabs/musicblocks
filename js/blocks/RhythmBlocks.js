@@ -489,7 +489,7 @@ function setupRhythmBlocks() {
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
                     tur.singer.embeddedGraphics[saveBlk] = [];  // graphics will have already been rendered
 
-                    Singer.processNote(logo, noteValue, saveBlk, turtle);
+                    Singer.processNote(noteValue, logo.blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle);
                     let bpmFactor =
                         TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 

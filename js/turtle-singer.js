@@ -905,7 +905,7 @@ class Singer {
                 )
             );
 
-            Singer.processNote(logo, 4, blk, turtle, () => {
+            Singer.processNote(4, false, blk, turtle, () => {
                 tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
             });
         }
@@ -1011,8 +1011,8 @@ class Singer {
                 }
 
                 Singer.processNote(
-                    logo,
                     1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)],
+                    logo.blocks.blockList[last(tur.singer.inNoteBlock)].name === "osctime",
                     last(tur.singer.inNoteBlock),
                     turtle
                 );
@@ -1047,29 +1047,20 @@ class Singer {
      * Processes a single note.
      *
      * @static
-     * @param {Object} logo - Logo object
      * @param {Number} noteValue
+     * @param {Boolean} isOsc - whether it is a millisecond block
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      * @param {Object} turtle - Turtle object
      * @param {Function} callback
      */
-    static processNote(logo, noteValue, blk, turtle, callback) {
+    static processNote(noteValue, isOsc, blk, turtle, callback) {
         let tur = logo.turtles.ithTurtle(turtle);
 
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-        let noteBeatValue;
-        if (logo.blocks.blockList[blk].name === "osctime") {
-            // Convert msecs to note value.
-            if (noteValue == 0) {
-                noteBeatValue = 0;
-            } else {
-                noteBeatValue = (bpmFactor * 1000) / noteValue;
-            }
-        } else {
-            noteBeatValue = noteValue;
-        }
+        let noteBeatValue =
+            isOsc ? (noteValue === 0 ? 0 : (bpmFactor * 1000) / noteValue) : noteValue;
 
         let vibratoRate = 0;
         let vibratoValue = 0;
@@ -1401,7 +1392,7 @@ class Singer {
                         // Play previous note
                         tur.singer.tie = false;
                         tieDelay = 0;
-                        Singer.processNote(logo, tur.singer.tieCarryOver, saveBlk, turtle);
+                        Singer.processNote(tur.singer.tieCarryOver, logo.blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle);
 
                         tur.singer.inNoteBlock.pop();
 
