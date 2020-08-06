@@ -190,19 +190,19 @@ function setupPitchActions() {
         /**
          * Returns pitch or octave from corresponding pitch number.
          *
-         * @param {*} number - pitch number
-         * @param {*} blkName - block type name
-         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @param {Number} number - pitch number
+         * @param {String} outType - either "pitch" or "octave" to return
+         * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {String|Number} pitch or octave based in blkName
          * @throws {String} No Arg Error
          */
-        static numToPitch(number, blkName, turtle) {
+        static numToPitch(number, outType, turtle) {
             if (number !== null && typeof number === "number") {
                 let obj = numberToPitch(
                     Math.floor(number) +
                     logo.turtles.ithTurtle(turtle).singer.pitchNumberOffset
                 );
-                if (blkName === "number2pitch") {
+                if (outType === "pitch") {
                     return obj[0];
                 } else {
                     return obj[1];
@@ -231,11 +231,11 @@ function setupPitchActions() {
         /**
          * Returns change in pithc or scalar change in pitch.
          *
-         * @param {*} blkName - block type name
-         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @param {String} outType - either "deltapitch" or "deltascalarpitch" to return
+         * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {Number} change/scalar change in pitch
          */
-        static deltaPitch(blkName, turtle) {
+        static deltaPitch(outType, turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.previousNotePlayed == null) {
@@ -253,7 +253,7 @@ function setupPitchActions() {
                 obj = [pitch, octave];
 
                 let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
-                if (blkName === "deltapitch") {
+                if (outType === "deltapitch") {
                     // half-step difference
                     return delta;
                 } else {

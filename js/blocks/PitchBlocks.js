@@ -585,7 +585,9 @@ function setupPitchBlocks() {
             let num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
             try {
-                return Singer.PitchActions.numToPitch(num, logo.blocks.blockList[blk].name, turtle);
+                let outType =
+                    logo.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
+                return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
                 if (e === "NoArgError") {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
