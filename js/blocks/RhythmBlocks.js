@@ -51,8 +51,7 @@ function setupRhythmBlocks() {
                     value = 0;
                 }
 
-                if (value !== 0) return 1 / value;
-                return 0;
+                return value !== 0 ? 1 / value : 0;
             }
         }
     }
