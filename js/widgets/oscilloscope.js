@@ -11,13 +11,16 @@ function Oscilloscope() {
     const ICONSIZE = 32;
     const analyserSize = 8192;
 
-    var beginnerMode = localStorage.beginnerMode;
-
     this.init = function(logo) {
         this._logo = logo;
-
+        this.pitchAnalysers = {};
         this.playingNow = false;
-
+        if (this.drawVisualIDs) {
+            for (let id of Object.keys(this.drawVisualIDs)) {
+                cancelAnimationFrame(this.drawVisualIDs[id]);
+            }
+        }
+        this.drawVisualIDs = {};
         var widgetWindow = window.widgetWindows.windowFor(
             this,
             "oscilloscope"
@@ -26,102 +29,84 @@ function Oscilloscope() {
         widgetWindow.clear();
 	    widgetWindow.show();
         
-        let that = this;
-        widgetWindow.onclose = function() {
-            cancelAnimationFrame(that.drawVisual);
-            logo.pitchAnalyser = null;
-            this.destroy();
+        widgetWindow.onclose = () => {
+            for (let turtle of this.divisions) {
+                let turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+                cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
+            }
+            this.pitchAnalysers = {};
+            widgetWindow.destroy();
         };
-
-        let options = [];
-        for (let i = 0 ;i<logo.turtles.turtleList.length ;i++) options.push(i);
-
-        this.turtleX = widgetWindow.addSelectorButton(
-            options,
-            0            
-        )
-        this.turtleX.onchange = () => {
-            logo.pitchAnalyser = null;
-            this.reconnectSynthsToAnalyser(this.turtleX.value || 0);
-        }
 
         let step = 10 ;
         this.zoomFactor = 40.0 ;
         this.verticalOffset = 0 ;
-        widgetWindow.addButton(
-            "up.svg",
-            ICONSIZE,
-            _("UP")
-        ).onclick = () => {
-            this.verticalOffset -= step;
-        };
-
-        widgetWindow.addButton(
-            "down.svg",
-            ICONSIZE,
-            _("DOWN")
-        ).onclick = () => {
-            this.verticalOffset += step;
-        };
-
-        widgetWindow.addButton(
+        let zoomInButton = widgetWindow.addButton(
             "",
             ICONSIZE,
             _("ZOOM IN")
-        ).onclick = () => {
+        );
+        zoomInButton.onclick = () => {
             this.zoomFactor += step;
         };
-
-        widgetWindow.addButton(
+        zoomInButton.children[0].src =
+        "data:image/svg+xml;base64," +
+        window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
+        
+        
+        let zoomOutButton = widgetWindow.addButton(
             "",
             ICONSIZE,
             _("ZOOM OUT")
-        ).onclick = () => {
+            );
+        zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
         };
-
-        // this.channelY = widgetWindow.addButton(
-        //     "",
-        //     ICONSIZE,
-        //     _("start")+'Y'
-        // ).onclick = () => {
-            
-        // };
+        zoomOutButton.children[0].src =
+        "data:image/svg+xml;base64," +
+        window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
-        this.reconnectSynthsToAnalyser(this.turtleX.value);
-        this.makeCanvas();
+        this.divisions = [];
+        for (let turtle of logo.oscilloscopeTurtles) {
+            if (turtle && !turtle.inTrash) this.divisions.push(turtle);
+        }
+        for (let turtle of this.divisions) {
+            turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            this.reconnectSynthsToAnalyser(turtleIdx);
+            this.makeCanvas(700, 400/this.divisions.length, turtle, turtleIdx);
+        }
     };
 
     this.reconnectSynthsToAnalyser = (turtle) => {
-        if (this._logo.pitchAnalyser === null) {
-            this._logo.pitchAnalyser = new Tone.Analyser({
+        if (this.pitchAnalysers[turtle] === undefined) {
+            this.pitchAnalysers[turtle] = new Tone.Analyser({
                 type: "waveform",
                 size: analyserSize,
             });
         }
         for (let synth in instruments[turtle])
-            instruments[turtle][synth].connect(this._logo.pitchAnalyser);
+            instruments[turtle][synth].connect(this.pitchAnalysers[turtle]);
     }
 
-    this.makeCanvas = function() {
+    this.makeCanvas = function(WIDTH,HEIGHT,turtle,turtleIdx) {
         let canvas = document.createElement("canvas");
-        canvas.height = 400;
-        canvas.width = 700;
+        canvas.height = HEIGHT;
+        canvas.width = WIDTH;
         this.widgetWindow.getWidgetBody().appendChild(canvas);
         let canvasCtx = canvas.getContext('2d');
-        let WIDTH = 700 ,HEIGHT = 400;
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
         let draw = () => {
             console.debug("oscilloscope running");
-            this.drawVisual = requestAnimationFrame(draw);
+            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-            var dataArray = this._logo.pitchAnalyser.getValue();
+            var dataArray = this.pitchAnalysers[turtleIdx].getValue();
             let bufferLength = dataArray.length ;
             canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
             canvasCtx.lineWidth = 2;
-            canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+            let rbga = turtle.painter._canvasColor
+            canvasCtx.strokeStyle = rbga ;
             canvasCtx.beginPath();
             var sliceWidth = WIDTH * this.zoomFactor / bufferLength;
             var x = 0;  
