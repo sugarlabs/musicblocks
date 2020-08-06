@@ -735,7 +735,19 @@ function setupPitchBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let cblk0 = logo.blocks.blockList[blk].connections[0];
             let cblk1 = logo.blocks.blockList[blk].connections[1];
-            if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
+            if (cblk0 === null) {
+                if (cblk1 === null) {
+                    return ("G4");
+                }
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                return (note + o2);
+            } else if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
+                if (cblk1 === null) {
+                    return (7);
+                }
                 let posY = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
                 posY %= YSTAFFOCTAVEHEIGHT;
@@ -745,27 +757,44 @@ function setupPitchBlocks() {
                 }
                 return (lc + (12 * o));
             } else if (logo.blocks.blockList[cblk0].name == "nthmodalpitch") {
+                if (cblk1 === null) {
+                    return (5);
+                }
                 let posY1 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
                 posY1 %= YSTAFFOCTAVEHEIGHT;
                 let lc1 = posY1 / YSTAFFNOTEHEIGHT;
                 return (lc1 + (o1 * 7));
             } else if (logo.blocks.blockList[cblk0].name == "print") {
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, "ytopitch"]);
+                }
+                if (cblk1 === null) {
+                    return ("G4");
+                }
                 let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
                 let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
-                if (logo.inStatusMatrix) {
-                    logo.statusFields.push([blk, "ytopitch"]);
-                } else {
-                    return (note + o2);
-                }
+                return (note + o2);
             } else if (logo.blocks.blockList[cblk0].name == "pitch") {
+                if (cblk1 === null) {
+                    return ["sol", 4];
+                }
                 let posY3 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
                 let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY3 %= YSTAFFOCTAVEHEIGHT;
                 let sol = SOLFEGENAMES[Math.floor(Math.abs(posY3 / YSTAFFNOTEHEIGHT))];
                 return [sol, o3];
+            } else {
+                if (cblk1 === null) {
+                    return ("G4");
+                }
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                return (note + o2);
             }
         }
     }
