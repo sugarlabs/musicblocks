@@ -78,7 +78,7 @@ function setupPitchActions() {
          *
          * @param {Number} hertz - frequency in hertz
          * @param {Number} turtle - Turtle index in turtles.turtleList
-         * @throws {String}
+         * @throws {String} No Note Error
          */
         static playHertz(hertz, turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
@@ -183,7 +183,32 @@ function setupPitchActions() {
                     );
                 }
             } else {
-                throw "NoNote";
+                throw "NoNoteError";
+            }
+        }
+
+        /**
+         * Returns pitch or octave from corresponding pitch number.
+         *
+         * @param {*} number - pitch number
+         * @param {*} blkName - block type name
+         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @returns {String|Number} pitch or octave based in blkName
+         * @throws {String} No Arg Error
+         */
+        static numToPitch(number, blkName, turtle) {
+            if (number !== null && typeof number === "number") {
+                let obj = numberToPitch(
+                    Math.floor(number) +
+                    logo.turtles.ithTurtle(turtle).singer.pitchNumberOffset
+                );
+                if (blkName === "number2pitch") {
+                    return obj[0];
+                } else {
+                    return obj[1];
+                }
+            } else {
+                throw "NoArgError";
             }
         }
     }

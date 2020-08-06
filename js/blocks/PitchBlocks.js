@@ -692,18 +692,16 @@ function setupPitchBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let cblk = logo.blocks.blockList[blk].connections[1];
             let num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            if (num != null && typeof num === "number") {
-                let obj =
-                    numberToPitch(Math.floor(num) +
-                    logo.turtles.ithTurtle(turtle).singer.pitchNumberOffset);
-                if (logo.blocks.blockList[blk].name === "number2pitch") {
-                    return obj[0];
+
+            try {
+                return Singer.PitchActions.numToPitch(num, logo.blocks.blockList[blk].name, turtle);
+            } catch (e) {
+                if (e === "NoArgError") {
+                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    logo.stopTurtle = true;
                 } else {
-                    return obj[1];
+                    console.error(e);
                 }
-            } else {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                logo.stopTurtle = true;
             }
         }
     }
@@ -1530,10 +1528,8 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === undefined) {
-                // Nothing to do.
+            if (args[0] === undefined)
                 return;
-            }
 
             let tur = logo.turtles.ithTurtle(turtle);
             tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
@@ -1638,7 +1634,7 @@ function setupPitchBlocks() {
             try {
                 return Singer.PitchActions.playHertz(arg, turtle);
             } catch (e) {
-                if (e === "NoNote") {
+                if (e === "NoNoteError") {
                     logo.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
                 } else {
                     console.error(e);
