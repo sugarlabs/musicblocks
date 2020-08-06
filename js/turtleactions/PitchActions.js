@@ -29,11 +29,48 @@ function setupPitchActions() {
          * @param {String} notenote - note value or solfege
          * @param {Number} octave - scale octave
          * @param {Number} cents - semitone offset due to accidentals
-         * @param {Number} turtle - Turtle object
-         * @param {Number} blk - corresponding Block object index in blocks.blockList or custom blockName
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playPitch(note, octave, cents, turtle, blk) {
             return Singer.processPitch(note, octave, cents, turtle, blk);
+        }
+
+        /**
+         * Processes a pitch number block.
+         *
+         * @param {Number} pitchNumber - pitch number
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
+         */
+        static playPitchNumber(pitchNumber, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.inDefineMode) {
+                tur.singer.defineMode.push(pitchNumber);
+                return;
+            } else {
+                if (
+                    isCustom(logo.synth.inTemperament) &&
+                    tur.singer.scalarTransposition + tur.singer.transposition !== 0
+                ) {
+                    logo.errorMsg(
+                        _(
+                            "Scalar transpositions are equal to Semitone transpositions for custom temperament."
+                        )
+                    );
+                }
+
+                // In number to pitch we assume A0 == 0, so add offset
+                let obj = numberToPitch(
+                    pitchNumber + tur.singer.pitchNumberOffset,
+                    logo.synth.inTemperament,
+                    logo.synth.startingPitch,
+                    tur.singer.pitchNumberOffset
+                );
+
+                return Singer.processPitch(obj[0], obj[1], 0, turtle, blk);
+            }
         }
     }
 }

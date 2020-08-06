@@ -1804,33 +1804,7 @@ function setupPitchBlocks() {
             // If arg0 is a float value then round-off to the nearest integer
             arg0 = Math.round(arg0);
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.inDefineMode) {
-                tur.singer.defineMode.push(arg0);
-                return;
-            } else {
-                if (
-                    isCustom(logo.synth.inTemperament) &&
-                    tur.singer.scalarTransposition + tur.singer.transposition !== 0
-                ) {
-                    logo.errorMsg(
-                        _(
-                            "Scalar transpositions are equal to Semitone transpositions for custom temperament."
-                        )
-                    );
-                }
-
-                // In number to pitch we assume A0 == 0, so add offset
-                let obj = numberToPitch(
-                    arg0 + tur.singer.pitchNumberOffset,
-                    logo.synth.inTemperament,
-                    logo.synth.startingPitch,
-                    tur.singer.pitchNumberOffset
-                );
-
-                return Singer.processPitch(obj[0], obj[1], 0, turtle, blk);
-            }
+            return Singer.PitchActions.playPitchNumber(arg0, turtle, blk);
         }
     }
 
