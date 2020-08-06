@@ -562,11 +562,10 @@ class Singer {
      * @param {String} note - note value or solfege
      * @param {Number} octave - scale octave
      * @param {Number} cents - semitone offset due to accidentals
-     * @param {Object} logo - Logo object
      * @param {Object} turtle - Turtle index in turtles.turtleList
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
-    static processPitch(note, octave, cents, logo, turtle, blk) {
+    static processPitch(note, octave, cents, turtle, blk) {
         let tur = logo.turtles.ithTurtle(turtle);
 
         let noteObj = Singer.addScalarTransposition(
