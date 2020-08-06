@@ -154,17 +154,7 @@ function setupPitchBlocks() {
         }
 
         arg(logo, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.lastNotePlayed !== null) {
-                let len = tur.singer.lastNotePlayed[0].length;
-                return getStepSizeDown(
-                    tur.singer.keySignature,
-                    tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                );
-            } else {
-                return getStepSizeDown(tur.singer.keySignature, "G");
-            }
+            return Singer.PitchActions.consonantStepSize("down", turtle);
         }
     }
 
@@ -188,17 +178,7 @@ function setupPitchBlocks() {
         }
 
         arg(logo, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.lastNotePlayed !== null) {
-                let len = tur.singer.lastNotePlayed[0].length;
-                return getStepSizeUp(
-                    tur.singer.keySignature,
-                    tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                );
-            } else {
-                return getStepSizeUp(tur.singer.keySignature, "G");
-            }
+            return Singer.PitchActions.consonantStepSize("up", turtle);
         }
     }
 

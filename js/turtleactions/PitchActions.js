@@ -299,5 +299,34 @@ function setupPitchActions() {
                 }
             }
         }
+
+        /**
+         * Returns the number of semi-tones up/down to the next note in the current key and mode.
+         *
+         * @param {String} stepType - step up or down
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {Number} number of semi-tones
+         */
+        static consonantStepSize(stepType, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.lastNotePlayed !== null) {
+                let len = tur.singer.lastNotePlayed[0].length;
+
+                return stepType === "up" ?
+                    getStepSizeUp(
+                        tur.singer.keySignature,
+                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                    ) :
+                    getStepSizeDown(
+                        tur.singer.keySignature,
+                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                    )
+            } else {
+                return stepType === "up" ?
+                    getStepSizeUp(tur.singer.keySignature, "G") :
+                    getStepSizeDown(tur.singer.keySignature, "G");
+            }
+        }
     }
 }
