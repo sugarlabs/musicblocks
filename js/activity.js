@@ -1169,10 +1169,9 @@ function Activity() {
         keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
         keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
         keyNameWheel.titleRotateAngle = 0;
-        keyNameWheel.clickModeRotate = false;
         keyNameWheel.colors = platformColor.pitchWheelcolors;
         keyNameWheel.animatetime = 0;
-        
+
         keyNameWheel.createWheel(keys);
 
         keyNameWheel2.colors = platformColor.pitchWheelcolors;
@@ -1196,7 +1195,7 @@ function Activity() {
         }
 
         keyNameWheel2.navAngle = -7.45;
-        keyNameWheel2.clickModeRotate = false;
+        keyNameWheel2.animatetime = 0;
         keyNameWheel2.createWheel(keys2);
 
         var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
@@ -1308,6 +1307,7 @@ function Activity() {
             let selection = keyNameWheel.navItems[
                 keyNameWheel.selectedNavItemIndex
             ].title;
+            keyNameWheel2.navigateWheel(2 * keyNameWheel.selectedNavItemIndex);
             if (selection === "") {
                 keyNameWheel.navigateWheel(
                     (keyNameWheel.selectedNavItemIndex + 1) %
@@ -1370,8 +1370,8 @@ function Activity() {
         let i = keys.indexOf(KeySignatureEnv[0]);
         if (i == -1) {
             i = keys2.indexOf(KeySignatureEnv[0]);
-            console.log("index is", i);
             if (i != -1) {
+                keyNameWheel.navigateWheel(Math.floor(i / 2));
                 keyNameWheel2.navigateWheel(i);
                 for (let j = 0; j < keys2.length; j++) {
                     keyNameWheel2.navItems[j].navItem.hide();
