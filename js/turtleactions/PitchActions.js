@@ -227,5 +227,77 @@ function setupPitchActions() {
             );
             tur.singer.pitchNumberOffset = pitchToNumber(pitch, _octave, tur.singer.keySignature);
         }
+
+        /**
+         * Returns change in pithc or scalar change in pitch.
+         *
+         * @param {*} blkName - block type name
+         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @returns {Number} change/scalar change in pitch
+         */
+        static deltaPitch(blkName, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.previousNotePlayed == null) {
+                return 0;
+            } else {
+                let len = tur.singer.previousNotePlayed[0].length;
+                let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
+                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1));
+                let obj = [pitch, octave];
+                let previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
+
+                len = tur.singer.lastNotePlayed[0].length;
+                pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
+                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                obj = [pitch, octave];
+
+                let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
+                if (blkName === "deltapitch") {
+                    // half-step difference
+                    return delta;
+                } else {
+                    // convert to scalar steps
+                    let scalarDelta = 0;
+                    let i = 0;
+
+                    let _calculate = type => {
+                        i++;
+                        let nhalf =
+                            type === "up" ?
+                                getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal") :
+                                getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal")
+                        delta -= nhalf;
+                        scalarDelta += type === "up" ? 1 : -1;
+                        obj = getNote(
+                            pitch,
+                            octave,
+                            nhalf,
+                            tur.singer.keySignature,
+                            tur.singer.moveable,
+                            null,
+                            logo.errorMsg,
+                            logo.synth.inTemperament
+                        );
+                        [pitch, octave] = obj;
+
+                        if (i > 100)
+                            return;
+                    }
+
+                    if (delta > 0) {
+                        while (delta > 0) {
+                            _calculate("up");
+                        }
+                    } else {
+                        while (delta < 0) {
+                            _calculate("down");
+                        }
+                    }
+
+                    return scalarDelta;
+                }
+            }
+        }
     }
 }

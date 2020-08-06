@@ -223,87 +223,14 @@ function setupPitchBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
-            } else if (tur.singer.previousNotePlayed == null) {
-                return 0;
-            } else {
-                let len = tur.singer.previousNotePlayed[0].length;
-                let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
-                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1));
-                let obj = [pitch, octave];
-                let previousValue = pitchToNumber(
-                    obj[0],
-                    obj[1],
-                    tur.singer.keySignature
-                );
-                len = tur.singer.lastNotePlayed[0].length;
-                pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
-                obj = [pitch, octave];
-                let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
-                if (logo.blocks.blockList[blk].name === "deltapitch") {
-                    // half-step difference
-                    return delta;
-                } else {
-                    // convert to scalar steps
-                    let scalarDelta = 0;
-                    let i = 0;
-                    if (delta > 0) {
-                        while (delta > 0) {
-                            i += 1;
-                            let nhalf = getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal");
-                            delta -= nhalf;
-                            scalarDelta += 1;
-                            obj = getNote(
-                                pitch,
-                                octave,
-                                nhalf,
-                                tur.singer.keySignature,
-                                tur.singer.moveable,
-                                null,
-                                logo.errorMsg,
-                                logo.synth.inTemperament
-                            );
-                            pitch = obj[0];
-                            octave = obj[1];
-                            if (i > 100) {
-                                return;
-                            }
-                        }
-
-                        return scalarDelta;
-                    } else {
-                        while (delta < 0) {
-                            i += 1;
-                            let nhalf = getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal");
-                            delta -= nhalf;
-                            scalarDelta -= 1;
-                            obj = getNote(
-                                pitch,
-                                octave,
-                                nhalf,
-                                tur.singer.keySignature,
-                                tur.singer.moveable,
-                                null,
-                                logo.errorMsg,
-                                logo.synth.inTemperament
-                            );
-                            pitch = obj[0];
-                            octave = obj[1];
-                            if (i > 100) {
-                                return;
-                            }
-                        }
-                        return scalarDelta;
-                    }
-                }
             }
+
+            return Singer.PitchActions.deltaPitch(logo.blocks.blockList[blk].name, turtle);
         }
     }
 
