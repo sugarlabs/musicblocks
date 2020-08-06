@@ -405,7 +405,7 @@ function setupPitchBlocks() {
             super("pitchinhertz", _("pitch in hertz"));
             this.setPalette("pitch");
             this.parameter = true;
-            // this.hidden = true;
+            this.hidden = true;
             this.setHelpString([
                 _(
                     "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
@@ -459,7 +459,6 @@ function setupPitchBlocks() {
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
                     .name === "outputtools"
             ) {
-                // logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
@@ -625,7 +624,11 @@ function setupPitchBlocks() {
                             );
                         case "pitch to color":
                             let note5 = notePlayed;
-                            note5 = note5.substr(0, note5.length - 1);
+                            if (Number(note5)) {
+                                [note5] = frequencyToPitch(note5);
+                            } else {
+                                note5 = note5.substr(0, note5.length - 1);
+                            }
                             let attr;
                             if (note5.includes("#")) {
                                 attr = "#";
