@@ -2528,8 +2528,8 @@ function Activity() {
                         if (inTempoWidget) {
                             logo.tempo.speedUp(0);
                         } else {
-                            textMsg("UP ARROW " + _("Moving block up."));
                             if (blocks.activeBlock != null) {
+                                textMsg("UP ARROW " + _("Moving block up."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     0,
@@ -2542,8 +2542,8 @@ function Activity() {
                                     STANDARDBLOCKHEIGHT,
                                     1
                                 );
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.y -= 20;
+                            } else {
+                                blocksContainer.y += 20;
                             }
                             stage.update();
                         }
@@ -2552,8 +2552,8 @@ function Activity() {
                         if (inTempoWidget) {
                             logo.tempo.slowDown(0);
                         } else {
-                            textMsg("DOWN ARROW " + _("Moving block down."));
                             if (blocks.activeBlock != null) {
+                                textMsg("DOWN ARROW " + _("Moving block down."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     0,
@@ -2566,16 +2566,16 @@ function Activity() {
                                     -STANDARDBLOCKHEIGHT,
                                     1
                                 );
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.y += 20;
+                            } else {
+                                blocksContainer.y -= 20;
                             }
                             stage.update();
                         }
                         break;
                     case KEYCODE_LEFT:
                         if (!inTempoWidget) {
-                            textMsg("LEFT ARROW " + _("Moving block left."));
                             if (blocks.activeBlock != null) {
+                                textMsg("LEFT ARROW " + _("Moving block left."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     -STANDARDBLOCKHEIGHT / 2,
@@ -2584,15 +2584,15 @@ function Activity() {
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
                             } else if (scrollBlockContainer) {
-                                blocksContainer.x -= 20;
+                                blocksContainer.x += 20;
                             }
                             stage.update();
                         }
                         break;
                     case KEYCODE_RIGHT:
                         if (!inTempoWidget) {
-                            textMsg("RIGHT ARROW " + _("Moving block right."));
                             if (blocks.activeBlock != null) {
+                                textMsg("RIGHT ARROW " + _("Moving block right."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     STANDARDBLOCKHEIGHT / 2,
@@ -2601,7 +2601,7 @@ function Activity() {
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
                             } else if (scrollBlockContainer) {
-                                blocksContainer.x += 20;
+                                blocksContainer.x -= 20;
                             }
                             stage.update();
                         }
