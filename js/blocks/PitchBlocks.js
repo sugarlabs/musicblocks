@@ -543,7 +543,7 @@ function setupPitchBlocks() {
                                 o1 = tur.singer.lastNotePlayed[0][2];
                             }
                             // these numbers are subject to staff artwork
-                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * 12.5 + (o1 - 4) * 87.5;
+                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
                         case "pitch number":
                             let value = null;
                             let obj;
@@ -719,6 +719,83 @@ function setupPitchBlocks() {
                 "documentation",
                 ""
             ]);
+        }
+    }
+
+    class StaffYToPitch extends LeftBlock {
+        constructor(name, displayName) {
+            super("ytopitch", _("y to pitch"));
+            this.setPalette("pitch");
+            this.formBlock({
+                args: 1,
+                defaults: [50]
+            });
+        }
+        
+        arg(logo, turtle, blk, receivedArg) {
+            let cblk0 = logo.blocks.blockList[blk].connections[0];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            if (cblk0 === null) {
+                if (cblk1 === null) {
+                    return ("G4");
+                }
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                return (note + o2);
+            } else if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
+                if (cblk1 === null) {
+                    return (7);
+                }
+                let posY = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
+                posY %= YSTAFFOCTAVEHEIGHT;
+                let lc = 0;
+                for (let i = 0; i < posY / YSTAFFNOTEHEIGHT; i++) {
+                    lc += MUSICALMODES["major"][i];
+                }
+                return (lc + (12 * o));
+            } else if (logo.blocks.blockList[cblk0].name == "nthmodalpitch") {
+                if (cblk1 === null) {
+                    return (5);
+                }
+                let posY1 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
+                posY1 %= YSTAFFOCTAVEHEIGHT;
+                let lc1 = posY1 / YSTAFFNOTEHEIGHT;
+                return (lc1 + (o1 * 7));
+            } else if (logo.blocks.blockList[cblk0].name == "print") {
+                if (logo.inStatusMatrix) {
+                    logo.statusFields.push([blk, "ytopitch"]);
+                }
+                if (cblk1 === null) {
+                    return ("G4");
+                }
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                return (note + o2);
+            } else if (logo.blocks.blockList[cblk0].name == "pitch") {
+                if (cblk1 === null) {
+                    return ["sol", 4];
+                }
+                let posY3 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY3 %= YSTAFFOCTAVEHEIGHT;
+                let sol = SOLFEGENAMES[Math.floor(Math.abs(posY3 / YSTAFFNOTEHEIGHT))];
+                return [sol, o3];
+            } else {
+                if (cblk1 === null) {
+                    return ("G4");
+                }
+                let posY2 = logo.blocks.blockList[cblk1].value + YSTAFFNOTEHEIGHT / 2;
+                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                posY2 %= YSTAFFOCTAVEHEIGHT;
+                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                return (note + o2);
+            }
         }
     }
 
@@ -1712,6 +1789,7 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            console.log(args);
             let arg0;
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -1920,8 +1998,14 @@ function setupPitchBlocks() {
 
                 let isNegativeArg = arg0 < 0 ? true : false;
                 arg0 = Math.abs(arg0);
+                
+                let obj;
+                if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch") {
+                    obj = keySignatureToMode("C major");
+                } else {
+                    obj = keySignatureToMode(logo.keySignature[turtle]);
+                }
 
-                let obj = keySignatureToMode(tur.singer.keySignature);
                 let modeLength = MUSICALMODES[obj[1]].length;
                 let scaleDegree = Math.floor(arg0 - 1) % modeLength + 1;
 
@@ -1967,7 +2051,13 @@ function setupPitchBlocks() {
                 */
 
                 scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
-                let note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+                let note;
+
+                if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch") {
+                    note = nthDegreeToPitch("C major", scaleDegree);
+                } else {
+                    note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+                }
 
                 let semitones =
                     ref +
@@ -2428,6 +2518,7 @@ function setupPitchBlocks() {
     new SetPitchNumberOffsetBlock().setup();
     new Number2PitchBlock().setup();
     new Number2OctaveBlock().setup();
+    new StaffYToPitch().setup();
     new AccidentalNameBlock().setup();
     new EastIndianSolfegeBlock().setup();
     new NoteNameBlock().setup();
