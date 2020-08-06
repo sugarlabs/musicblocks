@@ -211,5 +211,21 @@ function setupPitchActions() {
                 throw "NoArgError";
             }
         }
+
+        /**
+         * Sets the offset for mapping pitch numbers to pitch and octave.
+         *
+         * @param {String} pitch
+         * @param {Number} octave
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         */
+        static setPitchNumberOffset(pitch, octave, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let _octave = Math.floor(
+                calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, pitch)
+            );
+            tur.singer.pitchNumberOffset = pitchToNumber(pitch, _octave, tur.singer.keySignature);
+        }
     }
 }

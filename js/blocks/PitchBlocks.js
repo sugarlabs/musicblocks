@@ -645,29 +645,13 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0, arg1;
-            if (args[0] === null) {
+            if (args[0] === null || args[1] === null)
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = "C";
-            } else {
-                arg0 = args[0];
-            }
 
-            if (args[1] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
-            } else {
-                arg1 = args[1];
-            }
+            let arg0 = args[0] === null ? "C" : args[0];
+            let arg1 = args[1] === null ? 4 : args[0];
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            let octave = Math.floor(
-                calcOctave(
-                    tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, arg0
-                )
-            );
-            tur.singer.pitchNumberOffset = pitchToNumber(arg0, octave, tur.singer.keySignature);
+            Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle);
         }
     }
 
