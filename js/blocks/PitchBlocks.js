@@ -2496,7 +2496,7 @@ function setupPitchBlocks() {
                 }
             }
 
-            return Singer.processPitch(note, octave, cents, turtle, blk);
+            return Singer.PitchActions.playPitch(note, octave, cents, turtle, blk);
         }
     }
 

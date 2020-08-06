@@ -1,6 +1,7 @@
 /**
  * @file This contains the action methods of the Turtle's Singer component's Pitch blocks.
  * @author Anindya Kundu
+ * @author Walter Bender
  *
  * @copyright 2014-2020 Walter Bender
  * @copyright 2020 Anindya Kundu
@@ -22,8 +23,17 @@
  */
 function setupPitchActions() {
     Singer.PitchActions = class {
-        static test() {
-            console.log("This is a test");
+        /**
+         * Processes (and/or plays) a pitch.
+         *
+         * @param {String} notenote - note value or solfege
+         * @param {Number} octave - scale octave
+         * @param {Number} cents - semitone offset due to accidentals
+         * @param {Number} turtle - Turtle object
+         * @param {Number} blk - corresponding Block object index in blocks.blockList or custom blockName
+         */
+        static playPitch(note, octave, cents, turtle, blk) {
+            return Singer.processPitch(note, octave, cents, turtle, blk);
         }
     }
 }
