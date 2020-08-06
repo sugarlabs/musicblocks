@@ -3082,13 +3082,6 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (this._usePieNumberC1()) {
-            return true;
-        }
-        
-        if (this.blocks.setbpm3(blk, 1)) {
-            return true;
-        }
         return false;
     };
 
@@ -3145,7 +3138,8 @@ function Block(protoblock, blocks, overrideName) {
                 "hertz",
                 "right",
                 "left",
-                "setbpm3"
+                "setbpm3",
+                "setmasterbpm2"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1
         ) {
             return false;
@@ -4278,7 +4272,7 @@ function Block(protoblock, blocks, overrideName) {
                         );
                         break;
                     case "setbpm3": 
-                        this._piemenuHorizontalNumber ( 
+                        this._piemenuNumber ( 
                         [
                         40,
                         42,
@@ -4322,6 +4316,51 @@ function Block(protoblock, blocks, overrideName) {
                     ],
                     this.value
                     );
+                    case "setmasterbpm2": 
+                    this._piemenuNumber ( 
+                    [
+                    40,
+                    42,
+                    44,
+                    46,
+                    48,
+                    50,
+                    52,
+                    54,
+                    56,
+                    58,
+                    60,
+                    63,
+                    66,
+                    69,
+                    72,
+                    76,
+                    80,
+                    84,
+                    88,
+                    92,
+                    96,
+                    100,
+                    104,
+                    108,
+                    112,
+                    116,
+                    120,
+                    126,
+                    132,
+                    138,
+                    144,
+                    152,
+                    160,
+                    168,
+                    176,
+                    184,
+                    192,
+                    200,
+                    208,
+                ],
+                this.value
+                );
                     break;
 
                 }
@@ -6158,7 +6197,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        // this._numberWheel.titleRotateAngle = 0;
+        this._numberWheel.titleRotateAngle = 0;
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
@@ -6749,168 +6788,6 @@ function Block(protoblock, blocks, overrideName) {
                 __exitMenu();
             };
         }
-    };
-    this._piemenuHorizontalNumber = function(wheelValues, selectedValue) {
-        // number pie menu with radial
-        if (this.blocks.stageClick) {
-            return;
-        }
-        docById("wheelDiv").style.display = "";
-        this._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
-        this._exitWheel = new wheelnav("_exitWheel", this._numberWheel.raphael);
-        let wheelLabels = [];
-        for (let i = 0; i < wheelValues.length; i++) {
-            wheelLabels.push(wheelValues[i].toString());
-        }
-        wheelLabels.push(null);
-        wheelnav.cssMode = true;
-        this._numberWheel.keynavigateEnabled = false;
-        this._numberWheel.colors = platformColor.numberWheelcolors;
-        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
-        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        if (wheelValues.length > 16) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else if (wheelValues.length > 10) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.5;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.9;
-        } else {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
-        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-         this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 0; 
-        this._numberWheel.createWheel(wheelLabels);
-        if (this._numberWheel.navItems.length > 20) {
-            for (let i = 0; i < this._numberWheel.navItems.length; i++) {
-                this._numberWheel.navItems[i].titleAttr.font =
-                    "30 30px sans-serif";
-                this._numberWheel.navItems[i].titleSelectedAttr.font =
-                    "30 30px sans-serif";
-            }
-        }
-        this._exitWheel.colors = platformColor.exitWheelcolors2;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", "-", "+"]);
-        let that = this;
-        let __selectionChanged = function() {
-            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
-            that.text.text =
-                wheelLabels[that._numberWheel.selectedNavItemIndex];
-            that.container.setChildIndex(that.text,  that.container.children.length - 1);
-            that.updateCache();
-        };
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._numberWheel.removeWheel();
-            that._exitWheel.removeWheel();
-            that.label.style.display = "none";
-
-            if (that._check_meter_block !== null) {
-                that.blocks.meter_block_changed(that._check_meter_block);
-            }
-        };
-        let labelElem = docById("labelDiv");
-        labelElem.innerHTML =
-            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-            selectedValue +
-            '" />';
-        labelElem.classList.add("hasKeyboard");
-        this.label = docById("numberLabel");
-        this.label.addEventListener(
-            "keypress",
-            this._exitKeyPressed.bind(this)
-        );
-        this.label.addEventListener("change", function() {
-            that._labelChanged(false, false);
-        });
-        let x = this.container.x;
-        let y = this.container.y;
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-        let selectorWidth = 150;
-        let left = Math.round(
-            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-        );
-        let top = Math.round(
-            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-        );
-        this.label.style.left = left + "px";
-        this.label.style.top = top + "px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(left - (300 - selectorWidth) / 2, 0),
-                this.blocks.turtles._canvas.width - 300
-            ) + "px";
-        if (top - 300 < 0) {
-            docById("wheelDiv").style.top = top + 40 + "px";
-        } else {
-            docById("wheelDiv").style.top = top - 300 + "px";
-        }
-        this.label.style.width =
-            (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) /
-            2 +
-            "px";
-        let i = wheelValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 0;
-        }
-        if (selectedValue % 1 !== 0) {
-            i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
-        }
-        this._numberWheel.navigateWheel(i);
-        this.label.style.fontSize =
-            Math.round(
-                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-            ) + "px";
-
-        this.label.style.display = "";
-        this.label.focus();
-        for (let i = 0; i < wheelLabels.length; i++) {
-            this._numberWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            __exitMenu();
-        };
-        this._exitWheel.navItems[1].navigateFunction = function () {
-            let cblk1 = that.connections[0];
-            let cblk2 = that.blocks.blockList[cblk1].connections[0];
-            if ((that.value < 1) && (that.blocks.blockList[cblk1].name === 'newnote' || (cblk2 && that.blocks.blockList[cblk2].name == 'newnote'))) {
-                that.value = 0;
-            } else {
-                that.value -= 1;
-            }
-            that.text.text = that.value.toString();
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-            that.label.value = that.value;
-        };
-        this._exitWheel.navItems[2].navigateFunction = function() {
-            that.value += 1;
-            that.text.text = that.value.toString();
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            that.label.value = that.value;
-        };
     };
 
     this._piemenuBoolean = function(booleanLabels, booleanValues, boolean) {
