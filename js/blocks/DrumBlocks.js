@@ -403,7 +403,7 @@ function setupDrumBlocks() {
                 let __callback =
                     () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
-                Singer.processNote(logo, noteBeatValue, blk, turtle, __callback);
+                Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
             } else {
                 console.debug('PLAY DRUM ERROR: missing context');
                 return;

@@ -709,21 +709,18 @@ class Logo {
     /**
      * Sets a named listener after removing any existing listener in the same place.
      *
-     * @param {Number} turtle - Turtle index in turtleList
+     * @param {Number} turtle - Turtle index in turtles.turtleList
      * @param {String} listenerName
      * @param {Function} listener
      * @returns {void}
      */
     setTurtleListener(turtle, listenerName, listener) {
-        if (listenerName in this.turtles.turtleList[turtle].listeners) {
-            this.stage.removeEventListener(
-                listenerName,
-                this.turtles.turtleList[turtle].listeners[listenerName],
-                false
-            );
+        let tur = this.turtles.ithTurtle(turtle);
+        if (listenerName in tur.listeners) {
+            this.stage.removeEventListener(listenerName, tur.listeners[listenerName], false);
         }
 
-        this.turtles.turtleList[turtle].listeners[listenerName] = listener;
+        tur.listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
     }
 
@@ -738,6 +735,7 @@ class Logo {
     setDispatchBlock(blk, turtle, listenerName) {
         let tur = this.turtles.ithTurtle(turtle);
 
+        let nextBlock = null;
         if (!tur.singer.inDuplicate && tur.singer.backward.length > 0) {
             let c = this.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
             if (
@@ -745,30 +743,19 @@ class Logo {
                     this.blocks.blockList[last(tur.singer.backward)].connections[c], blk
                 )
             ) {
-                let nextBlock = this.blocks.blockList[blk].connections[0];
-                if (nextBlock in tur.endOfClampSignals) {
-                    tur.endOfClampSignals[nextBlock].push(listenerName);
-                } else {
-                    tur.endOfClampSignals[nextBlock] = [listenerName];
-                }
+                nextBlock = this.blocks.blockList[blk].connections[0];
             } else {
-                let nextBlock = last(this.blocks.blockList[blk].connections);
-                if (nextBlock != null) {
-                    if (nextBlock in tur.endOfClampSignals) {
-                        tur.endOfClampSignals[nextBlock].push(listenerName);
-                    } else {
-                        tur.endOfClampSignals[nextBlock] = [listenerName];
-                    }
-                }
+                nextBlock = last(this.blocks.blockList[blk].connections);
             }
         } else {
-            let nextBlock = last(this.blocks.blockList[blk].connections);
-            if (nextBlock != null) {
-                if (nextBlock in tur.endOfClampSignals) {
-                    tur.endOfClampSignals[nextBlock].push(listenerName);
-                } else {
-                    tur.endOfClampSignals[nextBlock] = [listenerName];
-                }
+            nextBlock = last(this.blocks.blockList[blk].connections);
+        }
+
+        if (nextBlock !== null) {
+            if (nextBlock in tur.endOfClampSignals) {
+                tur.endOfClampSignals[nextBlock].push(listenerName);
+            } else {
+                tur.endOfClampSignals[nextBlock] = [listenerName];
             }
         }
     }
@@ -1589,7 +1576,7 @@ class Logo {
             let queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
             if (nextFlow != null) {
                 // This could be the last block
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                tur.queue.push(queueBlock);
             }
         }
 
@@ -1645,8 +1632,7 @@ class Logo {
         // Is the block in a queued clamp?
         if (blk !== logo._ignoringBlock) {
             if (blk in tur.endOfClampSignals) {
-                let n = tur.endOfClampSignals[blk].length;
-                for (let i = 0; i < n; i++) {
+                for (let i = 0; i < tur.endOfClampSignals[blk].length; i++) {
                     let signal = tur.endOfClampSignals[blk].pop();
                     if (signal != null) {
                         logo.stage.dispatchEvent(signal);
@@ -1673,9 +1659,8 @@ class Logo {
                 queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
             }
 
-            // We need to keep track of the parent block to the child
-            // flow so we can unhighlight the parent block after the
-            // child flow completes.
+            // We need to keep track of the parent block to the child flow so we can unhighlight the
+            // parent block after the child flow completes.
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
@@ -2504,9 +2489,7 @@ class Logo {
                     break;
 
                 default:
-                    console.debug(
-                        name + " is not supported inside of Note Blocks"
-                    );
+                    console.debug(name + " is not supported inside of Note Blocks");
                     break;
             }
         }

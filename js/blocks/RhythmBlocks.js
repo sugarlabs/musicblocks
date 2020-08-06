@@ -51,8 +51,7 @@ function setupRhythmBlocks() {
                     value = 0;
                 }
 
-                if (value !== 0) return 1 / value;
-                return 0;
+                return value !== 0 ? 1 / value : 0;
             }
         }
     }
@@ -134,7 +133,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "osctime", blk, _callback);
 
             return [args[1], 1];
         }
@@ -490,7 +489,7 @@ function setupRhythmBlocks() {
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
                     tur.singer.embeddedGraphics[saveBlk] = [];  // graphics will have already been rendered
 
-                    Singer.processNote(logo, noteValue, saveBlk, turtle);
+                    Singer.processNote(noteValue, logo.blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle);
                     let bpmFactor =
                         TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
@@ -885,8 +884,7 @@ function setupRhythmBlocks() {
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
@@ -907,7 +905,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "note", blk, _callback);
 
             return [args[1], 1];
         }
@@ -969,7 +967,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "newnote", blk, _callback);
 
             return [args[1], 1];
         }
