@@ -1392,7 +1392,9 @@ class Singer {
                         // Play previous note
                         tur.singer.tie = false;
                         tieDelay = 0;
-                        Singer.processNote(tur.singer.tieCarryOver, logo.blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle);
+
+                        /** @todo FIXME: consider osctime block in tie */
+                        Singer.processNote(tur.singer.tieCarryOver, false, saveBlk, turtle);
 
                         tur.singer.inNoteBlock.pop();
 
@@ -1805,26 +1807,16 @@ class Singer {
                         }
                         tur.singer.currentCalculatedOctave = tur.singer.currentOctave;
 
-                        if (logo.turtles.turtleList[turtle].drum) {
-                            for (let i = 0; i < notes.length; i++) {
-                                notes[i] = notes[i]
-                                    .replace(/♭/g, "b")
-                                    .replace(/♯/g, "#"); // 'C2'; // Remove pitch
-                            }
-                        } else {
-                            for (let i = 0; i < notes.length; i++) {
-                                if (typeof notes[i] === "string") {
-                                    notes[i] = notes[i]
-                                        .replace(/♭/g, "b")
-                                        .replace(/♯/g, "#");
-                                }
+                        for (let i = 0; i < notes.length; i++) {
+                            if (typeof notes[i] === "string") {
+                                notes[i] = notes[i].replace(/♭/g, "b").replace(/♯/g, "#");
                             }
                         }
 
                         if (duration > 0) {
                             if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
                                 // Parameters related to effects
-                                var paramsEffects = {
+                                let paramsEffects = {
                                     doVibrato: doVibrato,
                                     doDistortion: doDistortion,
                                     doTremolo: doTremolo,
@@ -1852,21 +1844,18 @@ class Singer {
                                     neighborArgCurrentBeat: neighborArgCurrentBeat
                                 };
 
-                                // For case when note block is inside a
-                                // settimbre block, which in turn is inside a
-                                // setdrum block
+                                // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
                                 let hasSetTimbreInSetDrum = false;
                                 // This case is only applicable if the note block is at all inside a setdrum block
-                                if (tur.singer.drumStyle.length > 0) {
+                                if (
+                                    tur.singer.drumStyle.length > 0 && blk in logo.blocks.blockList
+                                ) {
                                     // Start from the note block's parent
-                                    let par =
-                                        logo.blocks.blockList[blk]
-                                            .connections[0];
+                                    let par = logo.blocks.blockList[blk].connections[0];
                                     par = logo.blocks.blockList[par];
                                     // Keep looking for all parents up in order
-                                    while (par.name != "setdrum") {
-                                        // If settimbre encountered before
-                                        // setdrum, the said case is true
+                                    while (par.name !== "setdrum") {
+                                        // If settimbre encountered before setdrum, the said case is true
                                         if (par.name === "settimbre") {
                                             hasSetTimbreInSetDrum = true;
                                             break;
@@ -1909,20 +1898,6 @@ class Singer {
                                             notes,
                                             beatValue,
                                             last(tur.singer.drumStyle),
-                                            null,
-                                            null,
-                                            false
-                                        );
-                                    }
-                                } else if (
-                                    logo.turtles.turtleList[turtle].drum
-                                ) {
-                                    if (!tur.singer.suppressOutput) {
-                                        logo.synth.trigger(
-                                            turtle,
-                                            notes,
-                                            beatValue,
-                                            "drum",
                                             null,
                                             null,
                                             false
@@ -2151,14 +2126,14 @@ class Singer {
                 tur.singer.embeddedGraphics[blk] = [];
 
                 // Ensure note value block unhighlights after note plays.
-                setTimeout(function () {
-                    if (logo.blocks.visible) {
+                setTimeout(() => {
+                    if (logo.blocks.visible && blk in logo.blocks.blockList) {
                         logo.blocks.unhighlight(blk);
                     }
                 }, beatValue * 1000);
             };
 
-            if (last(tur.singer.inNoteBlock) != null) {
+            if (last(tur.singer.inNoteBlock) !== null) {
                 __playnote();
             }
         }
