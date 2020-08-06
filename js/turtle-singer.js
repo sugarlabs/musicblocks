@@ -915,11 +915,12 @@ class Singer {
      *
      * @static
      * @param {Number} value - note value
-     * @param {Object} logo - Logo object
      * @param {Object} turtle - Turtle object
+     * @param {String} blkName - block type name
      * @param {Object} blk - corresponding Block object index in blocks.blockList
+     * @param {Function} [_enqueue] - callback
      */
-    static playNote(value, logo, turtle, blk, _enqueue) {
+    static playNote(value, turtle, blkName, blk, _enqueue) {
         /**
          * We queue up the child flow of the note clamp and once all of the children are run, we
          * trigger a _playnote_ event, then wait for the note to play. The note can be specified
@@ -982,7 +983,7 @@ class Singer {
         // arrays, which are used when we play the note
         logo.clearNoteParams(tur, blk, []);
 
-        let noteBeatValue = logo.blocks.blockList[blk].name === "newnote" ? 1 / value : value;
+        let noteBeatValue = blkName === "newnote" ? 1 / value : value;
 
         tur.singer.inNoteBlock.push(blk);
         tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1 ? true : false;
@@ -1011,7 +1012,7 @@ class Singer {
 
                 Singer.processNote(
                     1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)],
-                    logo.blocks.blockList[last(tur.singer.inNoteBlock)].name === "osctime",
+                    blkName === "osctime",
                     last(tur.singer.inNoteBlock),
                     turtle
                 );

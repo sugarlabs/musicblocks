@@ -133,7 +133,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "osctime", blk, _callback);
 
             return [args[1], 1];
         }
@@ -884,8 +884,7 @@ function setupRhythmBlocks() {
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
@@ -906,7 +905,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "note", blk, _callback);
 
             return [args[1], 1];
         }
@@ -968,7 +967,7 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, logo, turtle, blk, _callback);
+            Singer.playNote(value, turtle, "newnote", blk, _callback);
 
             return [args[1], 1];
         }
