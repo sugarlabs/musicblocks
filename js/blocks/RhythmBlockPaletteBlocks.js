@@ -59,7 +59,7 @@ function setupRhythmBlockPaletteBlocks() {
                 }
 
                 for (let i = 0; i < args[0]; i++) {
-                    Singer.processNote(logo, noteBeatValue, blk, turtle);
+                    Singer.processNote(noteBeatValue, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 // We don't check for balance since we want to support
@@ -119,9 +119,9 @@ function setupRhythmBlockPaletteBlocks() {
                     callback,
                     timeout
                 ) {
-                    setTimeout(function() {
-                        Singer.processNote(logo, thisBeat, blk, turtle, callback);
-                    }, timeout);
+                    setTimeout(
+                        () => Singer.processNote(thisBeat, false, blk, turtle, callback), timeout
+                    );
                 };
                 let __callback;
 
@@ -497,9 +497,10 @@ function setupRhythmBlockPaletteBlocks() {
                         callback,
                         timeout
                     ) {
-                        setTimeout(function() {
-                            Singer.processNote(logo, thisBeat, blk, turtle, callback);
-                        }, timeout);
+                        setTimeout(
+                            () => Singer.processNote(thisBeat, false, blk, turtle, callback),
+                            timeout
+                        );
                     };
 
                     let timeout = 0;
@@ -660,7 +661,7 @@ function setupRhythmBlockPaletteBlocks() {
                             logo.addingNotesToTuplet = true;
                         }
 
-                        Singer.processNote(logo, noteBeatValue, blk, turtle);
+                        Singer.processNote(noteBeatValue, false, blk, turtle);
                     }
                 } else {
                     logo.tupletParams.push([1, noteBeatValue]);
@@ -694,9 +695,9 @@ function setupRhythmBlockPaletteBlocks() {
                     callback,
                     timeout
                 ) {
-                    setTimeout(function() {
-                        Singer.processNote(logo, thisBeat, blk, turtle, callback);
-                    }, timeout);
+                    setTimeout(
+                        () => Singer.processNote(thisBeat, false, blk, turtle, callback), timeout
+                    );
                 };
 
                 for (let i = 0; i < arg0; i++) {

@@ -1751,7 +1751,7 @@ function setupPitchBlocks() {
                     tur.singer.pitchNumberOffset
                 );
 
-                return Singer.processPitch(obj[0], obj[1], 0, logo, turtle, blk);
+                return Singer.processPitch(obj[0], obj[1], 0, turtle, blk);
             }
         }
     }
@@ -1866,7 +1866,7 @@ function setupPitchBlocks() {
                     calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
                 );
 
-                return Singer.processPitch(note, octave, 0, logo, turtle, blk);
+                return Singer.processPitch(note, octave, 0, turtle, blk);
             } else {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
@@ -1982,7 +1982,7 @@ function setupPitchBlocks() {
                     calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
                 );
 
-                return Singer.processPitch(note, octave, 0, logo, turtle, blk);
+                return Singer.processPitch(note, octave, 0, turtle, blk);
             } else {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
@@ -2406,7 +2406,7 @@ function setupPitchBlocks() {
                 }
             }
 
-            return Singer.processPitch(note, octave, cents, logo, turtle, blk);
+            return Singer.processPitch(note, octave, cents, turtle, blk);
         }
     }
 
