@@ -3082,6 +3082,10 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
+        if(this._usePieNumberC1()) {
+            return true;
+        }
+
         return false;
     };
 
@@ -4271,7 +4275,7 @@ function Block(protoblock, blocks, overrideName) {
                             this.value
                         );
                         break;
-                    case "setbpm3": 
+                    case "setbpm3": case "setmasterbpm2": 
                         this._piemenuNumber ( 
                         [
                         40,
@@ -4316,51 +4320,6 @@ function Block(protoblock, blocks, overrideName) {
                     ],
                     this.value
                     );
-                    case "setmasterbpm2": 
-                    this._piemenuNumber ( 
-                    [
-                    40,
-                    42,
-                    44,
-                    46,
-                    48,
-                    50,
-                    52,
-                    54,
-                    56,
-                    58,
-                    60,
-                    63,
-                    66,
-                    69,
-                    72,
-                    76,
-                    80,
-                    84,
-                    88,
-                    92,
-                    96,
-                    100,
-                    104,
-                    108,
-                    112,
-                    116,
-                    120,
-                    126,
-                    132,
-                    138,
-                    144,
-                    152,
-                    160,
-                    168,
-                    176,
-                    184,
-                    192,
-                    200,
-                    208,
-                ],
-                this.value
-                );
                     break;
 
                 }
@@ -6197,7 +6156,9 @@ function Block(protoblock, blocks, overrideName) {
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.titleRotateAngle = 0;
+        if (this.blocks.blockList[this.connections[0]].name === "setbpm3" || this.blocks.blockList[this.connections[0]].name === "setmasterbpm2") {
+            this._numberWheel.titleRotateAngle = 0;
+        }
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
