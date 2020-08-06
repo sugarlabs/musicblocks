@@ -72,5 +72,119 @@ function setupPitchActions() {
                 return Singer.processPitch(obj[0], obj[1], 0, turtle, blk);
             }
         }
+
+        /**
+         * Processes a hertz block.
+         *
+         * @param {Number} hertz - frequency in hertz
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @throws {String}
+         */
+        static playHertz(hertz, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let obj = frequencyToPitch(hertz);
+            let note = obj[0];
+            let octave = obj[1];
+            let cents = obj[2];
+            let delta = 0;
+
+            if (tur.singer.justMeasuring.length > 0) {
+                // TODO: account for cents
+                let noteObj = getNote(
+                    note,
+                    octave,
+                    0,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg
+                );
+
+                let n = tur.singer.justMeasuring.length;
+                let pitchNumber =
+                    pitchToNumber(noteObj[0], noteObj[1], tur.singer.keySignature) -
+                    tur.singer.pitchNumberOffset;
+                if (tur.singer.firstPitch.length < n) {
+                    tur.singer.firstPitch.push(pitchNumber);
+                } else if (tur.singer.lastPitch.length < n) {
+                    tur.singer.lastPitch.push(pitchNumber);
+                }
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                if (!(tur.singer.invertList.length === 0)) {
+                    delta += Singer.calculateInvert(logo, turtle, note, octave);
+                }
+
+                let addPitch = (note, octave, cents, frequency, direction) => {
+                    let t = 2 * delta + tur.transposition + tur.singer.register * 12;
+                    let noteObj = getNote(
+                        note,
+                        octave,
+                        t,
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        direction,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    if (tur.singer.drumStyle.length > 0) {
+                        let drumname = last(tur.singer.drumStyle);
+                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    }
+
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
+                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
+                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(frequency);
+                    return noteObj;
+                };
+
+                let noteObj1 = addPitch(note, octave, cents, hertz);
+
+                for (let i = 0; i < tur.singer.intervals.length; i++) {
+                    let ii = getInterval(
+                        tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]
+                    );
+                    let noteObj2 = getNote(
+                        noteObj1[0],
+                        noteObj1[1],
+                        ii,
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
+                }
+
+                for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
+                    let noteObj2 = getNote(
+                        noteObj1[0],
+                        noteObj1[1],
+                        tur.singer.semitoneIntervals[i][0],
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    addPitch(
+                        noteObj2[0], noteObj2[1], cents, 0, tur.singer.semitoneIntervals[i][1]
+                    );
+                }
+
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+                tur.singer.pushedNote = true;
+                if (logo.runningLilypond) {
+                    logo.notation.notationMarkup(
+                        turtle,
+                        pitchToFrequency(noteObj1[0], noteObj1[1], cents, tur.singer.keySignature)
+                    );
+                }
+            } else {
+                throw "NoNote";
+            }
+        }
     }
 }
