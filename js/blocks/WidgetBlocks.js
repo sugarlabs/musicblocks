@@ -391,15 +391,46 @@ function setupWidgetBlocks() {
                 ),
                 "documentation",
                 null,
-                "meterwidget"
+                "oscilloscope"
             ]);
             this.formBlock({ name: _("oscilloscope"), canCollapse: true });
+            let addPrintTurtle = (blocks,turtle,prev,last) => {
+                let len = blocks.length;
+                let next = last ? null : len+2
+                blocks.push([len, "print", 0, 0, [prev, len + 1, next]]);
+                blocks.push([len + 1, ["text", { value: turtle.name}], 0, 0, [len, null]]);
+                return blocks;
+            }
+
+            this.makeMacro((x, y) => {
+                let blocks = [[0,"oscilloscope", x, y, [null, 1, null]]];
+                for (let turtle of turtles.turtleList) {
+                    if (!turtle.inTrash)
+                        blocks = addPrintTurtle(blocks, turtle, Math.max(0, blocks.length - 2), turtle == last(turtles.turtleList));
+                }
+                blocks[0][4][2]=blocks.length;
+                blocks.push([blocks.length, "hiddennoflow", 0, 0, [0, null]]);
+                return blocks;
+            });
         }
 
         flow(args, logo, turtle, blk) {
-            logo.Oscilloscope = new Oscilloscope();
-            
-            logo.Oscilloscope.init(logo);
+            if (logo.Oscilloscope === null) {
+                logo.Oscilloscope = new Oscilloscope();
+            }
+            logo.oscilloscopeTurtles = [];
+            logo.inOscilloscope = true;
+
+            let listenerName = "_oscilloscope_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = function(event) {
+                logo.Oscilloscope.init(logo);
+                logo.inOscilloscope = false;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
             if (args.length === 1) return [args[0], 1];
         }
     }
@@ -1146,6 +1177,7 @@ function setupWidgetBlocks() {
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
     new PitchDrumMatrixBlock().setup();
+    new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
     new ChromaticBlock().setup();
     new MusicKeyboard2Block().setup();
@@ -1156,6 +1188,5 @@ function setupWidgetBlocks() {
     new MatrixGMajorBlock().setup();
     new MatrixCMajorBlock().setup();
     new MatrixBlock().setup();
-    new oscilloscopeWidgetBlock().setup();
     new StatusBlock().setup();
 }

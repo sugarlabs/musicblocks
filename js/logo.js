@@ -85,6 +85,8 @@ class Logo {
         this.pitchSlider = null;
         this.musicKeyboard = null;
         this.modeWidget = null;
+        this.Oscilloscope = null;
+        this.oscilloscopeTurtles = [];
         this.meterWidget = null;
         this.statusMatrix = null;
 
@@ -182,6 +184,7 @@ class Logo {
 
         // Status matrix
         this.inStatusMatrix = false;
+        this.inOscilloscope = false;
         this.updatingStatusMatrix = false;
         this.statusFields = [];
 
