@@ -188,7 +188,7 @@ function setupPitchActions() {
         }
 
         /**
-         * Enters an accidental clamp block.
+         * Creates sharps and flats.
          *
          * @param {String} accidental - type of accidental
          * @param {Number} turtle - Turtle index in turtles.turtleList
@@ -223,6 +223,34 @@ function setupPitchActions() {
 
             let __listener = event => {
                 tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Shifts the pitches contained inside Note blocks up (or down) by half steps.
+         *
+         * @param {Number} transValue - number of semitones
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block object index in blocks.blockList
+         * @returns {void}
+         */
+        static setSemitoneTranspose(transValue, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.transposition +=
+                tur.singer.invertList.length > 0 ? -transValue : transValue;
+            tur.singer.transpositionValues.push(transValue);
+
+            let listenerName = "_transposition_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                transValue = tur.singer.transpositionValues.pop();
+                tur.singer.transposition +=
+                    tur.singer.invertList.length > 0 ? transValue : -transValue;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

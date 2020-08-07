@@ -622,7 +622,7 @@ function setupPitchBlocks() {
                 defaults: [50]
             });
         }
-        
+
         arg(logo, turtle, blk, receivedArg) {
             let cblk0 = logo.blocks.blockList[blk].connections[0];
             let cblk1 = logo.blocks.blockList[blk].connections[1];
@@ -980,22 +980,7 @@ function setupPitchBlocks() {
                 return;
 
             if (args[0] !== null && typeof args[0] === "number") {
-                let transValue = args[0];
-                let tur = logo.turtles.ithTurtle(turtle);
-                tur.singer.transposition +=
-                    tur.singer.invertList.length > 0 ? -transValue : transValue;
-                tur.singer.transpositionValues.push(transValue);
-
-                let listenerName = "_transposition_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = event => {
-                    transValue = tur.singer.transpositionValues.pop();
-                    tur.singer.transposition +=
-                        tur.singer.invertList.length > 0 ? transValue : -transValue;
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
+                Singer.PitchActions.setSemitoneTranspose(args[0], turtle, blk);
 
                 return [args[1], 1];
             }
@@ -1696,7 +1681,7 @@ function setupPitchBlocks() {
 
                 let isNegativeArg = arg0 < 0 ? true : false;
                 arg0 = Math.abs(arg0);
-                
+
                 let obj;
                 if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch") {
                     obj = keySignatureToMode("C major");
