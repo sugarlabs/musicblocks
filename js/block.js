@@ -3141,7 +3141,8 @@ function Block(protoblock, blocks, overrideName) {
                 "onbeatdo",
                 "hertz",
                 "right",
-                "left"
+                "left",
+                "setpanning"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1
         ) {
             return false;
@@ -4270,6 +4271,12 @@ function Block(protoblock, blocks, overrideName) {
                                 30,
                                 0
                             ],
+                            this.value
+                        );
+                        break;
+                    case "setpanning":
+                        this._piemenuNumber(
+                            [ -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100],
                             this.value
                         );
                         break;
