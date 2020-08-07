@@ -258,6 +258,43 @@ function setupMeterBlocks() {
         }
     }
 
+    class NoteCounterBlock2 extends LeftBlock {
+        constructor() {
+            //.TRANS: count the number of notes
+            super("notecounter2", _("note counter"));
+            this.setPalette("meter");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Note counter block can be used to count the number of contained notes."
+                ),
+                "documentation",
+                null,
+                "notecounterhelp"
+            ]);
+            this.formBlock({
+                flows: {
+                    labels: [""],
+                    type: "flow"
+                }
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                return Singer.numberOfNotes(logo, turtle, cblk);
+            }
+        }
+    }
+
     class ElapsedNotesBlock extends ValueBlock {
         constructor() {
             //.TRANS: number of whole notes that have been played
@@ -1117,6 +1154,7 @@ function setupMeterBlocks() {
     new MeasureValueBlock().setup();
     new BeatValueBlock().setup();
     new NoteCounterBlock().setup();
+    new NoteCounterBlock2().setup();
     new ElapsedNotesBlock().setup();
     new ElapsedNotes2Block().setup();
     new DriftBlock().setup();
