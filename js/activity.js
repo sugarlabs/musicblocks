@@ -1251,12 +1251,12 @@ function Activity() {
         
         exitWheel.navItems[0].navigateFunction = __exitMenu;
 
-        let __playNote = () => {
+        let __playNote = (note) => {
             let obj = getNote(
-                KeySignatureEnv[0],
+                note,
                 4,
                 null,
-                KeySignatureEnv[0] + " " + KeySignatureEnv[1],
+                note + " " + KeySignatureEnv[1],
                 false,
                 null,
                 null
@@ -1298,8 +1298,15 @@ function Activity() {
                     }
                 }
                 __selectionChangedKey();
-                if ((i >= 0 && i < 5) || (i > 9 && i < 12) )
-                    __playNote();
+                if ((i >= 0 && i < 5) || (i > 9 && i < 12) ) {
+                    __playNote(KeySignatureEnv[0]);
+                } else {
+                    let selection = keyNameWheel.navItems[
+                        keyNameWheel.selectedNavItemIndex
+                    ].title;
+                    selection = selection.split("/");
+                    __playNote(selection[0]);
+                }
             };
         };
 
@@ -1347,7 +1354,6 @@ function Activity() {
                 keyNameWheel2.selectedNavItemIndex
             ].title;
             KeySignatureEnv[0] = selection;
-            __playNote();
         };
 
         for (let i = 0; i < keys2.length; i++) {
