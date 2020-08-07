@@ -37,6 +37,199 @@ function setupPitchActions() {
         }
 
         /**
+         *  In combination with a number, plays the next pitch in a scale.
+         *
+         * @param {Number} value - step value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
+         */
+        static stepPitch(value, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // Similar to pitch but calculated from previous note played.
+            if (!logo.inMatrix && !logo.inMusicKeyboard && tur.singer.inNoteBlock.length === 0) {
+                logo.errorMsg(_("The Scalar Step Block must be used inside of a Note Block."), blk);
+                logo.stopTurtle = true;
+                return;
+            }
+
+            if (typeof value !== "number") {
+                logo.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                return;
+            }
+
+            // If we are just counting notes we don't care about the pitch.
+            if (tur.singer.justCounting.length > 0 && tur.singer.lastNotePlayed === null) {
+                console.debug("Just counting, so spoofing last note played.");
+                tur.singer.previousNotePlayed = ["G4", 4];
+                tur.singer.lastNotePlayed = ["G4", 4];
+            }
+
+            if (tur.singer.lastNotePlayed === null) {
+                logo.errorMsg(_("The Scalar Step Block must be preceded by a Pitch Block."), blk);
+                tur.singer.lastNotePlayed = ["G4", 4];
+            }
+
+            let addPitch = (note, octave, cents, direction) => {
+                let t = transposition + tur.singer.register * 12;
+                let noteObj = getNote(
+                    note,
+                    octave,
+                    t,
+                    tur.singer.keySignature,
+                    true,
+                    direction,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+
+                if (tur.singer.drumStyle.length > 0) {
+                    let drumname = last(tur.singer.drumStyle);
+                    if (EFFECTSNAMES.indexOf(drumname) === -1) {
+                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    } else {
+                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = effectsname;
+                    }
+                }
+
+                if (!logo.inMatrix && !logo.inMusicKeyboard) {
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
+                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
+                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
+                    if (cents !== 0) {
+                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
+                            pitchToFrequency(noteObj[0], noteObj[1], cents, tur.singer.keySignature)
+                        );
+                    } else {
+                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
+                    }
+                }
+
+                return noteObj;
+            };
+
+            let len = tur.singer.lastNotePlayed[0].length;
+
+            let noteObj = Singer.addScalarTransposition(
+                logo,
+                turtle,
+                tur.singer.lastNotePlayed[0].slice(0, len - 1),
+                parseInt(tur.singer.lastNotePlayed[0].slice(len - 1)),
+                value
+            );
+
+            let delta = 0;
+            if (!(tur.singer.invertList.length === 0)) {
+                delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
+            }
+
+            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
+
+            let noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
+            // Only apply the transposition to the base note of an interval
+            transposition = 0;
+
+            if (logo.inMatrix) {
+                logo.pitchTimeMatrix.addRowBlock(blk);
+                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    logo.pitchBlocks.push(blk);
+                }
+
+                if (logo.pitchTimeMatrix.rowLabels.length > 0) {
+                    if (last(logo.pitchTimeMatrix.rowLabels) === "hertz") {
+                        let freq = pitchToFrequency(
+                            noteObj[0], noteObj[1], 0, tur.singer.keySignature
+                        );
+                        logo.pitchTimeMatrix.rowLabels.push("hertz");
+                        logo.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                    } else {
+                        if (SOLFEGENAMES1.indexOf(last(logo.pitchTimeMatrix.rowLabels)) !== -1) {
+                            logo.pitchTimeMatrix.rowLabels.push(
+                                SOLFEGECONVERSIONTABLE[noteObj1[0]]
+                            );
+                        } else {
+                            logo.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                        }
+
+                        logo.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                    }
+                } else {
+                    logo.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                    logo.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                }
+
+                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
+            } else if (logo.inMusicKeyboard) {
+                if (tur.singer.drumStyle.length === 0) {
+                    logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                    if (logo.musicKeyboard.noteNames.length > 0) {
+                        if (last(logo.musicKeyboard.noteNames) === "hertz") {
+                            let freq = pitchToFrequency(
+                                noteObj[0], noteObj[1], 0, tur.singer.keySignature
+                            );
+                            logo.musicKeyboard.noteNames.push("hertz");
+                            logo.musicKeyboard.octaves.push(parseInt(freq));
+                        } else {
+                            if (SOLFEGENAMES1.indexOf(last(logo.musicKeyboard.noteNames)) !== -1) {
+                                logo.musicKeyboard.noteNames.push(
+                                    SOLFEGECONVERSIONTABLE[noteObj1[0]]
+                                );
+                            } else {
+                                logo.musicKeyboard.noteNames.push(noteObj1[0]);
+                            }
+
+                            logo.musicKeyboard.octaves.push(noteObj1[1]);
+                        }
+                    } else {
+                        logo.musicKeyboard.noteNames.push(noteObj1[0]);
+                        logo.musicKeyboard.octaves.push(noteObj1[1]);
+                    }
+
+                    logo.musicKeyboard.addRowBlock(blk);
+                    tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
+                }
+            }
+
+            let noteObj2;
+            for (let i = 0; i < tur.singer.intervals.length; i++) {
+                let ii = getInterval(tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]);
+                noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    ii,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], 0);
+            }
+
+            for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
+                noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    tur.singer.semitoneIntervals[i][0],
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], 0, tur.singer.semitoneIntervals[i][1]);
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+            }
+
+            tur.singer.pushedNote = true;
+        }
+
+        /**
          * Plays a nth modal pitch block.
          *
          * @param {Number} number - number of modal pitch
