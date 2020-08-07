@@ -2153,7 +2153,7 @@ function Activity() {
             .addClass("scrollSearch");
 
         let searchInput = searchWidget.idInput_custom;
-        if (searchInput.length <= 0) return;
+        if (!searchInput || searchInput.length <= 0) return;
 
         let protoblk = searchWidget.protoblk;
         let paletteName = protoblk.palette.name;
