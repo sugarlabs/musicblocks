@@ -4297,6 +4297,7 @@ function Block(protoblock, blocks, overrideName) {
                         80,
                         84,
                         88,
+                        90,
                         92,
                         96,
                         100,
@@ -6184,6 +6185,9 @@ function Block(protoblock, blocks, overrideName) {
         let that = this;
 
         let __selectionChanged = function() {
+            if(wheelValues[that._numberWheel.selectedNavItemIndex] === null) {
+                that.text.text = that.value
+            }
             that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
             that.text.text =
                 wheelLabels[that._numberWheel.selectedNavItemIndex];
