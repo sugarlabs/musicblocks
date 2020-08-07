@@ -445,6 +445,7 @@ function setupPitchBlocks() {
             super("currentpitch", _("current pitch"));
             this.setPalette("pitch");
             this.beginnerBlock(true);
+            this.hidden = true;
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
         }
@@ -642,6 +643,15 @@ function setupPitchBlocks() {
                             if (attr = "#") color += 8;
                             else if (attr = "b") color -= 8;
                             return color;
+                        case "pitch to shade":
+                            let note6 = notePlayed;
+                            let octave;
+                            if (Number(note6)) {
+                                [note6, octave] = frequencyToPitch(note6);
+                            } else {
+                                octave = note6[note6.length - 1];
+                            }
+                            return (octave * 10);
                         default:
                             return "__INVALID_INPUT__";
                     }
