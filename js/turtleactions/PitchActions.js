@@ -188,6 +188,47 @@ function setupPitchActions() {
         }
 
         /**
+         * Enters an accidental clamp block.
+         *
+         * @param {String} accidental - type of accidental
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block object index in blocks.blockList
+         * @returns {void}
+         */
+        static setAccidental(accidental, turtle, blk) {
+            let value;
+            let i = ACCIDENTALNAMES.indexOf(accidental);
+            if (i === -1) {
+                switch (accidental) {
+                    case _("sharp"):
+                        value = 1;
+                        return;
+                    case _("flat"):
+                        value = -1;
+                        return;
+                    default:
+                        value = 0;
+                        return;
+                }
+            } else {
+                value = ACCIDENTALVALUES[i];
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -value : value;
+
+            let listenerName = "_accidental_" + turtle + "_" + blk;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * Returns pitch or octave from corresponding pitch number.
          *
          * @param {Number} number - pitch number

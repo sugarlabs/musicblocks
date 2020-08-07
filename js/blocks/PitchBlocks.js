@@ -1310,47 +1310,16 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg, value;
-            if (args[0] === null || typeof args[0] !== "string") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "sharp";
-            } else {
-                arg = args[0];
             }
 
-            let i = ACCIDENTALNAMES.indexOf(arg);
-            if (i === -1) {
-                switch (arg) {
-                    case _("sharp"):
-                        value = 1;
-                        return;
-                    case _("flat"):
-                        value = -1;
-                        return;
-                    default:
-                        value = 0;
-                        return;
-                }
-            } else {
-                value = ACCIDENTALVALUES[i];
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.transposition += tur.singer.invertList.length > 0 ? -value : value;
-
-            let listenerName = "_accidental_" + turtle + "_" + blk;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.PitchActions.setAccidental(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -1388,9 +1357,8 @@ function setupPitchBlocks() {
             let listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
-                tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
-            };
+            let __listener =
+                event => tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -1424,17 +1392,7 @@ function setupPitchBlocks() {
             if (args[0] === undefined)
                 return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
-
-            let listenerName = "_sharp_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.PitchActions.setSharp(turtle, blk);
 
             return [args[0], 1];
         }
@@ -1566,11 +1524,9 @@ function setupPitchBlocks() {
                 logo.errorMsg(NANERRORMSG, blk);
                 arg0 = 7;
             } else {
-                arg0 = args[0];
+                // If args[0] is a float value then round-off to the nearest integer
+                arg0 = Math.round(args[0]);
             }
-
-            // If arg0 is a float value then round-off to the nearest integer
-            arg0 = Math.round(arg0);
 
             return Singer.PitchActions.playPitchNumber(arg0, turtle, blk);
         }
