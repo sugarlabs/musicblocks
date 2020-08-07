@@ -803,63 +803,17 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[3] === undefined) {
-                // Nothing to do...
+            if (args[3] === undefined)
                 return;
-            }
 
-            let arg0, arg1, arg2;
-            if (args[0] === null) {
+            if (args[0] === null || args[1] === null || args[2] === null)
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = "sol";
-            } else {
-                arg0 = args[0];
-            }
 
-            if (args[1] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 4;
-            } else {
-                arg1 = args[1];
-            }
+            let arg0 = args[0] === null ? "sol" : args[0];
+            let arg1 = args[1] === null ? 4 : args[1];
+            let arg2 = args[2] === null ? "even" : args[2];
 
-            if (args[2] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg2 = "even";
-            } else {
-                arg2 = args[2];
-            }
-
-            if (typeof arg2 === "number") {
-                if (arg2 % 2 === 0) {
-                    arg2 = "even";
-                } else {
-                    arg2 = "odd";
-                }
-            }
-
-            if (arg2 === _("even")) {
-                arg2 = "even";
-            } else if (arg2 === _("odd")) {
-                arg2 = "odd";
-            } else if (arg2 === _("scalar")) {
-                arg2 = "scalar";
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (arg2 === "even" || arg2 === "odd" || arg2 === "scalar") {
-                let octave = calcOctave(
-                    tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, arg0
-                );
-                tur.singer.invertList.push([arg0, octave, arg2]);
-            }
-
-            let listenerName = "_invert_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => tur.singer.invertList.pop();
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.PitchActions.invert(arg0, arg1, arg2, turtle, blk);
 
             return [args[3], 1];
         }
@@ -939,7 +893,7 @@ function setupPitchBlocks() {
 
         flow(args, logo, turtle) {
             if (args[0] !== null && typeof args[0] === "number") {
-                logo.turtles.ithTurtle(turtle).singer.register = Math.floor(args[0]);
+                Singer.PitchActions.setRegister(args[0], turtle);
             }
         }
     }

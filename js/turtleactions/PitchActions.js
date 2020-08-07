@@ -257,6 +257,55 @@ function setupPitchActions() {
         }
 
         /**
+         * Provides an easy way to modify the register (octave) of the notes that follow it.
+         *
+         * @param {Number} value - register value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         */
+        static setRegister(value, turtle) {
+            logo.turtles.ithTurtle(turtle).singer.register = Math.floor(value);
+        }
+
+        /**
+         * Rotates any contained notes around a target note.
+         *
+         * @param {String} name
+         * @param {Number} octave
+         * @param {String|Number} mode - even, odd, or scalar
+         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @param {*} [blk] - corresponding Block object index in blocks.blockList
+         */
+        static invert(name, octave, mode, turtle, blk) {
+            if (typeof mode === "number") {
+                mode = mode % 2 === 0 ? "even" : "odd";
+            }
+
+            if (mode === _("even")) {
+                mode = "even";
+            } else if (arg2 === _("odd")) {
+                mode = "odd";
+            } else if (arg2 === _("scalar")) {
+                mode = "scalar";
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (mode === "even" || mode === "odd" || mode === "scalar") {
+                let _octave = calcOctave(
+                    tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, name
+                );
+                tur.singer.invertList.push([name, _octave, mode]);
+            }
+
+            let listenerName = "_invert_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => tur.singer.invertList.pop();
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * Returns pitch or octave from corresponding pitch number.
          *
          * @param {Number} number - pitch number
