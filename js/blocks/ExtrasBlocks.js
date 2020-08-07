@@ -845,7 +845,7 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            if (logo.inOscilloscope && logo.blocks.blockList[cblk].name == "text"){
+            if (logo.inOscilloscope && cblk !=== null) {
                 let name = logo.blocks.blockList[cblk].value;
                 let turtle = -1;
                 for (let i = 0; i < logo.turtles.turtleList.length; i++) {
@@ -854,9 +854,8 @@ function setupExtrasBlocks() {
                         if (turtleName === name) turtle = i;
                     }
                 }
-                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle])<0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle])
-            }
-            if (!logo.inStatusMatrix) {
+                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle])
+            } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
                         let tur = logo.turtles.ithTurtle(turtle);

@@ -397,15 +397,16 @@ function setupWidgetBlocks() {
             let addPrintTurtle = (blocks,turtle,prev,last) => {
                 let len = blocks.length;
                 let next = last ? null : len+2
-                blocks.push([len,"print",0,0,[prev,len+1,next]]);
-                blocks.push([len+1,["text",{ value: turtle.name}],0,0,[len,null]]);
+                blocks.push([len, "print", 0, 0, [prev, len + 1, next]]);
+                blocks.push([len + 1, ["text", { value: turtle.name}], 0, 0, [len, null]]);
                 return blocks;
             }
+
             this.makeMacro((x, y) => {
-                let blocks = [ [0,"oscilloscope", x, y, [null, 1, null]] ];
+                let blocks = [[0,"oscilloscope", x, y, [null, 1, null]]];
                 for (let turtle of turtles.turtleList) {
                     if (!turtle.inTrash)
-                        blocks = addPrintTurtle(blocks,turtle,Math.max(0,blocks.length-2),turtle == last(turtles.turtleList));
+                        blocks = addPrintTurtle(blocks, turtle, Math.max(0, blocks.length - 2), turtle == last(turtles.turtleList));
                 }
                 blocks[0][4][2]=blocks.length;
                 blocks.push([blocks.length, "hiddennoflow", 0, 0, [0, null]]);

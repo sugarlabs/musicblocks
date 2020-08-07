@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Saksham Mrig
+
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
@@ -27,7 +29,7 @@ function Oscilloscope() {
         );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	    widgetWindow.show();
+            widgetWindow.show();
         
         widgetWindow.onclose = () => {
             for (let turtle of this.divisions) {
@@ -50,9 +52,8 @@ function Oscilloscope() {
             this.zoomFactor += step;
         };
         zoomInButton.children[0].src =
-        "data:image/svg+xml;base64," +
-        window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
-        
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
         
         let zoomOutButton = widgetWindow.addButton(
             "",
@@ -62,9 +63,10 @@ function Oscilloscope() {
         zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
         };
+
         zoomOutButton.children[0].src =
-        "data:image/svg+xml;base64," +
-        window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
@@ -75,7 +77,7 @@ function Oscilloscope() {
         for (let turtle of this.divisions) {
             turtleIdx = logo.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
-            this.makeCanvas(700, 400/this.divisions.length, turtle, turtleIdx);
+            this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
         }
     };
 
@@ -113,7 +115,7 @@ function Oscilloscope() {
             for(var i = 0; i < bufferLength; i++) {
 
                 var v = dataArray[i];
-                var y = HEIGHT/2*(1 - v) + this.verticalOffset;
+                var y = HEIGHT / 2 * (1 - v) + this.verticalOffset;
 
                 if(i === 0) {
                   canvasCtx.moveTo(x, y);
@@ -123,7 +125,7 @@ function Oscilloscope() {
   
                 x += sliceWidth;
             }
-            canvasCtx.lineTo(canvas.width, canvas.height/2);
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
         };
         draw();
