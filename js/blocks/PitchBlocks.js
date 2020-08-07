@@ -367,142 +367,17 @@ function setupPitchBlocks() {
                 [1, ["outputtools", { value: "pitch number" }], 0, 0, [0]],
             ]);
         }
+
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                if (tur.singer.noteStatus !== null) {
-                    let name = logo.blocks.blockList[blk].privateData;
-                    switch (name) {
-                        case "letter class":
-                            let lc = tur.singer.lastNotePlayed[0][0];
-                            return lc;
-                        case "solfege syllable":
-                            let lc2 = tur.singer.lastNotePlayed[0];
-                            lc2 = lc2.substr(0, lc2.length - 1);
-                            lc2 = lc2
-                                        .replace("#", SHARP)
-                                        .replace("b", FLAT);
-                            if (tur.singer.moveable === false) {
-                                return SOLFEGECONVERSIONTABLE[lc2];
-                            } else {
-                                let scale = _buildScale(tur.singer.keySignature)[0];
-                                let i = scale.indexOf(lc2);
-                                return SOLFEGENAMES[i];
-                            }
-                        case "pitch class":
-                            let note = tur.singer.lastNotePlayed[0];
-                            let num = pitchToNumber(
-                                note.substr(0, note.length - 1 ),
-                                note[note.length - 1],
-                                tur.singer.keySignature
-                            );
-                            return (num - 3) % 12;
-                        case "scalar class":
-                            let note2 = tur.singer.lastNotePlayed[0];
-                            note2 = note2.substr(0, note2.length - 1);
-                            note2 = note2
-                                        .replace("#", SHARP)
-                                        .replace("b", FLAT);
-                            let scalarClass = scaleDegreeToPitchMapping(
-                                tur.singer.keySignature,
-                                null,
-                                tur.singer.moveable,
-                                note2
-                            );
-                            return scalarClass[0];
-                        case "scale degree":
-                            let note3 = tur.singer.lastNotePlayed[0];
-                            note3 = note3.substr(0, note3.length - 1);
-                            note3 = note3
-                                        .replace("#", SHARP)
-                                        .replace("b", FLAT);
-                            let scalarClass1 = scaleDegreeToPitchMapping(
-                                tur.singer.keySignature,
-                                null,
-                                tur.singer.moveable,
-                                note3
-                            );
-                            return scalarClass1[0] + scalarClass1[1];
-                        case "nth degree":
-                            let note4 = tur.singer.lastNotePlayed[0];
-                            note4 = note4.substr(0, note4.length - 1);
-                            note4 = note4
-                                        .replace("#", SHARP)
-                                        .replace("b", FLAT);
-                            let scale = _buildScale(tur.singer.keySignature)[0];
-                            return scale.indexOf(note4);
-                        case "staff y":
-                            if (tur.singer.lastNotePlayed.length === 0) {
-                                return 0;
-                            }
-                            let lc1 = tur.singer.lastNotePlayed[0][0];
-                            let o1 = 4;
-                            if (tur.singer.lastNotePlayed[0].length === 2) {
-                                o1 = tur.singer.lastNotePlayed[0][1];
-                            } else {
-                                o1 = tur.singer.lastNotePlayed[0][2];
-                            }
-                            // these numbers are subject to staff artwork
-                            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) * YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
-                        case "pitch number":
-                            let value = null;
-                            let obj;
-                            if (tur.singer.lastNotePlayed !== null) {
-                                if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                                    let len = tur.singer.lastNotePlayed[0].length;
-                                    let pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                                    let octave = parseInt(
-                                        tur.singer.lastNotePlayed[0].slice(len - 1)
-                                    );
-                                    obj = [pitch, octave];
-                                } else {
-                                    // Hertz?
-                                    obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
-                                }
-                            } else if (
-                                tur.singer.inNoteBlock in tur.singer.notePitches &&
-                                tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
-                            ) {
-                                obj = getNote(
-                                    tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
-                                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
-                                    0,
-                                    tur.singer.keySignature,
-                                    tur.singer.moveable,
-                                    null,
-                                    logo.errorMsg
-                                );
-                            } else {
-                                if (tur.singer.lastNotePlayed !== null) {
-                                    console.debug("Cannot find a note ");
-                                    logo.errorMsg(INVALIDPITCH, blk);
-                                }
-
-                                obj = ["G", 4];
-                            }
-
-                            value =
-                                pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
-                                tur.singer.pitchNumberOffset;
-                            return value;
-                        case "pitch in hertz":
-                            return logo.synth._getFrequency(
-                                tur.singer.lastNotePlayed[0],
-                                logo.synth.changeInTemperament
-                            );
-                        default:
-                            return "__INVALID_INPUT__";
-                    }
-                } else {
-                    return "";
-                }
+                return Singer.PitchActions.getPitchInfo(
+                    logo.blocks.blockList[blk].privateData, turtle
+                );
             }
         }
 
