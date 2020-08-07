@@ -1,44 +1,56 @@
 {
-  "amd": {},
-  "volo": {
+    "name": "musicblocks",
+    "version": "3.2.0",
+    "description": "A musical microworld",
+    "repository": {
+       "url": "https://github.com/sugarlabs/musicblocks.git"
+    },
+    "license": "AGPL-3.0 License",
+    "bugs": {
+       "url": "https://github.com/sugarlabs/musicblocks/issues"
+    },
+    "amd": {},
+    "volo": {
     "baseUrl": "lib",
     "dependencies": {
-      "domReady": "github:requirejs/domReady/2.0.1",
-      "webL10n": "github:sugarlabs/webL10n/master"
+       "domReady": "github:requirejs/domReady/2.0.1",
+       "webL10n": "github:sugarlabs/webL10n/master"
     }
-  },
-  "scripts": {
-    "lint": "eslint js/**/*.js",
-    "serve": "python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1');\"",
-    "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\""
-  },
-  "devDependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/preset-env": "^7.5.0",
-    "babel-eslint": "^10.1.0",
-    "clean-css": "^4.2.1",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^7.1.0",
-    "eslint-plugin-import": "^2.21.1",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-clean-css": "^4.2.0",
-    "gulp-minify-css": "^1.2.4",
-    "gulp-prettier": "^2.3.0",
-    "gulp-uglify": "^3.0.2"
-  },
-  "dependencies": {
-    "autoprefixer": "^9.6.0",
-    "cssnano": "^4.1.10",
-    "gulp-concat": "^2.6.1",
-    "gulp-postcss": "^8.0.0",
-    "gulp-replace": "^1.0.0",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "http-server": "^0.11.1",
-    "lodash.template": "^4.5.0",
-    "node-static": "^0.7.11"
-  }
-}
+    },
+    "scripts": {
+        "lint": "eslint js/**/*.js",
+        "serve": "python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1');\"",
+        "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\""
+    },
+    "devDependencies": {
+        "@babel/core": "^7.5.0",
+        "@babel/preset-env": "^7.5.0",
+        "babel-eslint": "^10.1.0",
+        "clean-css": "^4.2.1",
+        "eslint": "^6.8.0",
+        "eslint-config-standard": "^7.1.0",
+        "eslint-plugin-import": "^2.21.1",
+        "eslint-plugin-promise": "^3.5.0",
+        "eslint-plugin-standard": "^2.1.1",
+        "gulp": "^4.0.2",
+        "gulp-babel": "^8.0.0",
+        "gulp-clean-css": "^4.2.0",
+        "gulp-minify-css": "^1.2.4",
+        "gulp-prettier": "^2.3.0",
+        "gulp-uglify": "^3.0.2"
+    },
+    "dependencies": {
+        "autoprefixer": "^9.6.0",
+        "cssnano": "^4.1.10",
+        "gulp-concat": "^2.6.1",
+        "gulp-postcss": "^8.0.0",
+        "gulp-replace": "^1.0.0",
+        "gulp-sass": "^4.0.2",
+        "gulp-sourcemaps": "^2.6.5",
+        "http-server": "^0.11.1",
+        "lodash.template": "^4.5.0",
+        "node-static": "^0.7.11"
+      }
+    }
+  
+  
