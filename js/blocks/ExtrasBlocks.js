@@ -845,7 +845,7 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            if (logo.inOscilloscope && cblk !=== null) {
+            if (logo.inOscilloscope && cblk !== null) {
                 let name = logo.blocks.blockList[cblk].value;
                 let turtle = -1;
                 for (let i = 0; i < logo.turtles.turtleList.length; i++) {
