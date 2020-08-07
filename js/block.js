@@ -4297,6 +4297,7 @@ function Block(protoblock, blocks, overrideName) {
                         80,
                         84,
                         88,
+                        90,
                         92,
                         96,
                         100,
@@ -6158,9 +6159,23 @@ function Block(protoblock, blocks, overrideName) {
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
         if (this.blocks.blockList[this.connections[0]].name === "setbpm3" || this.blocks.blockList[this.connections[0]].name === "setmasterbpm2") {
             this._numberWheel.titleRotateAngle = 0;
-            selectedValue = Math.floor(this.value / 4) * 4;
-            if (selectedValue < 40) selectedValue = 40;
-            if (selectedValue > 208) selectedValue = 208;
+            if (selectedValue === 90) {
+                selectedValue = 90;
+            } else if (selectedValue < 40) {
+                selectedValue = 40;
+            } else if (selectedValue < 60) {
+                selectedValue = Math.floor(this.value / 2) * 2;
+            } else if (selectedValue < 72) {
+                selectedValue = Math.floor(this.value / 3) * 3;
+            } else if (selectedValue < 120) {
+                selectedValue = Math.floor(this.value / 4) * 4;
+            } else if (selectedValue < 144) {
+                selectedValue = Math.floor(this.value / 6) * 6;
+            } else if (selectedValue < 208) {
+                selectedValue = Math.floor(this.value / 8) * 8;
+            } else {
+                selectedValue = 208;
+            }
         }
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
