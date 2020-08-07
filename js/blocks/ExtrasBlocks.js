@@ -845,6 +845,17 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
+            if (logo.inOscilloscope && logo.blocks.blockList[cblk].name == "text"){
+                let name = logo.blocks.blockList[cblk].value;
+                let turtle = -1;
+                for (let i = 0; i < logo.turtles.turtleList.length; i++) {
+                    if (!logo.turtles.turtleList[i].inTrash) {
+                        let turtleName = turtles.turtleList[i].name;
+                        if (turtleName === name) turtle = i;
+                    }
+                }
+                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle])<0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle])
+            }
             if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
