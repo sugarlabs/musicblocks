@@ -3145,8 +3145,6 @@ function Block(protoblock, blocks, overrideName) {
                 "setpanning",
                 "setbpm3",
                 "setmasterbpm2"
-
-              >>> master
             ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1
         ) {
             return false;
