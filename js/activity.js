@@ -237,6 +237,7 @@ function Activity() {
             "activity/turtleactions/PitchActions",
             "activity/turtleactions/OrnamentActions",
             "activity/turtleactions/VolumeActions",
+            "activity/turtleactions/DrumActions",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
