@@ -28,16 +28,50 @@ function setupOrnamentActions() {
          *
          * @param {Number} value - staccato value
          * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
          */
-        static setStaccato(value, turtle) {
+        static setStaccato(value, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.staccato.push(1 / value);
 
             let listenerName = "_staccato_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = event => tur.singer.staccato.pop();
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.
+         *
+         * @param {Number} value - staccato value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setSlur(value, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.staccato.push(-1 / value);
+
+            if (tur.singer.justCounting.length === 0) {
+                logo.notation.notationBeginSlur(turtle);
+            }
+
+            let listenerName = "_staccato_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.staccato.pop();
+                if (tur.singer.justCounting.length === 0) {
+                    logo.notation.notationEndSlur(turtle);
+                }
+            };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
