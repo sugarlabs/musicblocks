@@ -230,42 +230,16 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 16;
-            } else {
-                arg = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (logo.blocks.blockList[blk].name === "slur") {
-                tur.singer.staccato.push(-arg);
-            } else {
-                tur.singer.staccato.push(-1 / arg);
-            }
-
-            if (tur.singer.justCounting.length === 0) {
-                logo.notation.notationBeginSlur(turtle);
-            }
-
-            let listenerName = "_staccato_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.staccato.pop();
-                if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationEndSlur(turtle);
-                }
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.OrnamentActions.setSlur(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -299,7 +273,7 @@ function setupOrnamentBlocks() {
                 arg = 1 / 32;
             }
 
-            Singer.OrnamentActions.setStaccato(arg, turtle);
+            Singer.OrnamentActions.setStaccato(arg, turtle, blk);
 
             return [args[1], 1];
         }
