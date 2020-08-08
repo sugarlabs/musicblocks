@@ -293,28 +293,13 @@ function setupOrnamentBlocks() {
             if (args[1] === undefined)
                 return;
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 32;
-            } else {
-                arg = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (logo.blocks.blockList[blk].name === "newstaccato") {
-                tur.singer.staccato.push(1 / arg);
-            } else {
-                tur.singer.staccato.push(arg);
-            }
-
-            let listenerName = "_staccato_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => tur.singer.staccato.pop();
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.OrnamentActions.setStaccato(arg, turtle);
 
             return [args[1], 1];
         }
