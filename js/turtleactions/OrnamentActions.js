@@ -23,8 +23,23 @@
  */
 function setupOrnamentActions() {
     Singer.OrnamentActions = class {
-        static test() {
-            console.log("This is a test");
+        /**
+         * Shortens the length of the actual note while maintaining the specified rhythmic value of the notes.
+         *
+         * @param {Number} value - staccato value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         */
+        static setStaccato(value, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.staccato.push(1 / value);
+
+            let listenerName = "_staccato_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => tur.singer.staccato.pop();
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 }
