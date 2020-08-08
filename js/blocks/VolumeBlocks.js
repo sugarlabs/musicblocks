@@ -373,84 +373,25 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "string") {
+            let arg0 = args[0];
+            if (arg0 === null || typeof arg0 !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = "electronic synth";
-            } else {
-                arg0 = args[0];
             }
 
+            let arg1;
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
-                if (args[1] < 0) {
-                    arg1 = 0;
-                } else if (args[1] > 100) {
-                    arg1 = 100;
-                } else {
-                    arg1 = args[1];
-                }
+                arg1 = Math.max(Math.min(args[1], 100), 0);
 
                 if (arg1 === 0) {
                     logo.errorMsg(_("Setting volume to 0."), blk);
                 }
             }
 
-            let synth = null;
-
-            if (arg0 === "electronic synth" || arg0 === _("electronic synth")) {
-                synth = "electronic synth";
-            } else if (arg0 === "custom" || arg0 === _("custom")) {
-                synth = "custom";
-            }
-
-            if (synth === null) {
-                for (let voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === arg0) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === arg0) {
-                        synth = arg0;
-                        break;
-                    }
-                }
-            }
-
-            if (synth === null) {
-                for (let drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
-                        synth = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1].replace("-", " ") === arg0) {
-                        synth = arg0;
-                        break;
-                    }
-                }
-            }
-
-            if (synth === null) {
-                logo.errorMsg(synth + "not found", blk);
-                synth = "electronic synth";
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
-                tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
-
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
-            }
-
-            tur.singer.synthVolume[synth].push(args[1]);
-            if (!tur.singer.suppressOutput) {
-                Singer.setSynthVolume(logo, turtle, synth, args[1]);
-            }
+            Singer.VolumeActions.setSynthVolume(arg0, arg1, turtle);
         }
     }
 
