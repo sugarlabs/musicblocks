@@ -237,5 +237,22 @@ function setupVolumeActions() {
         static get masterVolume() {
             return last(Singer.masterVolume);
         }
+
+        /**
+         * Returns the current volume of the current synthesizer.
+         *
+         * @param {String} targetSynth
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {Number} synth volume
+         */
+        static getSynthVolume(targetSynth, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            for (let synth in tur.singer.synthVolume) {
+                if (synth === targetSynth) {
+                    return last(tur.singer.synthVolume[synth]);
+                }
+            }
+        }
     }
 }

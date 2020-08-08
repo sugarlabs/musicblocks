@@ -39,11 +39,7 @@ function setupVolumeBlocks() {
                 let cblk = logo.blocks.blockList[blk].connections[1];
                 if (cblk !== null) {
                     let targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    for (let synth in logo.turtles.ithTurtle(turtle).singer.synthVolume) {
-                        if (synth === targetSynth) {
-                            return last(logo.turtles.ithTurtle(turtle).singer.synthVolume[synth]);
-                        }
-                    }
+                    return Singer.VolumeActions.getSynthVolume(targetSynth, turtle);
                 }
                 return 0;
             }
