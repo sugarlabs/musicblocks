@@ -164,5 +164,69 @@ function setupVolumeActions() {
                 }
             }
         }
+
+        /**
+         * Sets the volume of a particular synth.
+         *
+         * @param {String} synthname - type of synth
+         * @param {Number} volume
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
+         */
+        static setSynthVolume(synthname, volume, turtle) {
+            let synth = null;
+
+            if (synthname === "electronic synth" || synthname === _("electronic synth")) {
+                synth = "electronic synth";
+            } else if (synthname === "custom" || synthname === _("custom")) {
+                synth = "custom";
+            }
+
+            if (synth === null) {
+                for (let voice in VOICENAMES) {
+                    if (VOICENAMES[voice][0] === synthname) {
+                        synth = VOICENAMES[voice][1];
+                        break;
+                    } else if (VOICENAMES[voice][1] === synthname) {
+                        synth = synthname;
+                        break;
+                    }
+                }
+            }
+
+            if (synth === null) {
+                for (let drum in DRUMNAMES) {
+                    if (DRUMNAMES[drum][0].replace("-", " ") === synthname) {
+                        synth = DRUMNAMES[drum][1];
+                        break;
+                    } else if (DRUMNAMES[drum][1].replace("-", " ") === synthname) {
+                        synth = synthname;
+                        break;
+                    }
+                }
+            }
+
+            if (synth === null) {
+                logo.errorMsg(synth + "not found");
+                synth = "electronic synth";
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+                tur.singer.instrumentNames.push(synth);
+                logo.synth.loadSynth(turtle, synth);
+
+                if (tur.singer.synthVolume[synth] === undefined) {
+                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
+                }
+            }
+
+            tur.singer.synthVolume[synth].push(volume);
+            if (!tur.singer.suppressOutput) {
+                Singer.setSynthVolume(logo, turtle, synth, volume);
+            }
+        }
     }
 }
