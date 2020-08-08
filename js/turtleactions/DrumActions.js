@@ -24,6 +24,44 @@
 function setupDrumActions() {
     Singer.DrumActions = class {
         /**
+         * Select a drum sound to replace the pitch of any contained notes.
+         *
+         * @param {String} drum - drum name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static setDrum(drum, turtle, blk) {
+            let drumname = DEFAULTDRUM;
+            for (let d in DRUMNAMES) {
+                if (DRUMNAMES[d][0] === drum) {
+                    drumname = DRUMNAMES[d][1];
+                } else if (DRUMNAMES[d][1] === drum) {
+                    drumname = drum;
+                }
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.drumStyle.push(drumname);
+
+            let listenerName = "_setdrum_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.drumStyle.pop();
+                tur.singer.pitchDrumTable = {};
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+            if (logo.inRhythmRuler) {
+                logo._currentDrumBlock = blk;
+                logo.rhythmRuler.Drums.push(blk);
+                logo.rhythmRuler.Rulers.push([[], []]);
+            }
+        }
+
+        /**
          * Replace every instance of a pitch with a drum sound.
          *
          * @param {String} drum - drum name
