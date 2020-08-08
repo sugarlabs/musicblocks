@@ -23,8 +23,10 @@ function setupSensorsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            // Pause the flow while we wait for input.
-            logo.doWait(turtle, 120);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // Pause the flow while we wait for input
+            tur.doWait(120);
 
             // Display the input form.
             docById("labelDiv").innerHTML =
@@ -123,7 +125,7 @@ function setupSensorsBlocks() {
                 });
                 logo.mic.connect(logo.pitchAnalyser);
             }
-            
+
 
             let values = logo.pitchAnalyser.getValue();
             let max = Infinity;

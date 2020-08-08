@@ -397,6 +397,14 @@ function Toolbar() {
         };
     };
 
+    this.renderChooseKeyIcon = function(onclick) {
+        var chooseKeyIcon = docById("chooseKeyIcon");
+        docById("chooseKeyDiv").style.display = "none";
+        chooseKeyIcon.onclick = () => {
+            onclick();
+        };
+    };
+
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = function() {
@@ -423,6 +431,12 @@ function Toolbar() {
             pt.onclick = function() {
                 languageBox.pt_onclick();
             };
+
+	    var ko = docById("ko");
+
+	    ko.onclick = function() {
+		languageBox.ko_onclick();
+	    };
 
             var ja = docById("ja");
 
@@ -513,6 +527,7 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Set Pitch Preview")],
             ["restoreIcon", _("Restore")],
             ["beginnerMode", _("Switch to beginner mode")],
             ["advancedMode", _("Switch to advanced mode")],
@@ -535,6 +550,7 @@ function Toolbar() {
             ["enUS", _("English (United States)"), "innerHTML"],
             ["enUK", _("English (United Kingdom)"), "innerHTML"],
             ["ja", _("日本語"), "innerHTML"],
+	    ["ko", _("한국어"), "innerHTML"],
             ["es", _("español"), "innerHTML"],
             ["pt", _("português"), "innerHTML"],
             ["kana", _("にほんご"), "innerHTML"],
@@ -570,6 +586,7 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Set Pitch Preview"),
             _("Restore"),
             _("Switch to beginner mode"),
             _("Switch to advanced mode"),
@@ -605,6 +622,7 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Set Pitch Preview")],
             ["restoreIcon", _("Restore")],
             ["languageSelectIcon", _("Select language")],
             ["save-html-beg", _("Save project as HTML"), "innerHTML"],
@@ -621,6 +639,7 @@ function Toolbar() {
             ["enUS", _("English (United States)"), "innerHTML"],
             ["enUK", _("English (United Kingdom)"), "innerHTML"],
             ["ja", _("日本語"), "innerHTML"],
+	    ["ko", _("한국인"), "innerHTML"],
             ["es", _("español"), "innerHTML"],
             ["pt", _("português"), "innerHTML"],
             ["kana", _("にほんご"), "innerHTML"],
@@ -656,6 +675,7 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Set Pitch Preview"),
             _("Restore"),
             _("Select language"),
             _("Save project as HTML"),

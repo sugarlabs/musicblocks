@@ -462,6 +462,9 @@ var STARTINGPITCH = "C4";
 
 const RHYTHMRULERHEIGHT = 100;
 
+const YSTAFFNOTEHEIGHT = 12.5;
+const YSTAFFOCTAVEHEIGHT = 87.5;
+ 
 const SLIDERHEIGHT = 200;
 const SLIDERWIDTH = 50;
 
@@ -1937,7 +1940,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                             }
                         }
                     }
-                }
+                } 
                 return sd;
             }
         } else if (chosenModePattern.length < 7) {

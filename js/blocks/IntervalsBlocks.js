@@ -191,7 +191,7 @@ function setupIntervalsBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                let saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = tur.singer.suppressOutput;
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
@@ -209,50 +209,29 @@ function setupIntervalsBlocks() {
                 let saveOrientation = tur.orientation;
                 let savePenState = tur.painter.penState;
 
-                logo.suppressOutput[turtle] = true;
+                tur.singer.suppressOutput = true;
 
-                logo.justCounting[turtle].push(true);
-                logo.justMeasuring[turtle].push(true);
+                tur.singer.justCounting.push(true);
+                tur.singer.justMeasuring.push(true);
 
-                for (let b in logo.endOfClampSignals[turtle]) {
-                    logo.butNotThese[turtle][b] = [];
-                    for (
-                        let i = 0;
-                        i < logo.endOfClampSignals[turtle][b].length;
-                        i++
-                    ) {
-                        logo.butNotThese[turtle][b].push(i);
+                for (let b in tur.endOfClampSignals) {
+                    tur.butNotThese[b] = [];
+                    for (let i in tur.endOfClampSignals[b]) {
+                        tur.butNotThese[b].push(i);
                     }
                 }
 
                 let actionArgs = [];
                 let saveNoteCount = tur.singer.notesPlayed;
-                logo.turtles.turtleList[turtle].running = true;
-                logo.runFromBlockNow(
-                    logo,
-                    turtle,
-                    cblk,
-                    true,
-                    actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
-                );
-                if (
-                    logo.firstPitch[turtle].length > 0 &&
-                    logo.lastPitch[turtle].length > 0
-                ) {
-                    return (
-                        last(logo.lastPitch[turtle]) -
-                        last(logo.firstPitch[turtle])
-                    );
-                    logo.firstPitch[turtle].pop();
-                    logo.lastPitch[turtle].pop();
+                tur.running = true;
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
+                if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
+                    return (last(tur.singer.lastPitch) - last(tur.singer.firstPitch));
+                    tur.singer.firstPitch.pop();
+                    tur.singer.lastPitch.pop();
                 } else {
                     return 0;
-                    logo.errorMsg(
-                        _(
-                            "You must use two pitch blocks when measuring an interval."
-                        )
-                    );
+                    logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
                 }
 
                 tur.singer.notesPlayed = saveNoteCount;
@@ -261,22 +240,22 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].painter.doPenUp();
-                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].painter.color = saveColor;
-                logo.turtles.turtleList[turtle].painter.value = saveValue;
-                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
-                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
-                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].painter.penState = savePenState;
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
 
-                logo.justCounting[turtle].pop();
-                logo.justMeasuring[turtle].pop();
-                logo.suppressOutput[turtle] = saveSuppressStatus;
+                tur.singer.justCounting.pop();
+                tur.singer.justMeasuring.pop();
+                tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
-                logo.butNotThese[turtle] = {};
+                tur.butNotThese = {};
             }
         }
     }
@@ -307,7 +286,7 @@ function setupIntervalsBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                let saveSuppressStatus = logo.suppressOutput[turtle];
+                let saveSuppressStatus = tur.singer.suppressOutput;
 
                 // We need to save the state of the boxes and heap
                 // although there is a potential of a boxes
@@ -325,44 +304,33 @@ function setupIntervalsBlocks() {
                 let saveOrientation = tur.orientation;
                 let savePenState = tur.painter.penState;
 
-                logo.suppressOutput[turtle] = true;
+                tur.singer.suppressOutput = true;
 
-                logo.justCounting[turtle].push(true);
-                logo.justMeasuring[turtle].push(true);
+                tur.singer.justCounting.push(true);
+                tur.singer.justMeasuring.push(true);
 
-                for (let b in logo.endOfClampSignals[turtle]) {
-                    logo.butNotThese[turtle][b] = [];
-                    for (
-                        let i = 0;
-                        i < logo.endOfClampSignals[turtle][b].length;
-                        i++
-                    ) {
-                        logo.butNotThese[turtle][b].push(i);
+                for (let b in tur.endOfClampSignals) {
+                    tur.butNotThese[b] = [];
+                    for (let i in tur.endOfClampSignals[b]) {
+                        tur.butNotThese[b].push(i);
                     }
                 }
 
                 let actionArgs = [];
                 let saveNoteCount = tur.singer.notesPlayed;
-                logo.turtles.turtleList[turtle].running = true;
+                tur.running = true;
                 logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
-                if (
-                    logo.firstPitch[turtle].length > 0 &&
-                    logo.lastPitch[turtle].length > 0
-                ) {
+                if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
                     return Singer.scalarDistance(
-                        logo, turtle, last(logo.firstPitch[turtle]), last(logo.lastPitch[turtle])
+                        logo, turtle, last(tur.singer.firstPitch), last(tur.singer.lastPitch)
                     );
 
-                    logo.firstPitch[turtle].pop();
-                    logo.lastPitch[turtle].pop();
+                    tur.singer.firstPitch.pop();
+                    tur.singer.lastPitch.pop();
                 } else {
                     return 0;
-                    logo.errorMsg(
-                        _(
-                            "You must use two pitch blocks when measuring an interval."
-                        )
-                    );
+                    logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
                 }
 
                 tur.singer.notesPlayed = saveNoteCount;
@@ -371,22 +339,22 @@ function setupIntervalsBlocks() {
                 logo.boxes = JSON.parse(saveBoxes);
                 logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
-                logo.turtles.turtleList[turtle].painter.doPenUp();
-                logo.turtles.turtleList[turtle].painter.doSetXY(saveX, saveY);
-                logo.turtles.turtleList[turtle].painter.color = saveColor;
-                logo.turtles.turtleList[turtle].painter.value = saveValue;
-                logo.turtles.turtleList[turtle].painter.chroma = saveChroma;
-                logo.turtles.turtleList[turtle].painter.stroke = saveStroke;
-                logo.turtles.turtleList[turtle].painter.canvasAlpha = saveCanvasAlpha;
-                logo.turtles.turtleList[turtle].painter.doSetHeading(saveOrientation);
-                logo.turtles.turtleList[turtle].painter.penState = savePenState;
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
 
-                logo.justCounting[turtle].pop();
-                logo.justMeasuring[turtle].pop();
-                logo.suppressOutput[turtle] = saveSuppressStatus;
+                tur.singer.justCounting.pop();
+                tur.singer.justMeasuring.pop();
+                tur.singer.suppressOutput = saveSuppressStatus;
 
                 // FIXME: we need to handle cascading.
-                logo.butNotThese[turtle] = {};
+                tur.butNotThese = {};
             }
         }
     }
@@ -438,7 +406,7 @@ function setupIntervalsBlocks() {
         // new SemitoneIntervalMacroBlock("major", 6, true).setup();
 
         new SemitoneIntervalMacroBlock("major", 3, false).setup();
-        
+
         // for (let i in [7, 6, 3, 2])
         //     new SemitoneIntervalMacroBlock("major", i).setup();
     }
@@ -506,15 +474,13 @@ function setupIntervalsBlocks() {
 
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
-                logo.semitoneIntervals[turtle].push([i, tur.singer.noteDirection]);
+                tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
                 tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function() {
-                    logo.semitoneIntervals[turtle].pop();
-                };
+                let __listener = () => tur.singer.semitoneIntervals.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -522,7 +488,7 @@ function setupIntervalsBlocks() {
             return [args[1], 1];
         }
     }
-    
+
     // DEPRECATED: verbose macros, no longer needed
 
     // function makeIntervalMacroBlocks() {
@@ -641,10 +607,8 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
@@ -654,15 +618,15 @@ function setupIntervalsBlocks() {
                 arg = args[0];
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            logo.intervals[turtle].push(i);
+            tur.singer.intervals.push(i);
 
             let listenerName = "_interval_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.intervals[turtle].pop();
-            };
+            let __listener = event => tur.singer.intervals.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -840,12 +804,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
-                return getModeLength(logo.keySignature[turtle]);
+                return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
             }
         }
     }
@@ -866,12 +829,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
-                let obj = logo.keySignature[turtle].split(" ");
+                let obj = logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ");
                 return obj[1];
             }
         }
@@ -893,12 +855,11 @@ function setupIntervalsBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
-                return logo.keySignature[turtle].split(' ')[0];
+                return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
             }
         }
     }
@@ -922,7 +883,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.keySignature[turtle] = args[0];
+                logo.turtles.ithTurtle(turtle).singer.keySignature = args[0];
             }
         }
     }
@@ -987,23 +948,22 @@ function setupIntervalsBlocks() {
                         args[0],
                         4,
                         tur.singer.transposition,
-                        logo.keySignature[turtle],
+                        tur.singer.keySignature,
                         false,
                         null,
                         logo.errorMsg,
                         logo.synth.inTemperament
                     );
-                    logo.keySignature[turtle] = noteObj[0] + " " + modename;
+                    tur.singer.keySignature = noteObj[0] + " " + modename;
                     logo.notation.notationKey(turtle, noteObj[0], modename);
                 } else {
-                    logo.keySignature[turtle] = args[0] + " " + modename;
+                    tur.singer.keySignature = args[0] + " " + modename;
                     logo.notation.notationKey(turtle, args[0], modename);
                 }
 
                 if (logo.insideModeWidget) {
-                    // Ensure logo the mode for Turtle 0 is set, since it
-                    // is used by the mode widget.
-                    logo.keySignature[0] = args[0] + " " + modename;
+                    // Ensure logo the mode for Turtle 0 is set, since it is used by the mode widget
+                    logo.turtles.ithTurtle(0).singer.keySignature = args[0] + " " + modename;
                     logo.notation.notationKey(0, args[0], modename);
                 }
             }

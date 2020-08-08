@@ -15,6 +15,12 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+var KeySignatureEnv = [
+    "C",
+    "major",
+    false
+];
+
 function Activity() {
     _THIS_IS_MUSIC_BLOCKS_ = true;
     LEADING = 0;
@@ -24,7 +30,7 @@ function Activity() {
     let _MSGTIMEOUT_ = 60000;
     let cellSize = 55;
     let searchSuggestions = [];
-    let homeButtonContainers = [];
+    let homeButtonContainer ;
 
     let msgTimeoutID = null;
     let msgText = null;
@@ -74,7 +80,6 @@ function Activity() {
     _loadButtonDragHandler = this._loadButtonDragHandler;
 
     scrollBlockContainer = false;
-    scrollPaletteContainer = false;
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
@@ -186,10 +191,6 @@ function Activity() {
         "activity/toolbar",
         "activity/trash",
         "activity/boundary",
-        "activity/turtle",
-        "activity/turtles",
-        "activity/turtle-singer",
-        "activity/turtle-painter",
         "activity/palette",
         "activity/protoblocks",
         "activity/blocks",
@@ -197,6 +198,10 @@ function Activity() {
         "activity/turtledefs",
         "activity/notation",
         "activity/logo",
+        "activity/turtle",
+        "activity/turtles",
+        "activity/turtle-singer",
+        "activity/turtle-painter",
         "activity/languagebox",
         "activity/basicblocks",
         "activity/blockfactory",
@@ -225,9 +230,11 @@ function Activity() {
             "widgets/pitchslider",
             "widgets/musickeyboard",
             "widgets/timbre",
+            "widgets/oscilloscope",
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
+            "activity/turtleactions/PitchActions",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
@@ -314,7 +321,6 @@ function Activity() {
         swiping = false;
         menuButtonsVisible = false;
         scrollBlockContainer = false;
-        scrollPaletteContainer = false;
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
@@ -324,8 +330,6 @@ function Activity() {
         // On-screen buttons
         smallerContainer = null;
         largerContainer = null;
-        smallerOffContainer = null;
-        largerOffContainer = null;
         resizeDebounce = false;
         hideBlocksContainer = null;
         collapseBlocksContainer = null;
@@ -556,13 +560,14 @@ function Activity() {
      * @param one {shows container}
      */
     setHomeContainers = function(zero, one) {
-        if (homeButtonContainers[0] === null) {
+        if (homeButtonContainer === null) {
             return;
         }
-
-        homeButtonContainers[0].visible = zero;
-        homeButtonContainers[1].visible = one;
-    };
+        if (zero)
+            changeImage(homeButtonContainer.children[0],GOHOMEFADEDBUTTON,GOHOMEBUTTON);
+        else
+            changeImage(homeButtonContainer.children[0],GOHOMEBUTTON,GOHOMEFADEDBUTTON);
+        };
 
     __saveHelpBlock = function(name, delay) {
         // Save the artwork for an individual help block.
@@ -979,6 +984,104 @@ function Activity() {
         }
     };
 
+    __generateSetKeyBlocks = () => {
+        // Find all setkey blocks in the code
+        let isSetKeyBlockPresent = 0;
+        let setKeyBlocks = [];
+        for (let i in logo.blocks.blockList) {
+            if (logo.blocks.blockList[i].name === "setkey2" &&
+            !logo.blocks.blockList[i].trash
+            ) {
+                isSetKeyBlockPresent = 1;
+                setKeyBlocks.push(i);
+            }
+        }
+
+        if (!isSetKeyBlockPresent) {
+            blocks.findStacks();
+            let stacks = blocks.stackList;
+            stacks.sort();
+            for (let i in stacks) {
+                if (logo.blocks.blockList[stacks[i]].name === "start") {
+                    let bottomBlock;
+                    bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
+                    let connectionsSetKey;
+                    let movable;
+                    if (KeySignatureEnv[2]) {
+                        blocks._makeNewBlockWithConnections(
+                            "movable",
+                            0,
+                            [stacks[i], null, null],
+                            null,
+                            null
+                        );
+                        movable = logo.blocks.blockList.length - 1;
+                        blocks._makeNewBlockWithConnections(
+                            "boolean",
+                            0,
+                            [movable],
+                            null,
+                            null
+                        );
+                        logo.blocks.blockList[movable].connections[1] =
+                        logo.blocks.blockList.length - 1;
+                        connectionsSetKey = [movable, null, null, bottomBlock];
+                    } else {
+                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                    }
+
+                    blocks._makeNewBlockWithConnections(
+                        "setkey2",
+                        0,
+                        connectionsSetKey,
+                        null,
+                        null
+                    );
+
+                    let setKey = logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[bottomBlock].connections[0] = setKey;
+
+                    if (KeySignatureEnv[2]) {
+                        logo.blocks.blockList[stacks[i]].connections[1] = movable;
+                        logo.blocks.blockList[movable].connections[2] = setKey;
+                    } else {
+                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
+                    }
+
+                    blocks.adjustExpandableClampBlock();
+
+                    blocks._makeNewBlockWithConnections(
+                        "notename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[1] =
+                    logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[0];
+                    blocks._makeNewBlockWithConnections(
+                        "modename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    logo.blocks.blockList[setKey].connections[2] =
+                    logo.blocks.blockList.length - 1;
+                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
+                    KeySignatureEnv[1];
+                    textMsg(
+                        _("You have chosen key ") + KeySignatureEnv[0] + " " + KeySignatureEnv[1] +
+                        _(" for your pitch preview.")
+                    );
+                }
+
+            }
+        }
+    };
+
     /*
      * @param onblur {when object loses focus}
      *
@@ -1001,8 +1104,6 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            Singer.setMasterVolume(logo, 0);
-
             let widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1052,6 +1153,256 @@ function Activity() {
         refreshCanvas();
     };
 
+    chooseKeyMenu = () => {
+        docById("chooseKeyDiv").style.display = "block";
+        docById("moveable").style.display = "block";
+
+        var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+        var keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
+        let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+
+        wheelnav.cssMode = true;
+
+        keyNameWheel.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
+        keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+        keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
+        keyNameWheel.titleRotateAngle = 0;
+        keyNameWheel.colors = platformColor.pitchWheelcolors;
+        keyNameWheel.animatetime = 0;
+
+        keyNameWheel.createWheel(keys);
+
+        keyNameWheel2.colors = platformColor.pitchWheelcolors;
+        keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
+        keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+        keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+        keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
+        keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
+        keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
+        let keys2 = [];
+
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].length > 2) {
+                let obj = keys[i].split("/");
+                keys2.push(obj[0]);
+                keys2.push(obj[1]);
+            } else {
+                keys2.push("");
+                keys2.push("");
+            }
+        }
+
+        keyNameWheel2.navAngle = -7.45;
+        keyNameWheel2.animatetime = 0;
+        keyNameWheel2.createWheel(keys2);
+
+        var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
+        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        modenameWheel.slicePathFunction = slicePath().DonutSlice;
+        modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
+        modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+        modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
+        modenameWheel.titleRotateAngle = 0;
+        modenameWheel.colors = platformColor.modeGroupWheelcolors;
+        modenameWheel.animatetime = 0;
+
+        modenameWheel.createWheel(modes);
+
+        var exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
+        exitWheel.slicePathFunction = slicePath().DonutSlice;
+        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+        exitWheel.titleRotateAngle = 0;
+        exitWheel.clickModeRotate = false;
+        exitWheel.colors = platformColor.exitWheelcolors;
+        exitWheel.animatetime = 0;
+        exitWheel.createWheel(["×", " "]);
+
+        let x = event.clientX;
+        let y = event.clientY;
+
+        docById("chooseKeyDiv").style.left = (x - 175) + "px";
+        docById("chooseKeyDiv").style.top = (y + 50) + "px";
+        docById("moveable").style.left = (x - 110) + "px";
+        docById("moveable").style.top = (y + 400) + "px";
+
+        let __exitMenu = () => {
+            docById("chooseKeyDiv").style.display = "none";
+            docById("moveable").style.display = "none";
+            let ele = document.getElementsByName("moveable");
+            for (let i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+                }
+            }
+            keyNameWheel.removeWheel();
+            keyNameWheel2.removeWheel();
+            modenameWheel.removeWheel();
+            localStorage.KeySignatureEnv = KeySignatureEnv;
+            __generateSetKeyBlocks();
+        };
+
+        exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+        let __playNote = (note) => {
+            let obj = getNote(
+                note,
+                4,
+                null,
+                note + " " + KeySignatureEnv[1],
+                false,
+                null,
+                null
+            );
+            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+            let tur = blocks.logo.turtles.ithTurtle(0);
+
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
+                blocks.logo.synth.createDefaultSynth(0);
+                blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            Singer.setSynthVolume(blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+            blocks.logo.synth.trigger(
+                0,
+                [obj[0] + obj[1]],
+                1 / 12,
+                DEFAULTVOICE,
+                null,
+                null
+            );
+        };
+
+        let __setupActionKey = function(i) {
+            keyNameWheel.navItems[i].navigateFunction = function() {
+                for (let j = 0; j < keys2.length; j++) {
+                    if ( Math.floor(j/2) != i) {
+                        keyNameWheel2.navItems[j].navItem.hide();
+                    } else {
+                        if (keys[i].length > 2) {
+                            keyNameWheel2.navItems[j].navItem.show();
+                        }
+                    }
+                }
+                __selectionChangedKey();
+                if ((i >= 0 && i < 5) || (i > 9 && i < 12) ) {
+                    __playNote(KeySignatureEnv[0]);
+                } else {
+                    let selection = keyNameWheel.navItems[
+                        keyNameWheel.selectedNavItemIndex
+                    ].title;
+                    selection = selection.split("/");
+                    __playNote(selection[0]);
+                }
+            };
+        };
+
+        let __selectionChangedKey = () => {
+            let selection = keyNameWheel.navItems[
+                keyNameWheel.selectedNavItemIndex
+            ].title;
+            keyNameWheel2.navigateWheel(2 * keyNameWheel.selectedNavItemIndex);
+            if (selection === "") {
+                keyNameWheel.navigateWheel(
+                    (keyNameWheel.selectedNavItemIndex + 1) %
+                    keyNameWheel.navItems.length
+                );
+            } else if (selection.length <= 2) {
+                KeySignatureEnv[0] = selection;
+            }
+        };
+
+        for (let i = 0; i < keys.length; i++) {
+            __setupActionKey(i);
+        }
+
+        let __selectionChangedMode = () => {
+            let selection = modenameWheel.navItems[
+                modenameWheel.selectedNavItemIndex
+            ].title;
+            if (selection === "") {
+                modenameWheel.navigateWheel(
+                    (modenameWheel.selectedNavItemIndex + 1) %
+                    modenameWheel.navItems.length
+                );
+            } else {
+                KeySignatureEnv[1] = selection;
+            }
+        };
+
+        for (let i = 0; i < modes.length; i++) {
+            modenameWheel.navItems[i].navigateFunction = function() {
+                __selectionChangedMode();
+            };
+        }
+
+        let __selectionChangedKey2 = function() {
+            let selection = keyNameWheel2.navItems[
+                keyNameWheel2.selectedNavItemIndex
+            ].title;
+            KeySignatureEnv[0] = selection;
+        };
+
+        for (let i = 0; i < keys2.length; i++) {
+            keyNameWheel2.navItems[i].navigateFunction = function() {
+                __selectionChangedKey2();
+            };
+        }
+        if (localStorage.KeySignatureEnv !== undefined) {
+            let ks = localStorage.KeySignatureEnv.split(",");
+            KeySignatureEnv[0] = ks[0];
+            KeySignatureEnv[1] = ks[1];
+            KeySignatureEnv[2] = (ks[2] == "true" ? true: false);
+        } else {
+            KeySignatureEnv = [
+                "C",
+                "major",
+                false
+            ];
+        }
+        let i = keys.indexOf(KeySignatureEnv[0]);
+        if (i == -1) {
+            i = keys2.indexOf(KeySignatureEnv[0]);
+            if (i != -1) {
+                keyNameWheel.navigateWheel(Math.floor(i / 2));
+                keyNameWheel2.navigateWheel(i);
+                for (let j = 0; j < keys2.length; j++) {
+                    keyNameWheel2.navItems[j].navItem.hide();
+                    if (i % 2 == 0) {
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i + 1].navItem.show();
+                    } else {
+                        keyNameWheel2.navItems[i].navItem.show();
+                        keyNameWheel2.navItems[i-1].navItem.show();
+                    }
+                }
+            }
+        } else {
+            keyNameWheel.navigateWheel(i);
+            keyNameWheel2.navItems[2 * i].navItem.hide();
+            keyNameWheel2.navItems[2 * i + 1].navItem.hide();
+        }
+
+        let j = modes.indexOf(KeySignatureEnv[1]);
+        if (j !== -1) {
+            modenameWheel.navigateWheel(j);
+        }
+    };
+
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
@@ -1059,7 +1410,7 @@ function Activity() {
     };
 
     // function doMuteButton() {
-    //     Singer.setMasterVolume(logo, 0);
+    //     logo.setMasterVolume(0);
     // };
 
     // function _hideBoxes() {
@@ -1075,7 +1426,6 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
-        scrollPaletteContainer = !scrollPaletteContainer;
         let enableHorizScrollIcon = docById("enableHorizScrollIcon");
         let disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
@@ -1259,20 +1609,16 @@ function Activity() {
      * then the icons to make them smaller/bigger will be hidden
      */
     setSmallerLargerStatus = function() {
-        if (BLOCKSCALES[blockscale] > 1) {
-            smallerContainer.visible = true;
-            smallerOffContainer.visible = false;
+        if (BLOCKSCALES[blockscale] < DEFAULTBLOCKSCALE) {
+            changeImage(smallerContainer.children[0],SMALLERBUTTON,SMALLERDISABLEBUTTON);
         } else {
-            smallerOffContainer.visible = true;
-            smallerContainer.visible = false;
+            changeImage(smallerContainer.children[0],SMALLERDISABLEBUTTON,SMALLERBUTTON);
         }
 
         if (BLOCKSCALES[blockscale] === 4) {
-            largerOffContainer.visible = true;
-            largerContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERBUTTON,BIGGERDISABLEBUTTON);
         } else {
-            largerContainer.visible = true;
-            largerOffContainer.visible = false;
+            changeImage(largerContainer.children[0],BIGGERDISABLEBUTTON,BIGGERBUTTON);
         }
     };
 
@@ -1388,80 +1734,6 @@ function Activity() {
             delta: 0
         };
 
-        let __paletteWheelHandler = function(event) {
-            // vertical scroll
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        palettesContainer.y -= event.deltaY;
-                    }
-                }
-            }
-
-            // horizontal scroll
-            if (scrollPaletteContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            palettesContainer.x -= event.deltaX;
-                        }
-                    }
-                }
-            } else {
-                event.preventDefault();
-            }
-
-            refreshCanvas();
-        };
-
-        let myCanvas = docById("myCanvas");
-
-        let __heightBasedScroll = function(event) {
-            actualReszieHandler(); // check size during init
-            window.addEventListener("resize", resizeThrottler, false);
-            let resizeTimeout;
-
-            function resizeThrottler() {
-                // Ignore resize events as long as an actualResizeHandler
-                // execution is in queue.
-                if (!resizeTimeout) {
-                    resizeTimeout = setTimeout(function() {
-                        resizeTimeout = null;
-                        actualReszieHandler();
-                        // The actualResizeHandler will execute at the
-                        // rate of 15 FPS.
-                    }, 66);
-                }
-            }
-        };
-
-        function actualReszieHandler() {
-            // Handle the resize event
-            let h = window.innerHeight;
-
-            if (h < 500) {
-                //activate on mobile
-                myCanvas.addEventListener(
-                    "wheel",
-                    __paletteWheelHandler,
-                    false
-                );
-            } else {
-                // Cleanup event listeners
-                myCanvas.removeEventListener("wheel", __paletteWheelHandler);
-            }
-        }
-
-        __heightBasedScroll();
-
         let closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv")!= null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv")!= null) docById("contextWheelDiv").style.display = "none";
@@ -1469,38 +1741,66 @@ function Activity() {
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         }
 
-        let __wheelHandler = function(event) {
-            if (event.deltaY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
-                if (palettes.paletteVisible) {
-                    if (event.clientX > cellSize + MENUWIDTH) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                } else {
-                    if (event.clientX > cellSize) {
-                        blocksContainer.y -= event.deltaY;
-                    }
-                }
+        let normalizeWheel = (event) => {
+            let PIXEL_STEP  = 10;
+            let LINE_HEIGHT = 40;
+            let PAGE_HEIGHT = 800;
+
+            let sX = 0, sY = 0,       // spinX, spinY
+                pX = 0, pY = 0;       // pixelX, pixelY
+
+            if ('detail'      in event) sY = event.detail;
+            if ('wheelDelta'  in event) sY = -event.wheelDelta / 120;
+            if ('wheelDeltaY' in event) sY = -event.wheelDeltaY / 120;
+            if ('wheelDeltaX' in event) sX = -event.wheelDeltaX / 120;
+
+            // side scrolling on FF with DOMMouseScroll
+            if ( 'axis' in event && event.axis === event.HORIZONTAL_AXIS ) {
+              sX = sY;
+              sY = 0;
             }
 
+            pX = sX * PIXEL_STEP;
+            pY = sY * PIXEL_STEP;
+
+            if ('deltaY' in event) pY = event.deltaY;
+            if ('deltaX' in event) pX = event.deltaX;
+
+            if ((pX || pY) && event.deltaMode) {
+              if (event.deltaMode == 1) {          // ff uses deltamode = 1
+                pX *= LINE_HEIGHT;
+                pY *= LINE_HEIGHT;
+              } else {                             // delta in PAGE units
+                pX *= PAGE_HEIGHT;
+                pY *= PAGE_HEIGHT;
+              }
+            }
+
+            // Fall-back if spin cannot be determined
+            if (pX && !sX) sX = (pX < 1) ? -1 : 1;
+            if (pY && !sY) sY = (pY < 1) ? -1 : 1;
+
+            return { pixelX : pX,
+                     pixelY : pY };
+        }
+
+        let __wheelHandler = function(event) {
+            let data = normalizeWheel(event);// normalize over different browsers
+            let delY = data.pixelY;
+            let delX = data.pixelX;
+            if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
+                closeAnyOpenMenusAndLabels();// closes all wheelnavs when scrolling .
+                blocksContainer.y -= delY;
+            }
             // horizontal scroll
             if (scrollBlockContainer) {
-                if (event.deltaX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
+                if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    if (palettes.paletteVisible) {
-                        if (event.clientX > cellSize + MENUWIDTH) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    } else {
-                        if (event.clientX > cellSize) {
-                            blocksContainer.x -= event.deltaX;
-                        }
-                    }
+                    blocksContainer.x -= delX;
                 }
             } else {
                 event.preventDefault();
             }
-
             refreshCanvas();
         };
 
@@ -1582,19 +1882,19 @@ function Activity() {
         let scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
-            palettes.menuScrollEvent(delta, scrollSpeed);
-            palettes.hidePaletteIconCircles();
+            //palettes.menuScrollEvent(delta, scrollSpeed);
+            //palettes.hidePaletteIconCircles();
         } else {
-            let palette = palettes.findPalette(
-                event.clientX / turtleBlocksScale,
-                event.clientY / turtleBlocksScale
-            );
-            if (palette) {
-                // if we are moving the palettes, deselect the active block.
-                blocks.activeBlock = null;
+            // let palette = palettes.findPalette(
+            //     event.clientX / turtleBlocksScale,
+            //     event.clientY / turtleBlocksScale
+            // );
+            // if (palette) {
+            //     // if we are moving the palettes, deselect the active block.
+            //     blocks.activeBlock = null;
 
-                palette.scrollEvent(delta, scrollSpeed);
-            }
+            //     //palette.scrollEvent(delta, scrollSpeed);
+            // }
         }
     }
 
@@ -1767,19 +2067,19 @@ function Activity() {
       Prepare a list of blocks for the search bar autocompletion.
      */
     prepSearchWidget = function() {
-        searchWidget.style.visibility = "hidden";
+        //searchWidget.style.visibility = "hidden";
         searchBlockPosition = [100, 100];
 
         searchSuggestions = [];
         deprecatedBlockNames = [];
 
         for (i in blocks.protoBlockDict) {
-            blockLabel = blocks.protoBlockDict[i].staticLabels[0];
+            blockLabel = blocks.protoBlockDict[i].staticLabels.join(' ');
             if (blockLabel) {
                 if (blocks.protoBlockDict[i].deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
-                    searchSuggestions.push(blockLabel);
+                    searchSuggestions.push({label : blockLabel ,value : blocks.protoBlockDict[i].name ,specialDict :blocks.protoBlockDict[i] }); 
                 }
             }
         }
@@ -1798,12 +2098,15 @@ function Activity() {
         }
 
         searchWidget.style.visibility = "hidden";
+        searchWidget.idInput_custom = "" ;
     };
 
     /*
      * Shows search widget
      */
     showSearchWidget = function() {
+        //bring to top;
+        searchWidget.style.zIndex = 1 ;
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
@@ -1813,7 +2116,7 @@ function Activity() {
             }
 
             searchWidget.value = null;
-            docById("searchResults").style.visibility = "visible";
+            //docById("searchResults").style.visibility = "visible";
             searchWidget.style.visibility = "visible";
             searchWidget.style.left =
                 palettes.getSearchPos()[0] * turtleBlocksScale + "px";
@@ -1821,7 +2124,7 @@ function Activity() {
                 palettes.getSearchPos()[1] * turtleBlocksScale + "px";
 
             searchBlockPosition = [100, 100];
-
+            prepSearchWidget();
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function() {
@@ -1840,49 +2143,55 @@ function Activity() {
         $j("#search").autocomplete({
             source: searchSuggestions,
             select: function(event, ui) {
+                event.preventDefault();
                 searchWidget.value = ui.item.label;
+                searchWidget.idInput_custom = ui.item.value;
+                searchWidget.protoblk = ui.item.specialDict;
                 doSearch();
-            }
+            },
+            focus: function(event, ui) {
+                event.preventDefault();
+                searchWidget.value = ui.item.label;
+            },
         });
 
         $j("#search")
             .autocomplete("widget")
             .addClass("scrollSearch");
 
-        let searchInput = searchWidget.value;
-        let obj = palettes.getProtoNameAndPalette(searchInput);
-        let protoblk = obj[0];
-        let paletteName = obj[1];
-        let protoName = obj[2];
+        let searchInput = searchWidget.idInput_custom;
+        if (!searchInput || searchInput.length <= 0) return;
+
+        let protoblk = searchWidget.protoblk;
+        let paletteName = protoblk.palette.name;
+        let protoName = protoblk.name;
 
         let searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
-        if (searchInput.length > 0) {
-            if (searchResult) {
-                palettes.dict[paletteName].makeBlockFromSearch(
-                    protoblk,
-                    protoName,
-                    function(newBlock) {
-                        blocks.moveBlock(
-                            newBlock,
-                            100 + searchBlockPosition[0] - blocksContainer.x,
-                            searchBlockPosition[1] - blocksContainer.y
-                        );
-                    }
-                );
+        if (searchResult) {
+            palettes.dict[paletteName].makeBlockFromSearch(
+                protoblk,
+                protoName,
+                function(newBlock) {
+                    blocks.moveBlock(
+                        newBlock,
+                        100 + searchBlockPosition[0] - blocksContainer.x,
+                        searchBlockPosition[1] - blocksContainer.y
+                    );
+                }
+            );
 
-                // Move the position of the next newly created block.
-                searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-                searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-            } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
-                blocks.errorMsg(_("This block is deprecated."));
-            } else {
-                blocks.errorMsg(_("Block cannot be found."));
-            }
-
-            searchWidget.value = "";
-            update = true;
+            // Move the position of the next newly created block.
+            searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+            searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+        } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
+            blocks.errorMsg(_("This block is deprecated."));
+        } else {
+            blocks.errorMsg(_("Block cannot be found."));
         }
+
+        searchWidget.value = "";
+        update = true;
     };
 
     /*
@@ -2233,8 +2542,8 @@ function Activity() {
                         if (inTempoWidget) {
                             logo.tempo.speedUp(0);
                         } else {
-                            textMsg("UP ARROW " + _("Moving block up."));
                             if (blocks.activeBlock != null) {
+                                textMsg("UP ARROW " + _("Moving block up."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     0,
@@ -2242,16 +2551,13 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     STANDARDBLOCKHEIGHT,
                                     1
                                 );
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.y -= 20;
+                            } else {
+                                blocksContainer.y += 20;
                             }
                             stage.update();
                         }
@@ -2260,8 +2566,8 @@ function Activity() {
                         if (inTempoWidget) {
                             logo.tempo.slowDown(0);
                         } else {
-                            textMsg("DOWN ARROW " + _("Moving block down."));
                             if (blocks.activeBlock != null) {
+                                textMsg("DOWN ARROW " + _("Moving block down."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     0,
@@ -2269,24 +2575,21 @@ function Activity() {
                                 );
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.mouseOver) {
-                                palettes.menuScrollEvent(-1, 10);
-                                palettes.hidePaletteIconCircles();
                             } else if (palettes.activePalette != null) {
                                 palettes.activePalette.scrollEvent(
                                     -STANDARDBLOCKHEIGHT,
                                     1
                                 );
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.y += 20;
+                            } else {
+                                blocksContainer.y -= 20;
                             }
                             stage.update();
                         }
                         break;
                     case KEYCODE_LEFT:
                         if (!inTempoWidget) {
-                            textMsg("LEFT ARROW " + _("Moving block left."));
                             if (blocks.activeBlock != null) {
+                                textMsg("LEFT ARROW " + _("Moving block left."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     -STANDARDBLOCKHEIGHT / 2,
@@ -2295,15 +2598,15 @@ function Activity() {
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
                             } else if (scrollBlockContainer) {
-                                blocksContainer.x -= 20;
+                                blocksContainer.x += 20;
                             }
                             stage.update();
                         }
                         break;
                     case KEYCODE_RIGHT:
                         if (!inTempoWidget) {
-                            textMsg("RIGHT ARROW " + _("Moving block right."));
                             if (blocks.activeBlock != null) {
+                                textMsg("RIGHT ARROW " + _("Moving block right."));
                                 blocks.moveStackRelative(
                                     blocks.activeBlock,
                                     STANDARDBLOCKHEIGHT / 2,
@@ -2312,7 +2615,7 @@ function Activity() {
                                 blocks.blockMoved(blocks.activeBlock);
                                 blocks.adjustDocks(blocks.activeBlock, true);
                             } else if (scrollBlockContainer) {
-                                blocksContainer.x += 20;
+                                blocksContainer.x -= 20;
                             }
                             stage.update();
                         }
@@ -2490,22 +2793,6 @@ function Activity() {
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        if (largerContainer !== null) {
-            homeButtonContainers[0].x = this._innerWidth - 4 * 55 - 27.5;
-            homeButtonContainers[1].x = homeButtonContainers[0].x;
-            hideBlocksContainer.x = homeButtonContainers[0].x;
-            collapseBlocksContainer.x = homeButtonContainers[0].x;
-            smallerContainer.x = homeButtonContainers[0].x;
-            largerContainer.x = homeButtonContainers[0].x;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-        }
-
         if (docById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
@@ -2543,8 +2830,6 @@ function Activity() {
         blocks.setScale(turtleBlocksScale);
         boundary.setScale(w, h, turtleBlocksScale);
 
-        palettes.setScale(turtleBlocksScale);
-
         trashcan.resizeEvent(turtleBlocksScale);
 
         // We need to reposition the palette buttons
@@ -2576,7 +2861,6 @@ function Activity() {
             toolbar.disableTooltips($j);
         } else {
             palettes.setMobile(false);
-            palettes.bringToTop();
         }
 
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
@@ -2838,18 +3122,15 @@ function Activity() {
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             palettes.hide();
-            hideBlocksContainer[1].visible = true;
-            hideBlocksContainer[0].visible = false;
+            changeImage(hideBlocksContainer.children[0],SHOWBLOCKSBUTTON,HIDEBLOCKSFADEDBUTTON);
         } else {
             if (chartBitmap != null) {
                 stage.removeChild(chartBitmap);
                 chartBitmap = null;
             }
-            hideBlocksContainer[1].visible = false;
-            hideBlocksContainer[0].visible = true;
+            changeImage(hideBlocksContainer.children[0],HIDEBLOCKSFADEDBUTTON,SHOWBLOCKSBUTTON);
             blocks.showBlocks();
             palettes.show();
-            palettes.bringToTop();
         }
 
         // Combine block and palette visibility into one button.
@@ -2933,8 +3214,14 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function() {
+        if (docById("palette").style.display != "none")
+            docById("palette").style.display = "none";
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
+        if (docById("buttoncontainerBOTTOM").style.display != "none")
+            docById("buttoncontainerBOTTOM").style.display = "none";
+        if (docById("buttoncontainerTOP").style.display != "none")
+            docById("buttoncontainerTOP").style.display = "none";
     };
 
     /*
@@ -3121,6 +3408,7 @@ function Activity() {
      */
     this.showContents = function() {
         docById("loading-image-container").style.display = "none";
+        docById("palette").style.display = "block";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
 
@@ -3132,6 +3420,8 @@ function Activity() {
             console.debug('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
         }
         */
+       docById("buttoncontainerBOTTOM").style.display = "block";
+       docById("buttoncontainerTOP").style.display = "block";
     };
 
     this._loadStart = async function() {
@@ -3218,10 +3508,6 @@ function Activity() {
                             50
                         )}...`
                     );
-                    // First, hide the palettes as they will need updating.
-                    for (let name in blocks.palettes.dict) {
-                        blocks.palettes.dict[name].hideMenu(true);
-                    }
 
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
@@ -3817,124 +4103,60 @@ function Activity() {
      * These menu items are on the canvas, not the toolbar.
      */
     _setupPaletteMenu = function(turtleBlocksScale) {
-        // Clean up if we've been here before.
-        if (homeButtonContainers.length !== 0) {
-            stage.removeChild(homeButtonContainers[0]);
-            stage.removeChild(homeButtonContainers[1]);
-            stage.removeChild(hideBlocksContainer[0]);
-            stage.removeChild(hideBlocksContainer[1]);
-            stage.removeChild(collapseBlocksContainer);
-            stage.removeChild(smallerContainer);
-            stage.removeChild(smallerOffContainer);
-            stage.removeChild(largerContainer);
-            stage.removeChild(largerOffContainer);
+        let removed = false ;
+        if(docById("buttoncontainerBOTTOM")){
+            removed = true ;
+            docById("buttoncontainerBOTTOM").parentNode.removeChild(docById("buttoncontainerBOTTOM"));
         }
-
         let btnSize = cellSize;
         // Upper left
         // var x = 27.5 + 6;
         // var y = toolbarHeight + 95.5 + 6;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
-        let y = this._innerHeight - 27.5;
+        let y = this._innerHeight - 57.5;
         let dx = btnSize;
 
-        homeButtonContainers = [];
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            homeButtonContainers[0],
+        let ButtonHolder = document.createElement("div");
+        ButtonHolder.setAttribute("id","buttoncontainerBOTTOM")
+        if(!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
+        document.body.appendChild(ButtonHolder);
+
+        homeButtonContainer = _makeButton(
+            GOHOMEFADEDBUTTON,
+            _("Home") + " [" + _("Home").toUpperCase() + "]",
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
-        );
+            btnSize,
+            0,
 
-        homeButtonContainers.push(
-            _makeButton(
-                GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
+        )
         that._loadButtonDragHandler(
-            homeButtonContainers[1],
+            homeButtonContainer,
             x,
             y,
-            _findBlocks,
-            null,
-            null,
-            null,
-            null
+            _findBlocks
         );
-        homeButtonContainers[1].visible = false;
 
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
         boundary.hide();
 
         x += dx;
 
-        hideBlocksContainer = [];
-        hideBlocksContainer.push(
+        hideBlocksContainer =
             _makeButton(
-                HIDEBLOCKSBUTTON,
+                SHOWBLOCKSBUTTON,
                 _("Show/hide block"),
                 x,
                 y,
                 btnSize,
                 0
             )
-        );
         that._loadButtonDragHandler(
-            hideBlocksContainer[0],
+            hideBlocksContainer,
             x,
             y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
+            _changeBlockVisibility
         );
-
-        hideBlocksContainer.push(
-            _makeButton(
-                HIDEBLOCKSFADEDBUTTON,
-                _("Show/hide block"),
-                x,
-                y - btnSize,
-                btnSize,
-                0
-            )
-        );
-        that._loadButtonDragHandler(
-            hideBlocksContainer[1],
-            x,
-            y,
-            _changeBlockVisibility,
-            null,
-            null,
-            null,
-            null
-        );
-        hideBlocksContainer[1].visible = false;
-
-        hideBlocksContainer[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        hideBlocksContainer[1].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
 
         x += dx;
 
@@ -3950,11 +4172,7 @@ function Activity() {
             collapseBlocksContainer,
             x,
             y,
-            _toggleCollapsibleStacks,
-            null,
-            null,
-            null,
-            null
+            _toggleCollapsibleStacks
         );
 
         x += dx;
@@ -3971,22 +4189,8 @@ function Activity() {
             smallerContainer,
             x,
             y,
-            doSmallerBlocks,
-            null,
-            null,
-            null,
-            null
+            doSmallerBlocks
         );
-
-        smallerOffContainer = _makeButton(
-            SMALLERDISABLEBUTTON,
-            _("Cannot be further decreased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        smallerOffContainer.visible = false;
 
         x += dx;
 
@@ -4002,22 +4206,9 @@ function Activity() {
             largerContainer,
             x,
             y,
-            doLargerBlocks,
-            null,
-            null,
-            null,
-            null
+            doLargerBlocks
         );
 
-        largerOffContainer = _makeButton(
-            BIGGERDISABLEBUTTON,
-            _("Cannot be further increased"),
-            x,
-            y,
-            btnSize,
-            0
-        );
-        largerOffContainer.visible = false;
     };
 
     // function doPopdownPalette() {
@@ -4143,155 +4334,38 @@ function Activity() {
     /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
-    _makeButton = function(name, label, x, y, size, rotation, parent) {
-        let container = new createjs.Container();
+    _makeButton = function(name, label, x, y,) {
+        let container = document.createElement("div");
+        container.setAttribute("id", ""+label);
 
-        if (parent === undefined) {
-            stage.addChild(container);
-        } else {
-            parent.addChild(container);
-        }
 
-        container.x = x;
-        container.y = y;
-
-        let text = new createjs.Text(label, "14px Sans", "#282828");
-        if (container.x < 55) {
-            text.textAlign = "left";
-            text.x = -14;
-        } else if (container.x > 255) {
-            text.textAlign = "right";
-            text.x = 14;
-        } else {
-            text.textAlign = "center";
-            text.x = 0;
-        }
-
-        if (y > 255) {
-            text.y = -60;
-        } else {
-            text.y = 30;
-        }
-
-        text.visible = false;
-
-        let circles;
-        container.on("mouseover", function(event) {
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = true;
-                    // Do we need to add a background?
-                    // Should be image and text, hence === 2
-                    if ([2, 5, 8].indexOf(container.children.length) !== -1) {
-                        let b = container.children[c].getBounds();
-                        let bg = new createjs.Shape();
-                        if (container.children[c].textAlign === "center") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else if (container.children[c].textAlign === "left") {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x - 22,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        } else {
-                            bg.graphics
-                                .beginFill("#FFF")
-                                .drawRoundRect(
-                                    b.x + 8,
-                                    container.children[c].y - 2,
-                                    b.width + 16,
-                                    b.height + 8,
-                                    10,
-                                    10,
-                                    10,
-                                    10
-                                );
-                        }
-                        container.addChildAt(bg, 0);
-                    }
-
-                    container.children[0].visible = true;
-                    stage.update();
-                    break;
-                }
-            }
-
-            let r = size / 2;
-            circles = showButtonHighlight(
-                container.x,
-                container.y,
-                r,
-                event,
-                palettes.scale,
-                stage
-            );
+        container.setAttribute("class","tooltipped");
+        container.setAttribute("data-tooltip",label);
+        container.setAttribute("data-position","top");
+        jQuery.noConflict()(".tooltipped").tooltip({
+            html: true,
+            delay: 100
         });
-
-        container.on("mouseout", function(event) {
-            hideButtonHighlight(circles, stage);
-            for (let c = 0; c < container.children.length; c++) {
-                if (container.children[c].text !== undefined) {
-                    container.children[c].visible = false;
-                    container.children[0].visible = false;
-                    stage.update();
-                    break;
-                }
+        container.onmouseover = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "pointer";
             }
-        });
-
-        let img = new Image();
-
-        img.onload = function() {
-            let originalSize = 55; // this is the original svg size
-            let halfSize = Math.floor(size / 2);
-
-            let bitmap = new createjs.Bitmap(img);
-            if (size !== originalSize) {
-                bitmap.scaleX = size / originalSize;
-                bitmap.scaleY = size / originalSize;
-            }
-
-            bitmap.regX = halfSize / bitmap.scaleX;
-            bitmap.regY = halfSize / bitmap.scaleY;
-            if (rotation !== undefined) {
-                bitmap.rotation = rotation;
-            }
-
-            container.addChild(bitmap);
-            let hitArea = new createjs.Shape();
-            hitArea.graphics
-                .beginFill("#FFF")
-                .drawEllipse(-halfSize, -halfSize, size, size);
-            hitArea.x = 0;
-            hitArea.y = 0;
-            container.hitArea = hitArea;
-            bitmap.cache(0, 0, size, size);
-            bitmap.updateCache();
-            update = true;
         };
 
+        container.onmouseout = (event) => {
+            if (!loading) {
+                document.body.style.cursor = "default";
+            }
+        };
+
+        let img = new Image();
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(name)));
-        container.addChild(text);
+
+        container.appendChild(img);
+        container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
+        docById("buttoncontainerBOTTOM").appendChild(container);
         return container;
     };
 
@@ -4308,158 +4382,16 @@ function Activity() {
         ox,
         oy,
         action,
-        hoverAction
+        actionClick,
+        arg
     ) {
-        // Prevent multiple button presses (i.e., debounce).
-        let lockTimer = null;
-        let locked = false;
-
-        /*
-        if (longAction === null) {
-            longAction = action;
-        }
-
-        if (extraLongAction === null) {
-            extraLongAction = longAction;
-        }
-
-        // Long and extra-long press variables declaration
-        var pressTimer = null;
-        var isLong = false;
-        var pressTimerExtra = null;
-        var isExtraLong = false;
-
-        var formerContainer = container;
-        */
-
-        // Long hover variables
-        let hoverTimer = null;
-        let isLongHover = false;
-
-        container.on("mouseover", function(event) {
-            if (!loading) {
-                document.body.style.cursor = "pointer";
-            }
-
-            if (hoverAction === null) {
-                return;
-            }
-
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-                lockTimer = setTimeout(function() {
-                    locked = false;
-
-                    clearTimeout(hoverTimer);
-                }, 2000);
-            }
-
-            hoverTimer = setTimeout(function() {
-                isLongHover = true;
-                console.debug("HOVER ACTION");
-                hoverAction(false);
-            }, 1500);
-        });
-
-        container.on("mouseout", function(event) {
+        container.onmousedown = function(event) {
             if (!loading) {
                 document.body.style.cursor = "default";
             }
-
-            if (hoverTimer !== null) {
-                clearTimeout(hoverTimer);
-            }
-        });
-
-        container.removeAllEventListeners("mousedown");
-        container.on("mousedown", function(event) {
-            /*
-            if (locked) {
-                return;
-            } else {
-                locked = true;
-
-                lockTimer = setTimeout(function () {
-                    locked = false;
-
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-                    if (longImg !== null || extraLongImg !== null) {
-                        container.visible = false;
-                        container = formerContainer;
-                        container.visible = true;
-                    }
-                }, 1500);
-            }
-
-            var mousedown = true;
-
-            pressTimer = setTimeout(function () {
-                isLong = true;
-                if (longImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(longImg, '', ox, oy, cellSize, 0);
-                }
-            }, 500);
-
-            pressTimerExtra = setTimeout(function () {
-                isExtraLong = true;
-                if (extraLongImg !== null) {
-                    container.visible = false;
-                    container = _makeButton(extraLongImg, '', ox, oy, cellSize, 0);
-                }
-            }, 1000);
-            */
-            let circles = showButtonHighlight(
-                ox,
-                oy,
-                cellSize / 2,
-                event,
-                turtleBlocksScale,
-                stage
-            );
-
-            function __pressupFunction(event) {
-                hideButtonHighlight(circles, stage);
-
-                /*
-                clearTimeout(lockTimer);
-
-                if (longImg !== null || extraLongImg !== null) {
-                    container.visible = false;
-                    container = formerContainer;
-                    container.visible = true;
-                }
-
-                locked = false;
-
-                if (action != null && mousedown && !locked) {
-                    clearTimeout(pressTimer);
-                    clearTimeout(pressTimerExtra);
-
-                    if (!isLong) {
-                        action();
-                    } else if (!isExtraLong) {
-                        longAction();
-                    } else {
-                        extraLongAction();
-                    }
-                }
-                */
-
-                action();
-                mousedown = false;
-            }
-
-            container.removeAllEventListeners("pressup");
-            let closure = container.on("pressup", __pressupFunction);
-
-            isLongHover = false;
-            // isLong = false;
-            // isExtraLong = false;
-        });
+            action();
+            if (actionClick)actionClick(arg);
+        };
     };
 
     /*
@@ -4504,14 +4436,6 @@ function Activity() {
             onscreenButtons[i].y += dy;
         }
 
-        // logoContainer.y += dy;
-        homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-        homeButtonContainers[1].y = homeButtonContainers[0].y;
-        hideBlocksContainer.y = homeButtonContainers[0].y;
-        collapseBlocksContainer.y = homeButtonContainers[0].y;
-        smallerContainer.y = homeButtonContainers[0].y;
-        largerContainer.y = homeButtonContainers[0].y;
-
         for (let i = 0; i < onscreenMenu.length; i++) {
             onscreenMenu[i].y += dy;
         }
@@ -4549,14 +4473,6 @@ function Activity() {
             dy = cellsize + LEADING + 5;
             toolbarHeight = dy;
 
-            // These buttons are smaller, hence + 6
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
-
             palettes.deltaY(dy);
             turtles.deltaY(dy);
 
@@ -4565,13 +4481,6 @@ function Activity() {
         } else {
             dy = toolbarHeight;
             toolbarHeight = 0;
-
-            homeButtonContainers[0].y = this._innerHeight - 27.5; // toolbarHeight + 95.5 + 6;
-            homeButtonContainers[1].y = homeButtonContainers[0].y;
-            hideBlocksContainer.y = homeButtonContainers[0].y;
-            collapseBlocksContainer.y = homeButtonContainers[0].y;
-            smallerContainer.y = homeButtonContainers[0].y;
-            largerContainer.y = homeButtonContainers[0].y;
 
             palettes.deltaY(-dy);
             turtles.deltaY(-dy);
@@ -4700,12 +4609,11 @@ function Activity() {
          *   turtles
          *   logo (drawing)
          */
-        palettesContainer = new createjs.Container();
         blocksContainer = new createjs.Container();
         trashContainer = new createjs.Container();
         turtleContainer = new createjs.Container();
         stage.addChild(turtleContainer);
-        stage.addChild(trashContainer, blocksContainer, palettesContainer);
+        stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
         trashcan = new Trashcan();
@@ -4748,11 +4656,8 @@ function Activity() {
 
         palettes = new Palettes();
         palettes
-            .setCanvas(canvas)
-            .setStage(palettesContainer)
-            .setRefreshCanvas(refreshCanvas)
+            .setBlocksContainer(blocksContainer)
             .setSize(cellSize)
-            .setTrashcan(trashcan)
             .setSearch(showSearchWidget, hideSearchWidget)
             .setBlocks(blocks)
             .init();
@@ -4817,7 +4722,9 @@ function Activity() {
 
             this.showMusicBlocks = function() {
                 document.getElementById("toolbars").style.display = "block";
+                document.getElementById("palette").style.display = "block";
 
+                prepSearchWidget();
                 widgetWindows.showWindows();
 
                 document
@@ -4828,6 +4735,8 @@ function Activity() {
                     platformColor.header;
                 stage.enableDOMEvents(true);
                 window.scroll(0, 0);
+                docById("buttoncontainerBOTTOM").style.display = "block";
+                docById("buttoncontainerTOP").style.display = "block";
             };
 
             this.showPlanet = function() {
@@ -4885,9 +4794,7 @@ function Activity() {
                 _allClear(false);
 
                 // First, hide the palettes as they will need updating.
-                for (let name in blocks.palettes.dict) {
-                    blocks.palettes.dict[name].hideMenu(true);
-                }
+                blocks.palettes._hideMenus(true);
 
                 let __afterLoad = function() {
                     document.removeEventListener(
@@ -5102,6 +5009,7 @@ function Activity() {
         );
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
+        toolbar.renderChooseKeyIcon(chooseKeyMenu);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 
@@ -5288,6 +5196,7 @@ function Activity() {
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
+                                        planet.saveLocally();
                                     };
 
                                     stage.addEventListener(
@@ -5299,6 +5208,7 @@ function Activity() {
                                     console.debug("clearing on load...");
                                     _allClear(false);
                                     if (planet) {
+                                        planet.closePlanet();
                                         planet.initialiseNewProject(
                                             fileChooser.files[0].name.substr(
                                                 0,
@@ -5493,8 +5403,6 @@ function Activity() {
                             if (palettes.visible) {
                                 palettes.hide();
                             }
-
-                            palettes.bringToTop();
                         }, 1000);
 
                         document.body.style.cursor = "default";
@@ -5673,6 +5581,7 @@ function Activity() {
 
         document.onkeydown = __keyPressed;
         _hideStopButton();
+        planet.planet.setAnalyzeProject(analyzeProject)
     };
 }
 

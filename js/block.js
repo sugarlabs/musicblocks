@@ -2863,6 +2863,16 @@ function Block(protoblock, blocks, overrideName) {
                 dy += 45 - finalPos;
             }
 
+            // scroll when reached edges.
+            if (event.stageX < 10 && scrollBlockContainer)
+                that.blocks.moveAllBlocksExcept(that,10,0);
+            else if (event.stageX > window.innerWidth-10 && scrollBlockContainer)
+                that.blocks.moveAllBlocksExcept(that,-10,0);
+            else if (event.stageY > window.innerHeight-10)
+                that.blocks.moveAllBlocksExcept(that,0,-10);
+            else if (event.stageY < 60)
+                that.blocks.moveAllBlocksExcept(that,0,10);
+
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3072,7 +3082,7 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (this._usePieNumberC1()) {
+        if(this._usePieNumberC1()) {
             return true;
         }
 
@@ -3131,7 +3141,10 @@ function Block(protoblock, blocks, overrideName) {
                 "onbeatdo",
                 "hertz",
                 "right",
-                "left"
+                "left",
+                "setpanning",
+                "setbpm3",
+                "setmasterbpm2"
             ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1
         ) {
             return false;
@@ -4263,6 +4276,60 @@ function Block(protoblock, blocks, overrideName) {
                             this.value
                         );
                         break;
+                    case "setpanning":
+                        this._piemenuNumber(
+                            [ 100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100],
+                            this.value
+                        );
+                        break;
+                    case "setbpm3": case "setmasterbpm2": 
+                        this._piemenuNumber ( 
+                        [
+                        40,
+                        42,
+                        44,
+                        46,
+                        48,
+                        50,
+                        52,
+                        54,
+                        56,
+                        58,
+                        60,
+                        63,
+                        66,
+                        69,
+                        72,
+                        76,
+                        80,
+                        84,
+                        88,
+                        90,
+                        92,
+                        96,
+                        100,
+                        104,
+                        108,
+                        112,
+                        116,
+                        120,
+                        126,
+                        132,
+                        138,
+                        144,
+                        152,
+                        160,
+                        168,
+                        176,
+                        184,
+                        192,
+                        200,
+                        208,
+                    ],
+                    this.value
+                    );
+                    break;
+
                 }
             } else {
                 labelElem.innerHTML =
@@ -4705,6 +4772,22 @@ function Block(protoblock, blocks, overrideName) {
         prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
+        let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
+
+        // auto selection of sharps and flats in fixed solfege
+        // handles the case of opening the pie-menu, not whilst in the pie-menu
+        if (!KeySignatureEnv[2]) {
+            for (let i in scale) {
+                if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note] ||
+                scale[i].substr(0, 1) == note) {
+                    accidental = scale[i].substr(1);
+                    this.value = this.value.replace(SHARP, "").replace(FLAT, "");
+                    this.value += accidental;
+                    this.text.text = this.value;
+                }
+            }
+        }
+
         if (!custom) {
             // Navigate to a the current accidental value.
             if (accidental === "") {
@@ -4744,25 +4827,59 @@ function Block(protoblock, blocks, overrideName) {
 
         // Set up event handlers
         let that = this;
+        let selection = {
+            "note": note,
+            "attr": accidental
+        };
 
-        let __selectionChanged = function() {
-            let label =
+        let __selectionChangedSolfege = function() {
+            selection["note"] =
                 that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
                     .title;
-            let i = noteLabels.indexOf(label);
+            let i = noteLabels.indexOf(selection["note"]);
             that.value = noteValues[i];
-            if (!custom) {
-                let attr =
-                    that._accidentalsWheel.navItems[
-                        that._accidentalsWheel.selectedNavItemIndex
-                        ].title;
-                if (attr !== "♮") {
-                    label += attr;
-                    that.value += attr;
+
+            let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
+        
+            // auto selection of sharps and flats in fixed solfege
+            // handles the case of opening the pie-menu, not whilst in the pie-menu
+            // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
+            // In case of alphabet, direct comparison is performed
+
+            if (!KeySignatureEnv[2]) {
+                for (let i in scale) {
+                    if (
+                        (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] ||
+                        scale[i].substr(0, 1) == selection["note"])) {
+                        selection["attr"] = scale[i].substr(1);
+                        that.value = selection["note"] + selection["attr"];
+                        switch (selection["attr"]) {
+                            case DOUBLEFLAT:
+                                that._accidentalsWheel.navigateWheel(4);
+                                break;
+                            case FLAT:
+                                that._accidentalsWheel.navigateWheel(3);
+                                break;
+                            case NATURAL:
+                                that._accidentalsWheel.navigateWheel(2);
+                                break;
+                            case SHARP:
+                                that._accidentalsWheel.navigateWheel(1);
+                                break;
+                            case DOUBLESHARP:
+                                that._accidentalsWheel.navigateWheel(0);
+                                break;
+                            default:
+                                that._accidentalsWheel.navigateWheel(2);
+                                break;
+                        }
+                    }
                 }
             }
-
-            that.text.text = label;
+            that.text.text = selection["note"];
+            if (selection["attr"] !== "♮") {
+                that.text.text += selection["attr"];
+            }
 
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -4773,7 +4890,7 @@ function Block(protoblock, blocks, overrideName) {
                 let octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                        ].title
+                    ].title
                 );
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
@@ -4781,12 +4898,31 @@ function Block(protoblock, blocks, overrideName) {
             if (
                 that.connections[0] !== null &&
                 ["setkey", "setkey2"].indexOf(
-                    this.blocks.blockList[that.connections[0]].name
+                    that.blocks.blockList[that.connections[0]].name
                 ) !== -1
             ) {
                 // We may need to update the mode widget.
                 that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
             }
+            __pitchPreview();
+        };
+
+
+        let __selectionChangedAccidental = () => {
+            selection["attr"] =
+                that._accidentalsWheel.navItems[
+                    that._accidentalsWheel.selectedNavItemIndex
+                ].title;
+
+            if (selection["attr"] !== "♮") {
+                that.value = selection["note"] + selection["attr"];
+            } else {
+                that.value = selection["note"];
+            }
+            that.text.text = that.value;
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+            __pitchPreview();
         };
 
         /*
@@ -4795,13 +4931,10 @@ function Block(protoblock, blocks, overrideName) {
          * @private
          */
         let __pitchPreview = function() {
-            let label =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
-                    .title;
+            let label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             let i = noteLabels.indexOf(label);
 
-            // Are we wrapping across C? We need to compare with the
-            // previous pitch.
+            // Are we wrapping across C? We need to compare with the previous pitch
             if (prevPitch === null) {
                 prevPitch = i;
             }
@@ -4830,7 +4963,7 @@ function Block(protoblock, blocks, overrideName) {
                 let attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
-                        ].title;
+                    ].title;
 
                 if (label === " ") {
                     return;
@@ -4844,7 +4977,7 @@ function Block(protoblock, blocks, overrideName) {
                 octave = Number(
                     that._octavesWheel.navItems[
                         that._octavesWheel.selectedNavItemIndex
-                        ].title
+                    ].title
                 );
             } else {
                 octave = 4;
@@ -4867,34 +5000,49 @@ function Block(protoblock, blocks, overrideName) {
                 let obj1 = splitScaleDegree(note);
                 note = SOLFEGENAMES[obj1[0] - 1];
                 if(obj1[1] != NATURAL) {
-                    note += obj1[1]
+                    note += obj1[1];
                 }
             }
-            // FIX ME: get key signature if available
-            // FIX ME: get moveable if availableconsole.log(note);
-            let obj = getNote(
-                note,
-                octave,
-                0,
-                "C major",
-                false,
-                null,
-                that.blocks.errorMsg,
-                that.blocks.logo.synth.inTemperament
-            );
+            
+            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
+
+            let obj;
+            if (that.name == "scaledegree2") {
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    true,
+                    null,
+                    that.blocks.errorMsg,
+                    that.blocks.logo.synth.inTemperament
+                );
+            } else {
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    KeySignatureEnv[2],
+                    null,
+                    that.blocks.errorMsg,
+                    that.blocks.logo.synth.inTemperament
+                );
+            }
+
+            
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
             }
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -4918,19 +5066,18 @@ function Block(protoblock, blocks, overrideName) {
                 that._triggerLock = false;
             }, 1 / 8);
 
-            __selectionChanged();
         };
 
         // Set up handlers for pitch preview.
         for (let i = 0; i < noteValues.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+            this._pitchWheel.navItems[i].navigateFunction = __selectionChangedSolfege;
         }
 
         if (!custom) {
             for (let i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[
                     i
-                    ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __selectionChangedAccidental;
             }
         }
 
@@ -4938,7 +5085,7 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[
                     i
-                    ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __pitchPreview;
             }
         }
 
@@ -5240,15 +5387,13 @@ function Block(protoblock, blocks, overrideName) {
                 label
             );
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -5468,7 +5613,7 @@ function Block(protoblock, blocks, overrideName) {
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                    ].title
+                ].title
             );
             that.blocks.setPitchOctave(that.connections[0], octave);
         };
@@ -5498,7 +5643,7 @@ function Block(protoblock, blocks, overrideName) {
             let octave = Number(
                 that._octavesWheel.navItems[
                     that._octavesWheel.selectedNavItemIndex
-                    ].title
+                ].title
             );
             octave += deltaOctave;
             if (octave < 1) {
@@ -5510,21 +5655,20 @@ function Block(protoblock, blocks, overrideName) {
             let note;
 
             // Use C major as of now; fix this to use current keySignature once that feature is in place
+            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
             if (noteValues[i] >= 0) {
-                note = nthDegreeToPitch("C major", noteValues[i]);
+                note = nthDegreeToPitch(keySignature, noteValues[i]);
             } else {
-                note = nthDegreeToPitch("C major", 7 + noteValues[i]);
+                note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
             }
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6020,7 +6164,26 @@ function Block(protoblock, blocks, overrideName) {
 
         this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
         this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        // this._numberWheel.titleRotateAngle = 0;
+        if (this.blocks.blockList[this.connections[0]].name === "setbpm3" || this.blocks.blockList[this.connections[0]].name === "setmasterbpm2") {
+            this._numberWheel.titleRotateAngle = 0;
+            if (selectedValue === 90) {
+                selectedValue = 90;
+            } else if (selectedValue < 40) {
+                selectedValue = 40;
+            } else if (selectedValue < 60) {
+                selectedValue = Math.floor(this.value / 2) * 2;
+            } else if (selectedValue < 72) {
+                selectedValue = Math.floor(this.value / 3) * 3;
+            } else if (selectedValue < 120) {
+                selectedValue = Math.floor(this.value / 4) * 4;
+            } else if (selectedValue < 144) {
+                selectedValue = Math.floor(this.value / 6) * 6;
+            } else if (selectedValue < 208) {
+                selectedValue = Math.floor(this.value / 8) * 8;
+            } else {
+                selectedValue = 208;
+            }
+        }
         this._numberWheel.animatetime = 0; // 300;
         this._numberWheel.createWheel(wheelLabels);
 
@@ -6189,22 +6352,17 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let __pitchPreviewForNum = function() {
-            let label =
-                that._numberWheel.navItems[
-                    that._numberWheel.selectedNavItemIndex
-                    ].title;
+            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
             let i = wheelLabels.indexOf(label);
             let actualPitch = numberToPitch(wheelValues[i] + 3);
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6235,22 +6393,17 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let __hertzPreview = function() {
-            let label =
-                that._numberWheel.navItems[
-                    that._numberWheel.selectedNavItemIndex
-                    ].title;
+            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
             let i = wheelLabels.indexOf(label);
             let actualPitch = frequencyToPitch(wheelValues[i]);
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -6839,22 +6992,18 @@ function Block(protoblock, blocks, overrideName) {
          * @private
          */
         let __voicePreview = function() {
-            let label =
-                that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex]
-                    .title;
+            let label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
             let i = voiceLabels.indexOf(label);
             let voice = voiceValues[i];
             let timeout = 0;
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(voice) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(voice);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(voice) === -1
+            ) {
+                tur.singer.instrumentNames.push(voice);
                 if (voice === DEFAULTVOICE) {
                     that.blocks.logo.synth.createDefaultSynth(0);
                 }
@@ -7015,7 +7164,6 @@ function Block(protoblock, blocks, overrideName) {
                 numbers.push(j.toString());
             }
         }
-
         this._intervalWheel.createWheel(numbers);
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
@@ -7127,16 +7275,11 @@ function Block(protoblock, blocks, overrideName) {
             let label =
                 that._intervalNameWheel.navItems[
                     that._intervalNameWheel.selectedNavItemIndex
-                    ].title;
+                ].title;
             let number =
-                that._intervalWheel.navItems[
-                    that._intervalWheel.selectedNavItemIndex
-                    ].title;
+                that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
-            that.value =
-                INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] +
-                " " +
-                number;
+            that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
             if (label === "perfect 1") {
                 that.text.text = _("unison");
             } else {
@@ -7147,26 +7290,16 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
 
-            let obj = getNote(
-                "C",
-                4,
-                INTERVALVALUES[that.value][0],
-                "C major",
-                false,
-                null,
-                null
-            );
+            let obj = getNote("C", 4, INTERVALVALUES[that.value][0], "C major", false, null, null);
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -7504,27 +7637,17 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             let i = that._modeWheel.selectedNavItemIndex;
-            // The mode doesn't matter here, since we are using semi-tones.
-            let obj = getNote(
-                key,
-                4,
-                i + o,
-                key + " chromatic",
-                false,
-                null,
-                null
-            );
+            // The mode doesn't matter here, since we are using semi-tones
+            let obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
-            if (
-                that.blocks.logo.instrumentNames[0] === undefined ||
-                that.blocks.logo.instrumentNames[0].indexOf(DEFAULTVOICE) === -1
-            ) {
-                if (that.blocks.logo.instrumentNames[0] === undefined) {
-                    that.blocks.logo.instrumentNames[0] = [];
-                }
+            let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-                that.blocks.logo.instrumentNames[0].push(DEFAULTVOICE);
+            if (
+                tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            ) {
+                tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
             }
@@ -8081,9 +8204,9 @@ function Block(protoblock, blocks, overrideName) {
         ];
 
         let topBlock = this.blocks.findTopBlock(thisBlock);
-        // if (this.name === 'action') {
-        //     labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        // }
+        if (this.name === 'action') {
+            labels.push('imgsrc:header-icons/save-blocks-button.svg');
+        }
         let message =
             this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
         let helpButton;

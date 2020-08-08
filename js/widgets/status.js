@@ -292,10 +292,10 @@ function StatusMatrix() {
                         }
                         break;
                     case "beatvalue":
-                        var value = mixedNumber(this._logo.currentBeat[turtle]);
+                        var value = mixedNumber(tur.singer.currentBeat);
                         break;
                     case "measurevalue":
-                        var value = this._logo.currentMeasure[turtle];
+                        var value = tur.singer.currentMeasure;
                         break;
                     case "pitchinhertz":
                         var value = "";

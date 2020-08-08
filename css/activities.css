@@ -1365,6 +1365,31 @@ input.timbreName {
     height: 100%;
 }
 
+#chooseKeyDiv {
+    height: 350px;
+    width: 350px;
+    margin: auto;
+    z-index: 10;
+    position: fixed;
+}
+
+#chooseKeyDiv > svg {
+    width: 100%;
+    height: 100%;
+    transition: width 2s linear 1s;
+}
+
+#moveable {
+    margin: auto;
+    z-index: 10;
+    position: fixed;
+    display: none;
+}
+
+.radioBtn {
+    cursor: pointer;
+}
+
 @media (max-width: 880px) {
     .wheelNav {
         height: 330px;
@@ -1410,6 +1435,13 @@ input.timbreName {
     visibility: hidden;
 }
 
+#palette td ,thead ,tr ,table {
+    border-collapse: collapse;
+    padding: 0; 
+    margin: 0;
+    border:0;
+ }
+
  #printText {
     border: 2px solid rgb(150, 150, 150);
     z-index: 100;
@@ -1435,3 +1467,9 @@ input.timbreName {
     height: 28px;
     filter: invert(100%);
   }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .disable_highlighting {
+    user-select: none;
+    }    

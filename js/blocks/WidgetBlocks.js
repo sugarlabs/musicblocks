@@ -23,6 +23,8 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
                     logo.errorMsg(_("Attack value should be from 0 to 100."));
@@ -37,25 +39,17 @@ function setupWidgetBlocks() {
                     logo.errorMsg(_("Release value should be from 0-100."));
                 }
 
-                logo.attack[turtle].push(args[0] / 100);
-                logo.decay[turtle].push(args[1] / 100);
-                logo.sustain[turtle].push(args[2] / 100);
-                logo.release[turtle].push(args[3] / 100);
+                turtle.singer.attack.push(args[0] / 100);
+                turtle.singer.decay.push(args[1] / 100);
+                turtle.singer.sustain.push(args[2] / 100);
+                turtle.singer.release.push(args[3] / 100);
             }
 
             if (logo.inTimbre) {
-                logo.timbre.synthVals["envelope"]["attack"] = last(
-                    logo.attack[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["decay"] = last(
-                    logo.decay[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["sustain"] = last(
-                    logo.sustain[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["release"] = last(
-                    logo.release[turtle]
-                );
+                logo.timbre.synthVals["envelope"]["attack"] = last(tur.singer.attack);
+                logo.timbre.synthVals["envelope"]["decay"] = last(tur.singer.decay);
+                logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
+                logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
                 if (logo.timbre.env.length != 0) {
                     logo.errorMsg(
@@ -72,18 +66,10 @@ function setupWidgetBlocks() {
                 }
 
                 logo.timbre.env.push(blk);
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.attack[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.decay[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.sustain[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.release[turtle]) * 100)
-                );
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.attack) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.decay) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.sustain) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.release) * 100));
             }
         }
     }
@@ -387,6 +373,60 @@ function setupWidgetBlocks() {
             let __listener = function(event) {
                 logo.meterWidget.init(logo, logo._meterBlock);
                 logo.insideMeterWidget = false;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    class oscilloscopeWidgetBlock extends StackClampBlock {
+        constructor() {
+            super("oscilloscope");
+            this.setPalette("widgets");
+            this.setHelpString([
+                _(
+                    "The oscilloscope block opens a tool to visualize waveforms."
+                ),
+                "documentation",
+                null,
+                "oscilloscope"
+            ]);
+            this.formBlock({ name: _("oscilloscope"), canCollapse: true });
+            let addPrintTurtle = (blocks,turtle,prev,last) => {
+                let len = blocks.length;
+                let next = last ? null : len+2
+                blocks.push([len, "print", 0, 0, [prev, len + 1, next]]);
+                blocks.push([len + 1, ["text", { value: turtle.name}], 0, 0, [len, null]]);
+                return blocks;
+            }
+
+            this.makeMacro((x, y) => {
+                let blocks = [[0,"oscilloscope", x, y, [null, 1, null]]];
+                for (let turtle of turtles.turtleList) {
+                    if (!turtle.inTrash)
+                        blocks = addPrintTurtle(blocks, turtle, Math.max(0, blocks.length - 2), turtle == last(turtles.turtleList));
+                }
+                blocks[0][4][2]=blocks.length;
+                blocks.push([blocks.length, "hiddennoflow", 0, 0, [0, null]]);
+                return blocks;
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (logo.Oscilloscope === null) {
+                logo.Oscilloscope = new Oscilloscope();
+            }
+            logo.oscilloscopeTurtles = [];
+            logo.inOscilloscope = true;
+
+            let listenerName = "_oscilloscope_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = function(event) {
+                logo.Oscilloscope.init(logo);
+                logo.inOscilloscope = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1137,6 +1177,7 @@ function setupWidgetBlocks() {
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
     new PitchDrumMatrixBlock().setup();
+    new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
     new ChromaticBlock().setup();
     new MusicKeyboard2Block().setup();

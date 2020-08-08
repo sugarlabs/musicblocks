@@ -817,7 +817,15 @@ function setupNumberBlocks() {
             }
 
             try {
-                return MathUtility.doRandom(a, b, octave);
+                if (octave === undefined) {
+                    let randomResult = MathUtility.doRandom(a, b, octave);
+                    if (typeof randomResult === "object") {
+                        return randomResult[0];
+                    }
+                    return randomResult;
+                } else {
+                    return MathUtility.doRandom(a, b, octave);
+                }
             } catch (e) {
                 logo.stopTurtle = true;
                 logo.errorMsg(NANERRORMSG, blk);

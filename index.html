@@ -119,6 +119,20 @@
     </head>
 
     <!-- #96D3F3-->
+    <div 
+            id="chooseKeyDiv"
+            tabindex="-1"
+        >
+    </div>
+    <div
+            id="moveable"
+            tabindex="-1"
+        >
+        <input class="radioBtn" type="radio" name="moveable" value="true">
+            <label for="moveabledo">Moveable Do</label>
+        <input class="radioBtn" type="radio" name="moveable" id="fixed" checked="checked" value="false">
+            <label for="fixed">Fixed</label>
+    </div>
 
     <body
         onload="init();"
@@ -421,18 +435,6 @@
                 tabindex="-1"
             ></div>
 
-            <div id="searchBar" tabindex="-1">
-                <input
-                    type="text"
-                    name="search"
-                    id="search"
-                    class="ui-autocomplete"
-                    placeholder="Search for Blocks"
-                    tabindex="-1"
-                />
-                <ul class="matches" id="searchResults"></ul>
-            </div>
-
             <div id="pastecode" tabindex="-1">
                 <input
                     type="text"
@@ -701,6 +703,16 @@
                                         ></a
                                     >
                                 </li>
+                                <li>
+                                    <a 
+                                        id="chooseKeyIcon" 
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        ><i class="material-icons md-48"
+                                            >music_note</i
+                                        ></a
+                                    >
+                                </li>
                                 <li
                                     class="filler"
                                     id="aligns_merge_under_load"
@@ -781,6 +793,7 @@
                     <li><a id="pt"></a></li>
                     <li><a id="ja"></a></li>
                     <li><a id="kana"></a></li>
+		    <li><a id="ko"></a></li>
                     <li><a id="zhCN"></a></li>
                     <li><a id="th"></a></li>
                     <li><a id="ayc"></a></li>
@@ -798,5 +811,18 @@
             </div>
         </div>
         <!-- hideContents -->
+
+        <div id="searchBar" tabindex="-1">
+            <input
+                type="text"
+                name="search"
+                id="search"
+                class="ui-autocomplete"
+                placeholder="Search for Blocks"
+                tabindex="-1"
+            />
+            <ul class="matches" id="searchResults"></ul>
+        </div>
+
     </body>
 </html>

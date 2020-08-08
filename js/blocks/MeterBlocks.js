@@ -15,16 +15,13 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmeter"]);
             } else {
-                return (
-                    logo.beatsPerMeasure[turtle] +
-                    ":" +
-                    logo.noteValuePerBeat[turtle]
-                );
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
             }
         }
     }
@@ -86,23 +83,27 @@ function setupMeterBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let len = logo.bpm[turtle].length;
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let len = tur.singer.bpm.length;
             if (len > 0) {
-                logo.bpm[turtle][len - 1] = value;
+                tur.singer.bpm[len - 1] = value;
             } else {
-                logo.bpm[turtle].push(value);
+                tur.singer.bpm.push(value);
             }
         }
 
         arg(logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
                     .name === "print"
             ) {
                 logo.statusFields.push([blk, "bpm"]);
-            } else if (logo.bpm[turtle].length > 0) {
-                return last(logo.bpm[turtle]);
+            } else if (tur.singer.bpm.length > 0) {
+                return last(tur.singer.bpm);
             } else {
                 return Singer.masterBPM;
             }
@@ -135,7 +136,7 @@ function setupMeterBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     return 0;
                 } else {
                     return (
@@ -143,9 +144,9 @@ function setupMeterBlocks() {
                             (
                                 (
                                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                                    logo.pickup[turtle]
-                                ) * logo.noteValuePerBeat[turtle]
-                            ) / logo.beatsPerMeasure[turtle]
+                                    tur.singer.pickup
+                                ) * tur.singer.noteValuePerBeat
+                            ) / tur.singer.beatsPerMeasure
                         ) + 1
                     );
                 }
@@ -204,16 +205,16 @@ function setupMeterBlocks() {
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < logo.pickup[turtle]) {
+                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     return 0;
                 } else {
                     return (
                         (
                             (
                                 tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                                logo.pickup[turtle]
-                            ) * logo.noteValuePerBeat[turtle]
-                        ) % logo.beatsPerMeasure[turtle]
+                                tur.singer.pickup
+                            ) * tur.singer.noteValuePerBeat
+                        ) % tur.singer.beatsPerMeasure
                     ) + 1;
                 }
             }
@@ -253,6 +254,43 @@ function setupMeterBlocks() {
                 return 0;
             } else {
                 return Singer.noteCounter(logo, turtle, cblk);
+            }
+        }
+    }
+
+    class NoteCounterBlock2 extends LeftBlock {
+        constructor() {
+            //.TRANS: count the number of notes
+            super("notecounter2", _("note counter"));
+            this.setPalette("meter");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Note counter block can be used to count the number of contained notes."
+                ),
+                "documentation",
+                null,
+                "notecounterhelp"
+            ]);
+            this.formBlock({
+                flows: {
+                    labels: [""],
+                    type: "flow"
+                }
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                return Singer.numberOfNotes(logo, turtle, cblk);
             }
         }
     }
@@ -373,17 +411,18 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined)
-                // Nothing to do.
                 return;
 
-            logo.drift[turtle] += 1;
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.drift++;
 
             let listenerName = "_drift_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                if (logo.drift[turtle] > 0) {
-                    logo.drift[turtle] -= 1;
+            let __listener = event => {
+                if (tur.singer.drift > 0) {
+                    tur.singer.drift--;
                 }
             };
 
@@ -414,48 +453,36 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // Set up a listener for this turtle/offbeat combo.
+            // Set up a listener for this turtle/offbeat combo
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
-                    if (logo.turtles.turtleList[turtle].running) {
-                        let queueBlock = new Queue(
-                            logo.actions[args[0]],
-                            1,
-                            blk
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let __listener = event => {
+                    if (tur.running) {
+                        let queueBlock = new Queue(logo.actions[args[0]], 1, blk);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped
-                        // running, we need to run the stack
-                        // from here.
+                        // Since the turtle has stopped running, we need to run the stack from here
                         if (isflow) {
                             logo.runFromBlockNow(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         } else {
                             logo.runFromBlock(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         }
                     }
                 };
 
-                let turtleID = logo.turtles.turtleList[turtle].id;
+                let turtleID = tur.id;
                 let eventName = "__offbeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("offbeat");
+                logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
             }
         }
     }
@@ -487,60 +514,46 @@ function setupMeterBlocks() {
                 if (!(args[1] in logo.actions)) {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
-                    let __listener = function(event) {
-                        if (logo.turtles.turtleList[turtle].running) {
-                            let queueBlock = new Queue(
-                                logo.actions[args[1]],
-                                1,
-                                blk
-                            );
-                            logo.parentFlowQueue[turtle].push(blk);
-                            logo.turtles.turtleList[turtle].queue.push(
-                                queueBlock
-                            );
+                    let tur = logo.turtles.ithTurtle(turtle);
+
+                    let __listener = event => {
+                        if (tur.running) {
+                            let queueBlock = new Queue(logo.actions[args[1]], 1, blk);
+                            tur.parentFlowQueue.push(blk);
+                            tur.queue.push(queueBlock);
                         } else {
-                            // Since the turtle has stopped
-                            // running, we need to run the stack
-                            // from here.
+                            // Since the turtle has stopped running, we need to run the stack from here
                             if (isflow) {
                                 logo.runFromBlockNow(
-                                    logo,
-                                    turtle,
-                                    logo.actions[args[1]],
-                                    isflow,
-                                    receivedArg
+                                    logo, turtle, logo.actions[args[1]], isflow, receivedArg
                                 );
                             } else {
                                 logo.runFromBlock(
-                                    logo,
-                                    turtle,
-                                    logo.actions[args[1]],
-                                    isflow,
-                                    receivedArg
+                                    logo, turtle, logo.actions[args[1]], isflow, receivedArg
                                 );
                             }
                         }
                     };
 
-                    let turtleID = logo.turtles.turtleList[turtle].id;
+                    let turtleID = tur.id;
                     let eventName = "__beat_" + args[0] + "_" + turtleID + "__";
                     logo.setTurtleListener(turtle, eventName, __listener);
 
                     //remove any default strong beats other than "everybeat " or  "offbeat"
-                    if (logo.defaultStrongBeats[turtle]) {
-                        for (let i = 0; i < logo.beatList[turtle].length; i++) {
-                            if (logo.beatList[turtle][i] !== "everybeat" && logo.beatList[turtle][i] !== "offbeat") {
-                                logo.beatList[turtle].splice(i, 1);
+                    if (tur.singer.defaultStrongBeats) {
+                        for (let i = 0; i < tur.singer.beatList.length; i++) {
+                            if (tur.singer.beatList[i] !== "everybeat" && tur.singer.beatList[i] !== "offbeat") {
+                                tur.singer.beatList.splice(i, 1);
                                 i--;
                             }
                         }
-                        logo.defaultStrongBeats[turtle] = false;
+                        tur.singer.defaultStrongBeats = false;
                     }
 
-                    if (args[0] > logo.beatsPerMeasure[turtle]) {
-                        logo.factorList[turtle].push(args[0]);
+                    if (args[0] > tur.singer.beatsPerMeasure) {
+                        tur.singer.factorList.push(args[0]);
                     } else {
-                        logo.beatList[turtle].push(args[0]);
+                        tur.singer.beatList.push(args[0]);
                     }
                 }
             }
@@ -578,71 +591,58 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
-            let orgTurtle =turtle ;
-            console.debug("used from :",orgTurtle)
+            let orgTurtle = turtle;
+            console.debug("used from: ", orgTurtle)
             if (!turtles.turtleList[orgTurtle].companionTurtle){
                 turtle = logo.turtles.turtleList.length;
                 turtles.turtleList[orgTurtle].companionTurtle = turtle ;
-                logo.turtles.addTurtle(
-                    logo.blocks.blockList[blk],
-                    []
-                );
-                console.debug("beat Turtle : ",turtle);
+                logo.turtles.addTurtle(logo.blocks.blockList[blk], []);
+                console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
 
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
-                    if (logo.turtles.turtleList[turtle].running) {
-                        let queueBlock = new Queue(
-                            logo.actions[args[0]],
-                            1,
-                            blk
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let __listener = event => {
+                    if (tur.running) {
+                        let queueBlock = new Queue(logo.actions[args[0]], 1, blk);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped
-                        // running, we need to run the stack
-                        // from here.
+                        // Since the turtle has stopped running, we need to run the stack from here
                         if (isflow) {
                             logo.runFromBlockNow(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         } else {
                             logo.runFromBlock(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         }
                     }
                 };
 
                 let eventName = "__everybeat_" + turtle + "__";
-                logo.turtles.turtleList[turtle].queue = [];
-                logo.parentFlowQueue[turtle] = [];
-                logo.unhighlightQueue[turtle] = [];
-                logo.parameterQueue[turtle] = [];
+                tur.queue = [];
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
                 logo.initTurtle(turtle);
                 logo.setTurtleListener(turtle, eventName, __listener);
+
+                let turOrg = logo.turtles.ithTurtle(orgTurtle);
                 let duration =
-                    60 /
-                    logo.bpm[orgTurtle].length > 0 ? last(logo.bpm[orgTurtle]) : Singer.masterBPM;
-                if (logo.turtles.turtleList[turtle].interval !== undefined) clearInterval(this.interval);
-                logo.turtles.turtleList[turtle].interval = setInterval (
-                    () => {
-                        logo.stage.dispatchEvent(eventName);
-                    }, duration * 1000);
-                console.debug("set listener", eventName);
+                    60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
+                if (tur.interval !== undefined) {
+                    clearInterval(tur.interval);
+                }
+                tur.interval = setInterval(
+                    () => logo.stage.dispatchEvent(eventName), duration * 1000
+                );
+                // console.debug("set listener: ", eventName);
             }
         }
     }
@@ -675,44 +675,32 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let __listener = function(event) {
-                    if (logo.turtles.turtleList[turtle].running) {
-                        let queueBlock = new Queue(
-                            logo.actions[args[0]],
-                            1,
-                            blk
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let __listener = event => {
+                    if (tur.running) {
+                        let queueBlock = new Queue(logo.actions[args[0]], 1, blk);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped
-                        // running, we need to run the stack
-                        // from here.
+                        // Since the turtle has stopped running, we need to run the stack from here
                         if (isflow) {
                             logo.runFromBlockNow(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         } else {
                             logo.runFromBlock(
-                                logo,
-                                turtle,
-                                logo.actions[args[0]],
-                                isflow,
-                                receivedArg
+                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
                             );
                         }
                     }
                 };
 
-                let turtleID = logo.turtles.turtleList[turtle].id;
+                let turtleID = tur.id;
                 let eventName = "__everybeat_" + turtleID + "__";
                 logo.setTurtleListener(turtle, eventName, __listener);
 
-                logo.beatList[turtle].push("everybeat");
+                tur.singer.beatList.push("everybeat");
             }
         }
     }
@@ -915,7 +903,7 @@ function setupMeterBlocks() {
                 }
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.bpm[turtle].push(bpm);
+                logo.turtles.ithTurtle(turtle).singer.bpm.push(bpm);
             }
 
             if (logo.inTempo) {
@@ -954,6 +942,8 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 args.length === 3 &&
                 typeof args[0] === "number" &&
@@ -969,13 +959,13 @@ function setupMeterBlocks() {
                 }
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.bpm[turtle].push(bpm);
+                tur.singer.bpm.push(bpm);
 
                 let listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
-                    logo.bpm[turtle].pop();
+                let __listener = event => {
+                    tur.singer.bpm.pop();
                 };
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1006,6 +996,8 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 2 && typeof args[0] === "number") {
                 let bpm;
                 if (args[0] < 30) {
@@ -1018,13 +1010,13 @@ function setupMeterBlocks() {
                     bpm = args[0];
                 }
 
-                logo.bpm[turtle].push(bpm);
+                tur.singer.bpm.push(bpm);
 
                 let listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 let __listener = function(event) {
-                    logo.bpm[turtle].pop();
+                    tur.singer.bpm.pop();
                 };
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1070,13 +1062,11 @@ function setupMeterBlocks() {
                 arg0 = args[0];
             }
 
-            if (arg0 < 0) {
-                logo.pickup[turtle] = 0;
-            } else {
-                logo.pickup[turtle] = arg0;
-            }
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            logo.notation.notationPickup(turtle, logo.pickup[turtle]);
+            tur.singer.pickup = Math.max(0, arg0);
+
+            logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
     }
 
@@ -1126,37 +1116,34 @@ function setupMeterBlocks() {
                 arg1 = 1 / 4;
             } else arg1 = args[1];
 
-            if (arg0 <= 0) logo.beatsPerMeasure[turtle] = 4;
-            else logo.beatsPerMeasure[turtle] = arg0;
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            if (arg1 <= 0) logo.noteValuePerBeat[turtle] = 4;
-            else logo.noteValuePerBeat[turtle] = 1 / arg1;
+            tur.singer.beatsPerMeasure = arg0 <= 0 ? 4 : arg0;
+            tur.singer.noteValuePerBeat = arg1 <= 0 ? 4 : 1 / arg1;
 
             // setup default strong / weak beats until any strong beat block is used
 
-            if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 4) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(3);
-                logo.defaultStrongBeats[turtle] = true;
+            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(3);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 2) {
-                logo.beatList[turtle].push(1);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 4 && logo.beatsPerMeasure[turtle] == 3) {
-                logo.beatList[turtle].push(1);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
             }
-            else if (logo.noteValuePerBeat[turtle] == 8 && logo.beatsPerMeasure[turtle] == 6) {
-                logo.beatList[turtle].push(1);
-                logo.beatList[turtle].push(4);
-                logo.defaultStrongBeats[turtle] = true;
+            else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(4);
+                tur.singer.defaultStrongBeats = true;
             }
 
             logo.notation.notationMeter(
-                turtle,
-                logo.beatsPerMeasure[turtle],
-                logo.noteValuePerBeat[turtle]
+                turtle, tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat
             );
         }
     }
@@ -1167,6 +1154,7 @@ function setupMeterBlocks() {
     new MeasureValueBlock().setup();
     new BeatValueBlock().setup();
     new NoteCounterBlock().setup();
+    new NoteCounterBlock2().setup();
     new ElapsedNotesBlock().setup();
     new ElapsedNotes2Block().setup();
     new DriftBlock().setup();
