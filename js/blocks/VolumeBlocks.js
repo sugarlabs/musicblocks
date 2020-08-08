@@ -637,61 +637,16 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 0;
-            } else {
-                arg = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            for (let synth in tur.singer.synthVolume) {
-                let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + arg)) / 100;
-                if (newVolume > 100) {
-                    console.debug("articulated volume exceeds 100%. clipping");
-                    newVolume = 100;
-                } else if (newVolume < -100) {
-                    console.debug("articulated volume exceeds 100%. clipping");
-                    newVolume = -100;
-                }
-
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [newVolume];
-                } else {
-                    tur.singer.synthVolume[synth].push(newVolume);
-                }
-
-                if (!tur.singer.suppressOutput) {
-                    Singer.setSynthVolume(logo, turtle, synth, newVolume);
-                }
-            }
-
-            if (tur.singer.justCounting.length === 0) {
-                logo.notation.notationBeginArticulation(turtle);
-            }
-
-            let listenerName = "_articulation_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                for (let synth in tur.singer.synthVolume) {
-                    tur.singer.synthVolume[synth].pop();
-                    Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
-                }
-
-                if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationEndArticulation(turtle);
-                }
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.VolumeActions.setRelativeVolume(volume, turtle, blk);
 
             return [args[1], 1];
         }
