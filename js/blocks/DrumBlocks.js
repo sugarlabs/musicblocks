@@ -68,50 +68,13 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg;
-            if (
-                args.length !== 1 ||
-                args[0] == null ||
-                typeof args[0] !== "string"
-            ) {
+            let arg = args[0];
+            if (args.length !== 1 || arg == null || typeof arg !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
-            } else {
-                arg = args[0];
             }
 
-            let noisename = arg;
-            for (let noise in NOISENAMES) {
-                if (NOISENAMES[noise][0] === arg) {
-                    noisename = NOISENAMES[noise][1];
-                    break;
-                } else if (NOISENAMES[noise][1] === arg) {
-                    noisename = arg;
-                    break;
-                }
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.inNoteBlock.length > 0) {
-                // Add the noise sound as if it were a drum
-                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(noisename);
-                if (tur.singer.synthVolume[noisename] === undefined) {
-                    tur.singer.synthVolume[noisename] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[noisename] = [DEFAULTVOLUME];
-                }
-            } else {
-                logo.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
-                return;
-            }
-
-            if (tur.singer.inNoteBlock.length > 0) {
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
-                    tur.singer.beatFactor
-                );
-            }
-
-            tur.singer.pushedNote = true;
+            Singer.DrumActions.playNoise(arg, turtle, blk);
         }
     }
 

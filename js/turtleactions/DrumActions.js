@@ -23,8 +23,41 @@
  */
 function setupDrumActions() {
     Singer.DrumActions = class {
-        static test() {
-            console.log("This is a test");
+        /**
+         * Generate white, pink, or brown noise.
+         *
+         * @param {String} noise - noise name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static playNoise(noise, turtle, blk) {
+            let noisename = noise;
+            for (let n in NOISENAMES) {
+                if (NOISENAMES[n][0] === noise) {
+                    noisename = NOISENAMES[n][1];
+                    break;
+                } else if (NOISENAMES[n][1] === noise) {
+                    noisename = noise;
+                    break;
+                }
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                // Add the noise sound as if it were a drum
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(noisename);
+                if (tur.singer.synthVolume[noisename] === undefined) {
+                    tur.singer.synthVolume[noisename] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[noisename] = [DEFAULTVOLUME];
+                }
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+
+                tur.singer.pushedNote = true;
+            } else {
+                logo.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
+                return;
+            }
         }
     }
 }
