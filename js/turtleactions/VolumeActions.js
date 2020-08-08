@@ -118,5 +118,27 @@ function setupVolumeActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * Sets the volume for all synthesizers.
+         *
+         * @param {Number} volume
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setMasterVolume(volume, turtle, blk) {
+            volume = Math.max(Math.min(volume, 100), 0);
+
+            if (arg === 0)
+                logo.errorMsg(_("Setting volume to 0."), blk);
+
+            Singer.masterVolume.push(arg);
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            if (!tur.singer.suppressOutput) {
+                Singer.setMasterVolume(logo, arg);
+            }
+        }
     }
 }
