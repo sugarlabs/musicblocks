@@ -540,7 +540,7 @@ Music Blocks users can create and preview code in fixed solfege and movable solf
 
 For movable systems an important point of context is its key and mode. For "C Major", the key is "C" and the mode is "Major" or Ionian. Key and mode is important as it lays out the tonal framework--which pitches are "in" and which are "out". It also lays out the function of the pitches within the framework. This is why for scale degrees `1`, `2`, `3`, `4`, and `5`, the expected result for C major is `C`, `D`, `E`, `F`, and `G` (skipping any sharps/flats), while those same scale degrees for D major are `D`, `E`, `F#`, `G`, and `A`. The set of pitches that make up C major have no sharps or flats, so they are skipped. D major has two sharps, `F#` and `C#`. The `F#` is the 3rd scale degree for D major.
 
-Scale Degree with *Set Key* is a very powerful tool for expression. It is also very common in music pedagogy. However, it is a tool that works best to express seven pitch tonal frameworks (e.g. major, minor, and common seven pitch scales). For musical ideas where a more purely mathematical form of expression is required, Music Blocks offers the user *nth modal pitch*.
+Scale Degree with *Set Key* is a very powerful tool for expression. It is also very common in music pedagogy. However, because the number values 1-7 are hard wired into this system, it is a tool that works best to express seven pitch tonal frameworks (e.g. major, minor, and common seven pitch scales). For musical ideas where a more purely mathematical form of expression is required, Music Blocks offers the user *nth modal pitch*.
 
 *nth Modal Pitch* is similar to *Scale Degree* in that it is a movable system that uses numbers to express pitches. However, unlike *Scale Degree*, *nth Modal Pitch* starts at `0`, allows for negative numbers, and is not restricted to a seven pitch tonal framework. `0` is the first pitch of the mode, `1` is the next pitch, `2` is the pitch above that, etc. `-1` is the pitch before the first pitch of the mode. This tool is expecially helpful for expressing a musical idea that requires computation as you can run computations directly on the number value. It is also helpful if you are, for example, creating music in a whole tone (six note) pitch space. In the case of *Set Key* set to "whole tone", `6` would be the octave above.
 
@@ -562,11 +562,11 @@ Block(s) | Fixed or Movable? (Do or La?) | Set Key Transformation?
 ----- | -------------------- | -------
 Alphabet Pitch | Fixed | No effect.
 Solfege | Fixed by default  | No effect.
-Solfege and Movable Do | Specified via "movable" block set to Do | Yes.
-Solfege and Movable La | Specified via "movable" block set to La | Yes. Works like Scale Degree.
+Solfege and Movable=Do | Specified via "movable" block set to Do | Yes.
+Solfege and Movable=La | Specified via "movable" block set to La | Yes. Works like Scale Degree.
 n^th modal pitch | Movable | Yes. Good for modes of any length.
 Scale Degree | Movable | Yes. Most useful for 7 note systems. Works just like Movable=La for Solfege by default.
-Scale Degree | Movable | Yes. When preceded by Movable=Do, the user can be explicit in their spelling.
+Scale Degree and Movable=Do | Movable | Yes. When preceded by Movable=Do, the user can be explicit in their spelling.
 Scalar Step | Movable | Yes. Navigates up/down within *nth modal pitch* space.
 Scalar Interval | Movable | Yes. Adds above/under within *nth modal pitch* space.
 Scalar Inversion | Movable | Yes. Inversion around a specified axis within *nth modal pitch* space.
