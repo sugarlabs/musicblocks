@@ -30,6 +30,7 @@ function setupVolumeActions() {
          * @param {Number} value - crescendo/decrescendo value
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
@@ -64,6 +65,54 @@ function setupVolumeActions() {
                         tur.singer.crescendoInitialVolume[synth]
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
+                }
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Changes the volume of the contained notes.
+         *
+         * @param {Number} volume
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setRelativeVolume(volume, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            for (let synth in tur.singer.synthVolume) {
+                let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
+                newVolume = Math.max(Math.min(newVolume, 100), -100);
+
+                if (tur.singer.synthVolume[synth] === undefined) {
+                    tur.singer.synthVolume[synth] = [newVolume];
+                } else {
+                    tur.singer.synthVolume[synth].push(newVolume);
+                }
+
+                if (!tur.singer.suppressOutput) {
+                    Singer.setSynthVolume(logo, turtle, synth, newVolume);
+                }
+            }
+
+            if (tur.singer.justCounting.length === 0) {
+                logo.notation.notationBeginArticulation(turtle);
+            }
+
+            let listenerName = "_articulation_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                for (let synth in tur.singer.synthVolume) {
+                    tur.singer.synthVolume[synth].pop();
+                    Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
+                }
+
+                if (tur.singer.justCounting.length === 0) {
+                    logo.notation.notationEndArticulation(turtle);
                 }
             };
 
