@@ -28,7 +28,7 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Fixed and Movable](#FIXED-AND-MOVABLE-SCALAR-AND-MODAL)
+      5. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
       6. [Dotted Notes](#DOTTED)
       7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       8. [Repeating Notes](#REPETITION)
@@ -520,64 +520,63 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
 
-#### <a name="FIXED-AND-MOVABLE-SCALAR-AND-MODAL"></a>3.2.5 Pitch Systems: Fixed and Movable; Absolute and Relative; Scalar and Modal
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Pitch Systems: Fixed and Movable and Subsystems
 
 Music Blocks allows users to express and explore musical ideas in a variety of different systems. The main systems of expression are fixed and movable.
 
-Fixed and Movable Systems
+**Fixed and Movable Systems**
 
 Fixed pitch systems represent pitches in an absolute way. Pitches in a fixed system do not change, regardless of a tonal context such as key. Movable systems, on the other hand, represent pitches in a relative way based on their tonal context.
 
-One example of a fixed system is alphabet notation. Pitches are expressed as A, B, C, D, E, F, and G. Regardless of whether the key is C major or G minor, the pitch G is the same. The pitches are the same regardless of the context.
+One example of a fixed system is alphabet notation. Pitches are expressed as `A`, `B`, `C`, `D`, `E`, `F`, and `G`. Regardless of whether the key is C major or G minor, the pitch G is the same. The pitches are the same regardless of the context.
 
-One example of a movable system is scale degree. Pitches are expressed as 1, 2, 3, 4, 5, 6, and 7. For C major, these pitches are C, D, E, F, G, A, and B. For G (natural) minor, these pitches are G, A, Bb, C, D, Eb, and F. The pitches are determined by the tonal context.
+One example of a movable system is scale degree. Pitches are expressed as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor, these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. The pitches are determined by the tonal context.
 
-One example of a system that is either fixed or movable is solfege. Solfege can either be a fixed system (fixed solfege) or a movable system (movable solfege). Fixed solfege works like the alphabet system; La is A, Ti is B, Do is C, etc. Context does not affect the sounding pitch. Movable solfege works like the scale degree system; For any major Do is 1st scale degree, Re is 2nd, Mi is 3rd, Fa is 4th, etc. 
+One example of a system that is either fixed or movable is solfege. Solfege can either be a fixed system (fixed solfege) or a movable system (movable solfege). Fixed solfege works like the alphabet system; `La` is `A`, `Ti` is `B`, `Do` is `C`, etc. Context does not affect the sounding pitch. Movable solfege works like the scale degree system; For any major, `Do` is 1st scale degree, `Re` is 2nd, `Mi` is 3rd, `Fa` is 4th, etc. 
 
 Music Blocks users can create and preview code in fixed solfege and movable solfege. Teachers and learners may use either system (or both) to express their musical ideas as well as deepen their understanding of music.
 
-Using Tonal Context with Movable Systems
+**Using Tonal Context with Movable Systems**
 
-For movable systems an important point of context is its key and mode. For "C Major", the key is "C" and the mode is "Major" or Ionian. Key and mode is important as it lays out the tonal framework--which pitches are "in" and which are "out". It also lays out the function of the pitches within the framework. This is why for scale degrees 1, 2, 3, 4, and 5, the expected result for C major is C, D, E, F, and G (skipping any sharps/flats), while those same scale degrees for D major are D, E, F#, G, and A. The set of pitches that make up C major have no sharps or flats, so they are skipped. D major has two sharps, F# and C#. The F# is the 3rd scale degree for D major.
+For movable systems an important point of context is its key and mode. For "C Major", the key is "C" and the mode is "Major" or Ionian. Key and mode is important as it lays out the tonal framework--which pitches are "in" and which are "out". It also lays out the function of the pitches within the framework. This is why for scale degrees `1`, `2`, `3`, `4`, and `5`, the expected result for C major is `C`, `D`, `E`, `F`, and `G` (skipping any sharps/flats), while those same scale degrees for D major are `D`, `E`, `F#`, `G`, and `A`. The set of pitches that make up C major have no sharps or flats, so they are skipped. D major has two sharps, `F#` and `C#`. The `F#` is the 3rd scale degree for D major.
 
 Scale Degree with *Set Key* is a very powerful tool for expression. It is also very common in music pedagogy. However, it is a tool that works best to express seven pitch tonal frameworks (e.g. major, minor, and common seven pitch scales). For musical ideas where a more purely mathematical form of expression is required, Music Blocks offers the user *nth modal pitch*.
 
-*nth Modal Pitch* is similar to *Scale Degree* in that it is a movable system that uses numbers to express pitches. However, unlike *Scale Degree*, *nth Modal Pitch* starts at 0, allows for negative numbers, and is not restricted to a seven pitch tonal framework. 0 is the first pitch of the mode, 1 is the next pitch, 2 is the pitch above that, etc. -1 is the pitch before the first pitch of the mode. This tool is expecially helpful for expressing a musical idea that requires computation as you can run computations directly on the number value. It is also helpful if you are, for example, creating music in a whole tone (six note) pitch space. In the case of *Set Key* set to "whole tone", "6" would be the octave above.
+*nth Modal Pitch* is similar to *Scale Degree* in that it is a movable system that uses numbers to express pitches. However, unlike *Scale Degree*, *nth Modal Pitch* starts at `0`, allows for negative numbers, and is not restricted to a seven pitch tonal framework. `0` is the first pitch of the mode, `1` is the next pitch, `2` is the pitch above that, etc. `-1` is the pitch before the first pitch of the mode. This tool is expecially helpful for expressing a musical idea that requires computation as you can run computations directly on the number value. It is also helpful if you are, for example, creating music in a whole tone (six note) pitch space. In the case of *Set Key* set to "whole tone", `6` would be the octave above.
 
-Pitch Number, MIDI, and Set Pitch Number Offset
+**Pitch Number, MIDI, and Set Pitch Number Offset**
 
-*Pitch Number* is similar to *nth Modal Pitch* in that it is a zero-based, mathematical system to express pitches. However, unlike *nth Modal Pitch*, *Pitch Number* disregards any tonal framework. It is also chromatic by default, meaning that its pitch space includes the sharp/flat pitches (black keys on piano) as well as the natural pitches (white keys on piano). By default, middle C (C_4) is 0. The C major scale in the 4th octave is 0, 2, 4, 5, 7, 9, and 11. 12 is the C an octave above middle C (C_5). This system is useful mathematically, but because it disregards key, it is difficult to create something musical. That being said, fretted instruments such as ukulele and guitar use this system to express pitch, so it is a good system for expressing how these instruments work.
+*Pitch Number* is similar to *nth Modal Pitch* in that it is a zero-based, mathematical system to express pitches. However, unlike *nth Modal Pitch*, *Pitch Number* disregards any tonal framework. It is also chromatic by default, meaning that its pitch space includes the sharp/flat pitches (black keys on piano) as well as the natural pitches (white keys on piano). By default, middle C (C_4) is `0`. The C major scale in the 4th octave is `0`, `2`, `4`, `5`, `7`, `9`, and `11`. `12` is the C an octave above middle C (C_5). This system is useful mathematically, but because it disregards key, it is difficult to create something musical. That being said, fretted instruments such as ukulele and guitar use this system to express pitch, so it is a good system for expressing how these instruments work.
 
-MIDI also uses a similar system to *Pitch Number* to express pitches, but the 0 is offset from Music Blocks' default. In order to change the sounding pitch of 0 for *Pitch Number*, use *set pitch number offset*. This makes *Pitch Number* blocks behave as a relative system as it transposes the pitches up or down accordingly (but has no effect on key).
+MIDI also uses a similar system to *Pitch Number* to express pitches, but the 0 is offset from Music Blocks' default. In order to change the sounding pitch of `0` for *Pitch Number*, use *set pitch number offset*. This makes *Pitch Number* blocks behave as a relative system as it transposes the pitches up or down accordingly (but has no effect on key).
 
-Two Subsystems for Movable
+**Two Subsystems for Movable**
 
-For Movable Do, there exists yet two more systems. One system, which we call Movable=Do, allows the user to express solfege syllables in relation to the Major mode. Therefore, if a user were to specify A minor, then La would be A, the first scale degree in A Minor. The other system, which we call Movable=La allows the user to express solfege in relation to the particular mode specified. Therefore, if a user were to specify A Minor, then Do would be A. *Scale Degree* works like Movable=La by default such that "1" is always the first pitch of a given mode.
+For Movable Do, there exists yet two more systems. One system, which we call `Movable=Do`, allows the user to express solfege syllables in relation to the Major mode. Therefore, if a user were to specify A minor, then La would be A, the first scale degree in A Minor. The other system, which we call `Movable=La` allows the user to express solfege in relation to the particular mode specified. Therefore, if a user were to specify A Minor, then Do would be A. *Scale Degree* works like `Movable=La` by default such that `1` is always the first pitch of a given mode.
 
 For scale degree, because some users may want to explicitly spell out all of the pitches regardless of the chosen key, we allow them to express it that we via the *Movable Do* block (because Scale Degree works like Movable=La by default). Please see [this code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html) as an example.
 
 Because many of the blocks behave differently depending on whether or not a *Movable Do* block is present, the following chart was created for clarity.
 
-Block(s) | Fixed | Movable Do or La | Modal
------ | ---------- | ---------- | -------
-Alphabet Pitch | Alphabet | Not movable | Modal cannot be specified
-Solfege | Fixed Do by default | Needs Movable=Do or Movable=La block | Modal can be defined (after) for modal blocks functionality*
-Solfege and Movable Do | N/A (Movable Do) | Specified via "movable" block set to Do | Modal can be defined (after) for modal blocks functionality*
-Solfege and Movable La | N/A (Movable La) | Specified via "movable" block set to La | Modal can be defined (after) for modal blocks functionality*
-n^th modal pitch | N/A | N/A | Notes chosen by specified mode (from "set key" block)
-Scale Degree | N/A (needs some reference, otherwise uses default of C Major) | Works just like Movable=La for Solfege by default | Modal can be defined for modal blocks functionality*
-Scale Degree | N/A (needs some reference, otherwise uses default of C Major) | When preceded by Movable=Do, the user can be explicit in their spelling*** | Modal can be defined for modal blocks functionality*
-Scalar Step | N/A | N/A | Modal motion up and down (or 0) by number
-Scalar Interval | N/A | N/A | Modal interval up and down (or 0) by number
-Scalar Inversion | N/A | N/A | Modal inversion around a specified axis
-
-`*`   Movable=NTH, if we decide to implement it.
+Block(s) | Fixed or Movable? (Do or La?) | Set Key Transformation?
+----- | -------------------- | -------
+Alphabet Pitch | Fixed | No effect.
+Solfege | Fixed by default  | No effect.
+Solfege and Movable Do | Specified via "movable" block set to Do | Yes.
+Solfege and Movable La | Specified via "movable" block set to La | Yes. Works like Scale Degree.
+n^th modal pitch | Movable | Yes. Good for modes of any length.
+Scale Degree | Movable | Yes. Most useful for 7 note systems. Works just like Movable=La for Solfege by default.
+Scale Degree | Movable | Yes. When preceded by Movable=Do, the user can be explicit in their spelling.
+Scalar Step | Movable | Yes. Navigates up/down within *nth modal pitch* space.
+Scalar Interval | Movable | Yes. Adds above/under within *nth modal pitch* space.
+Scalar Inversion | Movable | Yes. Inversion around a specified axis within *nth modal pitch* space.
+Pitch Number | Movable | No effect. Pitches can be transformed via Set Pitch Number Offset.
 
 Illustrative Examples:
 
 The following example exposes how the Scale Degree functionality combines math and musical modifiers. When combining numbers and accidentals, it recreates the same functionality as the *Scale Degree* block.
 
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/scale-degree-improv.svg "Scale Degree Improv")
+![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/charts/scale-degree-improv.svg "Scale Degree Improv")
 
 [Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/charts/Scale-Degree-Improv.html)
 
