@@ -513,28 +513,11 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
             if (args.length === 1) {
-                let arg;
                 if (typeof args[0] !== "number") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
-                    if (args[0] < 0) {
-                        arg = 0;
-                    } else if (args[0] > 100) {
-                        arg = 100;
-                    } else {
-                        arg = args[0];
-                    }
-
-                    if (arg === 0) {
-                        logo.errorMsg(_("Setting volume to 0."), blk);
-                    }
-
-                    Singer.masterVolume.push(arg);
-                    if (!tur.singer.suppressOutput) {
-                        Singer.setMasterVolume(logo, arg);
-                    }
+                    Singer.VolumeActions.setMasterVolume(args[0], turtle, blk);
                 }
             }
         }
