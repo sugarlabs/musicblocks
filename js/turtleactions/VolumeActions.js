@@ -228,5 +228,14 @@ function setupVolumeActions() {
                 Singer.setSynthVolume(logo, turtle, synth, volume);
             }
         }
+
+        /**
+         * Returns the master volume.
+         *
+         * @returns {Number} master volume
+         */
+        static get masterVolume() {
+            return last(Singer.masterVolume);
+        }
     }
 }

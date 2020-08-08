@@ -82,7 +82,7 @@ function setupVolumeBlocks() {
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {
-                return last(Singer.masterVolume);
+                return Singer.VolumeActions.masterVolume;
             }
         }
     }
