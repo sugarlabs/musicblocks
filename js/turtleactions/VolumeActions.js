@@ -23,8 +23,51 @@
  */
 function setupVolumeActions() {
     Singer.VolumeActions = class {
-        static Test() {
-            console.log("this is a test");
+        /**
+         * Increases/decreases the volume of the contained notes by a specified amount for every note played.
+         *
+         * @param {String} type - crescendo or decrescendo
+         * @param {Number} value - crescendo/decrescendo value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         */
+        static doCrescendo(type, value, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.crescendoDelta.push(type === "crescendo" ? value : -value);
+
+            for (let synth in tur.singer.synthVolume) {
+                let vol = last(tur.singer.synthVolume[synth]);
+                tur.singer.synthVolume[synth].push(vol);
+                if (tur.singer.crescendoInitialVolume[synth] === undefined) {
+                    tur.singer.crescendoInitialVolume[synth] = [vol];
+                } else {
+                    tur.singer.crescendoInitialVolume[synth].push(vol);
+                }
+            }
+
+            tur.singer.inCrescendo.push(true);
+
+            let listenerName = "_crescendo_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (tur.singer.justCounting.length === 0) {
+                    logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
+                }
+
+                tur.singer.crescendoDelta.pop();
+                for (let synth in tur.singer.synthVolume) {
+                    let len = tur.singer.synthVolume[synth].length;
+                    tur.singer.synthVolume[synth][len - 1] = last(
+                        tur.singer.crescendoInitialVolume[synth]
+                    );
+                    tur.singer.crescendoInitialVolume[synth].pop();
+                }
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 }
