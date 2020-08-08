@@ -730,46 +730,10 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
             if (args.length > 1 && args[0] !== 0) {
-                if (logo.blocks.blockList[blk].name === "crescendo") {
-                    tur.singer.crescendoDelta.push(args[0]);
-                } else {
-                    tur.singer.crescendoDelta.push(-args[0]);
-                }
-
-                for (let synth in tur.singer.synthVolume) {
-                    let vol = last(tur.singer.synthVolume[synth]);
-                    tur.singer.synthVolume[synth].push(vol);
-                    if (tur.singer.crescendoInitialVolume[synth] === undefined) {
-                        tur.singer.crescendoInitialVolume[synth] = [vol];
-                    } else {
-                        tur.singer.crescendoInitialVolume[synth].push(vol);
-                    }
-                }
-
-                tur.singer.inCrescendo.push(true);
-
-                let listenerName = "_crescendo_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = event => {
-                    if (tur.singer.justCounting.length === 0) {
-                        logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
-                    }
-
-                    tur.singer.crescendoDelta.pop();
-                    for (let synth in tur.singer.synthVolume) {
-                        let len = tur.singer.synthVolume[synth].length;
-                        tur.singer.synthVolume[synth][len - 1] = last(
-                            tur.singer.crescendoInitialVolume[synth]
-                        );
-                        tur.singer.crescendoInitialVolume[synth].pop();
-                    }
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
+                Singer.VolumeActions.doCrescendo(
+                    logo.blocks.blockList[blk].name, args[0], turtle, blk
+                );
 
                 return [args[1], 1];
             }
