@@ -539,11 +539,19 @@ whether the key is C major or G minor, the pitch of `G` is the
 same. In Alphabet Notation, pitches are the same ("fixed") regardless
 of the context.
 
+![Alphabet Fixed
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-alphabet.svg
+ "Alphabet (Fixed) System")
+
 An example of a movable system is Scale Degree. Pitches are expressed
 as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches
 are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor,
 these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. The pitches
 are determined by the tonal context.
+
+![Scale Degree Movable
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-scale-degree.svg
+ "Scale Degree (Movable) System")
 
 Solfege is an example of a system that can be either fixed or movable;
 it can either be a fixed system (Fixed Solfege) or a movable system
@@ -555,6 +563,10 @@ pitch. Movable Solfege works like the Scale Degree system; for any
 major, `Do` is 1st scale degree, `Re` is 2nd, `Mi` is 3rd, `Fa` is
 4th, etc. Hence, in Movable Solfege in the key of G (natural) minor,
 `Do` is `G`, `Re` is `A`, et al.
+
+![Movable Solfege
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-movable-solfege.svg
+ "Movable Solfege System")
 
 Music Blocks users can create and preview code in both Fixed Solfege
 and Movable Solfege. Teachers and learners may use either system (or
@@ -584,31 +596,31 @@ purely mathematical form of expression is required, Music Blocks
 offers the user the *nth Modal Pitch* block.
 
 *nth Modal Pitch* is similar to *Scale Degree* in that it is a movable
- system that uses numbers to express pitches. However, unlike *Scale
- Degree*, *nth Modal Pitch* starts at `0`, allows for negative
- numbers, and is not restricted to a seven-pitch tonal framework. `0`
- is the first pitch of the mode, `1` is the next pitch, `2` is the
- pitch above that, etc. `-1` is the pitch before the first pitch of
- the mode. This tool is expecially helpful for expressing a musical
- idea that requires computation as you can run computations directly
- on the number value. It is also helpful if you are, for example,
- creating music in a whole tone (six note) pitch space. In the case of
- *Set Key* set to "whole tone", `6` would be the octave above.
+system that uses numbers to express pitches. However, unlike *Scale
+Degree*, *nth Modal Pitch* starts at `0`, allows for negative
+numbers, and is not restricted to a seven-pitch tonal framework. `0`
+is the first pitch of the mode, `1` is the next pitch, `2` is the
+pitch above that, etc. `-1` is the pitch before the first pitch of
+the mode. This tool is expecially helpful for expressing a musical
+idea that requires computation as you can run computations directly
+on the number value. It is also helpful if you are, for example,
+creating music in a whole tone (six note) pitch space. In the case of
+*Set Key* set to "whole tone", `6` would be the octave above.
 
 **Pitch Number, MIDI, and Set Pitch Number Offset**
 
 *Pitch Number* is similar to *nth Modal Pitch* in that it is a
- zero-based, mathematical system to express pitches. However, unlike
- *nth Modal Pitch*, *Pitch Number* disregards any tonal framework. It
- is also chromatic by default, meaning that its pitch space includes
- the sharp/flat pitches (black keys on piano) as well as the natural
- pitches (white keys on piano). By default, middle C (C_4) is `0`. The
- C major scale in the 4th octave is `0`, `2`, `4`, `5`, `7`, `9`, and
- `11`. `12` is the C an octave above middle C (C_5). This system is
- useful mathematically, but because it disregards key, it is difficult
- to control when creating music. That being said, fretted instruments
- such as ukulele and guitar use this system to express pitch, so it is
- a good system for expressing how these instruments work.
+zero-based, mathematical system to express pitches. However, unlike
+*nth Modal Pitch*, *Pitch Number* disregards any tonal framework. It
+is also chromatic by default, meaning that its pitch space includes
+the sharp/flat pitches (black keys on piano) as well as the natural
+pitches (white keys on piano). By default, middle C (C_4) is `0`. The
+C major scale in the 4th octave is `0`, `2`, `4`, `5`, `7`, `9`, and
+`11`. `12` is the C an octave above middle C (C_5). This system is
+useful mathematically, but because it disregards key, it is difficult
+to control when creating music. That being said, fretted instruments
+such as ukulele and guitar use this system to express pitch, so it is
+a good system for expressing how these instruments work.
 
 MIDI also uses a similar system to *Pitch Number* to express pitches,
 but the 0 is offset from Music Blocks' default. In order to change the
@@ -660,9 +672,9 @@ combines math and musical modifiers. When combining numbers and
 accidentals, it recreates the same functionality as the *Scale Degree*
 block.
 
-![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/charts/scale-degree-improv.svg "Scale Degree Improv")
+![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/guide/scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/charts/Scale-Degree-Improv.html)
+[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
