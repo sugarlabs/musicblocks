@@ -75,5 +75,34 @@ function setupOrnamentActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * Rapidly switches between neighboring pitches.
+         *
+         * @param {Number} interval
+         * @param {Number} noteValue
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static doNeighbor(interval, noteValue, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inNeighbor.push(blk);
+            tur.singer.neighborStepPitch.push(interval);
+            tur.singer.neighborNoteValue.push(noteValue);
+
+            let listenerName = "_neighbor_" + turtle + "_" + blk;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.inNeighbor.pop();
+                tur.singer.neighborStepPitch.pop();
+                tur.singer.neighborNoteValue.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
     }
 }
