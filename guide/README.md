@@ -546,8 +546,9 @@ of the context.
 An example of a movable system is Scale Degree. Pitches are expressed
 as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches
 are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor,
-these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. The pitches
-are determined by the tonal context.
+these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. For D
+dorian, these pitches are `D`, `E`, `F`, `G`, `A`, `B`, and `C`. In
+all three examples, the pitches are determined by the tonal context.
 
 ![Scale Degree Movable
  System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-scale-degree.svg
