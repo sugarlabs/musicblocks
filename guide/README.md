@@ -520,25 +520,31 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
 
-#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Pitch Systems: Fixed and Movable and Subsystems
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Fixed and Movable Pitch Systems and their Subsystems
 
-Music Blocks allows users to express and explore musical ideas in a variety of different systems. The main systems of expression are fixed and movable.
+Musicians use a variety of different systems to express and explore musical ideas. This is because there are many different ways to understand something, and music is no different. The two main systems of expression in music are fixed and movable. Both systems are important tools to understanding music.
 
 **Fixed and Movable Systems**
 
-Fixed pitch systems represent pitches in an absolute way. Pitches in a fixed system do not change, regardless of a tonal context such as key. Movable systems, on the other hand, represent pitches in a relative way based on their tonal context.
+Fixed pitch systems represent pitches in an absolute way. Pitches in a fixed system do not change, regardless of a given tonal context (such as key). Movable systems, on the other hand, represent pitches in a relative way based on their tonal context.
 
 One example of a fixed system is alphabet notation. Pitches are expressed as `A`, `B`, `C`, `D`, `E`, `F`, and `G`. Regardless of whether the key is C major or G minor, the pitch G is the same. The pitches are the same regardless of the context.
 
-One example of a movable system is scale degree. Pitches are expressed as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor, these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. The pitches are determined by the tonal context.
+![Alphabet Fixed System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-alphabet.svg "Alphabet (Fixed) System")
 
-One example of a system that is either fixed or movable is solfege. Solfege can either be a fixed system (fixed solfege) or a movable system (movable solfege). Fixed solfege works like the alphabet system; `La` is `A`, `Ti` is `B`, `Do` is `C`, etc. Context does not affect the sounding pitch. Movable solfege works like the scale degree system; For any major, `Do` is 1st scale degree, `Re` is 2nd, `Mi` is 3rd, `Fa` is 4th, etc. 
+One example of a movable system is scale degree. Pitches are expressed as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor, these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. For D dorian, these pitches are `D`, `E`, `F`, `G`, `A`, `B`, and `C`. The pitches are determined by the tonal context.
+
+![Scale Degree Movable System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-scale-degree.svg "Scale Degree (Movable) System")
+
+One example of a system that can be either fixed or movable is solfege. Solfege can either be a fixed system (fixed solfege) or a movable system (movable solfege). Fixed solfege works like the alphabet system; `La` is `A`, `Ti` is `B`, `Do` is `C`, etc. Context does not affect the sounding pitch. Movable solfege works like the scale degree system; For any major, `Do` is 1st scale degree, `Re` is 2nd, `Mi` is 3rd, `Fa` is 4th, etc. 
+
+![Movable Solfege System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-movable-solfege.svg "Movable Solfege System")
 
 Music Blocks users can create and preview code in fixed solfege and movable solfege. Teachers and learners may use either system (or both) to express their musical ideas as well as deepen their understanding of music.
 
 **Using Tonal Context with Movable Systems**
 
-For movable systems an important point of context is its key and mode. For "C Major", the key is "C" and the mode is "Major" or Ionian. Key and mode is important as it lays out the tonal framework--which pitches are "in" and which are "out". It also lays out the function of the pitches within the framework. This is why for scale degrees `1`, `2`, `3`, `4`, and `5`, the expected result for C major is `C`, `D`, `E`, `F`, and `G` (skipping any sharps/flats), while those same scale degrees for D major are `D`, `E`, `F#`, `G`, and `A`. The set of pitches that make up C major have no sharps or flats, so they are skipped. D major has two sharps, `F#` and `C#`. The `F#` is the 3rd scale degree for D major.
+For movable systems an important point of context is its key and mode. For "C Major", the key is "C" and the mode is "Major" or Ionian. Key and mode is important as it lays out the tonal framework--which pitches are "in" and which are "out" of a given key. It also lays out the function of the pitches within the framework. This is why for scale degrees `1`, `2`, `3`, `4`, and `5`, the expected result for C major is `C`, `D`, `E`, `F`, and `G` (skipping any sharps/flats), while those same scale degrees for D major are `D`, `E`, `F#`, `G`, and `A`. The set of pitches that make up C major have no sharps or flats, so they are skipped. D major has two sharps, `F#` and `C#`. The `F#` is the 3rd scale degree for D major.
 
 Scale Degree with *Set Key* is a very powerful tool for expression. It is also very common in music pedagogy. However, because the number values 1-7 are hard wired into this system, it is a tool that works best to express seven pitch tonal frameworks (e.g. major, minor, and common seven pitch scales). For musical ideas where a more purely mathematical form of expression is required, Music Blocks offers the user *nth modal pitch*.
 
@@ -576,9 +582,9 @@ Illustrative Examples:
 
 The following example exposes how the Scale Degree functionality combines math and musical modifiers. When combining numbers and accidentals, it recreates the same functionality as the *Scale Degree* block.
 
-![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/charts/scale-degree-improv.svg "Scale Degree Improv")
+![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/guide/scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/charts/Scale-Degree-Improv.html)
+[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
