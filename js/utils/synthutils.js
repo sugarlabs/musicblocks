@@ -383,7 +383,7 @@ function Synth() {
     this.noteFrequencies = {};
 
     this.newTone = function() {
-        this.tone = new Tone();
+        this.tone = Tone;
     };
 
     this.temperamentChanged = function(temperament, startingPitch) {
@@ -776,7 +776,7 @@ function Synth() {
     // Until we fix #1744, disable recorder on FF
     if (!platform.FF) {
         // recoder breaks with Tone.js v13.8.25
-        // this.recorder = new Recorder(Tone.Master);
+        // this.recorder = new Recorder(Tone.Destination);
     }
 
     // Function that provides default parameters for various synths
@@ -971,9 +971,9 @@ function Synth() {
             "create default poly/default/custom synth for turtle " + turtle
         );
         let default_synth = new Tone.PolySynth(
-            POLYCOUNT,
-            Tone.AMSynth
-        ).toMaster();
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
         instruments[turtle]["custom"] = default_synth;
@@ -1050,8 +1050,8 @@ function Synth() {
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly");
                 builtin_synth = new Tone.PolySynth(
-                    synthOptions.polyphony,
-                    Tone.AMSynth
+                    Tone.AMSynth,
+                    synthOptions.polyphony
                 );
                 break;
             case "noise1":
@@ -1064,7 +1064,7 @@ function Synth() {
             default:
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly (default)");
-                builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+                builtin_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
                 break;
         }
 
@@ -1086,7 +1086,7 @@ function Synth() {
         } else if (sourceName.toLowerCase() === "duosynth") {
             tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
-            tempSynth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+            tempSynth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
         }
 
         return tempSynth;
@@ -1103,31 +1103,31 @@ function Synth() {
                 instrumentName,
                 sourceName,
                 null
-            ).toMaster();
+            ).toDestination();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
                 turtle,
                 instrumentName,
                 sourceName,
                 params
-            ).toMaster();
+            ).toDestination();
         } else if (sourceName in CUSTOM_SYNTHS) {
             instruments[turtle][instrumentName] = this._createCustomSynth(
                 sourceName,
                 params
-            ).toMaster();
+            ).toDestination();
             instrumentsSource[instrumentName] = [0, "poly"];
         } else {
             if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === "http") {
                     instruments[turtle][sourceName] = new Tone.Sampler(
                         sourceName
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName.slice(0, 4) === "file") {
                     instruments[turtle][sourceName] = new Tone.Sampler(
                         sourceName
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName === "drum") {
                     instruments[turtle][sourceName] = this._createSampleSynth(
@@ -1135,7 +1135,7 @@ function Synth() {
                         sourceName,
                         sourceName,
                         null
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 }
             }
@@ -1167,7 +1167,7 @@ function Synth() {
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName].toMaster();
+            return instruments[turtle][sourceName].toDestination();
         }
 
         return null;
@@ -1234,7 +1234,7 @@ function Synth() {
                         paramsFilters[k].filterRolloff
                     );
                     temp_filters.push(filterVal);
-                    synth.chain(temp_filters[k], Tone.Master);
+                    synth.chain(temp_filters[k], Tone.Destination);
                 }
             }
 
@@ -1244,14 +1244,14 @@ function Synth() {
                         1 / paramsEffects.vibratoFrequency,
                         paramsEffects.vibratoIntensity
                     );
-                    synth.chain(vibrato, Tone.Master);
+                    synth.chain(vibrato, Tone.Destination);
                 }
 
                 if (paramsEffects.doDistortion) {
                     var distort = new Tone.Distortion(
                         paramsEffects.distortionAmount
-                    ).toMaster();
-                    synth.connect(distort, Tone.Master);
+                    ).toDestination();
+                    synth.connect(distort, Tone.Destination);
                 }
 
                 if (paramsEffects.doTremolo) {
@@ -1259,7 +1259,7 @@ function Synth() {
                         frequency: paramsEffects.tremoloFrequency,
                         depth: paramsEffects.tremoloDepth
                     })
-                        .toMaster()
+                        .toDestination()
                         .start();
                     synth.chain(tremolo);
                 }
@@ -1269,8 +1269,8 @@ function Synth() {
                         frequency: paramsEffects.rate,
                         octaves: paramsEffects.octaves,
                         baseFrequency: paramsEffects.baseFrequency
-                    }).toMaster();
-                    synth.chain(phaser, Tone.Master);
+                    }).toDestination();
+                    synth.chain(phaser, Tone.Destination);
                 }
 
                 if (paramsEffects.doChorus) {
@@ -1278,8 +1278,8 @@ function Synth() {
                         frequency: paramsEffects.chorusRate,
                         delayTime: paramsEffects.delayTime,
                         depth: paramsEffects.chorusDepth
-                    }).toMaster();
-                    synth.chain(chorusEffect, Tone.Master);
+                    }).toDestination();
+                    synth.chain(chorusEffect, Tone.Destination);
                 }
 
                 if (paramsEffects.doPartials) {
@@ -1491,7 +1491,7 @@ function Synth() {
                 break;
             case 2: // voice sample
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     notes,
                     beatValue,
                     paramsEffects,
@@ -1505,7 +1505,7 @@ function Synth() {
                 }
 
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
@@ -1519,7 +1519,7 @@ function Synth() {
             case 0: // default synth
             default:
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
@@ -1619,7 +1619,7 @@ function Synth() {
 
     this.setMasterVolume = function(volume) {
         let db = Tone.gainToDb(volume / 100);
-        Tone.Master.volume.rampTo(db, 0.01);
+        Tone.Destination.volume.rampTo(db, 0.01);
     };
 
     return this;
