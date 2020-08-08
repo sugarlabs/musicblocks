@@ -234,6 +234,7 @@ function Activity() {
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
+            "activity/turtleactions/PitchActions",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
@@ -564,7 +565,7 @@ function Activity() {
         }
         if (zero)
             changeImage(homeButtonContainer.children[0],GOHOMEFADEDBUTTON,GOHOMEBUTTON);
-        else 
+        else
             changeImage(homeButtonContainer.children[0],GOHOMEBUTTON,GOHOMEFADEDBUTTON);
         };
 
@@ -995,7 +996,7 @@ function Activity() {
                 setKeyBlocks.push(i);
             }
         }
-        
+
         if (!isSetKeyBlockPresent) {
             blocks.findStacks();
             let stacks = blocks.stackList;
@@ -1046,7 +1047,7 @@ function Activity() {
                     } else {
                         logo.blocks.blockList[stacks[i]].connections[1] = setKey;
                     }
-                    
+
                     blocks.adjustExpandableClampBlock();
 
                     blocks._makeNewBlockWithConnections(
@@ -1159,7 +1160,7 @@ function Activity() {
         var keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
         var keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
         let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
-        
+
         wheelnav.cssMode = true;
 
         keyNameWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1209,7 +1210,7 @@ function Activity() {
         modenameWheel.titleRotateAngle = 0;
         modenameWheel.colors = platformColor.modeGroupWheelcolors;
         modenameWheel.animatetime = 0;
-        
+
         modenameWheel.createWheel(modes);
 
         var exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
@@ -1248,7 +1249,7 @@ function Activity() {
             localStorage.KeySignatureEnv = KeySignatureEnv;
             __generateSetKeyBlocks();
         };
-        
+
         exitWheel.navItems[0].navigateFunction = __exitMenu;
 
         let __playNote = (note) => {
@@ -1752,16 +1753,16 @@ function Activity() {
             if ('wheelDelta'  in event) sY = -event.wheelDelta / 120;
             if ('wheelDeltaY' in event) sY = -event.wheelDeltaY / 120;
             if ('wheelDeltaX' in event) sX = -event.wheelDeltaX / 120;
-          
+
             // side scrolling on FF with DOMMouseScroll
             if ( 'axis' in event && event.axis === event.HORIZONTAL_AXIS ) {
               sX = sY;
               sY = 0;
             }
-          
+
             pX = sX * PIXEL_STEP;
             pY = sY * PIXEL_STEP;
-          
+
             if ('deltaY' in event) pY = event.deltaY;
             if ('deltaX' in event) pX = event.deltaX;
 
@@ -1774,11 +1775,11 @@ function Activity() {
                 pY *= PAGE_HEIGHT;
               }
             }
-          
+
             // Fall-back if spin cannot be determined
             if (pX && !sX) sX = (pX < 1) ? -1 : 1;
             if (pY && !sY) sY = (pY < 1) ? -1 : 1;
-          
+
             return { pixelX : pX,
                      pixelY : pY };
         }
@@ -2129,7 +2130,7 @@ function Activity() {
             setTimeout(function() {
                 searchWidget.focus();
                 doSearch();
-            }, 500);    
+            }, 500);
         }
     };
 
@@ -3213,7 +3214,7 @@ function Activity() {
      * Opens samples on planet after closing all sub menus
      */
     _doOpenSamples = function() {
-        if (docById("palette").style.display != "none") 
+        if (docById("palette").style.display != "none")
             docById("palette").style.display = "none";
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         planet.openPlanet();
@@ -3507,7 +3508,7 @@ function Activity() {
                             50
                         )}...`
                     );
-                    
+
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
             } catch (e) {
@@ -4128,7 +4129,7 @@ function Activity() {
             y,
             btnSize,
             0,
-            
+
         )
         that._loadButtonDragHandler(
             homeButtonContainer,
@@ -4141,7 +4142,7 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = 
+        hideBlocksContainer =
             _makeButton(
                 SHOWBLOCKSBUTTON,
                 _("Show/hide block"),
@@ -4154,7 +4155,7 @@ function Activity() {
             hideBlocksContainer,
             x,
             y,
-            _changeBlockVisibility            
+            _changeBlockVisibility
         );
 
         x += dx;
@@ -4337,7 +4338,7 @@ function Activity() {
         let container = document.createElement("div");
         container.setAttribute("id", ""+label);
 
-        
+
         container.setAttribute("class","tooltipped");
         container.setAttribute("data-tooltip",label);
         container.setAttribute("data-position","top");
@@ -4350,7 +4351,7 @@ function Activity() {
                 document.body.style.cursor = "pointer";
             }
         };
-        
+
         container.onmouseout = (event) => {
             if (!loading) {
                 document.body.style.cursor = "default";
@@ -4361,7 +4362,7 @@ function Activity() {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(name)));
-        
+
         container.appendChild(img);
         container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth-x)+"px;  top: "+y+"px;")
         docById("buttoncontainerBOTTOM").appendChild(container);
@@ -4794,7 +4795,7 @@ function Activity() {
 
                 // First, hide the palettes as they will need updating.
                 blocks.palettes._hideMenus(true);
-                
+
                 let __afterLoad = function() {
                     document.removeEventListener(
                         "finishedLoading",
