@@ -1059,34 +1059,16 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let transValue;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let transValue = args[0];
+            if (transValue === null || typeof transValue !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 transValue = 0;
-            } else {
-                transValue = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-            tur.singer.scalarTransposition +=
-                tur.singer.invertList.length > 0 ? transValue : -transValue;
-            tur.singer.scalarTranspositionValues.push(transValue);
-
-            let listenerName = "_scalar_transposition_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                transValue = tur.singer.scalarTranspositionValues.pop();
-                tur.singer.scalarTransposition +=
-                    tur.singer.invertList.length > 0 ? transValue : -transValue;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.PitchActions.setScalarTranspose(transValue, turtle, blk);
 
             return [args[1], 1];
         }

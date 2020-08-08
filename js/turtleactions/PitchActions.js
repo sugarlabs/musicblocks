@@ -523,6 +523,34 @@ function setupPitchActions() {
         }
 
         /**
+         * Shifts the pitches contained inside Note blocks up (or down) the scale.
+         *
+         * @param {Number} transValue - number of steps
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block object index in blocks.blockList
+         * @returns {void}
+         */
+        static setScalarTranspose(transValue, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.scalarTransposition +=
+                tur.singer.invertList.length > 0 ? -transValue : transValue;
+            tur.singer.scalarTranspositionValues.push(transValue);
+
+            let listenerName = "_scalar_transposition_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                transValue = tur.singer.scalarTranspositionValues.pop();
+                tur.singer.scalarTransposition +=
+                    tur.singer.invertList.length > 0 ? transValue : -transValue;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * Shifts the pitches contained inside Note blocks up (or down) by half steps.
          *
          * @param {Number} transValue - number of semitones
@@ -643,8 +671,8 @@ function setupPitchActions() {
         /**
          * Converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al.
          *
-         * @param {*} type - required format: letter class, solfege syllable, pitch class, scalar class, scale degree, nth degree, staff y, pitch number, pitch in hertz
-         * @param {*} turtle - Turtle index in turtles.turtleList
+         * @param {String} type - required format: letter class, solfege syllable, pitch class, scalar class, scale degree, nth degree, staff y, pitch number, pitch in hertz
+         * @param {Number} turtle - Turtle index in turtles.turtleList
          */
         static getPitchInfo(type, turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
@@ -752,7 +780,7 @@ function setupPitchActions() {
         }
 
         /**
-         * Returns change in pithc or scalar change in pitch.
+         * Returns change in pitch or scalar change in pitch.
          *
          * @param {String} outType - either "deltapitch" or "deltascalarpitch" to return
          * @param {Number} turtle - Turtle index in turtles.turtleList
