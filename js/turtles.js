@@ -69,6 +69,7 @@ class Turtles {
         setupPitchActions();
         setupOrnamentActions();
         setupVolumeActions();
+        setupDrumActions();
     }
 
     /**
