@@ -87,6 +87,7 @@ class Singer {
         // Music-related attributes
         this.notesPlayed = [0, 1];
         this.whichNoteToCount = 1;
+        this.tallyNotes = 0;
         this.moveable = false;                  // moveable solfege?
 
         // Parameters used by the note block
@@ -439,6 +440,7 @@ class Singer {
 
         let actionArgs = [];
         let saveNoteCount = tur.singer.notesPlayed;
+        let saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
 
         tur.singer.whichNoteToCount += tur.singer.inNoteBlock.length;
@@ -451,6 +453,7 @@ class Singer {
             tur.singer.notesPlayed, [-saveNoteCount[0], saveNoteCount[1]]
         );
         tur.singer.notesPlayed = saveNoteCount;
+        tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
         console.debug(saveBoxes);
@@ -479,6 +482,96 @@ class Singer {
         tur.butNotThese = {};
 
         return returnValue[0] / returnValue[1];
+    }
+
+    /**
+     * Tally notes inside clamp (with saving of the box, heap and turtle states.)
+     *
+     * @static
+     * @param {Object} logo
+     * @param {Object} turtle
+     * @param {Number} cblk - block number
+     * @returns {Number} number of notes
+     */
+    static numberOfNotes(logo, turtle, cblk) {
+        if (cblk === null)
+            return 0;
+
+        let tur = logo.turtles.ithTurtle(turtle);
+
+        let saveSuppressStatus = tur.singer.suppressOutput;
+
+        // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
+        let saveBoxes = JSON.stringify(logo.boxes);
+        let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+        // .. and the turtle state
+        let saveX = tur.x;
+        let saveY = tur.y;
+        let saveColor = tur.painter.color;
+        let saveValue = tur.painter.value;
+        let saveChroma = tur.painter.chroma;
+        let saveStroke = tur.painter.stroke;
+        let saveCanvasAlpha = tur.painter.canvasAlpha;
+        let saveOrientation = tur.orientation;
+        let savePenState = tur.painter.penState;
+
+        let saveWhichNoteToCount = tur.singer.whichNoteToCount;
+
+        let savePrevTurtleTime = tur.singer.previousTurtleTime;
+        let saveTurtleTime = tur.singer.turtleTime;
+
+        tur.singer.suppressOutput = true;
+        tur.singer.justCounting.push(true);
+
+        for (let b in tur.endOfClampSignals) {
+            tur.butNotThese[b] = [];
+            for (let i in tur.endOfClampSignals[b]) {
+                tur.butNotThese[b].push(i);
+            }
+        }
+
+        let actionArgs = [];
+        let saveNoteCount = tur.singer.notesPlayed;
+        let saveTallyNotes = tur.singer.tallyNotes;
+        tur.running = true;
+
+        tur.singer.whichNoteToCount += tur.singer.inNoteBlock.length;
+
+        logo.runFromBlockNow(
+            logo, turtle, cblk, true, actionArgs, logo.turtles.turtleList[turtle].queue.length
+        );
+        let returnValue = tur.singer.tallyNotes - saveTallyNotes;
+
+        tur.singer.notesPlayed = saveNoteCount;
+        tur.singer.tallyNotes = saveTallyNotes;
+
+        // Restore previous state
+        console.debug(saveBoxes);
+        logo.boxes = JSON.parse(saveBoxes);
+        console.debug(saveTurtleHeaps);
+        logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+
+        tur.painter.doPenUp();
+        tur.painter.doSetXY(saveX, saveY);
+        tur.painter.color = saveColor;
+        tur.painter.value = saveValue;
+        tur.painter.chroma = saveChroma;
+        tur.painter.stroke = saveStroke;
+        tur.painter.canvasAlpha = saveCanvasAlpha;
+        tur.painter.doSetHeading(saveOrientation);
+        tur.painter.penState = savePenState;
+
+        tur.singer.previousTurtleTime = savePrevTurtleTime;
+        tur.singer.turtleTime = saveTurtleTime;
+
+        tur.singer.whichNoteToCount = saveWhichNoteToCount;
+
+        tur.singer.justCounting.pop();
+        tur.singer.suppressOutput = saveSuppressStatus;
+
+        tur.butNotThese = {};
+
+        return returnValue;
     }
 
     /**
@@ -1547,6 +1640,7 @@ class Singer {
 
                 if (tur.singer.inNoteBlock.length === tur.singer.whichNoteToCount) {
                     tur.singer.notesPlayed = rationalSum(tur.singer.notesPlayed, [1, noteValue]);
+                    tur.singer.tallyNotes++ ;
                 }
 
                 var notes = [];
