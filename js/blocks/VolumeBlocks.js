@@ -39,11 +39,7 @@ function setupVolumeBlocks() {
                 let cblk = logo.blocks.blockList[blk].connections[1];
                 if (cblk !== null) {
                     let targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    for (let synth in logo.turtles.ithTurtle(turtle).singer.synthVolume) {
-                        if (synth === targetSynth) {
-                            return last(logo.turtles.ithTurtle(turtle).singer.synthVolume[synth]);
-                        }
-                    }
+                    return Singer.VolumeActions.getSynthVolume(targetSynth, turtle);
                 }
                 return 0;
             }
@@ -82,7 +78,7 @@ function setupVolumeBlocks() {
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {
-                return last(Singer.masterVolume);
+                return Singer.VolumeActions.masterVolume;
             }
         }
     }
@@ -373,84 +369,25 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "string") {
+            let arg0 = args[0];
+            if (arg0 === null || typeof arg0 !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = "electronic synth";
-            } else {
-                arg0 = args[0];
             }
 
+            let arg1;
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
-                if (args[1] < 0) {
-                    arg1 = 0;
-                } else if (args[1] > 100) {
-                    arg1 = 100;
-                } else {
-                    arg1 = args[1];
-                }
+                arg1 = Math.max(Math.min(args[1], 100), 0);
 
                 if (arg1 === 0) {
                     logo.errorMsg(_("Setting volume to 0."), blk);
                 }
             }
 
-            let synth = null;
-
-            if (arg0 === "electronic synth" || arg0 === _("electronic synth")) {
-                synth = "electronic synth";
-            } else if (arg0 === "custom" || arg0 === _("custom")) {
-                synth = "custom";
-            }
-
-            if (synth === null) {
-                for (let voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === arg0) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === arg0) {
-                        synth = arg0;
-                        break;
-                    }
-                }
-            }
-
-            if (synth === null) {
-                for (let drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
-                        synth = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1].replace("-", " ") === arg0) {
-                        synth = arg0;
-                        break;
-                    }
-                }
-            }
-
-            if (synth === null) {
-                logo.errorMsg(synth + "not found", blk);
-                synth = "electronic synth";
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
-                tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
-
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
-            }
-
-            tur.singer.synthVolume[synth].push(args[1]);
-            if (!tur.singer.suppressOutput) {
-                Singer.setSynthVolume(logo, turtle, synth, args[1]);
-            }
+            Singer.VolumeActions.setSynthVolume(arg0, arg1, turtle);
         }
     }
 
@@ -473,22 +410,11 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
             if (args.length === 1) {
-                let arg;
                 if (typeof args[0] !== "number") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
-                    if (args[0] < -100) {
-                        arg = -100;
-                    } else if (args[0] > 100) {
-                        arg = 100;
-                    } else {
-                        arg = args[0];
-                    }
-                    arg /= 100;
-
-                    Singer.setPanner(logo, arg ,turtle);
+                    Singer.VolumeActions.setPanning(args[0], turtle);
                 }
             }
         }
@@ -513,28 +439,11 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
             if (args.length === 1) {
-                let arg;
                 if (typeof args[0] !== "number") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
-                    if (args[0] < 0) {
-                        arg = 0;
-                    } else if (args[0] > 100) {
-                        arg = 100;
-                    } else {
-                        arg = args[0];
-                    }
-
-                    if (arg === 0) {
-                        logo.errorMsg(_("Setting volume to 0."), blk);
-                    }
-
-                    Singer.masterVolume.push(arg);
-                    if (!tur.singer.suppressOutput) {
-                        Singer.setMasterVolume(logo, arg);
-                    }
+                    Singer.VolumeActions.setMasterVolume(args[0], turtle, blk);
                 }
             }
         }
@@ -637,61 +546,16 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 0;
-            } else {
-                arg = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            for (let synth in tur.singer.synthVolume) {
-                let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + arg)) / 100;
-                if (newVolume > 100) {
-                    console.debug("articulated volume exceeds 100%. clipping");
-                    newVolume = 100;
-                } else if (newVolume < -100) {
-                    console.debug("articulated volume exceeds 100%. clipping");
-                    newVolume = -100;
-                }
-
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [newVolume];
-                } else {
-                    tur.singer.synthVolume[synth].push(newVolume);
-                }
-
-                if (!tur.singer.suppressOutput) {
-                    Singer.setSynthVolume(logo, turtle, synth, newVolume);
-                }
-            }
-
-            if (tur.singer.justCounting.length === 0) {
-                logo.notation.notationBeginArticulation(turtle);
-            }
-
-            let listenerName = "_articulation_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                for (let synth in tur.singer.synthVolume) {
-                    tur.singer.synthVolume[synth].pop();
-                    Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
-                }
-
-                if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationEndArticulation(turtle);
-                }
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.VolumeActions.setRelativeVolume(volume, turtle, blk);
 
             return [args[1], 1];
         }
@@ -730,46 +594,10 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
             if (args.length > 1 && args[0] !== 0) {
-                if (logo.blocks.blockList[blk].name === "crescendo") {
-                    tur.singer.crescendoDelta.push(args[0]);
-                } else {
-                    tur.singer.crescendoDelta.push(-args[0]);
-                }
-
-                for (let synth in tur.singer.synthVolume) {
-                    let vol = last(tur.singer.synthVolume[synth]);
-                    tur.singer.synthVolume[synth].push(vol);
-                    if (tur.singer.crescendoInitialVolume[synth] === undefined) {
-                        tur.singer.crescendoInitialVolume[synth] = [vol];
-                    } else {
-                        tur.singer.crescendoInitialVolume[synth].push(vol);
-                    }
-                }
-
-                tur.singer.inCrescendo.push(true);
-
-                let listenerName = "_crescendo_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = event => {
-                    if (tur.singer.justCounting.length === 0) {
-                        logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
-                    }
-
-                    tur.singer.crescendoDelta.pop();
-                    for (let synth in tur.singer.synthVolume) {
-                        let len = tur.singer.synthVolume[synth].length;
-                        tur.singer.synthVolume[synth][len - 1] = last(
-                            tur.singer.crescendoInitialVolume[synth]
-                        );
-                        tur.singer.crescendoInitialVolume[synth].pop();
-                    }
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
+                Singer.VolumeActions.doCrescendo(
+                    logo.blocks.blockList[blk].name, args[0], turtle, blk
+                );
 
                 return [args[1], 1];
             }
