@@ -24,6 +24,83 @@
 function setupDrumActions() {
     Singer.DrumActions = class {
         /**
+         * Plays a drum sound.
+         *
+         * @param {String} drum - drum name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static playDrum(drum, turtle, blk) {
+            let drumname = DEFAULTDRUM;
+            if (drum.slice(0, 4) === "http") {
+                drumname = drum;
+            } else {
+                for (let d in DRUMNAMES) {
+                    if (DRUMNAMES[d][0] === drum) {
+                        drumname = DRUMNAMES[d][1];
+                        break;
+                    } else if (DRUMNAMES[d][1] === drum) {
+                        drumname = drum;
+                        break;
+                    }
+                }
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // If we are in a setdrum clamp, override the drum name
+            if (tur.singer.drumStyle.length > 0) {
+                drumname = last(tur.singer.drumStyle);
+            }
+
+            if (logo.inPitchDrumMatrix) {
+                logo.pitchDrumMatrix.drums.push(drumname);
+                logo.pitchDrumMatrix.addColBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (logo.inMatrix) {
+                logo.pitchTimeMatrix.rowLabels.push(drumname);
+                logo.pitchTimeMatrix.rowArgs.push(-1);
+
+                logo.pitchTimeMatrix.addRowBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                if (tur.singer.synthVolume[drumname] === undefined) {
+                    tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
+                }
+            } else if (
+                logo.blocks.blockList[blk].connections[0] == null &&
+                last(logo.blocks.blockList[blk].connections) == null
+            ) {
+                // Play a stand-alone drum block as a quarter note.
+                logo.clearNoteParams(tur, blk, []);
+                tur.singer.inNoteBlock.push(blk);
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+
+                let noteBeatValue = 4;
+
+                let __callback =
+                    () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+
+                Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
+            } else {
+                console.debug('PLAY DRUM ERROR: missing context');
+                return;
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+            }
+
+            tur.singer.pushedNote = true;
+        }
+
+        /**
          * Select a drum sound to replace the pitch of any contained notes.
          *
          * @param {String} drum - drum name
