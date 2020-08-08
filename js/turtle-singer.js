@@ -495,7 +495,7 @@ class Singer {
         arg = Math.min(Math.max(arg, -1), 1); //(-1 to 1)
 
         if (!tur.singer.panner) {
-            let panner = new Tone.Panner(arg).toMaster();
+            let panner = new Tone.Panner(arg).toDestination();
             tur.singer.panner = panner;
         }
         else {tur.singer.panner.pan.value = arg;}
