@@ -155,30 +155,7 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let drumname = DEFAULTDRUM;
-            for (let drum in DRUMNAMES) {
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
-                }
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.drumStyle.push(drumname);
-
-            let listenerName = "_mapdrum_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => tur.singer.drumStyle.pop();
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
-            if (logo.inRhythmRuler) {
-                logo._currentDrumBlock = blk;
-                logo.rhythmRuler.Drums.push(blk);
-                logo.rhythmRuler.Rulers.push([[], []]);
-            }
+            Singer.DrumActions.mapPitchToDrum(args[0], turtle, blk);
 
             return [args[1], 1];
         }
