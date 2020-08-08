@@ -130,14 +130,14 @@ function setupVolumeActions() {
         static setMasterVolume(volume, turtle, blk) {
             volume = Math.max(Math.min(volume, 100), 0);
 
-            if (arg === 0)
+            if (volume === 0)
                 logo.errorMsg(_("Setting volume to 0."), blk);
 
-            Singer.masterVolume.push(arg);
+            Singer.masterVolume.push(volume);
 
             let tur = logo.turtles.ithTurtle(turtle);
             if (!tur.singer.suppressOutput) {
-                Singer.setMasterVolume(logo, arg);
+                Singer.setMasterVolume(logo, volume);
             }
         }
 
