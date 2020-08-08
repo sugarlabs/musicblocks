@@ -140,5 +140,29 @@ function setupVolumeActions() {
                 Singer.setMasterVolume(logo, arg);
             }
         }
+
+        /**
+         * Sets the panning for all synthesizers.
+         *
+         * @param {Number} value - pan value in range (-1, 1)
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
+         */
+        static setPanning(value, turtle) {
+            value = Math.max(Math.min(value, 100), -100) / 100;
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            if (!tur.singer.panner) {
+                tur.singer.panner = new Tone.Panner(value).toMaster();
+            } else {
+                tur.singer.panner.pan.value = value;
+            }
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                for (let synth in instruments[turtle]) {
+                    instruments[turtle][synth].connect(tur.singer.panner);
+                }
+            }
+        }
     }
 }

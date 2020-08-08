@@ -482,32 +482,6 @@ class Singer {
     }
 
     /**
-     * sets the panValue for synths in range(-1 to 1).
-     *
-     * @static
-     * @param {Object} logo
-     * @param {Number} pan
-     * @param {Object} turtle
-     * @returns {void}
-     */
-    static setPanner(logo, arg, turtle) {
-        let tur = logo.turtles.ithTurtle(turtle);
-        arg = Math.min(Math.max(arg, -1), 1); //(-1 to 1)
-
-        if (!tur.singer.panner) {
-            let panner = new Tone.Panner(arg).toMaster();
-            tur.singer.panner = panner;
-        }
-        else {tur.singer.panner.pan.value = arg;}
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            for (let synth in instruments[turtle]) {
-                instruments[turtle][synth].connect(tur.singer.panner);
-            }
-        }
-    }
-
-    /**
      * Sets the master volume to a value of at least 0 and at most 100.
      *
      * @static
