@@ -556,8 +556,10 @@ class Logo {
         }
 
         Singer.setMasterVolume(logo, DEFAULTVOLUME);
-        for (let synth in this.synthVolume[turtle]) {
-            Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+        for (let turtle in this.turtles.turtleList) {
+            for (let synth in this.turtles.ithTurtle(turtle).singer.synthVolume) {
+                Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+            }
         }
 
         this.synth.start();
