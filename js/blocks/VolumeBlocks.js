@@ -473,22 +473,11 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
             if (args.length === 1) {
-                let arg;
                 if (typeof args[0] !== "number") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
-                    if (args[0] < -100) {
-                        arg = -100;
-                    } else if (args[0] > 100) {
-                        arg = 100;
-                    } else {
-                        arg = args[0];
-                    }
-                    arg /= 100;
-
-                    Singer.setPanner(logo, arg ,turtle);
+                    Singer.VolumeActions.setPanning(args[0], turtle);
                 }
             }
         }
