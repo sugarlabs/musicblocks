@@ -431,8 +431,7 @@ function setupPitchBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
 
             let arg0 = args[0] === null ? "C" : args[0];
-            let arg1 = args[1] === null ? 4 : args[0];
-
+            let arg1 = args[1] === null ? 4 : args[1];
             Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle);
         }
     }
