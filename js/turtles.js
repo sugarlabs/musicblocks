@@ -67,6 +67,7 @@ class Turtles {
      */
     initActions() {
         setupPitchActions();
+        setupOrnamentActions();
     }
 
     /**

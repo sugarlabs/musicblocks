@@ -235,6 +235,7 @@ function Activity() {
             "activity/abc",
             "activity/mxml",
             "activity/turtleactions/PitchActions",
+            "activity/turtleactions/OrnamentActions",
             "activity/blocks/RhythmBlocks",
             "activity/blocks/MeterBlocks",
             "activity/blocks/PitchBlocks",
@@ -2079,7 +2080,7 @@ function Activity() {
                 if (blocks.protoBlockDict[i].deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
-                    searchSuggestions.push({label : blockLabel ,value : blocks.protoBlockDict[i].name ,specialDict :blocks.protoBlockDict[i] }); 
+                    searchSuggestions.push({label : blockLabel ,value : blocks.protoBlockDict[i].name ,specialDict :blocks.protoBlockDict[i] });
                 }
             }
         }
