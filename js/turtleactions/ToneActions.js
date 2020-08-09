@@ -23,8 +23,53 @@
  */
 function setupToneActions() {
     Singer.ToneActions = class {
-        static test() {
-            console.log("This is a test");
+        /**
+         * Selects a voice for the synthesizer.
+         *
+         * @param {String} instrument - timbre name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static setTimbre(instrument, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.inSetTimbre = true;
+
+            let synth = instrument;
+            for (let voice in VOICENAMES) {
+                if (VOICENAMES[voice][0] === instrument) {
+                    synth = VOICENAMES[voice][1];
+                    break;
+                } else if (VOICENAMES[voice][1] === instrument) {
+                    synth = instrument;
+                    break;
+                }
+            }
+
+            if (logo.inMatrix) {
+                logo.pitchTimeMatrix._instrumentName = synth;
+            }
+
+            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+                tur.singer.instrumentNames.push(synth);
+                logo.synth.loadSynth(turtle, synth);
+
+                if (tur.singer.synthVolume[synth] === undefined) {
+                    tur.singer.synthVolume[synth] = [last(Singer.masterVolume)];
+                    tur.singer.crescendoInitialVolume[synth] = [last(Singer.masterVolume)];
+                }
+            }
+
+            let listenerName = "_settimbre_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.inSetTimbre = false;
+                tur.singer.instrumentNames.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 }

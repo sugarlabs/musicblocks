@@ -876,51 +876,15 @@ function setupToneBlocks() {
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                tur.inSetTimbre = true;
-
-                let synth = args[0];
-                for (let voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === args[0]) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === args[0]) {
-                        synth = args[0];
-                        break;
-                    }
-                }
-
-                if (logo.inMatrix) {
-                    logo.pitchTimeMatrix._instrumentName = synth;
-                }
-
-                if (tur.singer.instrumentNames.indexOf(synth) === -1) {
-                    tur.singer.instrumentNames.push(synth);
-                    logo.synth.loadSynth(turtle, synth);
-
-                    if (tur.singer.synthVolume[synth] === undefined) {
-                        tur.singer.synthVolume[synth] = [last(Singer.masterVolume)];
-                        tur.singer.crescendoInitialVolume[synth] = [last(Singer.masterVolume)];
-                    }
-                }
-
-                let listenerName = "_settimbre_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = event => {
-                    tur.inSetTimbre = false;
-                    tur.singer.instrumentNames.pop();
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
-
                 if (logo.inRhythmRuler) {
                     logo._currentDrumBlock = blk;
                     logo.rhythmRuler.Drums.push(blk);
                     logo.rhythmRuler.Rulers.push([[], []]);
                 }
+
+                Singer.ToneActions.setTimbre(args[0], turtle, blk);
             }
+
             return [args[1], 1];
         }
     }
