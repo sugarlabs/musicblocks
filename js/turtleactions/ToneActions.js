@@ -152,17 +152,35 @@ function setupToneActions() {
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
+        }
 
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusActive"] = true;
-                logo.timbre.chorusEffect.push(blk);
-                logo.timbre.chorusParams.push(last(tur.singer.chorusRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = chorusRate;
-                logo.timbre.chorusParams.push(last(tur.singer.delayTime));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = delayTime;
-                logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = chorusDepth;
-            }
+        /**
+         * Adds a sweeping sound.
+         *
+         * @param {*} rate
+         * @param {*} octaves
+         * @param {*} baseFrequency
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static doPhaser(rate, octaves, baseFrequency, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.rate.push(rate);
+            tur.singer.octaves.push(octaves);
+            tur.singer.baseFrequency.push(baseFrequency);
+
+            let listenerName = "_phaser_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.rate.pop();
+                tur.singer.octaves.pop();
+                tur.singer.baseFrequency.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 }

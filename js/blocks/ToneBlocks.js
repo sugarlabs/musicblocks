@@ -556,26 +556,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let rate = args[0];
-            let octaves = args[1];
-            let baseFrequency = args[2];
+            Singer.ToneActions.doPhaser(args[0], args[1], args[2], turtle, blk);
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.rate.push(rate);
-            tur.singer.octaves.push(octaves);
-            tur.singer.baseFrequency.push(baseFrequency);
-
-            let listenerName = "_phaser_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.rate.pop();
-                tur.singer.octaves.pop();
-                tur.singer.baseFrequency.pop();
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["phaserActive"] = true;
                 logo.timbre.phaserEffect.push(blk);
@@ -616,6 +598,17 @@ function setupToneBlocks() {
 
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
+
+            if (logo.inTimbre) {
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusActive"] = true;
+                logo.timbre.chorusEffect.push(blk);
+                logo.timbre.chorusParams.push(last(tur.singer.chorusRate));
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = chorusRate;
+                logo.timbre.chorusParams.push(last(tur.singer.delayTime));
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = delayTime;
+                logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = chorusDepth;
+            }
 
             return [args[3], 1];
         }
