@@ -436,22 +436,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let distortion = args[0] / 100;
-            if (distortion < 0 || distortion > 1) {
-                logo.errorMsg(_("Distortion must be from 0 to 100."), blk);
-                logo.stopTurtle = true;
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.distortionAmount.push(distortion);
-
-            let listenerName = "_distortion_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            logo.setTurtleListener(
-                turtle, listenerName, event => tur.singer.distortionAmount.pop()
-            );
+            Singer.ToneActions.doDistortion(args[0], turtle, blk);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;

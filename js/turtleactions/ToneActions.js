@@ -216,5 +216,33 @@ function setupToneActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * Adds distortion to the pitches.
+         *
+         * @param {Number} distortion
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static doDistortion(distortion, turtle, blk) {
+            distortion /= 100;
+
+            if (distortion < 0 || distortion > 1) {
+                logo.errorMsg(_("Distortion must be from 0 to 100."), blk);
+                logo.stopTurtle = true;
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.distortionAmount.push(distortion);
+
+            let listenerName = "_distortion_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            logo.setTurtleListener(
+                turtle, listenerName, event => tur.singer.distortionAmount.pop()
+            );
+        }
     }
 }
