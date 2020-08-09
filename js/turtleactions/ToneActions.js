@@ -71,5 +71,51 @@ function setupToneActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * Adds a rapid, slight variation in pitch.
+         *
+         * @param {Number} intensity
+         * @param {Number} rate
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static doVibrato(intensity, rate, turtle, blk) {
+            if (intensity < 1 || intensity > 100) {
+                logo.errorMsg(_("Vibrato intensity must be between 1 and 100."), blk);
+                logo.stopTurtle = true;
+            }
+
+            if (rate <= 0) {
+                logo.errorMsg(_("Vibrato rate must be greater than 0."), blk);
+                logo.stopTurtle = true;
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.vibratoIntensity.push(intensity / 100);
+            tur.singer.vibratoRate.push(1 / rate);
+
+            let listenerName = "_vibrato_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.vibratoIntensity.pop();
+                tur.singer.vibratoRate.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (logo.inTimbre) {
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoActive"] = true;
+                logo.timbre.vibratoEffect.push(blk);
+                logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoIntensity"] =
+                    tur.singer.vibratoIntensity;
+                logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoFrequency"] = rate;
+            }
+        }
     }
 }

@@ -687,47 +687,8 @@ function setupToneBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            let intensity = args[0];
-            let rate = args[1];
-
-            if (intensity < 1 || intensity > 100) {
-                logo.errorMsg(
-                    _("Vibrato intensity must be between 1 and 100."),
-                    blk
-                );
-                logo.stopTurtle = true;
-            }
-
-            if (rate <= 0) {
-                logo.errorMsg(_("Vibrato rate must be greater than 0."), blk);
-                logo.stopTurtle = true;
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.vibratoIntensity.push(intensity / 100);
-            tur.singer.vibratoRate.push(1 / rate);
-
-            let listenerName = "_vibrato_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.vibratoIntensity.pop();
-                tur.singer.vibratoRate.pop();
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
-
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoActive"] = true;
-                logo.timbre.vibratoEffect.push(blk);
-                logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoIntensity"] =
-                    tur.singer.vibratoIntensity;
-                logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoFrequency"] = rate;
-            }
+        flow(args, logo, turtle, blk) {
+            Singer.ToneActions.doVibrato(args[0], args[1], turtle, blk);
 
             return [args[2], 1];
         }
