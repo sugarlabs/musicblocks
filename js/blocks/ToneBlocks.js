@@ -97,52 +97,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let synthVibratoRate;
-            let synthVibratoAmount;
-            if (logo.inTimbre) {
-                if (logo.timbre.osc.length != 0) {
-                    logo.errorMsg(
-                        _("Unable to use synth due to existing oscillator")
-                    );
-                }
-
-                logo.timbre.duoSynthParams = [];
-            }
-
-            let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 10;
-            } else {
-                arg0 = args[0];
-            }
-
-            if (args[1] === null || typeof args[1] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 50;
-            } else {
-                arg1 = args[1];
-            }
-
-            synthVibratoRate = Math.abs(arg0);
-            synthVibratoAmount = Math.abs(arg1) / 100;
-
-            if (logo.inTimbre) {
-                logo.timbre.duoSynthParamVals["vibratoRate"] = synthVibratoRate;
-                logo.timbre.duoSynthParamVals[
-                    "vibratoAmount"
-                ] = synthVibratoAmount;
-                logo.synth.createSynth(
-                    turtle,
-                    logo.timbre.instrumentName,
-                    "duosynth",
-                    logo.timbre.duoSynthParamVals
-                );
-
-                logo.timbre.duoSynthesizer.push(blk);
-                logo.timbre.duoSynthParams.push(synthVibratoRate);
-                logo.timbre.duoSynthParams.push(synthVibratoAmount);
-            }
+            Singer.ToneActions.defDuoSynth(args[0], args[1], turtle, blk);
         }
     }
 

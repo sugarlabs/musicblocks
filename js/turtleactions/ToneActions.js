@@ -356,5 +356,47 @@ function setupToneActions() {
                 logo.timbre.AMSynthParams.push(harmonicity);
             }
         }
+
+        /**
+         * Duo-frequency Modulator used to define a timbre.
+         *
+         * @param {Number} synthVibratoRate
+         * @param {Number} synthVibratoAmount
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static defDuoSynth(synthVibratoRate, synthVibratoAmount, turtle, blk) {
+            if (logo.inTimbre) {
+                if (logo.timbre.osc.length != 0) {
+                    logo.errorMsg(_("Unable to use synth due to existing oscillator"));
+                }
+                logo.timbre.duoSynthParams = [];
+            }
+
+            if (synthVibratoRate === null || typeof synthVibratoRate !== "number") {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                synthVibratoRate = 10;
+            }
+
+            if (synthVibratoAmount === null || typeof synthVibratoAmount !== "number") {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                synthVibratoAmount = 50;
+            }
+
+            synthVibratoRate = Math.abs(synthVibratoRate);
+            synthVibratoAmount = Math.abs(synthVibratoAmount) / 100;
+
+            if (logo.inTimbre) {
+                logo.timbre.duoSynthParamVals["vibratoRate"] = synthVibratoRate;
+                logo.timbre.duoSynthParamVals["vibratoAmount"] = synthVibratoAmount;
+                logo.synth.createSynth(
+                    turtle, logo.timbre.instrumentName, "duosynth", logo.timbre.duoSynthParamVals
+                );
+
+                logo.timbre.duoSynthesizer.push(blk);
+                logo.timbre.duoSynthParams.push(synthVibratoRate);
+                logo.timbre.duoSynthParams.push(synthVibratoAmount);
+            }
+        }
     }
 }
