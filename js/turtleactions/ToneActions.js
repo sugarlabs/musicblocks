@@ -320,5 +320,41 @@ function setupToneActions() {
                 logo.timbre.FMSynthParams.push(modulationIndex);
             }
         }
+
+        /**
+         * Amplitude Modulator used to define a timbre.
+         *
+         * @param {Number} harmonicity
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static defAMSynth(harmonicity, turtle, blk) {
+            if (logo.inTimbre) {
+                logo.timbre.AMSynthParams = [];
+                if (logo.timbre.osc.length != 0) {
+                    logo.errorMsg(_("Unable to use synth due to existing oscillator"));
+                }
+            }
+
+            if (harmonicity === null || typeof harmonicity !== "number") {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                harmonicity = 1;
+            }
+
+            if (harmonicity < 0) {
+                logo.errorMsg(_("The input cannot be negative."));
+                harmonicity = -harmonicity;
+            }
+
+            if (logo.inTimbre) {
+                logo.timbre.amSynthParamvals["harmonicity"] = harmonicity;
+                logo.synth.createSynth(
+                    turtle, logo.timbre.instrumentName, "amsynth", logo.timbre.amSynthParamvals
+                );
+
+                logo.timbre.AMSynthesizer.push(blk);
+                logo.timbre.AMSynthParams.push(harmonicity);
+            }
+        }
     }
 }

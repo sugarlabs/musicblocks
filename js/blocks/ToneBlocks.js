@@ -166,43 +166,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let harmonicity;
-            if (logo.inTimbre) {
-                logo.timbre.AMSynthParams = [];
-                if (logo.timbre.osc.length != 0) {
-                    logo.errorMsg(
-                        _("Unable to use synth due to existing oscillator")
-                    );
-                }
-            }
-
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
-            } else {
-                arg = args[0];
-            }
-
-            if (arg < 0) {
-                logo.errorMsg(_("The input cannot be negative."));
-                harmonicity = -arg;
-            } else {
-                harmonicity = arg;
-            }
-
-            if (logo.inTimbre) {
-                logo.timbre.amSynthParamvals["harmonicity"] = harmonicity;
-                logo.synth.createSynth(
-                    turtle,
-                    logo.timbre.instrumentName,
-                    "amsynth",
-                    logo.timbre.amSynthParamvals
-                );
-
-                logo.timbre.AMSynthesizer.push(blk);
-                logo.timbre.AMSynthParams.push(harmonicity);
-            }
+            Singer.ToneActions.defAMSynth(args[0], turtle, blk);
         }
     }
 
