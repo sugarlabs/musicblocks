@@ -1370,6 +1370,8 @@ input.timbreName {
     width: 350px;
     margin: auto;
     z-index: 10;
+    background: #f2f2f2;
+    border-radius: 50%;
     position: fixed;
 }
 
@@ -1384,6 +1386,9 @@ input.timbreName {
     z-index: 10;
     position: fixed;
     display: none;
+    background: #f2f2f2;
+    font-family: sans-serif;
+    text-align: center;
 }
 
 .radioBtn {
