@@ -226,45 +226,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let modulationIndex;
-            if (logo.inTimbre) {
-                logo.timbre.FMSynthParams = [];
-                if (logo.timbre.osc.length != 0) {
-                    logo.errorMsg(
-                        _("Unable to use synth due to existing oscillator")
-                    );
-                }
-            }
-
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 10;
-            } else {
-                arg = args[0];
-            }
-
-            if (arg < 0) {
-                logo.errorMsg(_("The input cannot be negative."));
-                modulationIndex = -arg;
-            } else {
-                modulationIndex = arg;
-            }
-
-            if (logo.inTimbre) {
-                logo.timbre.fmSynthParamvals[
-                    "modulationIndex"
-                ] = modulationIndex;
-                logo.synth.createSynth(
-                    turtle,
-                    logo.timbre.instrumentName,
-                    "fmsynth",
-                    logo.timbre.fmSynthParamvals
-                );
-
-                logo.timbre.FMSynthesizer.push(blk);
-                logo.timbre.FMSynthParams.push(modulationIndex);
-            }
+            Singer.ToneActions.defFMSynth(args[0], turtle, blk);
         }
     }
 
@@ -382,36 +344,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (typeof args[0] !== "number" || args[0] < 0) {
-                //.TRANS: partials components in a harmonic series
-                logo.errorMsg(_("Partial must be greater than or equal to 0."));
-                logo.stopTurtle = true;
-                return;
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.inHarmonic.push(blk);
-            tur.singer.partials.push([]);
-            let n = tur.singer.partials.length - 1;
-
-            for (let i = 0; i < args[0]; i++) {
-                tur.singer.partials[n].push(0);
-            }
-
-            tur.singer.partials[n].push(1);
-            logo.notation.notationBeginHarmonics(turtle);
-
-            let listenerName = "_harmonic_" + turtle + "_" + blk;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.inHarmonic.pop();
-                tur.singer.partials.pop();
-                logo.notation.notationEndHarmonics(turtle);
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.ToneActions.doHarmonic(args[0], turtle, blk);
 
             return [args[1], 1];
         }

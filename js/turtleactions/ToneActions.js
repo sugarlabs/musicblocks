@@ -244,5 +244,81 @@ function setupToneActions() {
                 turtle, listenerName, event => tur.singer.distortionAmount.pop()
             );
         }
+
+        /**
+         * Adds harmonic to the contained notes.
+         *
+         * @param {Number} harmonic
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static doHarmonic(harmonic, turtle, blk) {
+            if (typeof harmonic !== "number" || harmonic < 0) {
+                //.TRANS: partials components in a harmonic series
+                logo.errorMsg(_("Partial must be greater than or equal to 0."));
+                logo.stopTurtle = true;
+                return;
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.inHarmonic.push(blk);
+            tur.singer.partials.push([]);
+            let n = tur.singer.partials.length - 1;
+
+            for (let i = 0; i < harmonic; i++) {
+                tur.singer.partials[n].push(0);
+            }
+
+            tur.singer.partials[n].push(1);
+            logo.notation.notationBeginHarmonics(turtle);
+
+            let listenerName = "_harmonic_" + turtle + "_" + blk;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.inHarmonic.pop();
+                tur.singer.partials.pop();
+                logo.notation.notationEndHarmonics(turtle);
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Frequency Modulator used to define a timbre.
+         *
+         * @param {Number} modulationIndex
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block index in blocks.blockList
+         */
+        static defFMSynth(modulationIndex, turtle, blk) {
+            if (logo.inTimbre) {
+                logo.timbre.FMSynthParams = [];
+                if (logo.timbre.osc.length != 0) {
+                    logo.errorMsg(_("Unable to use synth due to existing oscillator"));
+                }
+            }
+
+            if (modulationIndex === null || typeof modulationIndex !== "number") {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                modulationIndex = 10;
+            }
+
+            if (modulationIndex < 0) {
+                logo.errorMsg(_("The input cannot be negative."));
+                modulationIndex = -arg;
+            }
+
+            if (logo.inTimbre) {
+                logo.timbre.fmSynthParamvals["modulationIndex"] = modulationIndex;
+                logo.synth.createSynth(
+                    turtle, logo.timbre.instrumentName, "fmsynth", logo.timbre.fmSynthParamvals
+                );
+
+                logo.timbre.FMSynthesizer.push(blk);
+                logo.timbre.FMSynthParams.push(modulationIndex);
+            }
+        }
     }
 }
