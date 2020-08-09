@@ -499,29 +499,8 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let frequency = args[0];
-            let depth = args[1] / 100;
+            Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
 
-            if (depth < 0 || depth > 1) {
-                //.TRANS: Depth is the intesity of the tremolo or chorus effect.
-                logo.errorMsg(_("Depth is out of range."), blk);
-                logo.stopTurtle = true;
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.tremoloFrequency.push(frequency);
-            tur.singer.tremoloDepth.push(depth);
-
-            let listenerName = "_tremolo_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.tremoloFrequency.pop();
-                tur.singer.tremoloDepth.pop();
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
                 logo.timbre.tremoloEffect.push(blk);

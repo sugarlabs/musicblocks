@@ -157,9 +157,9 @@ function setupToneActions() {
         /**
          * Adds a sweeping sound.
          *
-         * @param {*} rate
-         * @param {*} octaves
-         * @param {*} baseFrequency
+         * @param {Number} rate
+         * @param {Number} octaves
+         * @param {Number} baseFrequency
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
@@ -178,6 +178,40 @@ function setupToneActions() {
                 tur.singer.rate.pop();
                 tur.singer.octaves.pop();
                 tur.singer.baseFrequency.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Adds a wavering effect.
+         *
+         * @param {Number} frequency
+         * @param {Number} depth
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static doTremolo(frequency, depth, turtle, blk) {
+            depth /= 100;
+
+            if (depth < 0 || depth > 1) {
+                //.TRANS: Depth is the intesity of the tremolo or chorus effect.
+                logo.errorMsg(_("Depth is out of range."), blk);
+                logo.stopTurtle = true;
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.tremoloFrequency.push(frequency);
+            tur.singer.tremoloDepth.push(depth);
+
+            let listenerName = "_tremolo_" + turtle;
+            if (blk !== undefined && blk in logo.blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.tremoloFrequency.pop();
+                tur.singer.tremoloDepth.pop();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
