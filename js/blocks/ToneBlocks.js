@@ -615,42 +615,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let chorusRate = args[0];
-            let delayTime = args[1];
-            let chorusDepth = args[2] / 100;
-
-            if (chorusDepth < 0 || chorusDepth > 1) {
-                logo.errorMsg(_("Depth is out of range."), blk);
-                logo.stopTurtle = true;
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.chorusRate.push(chorusRate);
-            tur.singer.delayTime.push(delayTime);
-            tur.singer.chorusDepth.push(chorusDepth);
-
-            let listenerName = "_chorus_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.chorusRate.pop();
-                tur.singer.delayTime.pop();
-                tur.singer.chorusDepth.pop();
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
-
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusActive"] = true;
-                logo.timbre.chorusEffect.push(blk);
-                logo.timbre.chorusParams.push(last(tur.singer.chorusRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = chorusRate;
-                logo.timbre.chorusParams.push(last(tur.singer.delayTime));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = delayTime;
-                logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = chorusDepth;
-            }
+            Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
 
             return [args[3], 1];
         }
