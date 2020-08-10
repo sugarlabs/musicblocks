@@ -47,7 +47,7 @@ class MusicBlocks {
                     this.turtle.painter[command](...args);
                 }
             }
-            setTimeout(resolve, 250);
+            setTimeout(resolve, 100);
         });
     }
 
@@ -84,27 +84,15 @@ class MusicBlocks {
     }
 
     drawBezier(x, y) {
-        return this.runCommand("doBezier", [
-            logo.cp1x[this.turtle],
-            logo.cp1y[this.turtle],
-            logo.cp2x[this.turtle],
-            logo.cp2y[this.turtle],
-            x, y
-        ]);
+        return this.runCommand("doBezier", [x, y]);
     }
 
     setBezierControlPoint1(x, y) {
-        return this.runCommand(
-            "_anonymous",
-            () => [logo.cp1x[this.turtle], logo.cp1y[this.turtle]] = [x, y]
-        );
+        return this.runCommand("setControlPoint1", [x, y]);
     }
 
     setBezierControlPoint2(x, y) {
-        return this.runCommand(
-            "_anonymous",
-            () => [logo.cp2x[this.turtle], logo.cp2y[this.turtle]] = [x, y]
-        );
+        return this.runCommand("setControlPoint2", [x, y]);
     }
 
     clear() {
@@ -185,7 +173,7 @@ class MusicBlocks {
     }
 
     fillBackground() {
-        return this.runCommand("_anonymous", () => logo.setBackgroundColor(turtle));
+        return this.runCommand("_anonymous", () => logo.turtles.setBackgroundColor(turtle));
     }
 
     setFont(fontname) {
