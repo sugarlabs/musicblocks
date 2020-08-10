@@ -305,8 +305,8 @@ function setupMediaBlocks() {
             });
         }
 
-        arg() {
-            // No need to do anything here.
+        arg(logo, turtle, blk, receivedArg) {
+	    return logo.blocks.blockList[blk].value;
         }
     }
 
