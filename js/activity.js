@@ -235,6 +235,7 @@ function Activity() {
             "activity/abc",
             "activity/mxml",
             "activity/turtleactions/PitchActions",
+            "activity/turtleactions/ToneActions",
             "activity/turtleactions/OrnamentActions",
             "activity/turtleactions/VolumeActions",
             "activity/turtleactions/DrumActions",
