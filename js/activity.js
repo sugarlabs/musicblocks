@@ -2308,6 +2308,9 @@ function Activity() {
     let keyboardEnableFlag;
 
     function __keyPressed(event) {
+        if (window.widgetWindows.isOpen("JavaScript Editor") === true)
+            return;
+
         let that = this;
         let disableKeys;
 
