@@ -219,6 +219,7 @@ function Activity() {
         let MUSICBLOCKS_EXTRAS = [
             "Tone",
             "widgets/widgetWindows",
+            "widgets/jseditor",
             "widgets/modewidget",
             "widgets/meterwidget",
             "widgets/pitchtimematrix",
@@ -1405,10 +1406,6 @@ function Activity() {
         if (j !== -1) {
             modenameWheel.navigateWheel(j);
         }
-    };
-
-    toggleJSWindow = () => {
-        console.log("Success");
     };
 
     // DEPRECATED
@@ -4224,6 +4221,14 @@ function Activity() {
     //     p.popdown();
     // };
 
+    /**
+     * Toggles display of javaScript editor widget.
+     */
+    _toggleJSWindow = () => {
+        let jsEditor = new JSEditor();
+        jsEditor.init();
+    };
+
     /*
      * Shows help page
      */
@@ -5018,7 +5023,7 @@ function Activity() {
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderChooseKeyIcon(chooseKeyMenu);
-        toolbar.renderJavaScriptIcon(toggleJSWindow);
+        toolbar.renderJavaScriptIcon(_toggleJSWindow);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 
