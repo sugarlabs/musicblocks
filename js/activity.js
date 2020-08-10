@@ -1407,6 +1407,10 @@ function Activity() {
         }
     };
 
+    toggleJSWindow = () => {
+        console.log("Success");
+    };
+
     // DEPRECATED
     doStopButton = function() {
         blocks.activeBlock = null;
@@ -5014,6 +5018,7 @@ function Activity() {
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderChooseKeyIcon(chooseKeyMenu);
+        toolbar.renderJavaScriptIcon(toggleJSWindow);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 
