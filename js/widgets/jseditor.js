@@ -28,13 +28,14 @@ class JSEditor {
     init() {
         this.isOpen = true;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "JavaScript Editor", "JavaScript Editor");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        widgetWindow.show();
+        this.widgetWindow =
+            window.widgetWindows.windowFor(this, "JavaScript Editor", "JavaScript Editor");
+        this.widgetWindow.clear();
+        this.widgetWindow.show();
+        this.widgetWindow.setPosition(160, 160);
 
         let that = this;
-        widgetWindow.onClose = function() {
+        this.widgetWindow.onClose = function() {
             that.isOpen = false;
             this.destroy();
         };
@@ -47,14 +48,73 @@ class JSEditor {
     }
 
     setup() {
-        this._editor.style.width = "30rem";
-        this._editor.style.height = "30rem";
-        this._editor.style.background = "#0984e3";
+        this._editor.style.width = "35rem";
+        this._editor.style.height = "40rem";
+        this._editor.style.display = "flex";
+        this._editor.style.flexDirection = "column";
 
-        this._editor.innerHTML = "ALL THE CODE GOES IN HERE";
+        let menubar = document.createElement("div");
+            menubar.id = "js_editor_menu";
+            menubar.style.width = "100%";
+            menubar.style.height = "3rem";
+            menubar.style.display = "flex";
+            menubar.style.flexDirection = "row";
+            menubar.style.justifyContent = "end";
+            menubar.style.alignItems = "center";
+            menubar.style.background = "#1e88e5";
+            menubar.style.color = "white";
+
+            let generateBtn = document.createElement("span");
+                generateBtn.classList.add("material-icons");
+                generateBtn.style.borderRadius = "50%";
+                generateBtn.style.padding = ".25rem";
+                generateBtn.style.marginLeft = ".75rem";
+                generateBtn.style.fontSize = "2rem";
+                generateBtn.style.background = "#2196f3";
+                generateBtn.style.cursor = "pointer";
+                generateBtn.innerHTML = "autorenew";
+                generateBtn.onclick = this.generateCode;
+            menubar.appendChild(generateBtn);
+
+            let runBtn = document.createElement("span");
+                runBtn.classList.add("material-icons");
+                runBtn.style.borderRadius = "50%";
+                runBtn.style.padding = ".25rem";
+                runBtn.style.marginLeft = ".75rem";
+                runBtn.style.fontSize = "2rem";
+                runBtn.style.background = "#2196f3";
+                runBtn.style.cursor = "pointer";
+                runBtn.innerHTML = "play_arrow";
+                runBtn.onclick = this.runCode;
+            menubar.appendChild(runBtn);
+        this._editor.appendChild(menubar);
+
+        let codebox = document.createElement("textarea");
+            codebox.id = "js_editor_codebox";
+            codebox.name = "codebox";
+            codebox.style.width = "100%";
+            codebox.style.height = "calc(100% - 3rem)";
+            codebox.style.boxSizing = "border-box";
+            codebox.style.padding = ".25rem";
+            codebox.style.resize = "none";
+        this._editor.appendChild(codebox);
 
         this.widgetWindow.getWidgetBody().append(this._editor);
 
         this.widgetWindow.takeFocus();
+    }
+
+    runCode() {
+        console.log("Run JavaScript");
+        let codebox = docById("js_editor_codebox");
+        try {
+            new Function(codebox.value)();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    generateCode() {
+        console.log("Generate JavaScript");
     }
 }
