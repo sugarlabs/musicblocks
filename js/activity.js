@@ -3920,7 +3920,6 @@ function Activity() {
                 switch (myBlock.name) {
                     case "namedbox":
                     case "namedarg":
-                    case "outputtools":
                         args = {
                             value: myBlock.privateData
                         };
@@ -3998,6 +3997,7 @@ function Activity() {
                     case "nameddoArg":
                     case "namedcalc":
                     case "namedcalcArg":
+                    case "outputtools":
                         args = {
                             value: myBlock.privateData
                         };

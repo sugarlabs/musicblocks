@@ -5230,7 +5230,6 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
-                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
@@ -5255,7 +5254,8 @@ function Blocks(activity) {
                     "nameddo",
                     "namedcalc",
                     "nameddoArg",
-                    "namedcalcArg"
+                    "namedcalcArg",
+                    "outputtools"
                 ].indexOf(myBlock.name) !== -1
             ) {
                 blockItem = [
@@ -6278,7 +6278,7 @@ function Blocks(activity) {
                         var value = args[1];
                         that.blockList[thisBlock].privateData = value;
                         that.blockList[thisBlock].overrideName = value;
-                    }
+                    };
                     this._makeNewBlockWithConnections(
                         "outputtools",
                         blockOffset,
