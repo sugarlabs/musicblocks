@@ -43,6 +43,8 @@ class JSEditor {
         // Position the widget and make it visible
         this._editor = document.createElement("div");
 
+        this._code = null;
+
         // Give the DOM time to create the div
         setTimeout(() => this.setup(), 100);
     }
@@ -54,7 +56,6 @@ class JSEditor {
         this._editor.style.flexDirection = "column";
 
         let menubar = document.createElement("div");
-            menubar.id = "js_editor_menu";
             menubar.style.width = "100%";
             menubar.style.height = "3rem";
             menubar.style.display = "flex";
@@ -73,7 +74,7 @@ class JSEditor {
                 generateBtn.style.background = "#2196f3";
                 generateBtn.style.cursor = "pointer";
                 generateBtn.innerHTML = "autorenew";
-                generateBtn.onclick = this.generateCode;
+                generateBtn.onclick = this.generateCode.bind(this);
             menubar.appendChild(generateBtn);
 
             let runBtn = document.createElement("span");
@@ -85,19 +86,78 @@ class JSEditor {
                 runBtn.style.background = "#2196f3";
                 runBtn.style.cursor = "pointer";
                 runBtn.innerHTML = "play_arrow";
-                runBtn.onclick = this.runCode;
+                runBtn.onclick = this.runCode.bind(this);
             menubar.appendChild(runBtn);
         this._editor.appendChild(menubar);
 
-        let codebox = document.createElement("textarea");
-            codebox.id = "js_editor_codebox";
-            codebox.name = "codebox";
+        let codebox = document.createElement("div");
+            codebox.classList.add("editor");
+            codebox.classList.add("language-js");
             codebox.style.width = "100%";
             codebox.style.height = "calc(100% - 3rem)";
             codebox.style.boxSizing = "border-box";
             codebox.style.padding = ".25rem";
-            codebox.style.resize = "none";
+            codebox.style.fontFamily = '"PT Mono", monospace';
+            codebox.style.fontSize = "14px";
+            codebox.style.fontWeight = "400";
+            codebox.style.letterSpacing = "normal";
+            codebox.style.lineHeight = "20px";
+            codebox.style.resize = "none !important";
+            codebox.style.tabSize = "4";
+            codebox.style.cursor = "text";
         this._editor.appendChild(codebox);
+
+        const highlight = (editor) => {
+            editor.textContent = editor.textContent;
+            hljs.highlightBlock(editor);
+        };
+
+        let jar = new CodeJar(codebox, highlight);
+
+        let code =
+`class Test {
+    constructor() {
+        this.foo = 5;
+    }
+
+    bar(myarg) {
+        if (typeof myarg === "number") {
+            console.log(this.foo * myarg);
+        } else {
+            let str = "";
+            for (let i = 1; i <= this.foo; i++) {
+                str += myarg + " ";
+            }
+            console.log(str);
+        }
+    }
+}
+
+new Test().bar("Test");
+new Test().bar(10);`;
+
+        this._code = code;
+
+        codebox.className = "editor language-js";
+        jar.updateCode(code);
+        jar.updateOptions({
+            tab: ' '.repeat(4), // default is '\t'
+            indentOn: /[(\[]$/, // default is /{$/
+            spellcheck: false,  // default is false
+            addClosing: true    // default is true
+        });
+        jar.onUpdate(code => this._code = code);
+
+        // const styles = [
+        //   "dracula", "github", "solarized-dark", "solarized-light", "railscasts",
+        //   "monokai-sublime", "mono-blue", "tomorrow", "color-brewer", "zenburn",
+        //   "agate", "androidstudio", "atom-one-light", "rainbow", "vs", "atom-one-dark"
+        // ];
+
+        const link = document.createElement("link");
+        link.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/vs.min.css`;
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
 
         this.widgetWindow.getWidgetBody().append(this._editor);
 
@@ -106,9 +166,8 @@ class JSEditor {
 
     runCode() {
         console.log("Run JavaScript");
-        let codebox = docById("js_editor_codebox");
         try {
-            new Function(codebox.value)();
+            new Function(this._code)();
         } catch (e) {
             console.error(e);
         }
