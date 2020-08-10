@@ -2345,6 +2345,11 @@ function Blocks(activity) {
             return true;
         }
         if (
+            type1 === "pitchout" && type2 === "pitchin"
+        ) {
+            return true;
+        }
+        if (
             type1 === "gridout" && type2 ==="gridin"
         ) {
             return true;

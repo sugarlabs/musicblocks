@@ -674,15 +674,15 @@ function setupPitchActions() {
          * @param {String} type - required format: letter class, solfege syllable, pitch class, scalar class, scale degree, nth degree, staff y, pitch number, pitch in hertz
          * @param {Number} turtle - Turtle index in turtles.turtleList
          */
-        static getPitchInfo(type, turtle) {
+        static getPitchInfo(type, notePlayed, turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.noteStatus !== null) {
                 switch (type) {
                     case "letter class":
-                        return tur.singer.lastNotePlayed[0][0];
+                        return notePlayed[0];
                     case "solfege syllable":
-                        let lc2 = tur.singer.lastNotePlayed[0];
+                        let lc2 = notePlayed;
                         lc2 = lc2.substr(0, lc2.length - 1);
                         lc2 = lc2.replace("#", SHARP).replace("b", FLAT);
                         if (tur.singer.moveable === false) {
@@ -692,7 +692,7 @@ function setupPitchActions() {
                             return SOLFEGENAMES[i];
                         }
                     case "pitch class":
-                        let note = tur.singer.lastNotePlayed[0];
+                        let note = notePlayed;
                         let num = pitchToNumber(
                             note.substr(0, note.length - 1 ),
                             note[note.length - 1],
@@ -700,7 +700,7 @@ function setupPitchActions() {
                         );
                         return (num - 3) % 12;
                     case "scalar class":
-                        let note2 = tur.singer.lastNotePlayed[0];
+                        let note2 = notePlayed;
                         note2 = note2.substr(0, note2.length - 1);
                         note2 = note2.replace("#", SHARP).replace("b", FLAT);
                         let scalarClass = scaleDegreeToPitchMapping(
@@ -708,7 +708,7 @@ function setupPitchActions() {
                         );
                         return scalarClass[0];
                     case "scale degree":
-                        let note3 = tur.singer.lastNotePlayed[0];
+                        let note3 = notePlayed;
                         note3 = note3.substr(0, note3.length - 1);
                         note3 = note3.replace("#", SHARP).replace("b", FLAT);
                         let scalarClass1 = scaleDegreeToPitchMapping(
@@ -716,33 +716,33 @@ function setupPitchActions() {
                         );
                         return scalarClass1[0] + scalarClass1[1];
                     case "nth degree":
-                        let note4 = tur.singer.lastNotePlayed[0];
+                        let note4 = notePlayed;
                         note4 = note4.substr(0, note4.length - 1);
                         note4 = note4.replace("#", SHARP).replace("b", FLAT);
                         return _buildScale(tur.singer.keySignature)[0].indexOf(note4);
                     case "staff y":
                         if (tur.singer.lastNotePlayed.length === 0)
                             return 0;
-                        let lc1 = tur.singer.lastNotePlayed[0][0];
+                        let lc1 = notePlayed[0];
                         let o1 =
-                            tur.singer.lastNotePlayed[0].length === 2 ?
-                                tur.singer.lastNotePlayed[0][1] :
-                                tur.singer.lastNotePlayed[0][2];
+                            notePlayed.length === 2 ?
+                                notePlayed[1] :
+                                notePlayed[2];
                         // these numbers are subject to staff artwork
                         return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) *
                             YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
                     case "pitch number":
                         let obj;
                         if (tur.singer.lastNotePlayed !== null) {
-                            if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                                let len = tur.singer.lastNotePlayed[0].length;
-                                let pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
+                            if (typeof notePlayed === "string") {
+                                let len = notePlayed.length;
+                                let pitch = notePlayed.slice(0, len - 1);
                                 let octave =
-                                    parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                                    parseInt(notePlayed.slice(len - 1));
                                 obj = [pitch, octave];
                             } else {
                                 // Hertz?
-                                obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
+                                obj = frequencyToPitch(notePlayed);
                             }
                         } else if (
                             tur.singer.inNoteBlock in tur.singer.notePitches &&
@@ -768,9 +768,38 @@ function setupPitchActions() {
                             tur.singer.pitchNumberOffset;
                     case "pitch in hertz":
                         return logo.synth._getFrequency(
-                            tur.singer.lastNotePlayed[0],
+                            notePlayed,
                             logo.synth.changeInTemperament
                         );
+                    case "pitch to color":
+                        let note5 = notePlayed;
+                        if (Number(note5)) {
+                            [note5] = frequencyToPitch(note5);
+                        } else {
+                            note5 = note5.substr(0, note5.length - 1);
+                        }
+                        let attr;
+                        if (note5.includes("#")) {
+                            attr = "#";
+                        } else if (note5.includes("b")) {
+                            attr = "b";
+                        } else {
+                            attr = NATURAL;
+                        }
+                        note5 = note5.replace(attr, "");
+                        let color = NOTENAMES.indexOf(note5) * 16;
+                        if (attr = "#") color += 8;
+                        else if (attr = "b") color -= 8;
+                        return color;
+                    case "pitch to shade":
+                        let note6 = notePlayed;
+                        let octave;
+                        if (Number(note6)) {
+                            [note6, octave] = frequencyToPitch(note6);
+                        } else {
+                            octave = note6[note6.length - 1];
+                        }
+                        return (octave * 10);
                     default:
                         return "__INVALID_INPUT__";
                 }

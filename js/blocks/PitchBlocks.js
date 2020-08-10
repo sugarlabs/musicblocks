@@ -347,36 +347,70 @@ function setupPitchBlocks() {
         }
     }
 
-    class OutputToolsBlocks extends ValueBlock {
+    class CurrentPitchBlock extends ValueBlock {
+        constructor() {
+            super("currentpitch", _("current pitch"));
+            this.setPalette("pitch");
+            this.beginnerBlock(true);
+            this.hidden = true;
+            this.parameter = true;
+            this.formBlock({ outType: "pitchout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "outputtools"
+            ) {
+            } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                if (tur.singer.lastNotePlayed !== null) {
+                    return tur.singer.lastNotePlayed[0];
+                }
+            }
+        }
+    }
+
+
+    class OutputToolsBlocks extends LeftBlock {
         constructor() {
             super("outputtools");
             this.setPalette("pitch");
             this.beginnerBlock(true);
             this.extraWidth = 40;
             this.setHelpString([
-                        _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
-                        "documentation",
-                        null,
-                        "outputtoolshelp"
-                    ]);
+                _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
+                "documentation",
+                null,
+                "outputtoolshelp"
+            ]);
             this.formBlock({
-                outType: "anyout"
+                args: 1,
+                argTypes: ["pitchin"]
             });
             this.makeMacro((x, y) => [
-                [0, "print", x, y, [null, 1, null]],
-                [1, ["outputtools", { value: "pitch number" }], 0, 0, [0]],
+                [0, ["outputtools", { value: "letter class"} ], x, y, [null, 1, null]],
+                [1, ["currentpitch"], 0, 0, [0]],
             ]);
         }
 
-        arg(logo, turtle, blk) {
+        arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let notePlayed = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 return Singer.PitchActions.getPitchInfo(
-                    logo.blocks.blockList[blk].privateData, turtle
+                    logo.blocks.blockList[blk].privateData, notePlayed, turtle
                 );
             }
         }
@@ -1650,6 +1684,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new CurrentPitchBlock().setup();
     new OutputToolsBlocks().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
