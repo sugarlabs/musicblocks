@@ -6676,8 +6676,8 @@ function Block(protoblock, blocks, overrideName) {
         this._basicWheel.colors = colors;
         this._basicWheel.slicePathFunction = slicePath().DonutSlice;
         this._basicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._basicWheel.slicePathCustom.minRadiusPercent = 0;
-        this._basicWheel.slicePathCustom.maxRadiusPercent = 0.9;
+        this._basicWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._basicWheel.slicePathCustom.maxRadiusPercent = 1.0;
         this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
         this._basicWheel.titleRotateAngle = 0;
