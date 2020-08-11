@@ -219,6 +219,7 @@ function Activity() {
         let MUSICBLOCKS_EXTRAS = [
             "Tone",
             "widgets/widgetWindows",
+            "widgets/jseditor",
             "widgets/modewidget",
             "widgets/meterwidget",
             "widgets/pitchtimematrix",
@@ -2307,6 +2308,9 @@ function Activity() {
     let keyboardEnableFlag;
 
     function __keyPressed(event) {
+        if (window.widgetWindows.isOpen("JavaScript Editor") === true)
+            return;
+
         let that = this;
         let disableKeys;
 
@@ -4220,6 +4224,14 @@ function Activity() {
     //     p.popdown();
     // };
 
+    /**
+     * Toggles display of javaScript editor widget.
+     */
+    _toggleJSWindow = () => {
+        let jsEditor = new JSEditor();
+        jsEditor.init();
+    };
+
     /*
      * Shows help page
      */
@@ -5014,6 +5026,7 @@ function Activity() {
         toolbar.renderMergeIcon(_doMergeLoad);
         toolbar.renderRestoreIcon(_restoreTrash);
         toolbar.renderChooseKeyIcon(chooseKeyMenu);
+        toolbar.renderJavaScriptIcon(_toggleJSWindow);
         toolbar.renderLanguageSelectIcon(languageBox);
         toolbar.renderWrapIcon();
 

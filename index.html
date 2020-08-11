@@ -7,14 +7,10 @@
             concepts.
         </title>
 
-        <meta
-            name="viewport"
-            content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"
-        />
-        <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-        />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="css/activities.css" />
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
@@ -53,11 +49,11 @@
 
         <script src="lib/wheelnav.js" defer></script>
 
-        <link
-            rel="prefetch"
-            type="application/l10n"
-            href="./localization.ini"
-        />
+        <script src="lib/codejar.min.js" defer></script>
+
+        <script src="lib/highlight.pack.js" defer></script>
+
+        <link rel="prefetch" type="application/l10n" href="./localization.ini"/>
 
         <script data-main="js/loader" src="lib/require.js" defer></script>
 
@@ -66,11 +62,7 @@
         <link rel="icon" sizes="192x192" href="favicon.ico" />
         <meta id="theme-color" name="theme-color" content="#2196F3" />
 
-        <link
-            type="text/css"
-            href="fonts/material-icons.css"
-            rel="stylesheet"
-        />
+        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
         <link rel="stylesheet" href="lib/materialize-iso.css" />
 
         <script src="lib/easeljs.min.js" defer></script>
@@ -689,8 +681,8 @@
                                     >
                                 </li>
                                 <li>
-                                    <a 
-                                        id="wrapTurtle" 
+                                    <a
+                                        id="wrapTurtle"
                                         class="tooltipped"
                                         data-position="bottom"
                                         ><i class="material-icons md-48"
@@ -699,12 +691,22 @@
                                     >
                                 </li>
                                 <li>
-                                    <a 
-                                        id="chooseKeyIcon" 
+                                    <a
+                                        id="chooseKeyIcon"
                                         class="tooltipped"
                                         data-position="bottom"
                                         ><i class="material-icons md-48"
                                             >music_note</i
+                                        ></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        id="toggleJavaScriptIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        ><i class="material-icons md-48"
+                                            >code</i
                                         ></a
                                     >
                                 </li>
@@ -713,7 +715,7 @@
                                     id="aligns_merge_under_load"
                                     style="user-select: none; visibility: hidden;"
                                 >
-                                    <a style="color: transparent;">space</a>
+                                    <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
                                 </li>
                                 <li>
                                     <a

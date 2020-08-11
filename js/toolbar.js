@@ -76,7 +76,7 @@ function Toolbar() {
     };
 
     // let wrapTurtleTooltipData = "Wrap Turtle Off";
-    
+
     this.renderWrapIcon = function() {
         let wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = "Turtle Wrap Off";
@@ -405,6 +405,10 @@ function Toolbar() {
         };
     };
 
+    this.renderJavaScriptIcon = function(onclick) {
+        docById("toggleJavaScriptIcon").onclick = () => onclick();
+    };
+
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = function() {
@@ -528,6 +532,7 @@ function Toolbar() {
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
             ["chooseKeyIcon", _("Set Pitch Preview")],
+            ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
             ["restoreIcon", _("Restore")],
             ["beginnerMode", _("Switch to beginner mode")],
             ["advancedMode", _("Switch to advanced mode")],
@@ -587,6 +592,7 @@ function Toolbar() {
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
             _("Set Pitch Preview"),
+            _("Toggle JavaScript Editor"),
             _("Restore"),
             _("Switch to beginner mode"),
             _("Switch to advanced mode"),
@@ -623,6 +629,7 @@ function Toolbar() {
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
             ["chooseKeyIcon", _("Set Pitch Preview")],
+            ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
             ["restoreIcon", _("Restore")],
             ["languageSelectIcon", _("Select language")],
             ["save-html-beg", _("Save project as HTML"), "innerHTML"],
@@ -676,6 +683,7 @@ function Toolbar() {
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
             _("Set Pitch Preview"),
+            _("Toggle JavaScript Editor"),
             _("Restore"),
             _("Select language"),
             _("Save project as HTML"),
