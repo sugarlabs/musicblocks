@@ -169,32 +169,10 @@ class JSEditor {
 
         let jar = new CodeJar(codebox, highlight);
 
-        let code =
-`class Test {
-    constructor() {
-        this.foo = 5;
-    }
-
-    bar(myarg) {
-        if (typeof myarg === "number") {
-            console.log(this.foo * myarg);
-        } else {
-            let str = "";
-            for (let i = 1; i <= this.foo; i++) {
-                str += myarg + " ";
-            }
-            console.log(str);
-        }
-    }
-}
-
-new Test().bar("Test");
-new Test().bar(10);`;
-
-        this._code = code;
+        this._code = JS_STARTER;
 
         codebox.className = "editor language-js";
-        jar.updateCode(code);
+        jar.updateCode(this._code);
         jar.updateOptions({
             tab: ' '.repeat(4), // default is '\t'
             indentOn: /[(\[]$/, // default is /{$/

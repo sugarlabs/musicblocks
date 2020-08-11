@@ -218,6 +218,8 @@ function Activity() {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         let MUSICBLOCKS_EXTRAS = [
             "Tone",
+            "activity/js-export/export",
+            "activity/js-export/sample",
             "widgets/widgetWindows",
             "widgets/jseditor",
             "widgets/modewidget",
@@ -261,9 +263,7 @@ function Activity() {
             "activity/blocks/PenBlocks",
             "activity/blocks/MediaBlocks",
             "activity/blocks/SensorsBlocks",
-            "activity/blocks/EnsembleBlocks",
-            "activity/js-export/export",
-            "activity/js-export/script"
+            "activity/blocks/EnsembleBlocks"
         ];
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
