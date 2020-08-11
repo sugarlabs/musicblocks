@@ -45,6 +45,34 @@ class JSEditor {
 
         this._code = null;
 
+        this.currentStyle = 0;
+        this.styles = [
+            "dracula",
+            "github",
+            "solarized-dark",
+            "solarized-light",
+            "railscasts",
+            "monokai-sublime",
+            "mono-blue",
+            "tomorrow",
+            "color-brewer",
+            "zenburn",
+            "agate",
+            "androidstudio",
+            "atom-one-light",
+            "rainbow",
+            "vs",
+            "atom-one-dark"
+        ].map((name) => {
+            const link = document.createElement("link");
+            link.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/${name}.min.css`;
+            link.rel = "stylesheet";
+            link.disabled = "true";
+            document.head.appendChild(link);
+            return link;
+        });
+        this.styles[this.currentStyle].removeAttribute("disabled");
+
         // Give the DOM time to create the div
         setTimeout(() => this.setup(), 100);
     }
@@ -60,34 +88,61 @@ class JSEditor {
             menubar.style.height = "3rem";
             menubar.style.display = "flex";
             menubar.style.flexDirection = "row";
-            menubar.style.justifyContent = "end";
-            menubar.style.alignItems = "center";
+            menubar.style.justifyContent = "space-between";
             menubar.style.background = "#1e88e5";
             menubar.style.color = "white";
 
-            let generateBtn = document.createElement("span");
-                generateBtn.classList.add("material-icons");
-                generateBtn.style.borderRadius = "50%";
-                generateBtn.style.padding = ".25rem";
-                generateBtn.style.marginLeft = ".75rem";
-                generateBtn.style.fontSize = "2rem";
-                generateBtn.style.background = "#2196f3";
-                generateBtn.style.cursor = "pointer";
-                generateBtn.innerHTML = "autorenew";
-                generateBtn.onclick = this.generateCode.bind(this);
-            menubar.appendChild(generateBtn);
+            let menuLeft = document.createElement("div");
+                menuLeft.style.height = "3rem";
+                menuLeft.style.display = "flex";
+                menuLeft.style.flexDirection = "row";
+                menuLeft.style.justifyContent = "end";
+                menuLeft.style.alignItems = "center";
 
-            let runBtn = document.createElement("span");
-                runBtn.classList.add("material-icons");
-                runBtn.style.borderRadius = "50%";
-                runBtn.style.padding = ".25rem";
-                runBtn.style.marginLeft = ".75rem";
-                runBtn.style.fontSize = "2rem";
-                runBtn.style.background = "#2196f3";
-                runBtn.style.cursor = "pointer";
-                runBtn.innerHTML = "play_arrow";
-                runBtn.onclick = this.runCode.bind(this);
-            menubar.appendChild(runBtn);
+                let generateBtn = document.createElement("span");
+                    generateBtn.classList.add("material-icons");
+                    generateBtn.style.borderRadius = "50%";
+                    generateBtn.style.padding = ".25rem";
+                    generateBtn.style.marginLeft = ".75rem";
+                    generateBtn.style.fontSize = "2rem";
+                    generateBtn.style.background = "#2196f3";
+                    generateBtn.style.cursor = "pointer";
+                    generateBtn.innerHTML = "autorenew";
+                    generateBtn.onclick = this.generateCode.bind(this);
+                menuLeft.appendChild(generateBtn);
+
+                let runBtn = document.createElement("span");
+                    runBtn.classList.add("material-icons");
+                    runBtn.style.borderRadius = "50%";
+                    runBtn.style.padding = ".25rem";
+                    runBtn.style.marginLeft = ".75rem";
+                    runBtn.style.fontSize = "2rem";
+                    runBtn.style.background = "#2196f3";
+                    runBtn.style.cursor = "pointer";
+                    runBtn.innerHTML = "play_arrow";
+                    runBtn.onclick = this.runCode.bind(this);
+                menuLeft.appendChild(runBtn);
+            menubar.appendChild(menuLeft);
+
+            let menuRight = document.createElement("div");
+                menuRight.style.height = "3rem";
+                menuRight.style.display = "flex";
+                menuRight.style.flexDirection = "row";
+                menuRight.style.justifyContent = "end";
+                menuRight.style.alignItems = "center";
+
+                let styleBtn = document.createElement("span");
+                    styleBtn.classList.add("material-icons");
+                    styleBtn.style.borderRadius = "50%";
+                    styleBtn.style.padding = ".25rem";
+                    styleBtn.style.marginRight = ".75rem";
+                    styleBtn.style.fontSize = "1.5rem";
+                    styleBtn.style.background = "#2196f3";
+                    styleBtn.style.cursor = "pointer";
+                    styleBtn.innerHTML = "invert_colors";
+                    styleBtn.onclick = this.changeStyle.bind(this);
+                menuRight.appendChild(styleBtn);
+            menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
 
         let codebox = document.createElement("div");
@@ -148,17 +203,6 @@ new Test().bar(10);`;
         });
         jar.onUpdate(code => this._code = code);
 
-        // const styles = [
-        //   "dracula", "github", "solarized-dark", "solarized-light", "railscasts",
-        //   "monokai-sublime", "mono-blue", "tomorrow", "color-brewer", "zenburn",
-        //   "agate", "androidstudio", "atom-one-light", "rainbow", "vs", "atom-one-dark"
-        // ];
-
-        const link = document.createElement("link");
-        link.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/vs.min.css`;
-        link.rel = "stylesheet";
-        document.head.appendChild(link);
-
         this.widgetWindow.getWidgetBody().append(this._editor);
 
         this.widgetWindow.takeFocus();
@@ -175,5 +219,13 @@ new Test().bar(10);`;
 
     generateCode() {
         console.log("Generate JavaScript");
+    }
+
+    changeStyle(event) {
+        event.preventDefault();
+
+        this.styles[this.currentStyle].setAttribute("disabled", "true");
+        this.currentStyle = (this.currentStyle + 1) % this.styles.length;
+        this.styles[this.currentStyle].removeAttribute("disabled");
     }
 }
