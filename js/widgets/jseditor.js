@@ -27,6 +27,7 @@
 class JSEditor {
     init() {
         this.isOpen = true;
+        this._showingHelp = false;
 
         this.widgetWindow =
             window.widgetWindows.windowFor(this, "JavaScript Editor", "JavaScript Editor");
@@ -43,7 +44,9 @@ class JSEditor {
         // Position the widget and make it visible
         this._editor = document.createElement("div");
 
+        this._jar = null;
         this._code = null;
+        this._codeBck = null;
 
         this.currentStyle = 0;
         this.styles = [
@@ -78,8 +81,8 @@ class JSEditor {
     }
 
     setup() {
-        this._editor.style.width = "35rem";
-        this._editor.style.height = "40rem";
+        this._editor.style.width = "39rem";
+        this._editor.style.height = "43rem";
         this._editor.style.display = "flex";
         this._editor.style.flexDirection = "column";
 
@@ -98,6 +101,19 @@ class JSEditor {
                 menuLeft.style.flexDirection = "row";
                 menuLeft.style.justifyContent = "end";
                 menuLeft.style.alignItems = "center";
+
+                let helpBtn = document.createElement("span");
+                    helpBtn.id = "js_editor_help_btn";
+                    helpBtn.classList.add("material-icons");
+                    helpBtn.style.borderRadius = "50%";
+                    helpBtn.style.padding = ".25rem";
+                    helpBtn.style.marginLeft = ".75rem";
+                    helpBtn.style.fontSize = "2rem";
+                    helpBtn.style.background = "#2196f3";
+                    helpBtn.style.cursor = "pointer";
+                    helpBtn.innerHTML = "help_outline";
+                    helpBtn.onclick = this.toggleHelp.bind(this);
+                menuLeft.appendChild(helpBtn);
 
                 let generateBtn = document.createElement("span");
                     generateBtn.classList.add("material-icons");
@@ -167,19 +183,22 @@ class JSEditor {
             hljs.highlightBlock(editor);
         };
 
-        let jar = new CodeJar(codebox, highlight);
+        this._jar = new CodeJar(codebox, highlight);
 
         this._code = JS_STARTER;
 
         codebox.className = "editor language-js";
-        jar.updateCode(this._code);
-        jar.updateOptions({
+        this._jar.updateCode(this._code);
+        this._jar.updateOptions({
             tab: ' '.repeat(4), // default is '\t'
             indentOn: /[(\[]$/, // default is /{$/
             spellcheck: false,  // default is false
             addClosing: true    // default is true
         });
-        jar.onUpdate(code => this._code = code);
+        this._jar.onUpdate(code => {
+            if (!this._showingHelp)
+                this._code = code;
+        });
 
         this.widgetWindow.getWidgetBody().append(this._editor);
 
@@ -187,7 +206,11 @@ class JSEditor {
     }
 
     runCode() {
-        console.log("Run JavaScript");
+        if (this._showingHelp)
+            return;
+
+        console.debug("Run JavaScript");
+
         try {
             new Function(this._code)();
         } catch (e) {
@@ -196,7 +219,24 @@ class JSEditor {
     }
 
     generateCode() {
-        console.log("Generate JavaScript");
+        console.debug("Generate JavaScript");
+    }
+
+    toggleHelp() {
+        this._showingHelp = !this._showingHelp;
+        let helpBtn = docById("js_editor_help_btn");
+
+        if (this._showingHelp) {
+            console.debug("Showing Help");
+            helpBtn.style.color = "gold";
+            this._codeBck = this._code;
+            this._jar.updateCode(JS_API);
+        } else {
+            console.debug("Hiding Help");
+            helpBtn.style.color = "white";
+            this._jar.updateCode(this._codeBck);
+            this._code = this._codeBck;
+        }
     }
 
     changeStyle(event) {
