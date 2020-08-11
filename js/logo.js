@@ -1277,7 +1277,7 @@ class Logo {
 
         for (let blk = 0; blk < this.blocks.stackList.length; blk++) {
             if (
-                ["start", "drum", "status"].indexOf(
+                ["start", "drum", "status", "oscilloscope"].indexOf(
                     this.blocks.blockList[this.blocks.stackList[blk]].name
                 ) !== -1
             ) {
@@ -1368,10 +1368,10 @@ class Logo {
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
-            // Look for a status block
+            // Look for a status/oscilloscope block
             for (let b = 0; b < startBlocks.length; b++) {
                 if (
-                    this.blocks.blockList[startBlocks[b]].name === "status" &&
+                    ["status", "oscilloscope"].indexOf(this.blocks.blockList[startBlocks[b]].name) !== -1 &&
                     !this.blocks.blockList[startBlocks[b]].trash
                 ) {
                     let turtle = 0;
@@ -1394,14 +1394,14 @@ class Logo {
 
             setTimeout(() => {
                 if (delayStart !== 0) {
-                    // Launching status block would have hidden the
+                    // Launching status/oscilloscope block would have hidden the
                     // Stop Button so show it again
                     this.onRunTurtle();
                 }
 
                 // If there are start blocks, run them all
                 for (let b = 0; b < startBlocks.length; b++) {
-                    if (this.blocks.blockList[startBlocks[b]].name !== "status") {
+                    if (["status", "oscilloscope"].indexOf(this.blocks.blockList[startBlocks[b]].name) === -1 ) {
                         let turtle = this.blocks.blockList[startBlocks[b]].value;
                         let tur = this.turtles.ithTurtle(turtle);
 
@@ -1892,11 +1892,12 @@ class Logo {
                     if (
                         blk !== null &&
                         logo.blocks.blockList[blk].connections[0] !== null &&
+                        ["status", "oscilloscope"].indexOf(
                         logo.blocks.blockList[
                             logo.blocks.blockList[blk].connections[0]
-                        ].name === "status"
+                        ].name) !== -1
                     ) {
-                        console.debug("running status block");
+                        console.debug("running status/oscilloscope block");
                     } else {
                         logo.blocks.showBlocks();
                         logo.showBlocksAfterRun = false;
