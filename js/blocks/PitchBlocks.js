@@ -392,8 +392,9 @@ function setupPitchBlocks() {
             ]);
             this.formBlock({
                 args: 1,
-                argTypes: ["pitchin"]
+                argTypes: ["anyin"]
             });
+            this.parameter = false;
             this.makeMacro((x, y) => [
                 [0, ["outputtools", { value: "letter class"} ], x, y, [null, 1, null]],
                 [1, ["currentpitch"], 0, 0, [0]],
