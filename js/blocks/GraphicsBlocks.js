@@ -242,8 +242,7 @@ function setupGraphicsBlocks() {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    tur.painter.cp2x = args[0];
-                    tur.painter.cp2y = args[1];
+                    tur.painter.setControlPoint2(args);
                 }
             }
         }
@@ -280,8 +279,7 @@ function setupGraphicsBlocks() {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    tur.painter.cp1x = args[0];
-                    tur.painter.cp1y = args[1];
+                    tur.painter.setControlPoint1(args);
                 }
             }
         }
@@ -689,9 +687,9 @@ function setupGraphicsBlocks() {
     new XBlock().setup();
     new ScrollXYBlock().setup();
     new ClearBlock().setup();
-    new ControlPoint1Block().setup();
-    new ControlPoint2Block().setup();
     new BezierBlock().setup();
+    new ControlPoint2Block().setup();
+    new ControlPoint1Block().setup();
     new ArcBlock().setup();
     new SetHeadingBlock().setup();
     new SetXYBlock().setup();

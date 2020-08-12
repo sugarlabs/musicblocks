@@ -874,6 +874,28 @@ class Painter {
     }
 
     /**
+     * Sets control point 1 for bezier curve.
+     *
+     * @param {Number} x - x coordinate
+     * @param {Number} y - y coordinate
+     */
+    setControlPoint1(x, y) {
+        tur.painter.cp1x = x;
+        tur.painter.cp1y = y;
+    }
+
+    /**
+     * Sets control point 2 for bezier curve.
+     *
+     * @param {Number} x - x coordinate
+     * @param {Number} y - y coordinate
+     */
+    setControlPoint2(x, y) {
+        tur.painter.cp2x = x;
+        tur.painter.cp2y = y;
+    }
+
+    /**
      * Draws a bezier curve.
      *
      * @param x2 - the x-coordinate of the ending point
