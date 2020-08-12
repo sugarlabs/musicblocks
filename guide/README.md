@@ -44,6 +44,7 @@ also available.
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
    7. [Ensemble](#ENSEMBLE)
+   8. [Converters](#CONVERTERS)
 4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
@@ -1377,6 +1378,57 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg
  "set mouse")
+
+## <a name="CONVERTERS"></a>3.8 Converters
+
+Converts are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
+
+Generalised shape of a connector is:
+
+// insert image
+
+where right argument is converted accordingly and output is received on the left side.
+
+### <a name="y-to-pitch"></a>4.1 Y to Pitch
+
+This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument. 
+Additionally, the block can be plugged into a print block to view the converted note value.
+
+### <a name="y-to-pitch"></a>4.2 Pitch converter
+
+Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
+It can also take custom input in form or solfege, hertz, pitch number etc.
+
+Various conversion options are:
+
+#### 1. Letter class: 
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
+
+#### 2. Solfege Syllable:
+Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
+It too, gives no info regarding accidentals.
+
+#### 3. Pitch class:
+Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
+
+#### 4. Scalar class:
+Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
+
+#### 5. Scale Degree:
+Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
+
+#### 6. N^th Degree:
+Zero based index of the degree of note being played in the chosen mode.
+
+#### 7. Pitch in Hertz: 
+Returns the value in hertz of the pitch of the note being currently played.
+
+#### 8. Pitch Number:
+Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
+
+#### 9. Staff Y:
+Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+
 
 ## <a name="WIDGETS"></a>Widgets
 
