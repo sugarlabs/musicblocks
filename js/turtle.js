@@ -44,7 +44,7 @@ class Turtle {
      */
     constructor(id, name, turtles) {
         // Import members of model and view (arguments only for model)
-        importMembers(this, [id, name, turtles]);
+        importMembers(this, "", [id, name, turtles]);
 
         this.singer = new Singer(this);     // for music logic
         this.painter = new Painter(this);   // for drawing logic
