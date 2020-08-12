@@ -203,6 +203,13 @@ function WidgetWindow(key, title) {
         return el.querySelector("input");
     };
 
+    this.addRangeSlider = function(initial, parent ,min ,max) {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML =   '<input type="range" min="'+min+'" max="'+max+'" value="'+initial+'">'
+        el.querySelector("input").style = "position: absolute;top: 40%;transform: rotate(270deg);"
+        return el.querySelector("input");
+    };
+
     this.addSelectorButton = function(list, initial, parent) {
         let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<select value="' + initial + '" />';
