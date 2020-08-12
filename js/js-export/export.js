@@ -1,4 +1,34 @@
+/**
+ * @file This contains the API classes' defimitions for JavaScript based Music Blocks code.
+ * @author Anindya Kundu
+ *
+ * @copyright 2020 Anindya Kundu
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+*/
+
+/**
+ * Class pertaining to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
+ *
+ * @class
+ *
+ * Private methods' names begin with underscore '_".
+ * Unused methods' names begin with double underscore '__'.
+ * Internal functions' names are in PascalCase.
+ */
 class Mouse {
+    /**
+     * @constructor
+     *
+     * @param {Function} flow - flow function associated with the Mouse
+     */
     constructor(flow) {
         if (Mouse.MouseCount < turtles.turtleList.length) {
             this.turtle = turtles.turtleList[Mouse.MouseCount];
@@ -14,20 +44,45 @@ class Mouse {
         Mouse.MouseList.push(this);
     }
 
+    /**
+     * Executes the flow of the Mouse object.
+     *
+     * @returns {void}
+     */
     run() {
         this.flow(this.MB);
     }
 }
 
+/** number of Mouse objects in program */
 Mouse.MouseCount = 0;
+/** Mouse objects in program */
 Mouse.MouseList = [];
 
+/**
+ * Class pertaining to the execution behavior of JavaScript based Music Blocks programs.
+ *
+ * @class
+ *
+ * Private methods' names begin with underscore '_".
+ * Unused methods' names begin with double underscore '__'.
+ * Internal functions' names are in PascalCase.
+ */
 class MusicBlocks {
+    /**
+     * @constructor
+     *
+     * @param {Object} turtle - corresponding Turtle object in turtles.turtleList
+     */
     constructor(turtle) {
         this.turtle = turtle;
-        // this.flowList = [];
     }
 
+    /**
+     * Executes the Music Blocks program by running all the mice.
+     *
+     * @returns {void}
+     */
     static run() {
         for (let mouse of Mouse.MouseList) {
             mouse.run();
@@ -36,6 +91,13 @@ class MusicBlocks {
         Mouse.MouseList = [];
     }
 
+    /**
+     * Returns a promise to run a particular instruction.
+     *
+     * @param {String} command - instruction method name
+     * @param {[*]} args - arguments to the method
+     * @returns {Promise}
+     */
     runCommand(command, args) {
         return new Promise(resolve => {
             if (command === "_anonymous") {
@@ -51,6 +113,10 @@ class MusicBlocks {
         });
     }
 
+    /**
+     * Returns a Promise for ending each flow.
+     * @returns {Promise}
+     */
     get ENDFLOW() {
         return new Promise(resolve => resolve());
     }
@@ -195,255 +261,4 @@ class MusicBlocks {
     get GREY() {
         return this.turtle.chroma;
     }
-
-    // play(delay) {
-    //     let timer = setInterval(() => {
-    //         if (this.flowList.length) {
-    //             let entry = this.flowList.shift();
-    //             if (entry[0] !== "_anonymous") {
-    //                 this.turtle[entry[0]](...entry[1]);
-    //             } else {
-    //                 entry[1]();
-    //             }
-    //         } else {
-    //             clearInterval(timer);
-    //         }
-    //     }, delay);
-    // }
-
-    // goForward(steps) {
-    //     if (typeof steps === "number") {
-    //         steps = Math.floor(steps);
-    //         this.flowList.push(["doForward", [steps]]);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof steps);
-    //     }
-    // }
-
-    // goBackward(steps) {
-    //     if (typeof steps === "number") {
-    //         steps = Math.floor(steps);
-    //         this.flowList.push(["doForward", [-steps]]);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof steps);
-    //     }
-    // }
-
-    // turnLeft(degrees) {
-    //     if (typeof degrees === "number") {
-    //         this.flowList.push(["doRight", [-degrees]]);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof degrees);
-    //     }
-    // }
-
-    // turnRight(degrees) {
-    //     if (typeof degrees === "number") {
-    //         this.flowList.push(["doRight", [degrees]]);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof degrees);
-    //     }
-    // }
-
-    // setXY(x, y) {
-    //     if (typeof x === "number" && typeof y === "number") {
-    //         this.flowList.push(["doSetXY", [x, y]]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof x + ", " + typeof y
-    //         );
-    //     }
-    // }
-
-    // setHeading(degrees) {
-    //     if (typeof degrees === "number") {
-    //         this.flowList.push(["doSetHeading", [degrees]]);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof degrees);
-    //     }
-    // }
-
-    // drawArc(degrees, steps) {
-    //     if (typeof degrees === "number" && typeof steps === "number") {
-    //         this.flowList.push(["doArc", [degrees, steps]]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof degrees + ", " + typeof steps
-    //         );
-    //     }
-    // }
-
-    // drawBezier(x, y) {
-    //     if (typeof x === "number" && typeof y === "number") {
-    //         this.flowList.push(["doBezier", [
-    //             logo.cp1x[this.turtle],
-    //             logo.cp1y[this.turtle],
-    //             logo.cp2x[this.turtle],
-    //             logo.cp2y[this.turtle],
-    //             x, y
-    //         ]]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof x + ", " + typeof y
-    //         );
-    //     }
-    // }
-
-    // setBezierControlPoint1(x, y) {
-    //     if (typeof x === "number" && typeof y === "number") {
-    //         this.flowList.push([
-    //             "_anonymous",
-    //             () => [logo.cp1x[this.turtle], logo.cp1y[this.turtle]] = [x, y]
-    //         ]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof x + ", " + typeof y
-    //         );
-    //     }
-    // }
-
-    // setBezierControlPoint2(x, y) {
-    //     if (typeof x === "number" && typeof y === "number") {
-    //         this.flowList.push([
-    //             "_anonymous",
-    //             () => [logo.cp2x[this.turtle], logo.cp2y[this.turtle]] = [x, y]
-    //         ]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof x + ", " + typeof y
-    //         );
-    //     }
-    // }
-
-    // clear() {
-    //     this.turtle.doClear(true, true, true);
-    // }
-
-    // scrollXY(x, y) {
-    //     if (typeof x === "number" && typeof y === "number") {
-    //         this.flowList.push(["doScrollXY", [x, y]]);
-    //     } else {
-    //         throw Error(
-    //             'Invalid argument: expected "number", "number" but received ' +
-    //             typeof x + ", " + typeof y
-    //         );
-    //     }
-    // }
-
-    // get X() {
-    //     return logo.turtles.screenX2turtleX(this.turtle.container.x);
-    // }
-
-    // get Y() {
-    //     return logo.turtles.screenX2turtleX(this.turtle.container.y);
-    // }
-
-    // get HEADING() {
-    //     return this.turtle.orientation;
-    // }
-
-    // setColor(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetColor(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // setGrey(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetChroma(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // setShade(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetValue(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // setHue(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetHue(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // setTranslucency(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetPenAlpha(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // setPenSize(value) {
-    //     if (typeof value === "number") {
-    //         value = Math.floor(value);
-    //         value = Math.max(0, Math.min(100, value));
-    //         this.turtle.doSetPenSize(value);
-    //     } else {
-    //         throw Error('Invalid argument: expected "number" but received ' + typeof value);
-    //     }
-    // }
-
-    // penUp() {
-    //     this.turtle.doPenUp();
-    // }
-
-    // penDown() {
-    //     this.turtle.doPenDown();
-    // }
-
-    // fillBackground() {
-    //     logo.setBackgroundColor(this.turtle);
-    // }
-
-    // setFont(font) {
-    //     if (typeof font === "string") {
-    //         try {
-    //             this.doSetFont(font);
-    //         } catch (e) {
-    //             throw new Error("Font not found");
-    //         }
-    //     } else {
-    //         throw new Error('Invalid argument: expected "string" but received ' + typeof font);
-    //     }
-    // }
-
-    // get PENSIZE() {
-    //     return this.turtle.stroke;
-    // }
-
-    // get COLOR() {
-    //     return this.turtle.color;
-    // }
-
-    // get SHADE() {
-    //     return this.turtle.value;
-    // }
-
-    // get GREY() {
-    //     return this.turtle.chroma;
-    // }
 }
