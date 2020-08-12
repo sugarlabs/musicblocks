@@ -773,10 +773,51 @@ function Synth() {
         }
     });
 
-    // Until we fix #1744, disable recorder on FF
-    if (!platform.FF) {
-        // recoder breaks with Tone.js v13.8.25
-        // this.recorder = new Recorder(Tone.Destination);
+    this.setupRecorder = () => {
+        const cont = Tone.getContext();
+        const dest = cont.createMediaStreamDestination();
+        var chunks = [];
+        let stream = dest.stream;
+        if (platform.FF){
+            this.recorder = new MediaRecorder(stream, {type: "audio/wav"});
+        }
+        else {
+            this.recorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
+        }
+        for (let tur in instruments){
+            for (let synth in instruments[tur]) {
+                instruments[tur][synth].connect(dest);
+            }
+        }
+        this.recorder.ondataavailable = (evt) => {
+            console.log(evt.data);
+            if (typeof evt.data === 'undefined' || evt.data.size === 0) 
+                return;
+            chunks.push(evt.data)
+        };
+        this.recorder.onstop = (e) => {
+            if (!chunks.length) return;
+            let blob;
+            if (platform.FF) {
+                blob = new Blob(chunks, {type: "audio/wav"})
+            } else {
+                blob = new Blob(chunks, {type: "audio/ogg"})
+            }
+            chunks = [];
+            let url = URL.createObjectURL(blob);
+            download(url,"")
+        }
+        let download = (uri, name) => {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        }
+        // this.recorder.start();
+        // setTimeout(()=>{this.recorder.stop();},5000);
     }
 
     // Function that provides default parameters for various synths

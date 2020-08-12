@@ -1095,6 +1095,7 @@ class Logo {
             }
 
             this.synth.stop();
+            if (this.synth.recorder && this.synth.recorder.state == "recording") this.synth.recorder.stop();
         }
 
         if (this.cameraID != null) {
@@ -1839,6 +1840,7 @@ class Logo {
                             // Save the session
                             logo.saveLocally();
                         }
+                        if (this.synth.recorder && this.synth.recorder.state == "recording") this.synth.recorder.stop();
                     }, 1000);
                 } else if (tur.singer.suppressOutput) {
                     setTimeout(() => __checkCompletionState(), 250);

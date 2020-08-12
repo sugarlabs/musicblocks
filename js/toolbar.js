@@ -204,15 +204,7 @@ function Toolbar() {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     var saveWAV = docById("save-wav");
 
-                    // Until we fix #1744, disable recorder on FF
-                    // if (platform.FF) {
-                    saveWAV.disabled = true;
-                    saveWAV.className = "grey-text inactiveLink";
-                    // } else {
-                    //    saveWAV.onclick = function () {
-                    //        wave_onclick();
-                    //    };
-                    // }
+                    saveWAV.onclick = wave_onclick;
 
                     var saveLY = docById("save-ly");
 

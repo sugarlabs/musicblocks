@@ -215,13 +215,9 @@ function SaveInterface(PlanetInterface) {
         this.filename = filename;
         this.logo.recording = true;
         console.debug("DURING SAVE WAV");
+        this.logo.synth.setupRecorder();
+        this.logo.synth.recorder.start();
         this.logo.runLogoCommands();
-    };
-
-    this.afterSaveWAV = function(blob) {
-        console.debug("AFTER SAVE WAV");
-        //don't reset cursor
-        this.download("wav", URL.createObjectURL(blob));
     };
 
     this.saveAbc = function(filename) {
