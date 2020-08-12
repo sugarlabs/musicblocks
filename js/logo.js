@@ -1095,7 +1095,7 @@ class Logo {
             }
 
             this.synth.stop();
-            if (this.synth.recorder &&this.synth.recorder.state == "recording") this.synth.recorder.stop();
+            if (this.synth.recorder && this.synth.recorder.state == "recording") this.synth.recorder.stop();
         }
 
         if (this.cameraID != null) {
