@@ -78,6 +78,8 @@ class JSEditor {
 
         // Give the DOM time to create the div
         setTimeout(() => this.setup(), 100);
+
+        createAPIMethodList();
     }
 
     setup() {

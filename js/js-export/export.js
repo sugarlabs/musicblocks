@@ -1,5 +1,5 @@
 /**
- * @file This contains the API classes' defimitions for JavaScript based Music Blocks code.
+ * @file This contains the API classes' defimitions and utilities for JavaScript based Music Blocks code.
  * @author Anindya Kundu
  *
  * @copyright 2020 Anindya Kundu
@@ -13,6 +13,45 @@
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
 */
+
+/** contains list of methods corresponding to each Action class */
+let methodList = {};
+
+/**
+ * Creates a JSON object that maps API actions' class name to list of corresponding methods.
+ * Invoked when JSEditor is initialized.
+ */
+function createAPIMethodList() {
+    let actionClassNames = [
+        "Painter",
+        // "Painter.GraphicsActions",
+        // "Painter.PenActions",
+        // "Singer.RhythmActions",
+        // "Singer.MeterActions",
+        "Singer.PitchActions",
+        // "Singer.IntervalsActions",
+        "Singer.ToneActions",
+        "Singer.OrnamentActions",
+        "Singer.VolumeActions",
+        "Singer.DrumActions"
+    ];
+    for (let className of actionClassNames) {
+        methodList[className] = [];
+
+        if (className === "Painter") {
+            for (let methodName of Object.getOwnPropertyNames(eval(className + ".prototype"))) {
+                if (methodName !== "constructor" && !methodName.startsWith("_"))
+                    methodList[className].push(methodName);
+            }
+            continue;
+        }
+
+        for (let methodName of Object.getOwnPropertyNames(eval(className))) {
+            if (methodName !== "length" && methodName !== "prototype")
+                methodList[className].push(methodName);
+        }
+    }
+}
 
 /**
  * Class pertaining to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
@@ -110,10 +149,20 @@ class MusicBlocks {
             if (command === "_anonymous") {
                 if (args !== undefined) args();
             } else {
+                let cname = null;
+                for (let className in methodList) {
+                    if (command in methodList[className]) {
+                        cname = className;
+                        break;
+                    }
+                }
+
+                cname = "Painter" ? this.turtle.painter : eval(cname);
+
                 if (args === undefined || args === []) {
-                    this.turtle.painter[command]();
+                    cname[command]();
                 } else {
-                    this.turtle.painter[command](...args);
+                    cname[command](...args);
                 }
             }
             setTimeout(resolve, 100);
