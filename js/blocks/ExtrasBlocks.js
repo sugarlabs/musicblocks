@@ -1079,6 +1079,7 @@ function setupExtrasBlocks() {
     new OpenProjectBlock().setup();
     new FloatToStringBlock().setup();
     new DrumBlock().setup();
+    new DisplayGridBlock().setup();
     new GridBlock().setup();
     new VSpaceBlock().setup();
     new HSpaceBlock().setup();
