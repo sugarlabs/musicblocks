@@ -430,93 +430,11 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             if (args[0] === undefined)
                 return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            // Tie notes together in pairs
-            tur.singer.tie = true;
-            tur.singer.tieNotePitches = [];
-            tur.singer.tieNoteExtras = [];
-            tur.singer.tieCarryOver = 0;
-            tur.singer.tieFirstDrums = [];
-
-            let listenerName = "_tie_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                tur.singer.tie = false;
-
-                // If tieCarryOver > 0, we have one more note to play
-                if (tur.singer.tieCarryOver > 0) {
-                    if (tur.singer.justCounting.length === 0) {
-                        let lastNote = last(tur.singer.inNoteBlock);
-                        if (lastNote != null && lastNote in tur.singer.notePitches) {
-                            // Remove the note from the Lilypond list
-                            for (
-                                let i = 0;
-                                i < tur.singer.notePitches[last(tur.singer.inNoteBlock)].length;
-                                i++
-                            ) {
-                                logo.notation.notationRemoveTie(turtle);
-                            }
-                        }
-                    }
-
-                    // Restore the extra note and play it
-                    let saveBlk = tur.singer.tieNoteExtras[0];
-                    let noteValue = tur.singer.tieCarryOver;
-                    tur.singer.tieCarryOver = 0;
-
-                    tur.singer.inNoteBlock.push(saveBlk);
-
-                    tur.singer.notePitches[saveBlk] = [];
-                    tur.singer.noteOctaves[saveBlk] = [];
-                    tur.singer.noteCents[saveBlk] = [];
-                    tur.singer.noteHertz[saveBlk] = [];
-                    for (let i = 0; i < tur.singer.tieNotePitches.length; i++) {
-                        tur.singer.notePitches[saveBlk].push(tur.singer.tieNotePitches[i][0]);
-                        tur.singer.noteOctaves[saveBlk].push(tur.singer.tieNotePitches[i][1]);
-                        tur.singer.noteCents[saveBlk].push(tur.singer.tieNotePitches[i][2]);
-                        tur.singer.noteHertz[saveBlk].push(tur.singer.tieNotePitches[i][3]);
-                    }
-
-                    tur.singer.oscList[saveBlk] = tur.singer.tieNoteExtras[1];
-                    tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
-                    tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
-                    tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
-                    tur.singer.embeddedGraphics[saveBlk] = [];  // graphics will have already been rendered
-
-                    Singer.processNote(noteValue, logo.blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle);
-                    let bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
-
-                    // Wait until this note is played before continuing
-                    tur.doWait(bpmFactor / noteValue);
-
-                    tur.singer.inNoteBlock.pop();
-
-                    delete tur.singer.notePitches[saveBlk];
-                    delete tur.singer.noteOctaves[saveBlk];
-                    delete tur.singer.noteCents[saveBlk];
-                    delete tur.singer.noteHertz[saveBlk];
-                    delete tur.singer.oscList[saveBlk];
-                    delete tur.singer.noteBeat[saveBlk];
-                    delete tur.singer.noteBeatValues[saveBlk];
-                    delete tur.singer.noteDrums[saveBlk];
-                    delete tur.singer.embeddedGraphics[saveBlk];
-
-                    // Remove duplicate note
-                    logo.notation.notationStaging[turtle].pop();
-                }
-
-                tur.singer.tieNotePitches = [];
-                tur.singer.tieNoteExtras = [];
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.doTie(turtle, blk);
 
             return [args[0], 1];
         }
