@@ -958,6 +958,7 @@ function setupRhythmBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
                 logo.errorMsg(_("Note value must be greater than 0."), blk);
+
             let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             let _callback = () => {
@@ -967,7 +968,8 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, turtle, "newnote", blk, _callback);
+
+            Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
 
             return [args[1], 1];
         }
