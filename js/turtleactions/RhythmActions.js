@@ -384,5 +384,38 @@ function setupRhythmActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * "note value" block.
+         * Returns the value of the duration of the note currently being played.
+         *
+         * @param {Number} turtle - Turtle index in turtles.turtleList.
+         * @returns {Number} note value
+         */
+        static getNoteValue(turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let value = 0;
+            if (
+                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== null &&
+                tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== undefined
+            ) {
+                value =
+                    tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== 0 ?
+                        1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)] : 0;
+            } else if (tur.singer.lastNotePlayed !== null) {
+                value = tur.singer.lastNotePlayed[1];
+            } else if (
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)] !== undefined &&
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+            ) {
+                value = tur.singer.noteBeat[last(tur.singer.inNoteBlock)];
+            } else {
+                console.debug("Cannot find a note for turtle " + turtle);
+                value = 0;
+            }
+
+            return value !== 0 ? 1 / value : 0;
+        }
     }
 }
