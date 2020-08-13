@@ -1220,7 +1220,7 @@ function Activity() {
         keyNameWheel2.createWheel(keys2);
 
         var modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"];
+        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"];
         modenameWheel.slicePathFunction = slicePath().DonutSlice;
         modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
