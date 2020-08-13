@@ -78,8 +78,6 @@ class JSEditor {
 
         // Give the DOM time to create the div
         setTimeout(() => this.setup(), 100);
-
-        createAPIMethodList();
     }
 
     setup() {
@@ -214,6 +212,7 @@ class JSEditor {
         console.debug("Run JavaScript");
 
         try {
+            MusicBlocks.init(true);
             new Function(this._code)();
         } catch (e) {
             console.error(e);

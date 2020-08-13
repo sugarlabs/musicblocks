@@ -12,80 +12,56 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
-
-/** contains list of methods corresponding to each Action class */
-let methodList = {};
-
-/**
- * Creates a JSON object that maps API actions' class name to list of corresponding methods.
- * Invoked when JSEditor is initialized.
- */
-function createAPIMethodList() {
-    let actionClassNames = [
-        "Painter",
-        // "Painter.GraphicsActions",
-        // "Painter.PenActions",
-        // "Singer.RhythmActions",
-        // "Singer.MeterActions",
-        "Singer.PitchActions",
-        // "Singer.IntervalsActions",
-        "Singer.ToneActions",
-        "Singer.OrnamentActions",
-        "Singer.VolumeActions",
-        "Singer.DrumActions"
-    ];
-    for (let className of actionClassNames) {
-        methodList[className] = [];
-
-        if (className === "Painter") {
-            for (let methodName of Object.getOwnPropertyNames(eval(className + ".prototype"))) {
-                if (methodName !== "constructor" && !methodName.startsWith("_"))
-                    methodList[className].push(methodName);
-            }
-            continue;
-        }
-
-        for (let methodName of Object.getOwnPropertyNames(eval(className))) {
-            if (methodName !== "length" && methodName !== "prototype")
-                methodList[className].push(methodName);
-        }
-    }
-}
-
-/**
- * Class pertaining to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
- *
- * @class
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
+*/
+
+/**
+ * @class
+ * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
 class Mouse {
+    /** Mouse objects in program */
+    static MouseList = [];
+    /** maps Turtle object to Mouse object */
+    static TurtleMouseMap = {};
+
     /**
      * @constructor
-     *
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        if (Mouse.MouseCount < turtles.turtleList.length) {
-            this.turtle = turtles.turtleList[Mouse.MouseCount];
+        if (Mouse.MouseList.length < turtles.turtleList.length) {
+            this.turtle = turtles.turtleList[Mouse.MouseList.length];
         } else {
             turtles.addTurtle();
             this.turtle = last(turtles.turtleList);
         }
 
-        this.flow = flow;
-        this.MB = new MusicBlocks(this.turtle);
+        this.turtle.initTurtle(false);
 
-        Mouse.MouseCount++;
+        this.flow = flow;
+        this.MB = new MusicBlocks(this);    // associate a MusicBlocks object with each Mouse
+
         Mouse.MouseList.push(this);
+        Mouse.TurtleMouseMap[this.turtle] = this;
+    }
+
+    /**
+     * Returns corresponding Mouse object from a Turtle object.
+     *
+     * @static
+     * @param {Object} turtle - Turtle object
+     * @returns {Object|null} Mouse object
+     */
+    static getMouseFromTurtle(turtle) {
+        return turtle in Mouse.TurtleMouseMap ? Mouse.TurtleMouseMap[turtle] : null;
     }
 
     /**
      * Executes the flow of the Mouse object.
-     *
      * @returns {void}
      */
     run() {
@@ -93,48 +69,130 @@ class Mouse {
     }
 }
 
-/** number of Mouse objects in program */
-Mouse.MouseCount = 0;
-/** Mouse objects in program */
-Mouse.MouseList = [];
-
 /**
- * Class pertaining to the execution behavior of JavaScript based Music Blocks programs.
- *
  * @class
- *
- * Private methods' names begin with underscore '_".
- * Unused methods' names begin with double underscore '__'.
- * Internal functions' names are in PascalCase.
+ * @classdesc pertains to the execution behavior of JavaScript based Music Blocks programs.
  */
 class MusicBlocks {
+    /** contains list of methods corresponding to each Action class */
+    static _methodList = {};
+    /** custom block numbers for JavaScript based Music Blocks programs */
+    static _blockNo = -1;
+    /** whether program is running */
+    static isRun = false;
+
     /**
      * @constructor
-     *
-     * @param {Object} turtle - corresponding Turtle object in turtles.turtleList
+     * @param {Object} mouse - corresponding Mouse object in Mouse.MouseList
      */
-    constructor(turtle) {
-        this.turtle = turtle;
+    constructor(mouse) {
+        this.mouse = mouse;
+        this.turtle = mouse.turtle;
+        this.turIndex = turtles.turtleList.indexOf(this.turtle);
+
+        this.listeners = [];
+
+        if (MusicBlocks._blockNo === -1) {
+            MusicBlocks._blockNo = 0;
+        }
 
         let APIClassNames = [
             "GraphicsBlocksAPI",
-            "PenBlocksAPI"
+            "PenBlocksAPI",
+            "PitchBlocksAPI"
         ];
         for (let className of APIClassNames)
             importMembers(this, className);
     }
 
     /**
+     * Returns the next custom block number.
+     *
+     * @static
+     * @returns {String} block number
+     */
+    static get BLK() {
+        return "B" + MusicBlocks._blockNo++;
+    }
+
+    /**
+     * Initializes the JavaScript based Music BLocks program's global state at start and end of run.
+     *
+     * @static
+     * @param {Boolean} start - whether starting to run
+     */
+    static init(start) {
+        /**
+         * Creates a JSON object that maps API actions' class name to list of corresponding methods.
+         * Invoked at start of run.
+         * @returns {void}
+         */
+        function CreateAPIMethodList() {
+            let actionClassNames = [
+                "Painter",
+                // "Painter.GraphicsActions",
+                // "Painter.PenActions",
+                // "Singer.RhythmActions",
+                // "Singer.MeterActions",
+                "Singer.PitchActions",
+                // "Singer.IntervalsActions",
+                "Singer.ToneActions",
+                "Singer.OrnamentActions",
+                "Singer.VolumeActions",
+                "Singer.DrumActions"
+            ];
+            for (let className of actionClassNames) {
+                MusicBlocks._methodList[className] = [];
+
+                if (className === "Painter") {
+                    for (
+                        let methodName of Object.getOwnPropertyNames(eval(className + ".prototype"))
+                    ) {
+                        if (methodName !== "constructor" && !methodName.startsWith("_"))
+                            MusicBlocks._methodList[className].push(methodName);
+                    }
+                    continue;
+                }
+
+                for (let methodName of Object.getOwnPropertyNames(eval(className))) {
+                    if (methodName !== "length" && methodName !== "prototype")
+                        MusicBlocks._methodList[className].push(methodName);
+                }
+            }
+        }
+
+        if (start) {
+            CreateAPIMethodList();
+        } else {
+            MusicBlocks._methodList = {};
+        }
+
+        MusicBlocks._blockNo = -1;
+        MusicBlocks.isRun = false;
+
+        Mouse.MouseList = [];
+        Mouse.TurtleMouseMap = {};
+    }
+
+    /**
      * Executes the Music Blocks program by running all the mice.
      *
+     * @static
      * @returns {void}
      */
     static run() {
+        // Remove any listeners that might be still active
         for (let mouse of Mouse.MouseList) {
-            mouse.run();
+            for (let listener in mouse.turtle.listeners) {
+                logo.stage.removeEventListener(listener, mouse.turtle.listeners[listener], false);
+            }
+            mouse.turtle.listeners = {};
         }
-        Mouse.MouseCount = 0;
-        Mouse.MouseList = [];
+
+        logo.prepSynths();
+
+        for (let mouse of Mouse.MouseList)
+            mouse.run();
     }
 
     /**
@@ -150,14 +208,14 @@ class MusicBlocks {
                 if (args !== undefined) args();
             } else {
                 let cname = null;
-                for (let className in methodList) {
-                    if (command in methodList[className]) {
+                for (let className in MusicBlocks._methodList) {
+                    if (MusicBlocks._methodList[className].indexOf(command) !== -1) {
                         cname = className;
                         break;
                     }
                 }
 
-                cname = "Painter" ? this.turtle.painter : eval(cname);
+                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
 
                 if (args === undefined || args === []) {
                     cname[command]();
@@ -165,7 +223,7 @@ class MusicBlocks {
                     cname[command](...args);
                 }
             }
-            setTimeout(resolve, 100);
+            setTimeout(resolve, 500);
         });
     }
 
@@ -175,6 +233,35 @@ class MusicBlocks {
      */
     get ENDFLOW() {
         return new Promise(resolve => resolve());
+    }
+
+    /**
+     * Returns a Promise for ending a clamp block command.
+     * Executes the listener created at the initiation of the corresponding command.
+     * @returns {Promise}
+     */
+    get ENDFLOWCOMMAND() {
+        return new Promise(resolve => {
+            let signal = this.listeners.pop();
+            if (signal !== null && signal !== undefined) {
+                logo.stage.dispatchEvent(signal);
+            }
+            setTimeout(resolve, 500);
+        });
+    }
+
+    /**
+     * Returns a Promise for ending a mouse flow..
+     * @returns {Promise}
+     */
+    get ENDMOUSE() {
+        return new Promise(resolve => {
+            Mouse.MouseList.splice(Mouse.MouseList.indexOf(this.mouse), 1);
+            if (Mouse.MouseList.length === 0)
+                MusicBlocks.init(false);
+
+            resolve();
+        });
     }
 
     // ========= Getters ==========================================================================
