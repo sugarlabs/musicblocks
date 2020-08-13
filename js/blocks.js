@@ -2345,7 +2345,7 @@ function Blocks(activity) {
             return true;
         }
         if (
-            type1 === "pitchout" && type2 === "pitchin"
+            type1 === "pitchout" && type2 === "anyin"
         ) {
             return true;
         }

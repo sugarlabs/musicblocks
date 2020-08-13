@@ -448,6 +448,8 @@ function setupPitchBlocks() {
                         );
                         notePlayed = obj[0] + obj[1];
                     }
+                } else {
+                    notePlayed = arg1;
                 }
                 return Singer.PitchActions.getPitchInfo(
                     logo.blocks.blockList[blk].privateData, notePlayed, turtle
