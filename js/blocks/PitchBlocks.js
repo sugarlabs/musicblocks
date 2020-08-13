@@ -447,6 +447,8 @@ function setupPitchBlocks() {
                             logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
                         );
                         notePlayed = obj[0] + obj[1];
+                    } else {
+                        notePlayed = arg1;
                     }
                 } else if (logo.blocks.blockList[cblk1].name === "scaledegree2") {
                     notePlayed = scaleDegreeToPitchMapping(
