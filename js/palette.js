@@ -300,20 +300,6 @@ function Palettes() {
             return;
         }
 
-        if (name == "search" && this.showSearchWidget !== null) {
-            for (var i in this.dict) {
-                if (this.dict[i].visible) {
-                    this.dict[i].hideMenu();
-                    this.dict[i]._hideMenuItems();
-                }
-            }
-
-            console.debug("searching");
-            this.dict[name].visible = true;
-            this.showSearchWidget(true);
-            return;
-        }
-
         this.hideSearchWidget(true);
 
         // for (var i in this.dict) {
@@ -394,7 +380,20 @@ function Palettes() {
             document.body.style.cursor = "pointer";
         }
         row.onclick = (evt) => {
-            if (name == "search")this.showSearchWidget();
+            if (name == "search"){
+                this.showSearchWidget();
+                let closeListener = (e) => {
+                    if (docById("search").style.visibility == "visible" && 
+                        (e.target === docById("search") || docById("search").contains(e.target))) {
+                        //do nothing
+                    }
+                    else {
+                        this.hideSearchWidget();
+                        document.removeEventListener("mousedown", closeListener);
+                    }
+                };
+                document.addEventListener("mousedown", closeListener);
+            }
             else this.showPalette(name)
         }
         row.onmouseup = (evt) => {
