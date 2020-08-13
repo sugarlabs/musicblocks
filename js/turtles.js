@@ -66,6 +66,7 @@ class Turtles {
      * @returns {void}
      */
     initActions() {
+        setupRhythmActions();
         setupPitchActions();
         setupToneActions();
         setupOrnamentActions();
