@@ -345,5 +345,44 @@ function setupRhythmActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * "swing" block.
+         * Works on pairs of notes (specified by note value), adding some duration (specified by swing value)
+         * to the first note and taking the same amount from the second note.
+         *
+         * @param {Number} swingValue - swing value
+         * @param {Number} noteValue - target note value
+         * @param {Object} turtle - Turtle object
+         * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
+         * @returns {void}
+         */
+        static addSwing(swingValue, noteValue, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.suppressOutput) {
+                logo.notation.notationSwing(turtle);
+            } else {
+                tur.singer.swing.push(1 / swingValue);
+                tur.singer.swingTarget.push(1 / noteValue);
+            }
+
+            tur.singer.swingCarryOver = 0;
+
+            let listenerName = "_swing_" + turtle;
+            if (blk !== undefined && blk in blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!tur.singer.suppressOutput) {
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
+                }
+
+                tur.singer.swingCarryOver = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
     }
 }

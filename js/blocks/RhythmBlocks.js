@@ -273,7 +273,6 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            // Should never happen, but if it does, nothing to do
             if (args[2] === undefined)
                 return;
 
@@ -286,30 +285,7 @@ function setupRhythmBlocks() {
             let arg1 =
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.suppressOutput) {
-                logo.notation.notationSwing(turtle);
-            } else {
-                tur.singer.swing.push(1 / arg0);
-                tur.singer.swingTarget.push(1 / arg1);
-            }
-
-            tur.singer.swingCarryOver = 0;
-
-            let listenerName = "_swing_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                if (!tur.singer.suppressOutput) {
-                    tur.singer.swingTarget.pop();
-                    tur.singer.swing.pop();
-                }
-
-                tur.singer.swingCarryOver = 0;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.addSwing(arg0, arg1, turtle, blk);
 
             return [args[2], 1];
         }
