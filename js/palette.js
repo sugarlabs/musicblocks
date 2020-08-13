@@ -380,24 +380,7 @@ function Palettes() {
             document.body.style.cursor = "pointer";
         }
         row.onclick = (evt) => {
-            if (name == "search"){
-                this.showSearchWidget();
-                let closeListener = (e) => {
-                    if (docById("search").style.visibility == "visible" && 
-                        (e.target === docById("search") || docById("search").contains(e.target))) {
-                        //do nothing when clicked in the input field
-                    }
-                    else if (docById("ui-id-1").style.visibility == "visible" && 
-                        (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))) {
-                        //do nothing when clicked on the menu
-                    }
-                    else {
-                        this.hideSearchWidget();
-                        document.removeEventListener("mousedown", closeListener);
-                    }
-                };
-                document.addEventListener("mousedown", closeListener);
-            }
+            if (name == "search") this.showSearchWidget();
             else this.showPalette(name)
         }
         row.onmouseup = (evt) => {
