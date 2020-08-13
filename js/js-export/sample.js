@@ -149,3 +149,24 @@ new Mouse(async mouse => {
 
 MusicBlocks.run();
 `;
+
+const SAMPLE_1 =
+`new Mouse(async mouse => {
+	await mouse.playPitch("sol", 4);
+	for (let i = 0; i < 7; i++) {
+		await mouse.playNote(1/4, async () => {
+			await mouse.stepPitch(1);
+			return mouse.ENDFLOW;
+		});
+	}
+	for (let i = 0; i < 7; i++) {
+		await mouse.playNote(1/4, async () => {
+			await mouse.stepPitch(-1);
+			return mouse.ENDFLOW;
+		});
+	}
+	return mouse.ENDMOUSE;
+});
+
+MusicBlocks.run();
+`;

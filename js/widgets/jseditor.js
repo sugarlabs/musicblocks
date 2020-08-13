@@ -185,7 +185,8 @@ class JSEditor {
 
         this._jar = new CodeJar(codebox, highlight);
 
-        this._code = JS_STARTER;
+        // this._code = JS_STARTER;
+        this._code = SAMPLE_1;
 
         codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
