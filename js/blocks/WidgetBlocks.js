@@ -629,8 +629,6 @@ function setupWidgetBlocks() {
                 logo.pitchSlider = new PitchSlider();
             }
 
-            logo.pitchSlider.Sliders = [];
-
             logo.inPitchSlider = true;
 
             let listenerName = "_pitchslider_" + turtle;

@@ -14,23 +14,13 @@
 // in continuous manner.
 
 function PitchSlider() {
-    const BUTTONDIVWIDTH = 118; // 2 buttons (55 + 4) * 2
-    const BUTTONSIZE = 51;
     const ICONSIZE = 32;
-    const SEMITONE = Math.pow(2, 1 / 12);
-
-    this.Sliders = [];
-    this._focusedCellIndex = 0;
-    this._isKeyPressed = 0;
     this._delta = 0;
-    this._slider = null;
 
-    this._save = function(cell) {
+    this._save = function() {
         var that = this;
-        var cellIndex = cell.cellIndex;
         var frequency =
-            this.Sliders[cellIndex][0] *
-            Math.pow(SEMITONE, this.Sliders[cellIndex][1]);
+            this.frequency;
 
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -65,7 +55,7 @@ function PitchSlider() {
         ]);
         newStack.push([
             frequencyIdx,
-            ["number", { value: frequency.toFixed(this.places) }],
+            ["number", { value: frequency }],
             0,
             0,
             [hertzIdx]
@@ -77,13 +67,13 @@ function PitchSlider() {
 
     this.init = function(logo) {
         this._logo = logo;
-        let audioCtx = new AudioContext();
-        let osc = audioCtx.createOscillator();
-        osc.frequency.value = 440;
-        osc.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 60);
-
+        if (window.widgetWindows.openWindows["slider"])return;
+        let osc = new Tone.AMSynth().toDestination();
+        osc.triggerAttack(this.frequency);
+        for (let turtle in logo.turtles.turtleList){
+            if (logo.Oscilloscope && logo.Oscilloscope.pitchAnalysers && logo.Oscilloscope.pitchAnalysers[turtle])
+                osc.connect(logo.Oscilloscope.pitchAnalysers[turtle])
+        }
         var w = window.innerWidth;
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
@@ -94,19 +84,49 @@ function PitchSlider() {
             "slider"
         );
         this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-	    widgetWindow.show();
-        let that = this;
+	    widgetWindow.onclose = () => {
+            osc.triggerRelease();
+            widgetWindow.destroy();
+        };
         this.slider = widgetWindow.addRangeSlider(
-            440,undefined,240,700
+            this.frequency || 440,
+            undefined,
+            240,
+            700
         );
-        this.slider.oninput = () => {
+        let changeFreq = () => {
             this.frequency = this.slider.value;
             osc.frequency.linearRampToValueAtTime(
                 this.frequency,
-                audioCtx.currentTime + 0.05
+                Tone.now() + 0.05
             );
+            freqLabel.innerHTML = '<label>'+this.frequency+'</label>';
+        } 
+        this.slider.oninput = () => {
+            changeFreq();
         };
+        this.slider.onchange = () => {
+            this._save();
+            osc.triggerRelease();
+            widgetWindow.destroy();
+        }
+        let freqLabel = document.createElement("div");
+        freqLabel.className = "wfbtItem";
+        widgetWindow._toolbar.appendChild(freqLabel);
+        freqLabel.innerHTML = '<label>'+this.frequency+'</label>';
+
+        widgetWindow.addButton("up.svg",iconSize,_("Move up")).onclick = () => {
+            this.slider.value -= -50; //value is a string
+            changeFreq()
+        }
+        widgetWindow.addButton("down.svg",iconSize,_("Move down")).onclick = () => {
+            this.slider.value -= 50;
+            changeFreq()
+        }
+        widgetWindow.addButton("export-chunk.svg",ICONSIZE,_("Save")).onclick = () => {
+            osc.triggerRelease();
+            this._save();
+        }
 
         this._logo.textMsg(_("Click on the slider to create a note block."));
     };
