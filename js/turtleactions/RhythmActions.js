@@ -322,5 +322,28 @@ function setupRhythmActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        /**
+         * "multiply note value" block.
+         * Changes the duration of notes by changing their note values.
+         *
+         * @param {Number} factor - multiply factor
+         * @param {Object} turtle - Turtle object
+         * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
+         * @returns {void}
+         */
+        static multiplyNoteValue(factor, turtle, blk) {
+            let tur = turtles.ithTurtle(turtle);
+
+            tur.singer.beatFactor /= factor;
+
+            let listenerName = "_multiplybeat_" + turtle;
+            if (blk !== undefined && blk in blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => tur.singer.beatFactor *= factor;
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
     }
 }

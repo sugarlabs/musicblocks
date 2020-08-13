@@ -372,33 +372,16 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let factor;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] <= 0
-            ) {
+            let factor = args[0];
+            if (factor === null || typeof factor !== "number" || factor <= 0) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 factor = 2;
-            } else {
-                factor = args[0];
             }
 
-            logo.turtles.ithTurtle(turtle).singer.beatFactor /= factor;
-
-            let listenerName = "_multiplybeat_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                logo.turtles.ithTurtle(turtle).singer.beatFactor *= factor;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.multiplyNoteValue(factor, turtle, blk);
 
             return [args[1], 1];
         }
