@@ -24,7 +24,7 @@
 function setupRhythmActions() {
     Singer.RhythmActions = class {
         /**
-         * "note" block.
+         * "note" block, "milliseconds" block.
          * Processes and plays a note clamp.
          *
          * @static

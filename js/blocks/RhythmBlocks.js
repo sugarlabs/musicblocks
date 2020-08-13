@@ -116,7 +116,6 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            // Should never happen, but if it does, nothing to do
             if (args[1] === undefined)
                 return;
 
@@ -133,7 +132,8 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, turtle, "osctime", blk, _callback);
+
+            Singer.RhythmActions.playNote(value, "osctime", turtle, blk, _callback);
 
             return [args[1], 1];
         }
@@ -745,7 +745,8 @@ function setupRhythmBlocks() {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             }
-            Singer.playNote(value, turtle, "note", blk, _callback);
+
+            Singer.RhythmActions.playNote(value, "note", turtle, blk, _callback);
 
             return [args[1], 1];
         }
