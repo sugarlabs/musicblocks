@@ -4775,19 +4775,23 @@ function Block(protoblock, blocks, overrideName) {
 
         this._pitchWheel.navigateWheel(i);
         let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
-
+        scale = scale.splice(0, scale.length - 1);
+        let rotation = NOTENAMES.indexOf(KeySignatureEnv[0].substr(0, 1));
+        for (let j = 0; j < rotation - 1; j++) {
+            scale.push(scale.shift());
+        }
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
         if (!KeySignatureEnv[2]) {
-            for (let i in scale) {
-                if (scale[i].substr(0, 1) == FIXEDSOLFEGE[note] ||
-                scale[i].substr(0, 1) == note) {
-                    accidental = scale[i].substr(1);
-                    this.value = this.value.replace(SHARP, "").replace(FLAT, "");
-                    this.value += accidental;
-                    this.text.text = this.value;
-                }
+            if (scale[6 - i][0] == FIXEDSOLFEGE[note] ||
+                scale[6 - i][0] == note) {
+                accidental = scale[6 - i].substr(1);
+            } else {
+                accidental = EQUIVALENTACCIDENTALS[scale[6-i]].substr(1);
             }
+            this.value = this.value.replace(SHARP, "").replace(FLAT, "");
+            this.value += accidental;
+            this.text.text = this.value;
         }
 
         if (!custom) {
@@ -4841,41 +4845,41 @@ function Block(protoblock, blocks, overrideName) {
             let i = noteLabels.indexOf(selection["note"]);
             that.value = noteValues[i];
 
-            let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
-        
             // auto selection of sharps and flats in fixed solfege
             // handles the case of opening the pie-menu, not whilst in the pie-menu
             // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
             // In case of alphabet, direct comparison is performed
 
             if (!KeySignatureEnv[2]) {
-                for (let i in scale) {
-                    if (
-                        (scale[i].substr(0, 1) == FIXEDSOLFEGE[selection["note"]] ||
-                        scale[i].substr(0, 1) == selection["note"])) {
-                        selection["attr"] = scale[i].substr(1);
-                        that.value = selection["note"] + selection["attr"];
-                        switch (selection["attr"]) {
-                            case DOUBLEFLAT:
-                                that._accidentalsWheel.navigateWheel(4);
-                                break;
-                            case FLAT:
-                                that._accidentalsWheel.navigateWheel(3);
-                                break;
-                            case NATURAL:
-                                that._accidentalsWheel.navigateWheel(2);
-                                break;
-                            case SHARP:
-                                that._accidentalsWheel.navigateWheel(1);
-                                break;
-                            case DOUBLESHARP:
-                                that._accidentalsWheel.navigateWheel(0);
-                                break;
-                            default:
-                                that._accidentalsWheel.navigateWheel(2);
-                                break;
-                        }
-                    }
+                let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+                if (i == -1) {
+                    i = NOTENAMES.indexOf(selection["note"]);
+                }
+                if (scale[i][0] == FIXEDSOLFEGE[selection["note"]] ||
+                    scale[i][0] == selection["note"]) {
+                    selection["attr"] = scale[i].substr(1);
+                } else {
+                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                }
+                switch (selection["attr"]) {
+                    case DOUBLEFLAT:
+                        that._accidentalsWheel.navigateWheel(4);
+                        break;
+                    case FLAT:
+                        that._accidentalsWheel.navigateWheel(3);
+                        break;
+                    case NATURAL:
+                        that._accidentalsWheel.navigateWheel(2);
+                        break;
+                    case SHARP:
+                        that._accidentalsWheel.navigateWheel(1);
+                        break;
+                    case DOUBLESHARP:
+                        that._accidentalsWheel.navigateWheel(0);
+                        break;
+                    default:
+                        that._accidentalsWheel.navigateWheel(2);
+                        break;
                 }
             }
             that.text.text = selection["note"];
