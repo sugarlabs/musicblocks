@@ -666,18 +666,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            if (tur.singer.inNoteBlock.length > 0) {
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
-                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
-                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);
-                tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
-                    tur.singer.beatFactor
-                );
-                tur.singer.pushedNote = true;
-            }
+            Singer.RhythmActions.playRest(turtle);
         }
     }
 
