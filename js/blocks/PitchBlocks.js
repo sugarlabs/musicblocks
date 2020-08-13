@@ -448,6 +448,14 @@ function setupPitchBlocks() {
                         );
                         notePlayed = obj[0] + obj[1];
                     }
+                } else if (logo.blocks.blockList[cblk1].name === "scaledegree2") {
+                    notePlayed = scaleDegreeToPitchMapping(
+                        tur.singer.keySignature,
+                        logo.blocks.blockList[cblk1].value,
+                        tur.singer.moveable,
+                        null
+                    );
+                    notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     notePlayed = arg1;
                 }
