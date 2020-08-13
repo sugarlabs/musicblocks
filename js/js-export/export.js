@@ -99,6 +99,7 @@ class MusicBlocks {
         let APIClassNames = [
             "GraphicsBlocksAPI",
             "PenBlocksAPI",
+            "RhythmBlocksAPI",
             "PitchBlocksAPI"
         ];
         for (let className of APIClassNames)
@@ -132,7 +133,7 @@ class MusicBlocks {
                 "Painter",
                 // "Painter.GraphicsActions",
                 // "Painter.PenActions",
-                // "Singer.RhythmActions",
+                "Singer.RhythmActions",
                 // "Singer.MeterActions",
                 "Singer.PitchActions",
                 // "Singer.IntervalsActions",
@@ -162,13 +163,14 @@ class MusicBlocks {
         }
 
         if (start) {
+            MusicBlocks.isRun = true;
             CreateAPIMethodList();
         } else {
+            MusicBlocks.isRun = false;
             MusicBlocks._methodList = {};
         }
 
         MusicBlocks._blockNo = -1;
-        MusicBlocks.isRun = false;
 
         Mouse.MouseList = [];
         Mouse.TurtleMouseMap = {};
@@ -223,7 +225,7 @@ class MusicBlocks {
                     cname[command](...args);
                 }
             }
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 200);
         });
     }
 
@@ -246,7 +248,7 @@ class MusicBlocks {
             if (signal !== null && signal !== undefined) {
                 logo.stage.dispatchEvent(signal);
             }
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 200);
         });
     }
 
@@ -296,5 +298,11 @@ class MusicBlocks {
 
     get GREY() {
         return this.turtle.chroma;
+    }
+
+    // ============================== RHYTHM ==================================
+
+    get NOTEVALUE() {
+        return Singer.RhythmActions.getNoteValue(this.turIndex);
     }
 }

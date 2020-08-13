@@ -110,8 +110,13 @@ function setupRhythmActions() {
                 1 / (noteBeatValue * tur.singer.beatFactor);
 
             let listenerName = "_playnote_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 if (tur.singer.multipleVoices) {
@@ -211,8 +216,13 @@ function setupRhythmActions() {
             tur.singer.beatFactor /= newDotFactor;
 
             let listenerName = "_dot_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
@@ -244,8 +254,13 @@ function setupRhythmActions() {
             tur.singer.tieFirstDrums = [];
 
             let listenerName = "_tie_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.tie = false;
@@ -338,8 +353,13 @@ function setupRhythmActions() {
             tur.singer.beatFactor /= factor;
 
             let listenerName = "_multiplybeat_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => tur.singer.beatFactor *= factor;
 
@@ -370,8 +390,13 @@ function setupRhythmActions() {
             tur.singer.swingCarryOver = 0;
 
             let listenerName = "_swing_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 if (!tur.singer.suppressOutput) {

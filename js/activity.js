@@ -222,6 +222,7 @@ function Activity() {
             "activity/js-export/sample",
             "activity/js-export/GraphicsBlocksAPI",
             "activity/js-export/PenBlocksAPI",
+            "activity/js-export/RhythmBlocksAPI",
             "activity/js-export/PitchBlocksAPI",
             "widgets/widgetWindows",
             "widgets/jseditor",
