@@ -676,7 +676,6 @@ function setupPitchActions() {
          */
         static getPitchInfo(type, notePlayed, turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
-            console.log(notePlayed);
 
             if (tur.singer.noteStatus !== null) {
                 switch (type) {
@@ -780,17 +779,18 @@ function setupPitchActions() {
                             note5 = note5.substr(0, note5.length - 1);
                         }
                         let attr;
-                        if (note5.includes("#")) {
-                            attr = "#";
-                        } else if (note5.includes("b")) {
-                            attr = "b";
+                        console.log(note5);
+                        if (note5.includes(SHARP)) {
+                            attr = SHARP;
+                        } else if (note5.includes(FLAT)) {
+                            attr = FLAT;
                         } else {
                             attr = NATURAL;
                         }
                         note5 = note5.replace(attr, "");
                         let color = NOTENAMES.indexOf(note5) * 16;
-                        if (attr == "#") color += 8;
-                        else if (attr == "b") color -= 8;
+                        if (attr == SHARP) color += 8;
+                        else if (attr == FLAT) color -= 8;
                         return color;
                     case "pitch to shade":
                         let note6 = notePlayed;
