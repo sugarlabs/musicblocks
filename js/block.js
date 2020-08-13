@@ -4776,8 +4776,16 @@ function Block(protoblock, blocks, overrideName) {
         this._pitchWheel.navigateWheel(i);
         let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
         scale = scale.splice(0, scale.length - 1);
-        let rotation = NOTENAMES.indexOf(KeySignatureEnv[0].substr(0, 1));
-        for (let j = 0; j < rotation - 1; j++) {
+        let rotation = {
+            "A" : 2,
+            "B" : 1,
+            "C" : 0,
+            "D" : 6,
+            "E" : 5,
+            "F" : 4,
+            "G" : 3
+        };
+        for (let j = 0; j < rotation[KeySignatureEnv[0].substr(0, 1)]; j++) {
             scale.push(scale.shift());
         }
         // auto selection of sharps and flats in fixed solfege
