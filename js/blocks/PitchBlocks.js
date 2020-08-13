@@ -352,7 +352,6 @@ function setupPitchBlocks() {
             super("currentpitch", _("current pitch"));
             this.setPalette("pitch");
             this.beginnerBlock(true);
-            this.hidden = true;
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
         }
@@ -409,7 +408,47 @@ function setupPitchBlocks() {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let notePlayed = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let tur = logo.turtles.ithTurtle(turtle);
+                let arg1;
+                let notePlayed;
+                if (cblk1 != null) {
+                    arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                }
+                if (logo.blocks.blockList[cblk1].name === "notename") {
+                    notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                } else if (
+                    logo.blocks.blockList[cblk1].name === "solfege" ||
+                    logo.blocks.blockList[cblk1].name === "eastindiansolfege"
+                ) {
+                    let sol = arg1;
+                    let attr;
+                    if (sol.indexOf(SHARP) != -1) {
+                        attr = SHARP;
+                    } else if (sol.indexOf(FLAT) != -1) {
+                        attr = FLAT;
+                    } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                        attr = DOUBLEFLAT;
+                    } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                        attr = DOUBLESHARP;
+                    } else {
+                        attr = NATURAL;
+                    }
+                    if (attr != NATURAL) {
+                        sol = sol.replace(attr, "");
+                    }
+                    notePlayed = FIXEDSOLFEGE[sol];
+                    if (attr != NATURAL) {
+                        notePlayed += attr;
+                    }
+                    notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                } else if (logo.blocks.blockList[cblk1].name === "number") {
+                    if (logo.blocks.blockList[cblk1].value < 100) {
+                        let obj = numberToPitch(
+                            logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
+                        );
+                        notePlayed = obj[0] + obj[1];
+                    }
+                }
                 return Singer.PitchActions.getPitchInfo(
                     logo.blocks.blockList[blk].privateData, notePlayed, turtle
                 );
