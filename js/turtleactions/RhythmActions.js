@@ -24,6 +24,7 @@
 function setupRhythmActions() {
     Singer.RhythmActions = class {
         /**
+         * "note" block.
          * Processes and plays a note clamp.
          *
          * @static
@@ -163,9 +164,11 @@ function setupRhythmActions() {
         }
 
         /**
+         * "silence" block.
          * Plays a rest.
          *
          * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
          */
         static playRest(turtle) {
             let tur = logo.turtles.ithTurtle(turtle);
@@ -180,6 +183,46 @@ function setupRhythmActions() {
                 );
                 tur.singer.pushedNote = true;
             }
+        }
+
+        /**
+         * "dot" block.
+         * Extends the duration of a note by 50%.
+         *
+         * @param {Number} value - dot value
+         * @param {Object} turtle - Turtle object
+         * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
+         * @returns {void}
+         */
+        static doRhythmicDot(value, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            tur.singer.beatFactor *= currentDotFactor;
+            if (value >= 0) {
+                tur.singer.dotCount += value;
+            } else if (value === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                value = 0;
+            } else {
+                tur.singer.dotCount += 1 / value;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            tur.singer.beatFactor /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            if (blk !== undefined && blk in blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+                tur.singer.beatFactor *= currentDotFactor;
+                tur.singer.dotCount -= value >= 0 ? value : 1 / value;
+                let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+                tur.singer.beatFactor /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 }

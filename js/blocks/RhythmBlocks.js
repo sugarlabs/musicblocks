@@ -608,33 +608,7 @@ function setupRhythmBlocks() {
             if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
             let arg = args[0] === null ? 0 : args[0];
 
-            let tur = logo.turtles.ithTurtle(turtle);
-            let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor *= currentDotFactor;
-            if (arg >= 0) {
-                tur.singer.dotCount += arg;
-            } else if (arg === -1) {
-                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
-                arg = 0;
-            } else {
-                tur.singer.dotCount += 1 / arg;
-            }
-
-            let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor /= newDotFactor;
-
-            let listenerName = "_dot_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-                tur.singer.beatFactor *= currentDotFactor;
-                tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
-                let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-                tur.singer.beatFactor /= newDotFactor;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
 
             return [args[1], 1];
         }
