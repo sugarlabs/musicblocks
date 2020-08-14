@@ -70,5 +70,9 @@ function setupIntervalsActions() {
         static getModeLength(turtle) {
             return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
         }
+
+        static setMoveableDo(moveable, turtle) {
+            logo.turtles.ithTurtle(turtle).singer.moveable = moveable;
+        }
     }
 }

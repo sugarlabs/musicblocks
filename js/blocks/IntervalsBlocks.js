@@ -774,7 +774,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.turtles.ithTurtle(turtle).singer.moveable = args[0];
+                Singer.IntervalsActions.setMoveableDo(args[0], turtle);
             }
         }
     }
