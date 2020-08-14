@@ -457,33 +457,10 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
-            } else {
-                arg = args[0];
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            if (i !== 0) {
-                tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
-                tur.singer.noteDirection = 0;
-
-                let listenerName = "_semitone_interval_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = () => tur.singer.semitoneIntervals.pop();
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
-            }
+            Singer.IntervalsActions.setSemitoneInterval(args[0], turtle, blk);
 
             return [args[1], 1];
         }
