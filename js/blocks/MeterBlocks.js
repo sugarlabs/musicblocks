@@ -861,57 +861,16 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (
-                args.length === 2 &&
-                typeof args[0] === "number" &&
-                typeof args[1] === "number"
-            ) {
-                let bpm = (args[0] * args[1]) / 0.25;
-                let obj, target;
-                if (bpm < 30) {
-                    obj = rationalToFraction(args[1]);
-                    target = (30 * 0.25) / args[1];
-                    logo.errorMsg(
-                        obj[0] +
-                            "/" +
-                            obj[1] +
-                            " " +
-                            _("beats per minute must be greater than") +
-                            " " +
-                            target,
-                        blk
-                    );
-                    bpm = 30;
-                } else if (bpm > 1000) {
-                    obj = rationalToFraction(args[1]);
-                    target = (1000 * 0.25) / args[1];
-                    logo.errorMsg(
-                        _("maximum") +
-                            " " +
-                            obj[0] +
-                            "/" +
-                            obj[1] +
-                            " " +
-                            _("beats per minute is") +
-                            " " +
-                            target,
-                        blk
-                    );
-                    bpm = 1000;
-                } else {
-                    bpm = bpm;
-                }
+            if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
+                Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
 
                 logo.notation.notationTempo(turtle, args[0], args[1]);
-                logo.turtles.ithTurtle(turtle).singer.bpm.push(bpm);
             }
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
                 let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(
-                    logo.blocks.blockList[bpmnumberblock].text.text
-                );
+                logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }

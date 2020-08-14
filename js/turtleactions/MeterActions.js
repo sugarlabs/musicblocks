@@ -67,5 +67,43 @@ function setupMeterActions() {
             tur.singer.pickup = Math.max(0, value);
             logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
+
+        static setBPM(bpm, beatValue, turtle) {
+            let _bpm = (bpm * beatValue) / 0.25;
+            let obj, target;
+            if (_bpm < 30) {
+                obj = rationalToFraction(beatValue);
+                target = (30 * 0.25) / beatValue;
+                logo.errorMsg(
+                    obj[0] +
+                        "/" +
+                        obj[1] +
+                        " " +
+                        _("beats per minute must be greater than") +
+                        " " +
+                        target,
+                    blk
+                );
+                _bpm = 30;
+            } else if (_bpm > 1000) {
+                obj = rationalToFraction(beatValue);
+                target = (1000 * 0.25) / beatValue;
+                logo.errorMsg(
+                    _("maximum") +
+                        " " +
+                        obj[0] +
+                        "/" +
+                        obj[1] +
+                        " " +
+                        _("beats per minute is") +
+                        " " +
+                        target,
+                    _blk
+                );
+                _bpm = 1000;
+            }
+
+            logo.turtles.ithTurtle(turtle).singer.bpm.push(_bpm);
+        }
     }
 }
