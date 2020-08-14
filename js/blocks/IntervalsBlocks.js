@@ -808,7 +808,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
-                return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
+                return Singer.IntervalsActions.getModeLength(turtle);
             }
         }
     }

@@ -66,5 +66,9 @@ function setupIntervalsActions() {
         static getCurrentMode(turtle) {
             return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[1];
         }
+
+        static getModeLength(turtle) {
+            return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
+        }
     }
 }
