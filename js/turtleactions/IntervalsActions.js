@@ -29,6 +29,7 @@ function setupIntervalsActions() {
         /**
          * Utility function that returns appropriate object key in MUSICMODES corresponding to passed parameter.
          *
+         * @static
          * @param {String} mode
          * @returns {String}
          */
@@ -48,6 +49,7 @@ function setupIntervalsActions() {
          * "set key" block.
          * Sets the key and mode.
          *
+         * @static
          * @param {String} key
          * @param {String} mode
          * @param {Number} turtle - Turtle index in turtles.turtleList
@@ -81,6 +83,7 @@ function setupIntervalsActions() {
          * "current key" block.
          * Returns current key.
          *
+         * @static
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {String}
          */
@@ -92,6 +95,7 @@ function setupIntervalsActions() {
          * "current mode" block.
          * Returns current mode.
          *
+         * @static
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {String}
          */
@@ -103,6 +107,7 @@ function setupIntervalsActions() {
          * "mode length" block.
          * Returns current mode length.
          *
+         * @static
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {Number}
          */
@@ -114,6 +119,7 @@ function setupIntervalsActions() {
          * "moveable do" block.
          * Attaches or detaches solfege names to specific pitches.
          *
+         * @static
          * @param {Boolean} moveable - whether solfeges are fixed or moveable
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {void}
@@ -126,6 +132,7 @@ function setupIntervalsActions() {
          * "define mode" block.
          * Defines a custom mode by specifiying pitch numbers.
          *
+         * @static
          * @param {String} name - custom mode name
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
@@ -189,9 +196,11 @@ function setupIntervalsActions() {
         }
 
         /**
+         * "scalar interval" block.
          * Calculates a relative interval based on the current mode, skipping all notes outside of
          * the mode for the notes with it.
          *
+         * @static
          * @param {Number} value - interval value
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
@@ -219,8 +228,10 @@ function setupIntervalsActions() {
         }
 
         /**
+         * "semi-tone interval" block.
          * Calculates a relative interval of half-steps for the notes with it.
          *
+         * @static
          * @param {Number} value - interval value
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
@@ -247,6 +258,28 @@ function setupIntervalsActions() {
                 let __listener = () => tur.singer.semitoneIntervals.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
+            }
+        }
+
+        /**
+         * "temperament" block.
+         * Sets the tuning system used by Music Blocks.
+         *
+         * @static
+         * @param {String} temperament
+         * @param {String} pitch
+         * @param {Number} octave
+         * @returns {void}
+         */
+        static setTemperament(temperament, pitch, octave) {
+            logo.synth.inTemperament = temperament;
+            logo.synth.startingPitch = pitch + "" + octave;
+
+            logo.temperamentSelected.push(temperament);
+            let len = logo.temperamentSelected.length;
+
+            if (logo.temperamentSelected[len - 1] !== logo.temperamentSelected[len - 2]) {
+                logo.synth.changeInTemperament = true;
             }
         }
     }

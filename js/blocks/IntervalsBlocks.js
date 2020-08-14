@@ -26,7 +26,7 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo) {
-            Singer.setTemperament(args[0], args[1], args[2]);
+            Singer.IntervalsActions.setTemperament(args[0], args[1], args[2]);
         }
     }
 
