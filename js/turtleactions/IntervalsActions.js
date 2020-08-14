@@ -58,5 +58,9 @@ function setupIntervalsActions() {
                 logo.notation.notationKey(turtle, key, modename);
             }
         }
+
+        static getCurrentKey(turtle) {
+            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
+        }
     }
 }

@@ -859,7 +859,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
-                return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
+                return Singer.IntervalsActions.getCurrentKey(turtle);
             }
         }
     }
