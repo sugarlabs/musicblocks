@@ -675,70 +675,10 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // nothing to do
+            if (args[1] === undefined)
                 return;
-            }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.inDefineMode = true;
-            tur.singer.defineMode = [];
-            let modeName;
-            if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                modeName = "custom";
-            } else {
-                modeName = args[0].toLowerCase();
-            }
-
-            let listenerName = "_definemode_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = function(event) {
-                MUSICALMODES[modeName] = [];
-                if (tur.singer.defineMode.indexOf(0) === -1) {
-                    tur.singer.defineMode.push(0);
-                    logo.errorMsg(_("Adding missing pitch number 0."));
-                }
-
-                let pitchNumbers = tur.singer.defineMode.sort(function(a, b) {
-                    return a[0] - b[0];
-                });
-
-                for (let i = 0; i < pitchNumbers.length; i++) {
-                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        logo.errorMsg(
-                            _(
-                                "Ignoring pitch numbers less than zero or greater than eleven."
-                            )
-                        );
-                        continue;
-                    }
-
-                    if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
-                        logo.errorMsg(_("Ignoring duplicate pitch numbers."));
-                        continue;
-                    }
-
-                    if (i < pitchNumbers.length - 1) {
-                        MUSICALMODES[modeName].push(
-                            pitchNumbers[i + 1] - pitchNumbers[i]
-                        );
-                    } else {
-                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
-                    }
-                }
-
-                let cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "modename") {
-                    logo.blocks.updateBlockText(cblk);
-                }
-
-                tur.singer.inDefineMode = false;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.IntervalsActions.defineMode(args[0], turtle, blk);
 
             return [args[1], 1];
         }
