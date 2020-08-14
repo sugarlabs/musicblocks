@@ -131,5 +131,26 @@ function setupIntervalsActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        static setScalarInterval(value, turtle, blk) {
+            let arg = value;
+            if (arg === null || typeof arg !== "number") {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 1;
+            }
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
+            tur.singer.intervals.push(i);
+
+            let listenerName = "_interval_" + turtle;
+            if (blk !== undefined && blk in blocks.blockList)
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => tur.singer.intervals.pop();
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
     }
 }

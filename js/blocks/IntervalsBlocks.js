@@ -610,25 +610,7 @@ function setupIntervalsBlocks() {
             if (args[1] === undefined)
                 return;
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
-            } else {
-                arg = args[0];
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            tur.singer.intervals.push(i);
-
-            let listenerName = "_interval_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => tur.singer.intervals.pop();
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.IntervalsActions.setScalarInterval(args[0], turtle, blk);
 
             return [args[1], 1];
         }
