@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ *
+ * Utility methods are in PascalCase.
+ * Action methods are in camelCase.
 */
 
 /**
@@ -23,6 +26,12 @@
  */
 function setupIntervalsActions() {
     Singer.IntervalsActions = class {
+        /**
+         * Utility function that returns appropriate object key in MUSICMODES corresponding to passed parameter.
+         *
+         * @param {String} mode
+         * @returns {String}
+         */
         static GetModename(mode) {
             let modename = "major";
             for (let _mode in MUSICALMODES) {
@@ -35,6 +44,15 @@ function setupIntervalsActions() {
             return modename;
         }
 
+        /**
+         * "set key" block.
+         * Sets the key and mode.
+         *
+         * @param {String} key
+         * @param {String} mode
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
+         */
         static setKey(key, mode, turtle) {
             let modename = Singer.IntervalsActions.GetModename(mode);
 
@@ -59,22 +77,60 @@ function setupIntervalsActions() {
             }
         }
 
+        /**
+         * "current key" block.
+         * Returns current key.
+         *
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {String}
+         */
         static getCurrentKey(turtle) {
             return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
         }
 
+        /**
+         * "current mode" block.
+         * Returns current mode.
+         *
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {String}
+         */
         static getCurrentMode(turtle) {
             return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[1];
         }
 
+        /**
+         * "mode length" block.
+         * Returns current mode length.
+         *
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {Number}
+         */
         static getModeLength(turtle) {
             return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
         }
 
+        /**
+         * "moveable do" block.
+         * Attaches or detaches solfege names to specific pitches.
+         *
+         * @param {Boolean} moveable - whether solfeges are fixed or moveable
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
+         */
         static setMoveableDo(moveable, turtle) {
             logo.turtles.ithTurtle(turtle).singer.moveable = moveable;
         }
 
+        /**
+         * "define mode" block.
+         * Defines a custom mode by specifiying pitch numbers.
+         *
+         * @param {String} name - custom mode name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
         static defineMode(name, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
@@ -132,6 +188,15 @@ function setupIntervalsActions() {
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
+        /**
+         * Calculates a relative interval based on the current mode, skipping all notes outside of
+         * the mode for the notes with it.
+         *
+         * @param {Number} value - interval value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
         static setScalarInterval(value, turtle, blk) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
@@ -153,6 +218,14 @@ function setupIntervalsActions() {
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
+        /**
+         * Calculates a relative interval of half-steps for the notes with it.
+         *
+         * @param {Number} value - interval value
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
         static setSemitoneInterval(value, turtle, blk) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
