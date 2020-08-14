@@ -877,8 +877,7 @@ function setupIntervalsBlocks() {
                 argTypes: ["textin"],
                 defaults: ["C"]
             });
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle) {
@@ -931,35 +930,10 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
-                let modename = "major";
-                for (let mode in MUSICALMODES) {
-                    if (mode === args[1] || _(mode) === args[1]) {
-                        modename = mode;
-                        logo._modeBlock =
-                            logo.blocks.blockList[blk].connections[2];
-                        break;
-                    }
-                }
+                let modename = Singer.IntervalsActions.GetModename(args[1]);
+                logo._modeBlock = blocks.blockList[blk].connections[2];
 
-                let tur = logo.turtles.ithTurtle(turtle);
-                // Check to see if there are any transpositions on the key
-                if (tur.singer.transposition !== 0) {
-                    let noteObj = getNote(
-                        args[0],
-                        4,
-                        tur.singer.transposition,
-                        tur.singer.keySignature,
-                        false,
-                        null,
-                        logo.errorMsg,
-                        logo.synth.inTemperament
-                    );
-                    tur.singer.keySignature = noteObj[0] + " " + modename;
-                    logo.notation.notationKey(turtle, noteObj[0], modename);
-                } else {
-                    tur.singer.keySignature = args[0] + " " + modename;
-                    logo.notation.notationKey(turtle, args[0], modename);
-                }
+                Singer.IntervalsActions.setKey(args[0], args[1], turtle, blk);
 
                 if (logo.insideModeWidget) {
                     // Ensure logo the mode for Turtle 0 is set, since it is used by the mode widget

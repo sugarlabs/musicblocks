@@ -23,8 +23,40 @@
  */
 function setupIntervalsActions() {
     Singer.IntervalsActions = class {
-        static test() {
-            console.log("this is a test");
+        static GetModename(mode) {
+            let modename = "major";
+            for (let _mode in MUSICALMODES) {
+                if (_mode === mode || _(_mode) === mode) {
+                    modename = _mode;
+                    break;
+                }
+            }
+
+            return modename;
+        }
+
+        static setKey(key, mode, turtle) {
+            let modename = Singer.IntervalsActions.GetModename(mode);
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            // Check to see if there are any transpositions on the key
+            if (tur.singer.transposition !== 0) {
+                let noteObj = getNote(
+                    key,
+                    4,
+                    tur.singer.transposition,
+                    tur.singer.keySignature,
+                    false,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+                tur.singer.keySignature = noteObj[0] + " " + modename;
+                logo.notation.notationKey(turtle, noteObj[0], modename);
+            } else {
+                tur.singer.keySignature = key + " " + modename;
+                logo.notation.notationKey(turtle, key, modename);
+            }
         }
     }
 }
