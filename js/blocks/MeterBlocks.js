@@ -1103,48 +1103,19 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg0 = args[0] === null || typeof args[0] !== "number" ? 4 : args[0];
+            let arg1 = args[1] === null || typeof args[1] !== "number" ? 1 / 4 : args[1];
+
+            if (
+                args[0] === null || typeof args[0] !== "number" ||
+                args[1] === null || typeof args[1] !== "number"
+            ) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 4;
-            } else arg0 = args[0];
+            }
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
 
-            if (args[1] === null || typeof args[1] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
-            } else arg1 = args[1];
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.beatsPerMeasure = arg0 <= 0 ? 4 : arg0;
-            tur.singer.noteValuePerBeat = arg1 <= 0 ? 4 : 1 / arg1;
-
-            // setup default strong / weak beats until any strong beat block is used
-
-            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
-                tur.singer.beatList.push(1);
-                tur.singer.beatList.push(3);
-                tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
-                tur.singer.beatList.push(1);
-                tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
-                tur.singer.beatList.push(1);
-                tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
-                tur.singer.beatList.push(1);
-                tur.singer.beatList.push(4);
-                tur.singer.defaultStrongBeats = true;
-            }
-
-            logo.notation.notationMeter(
-                turtle, tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat
-            );
+            Singer.MeterActions.setMeter(arg0, arg1, turtle);
         }
     }
 

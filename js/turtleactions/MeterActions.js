@@ -23,8 +23,42 @@
  */
 function setupMeterActions() {
     Singer.MeterActions = class {
-        static test() {
-            console.log("this is a test");
+        /**
+         * @param {Number} beatCount
+         * @param {Number} noteValue
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {void}
+         */
+        static setMeter(beatCount, noteValue, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
+            tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
+
+            // setup default strong / weak beats until any strong beat block is used
+
+            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(3);
+                tur.singer.defaultStrongBeats = true;
+            }
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
+            }
+            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+                tur.singer.beatList.push(1);
+                tur.singer.defaultStrongBeats = true;
+            }
+            else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+                tur.singer.beatList.push(1);
+                tur.singer.beatList.push(4);
+                tur.singer.defaultStrongBeats = true;
+            }
+
+            logo.notation.notationMeter(
+                turtle, tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat
+            );
         }
     }
 }
