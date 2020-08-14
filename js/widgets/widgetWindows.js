@@ -206,8 +206,8 @@ function WidgetWindow(key, title) {
     this.addRangeSlider = function(initial, parent ,min ,max) {
         let el = create("div", "wfbtItem", parent || this._toolbar);
         el.style.height = "250px"
-        el.innerHTML =   '<input type="range" min="'+min+'" max="'+max+'" value="'+initial+'">'
-        el.querySelector("input").style = "transform: rotate(270deg); width:250px" //vertical
+        el.innerHTML =   '<input type="range" step=1 min="'+min+'" max="'+max+'" value="'+initial+'">'
+        el.querySelector("input").style = "position:absolute; transform:rotate(270deg); height:10px; width:57%" //vertical
         return el.querySelector("input");
     };
 

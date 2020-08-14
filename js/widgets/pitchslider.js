@@ -16,6 +16,7 @@
 function PitchSlider() {
     const ICONSIZE = 32;
     this._delta = 0;
+    const SEMITONE = Math.pow(2,1/12);
 
     this._save = function() {
         var that = this;
@@ -66,6 +67,7 @@ function PitchSlider() {
     };
 
     this.init = function(logo) {
+        if (!this.frequency) this.frequency = 392;
         this._logo = logo;
         if (window.widgetWindows.openWindows["slider"])return;
         let osc = new Tone.AMSynth().toDestination();
@@ -78,6 +80,9 @@ function PitchSlider() {
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
 
+        let min = this.frequency/2;
+        let max = this.frequency*2;
+
         var widgetWindow = window.widgetWindows.windowFor(
             this,
             "pitch slider",
@@ -89,10 +94,10 @@ function PitchSlider() {
             widgetWindow.destroy();
         };
         this.slider = widgetWindow.addRangeSlider(
-            this.frequency || 440,
+            this.frequency,
             undefined,
-            240,
-            700
+            min,
+            max
         );
         let changeFreq = () => {
             this.frequency = this.slider.value;
@@ -107,24 +112,25 @@ function PitchSlider() {
         };
         this.slider.onchange = () => {
             this._save();
-            osc.triggerRelease();
-            widgetWindow.destroy();
+            //osc.triggerRelease();
+            //widgetWindow.destroy();
         }
+
         let freqLabel = document.createElement("div");
         freqLabel.className = "wfbtItem";
         widgetWindow._toolbar.appendChild(freqLabel);
         freqLabel.innerHTML = '<label>'+this.frequency+'</label>';
 
         widgetWindow.addButton("up.svg",iconSize,_("Move up")).onclick = () => {
-            this.slider.value -= -50; //value is a string
+            this.slider.value = Math.min(this.slider.value*SEMITONE, max); //value is a string
             changeFreq()
         }
         widgetWindow.addButton("down.svg",iconSize,_("Move down")).onclick = () => {
-            this.slider.value -= 50;
+        this.slider.value = Math.max(this.slider.value/SEMITONE, min); //value is a string
             changeFreq()
         }
         widgetWindow.addButton("export-chunk.svg",ICONSIZE,_("Save")).onclick = () => {
-            osc.triggerRelease();
+            //osc.triggerRelease();
             this._save();
         }
 
