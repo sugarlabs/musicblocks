@@ -461,8 +461,8 @@ function setupPitchBlocks() {
                 } else {
                     notePlayed = arg1;
                 }
-                return Singer.PitchActions.getPitchInfo(
-                    logo.blocks.blockList[blk].privateData, notePlayed, turtle
+                return getPitchInfo(
+                    logo.blocks.blockList[blk].privateData, notePlayed, tur
                 );
             }
         }
