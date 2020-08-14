@@ -833,8 +833,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
-                let obj = logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ");
-                return obj[1];
+                return Singer.IntervalsActions.getCurrentMode(turtle);
             }
         }
     }

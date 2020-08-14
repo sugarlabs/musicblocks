@@ -62,5 +62,9 @@ function setupIntervalsActions() {
         static getCurrentKey(turtle) {
             return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
         }
+
+        static getCurrentMode(turtle) {
+            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[1];
+        }
     }
 }
