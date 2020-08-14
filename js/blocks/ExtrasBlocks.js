@@ -861,6 +861,10 @@ function setupExtrasBlocks() {
                         let tur = logo.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {
+                            if (logo.blocks.blockList[cblk].name === "grid"){
+                                let temp = new DisplayGridBlock();    
+                                temp.flow(args,logo,turtle,blk);
+                            }
                             if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {
@@ -894,6 +898,7 @@ function setupExtrasBlocks() {
         }
     }
 
+    //DEPRECATED grid: now used with print block.
     class DisplayGridBlock extends FlowBlock {
         constructor() {
             super("displaygrid", _("display grid"));
@@ -915,6 +920,7 @@ function setupExtrasBlocks() {
                 [0, "displaygrid", x, y, [null, 1, null]],
                 [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
             ]);
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -1073,8 +1079,8 @@ function setupExtrasBlocks() {
     new OpenProjectBlock().setup();
     new FloatToStringBlock().setup();
     new DrumBlock().setup();
-    new GridBlock().setup();
     new DisplayGridBlock().setup();
+    new GridBlock().setup();
     new VSpaceBlock().setup();
     new HSpaceBlock().setup();
     new WaitBlock().setup();

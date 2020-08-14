@@ -2350,7 +2350,7 @@ function Blocks(activity) {
             return true;
         }
         if (
-            type1 === "gridout" && type2 ==="gridin"
+            type1 === "gridout" && type2 === "anyin"
         ) {
             return true;
         }

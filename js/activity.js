@@ -239,6 +239,7 @@ function Activity() {
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
+            "activity/turtleactions/RhythmActions",
             "activity/turtleactions/PitchActions",
             "activity/turtleactions/ToneActions",
             "activity/turtleactions/OrnamentActions",
