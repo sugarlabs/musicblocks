@@ -68,6 +68,7 @@ class Turtles {
     initActions() {
         setupRhythmActions();
         setupPitchActions();
+        setupIntervalsActions();
         setupToneActions();
         setupOrnamentActions();
         setupVolumeActions();
