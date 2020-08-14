@@ -1035,6 +1035,7 @@ function Palette(palettes, name) {
 
     this.makeBlockFromSearch = function(protoblk, blkname, callback) {
         this._makeBlockFromPalette(protoblk, blkname, callback);
+        this.palettes.hideSearchWidget();
     };
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {
