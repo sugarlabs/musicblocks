@@ -60,5 +60,12 @@ function setupMeterActions() {
                 turtle, tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat
             );
         }
+
+        static setPickup(value, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.pickup = Math.max(0, value);
+            logo.notation.notationPickup(turtle, tur.singer.pickup);
+        }
     }
 }

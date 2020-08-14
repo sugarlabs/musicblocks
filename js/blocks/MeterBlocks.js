@@ -1054,19 +1054,13 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0;
+            let arg0 = args[0];
             if (args.length !== 1 || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
-            } else {
-                arg0 = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.pickup = Math.max(0, arg0);
-
-            logo.notation.notationPickup(turtle, tur.singer.pickup);
+            Singer.MeterActions.setPickup(arg0, turtle);
         }
     }
 
