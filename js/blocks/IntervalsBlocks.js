@@ -26,18 +26,7 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo) {
-            logo.synth.inTemperament = args[0];
-            logo.synth.startingPitch = args[1] + "" + args[2];
-
-            logo.temperamentSelected.push(args[0]);
-            let len = logo.temperamentSelected.length;
-
-            if (
-                logo.temperamentSelected[len - 1] !==
-                logo.temperamentSelected[len - 2]
-            ) {
-                logo.synth.changeInTemperament = true;
-            }
+            Singer.setTemperament(args[0], args[1], args[2]);
         }
     }
 
@@ -100,42 +89,14 @@ function setupIntervalsBlocks() {
                     if (blockToCheck.name === "intervalname") {
                         // Augmented or diminished only
                         if (blockToCheck.value[0] === "a") {
-                            return (
-                                logo.parseArg(
-                                    logo,
-                                    turtle,
-                                    cblk,
-                                    blk,
-                                    receivedArg
-                                ) + 1
-                            );
+                            return (logo.parseArg(logo, turtle, cblk, blk, receivedArg) + 1);
                         } else if (blockToCheck.value[0] === "d") {
-                            return (
-                                logo.parseArg(
-                                    logo,
-                                    turtle,
-                                    cblk,
-                                    blk,
-                                    receivedArg
-                                ) - 1
-                            );
+                            return (logo.parseArg(logo, turtle, cblk, blk, receivedArg) - 1);
                         } else {
-                            return logo.parseArg(
-                                logo,
-                                turtle,
-                                cblk,
-                                blk,
-                                receivedArg
-                            );
+                            return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         }
                     } else if (blockToCheck.name !== "doubly") {
-                        let value = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk,
-                            blk,
-                            receivedArg
-                        );
+                        let value = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         if (typeof value === "number") {
                             return value * 2;
                         } else if (typeof value === "string") {
@@ -145,11 +106,9 @@ function setupIntervalsBlocks() {
                         }
                     }
 
-                    currentblock =
-                        logo.blocks.blockList[currentblock].connections[1];
-                    if (currentblock === null) {
+                    currentblock = logo.blocks.blockList[currentblock].connections[1];
+                    if (currentblock === null)
                         return 0;
-                    }
                 }
             }
         }

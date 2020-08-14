@@ -622,6 +622,27 @@ class Singer {
         }
     }
 
+    /**
+     * Sets the tuning system used by Music Blocks.
+     *
+     * @static
+     * @param {String} temperament
+     * @param {String} pitch
+     * @param {Number} octave
+     * @returns {void}
+     */
+    static setTemperament(temperament, pitch, octave) {
+        logo.synth.inTemperament = temperament;
+        logo.synth.startingPitch = pitch + "" + octave;
+
+        logo.temperamentSelected.push(temperament);
+        let len = logo.temperamentSelected.length;
+
+        if (logo.temperamentSelected[len - 1] !== logo.temperamentSelected[len - 2]) {
+            logo.synth.changeInTemperament = true;
+        }
+    }
+
     // ========= Action =======================================================
 
     /**
