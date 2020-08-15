@@ -1129,19 +1129,20 @@ function setupWidgetBlocks() {
 
             this.formBlock({ name: _("status"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "status", x, y, [null, 1, 12]],
-                [1, "hidden", 0, 0, [0, 10]],
-                [2, "print", 0, 0, [10, 3, 4]],
-                [3, "beatvalue", 0, 0, [2]],
-                [4, "print", 0, 0, [2, 5, 6]],
-                [5, "measurevalue", 0, 0, [4]],
-                [6, "print", 0, 0, [4, 7, 8]],
-                [7, "elapsednotes", 0, 0, [6]],
-                [8, "print", 0, 0, [6, 9, null]],
-                [9, "bpmfactor", 0, 0, [8]],
-                [10, "print", 0, 0, [1, 11, 2]],
-                [11, ["outputtools", { value: "pitch in hertz"}], 0, 0, [10]],
-                [12, "hiddennoflow", 0, 0, [0, null]]
+                [0, "status", x, y, [null,1,11]],
+                [1, "hidden", 0, 0, [0,10]],
+                [2, "print",  0, 0, [10,3,4]],
+                [3, "beatvalue" , 0, 0, [2]],
+                [4, "print", 0, 0, [2,5,6]],
+                [5, "measurevalue", 0, 0,[4]],
+                [6, "print",0,0,[4,7,8]],
+                [7, "elapsednotes" , 0 , 0 ,[6]],
+                [8, "print",0,0,[6,9,null]],
+                [9, "bpmfactor", 0, 0,[8]],
+                [10, "print",0 ,0 ,[1,12,2]],
+                [11, "hiddennoflow", 0, 0,[0,null]],
+                [12, ["outputtools",{"value":"letter class"}], 0, 0,[10,13]],
+                [13, "currentpitch", 0, 0,[12]]
             ]);
         }
 

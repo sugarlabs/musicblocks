@@ -596,7 +596,7 @@ function PaletteModel(palette, palettes, name) {
                     label = "arg " + arg;
                     break;
                 case "outputtools":
-                    label = "current pitch  ";
+                    label = "pitch converter";
                     break;
                 default:
                     if (blkname != modname) {

@@ -347,36 +347,122 @@ function setupPitchBlocks() {
         }
     }
 
-    class OutputToolsBlocks extends ValueBlock {
+    class CurrentPitchBlock extends ValueBlock {
+        constructor() {
+            super("currentpitch", _("current pitch"));
+            this.setPalette("pitch");
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.formBlock({ outType: "pitchout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                    .name === "outputtools"
+            ) {
+            } else {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                if (tur.singer.lastNotePlayed !== null) {
+                    return tur.singer.lastNotePlayed[0];
+                }
+            }
+        }
+    }
+
+
+    class OutputToolsBlocks extends LeftBlock {
         constructor() {
             super("outputtools");
             this.setPalette("pitch");
             this.beginnerBlock(true);
             this.extraWidth = 40;
             this.setHelpString([
-                        _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
-                        "documentation",
-                        null,
-                        "outputtoolshelp"
-                    ]);
+                _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
+                "documentation",
+                null,
+                "outputtoolshelp"
+            ]);
             this.formBlock({
-                outType: "anyout"
+                args: 1,
+                argTypes: ["anyin"]
             });
+            this.parameter = false;
             this.makeMacro((x, y) => [
-                [0, "print", x, y, [null, 1, null]],
-                [1, ["outputtools", { value: "pitch number" }], 0, 0, [0]],
+                [0, ["outputtools", { value: "letter class"} ], x, y, [null, 1, null]],
+                [1, ["currentpitch"], 0, 0, [0]],
             ]);
         }
 
-        arg(logo, turtle, blk) {
+        arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
-                return Singer.PitchActions.getPitchInfo(
-                    logo.blocks.blockList[blk].privateData, turtle
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let tur = logo.turtles.ithTurtle(turtle);
+                let arg1;
+                let notePlayed;
+                if (cblk1 != null) {
+                    arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                }
+                if (logo.blocks.blockList[cblk1].name === "notename") {
+                    notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                } else if (
+                    logo.blocks.blockList[cblk1].name === "solfege" ||
+                    logo.blocks.blockList[cblk1].name === "eastindiansolfege"
+                ) {
+                    let sol = arg1;
+                    let attr;
+                    if (sol.indexOf(SHARP) != -1) {
+                        attr = SHARP;
+                    } else if (sol.indexOf(FLAT) != -1) {
+                        attr = FLAT;
+                    } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                        attr = DOUBLEFLAT;
+                    } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                        attr = DOUBLESHARP;
+                    } else {
+                        attr = NATURAL;
+                    }
+                    if (attr != NATURAL) {
+                        sol = sol.replace(attr, "");
+                    }
+                    notePlayed = FIXEDSOLFEGE[sol];
+                    if (attr != NATURAL) {
+                        notePlayed += attr;
+                    }
+                    notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                } else if (logo.blocks.blockList[cblk1].name === "number") {
+                    if (logo.blocks.blockList[cblk1].value < 100) {
+                        let obj = numberToPitch(
+                            logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
+                        );
+                        notePlayed = obj[0] + obj[1];
+                    } else {
+                        notePlayed = arg1;
+                    }
+                } else if (logo.blocks.blockList[cblk1].name === "scaledegree2") {
+                    notePlayed = scaleDegreeToPitchMapping(
+                        tur.singer.keySignature,
+                        logo.blocks.blockList[cblk1].value,
+                        tur.singer.moveable,
+                        null
+                    );
+                    notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                } else {
+                    notePlayed = arg1;
+                }
+                return getPitchInfo(
+                    logo.blocks.blockList[blk].privateData, notePlayed, tur
                 );
             }
         }
@@ -1650,6 +1736,7 @@ function setupPitchBlocks() {
     new DeltaPitch2Block().setup();
     new MyPitchBlock().setup();
     new PitchInHertzBlock().setup();
+    new CurrentPitchBlock().setup();
     new OutputToolsBlocks().setup();
     new MIDIBlock().setup();
     new SetPitchNumberOffsetBlock().setup();
