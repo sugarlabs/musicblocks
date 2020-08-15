@@ -442,7 +442,8 @@ function setupPitchBlocks() {
                     }
                     notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else if (logo.blocks.blockList[cblk1].name === "number") {
-                    if (logo.blocks.blockList[cblk1].value < 100) {
+                    // less than 55 hertz (A1)
+                    if (logo.blocks.blockList[cblk1].value < 55) {
                         let obj = numberToPitch(
                             logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
                         );
@@ -460,50 +461,65 @@ function setupPitchBlocks() {
                     notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof(arg1) === "string") {
-                        // Check to see if the octave was included.
-                        let lastChar = arg1.charAt(arg1.length - 1);
-                        let foundOctave = "";
-                        if ("12345678".indexOf(lastChar) !== -1) {
-                            foundOctave = lastChar;
-                            arg1 = arg1.slice(0, arg1.length - 1);
-                        }
-                        if (SOLFEGENAMES1.indexOf(arg1) !== -1) {
-                            let sol = arg1;
-                            let attr;
-                            if (sol.indexOf(SHARP) != -1) {
-                                attr = SHARP;
-                            } else if (sol.indexOf(FLAT) != -1) {
-                                attr = FLAT;
-                            } else if (sol.indexOf(DOUBLEFLAT) != -1) {
-                                attr = DOUBLEFLAT;
-                            } else if (sol.indexOf(DOUBLESHARP) != -1) {
-                                attr = DOUBLESHARP;
+                        // Is it a number encoded as a string?
+                        let foundNumber = Number(arg1);
+                        if (isNaN(foundNumber)) {
+                            // Check to see if the octave was included.
+                            let lastChar = arg1.charAt(arg1.length - 1);
+                            let foundOctave = "";
+                            if ("12345678".indexOf(lastChar) !== -1) {
+                                foundOctave = lastChar;
+                                arg1 = arg1.slice(0, arg1.length - 1);
+                            }
+                            if (SOLFEGENAMES1.indexOf(arg1) !== -1) {
+                                let sol = arg1;
+                                let attr;
+                                if (sol.indexOf(SHARP) != -1) {
+                                    attr = SHARP;
+                                } else if (sol.indexOf(FLAT) != -1) {
+                                    attr = FLAT;
+                                } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                                    attr = DOUBLEFLAT;
+                                } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                                    attr = DOUBLESHARP;
+                                } else {
+                                    attr = NATURAL;
+                                }
+                                if (attr != NATURAL) {
+                                    sol = sol.replace(attr, "");
+                                }
+                                notePlayed = FIXEDSOLFEGE[sol];
+                                if (attr != NATURAL) {
+                                    notePlayed += attr;
+                                }
+                                if (foundOctave.length === 0) {
+                                    notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                                } else {
+                                    notePlayed += foundOctave;
+                                }
+                            } else if (NOTENAMES.indexOf(arg1) !== -1) {
+                                if (foundOctave.length === 0) {
+                                    notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                                } else {
+                                    notePlayed = arg1 + foundOctave;
+                                }
                             } else {
-                                attr = NATURAL;
-                            }
-                            if (attr != NATURAL) {
-                                sol = sol.replace(attr, "");
-                            }
-                            notePlayed = FIXEDSOLFEGE[sol];
-                            if (attr != NATURAL) {
-                                notePlayed += attr;
-                            }
-                            if (foundOctave.length === 0) {
-                                notePlayed += (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
-                            } else {
-                                notePlayed += foundOctave;
-                            }
-                        } else if (NOTENAMES.indexOf(arg1) !== -1) {
-                            if (foundOctave.length === 0) {
-                                notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
-                            } else {
-                                notePlayed = arg1 + foundOctave;
+                                notePlayed = arg1;
                             }
                         } else {
-                            notePlayed = arg1;
+                            // less than 55 hertz (A1)
+                            if (foundNumber < 55) {
+                                let obj = numberToPitch(
+                                    foundNumber + tur.singer.pitchNumberOffset
+                                );
+                                notePlayed = obj[0] + obj[1];
+                            } else {
+                                notePlayed = foundNumber;
+                            }
                         }
                     } else if (typeof(arg1) === "number") {
-                        if (logo.blocks.blockList[cblk1].value < 100) {
+                        // less than 55 hertz (A1)
+                        if (logo.blocks.blockList[cblk1].value < 55) {
                             let obj = numberToPitch(
                                 logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
                             );
