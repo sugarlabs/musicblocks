@@ -1451,15 +1451,15 @@ function setupPitchBlocks() {
                 logo.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.Sliders.push([args[0], 0, 0]);
-            }
-
-            try {
-                return Singer.PitchActions.playHertz(arg, turtle);
-            } catch (e) {
-                if (e === "NoNoteError") {
-                    logo.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
-                } else {
-                    console.error(e);
+            } else {
+                try {
+                    return Singer.PitchActions.playHertz(arg, turtle);
+                } catch (e) {
+                    if (e === "NoNoteError") {
+                        logo.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
+                    } else {
+                        console.error(e);
+                    }
                 }
             }
         }
