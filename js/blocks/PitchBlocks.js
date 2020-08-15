@@ -667,7 +667,11 @@ function setupPitchBlocks() {
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
                 let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
-                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
+                while (noteIdx < 0) {
+                    noteIdx += NOTENAMES.length;
+                }
+                let note = NOTENAMES[noteIdx];
                 return (note + o2);
             } else if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
                 if (cblk1 === null) {
@@ -700,7 +704,11 @@ function setupPitchBlocks() {
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
                 let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
-                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
+                while (noteIdx < 0) {
+                    noteIdx += NOTENAMES.length;
+                }
+                let note = NOTENAMES[noteIdx];
                 return (note + o2);
             } else if (logo.blocks.blockList[cblk0].name == "pitch") {
                 if (cblk1 === null) {
@@ -709,7 +717,11 @@ function setupPitchBlocks() {
                 let posY3 = arg1 + YSTAFFNOTEHEIGHT / 2;
                 let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY3 %= YSTAFFOCTAVEHEIGHT;
-                let sol = SOLFEGENAMES[Math.floor(Math.abs(posY3 / YSTAFFNOTEHEIGHT))];
+                let noteIdx = Math.floor(posY3 / YSTAFFNOTEHEIGHT);
+                while (noteIdx < 0) {
+                    noteIdx += SOLFEGENAMES.length;
+                }
+                let sol = SOLFEGENAMES[noteIdx];
                 return [sol, o3];
             } else {
                 if (cblk1 === null) {
@@ -718,7 +730,11 @@ function setupPitchBlocks() {
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
                 let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
-                let note = NOTENAMES[Math.floor(posY2 / YSTAFFNOTEHEIGHT)];
+                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
+                while (noteIdx < 0) {
+                    noteIdx += NOTENAMES.length;
+                }
+                let note = NOTENAMES[noteIdx];
                 return (note + o2);
             }
         }
