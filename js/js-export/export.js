@@ -101,6 +101,7 @@ class MusicBlocks {
             "PenBlocksAPI",
             "RhythmBlocksAPI",
             "PitchBlocksAPI",
+            "IntervalsBlocksAPI",
             "OrnamentBlocksAPI",
             "VolumeBlocksAPI",
             "DrumBlocksAPI",
@@ -139,7 +140,7 @@ class MusicBlocks {
                 "Singer.RhythmActions",
                 // "Singer.MeterActions",
                 "Singer.PitchActions",
-                // "Singer.IntervalsActions",
+                "Singer.IntervalsActions",
                 "Singer.ToneActions",
                 "Singer.OrnamentActions",
                 "Singer.VolumeActions",
@@ -307,6 +308,20 @@ class MusicBlocks {
 
     get NOTEVALUE() {
         return Singer.RhythmActions.getNoteValue(this.turIndex);
+    }
+
+    // ============================== RHYTHM ==================================
+
+    get CURRENTKEY() {
+        return Singer.IntervalsActions.getCurrentKey(this.turIndex);
+    }
+
+    get CURRENTMODE() {
+        return Singer.IntervalsActions.getCurrentMode(this.turIndex);
+    }
+
+    get MODELENGTH() {
+        return Singer.IntervalsActions.getModeLength(this.turIndex);
     }
 
     // ============================== VOLUME ==================================

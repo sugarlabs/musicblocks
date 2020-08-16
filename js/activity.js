@@ -224,6 +224,7 @@ function Activity() {
             "activity/js-export/PenBlocksAPI",
             "activity/js-export/RhythmBlocksAPI",
             "activity/js-export/PitchBlocksAPI",
+            "activity/js-export/IntervalsBlocksAPI",
             "activity/js-export/OrnamentBlocksAPI",
             "activity/js-export/VolumeBlocksAPI",
             "activity/js-export/DrumBlocksAPI",
