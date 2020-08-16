@@ -866,7 +866,7 @@ function setupMeterBlocks() {
                 typeof args[0] === "number" &&
                 typeof args[1] === "number"
             ) {
-                let bpm = (args[0] * args[1]) / 0.25;
+                var bpm = (args[0] * args[1]) / 0.25;
                 let obj, target;
                 if (bpm < 30) {
                     obj = rationalToFraction(args[1]);
@@ -912,6 +912,9 @@ function setupMeterBlocks() {
                 logo.tempo.BPMs.push(
                     logo.blocks.blockList[bpmnumberblock].text.text
                 );
+            }
+            if (logo.inMusicKeyboard) {
+                logo.musicKeyboard.bpm = bpm;
             }
         }
     }

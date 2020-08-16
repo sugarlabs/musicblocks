@@ -20,6 +20,7 @@ function MusicKeyboard() {
     // Mapping between keycodes and virtual keyboard
     const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
+    const SPACE = 32;
 
     var saveOnKeyDown = document.onkeydown;
     var saveOnKeyUp = document.onkeyup;
@@ -155,6 +156,7 @@ function MusicKeyboard() {
         var temp1 = {};
         var temp2 = {};
         var prevKey = 0;
+        var current = [];
 
         var __startNote = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -163,6 +165,8 @@ function MusicKeyboard() {
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 var i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
+            } else if (SPACE == event.keyCode) {
+                var id = "rest";
             }
 
             var ele = docById(id);
@@ -189,21 +193,32 @@ function MusicKeyboard() {
                         temp1[id].replace(SHARP, "#").replace(FLAT, "b") +
                         ele.getAttribute("alt").split("__")[1];
                 }
-
-                that._logo.synth.trigger(
-                    0,
-                    temp2[id],
-                    1,
-                    that.instrumentMapper[id],
-                    null,
-                    null
-                );
                 prevKey = event.keyCode;
+                if (id == "rest") {    
+                    return;
+                }
+                if (that.sustain.checked){
+                    that._logo.synth.startSound(0,that.instrumentMapper[id],temp2[id])
+                } else {
+                    that._logo.synth.trigger(
+                        0,
+                        temp2[id],
+                        1,
+                        that.instrumentMapper[id],
+                        null,
+                        null
+                    );
+                }
             }
         };
 
         var __keyboarddown = function(event) {
+            if (current.indexOf(event.keyCode)>-1)return;
+
             __startNote(event);
+            current.push(event.keyCode);
+
+            event.preventDefault();
         };
 
         var __endNote = function(event) {
@@ -213,6 +228,8 @@ function MusicKeyboard() {
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 var i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
+            } else if (SPACE == event.keyCode) {
+                var id = "rest";
             }
 
             var ele = docById(id);
@@ -243,21 +260,28 @@ function MusicKeyboard() {
                 } else if (duration < 0) {
                     duration = -duration;
                 }
-
-                that._logo.synth.stopSound(
-                    0,
-                    that.instrumentMapper[id],
-                    temp2[id]
-                );
-
-                that._notesPlayed.push({
-                    startTime: startTime[id],
-                    noteOctave: temp2[id],
-                    objId: id,
-                    duration: duration,
-                    voice: that.instrumentMapper[id],
-                    blockNumber: that.blockNumberMapper[id]
-                });
+                if (id == "rest") {
+                    that._notesPlayed.push({
+                        startTime: startTime[id],
+                        noteOctave: "R",
+                        objId: null,
+                        duration: parseFloat(duration)
+                    });
+                } else {
+                    that._logo.synth.stopSound(
+                        0,
+                        that.instrumentMapper[id],
+                        temp2[id]
+                    );
+                    that._notesPlayed.push({
+                        startTime: startTime[id],
+                        noteOctave: temp2[id],
+                        objId: id,
+                        duration: duration,
+                        voice: that.instrumentMapper[id],
+                        blockNumber: that.blockNumberMapper[id]
+                    });
+                }
                 that._createTable();
 
                 delete startDate[id];
@@ -268,7 +292,9 @@ function MusicKeyboard() {
         };
 
         var __keyboardup = function(event) {
+            current.splice(current.indexOf(event.keyCode),1);   
             __endNote(event);
+            event.preventDefault();
         };
 
         document.onkeydown = __keyboarddown;
@@ -409,7 +435,7 @@ function MusicKeyboard() {
 
             selected = [];
             selectedNotes = [];
-
+            that.loopTick.stop();
             this.destroy();
         };
 
@@ -462,6 +488,12 @@ function MusicKeyboard() {
             that.doMIDI();
         };
 
+        let el = document.createElement("div");
+        el.className = "wfbtItem" 
+        this.widgetWindow._toolbar.appendChild(el);
+        el.innerHTML = '<input type="checkbox" id="sustainCheck" name="sustainCheck"><label for="sustainCheck">SUSTAIN</label>'
+        this.sustain = el.children[0];
+
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
 
         //that._createKeyboard();
@@ -478,6 +510,17 @@ function MusicKeyboard() {
         widgetWindow.getWidgetBody().style.width = "1000px";
 
         this._createKeyboard();
+        this._logo.synth.loadSynth(0,"cow bell");
+        this.loopTick = this._logo.synth.loop(
+            0,
+            "cow bell",
+            "C5",
+            1/64,
+            0,
+            this.bpm || 90,
+            1 
+        );
+        this._logo.synth.start();
 
         //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
 
@@ -2334,6 +2377,20 @@ function MusicKeyboard() {
                 parenttbl.appendChild(newel);
             }
         }
+        var parenttbl = document.getElementById("myrow");
+        var newel = document.createElement("td");
+        parenttbl.appendChild(newel)
+        newel.style.textAlign = "center";
+        newel.setAttribute("id", "rest");
+        newel.setAttribute(
+            "alt","R__"
+        );
+        newel.innerHTML =
+            "<small>(" +
+            "REST" +
+            ")</small><br/>";
+        newel.style.position = "relative";
+        newel.style.zIndex = "100";
 
         for (var i = 0; i < that.idContainer.length; i++) {
             this.loadHandler(
