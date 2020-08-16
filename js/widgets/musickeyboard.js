@@ -520,7 +520,7 @@ function MusicKeyboard() {
             this.bpm || 90,
             1 
         );
-        this._logo.synth.start();
+        setTimeout(()=>{this._logo.synth.start();},500)
 
         //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
 
