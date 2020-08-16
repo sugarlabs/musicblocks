@@ -374,7 +374,7 @@ function setupPitchActions() {
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @throws {String} No Note Error
          */
-        static playHertz(hertz, turtle) {
+        static playHertz(hertz, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
             let obj = frequencyToPitch(hertz);
@@ -477,7 +477,8 @@ function setupPitchActions() {
                     );
                 }
             } else {
-                throw "NoNoteError";
+                Singer.processPitch(note, octave, cents, turtle, blk);
+                // throw "NoNoteError";
             }
         }
 

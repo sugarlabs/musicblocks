@@ -1453,7 +1453,7 @@ function setupPitchBlocks() {
                 logo.pitchSlider.Sliders.push([args[0], 0, 0]);
             } else {
                 try {
-                    return Singer.PitchActions.playHertz(arg, turtle);
+                    return Singer.PitchActions.playHertz(arg, turtle, blk);
                 } catch (e) {
                     if (e === "NoNoteError") {
                         logo.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
