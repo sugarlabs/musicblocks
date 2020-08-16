@@ -100,7 +100,8 @@ class MusicBlocks {
             "GraphicsBlocksAPI",
             "PenBlocksAPI",
             "RhythmBlocksAPI",
-            "PitchBlocksAPI"
+            "PitchBlocksAPI",
+            "VolumeBlocksAPI"
         ];
         for (let className of APIClassNames)
             importMembers(this, className);
@@ -304,5 +305,11 @@ class MusicBlocks {
 
     get NOTEVALUE() {
         return Singer.RhythmActions.getNoteValue(this.turIndex);
+    }
+
+    // ============================== VOLUME ==================================
+
+    get MASTERVOLUME() {
+        return Singer.VolumeActions.masterVolume;
     }
 }
