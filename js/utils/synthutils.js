@@ -1603,8 +1603,10 @@ function Synth() {
         let synthA = instruments[turtle][instrumentName] 
         let flag = instrumentsSource[instrumentName][0]
         let loopA = new Tone.Loop(time => {
-            if (flag == 1)
+            if (flag == 1) {
+                this.setVolume(turtle,instrumentName,velocity*100)
                 instruments[turtle][instrumentName].start();
+            }
             else
                 synthA.triggerAttackRelease(note, duration, time, velocity);
         }, 60/bpm).start(start);

@@ -518,7 +518,7 @@ function MusicKeyboard() {
             1/64,
             0,
             this.bpm || 90,
-            1 
+            0.07 
         );
         setTimeout(()=>{this._logo.synth.start();},500)
 
